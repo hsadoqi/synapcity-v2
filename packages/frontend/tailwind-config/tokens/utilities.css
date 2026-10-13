@@ -24,6 +24,7 @@
   --divider: var(--muted-foreground);
   --input: var(--muted-background);
   --ring: var(--base);
+  --link: var(--base-600);
   --sidebar: var(--base-50);
   --sidebar-foreground: var(--foreground);
   --sidebar-primary: var(--primary);
@@ -55,6 +56,7 @@
   --divider: var(--muted-foreground);
   --input: var(--muted-background);
   --ring: var(--base);
+  --link: var(--base-400);
   --sidebar: var(--base-900);
   --sidebar-foreground: var(--foreground);
   --sidebar-primary: var(--primary);
