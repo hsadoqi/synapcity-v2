@@ -1,0 +1,10 @@
+{
+  "extends": "@synapcity/dev-typescript-config/react-library.json",
+  "compilerOptions": {
+    "strictNullChecks": true,
+    "module": "preserve",
+    "moduleResolution": "bundler"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", ".turbo"]
+}

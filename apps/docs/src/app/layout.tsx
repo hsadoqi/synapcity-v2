@@ -5,6 +5,7 @@ import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import RootProviders from './providers';
 import RootShell from '@synapcity/frontend-ui/blocks/root-shell';
+import { createMetadata } from '@synapcity/frontend-site/metadata';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -17,10 +18,7 @@ const geistMono = localFont({
   variable: '--font-geist-mono',
 });
 
-export const metadata: Metadata = {
-  title: 'Synapcity',
-  description: 'A connected workspace for thinking, planning, and doing.',
-};
+export const metadata: Metadata = createMetadata({ title: 'Synapcity Docs' });
 
 export default function RootLayout({
   children,

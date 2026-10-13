@@ -13,6 +13,7 @@
     "ui:add": "pnpm dlx shadcn@latest add"
   },
   "dependencies": {
+    "@synapcity/frontend-site": "workspace:*",
     "@synapcity/frontend-ui": "workspace:*",
     "@tailwindcss/postcss": "^4.3.3",
     "next": "16.3.8",
