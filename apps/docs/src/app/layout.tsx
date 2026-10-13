@@ -17,7 +17,7 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: 'Synapcity Docs',
   description:
-    'Documentation for Synapcity, the open-source platform for building decentralized applications.',
+    'Documentation for Synapcity, a connected workspace for thinking, planning, and doing.',
 };
 
 export default function RootLayout({
