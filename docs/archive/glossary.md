@@ -1,0 +1,112 @@
+# Working glossary and terminology ledger
+
+**Status:** Canonical terminology governance; most product labels below remain working terms  
+**Purpose:** Prevent repeated vocabulary from becoming an accidental naming, schema, route, or package decision
+
+## How to read this glossary
+
+Each entry has two independent statuses:
+
+- **Concept status** — whether the underlying product idea is adopted, deferred, or unresolved.
+- **Term status** — whether the displayed label is accepted, provisional, contaminated, implementation-specific, or unresolved.
+
+An adopted concept with a provisional label is not permission to create a type, table, route, package, API, or user-facing name from that label.
+
+## Controlled status labels
+
+| Status | Meaning |
+|---|---|
+| Accepted term | Approved controlled vocabulary within the stated scope |
+| Project identifier | Used to identify this project; formal brand review may remain open |
+| Strong working term | Clear and useful current label, still subject to the naming pass |
+| Provisional handle | Temporary label used so the concept can be discussed |
+| Semantically contaminated | Used for several incompatible concepts; never use unqualified |
+| Implementation-specific | Describes a framework, fixture, store, or current mechanism rather than product vocabulary |
+| Deferred | Naming is unnecessary until the deferred concept enters scope |
+| Unresolved | No term has been accepted |
+
+## Product vocabulary
+
+| Working label | Concept definition | Concept status | Term status | Guardrail |
+|---|---|---|---|---|
+| Synapcity | The overall personal working environment described by `PRODUCT.md` | Adopted | Project identifier; formal brand status not separately adjudicated | Do not infer market positioning from the project name |
+| Global operation / Global context | Working across Synapcity without being scoped to one user-defined contextual environment | Adopted | Provisional handle | Global is a legitimate context, not “no context” |
+| Space | A user-defined contextual working environment | Adopted | Provisional handle; final noun unresolved | Do not create `Space` types, tables, or packages solely from this label. Owner-approved exception (2026-10-05): placeholder route scaffolds `/home/spaces` and `/home/spaces/[spaceId]` exist in `apps/web`. The segment is a working label, not a naming decision, and renames with the final noun |
+| Context | The environment within which the user is operating | Adopted semantic dimension | Provisional and overloaded | Qualify product context to distinguish it from React Context and fixture fields |
+| Surface | The working capability currently in use within a context | Adopted semantic dimension | Provisional handle | A surface is not automatically a canonical owner |
+| Canonical information / canonical thing | A meaningfully stable thing whose identity does not depend on each context or representation in which it appears | Adopted reasoning concept | Provisional architecture/product language | Does not imply a universal entity table or base class |
+| Contextual participation | A canonical thing being relevant or present within a context without implying existential ownership | Adopted | Provisional handle | Exact record, lifecycle, and user-facing word are unresolved |
+| Document | General-purpose textual composition capability; Lexical is the accepted editor direction | Adopted | Strong working term | Schema, envelope, nodes, routes, and persistence remain unresolved |
+| Dashboard | Product-defined spatial composition surface | Adopted | Strong working term | Global Home is not automatically a Dashboard |
+| Widget | Product-defined configurable interface used in Dashboard composition | Adopted | Strong working term | Do not infer a registry, plugin system, or exactly-one-source model |
+| Application-level utility panel | Persistent-shell utility surface that augments current work | Adopted | Descriptive concept; “Global Panel” is provisional | Distinct from the Document contextual sidebar |
+| Document contextual sidebar | Document-specific surface for related context and actions | Adopted | Descriptive provisional handle | Shared primitives with the utility panel are optional, not assumed |
+| Home | A global or contextual orientation/default-presentation concept | Adopted need; detailed model unresolved | Provisional handle | Global Home/Dashboard relationship remains open |
+| Capture | Low-interruption recording behavior | Adopted requirement | Strong working verb/noun; lifecycle noun unresolved | The experimental `CaptureItem` is not automatically adopted |
+| Addressability | Ability for meaningful supported things or internal regions to be targeted for navigation, connection, annotation, history, or resumption | Adopted direction | Reasoning term | Does not mean every editor node gets a global ID |
+| Connection / reference | Meaningful association or reference among addressable targets | Adopted direction; taxonomy unresolved | Provisional and potentially distinct terms | Do not collapse participation, links, comments, annotations, containment, or provenance into one edge |
+| Comment / annotation | Potential target-relative contextual information | Adopted direction; detailed model unresolved | Provisional | Threading, authorship, status, visibility, and lifecycle remain open |
+| Copy | New independent information that may diverge from its origin | Adopted semantic outcome | Strong working term | Provenance rules unresolved |
+| Fork / detach | Intentional separation from previously shared identity, with appropriate provenance | Adopted semantic outcome | Provisional pair | UX and lineage behavior unresolved |
+| History | Umbrella concern for meaningful change over time | Adopted direction | Provisional umbrella | Must not collapse versions, provenance, activity, restoration, audit, and telemetry |
+| Provenance | Where something originated or how it came to exist | Adopted direction | Strong working term | Storage and retention unresolved |
+| Resumption / continuity | Returning to meaningful work without reconstructing all context | Adopted requirement | Provisional language | “Continue” has no canonical ranking semantics yet |
+| Data Source | Possible abstraction for where capabilities obtain information | Unresolved hypothesis | Unresolved | Do not create source APIs, tables, or packages from symmetry alone |
+| Task / Goal / Habit | Future specialized product-defined capabilities | Deferred | Deferred | Do not let them dictate the current schema or MVP |
+
+## Semantically contaminated or unsafe terms
+
+### Note
+
+**Status:** Semantically contaminated. Never use without qualification.
+
+The experimental evidence used “Note” for at least:
+
+- a persisted utility-panel scratch item;
+- a capture classification value;
+- a possible synonym for Document;
+- generic prose and an unrelated icon name.
+
+Synapcity has not decided whether a Note is a capability, a lifecycle stage, a Document synonym, a lightweight object, or no controlled term at all.
+
+### Context
+
+**Status:** Adopted product concept with overloaded terminology.
+
+Qualify references as **product context**, **React Context**, **fixture category**, or another exact meaning. Fixture fields named `context` do not establish a product taxonomy.
+
+### View
+
+**Status:** Ordinary and overloaded language.
+
+It may refer to a representation of canonical information, a UI display mode, a read model, or generic prose. Do not promote `View` into a domain type without an accepted decision.
+
+### Entity, resource, item, record
+
+**Status:** Unresolved/implementation-sensitive.
+
+These words frequently appear in data structures and framework idioms. None is accepted as the universal user-facing or domain-level noun for canonical information.
+
+## Implementation vocabulary that is not product vocabulary
+
+The following terms may be valid in implementation contexts but carry no automatic product or domain authority:
+
+- React Context, provider, hook, store, slice, selector;
+- Next.js page, layout, segment, route group, and dynamic parameter;
+- normalized `entities` and `ids` collections;
+- Zod `Schema`, `Item`, or `PersistedState` suffixes;
+- fixture shapes such as `*Summary` and `*ViewFixture`;
+- current package-layer labels such as domain, runtime, UI, adapter, service, and app;
+- experimental identifiers such as `EntityRef`, `synapcity://`, `regionCount`, and `dataSourceId`.
+
+## Naming decision process
+
+Before adopting a controlled term:
+
+1. identify the concept independently of its current label;
+2. identify overloaded, historical, and implementation-specific alternatives;
+3. decide whether the term is user-facing, internal, or both;
+4. record the human decision and migration consequences;
+5. update this glossary and any affected ADR or specification;
+6. only then derive routes, types, schemas, packages, APIs, or components from the term.
+
