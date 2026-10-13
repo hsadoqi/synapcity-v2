@@ -1,12 +1,12 @@
 @import 'tw-animate-css';
+@import './colors.css';
 @import './accessibility.css';
-@import './utilities.css';
 @import './typography.css';
 @import './variants.css';
+@import './utilities.css';
 
 @layer base {
   :root {
-    --text-base-size: 0.9375rem;
     --radius-base: 0.25rem;
     --radius: var(--radius-base);
     @apply theme-light;

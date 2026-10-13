@@ -12,6 +12,9 @@
   --color-base-800: var(--base-800);
   --color-base-900: var(--base-900);
   --color-base-950: var(--base-950);
+  --color-base: var(--base);
+  --color-base-foreground: var(--base-foreground);
+  --color-base-background: var(--base-background);
   --color-primary-50: var(--primary-50);
   --color-primary-100: var(--primary-100);
   --color-primary-200: var(--primary-200);
@@ -23,6 +26,9 @@
   --color-primary-800: var(--primary-800);
   --color-primary-900: var(--primary-900);
   --color-primary-950: var(--primary-950);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-background: var(--primary-background);
   --color-accent-50: var(--accent-50);
   --color-accent-100: var(--accent-100);
   --color-accent-200: var(--accent-200);
@@ -34,6 +40,9 @@
   --color-accent-800: var(--accent-800);
   --color-accent-900: var(--accent-900);
   --color-accent-950: var(--accent-950);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-background: var(--accent-background);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -44,8 +53,9 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
+  --color-base: var(--base);
+  --color-base-foreground: var(--base-foreground);
+  --color-base-background: var(--base-background);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
@@ -66,8 +76,10 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --color-primary: var(--shadcn-primary);
-  --color-primary-foreground: var(--shadcn-primary-foreground);
+  --color-shadcn-primary: var(--shadcn-primary);
+  --color-shadcn-primary-foreground: var(--shadcn-primary-foreground);
+  --color-shadcn-accent: var(--shadcn-accent);
+    --color-shadcn-accent-foreground: var(--shadcn-accent-foreground);
   /* Each role reads a user override first (--font-preference-*, written on :root by the theme
    * editor, ADR-0016) and falls back to the shipped default loaded in apps/web/src/app/layout.tsx.
    * UI follows the body choice unless a UI-specific override is set. */
