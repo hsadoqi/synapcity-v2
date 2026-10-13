@@ -23,6 +23,8 @@ Pins: `vitest` and `@vitest/browser-playwright` 4.1.11 to match `apps/storybook`
 
 Coverage uses the `v8` provider (`@vitest/coverage-v8` 4.1.11, matching the Vitest pin; `apps/storybook` already depended on it). It is opt-in through `pnpm test:coverage` (`vitest run --coverage` per workspace, Turborepo task `test:coverage`), with text and HTML reports in `coverage/report`. No thresholds are set. Decided 2026-10-13.
 
+`pnpm report` produces one combined report for the workspace: the root `vitest.config.ts` lists the Vitest packages as `projects` and declares coverage once, because Vitest 4 supports coverage only at the root in that mode. It is not part of `pnpm verify`. It covers the packages listed there (not the browser-mode Storybook story tests or the Playwright smoke test), and a package must be added to the list when it gains Vitest tests. An earlier blob-merging design (`merge-blob-reports`, written for the `istanbul` provider and for a script that never existed) was removed; Vitest's documentation describes blob reports for merging test results, not for combining coverage across packages.
+
 ## Verification chain
 
 The owner approved (2026-10-13) moving the tests into `pnpm verify`, and therefore into the pre-push hook and CI. CI installs Chromium before running it (`pnpm --filter web exec playwright install --with-deps chromium`), because `pnpm install` does not download browsers. ADR-0001 records the chain.
