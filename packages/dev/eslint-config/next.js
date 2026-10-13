@@ -17,6 +17,8 @@ export const nextJsConfig = [
     'out/**',
     'build/**',
     'next-env.d.ts',
+    'dist/**',
+    'node_modules/**',
   ]),
   {
     languageOptions: {
