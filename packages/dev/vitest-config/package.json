@@ -17,8 +17,12 @@
     "vitest": "4.1.11"
   },
   "peerDependenciesMeta": {
-    "@testing-library/react": { "optional": true },
-    "@vitest/browser-playwright": { "optional": true }
+    "@testing-library/react": {
+      "optional": true
+    },
+    "@vitest/browser-playwright": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@synapcity/dev-typescript-config": "workspace:*",

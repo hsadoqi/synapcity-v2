@@ -2,10 +2,10 @@
 
 Owns: the shared Vitest presets that workspaces compose with `mergeConfig`.
 
-| Export      | Gives                                                                  |
-| ----------- | ---------------------------------------------------------------------- |
-| `./base`    | `baseConfig`: Node environment, `src/**/*.test.{ts,tsx}`, no globals   |
-| `./react`   | `reactConfig`: `baseConfig` plus jsdom and automatic Testing Library cleanup |
+| Export      | Gives                                                                         |
+| ----------- | ----------------------------------------------------------------------------- |
+| `./base`    | `baseConfig`: Node environment, `src/**/*.test.{ts,tsx}`, no globals          |
+| `./react`   | `reactConfig`: `baseConfig` plus jsdom and automatic Testing Library cleanup  |
 | `./browser` | `chromiumBrowser()`: headless Chromium through Playwright, for `test.browser` |
 
 A workspace adds a `vitest.config.ts`:
