@@ -1,5 +1,8 @@
 {
   "MD041": {
     "enabled": false
+  },
+  "MD013": {
+    "line_length": 120
   }
 }

@@ -10,12 +10,15 @@
     "format": "prettier --write . --cache=.prettiercache",
     "format:check": "prettier --check . --cache=.prettiercache",
     "check-types": "turbo run check-types",
-    "verify": "pnpm format:check && pnpm lint && pnpm check-types && pnpm build"
+    "verify": "pnpm format:check && pnpm lint && pnpm check-types && pnpm deps && pnpm build",
+    "deps": "knip",
+    "ui:add": "pnpm dlx shadcn@latest add -c apps/web"
   },
   "devDependencies": {
     "prettier": "3.9.6",
     "turbo": "^2.11.7",
-    "typescript": "7.0.2"
+    "typescript": "7.0.2",
+    "knip": "^6.38.0"
   },
   "packageManager": "pnpm@11.25.0",
   "engines": {
