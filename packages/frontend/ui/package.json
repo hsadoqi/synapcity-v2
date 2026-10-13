@@ -5,13 +5,13 @@
   "exports": {
     "./styles.css": "./src/styles/globals.css",
     "./lib/*": "./src/lib/*.ts",
-    "./lib/utils": "./src/lib/utils.ts",
     "./core/*": "./src/components/ui/*.tsx",
     "./components": "./src/components/index.ts",
     "./components/*": "./src/components/*.tsx",
     "./providers/*": "./src/providers/*.tsx",
-    "./blocks/*": "./src/blocks/*/*.tsx",
-    "./blocks": "./src/blocks/index.ts"
+    "./blocks": "./src/blocks/index.ts",
+    "./blocks/root-shell": "./src/blocks/root-shell/index.ts",
+    "./blocks/*": "./src/blocks/*.tsx"
   },
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
@@ -27,7 +27,9 @@
     "@types/node": "26.4.1",
     "@types/react": "19.2.18",
     "eslint": "10.9.1",
-    "typescript": "7.0.2"
+    "typescript": "7.0.2",
+    "@storybook/nextjs-vite": "10.6.1",
+    "storybook": "10.6.1"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

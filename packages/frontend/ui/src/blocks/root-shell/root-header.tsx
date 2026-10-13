@@ -4,9 +4,11 @@ import Link from 'next/link';
 
 export const RootHeader = () => {
   return (
-    <header className="flex w-full items-center justify-between px-6 py-4">
+    <header className="flex w-full px-6 py-4">
+        <div className="flex-1 flex items-center justify-between  gap-4">
       <RootLogoLink />
       <RootIconActions />
+      </div>
     </header>
   );
 };
@@ -14,7 +16,7 @@ export const RootHeader = () => {
 const RootLogoLink = () => {
   return (
     <Link href="/">
-      <SynapcityLogo size="md" className="text-foreground" />
+      <SynapcityLogo size="sm" className="text-foreground" />
     </Link>
   );
 };
@@ -22,7 +24,7 @@ const RootLogoLink = () => {
 const RootIconActions = () => {
   return (
     <div className="flex items-center gap-4">
-      <ModeToggle />
+      <ModeToggle variant="ghost"/>
     </div>
   );
 };

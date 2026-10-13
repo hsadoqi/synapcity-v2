@@ -4,7 +4,6 @@ import * as React from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
-import { Button } from './ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,27 +11,29 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
+import { IconButton, IconButtonProps, IconSize } from './icon-button';
+import { ButtonVariant } from './ui/button';
 
 type Mode = 'light' | 'dark' | 'system';
 
-const ModeButton = React.forwardRef<
-  HTMLButtonElement,
-  React.ComponentPropsWithoutRef<typeof Button>
->(({ className, ...props }, ref) => {
-  return (
-    <Button
-      variant="outline"
-      size="icon"
-      ref={ref}
-      className={className}
-      {...props}
-    >
-      <Sun className="scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-      <Moon className="absolute scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-      <span className="sr-only">Theme</span>
-    </Button>
-  );
-});
+const ModeButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
+  ({ className, ...props }, ref) => {
+    return (
+      <IconButton
+        data-slot="mode-button"
+        aria-label="Theme"
+        variant="outline"
+        ref={ref}
+        className={className}
+        {...props}
+      >
+        <Sun className="scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+        <Moon className="absolute scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+        <span className="sr-only">Theme</span>
+      </IconButton>
+    );
+  },
+);
 
 const MODES: ReadonlyArray<{ value: Mode; label: string }> = [
   { value: 'light', label: 'Light' },
@@ -66,13 +67,25 @@ function ModeMenu({
   );
 }
 
-function ModeToggle({ className }: { className?: string }) {
+function ModeToggle({
+  className,
+  size = 'md',
+  variant = 'default',
+}: {
+  className?: string;
+  size?: IconSize;
+  variant?: ButtonVariant;
+}) {
   const { theme, setTheme } = useTheme();
 
   return (
     <div className={className}>
       <DropdownMenu>
-        <DropdownMenuTrigger render={(props) => <ModeButton {...props} />} />
+        <DropdownMenuTrigger
+          render={(props) => (
+            <ModeButton {...props} size={size} variant={variant} />
+          )}
+        />
         <DropdownMenuContent align="end">
           <ModeMenu
             value={isMode(theme) ? theme : 'system'}
