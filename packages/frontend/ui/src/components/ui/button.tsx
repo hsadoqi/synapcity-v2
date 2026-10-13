@@ -7,7 +7,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-shadcn-primary text-shadcn-primary-foreground hover:bg-shadcn-primary/80',
+        default:
+          'bg-shadcn-primary text-shadcn-primary-foreground hover:bg-shadcn-primary/80',
         outline:
           'border-border hover:bg-input/50 hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:bg-input/30',
         secondary:
@@ -24,13 +25,15 @@ const buttonVariants = cva(
         xs: "h-5 pointer-coarse:h-11 gap-1 rounded-sm px-2 text-[0.625rem] has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-2.5",
         sm: "h-6 pointer-coarse:h-11 gap-1 px-2 text-xs/relaxed has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
         lg: "h-8 pointer-coarse:h-12 gap-1 px-2.5 text-xs/relaxed has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*='size-'])]:size-4",
-        icon: "size-7 pointer-coarse:size-11 [&_svg:not([class*='size-'])]:size-3.5",
         'icon-xs':
           "size-5 pointer-coarse:size-11 rounded-sm [&_svg:not([class*='size-'])]:size-2.5",
         'icon-sm':
           "size-6 pointer-coarse:size-11 [&_svg:not([class*='size-'])]:size-3",
+        icon: "size-7 pointer-coarse:size-11 [&_svg:not([class*='size-'])]:size-3.5",
         'icon-lg':
           "size-8 pointer-coarse:size-12 [&_svg:not([class*='size-'])]:size-4",
+        'icon-xl':
+          "size-10 pointer-coarse:size-12 [&_svg:not([class*='size-'])]:size-5",
       },
     },
     defaultVariants: {
@@ -41,6 +44,9 @@ const buttonVariants = cva(
 );
 
 type ButtonProps = ButtonPrimitive.Props & VariantProps<typeof buttonVariants>;
+type ButtonVariant = VariantProps<typeof buttonVariants>['variant'];
+type ButtonSize = VariantProps<typeof buttonVariants>['size'];
+
 function Button({
   className,
   variant = 'default',
@@ -57,4 +63,4 @@ function Button({
 }
 
 export { Button, buttonVariants };
-export type { ButtonProps };
+export type { ButtonProps, ButtonVariant, ButtonSize };

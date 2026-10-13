@@ -10,12 +10,12 @@
 }
 
 :root {
-    --font-inter: 'Inter', system-ui;
-    --font-geist: 'Geist', 'Geist Sans', system-ui;
-    --font-geist-mono: 'Geist Mono', ui-monospace;
-    --font-preference-body: var(--font-inter, system-ui);
-    --font-preference-ui: var(--font-inter, system-ui);
-    --font-preference-heading: var(--font-geist, system-ui);
-    --font-preference-code: var(--font-geist-mono, ui-monospace);
-    --text-base-size: 0.9375rem;
+  --font-inter: 'Inter', system-ui;
+  --font-geist: 'Geist', 'Geist Sans', system-ui;
+  --font-geist-mono: 'Geist Mono', ui-monospace;
+  --font-preference-body: var(--font-inter, system-ui);
+  --font-preference-ui: var(--font-inter, system-ui);
+  --font-preference-heading: var(--font-geist, system-ui);
+  --font-preference-code: var(--font-geist-mono, ui-monospace);
+  --text-base-size: 0.9375rem;
 }

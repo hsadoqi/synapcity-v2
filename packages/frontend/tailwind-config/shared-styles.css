@@ -79,7 +79,7 @@
   --color-shadcn-primary: var(--shadcn-primary);
   --color-shadcn-primary-foreground: var(--shadcn-primary-foreground);
   --color-shadcn-accent: var(--shadcn-accent);
-    --color-shadcn-accent-foreground: var(--shadcn-accent-foreground);
+  --color-shadcn-accent-foreground: var(--shadcn-accent-foreground);
   /* Each role reads a user override first (--font-preference-*, written on :root by the theme
    * editor, ADR-0016) and falls back to the shipped default loaded in apps/web/src/app/layout.tsx.
    * UI follows the body choice unless a UI-specific override is set. */

@@ -1,7 +1,5 @@
-
-
 :root {
-      --base-50: oklch(98.5% 0 0);
+  --base-50: oklch(98.5% 0 0);
   --base-100: oklch(97% 0 0);
   --base-200: oklch(92.2% 0 0);
   --base-300: oklch(87% 0 0);
@@ -12,7 +10,7 @@
   --base-800: oklch(26.9% 0 0);
   --base-900: oklch(20.5% 0 0);
   --base-950: oklch(14.5% 0 0);
-    --primary-50: var(--base-50);
+  --primary-50: var(--base-50);
   --primary-100: var(--base-100);
   --primary-200: var(--base-200);
   --primary-300: var(--base-300);
@@ -23,7 +21,7 @@
   --primary-800: var(--base-800);
   --primary-900: var(--base-900);
   --primary-950: var(--base-950);
-    --accent-50: var(--base-50);
+  --accent-50: var(--base-50);
   --accent-100: var(--base-100);
   --accent-200: var(--base-200);
   --accent-300: var(--base-300);

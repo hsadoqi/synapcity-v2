@@ -18,9 +18,9 @@
   --accent-background: var(--base-50);
   --background: var(--base-background);
   --foreground: var(--base-foreground);
-  --card: var(--base-background)/80;
+  --card: var(--background);
   --card-foreground: var(--foreground);
-  --popover: var(--background)/70;
+  --popover: var(--background);
   --popover-foreground: var(--foreground);
   --shadcn-primary: var(--primary-900);
   --shadcn-primary-foreground: var(--primary-50);
@@ -68,8 +68,8 @@
   --base-900: oklch(97% 0 0);
   --base-950: oklch(98.5% 0 0);
   --base: var(--base-500);
-    --base-foreground: var(--base-50);
-    --base-background: var(--base-950);
+  --base-foreground: var(--base-50);
+  --base-background: var(--base-950);
   /* Primary and accent start neutral; each ramp can be overridden independently. */
   --primary-50: var(--base-50);
   --primary-100: var(--base-100);
@@ -101,16 +101,17 @@
   --accent: var(--accent-500);
   --accent-foreground: var(--base-50);
   --accent-background: var(--base-950);
-  --card: var(--background)/80;
+  /* Literals, not ramp steps: colors.css's unlayered :root ramp overrides this theme's mirrored ramp. */
+  --card: oklch(20.5% 0 0);
   --card-foreground: var(--foreground);
-  --popover: var(--background)/70;
+  --popover: oklch(20.5% 0 0);
   --popover-foreground: var(--foreground);
   --shadcn-primary: var(--primary-800);
   --shadcn-primary-foreground: var(--primary-100);
   --secondary: var(--base-200);
   --secondary-foreground: var(--base-950);
-  --muted: var(--background)/20;
-  --muted-foreground: var(--background)/60;
+  --muted: oklch(26.9% 0 0);
+  --muted-foreground: oklch(70.8% 0 0);
   --muted-background: var(--background)/10;
   --shadcn-accent: var(--accent-200);
   --shadcn-accent-foreground: var(--base-950);
