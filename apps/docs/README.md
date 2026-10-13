@@ -13,7 +13,7 @@ pnpm install
 pnpm dev:docs     # http://localhost:4000
 ```
 
-The shared checks run through the root scripts (`pnpm lint`, `pnpm check-types`, `pnpm build`); `pnpm verify` runs everything. There is no test runner yet.
+The shared checks run through the root scripts (`pnpm lint`, `pnpm check-types`, `pnpm build`); `pnpm verify` runs everything. This app has no tests of its own.
 
 ## Structure
 

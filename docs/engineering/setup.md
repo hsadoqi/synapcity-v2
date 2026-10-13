@@ -10,10 +10,11 @@
 ## From clone to a verified checkout
 
 ```bash
-git clone https://github.com/hsadoqi/synapcity.git
-cd synapcity
+git clone https://github.com/hsadoqi/synapcity-v2.git
+cd synapcity-v2
 corepack enable pnpm
 pnpm install --frozen-lockfile
+pnpm exec playwright install chromium   # once per machine
 pnpm verify
 ```
 
@@ -21,25 +22,31 @@ pnpm verify
 
 ## Commands
 
-| Command                             | What it does                                                                                       |
-| ----------------------------------- | -------------------------------------------------------------------------------------------------- |
-| `pnpm verify`                       | Runs `format:check`, `lint`, `check-types`, `deps`, `brand:check` and `build`; stops at first fail |
-| `pnpm format:check` / `pnpm format` | Check or apply Prettier formatting                                                                 |
-| `pnpm lint`                         | ESLint in every workspace, through Turbo                                                           |
-| `pnpm check-types`                  | `tsc --noEmit` in every workspace (Next apps run `next typegen` first)                             |
-| `pnpm deps`                         | Knip: unused files, exports and dependencies                                                       |
-| `pnpm brand:check`                  | Static brand exports match the logo geometry in `logo-mark.tsx` (not the rasters)                  |
-| `pnpm build`                        | Builds every workspace through Turbo                                                               |
-| `pnpm dev`                          | Runs every workspace's dev server; `pnpm dev:web` and `pnpm dev:docs` run one                      |
-| `pnpm ui:add <component>`           | Adds a shadcn component from the root, writing into `@synapcity/frontend-ui`                       |
+| Command                             | What it does                                                                                                                                            |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm verify`                       | Runs `format:check`, `lint`, `typecheck`, `deps`, `brand:check`, `test`, `test:coverage`, `test:e2e`, `test:storybook` and `build`; stops at first fail |
+| `pnpm format:check` / `pnpm format` | Check or apply Prettier formatting                                                                                                                      |
+| `pnpm lint`                         | ESLint in every workspace, through Turbo                                                                                                                |
+| `pnpm check-types`                  | `tsc --noEmit` in every workspace (Next apps run `next typegen` first)                                                                                  |
+| `pnpm deps`                         | Knip: unused files, exports and dependencies                                                                                                            |
+| `pnpm brand:check`                  | Static brand exports match the logo geometry in `logo-mark.tsx` (not the rasters)                                                                       |
+| `pnpm test`                         | Vitest unit tests in every workspace that has them, through Turbo                                                                                       |
+| `pnpm test:coverage`                | The same tests with v8 coverage (no thresholds)                                                                                                         |
+| `pnpm test:e2e`                     | Playwright smoke test of `apps/web` against a production build (Chromium)                                                                               |
+| `pnpm test:storybook`               | Storybook story tests in Chromium, including the a11y addon's axe checks                                                                                |
+| `pnpm report`                       | One combined v8 coverage report for the workspace, in `coverage/report`; not part of `verify`                                                           |
+| `pnpm build`                        | Builds every workspace through Turbo                                                                                                                    |
+| `pnpm dev`                          | Runs every workspace's dev server; `pnpm dev:web` and `pnpm dev:docs` run one                                                                           |
+| `pnpm ui:add <component>`           | Adds a shadcn component from the root, writing into `@synapcity/frontend-ui`                                                                            |
 
-There is no test command. A passing `pnpm verify` proves the repository's formatting, lint, types, unused-code and build checks pass; it does not prove behavior, and does not prove a product feature exists, is product-required, or is product-validated.
+A passing `pnpm verify` proves the repository's formatting, lint, types, unused-code and build checks pass, and that the existing tests pass. Test coverage is thin, so it proves behavior only where a test exercises it, and it does not prove a product feature exists, is product-required, or is product-validated. The browser tests need Chromium, which `pnpm install` does not download (`pnpm exec playwright install chromium`, once per machine).
 
 `pnpm dev:web` serves `apps/web` on port 8080; `pnpm dev:docs` serves `apps/docs` on port 4000.
 
 ## Environment variables
 
-- No environment variables exist yet. When one is added, add it to a committed `.env.example` with a placeholder value in the same change.
+- `apps/web` needs three: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `SITE_URL`. Copy `apps/web/.env.example` to `apps/web/.env.local` and fill them in; the README table in `apps/web` says what each is for.
+- When another variable is added, add it to the committed `.env.example` with a placeholder value in the same change.
 - Real values go in an untracked `.env` or `.env*.local` file, both git-ignored. Never commit secrets. The `security` CI job scans history for them.
 
 ## Generated files and caches
