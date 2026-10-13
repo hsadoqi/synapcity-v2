@@ -1,3 +1,6 @@
+/** Form fields an auth error can point at, so the form can mark them invalid. */
+export type AuthFieldName = 'name' | 'email' | 'password' | 'confirm';
+
 /**
  * Turns a Supabase Auth error code (`error.code`, for example
  * `invalid_credentials`) into text shown to the user. Never pass `error.message`
@@ -30,5 +33,30 @@ export function authErrorMessage(code: string | undefined): string {
       return 'Sign-ups are closed right now.';
     default:
       return 'Something went wrong. Try again.';
+  }
+}
+
+/**
+ * Which fields a Supabase Auth error code is about. The form marks these
+ * `aria-invalid` and links them to the message; an empty list means the error
+ * is about the request as a whole (rate limits, outages), not what was typed.
+ */
+export function authErrorFields(code: string | undefined): AuthFieldName[] {
+  switch (code) {
+    // The reply must not say which of the two was wrong, so both are marked.
+    case 'invalid_credentials':
+      return ['email', 'password'];
+    case 'weak_password':
+    case 'same_password':
+      return ['password'];
+    case 'email_address_invalid':
+    case 'validation_failed':
+    case 'email_address_not_authorized':
+      return ['email'];
+    // Everything else is about the request, or deliberately says nothing about
+    // the input: marking `email` for an account-discovery code would hint that
+    // the account exists.
+    default:
+      return [];
   }
 }

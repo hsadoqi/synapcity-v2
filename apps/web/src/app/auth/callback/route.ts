@@ -1,6 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-import { safeNextPath } from '@/lib/auth/safe-next';
+import { authErrorPath, parseAuthFlow } from '@/lib/auth/auth-flow/auth-flow';
+import { homePathFor } from '@/lib/auth/home-path/home-path';
+import { safeNextPath } from '@/lib/auth/safe-next/safe-next';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -11,15 +13,19 @@ import { createClient } from '@/lib/supabase/server';
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
   const code = searchParams.get('code');
-  const next = safeNextPath(searchParams.get('next'));
+  const next = searchParams.get('next');
+  // Set by the action that started the flow, so a failure can say which link broke.
+  const flow = parseAuthFlow(searchParams.get('flow'));
 
   if (code) {
     const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error && data.user) {
+      // No (or an unsafe) `next`: send them to their own home.
+      const destination = safeNextPath(next, homePathFor(data.user.id));
+      return NextResponse.redirect(`${origin}${destination}`);
     }
   }
 
-  return NextResponse.redirect(`${origin}/auth/error`);
+  return NextResponse.redirect(`${origin}${authErrorPath(flow)}`);
 }

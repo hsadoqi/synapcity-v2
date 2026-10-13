@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { authErrorMessage } from './error-messages';
+import { authErrorFields, authErrorMessage } from './error-messages';
 
 const GENERIC = 'Something went wrong. Try again.';
 
@@ -86,5 +86,34 @@ describe('authErrorMessage', () => {
         /already (exists|registered|in use)|no (such )?(user|account)|not found/i,
       );
     }
+  });
+});
+
+describe('authErrorFields', () => {
+  it.each([
+    ['invalid_credentials', ['email', 'password']],
+    ['weak_password', ['password']],
+    ['same_password', ['password']],
+    ['email_address_invalid', ['email']],
+    ['validation_failed', ['email']],
+    ['email_address_not_authorized', ['email']],
+  ])('marks the fields %s is about', (code, fields) => {
+    expect(authErrorFields(code)).toEqual(fields);
+  });
+
+  it.each([
+    // About the request, not the input.
+    'email_not_confirmed',
+    'over_email_send_rate_limit',
+    'over_request_rate_limit',
+    'signup_disabled',
+    // Would confirm whether an account exists, so they must not mark `email`.
+    'user_not_found',
+    'user_already_exists',
+    'email_exists',
+    'something_unknown',
+    undefined,
+  ])('marks nothing for %s', (code) => {
+    expect(authErrorFields(code)).toEqual([]);
   });
 });

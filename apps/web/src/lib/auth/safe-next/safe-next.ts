@@ -1,6 +1,11 @@
 const PLACEHOLDER_ORIGIN = 'http://placeholder.invalid';
 
-export const DEFAULT_NEXT_PATH = '/home';
+/**
+ * Last-resort destination when there is no valid `next` and no signed-in user to
+ * build a home path from. Callers that know the user pass `homePathFor(id)` as
+ * the fallback instead.
+ */
+export const DEFAULT_NEXT_PATH = '/';
 
 /**
  * Returns a same-origin path that is safe to redirect to after sign-in.

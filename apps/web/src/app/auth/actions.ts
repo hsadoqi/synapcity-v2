@@ -3,9 +3,16 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-import { authErrorMessage } from '@/lib/auth/error-messages';
-import { getOrigin } from '@/lib/auth/origin';
-import { safeNextPath } from '@/lib/auth/safe-next';
+import {
+  authErrorFields,
+  authErrorMessage,
+  type AuthFieldName,
+} from '@/lib/auth/error-messages/error-messages';
+import { homePathFor } from '@/lib/auth/home-path/home-path';
+import { checkName } from '@/lib/auth/name/name';
+import { authErrorPath, type AuthFlow } from '@/lib/auth/auth-flow/auth-flow';
+import { getOrigin } from '@/lib/auth/origin/origin';
+import { safeNextPath } from '@/lib/auth/safe-next/safe-next';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -14,9 +21,19 @@ import { createClient } from '@/lib/supabase/server';
  */
 export type AuthState = {
   error?: string;
+  /** The fields `error` is about; absent or empty when it concerns no one field. */
+  fields?: AuthFieldName[];
   message?: string;
   success?: boolean;
-  email?: string;
+  data?: {
+    user?: UserData;
+  };
+};
+
+type UserData = {
+  email: string;
+  /** Only collected when registering. */
+  name?: string;
 };
 
 const MIN_PASSWORD_LENGTH = 8;
@@ -32,8 +49,9 @@ function isOAuthProvider(value: string): value is OAuthProvider {
   return (OAUTH_PROVIDERS as readonly string[]).includes(value);
 }
 
-function callbackUrl(origin: string, next: string): string {
-  return `${origin}/auth/callback?next=${encodeURIComponent(next)}`;
+function callbackUrl(origin: string, next: string, flow: AuthFlow): string {
+  const params = new URLSearchParams({ next, flow });
+  return `${origin}/auth/callback?${params}`;
 }
 
 export async function signInWithPassword(
@@ -43,15 +61,30 @@ export async function signInWithPassword(
   const email = field(formData, 'email').trim();
   const password = field(formData, 'password');
   if (!email || !password) {
-    return { error: 'Enter your email and password.', email };
+    return {
+      error: 'Enter your email and password.',
+      fields: [
+        ...(email ? [] : (['email'] as const)),
+        ...(password ? [] : (['password'] as const)),
+      ],
+      data: { user: { email } },
+    };
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return { error: authErrorMessage(error.code), email };
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+  if (error)
+    return {
+      error: authErrorMessage(error.code),
+      fields: authErrorFields(error.code),
+      data: { user: { email } },
+    };
 
   revalidatePath('/', 'layout');
-  redirect(safeNextPath(field(formData, 'next')));
+  redirect(safeNextPath(field(formData, 'next'), homePathFor(data.user.id)));
 }
 
 export async function signUp(
@@ -60,12 +93,27 @@ export async function signUp(
 ): Promise<AuthState> {
   const email = field(formData, 'email').trim();
   const password = field(formData, 'password');
-  const next = safeNextPath(field(formData, 'next'));
-  if (!email) return { error: 'Enter your email.', email };
+  // Empty when the visitor gave no destination: the callback then falls back
+  // to the new user's own home.
+  const next = safeNextPath(field(formData, 'next'), '');
+  const { name, error: nameError } = checkName(field(formData, 'name'));
+  if (!email)
+    return {
+      error: 'Enter your email.',
+      fields: ['email'],
+      data: { user: { email, name } },
+    };
+  if (nameError)
+    return {
+      error: nameError,
+      fields: ['name'],
+      data: { user: { email, name } },
+    };
   if (password.length < MIN_PASSWORD_LENGTH) {
     return {
       error: `Use a password of at least ${MIN_PASSWORD_LENGTH} characters.`,
-      email,
+      fields: ['password'],
+      data: { user: { email, name } },
     };
   }
 
@@ -73,22 +121,68 @@ export async function signUp(
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { emailRedirectTo: callbackUrl(getOrigin(), next) },
+    options: {
+      emailRedirectTo: callbackUrl(getOrigin(), next, 'confirm'),
+      // Same key OAuth providers fill, so one reader covers both sign-up paths.
+      data: { full_name: name },
+    },
   });
-  if (error) return { error: authErrorMessage(error.code), email };
+  if (error)
+    return {
+      error: authErrorMessage(error.code),
+      fields: authErrorFields(error.code),
+      data: { user: { email, name } },
+    };
 
   // A session exists only when the project does not require email
   // confirmation. ADR-0006 requires it, so this is the unusual branch.
-  if (data.session) {
+  if (data.session && data.user) {
     revalidatePath('/', 'layout');
-    redirect(next);
+    redirect(next || homePathFor(data.user.id));
   }
   return {
     // Worded so it stays true when the address already has an account, in
     // which case Supabase sends nothing (it hides that to prevent account
-    // discovery). Do not name the address or say a link "was sent".
+    // discovery). Do not say a link "was sent".
+    success: true,
     message:
-      'If this email can be registered, a confirmation link is on its way. If you already have an account, sign in or reset your password instead.',
+      'Check your email for a link to confirm your account. If you already have an account, sign in or reset your password instead.',
+    data: { user: { email, name } },
+  };
+}
+
+export async function resendConfirmation(
+  _previous: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const email = field(formData, 'email').trim();
+  const next = safeNextPath(field(formData, 'next'), '');
+  if (!email)
+    return {
+      error: 'Enter your email.',
+      fields: ['email'],
+      data: { user: { email } },
+    };
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resend({
+    type: 'signup',
+    email,
+    options: { emailRedirectTo: callbackUrl(getOrigin(), next, 'confirm') },
+  });
+  if (
+    error?.code === 'over_email_send_rate_limit' ||
+    error?.code === 'over_request_rate_limit'
+  ) {
+    return { error: authErrorMessage(error.code), data: { user: { email } } };
+  }
+
+  // The same reply whether or not the address has a pending sign-up, like the
+  // other forms, so this cannot be used to discover registered emails.
+  return {
+    success: true,
+    message: 'Requested again. It can take a minute to arrive.',
+    data: { user: { email } },
   };
 }
 
@@ -97,14 +191,23 @@ export async function requestPasswordReset(
   formData: FormData,
 ): Promise<AuthState> {
   const email = field(formData, 'email').trim();
-  if (!email) return { error: 'Enter your email.', email };
+  const name = '';
+  if (!email)
+    return {
+      error: 'Enter your email.',
+      fields: ['email'],
+      data: { user: { email, name } },
+    };
 
   const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: callbackUrl(getOrigin(), '/auth/update-password'),
+    redirectTo: callbackUrl(getOrigin(), '/auth/update-password', 'reset'),
   });
   if (error?.code === 'over_email_send_rate_limit') {
-    return { error: authErrorMessage(error.code), email };
+    return {
+      error: authErrorMessage(error.code),
+      data: { user: { email, name } },
+    };
   }
 
   // The same reply whether or not the address has an account, so the form
@@ -112,7 +215,7 @@ export async function requestPasswordReset(
   return {
     success: true,
     message: 'If that email has an account, a reset link is on its way.',
-    email,
+    data: { user: { email, name } },
   };
 }
 
@@ -125,21 +228,33 @@ export async function updatePassword(
   if (password.length < MIN_PASSWORD_LENGTH) {
     return {
       error: `Use a password of at least ${MIN_PASSWORD_LENGTH} characters.`,
+      fields: ['password'],
+      data: { user: { email: '', name: '' } },
     };
   }
-  if (password !== confirm) return { error: 'The passwords do not match.' };
+  if (password !== confirm)
+    return {
+      error: 'The passwords do not match.',
+      fields: ['confirm'],
+      data: { user: { email: '', name: '' } },
+    };
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.updateUser({ password });
-  if (error) return { error: authErrorMessage(error.code) };
+  const { data, error } = await supabase.auth.updateUser({ password });
+  if (error)
+    return {
+      error: authErrorMessage(error.code),
+      fields: authErrorFields(error.code),
+      data: { user: { email: '', name: '' } },
+    };
 
   revalidatePath('/', 'layout');
-  redirect(safeNextPath(null));
+  redirect(homePathFor(data.user.id));
 }
 
 export async function signInWithOAuth(formData: FormData): Promise<void> {
   const provider = field(formData, 'provider');
-  if (!isOAuthProvider(provider)) redirect('/auth/error');
+  if (!isOAuthProvider(provider)) redirect(authErrorPath('oauth'));
 
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signInWithOAuth({
@@ -147,11 +262,12 @@ export async function signInWithOAuth(formData: FormData): Promise<void> {
     options: {
       redirectTo: callbackUrl(
         getOrigin(),
-        safeNextPath(field(formData, 'next')),
+        safeNextPath(field(formData, 'next'), ''),
+        'oauth',
       ),
     },
   });
-  if (error || !data.url) redirect('/auth/error');
+  if (error || !data.url) redirect(authErrorPath('oauth'));
 
   redirect(data.url);
 }
