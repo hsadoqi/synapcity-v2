@@ -1,36 +1,29 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/create-next-app).
+# web
 
-## Getting Started
+Owns: the Synapcity web application: routes, page composition, font loading and app-level data. It is a composition root; reusable components live in `@synapcity/ui` and theme tokens in `@repo/tailwind-config`.
 
-First, run the development server:
+Next.js 16 (App Router) and React 19. See [ADR-0001](../../docs/architecture/decisions/0001-workspace-topology-and-toolchain.md) for the workspace and toolchain.
+
+## Running it
+
+From the repository root:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+pnpm dev:web      # http://localhost:8080
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Per-app checks run through the root scripts (`pnpm lint`, `pnpm check-types`, `pnpm build`); `pnpm verify` runs everything. There is no test runner yet.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load Inter, a custom Google Font.
+| Path                     | Contains                                                         |
+| ------------------------ | ---------------------------------------------------------------- |
+| `src/app/`               | Routes and the root layout, which loads Inter, Geist, Geist Mono |
+| `src/styles/globals.css` | Imports and `@source` lines only; no tokens                      |
+| `src/lib/`               | App-level helpers, including the `cn` re-export                  |
+| `components.json`        | shadcn config; routes added components into `@synapcity/ui`      |
 
-## Learn More
+## Styling
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Do not add theme variables, `:root`/`.dark` rules, or font stacks here. Change tokens in `@repo/tailwind-config` ([ADR-0002](../../docs/architecture/decisions/0002-styling-foundation.md)) and fonts through the roles in [ADR-0003](../../docs/architecture/decisions/0003-typography-roles-and-font-preferences.md). Add components with `pnpm ui:add <name>` from the root.

@@ -7,9 +7,7 @@
       }
     ],
     "strictNullChecks": true,
-    // "rootDir": ".",
     "paths": {
-      //   "@synapcity/ui/*": ["../../packages/frontend/ui/src/*"],
       "@/*": ["./src/*"]
     }
   },
