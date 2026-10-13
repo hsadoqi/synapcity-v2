@@ -3,3 +3,21 @@ packages:
   - 'packages/**/*'
 allowBuilds:
   core-js: true
+
+# Transitive security fixes. These pin patched versions of packages reached only through
+# tooling (eslint, @next/eslint-plugin-next, shadcn) and next's own pinned postcss/sharp.
+# Drop an entry once its parent ships a patched range. Recorded in ADR-0001.
+overrides:
+  flatted: '^3.4.4'
+  picomatch@<2.3.2: '^2.3.2'
+  nanoid@<3.3.18: '^3.3.20'
+  '@humanfs/node@<0.16.8': '^0.16.8'
+  source-map-js@<1.2.2: '^1.2.2'
+  sharp@<0.35.5: '^0.35.5'
+
+# No patched release of braces exists (latest 3.0.3 is affected). It is reached only through
+# dev-time glob tooling (eslint-plugin-next's fast-glob, the shadcn CLI), never shipped to users.
+# Accepted by the repository owner 2026-10-13. Remove this when a patched braces is published.
+auditConfig:
+  ignoreGhsas:
+    - GHSA-vfj7-8cjw-p6xm

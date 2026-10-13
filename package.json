@@ -12,6 +12,7 @@
     "check-types": "turbo run check-types",
     "verify": "pnpm format:check && pnpm lint && pnpm check-types && pnpm deps && pnpm build",
     "deps": "knip",
+    "prepare": "git config core.hooksPath .githooks || echo 'git hooks not activated (not a git checkout)'",
     "ui:add": "pnpm dlx shadcn@latest add -c apps/web"
   },
   "devDependencies": {
