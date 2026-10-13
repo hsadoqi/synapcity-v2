@@ -1,5 +1,33 @@
 # Task scope
 
+## Active task: proposed auth decisions and task plans (2026-10-13)
+
+- Goal and mode: create decision files and implementation plans with concrete tasks for the existing auth-refactor proposal. Mode: planning and documentation authoring only, under the owner's direct request, "could you create decision files and implementation plans with tasks".
+- Source readiness: existing auth-refactor spec/plan are Draft; their authoring and expansion are directly requested, not implementation approval. Re-read live ADR index (0001-0006), Accepted ADR-0006, current consumers, new auth-flow and form-focus helpers, and actual root scripts. Preserve unrelated/concurrent source work.
+- Create 6: `docs/architecture/decisions/0007-app-local-auth-and-account-ownership.md`, `docs/architecture/decisions/0008-auth-actions-and-server-operations.md`, `docs/architecture/decisions/0009-caller-owned-auth-navigation.md`, `docs/superpowers/plans/2026-10-13-auth-refactor-foundation.md`, `docs/superpowers/plans/2026-10-13-auth-refactor-operations.md`, `docs/superpowers/plans/2026-10-13-auth-refactor-navigation.md`.
+- Update 4: this `.agents/task-scope.md` entry; `docs/architecture/decisions/README.md` (index the three Proposed ADRs only); `docs/superpowers/specs/2026-10-13-auth-refactor-design.md` (decision links, source refresh and alignment); `docs/superpowers/plans/2026-10-13-auth-refactor.md` (parent sequence, refreshed map, links and final verification task).
+- Budget: repository document creates 6, updates 4; delete/move/rename 0; application/shared-package source and config updates 0; dependencies/packages 0; Git history/branches/commits/PRs 0; GitHub issues/labels/milestones/project fields 0; external task trackers/operational changes 0. Show the resulting parent plan in this chat's editor.
+- Systems of record: ADRs own the proposed choices and eventual acceptance status; spec owns requirements/invariants and derives architecture from those ADRs; parent plan owns migration inventory and sequence; child plans own their task definitions and execution checkboxes; final verification task lives only in the parent. This scope owns authoring bounds. No status is mirrored into GitHub or another tracker.
+- Preconditions: six new paths absent and ADR numbers free; prior draft paths present; current source references exist; no claim of owner acceptance, execution approval or completed implementation. A future executing agent must refresh scope, numeric source budgets and recovery baseline.
+- Verification: scoped Prettier; read-back of all ten files; internal link and current-source checks; consecutive ADR numbers, Proposed status, unique task IDs, valid dependency order and unchecked implementation tasks; diff whitespace and mutation counts. No runtime checks required for this documentation-only work.
+- Recovery: separately authorized reversal of only the six new documents and this task's hunks in the four existing documents. Preserve older drafts and all concurrent work; no reset/stash/clean.
+- Stop when: destination collision, newly occupied ADR number, human scope correction, or another mutation class is needed. Source drift requires refreshing the proposal, not silently changing source.
+- Not authorized: accepting ADRs, changing Accepted ADR-0006, executing any code task, inventing a workspace package, changing storage/routing/provider architecture, committing or publishing.
+
+## Active task: draft auth-refactor specification and plan (2026-10-13)
+
+- Goal and mode: provide the owner with example reviewable files for the auth organization discussed in chat. Mode: planning; documentation only.
+- Direct authority: the owner's request, "could u give me an example plan/specs file for this?" Authorizes drafting the proposal, not adopting its architecture or executing it.
+- Source readiness: current-source investigation on `fix/auth-ui`; Accepted ADR-0006 keeps auth in `apps/web`; architecture principles section 6 favors responsibility boundaries before package boundaries. The existing auth-UI spec is Draft and does not authorize this refactor. This proposal is independently requested and explicitly unapproved for implementation.
+- Exact destinations: create `docs/superpowers/specs/2026-10-13-auth-refactor-design.md`; create `docs/superpowers/plans/2026-10-13-auth-refactor.md`; append this entry to `.agents/task-scope.md` while preserving all existing entries.
+- Mutation budget: repository documentation creates 2, scope-record updates 1; application/shared-package code updates 0; delete/move/rename 0; dependencies/packages 0; Git history/branches/commits/PRs 0; GitHub issues/labels/milestones/project fields 0; external planning tools and operational state 0. Opening the resulting documents in the current chat is allowed.
+- Systems of record: accepted decisions remain in the existing ADRs; the new spec owns this proposal's requirements/boundaries; the companion plan owns its proposed sequence. This entry records authoring scope only. No execution status, backlog, or external tracker is created or mirrored.
+- Preconditions: both proposed document paths are absent; preserve concurrent auth work and existing planning documents; derive the migration map from live files; do not resolve open product, persistence, routing, package-category, or provider decisions.
+- Verification: read back both documents; check referenced current source paths and internal document links; run scoped Prettier checks. Tests, lint, typecheck, dependency analysis, brand checks, browser checks, coverage and builds are not required for this documentation-only proposal and will not be claimed.
+- Recovery: remove only these two newly authored drafts and this entry if separately authorized. Never reset/stash/clean or remove any existing untracked work.
+- Stop conditions: destination already exists; drafting requires another mutation class; source changes make the proposed mapping inaccurate; a human correction suspends mutation authority under the reset protocol.
+- Implementation authority: none. The future refactor requires approval of its ownership choices and a fresh exact execution manifest with numeric budgets; no proposed source-code table in these drafts grants that authority.
+
 ## Active task: shared Vitest and Playwright config packages (2026-10-13)
 
 Approved by the owner (2026-10-13): ADR plus packages in one change, packages under `packages/dev/`, consumers `frontend-ui`, `frontend-site`, `storybook` and `web`, and Vitest staying on 4.1.11. Phase B.

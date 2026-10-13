@@ -104,7 +104,7 @@ One graphite ramp (`base`, `primary`, `accent` are currently identical achromati
 - **Neutral** (`--base-50` to `--base-950`, achromatic): the page, cards, popovers, borders and most text. Muted areas and the sidebar carry a whisper of the primary's hue at the neutral's own lightness, with chroma capped, so text contrast on them is the same for every pick. Colour is a share of the screen, not the ground it sits on: primary marks what you can do next, accent marks hover, selection and secondary emphasis, and the neutral scale carries everything else.
 - **Ring** (default `oklch(60% 0 0)`): focus ring and active-field border.
 
-Interactive fills are **solid** mixes of existing tokens (hover and pressed shift toward `background`), so contrast is deterministic and guarded by `tests/theme-contrast.test.ts` (**Verified**: the test exists). Alpha overlays are for the ghost variant only.
+Interactive fills are **solid** mixes of existing tokens (hover and pressed shift toward `background`), so contrast is deterministic. It is guarded by `apps/web/e2e/theme-tokens.e2e.ts`, which measures rendered colours in both themes (card opaque, muted text at least 4.5:1 and quieter than body, field borders at least 3:1, filled-button hover solid and readable, focus outline at least 3:1). There is no `tests/theme-contrast.test.ts`; an earlier version of this document claimed one. Alpha overlays are for the ghost variant only.
 
 ### State
 
@@ -119,8 +119,8 @@ Interactive fills are **solid** mixes of existing tokens (hover and pressed shif
 - **Muted** `oklch(97% 0 0)`: secondary and muted fills, row tint.
 - **Border** `oklch(92.2% 0 0)`: card and control edges; `oklch(100% 0 0 / 35%)` in dark, held at 3:1 against cards.
 - **Divider** `oklch(92.2% 0 0)`: structural seams between regions (sidebar edge, panel seam, rail); a solid `oklch(26.9% 0 0)` in dark, about 1.3:1, so the shell reads as tone, not outlines.
-- **Input** `oklch(60% 0 0)`: input borders (`oklch(100% 0 0 / 40%)` in dark).
-- **Muted foreground** `oklch(52% 0 0)`: secondary text.
+- **Input** (`--input`): input borders, a solid `color-mix` of ink and page (about 60% grey in light, 52% in dark). **Verified** 3.8:1 (light) and 3.3:1 (dark) on the card.
+- **Muted foreground** (`--muted-foreground`): secondary text, a solid `color-mix` of ink and page (about 52% grey in light, 71% in dark). **Verified** 5.4:1 (light) and 6.9:1 (dark) on the card. The previous `var(...)/20` form was invalid CSS and silently fell back to full ink; the same applied to `--card` and `--popover`, now literals.
 - **Foreground** `oklch(14.5% 0 0)`: body text and headings.
 
 ### Measured contrast (WCAG ratio, computed from the token values; NOT a substitute for the test file)
@@ -156,15 +156,17 @@ The scale is a fixed ladder off `--text-base-size: 0.9375rem` (15px), never flui
 
 ### Hierarchy (**Verified** values; supersedes the previous 12 / 13 / 14px ladder off 0.875rem)
 
-| Role     | Utility     | Multiplier | Size (px) | Line height | Used for                                                                                       |
-| -------- | ----------- | ---------- | --------- | ----------- | ---------------------------------------------------------------------------------------------- |
-| Feature  | `text-3xl`  | 2          | 30        | 1.2         | the one lead heading of a full-page surface (e.g. the theme editor host); never inside a panel |
-| Display  | `text-2xl`  | 1.6        | 24        | 1.333       | page and panel titles (`h1`)                                                                   |
-| Headline | `text-xl`   | 1.2667     | 19        | 1.4         | section headings (`h2`)                                                                        |
-| Title    | `text-lg`   | 1.1333     | 17        | 1.556       | sub-section and card titles                                                                    |
-| Body     | `text-base` | 1          | 15        | 1.5         | default text, inputs                                                                           |
-| Label    | `text-sm`   | 0.9333     | 14        | 1.429       | buttons, form labels                                                                           |
-| Caption  | `text-xs`   | 0.8667     | 13        | 1.333       | sidebar items, badges, metadata                                                                |
+| Role     | Utility     | Multiplier | Size (px) | Line height | Used for                                                                                         |
+| -------- | ----------- | ---------- | --------- | ----------- | ------------------------------------------------------------------------------------------------ |
+| Feature  | `text-3xl`  | 2          | 30        | 1.2         | the one lead heading of a full-page surface (e.g. the theme editor host); never inside a panel   |
+| Display  | `text-2xl`  | 1.6        | 24        | 1.333       | page and panel titles (`h1`) on full-page surfaces                                               |
+| Headline | `text-xl`   | 1.2667     | 19        | 1.4         | section headings (`h2`)                                                                          |
+| Title    | `text-lg`   | 1.1333     | 17        | 1.556       | sub-section and card titles, including the page title of a form card (auth)                      |
+| Body     | `text-base` | 1          | 15        | 1.5         | default text                                                                                     |
+| Label    | `text-sm`   | 0.9333     | 14        | 1.429       | form messages and secondary body text                                                            |
+| Caption  | `text-xs`   | 0.8667     | 13        | 1.333       | buttons, form labels and fields (on a mouse), card descriptions, sidebar items, badges, metadata |
+
+**The compact control scale is canonical.** Controls follow the shadcn base-mira compact scale, not the 14px Label step: buttons, labels, fields and card descriptions render at Caption (13px, `text-xs/relaxed`); form messages at Label (14px); the page title of a form card is Title (17px, 500) set as a real `h1`. On touch, fields are 16px (the Real-16 Rule below). **Verified** in a browser (production build, light and dark); field sizes are guarded by `e2e/touch-fields.e2e.ts`.
 
 `text-4xl` (36px) and `text-5xl` (45px) stay in the ladder for display moments; product chrome does not use them. Weights: 600 for display to title, 500 for label and feature, 400 otherwise (**Proposed**; not re-verified per component).
 
@@ -172,7 +174,7 @@ The scale is a fixed ladder off `--text-base-size: 0.9375rem` (15px), never flui
 
 **The Fixed Ladder Rule.** Sizes come only from the `--text-*` ladder, all multiples of `--text-base-size`. No `clamp()`, no pixel one-offs. Changing `--text-base-size` rescales the system.
 
-**The Real-16 Rule (Proposed).** `text-base` here is 15px, not 16px. Anything that must be a literal 16px (touch fields, so iOS Safari does not zoom on focus) would use `1rem` with a comment saying why. No such field is verified in this repo yet.
+**The Real-16 Rule (Adopted).** `text-base` here is 15px, not 16px. Anything that must be a literal 16px takes it from a named theme value, never a bracket value. `--text-touch-field` (`1rem`, in `shared-styles.css`) is used as `pointer-coarse:text-touch-field` by Input and Textarea (and so InputGroup and PasswordInput), so iOS Safari does not zoom on focus. **Verified** at phone and tablet widths with touch, and on desktop with a mouse, in `e2e/touch-fields.e2e.ts`; not yet tried on a physical iPhone.
 
 **The Balance Rule.** `h1` to `h3` use `text-wrap: balance`, paragraphs `text-wrap: pretty`, tables tabular numerals (**Verified** in `globals.css`).
 
@@ -208,7 +210,7 @@ Flat by default. Depth comes from tonal layering and 1px hairlines; a 1px border
 - **Button edge** (`--shadow-button`: `inset 0 1px 0 0 oklch(1 0 0 / 12%), 0 1px 2px 0 oklch(0 0 0 / 16%)`; dark `--shadow-button-dark`): default button resting depth. **Verified** in `tokens/misc.css`.
 - **Overlay** (`shadow-md` plus `ring-1 ring-foreground/10`): popovers, menus, sheets (**Proposed**; not re-verified per component).
 - **Inset panel** (`shadow-sm`): the content panel floating beside the sidebar.
-- **Focus ring**: `focus-visible` only, `outline-2 outline-offset-2 outline-ring`, `Highlight` outline in forced-colors (**Verified** in `globals.css`).
+- **Focus ring**: `focus-visible` only, `outline-2 outline-offset-2 outline-ring`, `Highlight` outline in forced-colors (**Verified** in `globals.css`). Applied as a solid outline (not a translucent halo) to Button, LinkButton, Input, Textarea, InputGroup and Toggle: **Verified** at 4.7:1 (light) and 3.8:1 (dark) against the card, and guarded in `e2e/theme-tokens.e2e.ts`. Other shadcn components (select, checkbox and similar) still use a ring halo until migrated.
 
 **The Flat-By-Default Rule.** If it looks like a card floating on a glow, the blur is too wide. Never nest a bordered card inside a card.
 
@@ -223,13 +225,14 @@ Compact and exact: small controls, strict focus, state-only motion.
 ### Buttons (**Verified** against `base/button/button.tsx`)
 
 - **Heights:** `xs` 20px, `sm` 24px, `default` 28px, `lg` 32px; icon-only 24 / 28 / 32 / 36px.
-- **Touch:** `xs`, `sm`, `icon-xs` and `icon-sm` extend a 44px hit area on `pointer-coarse` via an `::after` (24px + 2 x 10px, and 28px + 2 x 8px for `icon-sm`). Class presence is unit-tested; the rendered 44px is not yet checked on a touch device. `default`, `lg`, `icon` and `icon-lg` have no coarse-pointer rule, so the claim "text buttons are 44px on touch" is **Proposed**, not shipped.
+- **Touch:** on `pointer-coarse`, `xs`, `sm` and `default` are 44px tall, `lg` is 48px, and icon sizes grow to 44px (`icon-xl` and `icon-lg` to 48px). **Verified** in a browser on a 375px touch context (critique pass); not covered by an automated test, and not tried on a physical device.
 - **Motion:** 150ms transition on colour, border, shadow and opacity, with `motion-reduce:transition-none`.
-- Variant fills (hover 12%/20% mix, ghost 6%/11%, destructive tint 10/17/24%) are carried over from the previous `DESIGN.md`; **Not re-verified** in this pass.
+- **Filled (default) button:** hover and pressed are solid mixes of its ink toward the page (`bg-fill-hover` 18%, `bg-fill-pressed` 32%), never an alpha, so hover cannot read as the disabled state. **Verified** and guarded in `e2e/theme-tokens.e2e.ts`.
+- Other variant fills (ghost 6%/11%, destructive tint 10/17/24%) are carried over from the previous `DESIGN.md`; **Not re-verified** in this pass.
 
 ### Inputs, badges, navigation
 
-Input 32px / `lg` radius, badge 20px / `sm` radius, sidebar 16rem / 18rem sheet / 3rem collapsed, header 56px: carried over from the previous `DESIGN.md`, **Not re-verified**. Input border contrast: the light `input` token measures 3.95:1 against `background` (above), clearing the 3:1 non-text minimum; the dark token is alpha-based and not yet measured.
+Input 28px on a mouse (44px with 16px text on touch), `md` radius: **Verified** in `e2e/touch-fields.e2e.ts`. Badge 20px / `sm` radius, sidebar 16rem / 18rem sheet / 3rem collapsed, header 56px: carried over from the previous `DESIGN.md`, **Not re-verified**. Input border contrast is in the Neutral list above (3.8:1 light, 3.3:1 dark).
 
 ## 8. Do's and Don'ts
 
@@ -269,6 +272,10 @@ Input 32px / `lg` radius, badge 20px / `sm` radius, sidebar 16rem / 18rem sheet 
 | `--font-preference-*` overrides                    | documented                                           | read by `--font-heading`, `--font-body`, `--font-ui` and `--font-code` in `shared-styles.css`; nothing writes them yet (the theme editor is not built)                       | Open Question                                                                                 |
 | Radius derivation                                  | `--radius-base` 0.25rem                              | present                                                                                                                                                                      | **Aligned**                                                                                   |
 | Button sizes and 150ms motion                      | 20/24/28/32px, 150ms                                 | match `button.tsx`                                                                                                                                                           | **Aligned**                                                                                   |
+| Compact control scale                              | h1 of a form card 17px, controls 13px, fields 28px   | rendered values match; guarded for fields by `e2e/touch-fields.e2e.ts`                                                                                                       | **Aligned** (Verified)                                                                        |
+| Real-16 touch fields                               | 16px, 44px tall on touch                             | `--text-touch-field` plus `pointer-coarse:` classes on Input and Textarea                                                                                                    | **Aligned** (Verified in emulation); physical iPhone untested                                 |
+| Focus outline                                      | `outline-2 outline-offset-2 outline-ring`            | Button, LinkButton, Input, Textarea, InputGroup, Toggle use it; other shadcn components still use ring halos                                                                 | Partly aligned                                                                                |
+| Muted, card, popover and input tokens              | solid mixes and literals                             | `color-mix` solids and literals in `tokens/colors.css` and `utilities.css`; guarded by `e2e/theme-tokens.e2e.ts`                                                             | **Aligned** (Verified)                                                                        |
 | Button/icon-button 44px on touch                   | text buttons 44px                                    | `xs`, `sm`, `icon-xs`, `icon-sm` extend a 44px hit area (class-tested); `default`, `lg`, `icon`, `icon-lg` do not                                                            | **Proposed** for the unextended sizes; code lags                                              |
 | Inputs, badges, sidebar, header specifics          | as listed                                            | not re-checked                                                                                                                                                               | Open Question                                                                                 |
 | Out-of-gamut state colours                         | n/a                                                  | destructive, success, info exceed sRGB                                                                                                                                       | **Known Problem**; decision for token review                                                  |
@@ -282,4 +289,4 @@ Input 32px / `lg` radius, badge 20px / `sm` radius, sidebar 16rem / 18rem sheet 
 
 - Colour, ladder and elevation values were checked against `packages/frontend/tailwind-config`; contrast ratios were computed from those values.
 - The header, handle and hint behaviour was read from source and exercised in a browser (desktop and phone widths); contrast for the handle and hint text was computed from rendered colours.
-- The theme-owned framing, One Voice rule, touch-by-input-method and Real-16 rule are guidance, not verified behaviour.
+- The theme-owned framing, One Voice rule and touch-by-input-method are guidance, not verified behaviour. The Real-16 rule, the compact scale, the focus outline and the colour tokens above were measured in a browser and are guarded by the end-to-end tests named beside them.
