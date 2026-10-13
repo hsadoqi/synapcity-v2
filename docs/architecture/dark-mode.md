@@ -46,11 +46,11 @@ Because the variables carry both modes, components use semantic classes (`bg-bac
 
 ### Control
 
-`ModeToggle` is a dropdown trigger (`ModeButton`) plus three items (`ModeMenu`). Selecting an item calls `setTheme("light" | "dark" | "system")`. The sun and moon icons cross-fade using the `dark:` variant, not JavaScript.
+`ModeToggle` is a dropdown trigger (`ModeButton`) plus three items (`ModeMenu`). It appears in the header of the shared root shell, so both apps get the same control from one place. Selecting an item calls `setTheme("light" | "dark" | "system")`. The sun and moon icons cross-fade using the `dark:` variant, not JavaScript.
 
 ## Wiring rules
 
-1. **`ModeToggle` must render inside `ModeProvider`.** In `apps/web/src/app/layout.tsx` the toggle is a child of `<RootProviders>`. `useTheme()` outside a provider does not throw. It returns a default whose `setTheme` is an empty function, so the click handler runs, nothing changes, and no `.dark` class appears. This was the cause of an earlier bug where the new theme was logged but the page did not update.
+1. **`ModeToggle` must render inside `ModeProvider`.** The toggle is rendered by `RootHeader` (`packages/frontend/ui/src/blocks/root-shell/root-header.tsx`), and each app's `layout.tsx` wraps `<RootShell>` in `<RootProviders>`, so it is inside the provider. Rendering `ModeToggle` anywhere outside that wrapper breaks it. `useTheme()` outside a provider does not throw. It returns a default whose `setTheme` is an empty function, so the click handler runs, nothing changes, and no `.dark` class appears. This was the cause of an earlier bug where the new theme was logged but the page did not update.
 2. **Put `suppressHydrationWarning` on `<html>`.** `next-themes` changes the `class` attribute before React hydrates, so React would otherwise warn about a mismatch.
 3. **Do not set `:root`, `.dark` or `@theme` rules in an app's `globals.css`.** Colour values are changed once, in `utilities.css` (ADR-0002 §3).
 4. **Import from the package exports.** Providers are `@synapcity/frontend-ui/providers/*`, and the toggle is `@synapcity/frontend-ui/components/mode-toggle`.
@@ -66,11 +66,10 @@ If the mode does not change:
 
 ## Known gaps and open items
 
-- `mode-toggle.tsx` uses `h-[1.2rem] w-[1.2rem]` bracket values, which the design rules discourage. A scale step such as `size-5` would change the icon size, so it needs a decision.
 - `apps/web` and `apps/docs` each have their own `providers.tsx` with identical content. The duplication is how they drifted apart once already; sharing one provider config from `@synapcity/frontend-ui` would remove that risk but is a separate decision.
 - A debug `console.log` remains in `handleModeChange`.
 - The `dark-mode-provider.tsx` filename was renamed to `mode-provider.tsx`. The archived note `docs/archive/archive/2026-10-10-dark-mode-provider.md` describes a different, earlier provider from the previous implementation and is historical only.
-- Light, dark and system-dark have not been checked by eye (ADR-0002 states the same).
+- The docs app was screenshotted in headless Chrome in both system light and system dark, and both render correctly. The toggle itself, and choosing Light or Dark explicitly, have not been exercised in a browser.
 
 ## Revisit triggers
 
