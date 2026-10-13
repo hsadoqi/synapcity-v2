@@ -16,20 +16,28 @@ type LinkButtonProps = NativeLinkProps &
   Pick<ButtonProps, 'variant' | 'size'> & { href: string; disabled?: boolean };
 
 const LinkButton = React.forwardRef<HTMLAnchorElement, LinkButtonProps>(
-  ({ variant, size, className, href, disabled, ...props }: LinkButtonProps) => {
+  ({ variant, size, className, href, disabled, onClick, ...props }, ref) => {
     return (
       <Link
-        ref={disabled ? null : undefined}
+        ref={ref}
         data-slot="link-button"
         aria-disabled={disabled}
         tabIndex={disabled ? -1 : undefined}
-        className={cn(buttonVariants({ variant, size, ...props }), className)}
+        className={cn(buttonVariants({ variant, size }), className)}
         href={href}
+        onClick={(event) => {
+          if (disabled) {
+            event.preventDefault();
+            return;
+          }
+          onClick?.(event);
+        }}
         {...props}
       />
     );
   },
 );
+LinkButton.displayName = 'LinkButton';
 
 export { LinkButton };
 export type { LinkButtonProps };

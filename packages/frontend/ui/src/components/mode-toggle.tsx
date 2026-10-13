@@ -2,8 +2,8 @@
 
 import * as React from 'react';
 import { Moon, Sun } from 'lucide-react';
-import { useTheme } from 'next-themes';
-
+import type { Mode } from '../providers/mode-provider';
+import { useMode } from '../providers/mode-provider';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +14,6 @@ import {
 import { IconButton, IconButtonProps, IconSize } from './icon-button';
 import { ButtonVariant } from './ui/button';
 
-type Mode = 'light' | 'dark' | 'system';
 
 const ModeButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
   ({ className, ...props }, ref) => {
@@ -76,7 +75,7 @@ function ModeToggle({
   size?: IconSize;
   variant?: ButtonVariant;
 }) {
-  const { theme, setTheme } = useTheme();
+  const { mode, setMode } = useMode();
 
   return (
     <div className={className}>
@@ -88,8 +87,8 @@ function ModeToggle({
         />
         <DropdownMenuContent align="end">
           <ModeMenu
-            value={isMode(theme) ? theme : 'system'}
-            onUpdate={setTheme}
+            value={isMode(mode) ? mode : 'system'}
+            onUpdate={setMode}
           />
         </DropdownMenuContent>
       </DropdownMenu>

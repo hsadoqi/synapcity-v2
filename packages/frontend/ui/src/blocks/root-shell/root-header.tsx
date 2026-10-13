@@ -4,10 +4,10 @@ import Link from 'next/link';
 
 export const RootHeader = () => {
   return (
-    <header className="flex w-full px-6 py-4">
-        <div className="flex-1 flex items-center justify-between  gap-4">
-      <RootLogoLink />
-      <RootIconActions />
+    <header className="flex w-full ">
+      <div className="flex-1 flex items-center justify-between gap-4 bg-background/80 backdrop-blur-sm rounded-lg px-4 py-2">
+        <RootLogoLink />
+        <RootIconActions />
       </div>
     </header>
   );
@@ -24,7 +24,7 @@ const RootLogoLink = () => {
 const RootIconActions = () => {
   return (
     <div className="flex items-center gap-4">
-      <ModeToggle variant="ghost"/>
+      <ModeToggle variant="ghost" />
     </div>
   );
 };
