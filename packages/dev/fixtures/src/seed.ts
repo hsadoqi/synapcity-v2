@@ -1,21 +1,37 @@
-import { DEFAULT_SEED, createFixtures, type Person } from './index.ts';
+import { fileURLToPath } from 'node:url';
+import { DEFAULT_SEED, createFixtures, type Fixtures } from './index.ts';
 
 /*
- * The seed file's content. Generic placeholders: the shape follows the
- * accepted data model once there is one, so this holds no domain entity yet.
+ * One entry per seed file: the key is the file name (`seed/<name>.json`) and
+ * the value builds its rows from a seeded `Fixtures`. To add a kind of seed,
+ * add an entry and run `pnpm --filter @synapcity/dev-fixtures generate`.
+ * Entries stay generic until the data model is accepted.
  */
-export type Seed = {
-  seed: number;
-  people: Person[];
-};
+export const seedDefinitions = {
+  users: (fx: Fixtures) => fx.list(10, fx.person),
+} satisfies Record<string, (fx: Fixtures) => unknown[]>;
 
-export const PEOPLE_COUNT = 10;
+export type SeedName = keyof typeof seedDefinitions;
 
-export function buildSeed(seed: number = DEFAULT_SEED): Seed {
-  const fx = createFixtures(seed);
-  return { seed, people: fx.list(PEOPLE_COUNT, fx.person) };
+export const seedNames = Object.keys(seedDefinitions) as SeedName[];
+
+export function isSeedName(name: string): name is SeedName {
+  return Object.hasOwn(seedDefinitions, name);
 }
 
-export function serializeSeed(seed: Seed): string {
-  return `${JSON.stringify(seed, null, 2)}\n`;
+export function buildSeed<N extends SeedName>(
+  name: N,
+  seed: number = DEFAULT_SEED,
+): ReturnType<(typeof seedDefinitions)[N]> {
+  return seedDefinitions[name](createFixtures(seed)) as ReturnType<
+    (typeof seedDefinitions)[N]
+  >;
+}
+
+export function seedPath(name: SeedName): string {
+  return fileURLToPath(new URL(`../seed/${name}.json`, import.meta.url));
+}
+
+export function serializeSeed(rows: unknown[]): string {
+  return `${JSON.stringify(rows, null, 2)}\n`;
 }

@@ -14,6 +14,14 @@ const people = fx.list(5, fx.person);
 - **Dev-only.** Declare it in `devDependencies`, and import it only from tests, stories, e2e specs and seed scripts, never from shipped app code.
 - Source is exported as TypeScript (`./src/index.ts`), like the other `dev-*` packages.
 
-## Seed file
+## Seed files
 
-`seed/seed.json` is a committed, deterministic seed built from the same factories (`src/seed.ts`). Regenerate it with `pnpm --filter @synapcity/dev-fixtures generate [seed]` after changing a factory, then commit it. A test fails when the file drifts from the generator. Its shape is a placeholder (a list of people) until the data model is decided; nothing consumes it yet.
+`seed/<name>.json` files are committed, deterministic seeds built from the same factories. Each is one entry in `seedDefinitions` (`src/seed.ts`): the key is the file name, the value builds its rows from a seeded `Fixtures`.
+
+```sh
+pnpm --filter @synapcity/dev-fixtures generate            # every seed
+pnpm --filter @synapcity/dev-fixtures generate users      # one seed
+pnpm --filter @synapcity/dev-fixtures generate users 42   # one seed, another RNG seed
+```
+
+To add a kind of seed, add a `seedDefinitions` entry and run `generate`. A test per entry fails when a committed file drifts from its definition (it checks the default seed, so commit files generated without a seed argument). Files are exported as `@synapcity/dev-fixtures/data/<name>`. The shapes are placeholders until the data model is decided; nothing consumes them yet.

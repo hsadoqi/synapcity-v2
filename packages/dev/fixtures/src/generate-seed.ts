@@ -1,22 +1,34 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { buildSeed, serializeSeed } from './seed.ts';
+import {
+  buildSeed,
+  isSeedName,
+  seedNames,
+  seedPath,
+  serializeSeed,
+} from './seed.ts';
 
 /*
- * `pnpm --filter @synapcity/dev-fixtures generate [seed]` rewrites
- * seed/seed.json. Run it after changing a factory, then commit the result.
+ * `pnpm --filter @synapcity/dev-fixtures generate [name] [seed]` rewrites
+ * seed/<name>.json, or every seed when no name is given. Run it after changing
+ * a factory or a definition, then commit the result.
  */
-export const SEED_FILE = fileURLToPath(
-  new URL('../seed/seed.json', import.meta.url),
-);
+const [nameArg, seedArg] = process.argv.slice(2);
 
-const arg = process.argv[2];
-const seed = arg === undefined ? undefined : Number(arg);
-if (seed !== undefined && !Number.isInteger(seed)) {
-  throw new Error(`Seed must be an integer, received "${arg}"`);
+if (nameArg !== undefined && !isSeedName(nameArg)) {
+  throw new Error(
+    `Unknown seed "${nameArg}". Known seeds: ${seedNames.join(', ')}`,
+  );
 }
 
-mkdirSync(dirname(SEED_FILE), { recursive: true });
-writeFileSync(SEED_FILE, serializeSeed(buildSeed(seed)));
-console.log(`Wrote ${SEED_FILE}`);
+const seed = seedArg === undefined ? undefined : Number(seedArg);
+if (seed !== undefined && !Number.isInteger(seed)) {
+  throw new Error(`Seed must be an integer, received "${seedArg}"`);
+}
+
+for (const name of nameArg === undefined ? seedNames : [nameArg]) {
+  const file = seedPath(name);
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, serializeSeed(buildSeed(name, seed)));
+  console.log(`Wrote ${file}`);
+}
