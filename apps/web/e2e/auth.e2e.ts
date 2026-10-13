@@ -221,10 +221,10 @@ test.describe('server-side field errors', () => {
       'Use a password of at least 8 characters.',
     );
     await expect(password).toHaveAttribute('aria-invalid', 'true');
-    await expect(password).toHaveAttribute(
-      'aria-describedby',
-      'password-hint form-message',
-    );
+    // The message carries the rule while the field is invalid, so the hint
+    // steps aside instead of repeating it above the error.
+    await expect(password).toHaveAttribute('aria-describedby', 'form-message');
+    await expect(page.getByText('Use at least 8 characters.')).toHaveCount(0);
     await expect(page.getByLabel('Email')).not.toHaveAttribute(
       'aria-invalid',
       /.*/,
