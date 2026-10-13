@@ -48,7 +48,7 @@ describe('AuthButtons', () => {
     const signUp = screen.getByRole('link', { name: 'Sign up' });
 
     expect(signIn.getAttribute('aria-current')).toBe('page');
-    expect(signIn.className).toContain('bg-secondary');
+    expect(signIn.className).toContain('border-border');
     expect(signUp.className).not.toContain('bg-primary-foreground');
   });
 });
