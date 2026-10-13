@@ -4,10 +4,8 @@ import {
   type LinkButtonSize,
   type LinkButtonVariant,
 } from '@synapcity/frontend-ui/components/link-button';
-import { LogoutButton } from './logout-button';
 
-type AuthType =
-  'login' | 'register' | 'forgot-password' | 'update-password' | 'logout';
+type AuthType = 'login' | 'register' | 'forgot-password' | 'update-password';
 
 interface AuthButtonProps {
   type?: AuthType;
@@ -16,6 +14,8 @@ interface AuthButtonProps {
   variant?: LinkButtonVariant;
   buttonClassName?: string;
   className?: string;
+  /** A safe post-sign-in destination, carried across to the other auth page. */
+  next?: string;
 }
 
 const authTypeToPath: Record<AuthType, string> = {
@@ -23,7 +23,6 @@ const authTypeToPath: Record<AuthType, string> = {
   register: '/auth/register',
   'forgot-password': '/auth/forgot-password',
   'update-password': '/auth/update-password',
-  logout: '/auth/logout',
 };
 
 export const AuthLinkButton = ({
@@ -33,21 +32,22 @@ export const AuthLinkButton = ({
   variant = 'link',
   buttonClassName,
   className,
+  next,
 }: AuthButtonProps) => {
-  if (type === 'logout') {
-    return <LogoutButton />;
-  }
+  const href = next
+    ? `${authTypeToPath[type]}?next=${encodeURIComponent(next)}`
+    : authTypeToPath[type];
 
   return (
-    <nav className={cn('flex justify-center flex-1', className)}>
+    <div className={cn('flex flex-1 justify-center', className)}>
       <LinkButton
-        href={authTypeToPath[type]}
+        href={href}
         variant={variant}
         size={size}
         className={buttonClassName}
       >
         {label}
       </LinkButton>
-    </nav>
+    </div>
   );
 };

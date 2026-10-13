@@ -12,7 +12,6 @@ export function OAuthButtons({ next }: { next: string }) {
         value="google"
         variant="outline"
         size="lg"
-        label="Continue with Google"
       >
         Continue with Google
       </Button>
@@ -22,7 +21,6 @@ export function OAuthButtons({ next }: { next: string }) {
         value="github"
         variant="outline"
         size="lg"
-        label="Continue with GitHub"
       >
         Continue with GitHub
       </Button>

@@ -6,7 +6,7 @@ import {
   AvatarImage,
 } from '@synapcity/frontend-ui/core/avatar';
 
-import { useCurrentUserProfile } from '@/hooks/use-current-user-profile';
+import { useCurrentUser } from '../provider/user-provider';
 
 function initialsOf(name: string | null): string {
   if (!name) return '?';
@@ -20,7 +20,9 @@ function initialsOf(name: string | null): string {
 }
 
 export function CurrentUserAvatar() {
-  const { name, imageUrl } = useCurrentUserProfile();
+  const user = useCurrentUser();
+  const name = user?.name ?? null;
+  const imageUrl = user?.imageUrl ?? null;
 
   return (
     <Avatar>
