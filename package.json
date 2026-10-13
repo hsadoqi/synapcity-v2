@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "turbo run build",
-    "build:storybook": "turbo run build --filter=storybook",
+    "build:storybook": "turbo run build-storybook --filter=storybook",
     "dev": "turbo run dev",
     "dev:web": "turbo run dev --filter=web",
     "dev:docs": "turbo run dev --filter=docs",
