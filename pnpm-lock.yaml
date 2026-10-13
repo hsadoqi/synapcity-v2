@@ -31,7 +31,7 @@ importers:
 
   apps/docs:
     dependencies:
-      '@synapcity/ui':
+      '@synapcity/frontend-ui':
         specifier: workspace:*
         version: link:../../packages/frontend/ui
       next:
@@ -77,7 +77,7 @@ importers:
 
   apps/web:
     dependencies:
-      '@synapcity/ui':
+      '@synapcity/frontend-ui':
         specifier: workspace:*
         version: link:../../packages/frontend/ui
       '@tailwindcss/postcss':

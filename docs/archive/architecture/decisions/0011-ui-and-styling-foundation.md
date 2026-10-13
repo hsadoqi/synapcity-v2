@@ -7,10 +7,10 @@
 ## Context
 
 The Phase 2 design (§4.1, §6) already settles the physical path
-(`packages/ui/core` → `@synapcity/ui-core`) and the ownership-sensitive
+(`packages/ui/core` → `@synapcity/frontend-uiontend-uiontend-ui-core`) and the ownership-sensitive
 runtime rule (§7.2, amending ADR-0005/ADR-0007). This ADR records the
 remaining approval-sensitive technical choices the plan requires before
-`@synapcity/ui-core` is created: the styling model and the shadcn/Base UI
+`@synapcity/frontend-uiontend-uiontend-ui-core` is created: the styling model and the shadcn/Base UI
 source-acquisition mechanism. The dependency evidence in
 [phase-02-dependency-evidence.md](../../engineering/plans/phase-02-dependency-evidence.md)
 confirms Tailwind CSS 4.3.3 and shadcn CLI 4.21.0 as current.
@@ -30,7 +30,7 @@ maintainers), not a change of technical direction.
 
 ## Decision
 
-1. `@synapcity/ui-core` (`packages/ui/core`) is the single, consolidated
+1. `@synapcity/frontend-uiontend-uiontend-ui-core` (`packages/ui/core`) is the single, consolidated
    initial shared UI package. It owns reusable React/web primitives,
    intrinsic browser presentation behavior, foundational shared styling, and
    colocated component tests/stories. It does not own Next.js routing,
@@ -40,7 +40,7 @@ maintainers), not a change of technical direction.
    model: `@theme` for utility-generating theme variables, ordinary CSS
    custom properties for runtime/semantic values that should not generate
    utilities. No legacy JavaScript `tailwind.config.*` is created by default.
-   `@synapcity/ui-core` owns the shared theme/token source; each application
+   `@synapcity/frontend-uiontend-uiontend-ui-core` owns the shared theme/token source; each application
    owns its own build-tool Tailwind integration.
 3. shadcn CLI `4.x` (evidence version 4.21.0) is adopted strictly as a
    source-acquisition and maintenance mechanism (design §6.3), not as an
@@ -51,7 +51,7 @@ maintainers), not a change of technical direction.
 4. Base UI (`@base-ui/react`, evidence version `1.8.0` GA — renamed from the
    now-deprecated `@base-ui-components/react`) is the shadcn primitive base.
 5. Exactly one representative primitive (Button) is added inside
-   `@synapcity/ui-core` to prove the acquisition → package → export → styling
+   `@synapcity/frontend-uiontend-uiontend-ui-core` to prove the acquisition → package → export → styling
    → consumption path. No component catalog begins in Phase 2.
 
 ## Scope
@@ -90,7 +90,7 @@ package/version requires founder approval and an amending ADR.
 
 ## Integration expectations
 
-`@synapcity/ui-core` must respect ADR-0005's `ui` category dependency
+`@synapcity/frontend-uiontend-uiontend-ui-core` must respect ADR-0005's `ui` category dependency
 direction (may import `shared`; must not import `domain`; must not import
 Next.js). Cross-workspace consumers use only the package's declared
 `exports` (ADR-0005 public-API rule).

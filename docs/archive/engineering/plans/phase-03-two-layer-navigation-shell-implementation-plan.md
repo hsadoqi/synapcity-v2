@@ -17,7 +17,7 @@
 ## Global Constraints
 
 - Versions are pinned by the repository; do not add or upgrade dependencies.
-- Import ui-core through `@synapcity/ui-core/components` and `@synapcity/ui-core/layouts/panel`, as the existing root components do.
+- Import ui-core through `@synapcity/frontend-uiontend-uiontend-uionten@synapcity/frontend-uiapcity/frontend-uiapcity/frontend-uiapcity/frontend-ui-core/layouts/panel`, as the existing root components do.
 - Colors and radii come from theme tokens only. No hardcoded colors, no bracket values, no `!important`, no inline `style` for static values (the two existing commented `overflow: hidden` overrides on resizable panels stay).
 - `className` on ui-core components is for layout only.
 - Merge classes with `cn()` from `apps/web/lib/utils` where classes are combined; never concatenate strings or write a ternary inside a class string.
@@ -250,7 +250,7 @@ Expected: PASS.
 - [ ] **Step 5: Verify and commit**
 
 ```bash
-pnpm --filter @synapcity/ui-core typecheck
+pnpm --filter @synapcity/frontend-uiontend-uiontend-uiontend-ui-core typecheck
 pnpm exec eslint packages/ui/core/src/components/base/sidebar
 git add packages/ui/core/src/components/base/sidebar
 git commit -m "feat: let the sidebar provider turn off its cookie and shortcut"
@@ -549,7 +549,7 @@ Create `apps/web/components/root/root-space-sidebar.test.tsx`:
 import {
   DarkModeProvider,
   SidebarProvider,
-} from '@synapcity/ui-core/components';
+} from '@synapcity/frontend-uiontend-uiontend-uiontend-ui-core/components';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { RootSpaceSidebar } from './root-space-sidebar';
@@ -708,7 +708,7 @@ Create `apps/web/components/root/root-sidebar-lock-button.tsx`:
 ```tsx
 'use client';
 
-import { IconButton } from '@synapcity/ui-core/components';
+import { IconButton } from '@synapcity/frontend-uiontend-uiontend-uiontend-ui-core/components';
 import { Lock, LockOpen } from 'lucide-react';
 
 /**
@@ -764,7 +764,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from '@synapcity/ui-core/components';
+} from '@synapcity/frontend-uiontend-uiontend-uiontend-ui-core/components';
 import { GalleryVerticalEnd } from 'lucide-react';
 import { RootSidebarLockButton } from './root-sidebar-lock-button';
 import { currentRouteItem, hasSpaceSidebar } from './root-routes';
@@ -948,7 +948,7 @@ Replace the file:
 'use client';
 
 import type { ReactNode } from 'react';
-import { ContentContainer } from '@synapcity/ui-core/components';
+import { ContentContainer } from '@synapcity/frontend-uiontend-uiontend-uiontend-ui-core/components';
 import { RootSpaceSidebar } from './root-space-sidebar';
 
 /**
@@ -1055,19 +1055,19 @@ Replace the file. This is the largest change; read it against the current file f
 
 import React from 'react';
 import { usePathname } from 'next/navigation';
-import { SidebarProvider, useSidebar } from '@synapcity/ui-core';
+import { SidebarProvider, useSidebar } from '@synapcity/frontend-uiontend-uiontend-uiontend-ui-core';
 import { RootHeader } from './root-header';
 import { RootCommandPaletteProvider } from './root-command-palette';
 import { RootGlobalPanel } from './root-global-panel';
-import { useCollapsiblePanel } from '@synapcity/ui-core/hooks/use-collapsible-panel';
-import { useEscapeKey } from '@synapcity/ui-core/hooks/use-escape-key';
-import { useHeaderHeight } from '@synapcity/ui-core/hooks/use-header-height';
-import { useOutsideClick } from '@synapcity/ui-core/hooks/use-outside-click';
+import { useCollapsiblePanel } from '@synapcity/frontend-uiontend-uiontend-uiontend-ui-core/hooks/use-collapsible-panel';
+import { useEscapeKey } from '@synapcity/frontend-uiontend-uiontend-uiontend-ui-core/hooks/use-escape-key';
+import { useHeaderHeight } from '@synapcity/frontend-uiontend-uiontend-uiontend-ui-core/hooks/use-header-height';
+import { useOutsideClick } from '@synapcity/frontend-uiontend-uiontend-uiontend-ui-core/hooks/use-outside-click';
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-} from '@synapcity/ui-core';
+} from '@synapcity/frontend-uiontend-uiontend-uiontend-ui-core';
 import { RootGlobalContent } from './root-global-content';
 import { RootGlobalSidebar } from './root-global-sidebar';
 import { hasSpaceSidebar } from './root-routes';
@@ -1875,7 +1875,7 @@ Replace `root-header.tsx`:
 'use client';
 
 import * as React from 'react';
-import { PanelToggleButton } from '@synapcity/ui-core/layouts/panel';
+import { PanelToggleButton } from '@synapcity/frontend-uiontend-uiontend-uiontend-ui-core/layouts/panel';
 import { cn } from '../../lib/utils';
 import { useRootHeaderReveal } from '../../hooks/use-root-header-reveal';
 import { RootNavigation } from './root-navigation';

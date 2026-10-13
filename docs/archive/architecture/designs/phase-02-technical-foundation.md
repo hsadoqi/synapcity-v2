@@ -133,10 +133,10 @@ The repository owner has settled the physical-path question raised by the discov
 
 ```text
 packages/ui/core
-@synapcity/ui-core
+@synapcity/frontend-uiontend-ui-core
 ```
 
-This follows ADR-0007's category-qualified naming (`packages/<category>/<name>` → `@synapcity/<category>-<name>`), amended during the Phase 2 architecture reconciliation. It is intentionally a single consolidated initial UI package: `@synapcity/ui-core` does not approve a future hierarchy such as `ui-core` → `ui-shadcn` → `ui-components` (see §6.3). This design uses **shared UI package** where the discussion is not about the specific path or name.
+This follows ADR-0007's category-qualified naming (`packages/<category>/<name>` → `@synapcity/<category>-<name>`), amended during the Phase 2 architecture reconciliation. It is intentionally a single consolidated initial UI package: `@synapcity/frontend-uiontend-ui-core` does not approve a future hierarchy such as `ui-core` → `ui-shadcn` → `ui-components` (see §6.3). This design uses **shared UI package** where the discussion is not about the specific path or name.
 
 ### 4.2 `apps/web`
 
@@ -226,7 +226,7 @@ An independently versioned design-token/style package is deferred. Extraction be
 
 shadcn is a way to acquire and adapt source, not a runtime or architecture layer. After acquisition, Synapcity owns the component source, tests, accessibility behavior, public API, and maintenance.
 
-`@synapcity/ui-core` (§4.1) is the approved name of the single consolidated initial UI boundary. That name does not approve a speculative ancestry or layering model such as `ui-core` → `ui-shadcn` → `ui-components`, or any equivalent tiering. Phase 2 must not create such layers. It adds only one representative primitive—likely a Button, with the exact selection confirmed during planning—to prove the full integration path, inside the one approved package. Additional primitives must be pulled by Phase 3 requirements.
+`@synapcity/frontend-uiontend-ui-core` (§4.1) is the approved name of the single consolidated initial UI boundary. That name does not approve a speculative ancestry or layering model such as `ui-core` → `ui-shadcn` → `ui-components`, or any equivalent tiering. Phase 2 must not create such layers. It adds only one representative primitive—likely a Button, with the exact selection confirmed during planning—to prove the full integration path, inside the one approved package. Additional primitives must be pulled by Phase 3 requirements.
 
 If the shadcn CLI is used, its workspace configuration and aliases must align with the accepted package layout and public exports. Current upstream monorepo examples are evidence, not permission to replace Synapcity's topology with the example topology.
 
@@ -400,7 +400,7 @@ Use Vercel's supported monorepo behavior first. Do not build custom skip/filter 
 
 This is a dependency order, not an issue list:
 
-1. Record the required Phase 2 ADRs and approval-sensitive technical choices (the physical shared-UI package path, `packages/ui/core` / `@synapcity/ui-core`, is already settled; see §4.1).
+1. Record the required Phase 2 ADRs and approval-sensitive technical choices (the physical shared-UI package path, `packages/ui/core` / `@synapcity/frontend-uiontend-ui-core`, is already settled; see §4.1).
 2. Select compatible dependency versions from current first-party evidence without unrelated upgrades.
 3. Establish dependency/version/configuration ownership and the minimum shared TypeScript/testing profiles.
 4. Add Turborepo and define the small task graph.
@@ -514,7 +514,7 @@ The physical initial-UI-package path and the ADR-0007 runtime-agnostic question 
 
 ### Speculative packages
 
-- Only one shared UI boundary is proposed, at the now-settled path `packages/ui/core` (`@synapcity/ui-core`), which does not authorize any future layering (§4.1, §6.3).
+- Only one shared UI boundary is proposed, at the now-settled path `packages/ui/core` (`@synapcity/frontend-uiontend-ui-core`), which does not authorize any future layering (§4.1, §6.3).
 - Config, token, runtime, test, Storybook, widget, theme, and native packages remain candidates in the discovery ledger.
 
 ### Phase 0/1 consistency

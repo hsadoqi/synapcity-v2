@@ -226,7 +226,7 @@ It should initially contain only enough application code to prove:
 - TypeScript works;
 - linting covers TSX;
 - production build succeeds;
-- later integration can consume `@synapcity/ui-core`.
+- later integration can consume `@synapcity/frontend-uiontend-ui-core`.
 
 Do **not** create:
 
@@ -327,7 +327,7 @@ web-and-Storybook integration proof yet.
 Stage 2 target:
 
 ```text
-@synapcity/ui-core
+@synapcity/frontend-uiontend-ui-core
         |
         v
 apps/storybook
@@ -340,7 +340,7 @@ Neither application depends on the other.
 
 ---
 
-### 6.1 Create `@synapcity/ui-core`
+### 6.1 Create `@synapcity/frontend-uiontend-ui-core`
 
 Create:
 
@@ -351,7 +351,7 @@ packages/ui/core
 with manifest name:
 
 ```text
-@synapcity/ui-core
+@synapcity/frontend-uiontend-ui-core
 ```
 
 Initial ownership is intentionally narrow:
@@ -497,7 +497,7 @@ Storybook owns:
 - Storybook-specific addons;
 - independent build.
 
-Stories remain colocated with their components in `@synapcity/ui-core`.
+Stories remain colocated with their components in `@synapcity/frontend-uiontend-ui-core`.
 
 ---
 
@@ -507,7 +507,7 @@ Required durable decisions should capture:
 
 #### UI/styling
 
-- `@synapcity/ui-core`;
+- `@synapcity/frontend-uiontend-ui-core`;
 - React/web ownership;
 - Tailwind v4 CSS-first model;
 - semantic CSS ownership;
@@ -737,7 +737,7 @@ Use the representative primitive through the entire architecture:
 ```text
 shadcn / Base UI source
           ↓
-@synapcity/ui-core
+@synapcity/frontend-uiontend-ui-core
           ↓
 public package export
           ↓
@@ -756,7 +756,7 @@ apps/web   apps/storybook
 
 `apps/web` must:
 
-- declare `@synapcity/ui-core` as a workspace dependency;
+- declare `@synapcity/frontend-uiontend-ui-core` as a workspace dependency;
 - import it through its public export;
 - load the required shared styles;
 - correctly process Tailwind utilities originating from the shared package;
@@ -770,7 +770,7 @@ No deep imports are permitted.
 
 `apps/storybook` must independently:
 
-- declare `@synapcity/ui-core`;
+- declare `@synapcity/frontend-uiontend-ui-core`;
 - discover the component-owned Button story;
 - load the same shared presentation semantics;
 - render the component correctly;
@@ -784,11 +784,11 @@ No deep imports are permitted.
 Required graph:
 
 ```text
-apps/web -----------> @synapcity/ui-core
-apps/storybook -----> @synapcity/ui-core
+apps/web -----------> @synapcity/frontend-uiontend-ui-core
+apps/storybook -----> @synapcity/frontend-uiontend-ui-core
 
-@synapcity/ui-core -X-> apps/web
-@synapcity/ui-core -X-> apps/storybook
+@synapcity/frontend-uiontend-ui-core -X-> apps/web
+@synapcity/frontend-uiontend-ui-core -X-> apps/storybook
 
 apps/web -X-> apps/storybook
 apps/storybook -X-> apps/web
@@ -1362,7 +1362,7 @@ Records:
 
 Records:
 
-- `@synapcity/ui-core`;
+- `@synapcity/frontend-uiontend-ui-core`;
 - React/web presentation ownership;
 - Tailwind v4 CSS-first;
 - semantic CSS ownership;
@@ -1488,7 +1488,7 @@ Phase 2 is complete only when all of the following are true.
 
 #### UI
 
-- `@synapcity/ui-core` exists.
+- `@synapcity/frontend-uiontend-ui-core` exists.
 - public exports work.
 - no application-runtime dependency leaks exist.
 - one real representative primitive exists.

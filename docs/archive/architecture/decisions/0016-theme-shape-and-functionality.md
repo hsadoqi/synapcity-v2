@@ -6,7 +6,7 @@
 
 ## Context
 
-The theme editor in `@synapcity/ui-core` has grown control-by-control
+The theme editor in `@synapcity/frontend-uiontend-ui-core` has grown control-by-control
 (text scale, dark mode, accent picker) without a single statement of what a
 theme is made of or how its controls are grouped. This ADR records the intended
 shape of a theme and the behavior of each control, so later work builds against
@@ -208,7 +208,7 @@ identifiers, storage, and the font list each need their own approval under
 
 ## Integration expectations
 
-- Lives in `@synapcity/ui-core` for now and follows ADR-0005 (dependency
+- Lives in `@synapcity/frontend-uiontend-ui-core` for now and follows ADR-0005 (dependency
   direction and exports-only public API) and ADR-0011 (Tailwind v4 CSS-first,
   tokens in `globals.css`).
 - Mode, text scale, and any other value applied to the document root are applied

@@ -1,1 +1,1 @@
-export { cn } from '@synapcity/ui/lib/utils';
+export { cn } from '@synapcity/frontend-ui/lib/utils';

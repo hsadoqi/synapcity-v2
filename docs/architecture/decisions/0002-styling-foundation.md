@@ -14,9 +14,9 @@ Evidence: `packages/frontend/tailwind-config/`, `apps/web/src/styles/globals.css
 
 1. **Tailwind CSS v4, CSS-first.** There is no `tailwind.config.*`. The theme is declared in CSS with `@theme inline`, `@utility` and `@custom-variant`. PostCSS runs `@tailwindcss/postcss` through the shared config exported as `@synapcity/frontend-tailwind-config/postcss`.
 2. **One owner for tokens: `@synapcity/frontend-tailwind-config`.** `shared-styles.css` is the package entry and composes `tokens/variants.css`, `base.css`, `utilities.css`, `accessibility.css` and `typeset.css`. Colour ramps (`base`, `primary`, `accent`), the semantic colours (`background`, `foreground`, `primary`, `muted`, `border`, `ring`, `success`, `warning`, `info`, the sidebar set), the type ladder, the radius scale and the font roles are defined there and nowhere else.
-3. **Apps contain wiring only.** `apps/web/src/styles/globals.css` imports `tailwindcss`, `shadcn/tailwind.css` and `@synapcity/ui/styles.css`, and declares `@source` lines. It declares no `:root`, `.dark`, `@theme` or `@layer base` rules. A token change is made in `@synapcity/frontend-tailwind-config`.
+3. **Apps contain wiring only.** `apps/web/src/styles/globals.css` imports `tailwindcss`, `shadcn/tailwind.css` and `@synapcity/frontend-ui/styles.css`, and declares `@source` lines. It declares no `:root`, `.dark`, `@theme` or `@layer base` rules. A token change is made in `@synapcity/frontend-tailwind-config`.
 4. **Light and dark are explicit-or-system.** `.light` and `.dark` on the root force a mode; without either, `prefers-color-scheme` decides. The `dark` variant follows the same rule. Mode values come from the `theme-light` and `theme-dark` utilities, applied on `:root`.
-5. **shadcn/ui, style `base-mira`, on Base UI.** Components live in `@synapcity/ui` (`packages/frontend/ui/src/components/ui`) and use `@base-ui/react` primitives, `class-variance-authority` and `lucide-react`. Both `components.json` files set `tailwind.config` to empty, `cssVariables: true` and `baseColor: neutral`. The web app's `components.json` routes the `ui` alias to `@synapcity/ui/core` and `utils` to `@synapcity/ui/lib/utils`, so `pnpm ui:add` (`shadcn add -c apps/web`) writes into the shared package.
+5. **shadcn/ui, style `base-mira`, on Base UI.** Components live in `@synapcity/frontend-ui` (`packages/frontend/ui/src/components/ui`) and use `@base-ui/react` primitives, `class-variance-authority` and `lucide-react`. Both `components.json` files set `tailwind.config` to empty, `cssVariables: true` and `baseColor: neutral`. The web app's `components.json` routes the `ui` alias to `@synapcity/frontend-ui/core` and `utils` to `@synapcity/frontend-ui/lib/utils`, so `pnpm ui:add` (`shadcn add -c apps/web`) writes into the shared package.
 6. **`shadcn/tailwind.css` is imported by each consuming app.** It supplies the `data-open` and `data-closed` variants and the accordion keyframes that the base-style overlay components use.
 7. **Values.** Base radius 0.25rem (`--radius-base`), text base 0.9375rem (`--text-base-size`) with a fixed ladder derived from it, achromatic default palette. Classes use semantic tokens, never palette colours.
 8. **Reduced motion and forced colours** are handled once, in `accessibility.css` and `base.css`, outside component code.
@@ -34,7 +34,7 @@ How styling is owned, composed and extended. It does not choose which components
 
 ## Unresolved
 
-- The `@source` line in each app that points into `packages/frontend/ui/src` is duplicated in `@synapcity/ui`'s own stylesheet. Whether one of them can go has not been tested.
+- The `@source` line in each app that points into `packages/frontend/ui/src` is duplicated in `@synapcity/frontend-ui`'s own stylesheet. Whether one of them can go has not been tested.
 - The `typeset.css` file is vendored from shadcn's typeset; whether upgrades are tracked as a dependency or a copy has not been decided.
 
 ## Governance boundary
@@ -43,7 +43,7 @@ The repository owner approves changes to token ownership, the shadcn style or ba
 
 ## Integration expectations
 
-- A new app imports `tailwindcss`, `shadcn/tailwind.css` and `@synapcity/ui/styles.css`, then adds `@source` for any workspace it renders classes from, because Tailwind v4 does not scan symlinked workspace packages by itself.
+- A new app imports `tailwindcss`, `shadcn/tailwind.css` and `@synapcity/frontend-ui/styles.css`, then adds `@source` for any workspace it renders classes from, because Tailwind v4 does not scan symlinked workspace packages by itself.
 - Components import `cn` per ADR-0004 and use `className` for layout only.
 - `shadcn add` must not write token blocks into an app's `globals.css`; if it does, remove them.
 

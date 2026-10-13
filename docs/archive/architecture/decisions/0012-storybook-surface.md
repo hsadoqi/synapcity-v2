@@ -43,7 +43,7 @@ package and app.
    global preview/decorators, shared-CSS loading, and its own independent
    static production build. It does not own shared components, component
    tests, or component stories — those remain colocated with
-   `@synapcity/ui-core` (ADR-0011); Storybook discovers rather than owns
+   `@synapcity/frontend-uiontend-uiontend-ui-core` (ADR-0011); Storybook discovers rather than owns
    them.
 3. Accessibility integration uses `@storybook/addon-a11y` (evidence version
    10.6.0), configured to fail on real violations (`a11y.test = 'error'`),
@@ -76,7 +76,7 @@ workspace Vitest baseline.
 
 ## What this does NOT decide
 
-- `@synapcity/ui-core`'s contents (ADR-0011).
+- `@synapcity/frontend-uiontend-uiontend-ui-core`'s contents (ADR-0011).
 - ADR-0004's Vitest `^5.0.2` baseline for the root and every other package/app
   — unchanged; this ADR only adds an isolated, workspace-scoped Vitest `^4.1.11`
   inside `apps/storybook` itself.

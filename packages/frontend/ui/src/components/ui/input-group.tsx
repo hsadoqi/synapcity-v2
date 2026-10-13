@@ -4,9 +4,9 @@ import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from 'cn';
 
-import { Button } from '@synapcity/ui/core/button';
-import { Input } from '@synapcity/ui/core/input';
-import { Textarea } from '@synapcity/ui/core/textarea';
+import { Button } from '@synapcity/frontend-ui/core/button';
+import { Input } from '@synapcity/frontend-ui/core/input';
+import { Textarea } from '@synapcity/frontend-ui/core/textarea';
 
 function InputGroup({ className, ...props }: React.ComponentProps<'div'>) {
   return (

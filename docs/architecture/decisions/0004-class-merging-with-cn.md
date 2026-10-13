@@ -13,7 +13,7 @@ The npm registry page could not be read in this session (HTTP 403), so the packa
 ## Decision
 
 - Class names are merged with `cn` from the `cn` package.
-- `@synapcity/ui` depends on `cn` and re-exports it from `src/lib/utils.ts` (`export { cn } from 'cn'`). Applications re-export it from `@synapcity/ui/lib/utils`.
+- `@synapcity/frontend-ui` depends on `cn` and re-exports it from `src/lib/utils.ts` (`export { cn } from 'cn'`). Applications re-export it from `@synapcity/frontend-ui/lib/utils`.
 - `clsx` and `tailwind-merge` are not added as direct dependencies.
 - Components should import through the `utils` alias that `components.json` defines, so that `shadcn add` output and hand-written components match. Today `button.tsx` imports `cn` straight from `'cn'`; that is allowed but should be aligned when the file is next touched.
 

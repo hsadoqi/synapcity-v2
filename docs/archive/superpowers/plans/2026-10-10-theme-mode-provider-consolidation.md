@@ -42,7 +42,7 @@ Failure modes the spec implies, most likely first. Each has a test in the task t
 - Modify: `packages/ui/core/src/providers/index.ts`
 
 **Interfaces:**
-- Produces: `THEME_COOKIE: 'theme'` and `THEME_INIT_SCRIPT: string` (an immediately-invoked function expression), both exported from `@synapcity/ui-core` through `providers/index.ts`.
+- Produces: `THEME_COOKIE: 'theme'` and `THEME_INIT_SCRIPT: string` (an immediately-invoked function expression), both exported from `@synapcity/frontend-uiontend-uiontend-ui-core` through `providers/index.ts`.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -633,7 +633,7 @@ git commit -m "refactor: wire the dark-mode block to ThemeProvider"
 - Create: `apps/web/tests/theme-mode.spec.ts`
 
 **Interfaces:**
-- Consumes: `InlineScript`, `THEME_COOKIE`, `THEME_INIT_SCRIPT` from `@synapcity/ui-core`.
+- Consumes: `InlineScript`, `THEME_COOKIE`, `THEME_INIT_SCRIPT` from `@synapcity/frontend-uiontend-uiontend-ui-core`.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -703,7 +703,7 @@ import {
   InlineScript,
   THEME_COOKIE,
   THEME_INIT_SCRIPT,
-} from '@synapcity/ui-core';
+} from '@synapcity/frontend-uiontend-uiontend-ui-core';
 ```
 
 2. Change the cookie read to use the constant:

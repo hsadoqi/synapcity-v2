@@ -6,7 +6,7 @@
 
 ## Why
 
-The block redefined every `--text-*` token in terms of `--text-scale`, which resolved from `--text-scale-base`. Nothing defined `--text-scale-base`, so the web type utilities had no value to scale. It also competed with the documented ladder in `@synapcity/ui-core` (`--text-base-size: 0.875rem`), and its multipliers read as 16px-based, which contradicts `DESIGN.md`. The founder chose the `ui-core` ladder (ADR-0016, "Unresolved": text size).
+The block redefined every `--text-*` token in terms of `--text-scale`, which resolved from `--text-scale-base`. Nothing defined `--text-scale-base`, so the web type utilities had no value to scale. It also competed with the documented ladder in `@synapcity/frontend-uiontend-ui-core` (`--text-base-size: 0.875rem`), and its multipliers read as 16px-based, which contradicts `DESIGN.md`. The founder chose the `ui-core` ladder (ADR-0016, "Unresolved": text size).
 
 ## Replacement
 

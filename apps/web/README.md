@@ -1,6 +1,6 @@
 # web
 
-Owns: the Synapcity web application: routes, page composition, font loading and app-level data. It is a composition root; reusable components live in `@synapcity/ui` and theme tokens in `@synapcity/frontend-tailwind-config`.
+Owns: the Synapcity web application: routes, page composition, font loading and app-level data. It is a composition root; reusable components live in `@synapcity/frontend-ui` and theme tokens in `@synapcity/frontend-tailwind-config`.
 
 Next.js 16 (App Router) and React 19. See [ADR-0001](../../docs/architecture/decisions/0001-workspace-topology-and-toolchain.md) for the workspace and toolchain.
 
@@ -17,12 +17,12 @@ Per-app checks run through the root scripts (`pnpm lint`, `pnpm check-types`, `p
 
 ## Structure
 
-| Path                     | Contains                                                         |
-| ------------------------ | ---------------------------------------------------------------- |
-| `src/app/`               | Routes and the root layout, which loads Inter, Geist, Geist Mono |
-| `src/styles/globals.css` | Imports and `@source` lines only; no tokens                      |
-| `src/lib/`               | App-level helpers, including the `cn` re-export                  |
-| `components.json`        | shadcn config; routes added components into `@synapcity/ui`      |
+| Path                     | Contains                                                             |
+| ------------------------ | -------------------------------------------------------------------- |
+| `src/app/`               | Routes and the root layout, which loads Inter, Geist, Geist Mono     |
+| `src/styles/globals.css` | Imports and `@source` lines only; no tokens                          |
+| `src/lib/`               | App-level helpers, including the `cn` re-export                      |
+| `components.json`        | shadcn config; routes added components into `@synapcity/frontend-ui` |
 
 ## Styling
 

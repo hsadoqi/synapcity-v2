@@ -26,7 +26,7 @@ the repository's Node `>=24.20.0 <25` pin, and are mutually compatible
 3. Providers are introduced only for a demonstrated requirement, placed as
    deep in the tree as practical.
 4. `apps/web` owns Next.js APIs, routing, request/cookie/environment
-   integration, and application composition. `@synapcity/ui-core` may use
+   integration, and application composition. `@synapcity/frontend-uiontend-ui-core` may use
    React, React DOM, and browser-intrinsic behavior for reusable components,
    including a narrow `'use client'` boundary, but must not depend on Next.js
    (ADR-0005, ADR-0007, ADR-0008 already establish this ownership split; this
@@ -47,7 +47,7 @@ ADR-0007/ADR-0008.
 
 - Application shell, navigation, sidebars, dashboard routes, or any product
   route (explicit Phase 2 non-goal).
-- `@synapcity/ui-core`'s contents, Tailwind, shadcn, or Storybook (ADR-0011,
+- `@synapcity/frontend-uiontend-ui-core`'s contents, Tailwind, shadcn, or Storybook (ADR-0011,
   ADR-0012).
 - Task orchestration or verification composition (ADR-0013).
 - Deployment topology (ADR-0014).

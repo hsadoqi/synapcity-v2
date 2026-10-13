@@ -31,7 +31,7 @@ Decisions 1 and 2 were put to the owner as questions and accepted as recommended
 
 ## Design
 
-### 1. Provider contract (`@synapcity/ui-core`)
+### 1. Provider contract (`@synapcity/frontend-ui-core`)
 
 - Keep `mode`, `resolvedMode`, `setMode`, `useThemeMode`. Keep `resolvedMode` as `null` on the server and the first client render, to avoid a hydration mismatch.
 - `setMode` writes cookie `theme` (1 year, `Path=/`, `SameSite=Lax`, `Secure` on https). Invalid input is ignored, as today.

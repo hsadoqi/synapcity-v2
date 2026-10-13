@@ -37,7 +37,6 @@ Not decided. Each needs an ADR, and the owner's approval, before it is treated a
 - **Testing strategy.** No test runner, component-test setup, accessibility automation or browser gate exists. `pnpm verify` proves formatting, lint, types, unused code and builds only.
 - **Dependency direction between package categories**, and any tool that enforces it.
 - **Component catalogue** (Storybook or another).
-- **npm scope naming** (`@synapcity/*` versus `@synapcity/dev-*`), recorded under ADR-0001's Unresolved.
 - **Theme editor and preference persistence** (what writes `--font-preference-*` and the other overrides).
 - **Persistence, API, routing, authentication and state management.** Open per `PRODUCT.md`; the README's technology table is direction, not decision.
 - **Deployment topology.**

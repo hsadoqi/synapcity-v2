@@ -80,7 +80,7 @@ What is in the code today, checked against the files and not against this brief'
 
 | Brief element | State |
 | --- | --- |
-| `/home` empty state: one `h1` "Home", one sentence, disabled but focusable "Create a Document" with a tooltip | Done (`EmptyHomeContent` in `@synapcity/ui-core`) |
+| `/home` empty state: one `h1` "Home", one sentence, disabled but focusable "Create a Document" with a tooltip | Done (`EmptyHomeContent` in `@synapcity/frontend-uiontend-ui-core`) |
 | The `h1` belongs to `/home`, not to the top panel | Done. The top panel titles itself with an `h2` |
 | Demo navigation (Playground, Models, Projects, Support, Feedback) removed | Done. Archived at `refs/archive/p3-sidebar-demo-nav` |
 | Context switcher in the sidebar header with one checked "Global" entry | Stub only. `SidebarContextSwitcher` is wired with placeholder items (`1.0`, `1.1`, `1.2`), not "Global" |

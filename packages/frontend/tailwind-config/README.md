@@ -18,7 +18,7 @@ Nothing else defines a token. An app's `globals.css` contains imports and `@sour
 
 ## Using it
 
-An app imports, in this order, `tailwindcss`, `shadcn/tailwind.css` and `@synapcity/ui/styles.css` (which imports this package), then adds an `@source` line for each workspace whose classes it renders. Its `postcss.config.mjs` re-exports `postcssConfig` from `@synapcity/frontend-tailwind-config/postcss`.
+An app imports, in this order, `tailwindcss`, `shadcn/tailwind.css` and `@synapcity/frontend-ui/styles.css` (which imports this package), then adds an `@source` line for each workspace whose classes it renders. Its `postcss.config.mjs` re-exports `postcssConfig` from `@synapcity/frontend-tailwind-config/postcss`.
 
 ## Fonts
 

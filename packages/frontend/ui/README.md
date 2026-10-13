@@ -1,4 +1,4 @@
-# @synapcity/ui
+# @synapcity/frontend-ui
 
 Owns: the shared React components (shadcn/ui, style `base-mira`, on Base UI), the `cn` class-merging helper, and the stylesheet entry that applies the shared theme.
 
@@ -6,11 +6,11 @@ It owns no theme tokens. Tokens live in `@synapcity/frontend-tailwind-config` ([
 
 ## Entry points
 
-| Import                      | Provides                                                                              |
-| --------------------------- | ------------------------------------------------------------------------------------- |
-| `@synapcity/ui/core/<name>` | A component, for example `@synapcity/ui/core/button`                                  |
-| `@synapcity/ui/lib/utils`   | `cn` ([ADR-0004](../../../docs/architecture/decisions/0004-class-merging-with-cn.md)) |
-| `@synapcity/ui/styles.css`  | The shared theme, imported once by each app                                           |
+| Import                               | Provides                                                                              |
+| ------------------------------------ | ------------------------------------------------------------------------------------- |
+| `@synapcity/frontend-ui/core/<name>` | A component, for example `@synapcity/frontend-ui/core/button`                         |
+| `@synapcity/frontend-ui/lib/utils`   | `cn` ([ADR-0004](../../../docs/architecture/decisions/0004-class-merging-with-cn.md)) |
+| `@synapcity/frontend-ui/styles.css`  | The shared theme, imported once by each app                                           |
 
 Installed components: `Button`, `Input`, `InputGroup`, `Label`, `Textarea`.
 

@@ -1482,7 +1482,7 @@ Expected: FAIL: the style element does not exist yet, so the first-HTML, empty-e
 
 - [ ] **Step 3: Write minimal implementation**
 
-In `apps/web/app/layout.tsx`, add imports below the existing `@synapcity/ui-core` import:
+In `apps/web/app/layout.tsx`, add imports below the existing `@synapcity/frontend-uiontend-uiontend-ui-core` import:
 
 ```tsx
 import { APPLIED_STYLE_ID } from '../components/theme/lib/apply';

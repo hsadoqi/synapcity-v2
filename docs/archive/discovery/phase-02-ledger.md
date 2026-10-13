@@ -239,7 +239,7 @@ Nothing in this ledger is a requirement or accepted ADR. Labels are working desc
 
 **Current-phase impact:** Create only one shared UI ownership boundary. shadcn ancestry does not create a package layer.
 
-**Current disposition (Phase 2 architecture reconciliation):** `@synapcity/ui-core` is now the selected name for the single consolidated initial UI package (see the Phase 2 design proposal §4.1 and §6.3). Selecting that name does **not** mean the layered UI package architecture explored below has been accepted. This entry's historical exploration of `ui-core` → `ui-shadcn` → higher-level component tiers is preserved as evidence, not adopted as a plan: broader UI package layering remains deferred until demonstrated ownership and consumer pressure justify extraction, exactly as it did before this name was settled.
+**Current disposition (Phase 2 architecture reconciliation):** `@synapcity/frontend-uiontend-ui-core` is now the selected name for the single consolidated initial UI package (see the Phase 2 design proposal §4.1 and §6.3). Selecting that name does **not** mean the layered UI package architecture explored below has been accepted. This entry's historical exploration of `ui-core` → `ui-shadcn` → higher-level component tiers is preserved as evidence, not adopted as a plan: broader UI package layering remains deferred until demonstrated ownership and consumer pressure justify extraction, exactly as it did before this name was settled.
 
 **What is not decided:** Whether future scale, publication, dependency constraints, or teams justify multiple UI packages.
 

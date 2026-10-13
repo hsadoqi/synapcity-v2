@@ -29,12 +29,12 @@ This record distinguishes four kinds of claim, per `AGENTS.md`'s "not verified" 
 | 2 | `pnpm browsers:install` | ✅ Pass (download only) | Chromium 153.0.8010.12 (playwright chromium v1243) downloaded to `~/.cache/ms-playwright`. |
 | 3 | `pnpm format:check` | ✅ Pass | One violation found and fixed during this session (`tests/story-public-api.test.ts`, the new regression test added below — formatted with `prettier --write`, not a pre-existing repository issue). |
 | 4 | `pnpm lint` | ✅ Pass | `eslint .`, zero errors. |
-| 5 | `pnpm typecheck` | ✅ Pass | `tsc --noEmit` (root) + `turbo run typecheck` across `@synapcity/ui-core`, `@synapcity/web`, `@synapcity/storybook` — 3/3 successful, 0 cached (cold run). |
+| 5 | `pnpm typecheck` | ✅ Pass | `tsc --noEmit` (root) + `turbo run typecheck` across `@synapcity/frontend-uiontend-ui-core`, `@synapcity/web`, `@synapcity/storybook` — 3/3 successful, 0 cached (cold run). |
 | 6 | `pnpm test` (`vitest run --project root && vitest run --project ui-core`) | ✅ Pass | root: 7 test files / 31 tests passed (`ci-workflow`, `check-docs`, `story-public-api` [new], `pr-text`, `verification-contract`, `agents-accuracy`, `boundaries`). `ui-core`: 1 file / 5 tests passed (`button.test.tsx`, jsdom environment, includes RTL + axe-core assertions). |
 | 7 | `pnpm deps` (`knip`) | ❌ **Not verified in this environment** | Crashes with `RangeError: Array buffer allocation failed` inside `oxc-parser`'s native binding (`node_modules/.pnpm/oxc-parser@0.150.0`), reproduced twice, independent of build-artifact cleanup. Consistent with a native-addon/mmap restriction specific to this sandboxed device VM, not a code defect — no repository file changed as part of chasing this. See Blocked section. |
 | 8 | `pnpm deps:boundaries` (`depcruise`) | ✅ Pass | `no dependency violations found (36 modules, 32 dependencies cruised)`, run against the real repository (not the test fixtures) after the Storybook public-API fix. |
 | 9 | `pnpm docs:check` | ✅ Pass | `docs check: ADR index and documentation links are consistent`. |
-| 10 | `pnpm build` (`turbo run build`) | ✅ Pass | `@synapcity/ui-core`, `@synapcity/web`, `@synapcity/storybook` — 3/3 successful. Storybook production build completed (`storybook-static` regenerated); Next.js production build completed (`apps/web`, static routes `/` and `/_not-found`). Confirmed `>>> FULL TURBO` (3/3 cached) on an immediate re-run with no changes. |
+| 10 | `pnpm build` (`turbo run build`) | ✅ Pass | `@synapcity/frontend-uiontend-ui-core`, `@synapcity/web`, `@synapcity/storybook` — 3/3 successful. Storybook production build completed (`storybook-static` regenerated); Next.js production build completed (`apps/web`, static routes `/` and `/_not-found`). Confirmed `>>> FULL TURBO` (3/3 cached) on an immediate re-run with no changes. |
 | 11 | `pnpm test:storybook` | ⛔ **Blocked** | See Blocked section. |
 | 12 | `pnpm test:smoke` | ⛔ **Blocked** (not attempted — same root cause as #11) | See Blocked section. |
 
@@ -46,9 +46,9 @@ All probes below were introduced, exercised, and then fully reverted. "Clean" he
 
 | Probe | Target contract | Violation introduced | Command | Expected | Observed | Exit | Restored? |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| P2-05 story public-API bypass | New regression test (`tests/story-public-api.test.ts`) | Reverted `button.stories.tsx`'s import from `'@synapcity/ui-core'` back to `'./button'` | `pnpm vitest run --project root tests/story-public-api.test.ts` | Fail | **Failed** — `AssertionError: ... imports ["./button"] via a relative path instead of the package's public export` | 1 | ✅ Yes — re-ran green after restore |
+| P2-05 story public-API bypass | New regression test (`tests/story-public-api.test.ts`) | Reverted `button.stories.tsx`'s import from `'@synapcity/frontend-uiontend-ui-core'` back to `'./button'` | `pnpm vitest run --project root tests/story-public-api.test.ts` | Fail | **Failed** — `AssertionError: ... imports ["./button"] via a relative path instead of the package's public export` | 1 | ✅ Yes — re-ran green after restore |
 | P2-02 real TSX lint violation | `pnpm lint` (`eslint .`) | Prepended an unused-variable / expression statement to `apps/web/app/page.tsx` | `pnpm lint` | Fail | **Failed** — `@typescript-eslint/no-unused-vars`, `@typescript-eslint/no-unused-expressions`, 2 errors, `ELIFECYCLE ... exit code 1` | 1 | ✅ Yes — `pnpm lint` re-ran clean after `git checkout -- apps/web/app/page.tsx` |
-| P2-06 Turbo cache invalidation across consumers | `pnpm build` task graph (`turbo run build`) | Appended a comment line to `packages/ui/core/src/components/button/button.tsx` (the shared UI source both apps consume) | `pnpm build` (after a fully-cached baseline run) | `@synapcity/ui-core`, `@synapcity/web`, and `@synapcity/storybook` all cache-miss | **Confirmed** — all three printed `cache miss, executing ...`; `Cached: 0 cached, 3 total` | 0 (all rebuilt successfully) | ✅ Yes — `git checkout -- ...` then re-ran `pnpm build`, back to `Cached: 3 cached, 3 total`, `>>> FULL TURBO` |
+| P2-06 Turbo cache invalidation across consumers | `pnpm build` task graph (`turbo run build`) | Appended a comment line to `packages/ui/core/src/components/button/button.tsx` (the shared UI source both apps consume) | `pnpm build` (after a fully-cached baseline run) | `@synapcity/frontend-uiontend-ui-core`, `@synapcity/web`, and `@synapcity/storybook` all cache-miss | **Confirmed** — all three printed `cache miss, executing ...`; `Cached: 0 cached, 3 total` | 0 (all rebuilt successfully) | ✅ Yes — `git checkout -- ...` then re-ran `pnpm build`, back to `Cached: 3 cached, 3 total`, `>>> FULL TURBO` |
 | P2-05 boundary rules (pre-existing, re-run as live confirmation) | `.dependency-cruiser.cjs` rules | None introduced this session — `tests/boundaries.test.ts` already proves each of the 12 configured rules fires against a synthetic violations fixture (app-to-app, package-to-app relative import, `ui`→`next`, `ui`→`domain`, `domain`→`ui`, `dev` misuse, circular, unresolved) and that same-package imports produce zero violations | `pnpm test` (includes `tests/boundaries.test.ts`) | Pass | **Passed** — 3/3 assertions, including "reports every rule against the violations fixture" and "reports nothing for imports within a single package" | 0 | N/A — no repo state changed by this probe |
 
 ### Blocked probes (not run — browser required)
@@ -116,7 +116,7 @@ branch preserves the original three-commit history if it's ever needed.
 
 `tests/story-public-api.test.ts` originally flagged any relative import in a colocated story file.
 The audit found this both false-passed a private absolute/subpath import of the package's own name
-(e.g. `@synapcity/ui-core/src/components/button/button`) and would false-fail a legitimate
+(e.g. `@synapcity/frontend-uiontend-ui-core/src/components/button/button`) and would false-fail a legitimate
 colocated story-only helper import (e.g. `./fixtures`). The check (now `tests/story-public-api/check.ts`,
 shared by both test files) was rewritten to resolve each story's owning package's `exports` map and
 flag only an import that reaches one of that package's own publicly-exported files or a private
@@ -147,7 +147,7 @@ using a standalone Node 24.20.0 and pnpm 10.24.0 exactly matching this repositor
 | `pnpm test` | ✅ Pass | 8 test files, 35 tests (root: 7 files/30 tests including the new `story-public-api/fixtures.test.ts`; `ui-core`: 1 file/5 tests) |
 | `pnpm deps:boundaries` | ✅ Pass | 36 modules, 32 dependencies, 0 violations |
 | `pnpm docs:check` | ✅ Pass | |
-| `pnpm build` (`turbo run build`) | ✅ Pass | `@synapcity/ui-core`, `@synapcity/web`, `@synapcity/storybook` — 3/3, including a real Next.js production build of `apps/web`, which is the exact gate the audit's own sandbox could not get past (`Operation not permitted` binding a port there). Not reproduced here — this environment built it cleanly. |
+| `pnpm build` (`turbo run build`) | ✅ Pass | `@synapcity/frontend-uiontend-ui-core`, `@synapcity/web`, `@synapcity/storybook` — 3/3, including a real Next.js production build of `apps/web`, which is the exact gate the audit's own sandbox could not get past (`Operation not permitted` binding a port there). Not reproduced here — this environment built it cleanly. |
 | `pnpm deps` (`knip`) | ❌ Not verified in this environment | Reproduces the same `RangeError: Array buffer allocation failed` inside `oxc-parser`'s native binding recorded in the original session, in a different device VM. Consistent with the audit's own conclusion that this is VM-specific, not a repository defect — the audit's own (different) environment ran it clean. |
 | `pnpm test:storybook`, `pnpm test:smoke` | ⛔ Blocked | Same root cause as the original session: `chrome-headless-shell: error while loading shared libraries: libXdamage.so.1`, and no root/sudo available in this VM to install it (confirmed directly, not assumed). The audit's own separate macOS environment ran these clean; this remains a per-VM limitation of the two Linux sandboxes used for this repository's work so far, not a defect in the reconciliation. |
 
@@ -229,7 +229,7 @@ Independent of issue state. Evidence is also posted on #30.
 | --- | --- | --- | --- |
 | PR #38, `probe/p2-08-web-only` (head `1fdc8be`) | `apps/web` only | Deployed (Ready) | Skipped |
 | PR #39, `probe/p2-08-storybook-only` (head `eb22051`) | `apps/storybook` only | Skipped | Deployed (Ready) |
-| PR #40, `probe/p2-08-shared-ui` (heads `2805f50`, then `9fa6f4d`) | `@synapcity/ui-core` shared source | Deployed (Ready) | Deployed (Ready) |
+| PR #40, `probe/p2-08-shared-ui` (heads `2805f50`, then `9fa6f4d`) | `@synapcity/frontend-uiontend-ui-core` shared source | Deployed (Ready) | Deployed (Ready) |
 
 The three probe pull requests were closed unmerged and their branches are kept. Production stayed
 on the clean `main` commit; no probe marker (`data-probe`) exists on `main`. PR #40's first hosted
@@ -245,7 +245,7 @@ The closeout audit found that `no-relative-cross-package` applies only to import
 `apps-no-relative-package-internals`, registers it in `tests/boundaries.test.ts`, and adds the
 deliberate-violation fixture `tests/boundaries/fixtures/violations/apps/web/src/deep.ts`, so the
 existing self-consistency test proves the rule fires. Before PR #41 the relative deep import was
-accepted; after it, it is rejected. The public `@synapcity/ui-core` import still passes.
+accepted; after it, it is rejected. The public `@synapcity/frontend-uiontend-ui-core` import still passes.
 
 Hosted CI for PR #41 (head `1a91ad0`): run 36517952843, `verify` (2m 4s, including knip and the
 35 root tests), `pr-hygiene` and `security` all succeeded. That includes knip accepting the new
@@ -268,7 +268,7 @@ recorded here as results, not preserved as re-runnable fixtures, except where no
 | P2-05 | App-to-app import | Rejected | Rejected (`apps-not-to-apps`) |
 | P2-05 | Package-to-app import | Rejected | Rejected (`nothing-imports-apps`) |
 | P2-05 | UI-to-Next import | Rejected | Rejected (`ui-no-application-runtime`) |
-| P2-05 | Package-name deep import (`@synapcity/ui-core/src/...`) | Rejected | Rejected (`tsc` and `depcruise` unresolved) |
+| P2-05 | Package-name deep import (`@synapcity/frontend-uiontend-ui-core/src/...`) | Rejected | Rejected (`tsc` and `depcruise` unresolved) |
 | P2-05 | Valid public app-to-UI import | Passes | Passes (real-repo baseline) |
 | P2-05 | App importing ui-core private source by relative path | Rejected | Accepted before PR #41; rejected with `apps-no-relative-package-internals` after it |
 

@@ -1,4 +1,4 @@
-import { Button } from '@synapcity/ui/core/button';
+import { Button } from '@synapcity/frontend-ui/core/button';
 
 export default function Home() {
   return (

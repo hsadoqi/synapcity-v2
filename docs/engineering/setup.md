@@ -30,7 +30,7 @@ pnpm verify
 | `pnpm deps`                         | Knip: unused files, exports and dependencies                                        |
 | `pnpm build`                        | Builds every workspace through Turbo                                                |
 | `pnpm dev`                          | Runs every workspace's dev server; `pnpm dev:web` and `pnpm dev:docs` run one       |
-| `pnpm ui:add <component>`           | Adds a shadcn component from the root, writing into `@synapcity/ui`                 |
+| `pnpm ui:add <component>`           | Adds a shadcn component from the root, writing into `@synapcity/frontend-ui`        |
 
 There is no test command. A passing `pnpm verify` proves the repository's formatting, lint, types, unused-code and build checks pass; it does not prove behavior, and does not prove a product feature exists, is product-required, or is product-validated.
 

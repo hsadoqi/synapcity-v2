@@ -108,7 +108,7 @@ Follow these rules when writing or editing UI in this repo.
 
 - Design tokens live in `packages/frontend/tailwind-config`. `shared-styles.css` is the entry; `tokens/` holds the pieces (`utilities.css` has the `theme-light` and `theme-dark` colour values, `base.css` the base element styles, `accessibility.css` reduced motion, `variants.css` the `dark` variant). Reach for an existing token before inventing any value, and change a token there, never in an app or component.
 - Apps contain wiring only. `apps/web/src/styles/globals.css` is imports and `@source` lines; do not add `:root`, `.dark`, `@theme` or `@layer base` rules to it, and remove them if `shadcn init` or `shadcn add` writes them back.
-- Shared components live in `packages/frontend/ui/src/components/ui` and are consumed as `@synapcity/ui/core/*`. Prefer extending them over building parallel pieces.
+- Shared components live in `packages/frontend/ui/src/components/ui` and are consumed as `@synapcity/frontend-ui/core/*`. Prefer extending them over building parallel pieces.
 
 ### Colours
 
@@ -119,7 +119,7 @@ Follow these rules when writing or editing UI in this repo.
 
 - Installed today: `Button`, `Input`, `InputGroup`, `Label`, `Textarea` (`packages/frontend/ui/src/components/ui`). Use these before writing your own, and check this list is current before relying on it.
 - This is a shadcn install: style `base-mira` on Base UI (`@base-ui/react`), base colour neutral, icons from `lucide-react` only.
-- Add a component with `pnpm ui:add <name>` from the repository root (it targets `apps/web` and writes into `@synapcity/ui`), then edit it. Upstream differences: `pnpm dlx shadcn@latest add <name> --diff -c apps/web`.
+- Add a component with `pnpm ui:add <name>` from the repository root (it targets `apps/web` and writes into `@synapcity/frontend-ui`), then edit it. Upstream differences: `pnpm dlx shadcn@latest add <name> --diff -c apps/web`.
 - Edit the component you own. Never build a second one beside it under another name. A wrapper that composes shadcn components is fine; a second implementation is not.
 - Before adding classes to a shadcn component, use one of its variants (`variant="outline"`, `size="sm"`). `className` on a shadcn component is for layout only: width, margin, position. Never colour, never typography; add a variant instead.
 - Merge classes with `cn()` (ADR-0004). Never concatenate strings and never write a ternary inside a className string.

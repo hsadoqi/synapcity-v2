@@ -6,7 +6,7 @@
 
 **Architecture:** `ColorsSection` renders three numbered `CollapsibleStep`s whose open state is local UI state. The existing `PresetGroup` gains `hint`, `dashed` and `ariaLabel` so it renders the reference's cards. `ColorsProvider.accentIndex` becomes `number | null` (`null` = derived accent), with `accentSourceFor` handling `null`.
 
-**Tech Stack:** React, Next (apps/web), Tailwind tokens, Vitest + Testing Library, `@synapcity/ui-core`.
+**Tech Stack:** React, Next (apps/web), Tailwind tokens, Vitest + Testing Library, `@synapcity/frontend-uiontend-ui-core`.
 
 **Spec:** `docs/superpowers/specs/2026-10-10-colors-guided-steps-design.md`
 
@@ -597,7 +597,7 @@ Expected: FAIL (no step headers).
 'use client';
 
 import { Check } from 'lucide-react';
-import { Button } from '@synapcity/ui-core/components';
+import { Button } from '@synapcity/frontend-uiontend-ui-core/components';
 import {
   harmonyColors,
   hueName,

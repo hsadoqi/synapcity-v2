@@ -30,7 +30,7 @@ flowchart TD
 ## 2. Place it
 
 - [ ] It lives in exactly one existing category (`dev` or `frontend`) at `packages/<category>/<name>`. A new category needs an ADR first.
-- [ ] Directory and package names follow [workspace-conventions.md](workspace-conventions.md): lowercase kebab-case, the scope of the neighbouring packages in that category, unique across categories.
+- [ ] Directory and package names follow [workspace-conventions.md](workspace-conventions.md): the package is named `@synapcity/<category>-<name>` in lowercase kebab-case, the leaf directory does not repeat the category, and the name is unique across categories.
 - [ ] If it goes in `frontend`, it may use React and web presentation capabilities but must not depend on Next.js routing, request APIs or other application-runtime concerns.
 - [ ] If it goes in `dev`, it is build-time tooling only and ships nothing to the browser.
 
