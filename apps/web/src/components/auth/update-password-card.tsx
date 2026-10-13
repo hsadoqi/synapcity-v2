@@ -17,10 +17,11 @@ export function UpdatePasswordCard({
       <Card>
         <CardHeader>
           <CardTitle className="font-medium text-lg tracking-normal">
-            Reset Your Password
+            Choose a Password
           </CardTitle>
           <CardDescription>
-            Please enter your new password below.
+            Enter the password you want to use below. You stay signed in after
+            saving it.
           </CardDescription>
         </CardHeader>
         <CardContent>

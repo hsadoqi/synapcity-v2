@@ -31,6 +31,16 @@ describe('authErrorMessage', () => {
     expect(authErrorMessage(code)).toBe(message);
   });
 
+  describe.each([
+    'reauthentication_needed',
+    'session_expired',
+    'session_not_found',
+  ])('password-change code %s', (code) => {
+    it('tells the user to sign in again, the only fix this app supports', () => {
+      expect(authErrorMessage(code)).toMatch(/sign in again/i);
+    });
+  });
+
   it('gives weak passwords a hint without quoting a server message', () => {
     expect(authErrorMessage('weak_password')).toMatch(/too weak/i);
   });

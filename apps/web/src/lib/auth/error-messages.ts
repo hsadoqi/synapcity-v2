@@ -28,6 +28,12 @@ export function authErrorMessage(code: string | undefined): string {
       return 'Too many attempts. Wait a few minutes and try again.';
     case 'signup_disabled':
       return 'Sign-ups are closed right now.';
+    case 'reauthentication_needed':
+    case 'session_expired':
+    case 'session_not_found':
+      // Changing a password needs a recent sign-in. The app does not run
+      // Supabase's reauthentication (nonce) step, so signing in again is the fix.
+      return 'For your security, sign out, sign in again, then try once more.';
     default:
       return 'Something went wrong. Try again.';
   }
