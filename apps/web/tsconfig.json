@@ -6,10 +6,12 @@
         "name": "next"
       }
     ],
-    "strictNullChecks": true
-  },
-  "paths": {
-    "@/*": ["./src/*"]
+    "strictNullChecks": true,
+    // "rootDir": ".",
+    "paths": {
+      //   "@synapcity/ui/*": ["../../packages/frontend/ui/src/*"],
+      "@/*": ["./src/*"]
+    }
   },
   "include": [
     "**/*.ts",

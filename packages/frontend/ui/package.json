@@ -1,28 +1,38 @@
 {
-  "name": "@repo/ui",
+  "name": "@synapcity/ui",
   "version": "0.0.0",
   "private": true,
   "exports": {
-    "./*": "./src/*.tsx"
+    "./*": "./src/components/ui/**/*.tsx",
+    "./styles.css": "./src/styles/globals.css",
+    "./lib/*": "./src/lib/*.ts",
+    "./lib/utils": "./src/lib/utils.ts",
+    "./core/*": "./src/components/ui/*.tsx",
+    "./components": "./src/components/index.ts",
+    "./components/*": "./src/components/*.tsx"
   },
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
     "lint": "eslint . --cache",
     "generate:component": "turbo gen react-component",
     "check-types": "tsc --noEmit",
-    "verify": "pnpm lint && pnpm check-types && pnpm build"
+    "verify": "pnpm lint && pnpm check-types && pnpm build",
+    "add": "pnpm dlx shadcn add"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "26.4.1",
     "@types/react": "19.2.18",
-    "@types/react-dom": "19.2.5",
     "eslint": "10.9.1",
     "typescript": "7.0.2"
   },
   "dependencies": {
+    "@base-ui/react": "^1.9.0",
+    "@repo/tailwind-config": "workspace:*",
+    "class-variance-authority": "^0.7.1",
+    "cn": "^0.4.0",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "shadcn": "^4.21.4"
   }
 }

@@ -1,28 +1,13 @@
-import Image, { type ImageProps } from 'next/image';
-import { Button } from '@repo/ui/button';
-import styles from '../styles/page.module.css';
-
-type Props = Omit<ImageProps, 'src'> & {
-  srcLight: string;
-  srcDark: string;
-};
-
-const ThemeImage = (props: Props) => {
-  const { srcLight, srcDark, ...rest } = props;
-
-  return (
-    <>
-      <Image {...rest} src={srcLight} className="imgLight" />
-      <Image {...rest} src={srcDark} className="imgDark" />
-    </>
-  );
-};
+import { Button } from '@synapcity/ui/core/button';
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
+    <div className="flex min-h-svh w-full justify-center px-6 py-12 sm:px-12 lg:px-24">
+      <main className="flex w-full max-w-5xl flex-1 items-center justify-center text-center">
         <h1>Welcome to Synapcity Web</h1>
+        <Button variant="ghost" size="lg">
+          Get Started
+        </Button>
       </main>
     </div>
   );
