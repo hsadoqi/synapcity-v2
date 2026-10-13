@@ -84,7 +84,11 @@ export async function signUp(
     redirect(next);
   }
   return {
-    message: `We sent a confirmation link to ${email}. Open it to finish creating your account.`,
+    // Worded so it stays true when the address already has an account, in
+    // which case Supabase sends nothing (it hides that to prevent account
+    // discovery). Do not name the address or say a link "was sent".
+    message:
+      'If this email can be registered, a confirmation link is on its way. If you already have an account, sign in or reset your password instead.',
   };
 }
 
