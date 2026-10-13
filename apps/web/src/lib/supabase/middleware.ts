@@ -1,7 +1,8 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-import { safeNextPath } from '@/lib/auth/safe-next';
+import { homePathFor } from '@/lib/auth/home-path/home-path';
+import { safeNextPath } from '@/lib/auth/safe-next/safe-next';
 import { getSupabaseEnv } from './env';
 import { isGuestOnlyPath, isProtectedPath } from './route-access';
 
@@ -51,7 +52,10 @@ export async function updateSession(request: NextRequest) {
 
   if (user && isGuestOnlyPath(request.nextUrl.pathname)) {
     const destination = new URL(
-      safeNextPath(request.nextUrl.searchParams.get('next')),
+      safeNextPath(
+        request.nextUrl.searchParams.get('next'),
+        homePathFor(user.sub),
+      ),
       request.url,
     );
     // safeNextPath only returns same-origin paths. Assert it anyway, so a later

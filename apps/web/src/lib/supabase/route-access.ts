@@ -5,13 +5,16 @@
  * Returning true sends an unauthenticated visitor to /auth/login?next=<path>.
  * Public pages, the auth pages themselves and /auth/callback must return false,
  * or sign-in can never complete.
+ *
+ * Protected: `/<userId>/home` and `/<userId>/settings` and everything under
+ * them (see `homePathFor`). The
+ * proxy only checks that someone is signed in; that the id is *theirs* is
+ * checked by `app/[userId]/layout.tsx`.
  */
-const PROTECTED_PREFIXES = ['/home'];
+const USER_AREA_PATH = /^\/(?!auth(?:\/|$))[^/]+\/(?:home|settings)(?:\/|$)/;
 
 export function isProtectedPath(pathname: string): boolean {
-  return PROTECTED_PREFIXES.some(
-    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
-  );
+  return USER_AREA_PATH.test(pathname);
 }
 
 /**
