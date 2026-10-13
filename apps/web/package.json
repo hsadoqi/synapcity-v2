@@ -11,7 +11,9 @@
     "check-types": "next typegen && tsc --noEmit",
     "verify": "pnpm lint && pnpm check-types && pnpm build",
     "ui:add": "pnpm dlx shadcn@latest add",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",
@@ -30,11 +32,14 @@
     "@synapcity/dev-eslint-config": "workspace:*",
     "@synapcity/dev-playwright-config": "workspace:*",
     "@synapcity/dev-typescript-config": "workspace:*",
+    "@synapcity/dev-vitest-config": "workspace:*",
     "@synapcity/frontend-tailwind-config": "workspace:*",
     "@types/node": "26.4.1",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.5",
+    "@vitest/coverage-v8": "4.1.11",
     "eslint": "10.9.1",
-    "typescript": "7.0.2"
+    "typescript": "7.0.2",
+    "vitest": "4.1.11"
   }
 }

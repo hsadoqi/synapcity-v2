@@ -13,7 +13,9 @@ pnpm install
 pnpm dev:web      # http://localhost:8080
 ```
 
-Per-app checks run through the root scripts (`pnpm lint`, `pnpm check-types`, `pnpm build`); `pnpm verify` runs everything. There is no test runner yet.
+Per-app checks run through the root scripts (`pnpm lint`, `pnpm check-types`, `pnpm build`); `pnpm verify` runs everything.
+
+Tests: Vitest unit tests sit beside the code they cover as `*.test.ts` (`pnpm test` from the root, or `pnpm --filter web test`). They cover the pure auth helpers in `src/lib` (redirect guard, error messages, site origin, route policy); the server actions, the proxy and the pages are not unit-tested. `pnpm test:e2e` runs the Playwright smoke test against a production build.
 
 ## Environment variables
 

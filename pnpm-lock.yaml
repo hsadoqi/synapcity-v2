@@ -220,6 +220,9 @@ importers:
       '@synapcity/dev-typescript-config':
         specifier: workspace:*
         version: link:../../packages/dev/typescript-config
+      '@synapcity/dev-vitest-config':
+        specifier: workspace:*
+        version: link:../../packages/dev/vitest-config
       '@synapcity/frontend-tailwind-config':
         specifier: workspace:*
         version: link:../../packages/frontend/tailwind-config
@@ -232,12 +235,18 @@ importers:
       '@types/react-dom':
         specifier: 19.2.5
         version: 19.2.5(@types/react@19.2.18)
+      '@vitest/coverage-v8':
+        specifier: 4.1.11
+        version: 4.1.11(@vitest/browser@4.1.11)(vitest@4.1.11)
       eslint:
         specifier: 10.9.1
         version: 10.9.1(jiti@2.7.0)(supports-color@7.2.0)
       typescript:
         specifier: 7.0.2
         version: 7.0.2
+      vitest:
+        specifier: 4.1.11
+        version: 4.1.11(@types/node@26.4.1)(@vitest/browser-playwright@4.1.11)(@vitest/coverage-v8@4.1.11)(jsdom@30.1.2)(vite@8.3.4(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
 
   packages/dev/eslint-config:
     devDependencies:
