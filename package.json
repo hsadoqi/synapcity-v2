@@ -18,7 +18,7 @@
     "test:e2e": "turbo run test:e2e --filter=web",
     "test:storybook": "turbo run test:storybook --filter=storybook",
     "test:watch": "turbo run test:watch",
-    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm deps && pnpm brand:check && pnpm:test && pnpm test:coverage && pnpm test:e2e && pnpm test:storybook && pnpm build",
+    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm deps && pnpm brand:check && pnpm test && pnpm test:coverage && pnpm test:e2e && pnpm test:storybook && pnpm build",
     "deps": "knip",
     "brand:check": "node scripts/check-brand-assets.mjs",
     "prepare": "git config core.hooksPath .githooks || echo 'git hooks not activated (not a git checkout)'",
