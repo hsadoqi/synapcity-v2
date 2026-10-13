@@ -73,7 +73,7 @@ export async function signUp(
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { emailRedirectTo: callbackUrl(await getOrigin(), next) },
+    options: { emailRedirectTo: callbackUrl(getOrigin(), next) },
   });
   if (error) return { error: authErrorMessage(error.code), email };
 
@@ -97,7 +97,7 @@ export async function requestPasswordReset(
 
   const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: callbackUrl(await getOrigin(), '/auth/update-password'),
+    redirectTo: callbackUrl(getOrigin(), '/auth/update-password'),
   });
   if (error?.code === 'over_email_send_rate_limit') {
     return { error: authErrorMessage(error.code), email };
@@ -142,7 +142,7 @@ export async function signInWithOAuth(formData: FormData): Promise<void> {
     provider,
     options: {
       redirectTo: callbackUrl(
-        await getOrigin(),
+        getOrigin(),
         safeNextPath(field(formData, 'next')),
       ),
     },

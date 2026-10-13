@@ -15,6 +15,18 @@ pnpm dev:web      # http://localhost:8080
 
 Per-app checks run through the root scripts (`pnpm lint`, `pnpm check-types`, `pnpm build`); `pnpm verify` runs everything. There is no test runner yet.
 
+## Environment variables
+
+Set these in `apps/web/.env.local` (git-ignored) and, for deployments, in the hosting provider. Authentication is governed by [ADR-0006](../../docs/architecture/decisions/0006-authentication-with-supabase.md).
+
+| Variable                               | Exposed to the browser | Purpose                                                                                                                                                   |
+| -------------------------------------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`             | yes                    | Supabase project URL                                                                                                                                      |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | yes                    | Supabase publishable key. Never put the secret or service-role key in this app                                                                            |
+| `SITE_URL`                             | no                     | Public origin of this app, for example `http://localhost:8080`. Used to build email and OAuth redirect URLs; it must be on Supabase's redirect allow-list |
+
+The app throws on the first sign-up, reset or OAuth call if `SITE_URL` is missing. Preview deployments need their own value.
+
 ## Structure
 
 | Path                     | Contains                                                             |

@@ -1,18 +1,33 @@
-import { headers } from 'next/headers';
-
 /**
- * The origin of the current request, used to build the redirect URLs that
- * Supabase embeds in emails and OAuth flows. Supabase only honours URLs on its
- * redirect allow-list, so a forged header cannot send a user elsewhere.
+ * The public origin of this app, used to build the redirect URLs that Supabase
+ * embeds in confirmation emails, password-reset emails and OAuth flows.
+ *
+ * It comes from configuration (`SITE_URL`), never from request headers. A
+ * request's `Origin` and `Host` are chosen by whoever sends it, so deriving the
+ * link from them would let an attacker aim a victim's reset email at their own
+ * site whenever the Supabase redirect allow-list is loose (for example a
+ * `*.vercel.app` wildcard for previews).
+ *
+ * `SITE_URL` is server-only on purpose, so it is not prefixed `NEXT_PUBLIC_`.
  */
-export async function getOrigin(): Promise<string> {
-  const requestHeaders = await headers();
+export function getOrigin(): string {
+  const raw = process.env.SITE_URL;
+  if (!raw) {
+    throw new Error(
+      'SITE_URL is not set. Set it to the public origin of this app, for example http://localhost:8080.',
+    );
+  }
 
-  const origin = requestHeaders.get('origin');
-  if (origin) return origin;
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    throw new Error(`SITE_URL is not a valid URL: ${raw}`);
+  }
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    throw new Error(`SITE_URL must start with http:// or https://: ${raw}`);
+  }
 
-  const host =
-    requestHeaders.get('x-forwarded-host') ?? requestHeaders.get('host');
-  const protocol = requestHeaders.get('x-forwarded-proto') ?? 'http';
-  return `${protocol}://${host}`;
+  // `.origin` drops any path, query or trailing slash.
+  return url.origin;
 }
