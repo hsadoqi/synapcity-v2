@@ -62,7 +62,6 @@
   --secondary-background: var(--secondary-50);
   --muted-foreground: var(--base-foreground)/20;
   --muted-background: var(--base-foreground)/80;
-  
 }
 
 .dark {
@@ -76,5 +75,4 @@
   --secondary-background: var(--secondary-950);
   --muted-foreground: var(--base-foreground)/80;
   --muted-background: var(--base-foreground)/20;
-  
 }

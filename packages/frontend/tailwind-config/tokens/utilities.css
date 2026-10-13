@@ -54,7 +54,7 @@
   --border: var(--muted);
   --divider: var(--muted-foreground);
   --input: var(--muted-background);
-  --ring: var(--base)       ;
+  --ring: var(--base);
   --sidebar: var(--base-900);
   --sidebar-foreground: var(--foreground);
   --sidebar-primary: var(--primary);

@@ -9,9 +9,8 @@
 
 /* The theme addon puts `light` or `dark` on <html>; paint the canvas and docs pages from the
  * semantic tokens so both modes match the app. */
- .light,
- .dark,
+.light,
+.dark,
 .docs-story {
   @apply bg-(--background) text-(--foreground);
-};
-
+}

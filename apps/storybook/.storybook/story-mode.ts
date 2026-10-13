@@ -15,13 +15,14 @@ import type { SyntheticEvent } from 'react';
 export const storyModeAction = {
   title: 'Toggle mode',
   onClick: (event?: SyntheticEvent) => {
-    const story = (event?.target as HTMLElement)?.parentElement?.parentElement?.previousElementSibling?.querySelector('.docs-story')
+    const story = (
+      event?.target as HTMLElement
+    )?.parentElement?.parentElement?.previousElementSibling?.querySelector(
+      '.docs-story',
+    );
     if (!story) return;
 
-
-    const pageMode = story.classList.contains('dark')
-      ? 'dark'
-      : 'light';
+    const pageMode = story.classList.contains('dark') ? 'dark' : 'light';
     const current = story.classList.contains('dark')
       ? 'dark'
       : story.classList.contains('light')
@@ -29,7 +30,16 @@ export const storyModeAction = {
         : pageMode;
     const next = current === 'dark' ? 'light' : 'dark';
     story.classList.remove('light', 'dark');
-    console.log("page", pageMode, "current", current, "next", next, "story", story);
+    console.log(
+      'page',
+      pageMode,
+      'current',
+      current,
+      'next',
+      next,
+      'story',
+      story,
+    );
     if (next !== pageMode) story.classList.add(next);
   },
 };

@@ -14,7 +14,6 @@ import {
 import { IconButton, IconButtonProps, IconSize } from './icon-button';
 import { ButtonVariant } from './ui/button';
 
-
 const ModeButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
   ({ className, ...props }, ref) => {
     return (
@@ -86,10 +85,7 @@ function ModeToggle({
           )}
         />
         <DropdownMenuContent align="end">
-          <ModeMenu
-            value={isMode(mode) ? mode : 'system'}
-            onUpdate={setMode}
-          />
+          <ModeMenu value={isMode(mode) ? mode : 'system'} onUpdate={setMode} />
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
