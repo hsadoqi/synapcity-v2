@@ -16,6 +16,18 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "dev:web": {
+      "cache": false,
+      "persistent": true
+    },
+    "dev:docs": {
+      "cache": false,
+      "persistent": true
+    },
+    "verify": {
+      "dependsOn": ["lint", "check-types"],
+        "outputs": []
     }
   }
 }
