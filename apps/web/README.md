@@ -29,6 +29,8 @@ Set these in `apps/web/.env.local` (git-ignored) and, for deployments, in the ho
 
 The app throws on the first sign-up, reset or OAuth call if `SITE_URL` is missing. Preview deployments need their own value.
 
+If `NEXT_PUBLIC_SUPABASE_URL` or `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` is missing, every request fails (the session proxy runs on all pages) with an error that names the variable. They are read at build time for the browser bundle, so CI and deployments must set them before `next build`; CI uses placeholders.
+
 ## Structure
 
 | Path                     | Contains                                                             |
