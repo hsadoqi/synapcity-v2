@@ -4,7 +4,11 @@ import {
   ModeButton,
   ModeMenu,
 } from '@synapcity/frontend-ui/components/mode-toggle';
-import { DropdownMenu } from './ui/dropdown-menu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
 
 const meta: Meta<typeof ModeToggle> = {
   title: 'Components/ModeToggle',
@@ -70,21 +74,13 @@ export const Button: StoryObj<typeof ModeButton> = {
 };
 
 export const Menu: StoryObj<typeof ModeMenu> = {
-  decorators: [
-    (Story) => (
-      <div className="flex gap-4">
-        <DropdownMenu>
-          <Story />
-        </DropdownMenu>
-      </div>
-    ),
-  ],
   render: (args) => (
-    <div className="flex gap-4">
-      <ModeMenu {...args} aria-label="Light mode" value="light" />
-      <ModeMenu {...args} aria-label="Dark mode" value="dark" />
-      <ModeMenu {...args} aria-label="System mode" value="system" />
-    </div>
+    <DropdownMenu defaultOpen>
+      <DropdownMenuTrigger render={<ModeButton />} />
+      <DropdownMenuContent align="start">
+        <ModeMenu {...args} />
+      </DropdownMenuContent>
+    </DropdownMenu>
   ),
-  args: {},
+  args: { value: 'system' },
 };

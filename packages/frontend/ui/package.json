@@ -21,7 +21,9 @@
     "check-types": "tsc --noEmit",
     "verify": "pnpm lint && pnpm check-types && pnpm build",
     "add": "pnpm dlx shadcn add",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:watch": "vitest run --watch",
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@storybook/nextjs-vite": "10.6.1",
@@ -33,6 +35,7 @@
     "@types/node": "26.4.1",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.5",
+    "@vitest/coverage-v8": "4.1.11",
     "eslint": "10.9.1",
     "jsdom": "30.1.2",
     "react-dom": "19.2.8",
