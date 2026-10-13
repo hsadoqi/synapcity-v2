@@ -22,6 +22,7 @@ Upstream evidence, read 2026-10-13:
 - Sessions are cookie-based through `@supabase/ssr`, using the PKCE flow. Session refresh happens in `apps/web/src/proxy.ts`.
 - Code lives in `apps/web` only. No new workspace package is created.
 - Only the publishable key reaches the browser. The service-role or secret key is never exposed, never prefixed `NEXT_PUBLIC_`, and not used by this feature.
+- Redirect URLs sent to Supabase (confirmation, reset, OAuth) are built from the server-side `SITE_URL` setting, never from request headers, so a forged `Origin` or `Host` cannot aim an email link at another site. The Supabase redirect allow-list should list exact URLs; a wildcard such as `*.vercel.app` weakens this and needs the owner's approval.
 - Authorization checks on the server use `getClaims()` (or `getUser()` where fresh user data is required), never `getSession()`.
 - Email confirmation is required before first sign-in. Email is sent through Supabase's default sender for now.
 - Sign-ins that share a verified email address resolve to one user (Supabase's automatic identity linking). Observed on 2026-10-13: one address used for password, Google and GitHub sign-in produced a single user. This is only safe while confirmation is required and every enabled provider verifies emails; adding a provider that does not is a change to this ADR.
