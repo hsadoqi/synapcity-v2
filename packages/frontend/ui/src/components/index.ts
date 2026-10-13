@@ -13,3 +13,7 @@ export { LinkButton } from './link-button';
 export type { LinkButtonProps } from './link-button';
 export { IconButton } from './icon-button';
 export type { IconSize, IconButtonProps } from './icon-button';
+export { UserMenu } from './user-menu';
+export type { UserMenuProps } from './user-menu';
+export { AuthButtons } from './auth-buttons';
+export type { AuthButtonsVariant } from './auth-buttons';
