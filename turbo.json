@@ -54,7 +54,7 @@
     },
     "test": {
       "dependsOn": ["transit", "@synapcity/dev-vitest-config#build"],
-      "outputs": ["**/coverage/blob/**"]
+      "outputs": []
     },
     "test:coverage": {
       "dependsOn": ["transit", "@synapcity/dev-vitest-config#build"],
