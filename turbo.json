@@ -53,13 +53,28 @@
       "outputs": []
     },
     "test": {
-      "dependsOn": ["^build"],
-      "outputs": []
+      "dependsOn": ["transit", "@synapcity/dev-vitest-config#build"],
+      "outputs": ["**/coverage/blob/**"]
+    },
+    "test:coverage": {
+      "dependsOn": ["transit", "@synapcity/dev-vitest-config#build"],
+      "outputs": ["**/coverage/report/**"]
     },
     "test:e2e": {
       "dependsOn": ["build"],
       "cache": false,
       "outputs": ["playwright-report/**", "test-results/**"]
+    },
+    "storybook#test:storybook": {
+      "cache": false,
+      "outputs": []
+    },
+    "test:watch": {
+      "cache": false,
+      "persistent": true
+    },
+    "transit": {
+      "dependsOn": ["^transit"]
     }
   }
 }

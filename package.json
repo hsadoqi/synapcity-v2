@@ -14,12 +14,16 @@
     "format:check": "prettier --check . --cache=.prettiercache",
     "typecheck": "turbo run check-types",
     "test": "turbo run test",
+    "test:coverage": "turbo run test:coverage",
     "test:e2e": "turbo run test:e2e --filter=web",
-    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm deps && pnpm brand:check && pnpm build",
+    "test:storybook": "turbo run test:storybook --filter=storybook",
+    "test:watch": "turbo run test:watch",
+    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm deps && pnpm brand:check && pnpm:test && pnpm test:coverage && pnpm test:e2e && pnpm test:storybook && pnpm build",
     "deps": "knip",
     "brand:check": "node scripts/check-brand-assets.mjs",
     "prepare": "git config core.hooksPath .githooks || echo 'git hooks not activated (not a git checkout)'",
-    "ui:add": "pnpm dlx shadcn@latest add -c apps/web"
+    "ui:add": "pnpm dlx shadcn@latest add -c apps/web",
+    "report": "turbo run test && turbo run report"
   },
   "devDependencies": {
     "prettier": "3.9.6",

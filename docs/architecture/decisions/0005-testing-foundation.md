@@ -19,6 +19,10 @@ Consumers: `frontend-ui` (`reactConfig`), `frontend-site` (`baseConfig`), `story
 
 Pins: `vitest` and `@vitest/browser-playwright` 4.1.11 to match `apps/storybook`; `@playwright/test` and `playwright` 1.64.0. Vitest 5.0.4 is the registry latest (checked 2026-10-13); `@storybook/addon-vitest` 10.6.1 allows `^5`, so staying on 4 is a deliberate choice to avoid upgrading an existing dependency as a side effect, not a compatibility block.
 
+## Coverage
+
+Coverage uses the `v8` provider (`@vitest/coverage-v8` 4.1.11, matching the Vitest pin; `apps/storybook` already depended on it). It is opt-in through `pnpm test:coverage` (`vitest run --coverage` per workspace, Turborepo task `test:coverage`), with text and HTML reports in `coverage/report`. No thresholds are set. Decided 2026-10-13.
+
 ## Scope
 
 The shared presets, which workspaces use them, the pins above, and the root scripts and Turborepo tasks.
@@ -26,7 +30,7 @@ The shared presets, which workspaces use them, the pins above, and the root scri
 ## What this does NOT decide
 
 - Whether tests run inside `pnpm verify`, CI or the pre-push hook. They do not today, because that chain is recorded in ADR-0001.
-- Coverage provider, reporters or thresholds.
+- Coverage thresholds, and whether coverage runs in CI.
 - Which browsers and viewports end-to-end tests cover (Chromium only for now), and visual-regression tooling.
 - Whether Storybook story tests (including their axe checks) become a gate.
 - Test conventions beyond file naming: what to test, fixtures, mocking.
