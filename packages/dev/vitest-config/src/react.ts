@@ -2,7 +2,7 @@ import { fileURLToPath } from 'node:url';
 
 import { mergeConfig } from 'vitest/config';
 
-import { baseConfig } from './base';
+import { baseConfig } from './base.ts';
 
 /*
  * Component tests in jsdom. The consumer declares `jsdom`,

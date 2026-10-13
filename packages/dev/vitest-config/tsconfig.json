@@ -4,7 +4,9 @@
     "strictNullChecks": true,
     "module": "preserve",
     "moduleResolution": "bundler",
-    "noEmit": true
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "types": ["node"]
   },
   "include": ["src"],
   "exclude": ["node_modules", ".turbo"]
