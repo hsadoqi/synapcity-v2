@@ -14,7 +14,7 @@
     },
     "lint": {
       "dependsOn": ["^lint"],
-      "outputs": [".prettiercache"]
+      "outputs": []
     },
     "dev": {
       "cache": false,
