@@ -1,6 +1,6 @@
 # Workspace conventions
 
-**Status:** Current direction, defined by ADR-0001 (Proposed)
+**Status:** Canonical, defined by ADR-0001
 
 How packages and apps are laid out, named and built in the current repository. Creating a package still follows [the checklist](package-creation-checklist.md).
 

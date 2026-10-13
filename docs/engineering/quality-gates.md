@@ -1,6 +1,6 @@
 # Quality gates, branches, and pull requests
 
-**Status:** Canonical engineering workflow; the toolchain it describes is ADR-0001 (Proposed)
+**Status:** Canonical engineering workflow; the toolchain it describes is defined by ADR-0001
 
 This document states what counts as "done" mechanically, and which parts of that are enforced by a machine versus by convention. It adds no rule without a mechanism behind it. The verification standard itself is `docs/engineering/definition-of-done.md`.
 

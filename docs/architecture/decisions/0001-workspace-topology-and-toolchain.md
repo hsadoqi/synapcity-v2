@@ -1,7 +1,7 @@
 # ADR-0001: Workspace topology and toolchain
 
-**Status:** Proposed\
-**Date:** 2026-10-13\
+**Status:** Accepted
+**Date:** 2026-10-13
 **Deciders:** Hanaa Sadoqi (repository owner)
 
 ## Context

@@ -23,7 +23,7 @@ ADRs are numbered sequentially (`0001-*.md`, `0002-*.md`, ...) and never renumbe
 
 | ADR                                                   | Title                                                   | Status   |
 | ----------------------------------------------------- | ------------------------------------------------------- | -------- |
-| [0001](0001-workspace-topology-and-toolchain.md)      | Workspace topology and toolchain                        | Proposed |
+| [0001](0001-workspace-topology-and-toolchain.md)      | Workspace topology and toolchain                        | Accepted |
 | [0002](0002-styling-foundation.md)                    | Styling foundation (Tailwind v4, shared tokens, shadcn) | Accepted |
 | [0003](0003-typography-roles-and-font-preferences.md) | Typography roles and font preferences                   | Accepted |
 | [0004](0004-class-merging-with-cn.md)                 | Class merging with the `cn` package                     | Accepted |

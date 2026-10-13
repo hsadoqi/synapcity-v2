@@ -1,6 +1,6 @@
 # Package creation checklist
 
-**Status:** Current direction, defined by ADR-0001 (Proposed). No tool enforces package boundaries today; the checklist is followed by convention and review.
+**Status:** Canonical, defined by ADR-0001. No tool enforces package boundaries today; the checklist is followed by convention and review.
 
 Creating a package is an architecture decision (`AGENTS.md` §5). Complete every item before adding a package under `packages/`, and record the answers in the pull request.
 

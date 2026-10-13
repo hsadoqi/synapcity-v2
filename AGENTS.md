@@ -117,7 +117,7 @@ Follow these rules when writing or editing UI in this repo.
 
 ### Components installed
 
-- Installed today: `Button`, `Input`, `InputGroup`, `Label`, `Textarea` (`packages/frontend/ui/src/components/ui`). Use these before writing your own, and check this list is current before relying on it.
+- Look in `packages/frontend/ui/src/components/ui` before writing a component; use what is installed instead of writing a new one. If you need a new variant or prop, add it to the component you own.
 - This is a shadcn install: style `base-mira` on Base UI (`@base-ui/react`), base colour neutral, icons from `lucide-react` only.
 - Add a component with `pnpm ui:add <name>` from the repository root (it targets `apps/web` and writes into `@synapcity/frontend-ui`), then edit it. Upstream differences: `pnpm dlx shadcn@latest add <name> --diff -c apps/web`.
 - Edit the component you own. Never build a second one beside it under another name. A wrapper that composes shadcn components is fine; a second implementation is not.
