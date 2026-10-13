@@ -4,7 +4,7 @@
 
 ## Prerequisites
 
-- **Node.js 24 or newer**, declared in `package.json` `engines`. `.npmrc` sets `engine-strict`, so an older Node fails at install instead of causing odd errors later. The repository does not yet pin an exact Node version file (see ADR-0001, Unresolved); the last verified runtime was Node 24.20.0.
+- **Node.js 24 or newer**, declared in `package.json` `engines`. `.npmrc` sets `engine-strict`, so an older Node fails at install instead of causing odd errors later. `.node-version` pins 24.20.0, the version CI uses and the last verified runtime.
 - **pnpm 11.25.0**, pinned in `package.json` `packageManager`. Activate it with Corepack: `corepack enable pnpm`.
 
 ## From clone to a verified checkout
@@ -14,11 +14,10 @@ git clone https://github.com/hsadoqi/synapcity.git
 cd synapcity
 corepack enable pnpm
 pnpm install --frozen-lockfile
-git config core.hooksPath .githooks   # optional: run verify before every push
 pnpm verify
 ```
 
-The pre-push hook is a convenience and is not activated by install; the `prepare` script that used to do it is gone. `pnpm verify` and CI are the authoritative gates.
+`pnpm install` runs the root `prepare` script, which sets `core.hooksPath` to `.githooks` so `pnpm verify` runs before every push. pnpm skips it when an install has nothing to do, so in a checkout that was already installed run `pnpm run prepare` once. Outside a Git checkout it prints a notice and install still succeeds. The hook is a convenience; `pnpm verify` and CI are the authoritative gates.
 
 ## Commands
 
@@ -35,7 +34,7 @@ The pre-push hook is a convenience and is not activated by install; the `prepare
 
 There is no test command. A passing `pnpm verify` proves the repository's formatting, lint, types, unused-code and build checks pass; it does not prove behavior, and does not prove a product feature exists, is product-required, or is product-validated.
 
-`pnpm dev:web` serves `apps/web` on port 8080.
+`pnpm dev:web` serves `apps/web` on port 8080; `pnpm dev:docs` serves `apps/docs` on port 4000.
 
 ## Environment variables
 

@@ -18,15 +18,15 @@ flowchart LR
 
 ## The gates
 
-| Gate                | Runs                                                                                              | Blocks                                                         |
-| ------------------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| `pnpm verify`       | `format:check`, `lint`, `check-types`, `deps` (Knip), `build`, chained in the root `package.json` | Local pushes via the pre-push hook, once activated (skippable) |
-| CI `verify` job     | Frozen install, then `pnpm verify` on Node from `.node-version` and pnpm from `packageManager`    | Nothing automatically (see "What is not enforced")             |
-| CI `pr-hygiene` job | PR title is `type: short summary`, and no closing keyword sits near an issue reference            | Nothing automatically                                          |
-| CI `security` job   | `pnpm audit --audit-level=moderate` and a full-history gitleaks scan                              | Nothing automatically                                          |
-| Dependabot          | Weekly update pull requests for npm and GitHub Actions                                            | Nothing; keeps versions current (`AGENTS.md` §7a)              |
+| Gate                | Runs                                                                                              | Blocks                                             |
+| ------------------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| `pnpm verify`       | `format:check`, `lint`, `check-types`, `deps` (Knip), `build`, chained in the root `package.json` | Local pushes via the pre-push hook (skippable)     |
+| CI `verify` job     | Frozen install, then `pnpm verify` on Node from `.node-version` and pnpm from `packageManager`    | Nothing automatically (see "What is not enforced") |
+| CI `pr-hygiene` job | PR title is `type: short summary`, and no closing keyword sits near an issue reference            | Nothing automatically                              |
+| CI `security` job   | `pnpm audit --audit-level=moderate` and a full-history gitleaks scan                              | Nothing automatically                              |
+| Dependabot          | Weekly update pull requests for npm and GitHub Actions                                            | Nothing; keeps versions current (`AGENTS.md` §7a)  |
 
-**Known gap.** The CI `verify` and `security` jobs read `node-version-file: .node-version`, and the repository has no such file, so those jobs fail at the Node setup step until it is added or the workflow changes (ADR-0001, Unresolved).
+**Audit exceptions.** The `security` job's `pnpm audit` passes only because `pnpm-workspace.yaml` pins patched transitive versions (`overrides`) and records one accepted exception for `braces`, which has no patched release (`auditConfig.ignoreGhsas`; ADR-0001). A new advisory fails the job.
 
 ## Branches and pull requests
 

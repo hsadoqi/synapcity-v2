@@ -41,7 +41,7 @@ Not decided. Each needs an ADR, and the owner's approval, before it is treated a
 - **Theme editor and preference persistence** (what writes `--font-preference-*` and the other overrides).
 - **Persistence, API, routing, authentication and state management.** Open per `PRODUCT.md`; the README's technology table is direction, not decision.
 - **Deployment topology.**
-- **Fate of `apps/docs`.**
+- **Documentation site content and tooling** for `apps/docs`.
 
 ## Template
 

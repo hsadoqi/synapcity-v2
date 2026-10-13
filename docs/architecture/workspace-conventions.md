@@ -22,7 +22,7 @@ flowchart TD
 - Current categories:
   - `dev` — build-time tooling shared by workspaces: `@repo/eslint-config`, `@repo/typescript-config`.
   - `frontend` — shared presentation code: `@synapcity/ui` (shadcn components, `cn`, hooks) and `@repo/tailwind-config` (theme, tokens, PostCSS config).
-- Current apps: `web` (the product application) and `docs` (still the starter template).
+- Current apps: `web` (the product application) and `docs` (the documentation site, port 4000; a placeholder page today).
 - Internal dependencies use `workspace:*`.
 - A package's `exports` is its public API. Other packages import only what `exports` lists.
 

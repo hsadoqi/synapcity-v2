@@ -20,7 +20,7 @@ Evidence: `package.json`, `pnpm-workspace.yaml`, `turbo.json`, `.github/workflow
   | Workspace                           | Package name              | Role                                                        |
   | ----------------------------------- | ------------------------- | ----------------------------------------------------------- |
   | `apps/web`                          | `web`                     | The Next.js application (composition root)                  |
-  | `apps/docs`                         | `docs`                    | A second Next.js app, still the starter template            |
+  | `apps/docs`                         | `docs`                    | The documentation site; a placeholder page today            |
   | `packages/frontend/ui`              | `@synapcity/ui`           | Shared shadcn components, `cn`, hooks (ADR-0002, ADR-0004)  |
   | `packages/frontend/tailwind-config` | `@repo/tailwind-config`   | Shared Tailwind theme, tokens and PostCSS config (ADR-0002) |
   | `packages/dev/eslint-config`        | `@repo/eslint-config`     | Shared ESLint flat config                                   |
@@ -28,7 +28,8 @@ Evidence: `package.json`, `pnpm-workspace.yaml`, `turbo.json`, `.github/workflow
 
 - **Language and tooling:** TypeScript 7.0.2, ESLint 10.9.1 with the shared config, Prettier 3.9.6, Knip for unused files, exports and dependencies, Next.js 16.3.8 and React 19.2.8 for the applications.
 - **Verification chain:** `pnpm verify` runs `format:check`, `lint`, `check-types`, `deps` (Knip) and `build`, in that order, and stops at the first failure.
-- **Gates:** a `.githooks/pre-push` hook runs `pnpm verify`; CI (`.github/workflows/ci.yml`) runs `verify`, `pr-hygiene` and `security` jobs.
+- **Gates:** a `.githooks/pre-push` hook runs `pnpm verify`, activated on install by the root `prepare` script (`git config core.hooksPath .githooks`); CI (`.github/workflows/ci.yml`) runs `verify`, `pr-hygiene` and `security` jobs.
+- **Transitive security fixes:** `pnpm-workspace.yaml` pins patched versions of six transitive packages (`flatted`, `picomatch`, `nanoid`, `@humanfs/node`, `source-map-js`, `sharp`) with `overrides`, and records one audit exception, GHSA-vfj7-8cjw-p6xm (`braces`), under `auditConfig.ignoreGhsas`. The owner approved both on 2026-10-13. `braces` has no patched release; it is reached only through dev-time glob tooling (`@next/eslint-plugin-next`'s `fast-glob`, the shadcn CLI) and ships to no user. Remove each override when its parent ships a patched range, and the exception when `braces` does.
 
 ## Scope
 
@@ -40,14 +41,14 @@ This governs where code lives, what runs it, and what the repository-wide checks
 - A test framework or any testing gate. No test runner is configured.
 - A component-catalogue tool such as Storybook.
 - Deployment topology.
-- Whether `apps/docs` is kept, repurposed or removed.
+- Documentation site content and tooling for `apps/docs`.
 - The npm scope policy: `@synapcity/*` and `@repo/*` are both in use (see Unresolved).
 
 ## Unresolved
 
 - **Scope naming.** `@synapcity/ui` sits beside `@repo/tailwind-config`, `@repo/eslint-config` and `@repo/typescript-config`. Whether the scope should be `@synapcity/*` throughout, or `@repo/*` marks internal tooling only, has not been decided.
-- **Node pin.** CI reads `node-version-file: .node-version`, but the repository has no `.node-version`, so the `verify` and `security` jobs cannot resolve a Node version. Either add the file or switch CI to `engines`.
-- **Hook activation.** The old `prepare` script that set `core.hooksPath` is gone, so the pre-push hook is inactive until `git config core.hooksPath .githooks` is run by hand.
+- **Node pin.** `.node-version` (24.20.0) was added on 2026-10-13 because CI reads it; `engines` still says `>=24`. Whether the pin should track the newest 24.x or stay exact has not been decided.
+- **Exceptions are not tracked.** Nothing reminds anyone to remove an override or the `braces` exception when it becomes unnecessary; that is done by hand at dependency-update time.
 - **Enforcement.** CI failures block nothing on this repository's current plan (see `docs/engineering/quality-gates.md`).
 
 ## Governance boundary
