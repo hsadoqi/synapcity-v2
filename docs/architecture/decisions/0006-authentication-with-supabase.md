@@ -44,7 +44,7 @@ How users authenticate to `apps/web` and how their session is held and refreshed
 
 ## Unresolved
 
-- Applying the schema. `supabase/migrations/20261013162633_create_profiles.sql` (columns `display_name` and `avatar_url`, a signup trigger, owner-only RLS) is approved but is run by hand in the dashboard SQL editor. Whether to link the project and use `supabase db push`, and whether the repo adopts declarative schemas, is not yet chosen. Until the SQL is run and a second-user test passes, the `profiles` verification below is outstanding.
+- Applying the schema. `supabase/migrations/20261013162633_create_profiles.sql` (columns `display_name` and `avatar_url`, a signup trigger, owner-only RLS) is approved but is run by hand in the dashboard SQL editor. Whether to link the project and use `supabase db push`, and whether the repo adopts declarative schemas, is not yet chosen. The migration has been applied to the project.
 - Email delivery: Supabase's default sender is rate-limited and meant for development; the owner accepted it for now, and a custom SMTP provider is needed before real users.
 - How a user who signed up with Google or GitHub adds a password (an account-settings page using `updateUser({ password })`). Whether the password-reset email also works for such an account is untested and the Supabase docs do not cover it.
 - Site URL and redirect allow-list values for local, preview and production, which depend on the undecided production domain.
@@ -67,6 +67,17 @@ The repository owner approves changes to the provider, the session model, any pe
 - Manual, against the real Supabase project: sign up, confirm email, sign in, sign out, reset password, Google sign-in, GitHub sign-in, and an unauthenticated visit to the protected route redirecting to sign-in.
 - Supabase advisors report no missing RLS on exposed tables; a second user cannot read or update another user's profile row.
 - Automated tests cover only what they exercise; end-to-end OAuth is not automated and is reported as manually verified or not verified.
+
+Verified manually on 2026-10-13 by the repository owner against the real project:
+
+- Sign-up (password), confirmation, sign-in, sign-out, password reset, and Google and GitHub sign-in, each reaching the expected page.
+- Same-email sign-ins resolved to one user.
+- Signed-in visitors are redirected away from `/auth/login` and `/auth/register`.
+- `profiles` exists with the expected columns, RLS enabled, the two owner-only policies, both triggers and both functions; `anon` has no grants and `authenticated` may select and update only `display_name` and `avatar_url`.
+- The signup trigger created a profile for a new Google user with the provider's name and avatar.
+- Impersonating a stranger, a profile was neither visible nor updatable; impersonating the owner, it was both, and `created_at` could not be changed. These ran as rolled-back SQL (`DO` blocks that set the role and JWT claims), not through the application.
+
+Not verified: the Supabase security advisors, profile isolation between two real accounts through the application, the new `SITE_URL` redirect path end to end, and any automated test of the auth code.
 
 ## Reconsideration conditions
 
