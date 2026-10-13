@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    "./*": "./src/components/ui/**/*.tsx",
+    "./*": "./src/components/ui/*/*.tsx",
     "./styles.css": "./src/styles/globals.css",
     "./lib/*": "./src/lib/*.ts",
     "./lib/utils": "./src/lib/utils.ts",
@@ -20,8 +20,8 @@
     "add": "pnpm dlx shadcn add"
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
+    "@synapcity/dev-eslint-config": "workspace:*",
+    "@synapcity/dev-typescript-config": "workspace:*",
     "@types/node": "26.4.1",
     "@types/react": "19.2.18",
     "eslint": "10.9.1",
@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
-    "@repo/tailwind-config": "workspace:*",
+    "@synapcity/frontend-tailwind-config": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",
     "react": "19.2.8",

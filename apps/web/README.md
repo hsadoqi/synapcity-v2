@@ -1,6 +1,6 @@
 # web
 
-Owns: the Synapcity web application: routes, page composition, font loading and app-level data. It is a composition root; reusable components live in `@synapcity/ui` and theme tokens in `@repo/tailwind-config`.
+Owns: the Synapcity web application: routes, page composition, font loading and app-level data. It is a composition root; reusable components live in `@synapcity/ui` and theme tokens in `@synapcity/frontend-tailwind-config`.
 
 Next.js 16 (App Router) and React 19. See [ADR-0001](../../docs/architecture/decisions/0001-workspace-topology-and-toolchain.md) for the workspace and toolchain.
 
@@ -26,4 +26,4 @@ Per-app checks run through the root scripts (`pnpm lint`, `pnpm check-types`, `p
 
 ## Styling
 
-Do not add theme variables, `:root`/`.dark` rules, or font stacks here. Change tokens in `@repo/tailwind-config` ([ADR-0002](../../docs/architecture/decisions/0002-styling-foundation.md)) and fonts through the roles in [ADR-0003](../../docs/architecture/decisions/0003-typography-roles-and-font-preferences.md). Add components with `pnpm ui:add <name>` from the root.
+Do not add theme variables, `:root`/`.dark` rules, or font stacks here. Change tokens in `@synapcity/frontend-tailwind-config` ([ADR-0002](../../docs/architecture/decisions/0002-styling-foundation.md)) and fonts through the roles in [ADR-0003](../../docs/architecture/decisions/0003-typography-roles-and-font-preferences.md). Add components with `pnpm ui:add <name>` from the root.

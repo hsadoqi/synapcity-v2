@@ -19,9 +19,9 @@
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
-    "@repo/tailwind-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
+    "@synapcity/dev-eslint-config": "workspace:*",
+    "@synapcity/frontend-tailwind-config": "workspace:*",
+    "@synapcity/dev-typescript-config": "workspace:*",
     "@types/node": "26.4.1",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.5",

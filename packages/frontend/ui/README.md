@@ -2,7 +2,7 @@
 
 Owns: the shared React components (shadcn/ui, style `base-mira`, on Base UI), the `cn` class-merging helper, and the stylesheet entry that applies the shared theme.
 
-It owns no theme tokens. Tokens live in `@repo/tailwind-config` ([ADR-0002](../../../docs/architecture/decisions/0002-styling-foundation.md)).
+It owns no theme tokens. Tokens live in `@synapcity/frontend-tailwind-config` ([ADR-0002](../../../docs/architecture/decisions/0002-styling-foundation.md)).
 
 ## Entry points
 

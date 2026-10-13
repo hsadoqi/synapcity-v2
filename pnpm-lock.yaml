@@ -50,15 +50,15 @@ importers:
         specifier: ^4.3.3
         version: 4.3.3
     devDependencies:
-      '@repo/eslint-config':
+      '@synapcity/dev-eslint-config':
         specifier: workspace:*
         version: link:../../packages/dev/eslint-config
-      '@repo/tailwind-config':
-        specifier: workspace:*
-        version: link:../../packages/frontend/tailwind-config
-      '@repo/typescript-config':
+      '@synapcity/dev-typescript-config':
         specifier: workspace:*
         version: link:../../packages/dev/typescript-config
+      '@synapcity/frontend-tailwind-config':
+        specifier: workspace:*
+        version: link:../../packages/frontend/tailwind-config
       '@types/node':
         specifier: 26.4.1
         version: 26.4.1
@@ -99,15 +99,15 @@ importers:
         specifier: ^4.3.3
         version: 4.3.3
     devDependencies:
-      '@repo/eslint-config':
+      '@synapcity/dev-eslint-config':
         specifier: workspace:*
         version: link:../../packages/dev/eslint-config
-      '@repo/tailwind-config':
-        specifier: workspace:*
-        version: link:../../packages/frontend/tailwind-config
-      '@repo/typescript-config':
+      '@synapcity/dev-typescript-config':
         specifier: workspace:*
         version: link:../../packages/dev/typescript-config
+      '@synapcity/frontend-tailwind-config':
+        specifier: workspace:*
+        version: link:../../packages/frontend/tailwind-config
       '@types/node':
         specifier: 26.4.1
         version: 26.4.1
@@ -173,7 +173,7 @@ importers:
       '@base-ui/react':
         specifier: ^1.9.0
         version: 1.9.0(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@repo/tailwind-config':
+      '@synapcity/frontend-tailwind-config':
         specifier: workspace:*
         version: link:../tailwind-config
       class-variance-authority:
@@ -189,10 +189,10 @@ importers:
         specifier: ^4.21.4
         version: 4.21.4(supports-color@7.2.0)
     devDependencies:
-      '@repo/eslint-config':
+      '@synapcity/dev-eslint-config':
         specifier: workspace:*
         version: link:../../dev/eslint-config
-      '@repo/typescript-config':
+      '@synapcity/dev-typescript-config':
         specifier: workspace:*
         version: link:../../dev/typescript-config
       '@types/node':

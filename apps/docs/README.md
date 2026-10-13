@@ -25,4 +25,4 @@ The shared checks run through the root scripts (`pnpm lint`, `pnpm check-types`,
 
 ## Styling
 
-The same rules as `apps/web`: no theme variables, `:root`/`.dark` rules, or font stacks here. Tokens come from `@repo/tailwind-config` ([ADR-0002](../../docs/architecture/decisions/0002-styling-foundation.md)) and fonts from the roles in [ADR-0003](../../docs/architecture/decisions/0003-typography-roles-and-font-preferences.md). Shared components come from `@synapcity/ui`; add them with `pnpm ui:add <name>` from the root.
+The same rules as `apps/web`: no theme variables, `:root`/`.dark` rules, or font stacks here. Tokens come from `@synapcity/frontend-tailwind-config` ([ADR-0002](../../docs/architecture/decisions/0002-styling-foundation.md)) and fonts from the roles in [ADR-0003](../../docs/architecture/decisions/0003-typography-roles-and-font-preferences.md). Shared components come from `@synapcity/ui`; add them with `pnpm ui:add <name>` from the root.

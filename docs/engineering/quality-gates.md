@@ -54,7 +54,7 @@ Until then, a pull request states plainly that behavior was verified manually or
 
 ## Accessibility
 
-There is no automated accessibility check today. Semantics, keyboard behavior, focus visibility, contrast and reduced motion are reviewed manually. Reduced-motion and forced-colours handling is implemented once in `@repo/tailwind-config` (ADR-0002). Report accessibility as not automatically verified.
+There is no automated accessibility check today. Semantics, keyboard behavior, focus visibility, contrast and reduced motion are reviewed manually. Reduced-motion and forced-colours handling is implemented once in `@synapcity/frontend-tailwind-config` (ADR-0002). Report accessibility as not automatically verified.
 
 ## What is not enforced
 

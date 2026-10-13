@@ -20,15 +20,15 @@ flowchart TD
 
 - Apps live at `apps/<name>`; packages live at `packages/<category>/<name>`. The workspace globs are `apps/*` and `packages/**/*`.
 - Current categories:
-  - `dev` — build-time tooling shared by workspaces: `@repo/eslint-config`, `@repo/typescript-config`.
-  - `frontend` — shared presentation code: `@synapcity/ui` (shadcn components, `cn`, hooks) and `@repo/tailwind-config` (theme, tokens, PostCSS config).
+  - `dev` — build-time tooling shared by workspaces: `@synapcity/dev-eslint-config`, `@synapcity/dev-typescript-config`.
+  - `frontend` — shared presentation code: `@synapcity/ui` (shadcn components, `cn`, hooks) and `@synapcity/frontend-tailwind-config` (theme, tokens, PostCSS config).
 - Current apps: `web` (the product application) and `docs` (the documentation site, port 4000; a placeholder page today).
 - Internal dependencies use `workspace:*`.
 - A package's `exports` is its public API. Other packages import only what `exports` lists.
 
 ## Names
 
-Package names are not yet uniform: `@synapcity/ui` sits beside `@repo/*` tooling packages. Use the scope of the neighbouring packages in the same category until the scope question in ADR-0001 is resolved. App names are the directory name (`web`, `docs`).
+Package names are not yet uniform: `@synapcity/ui` sits beside `@synapcity/dev-*` tooling packages. Use the scope of the neighbouring packages in the same category until the scope question in ADR-0001 is resolved. App names are the directory name (`web`, `docs`).
 
 ## Scripts
 
@@ -42,7 +42,7 @@ Turborepo runs `build`, `lint`, `check-types` and `dev` from the root (`turbo.js
 
 ## Styling in the workspace
 
-Apps and packages never define theme tokens. `@repo/tailwind-config` owns them and an app's `globals.css` contains imports and `@source` lines only (ADR-0002). New shadcn components are added with `pnpm ui:add <name>` from the root, which targets `apps/web` and writes into `@synapcity/ui`.
+Apps and packages never define theme tokens. `@synapcity/frontend-tailwind-config` owns them and an app's `globals.css` contains imports and `@source` lines only (ADR-0002). New shadcn components are added with `pnpm ui:add <name>` from the root, which targets `apps/web` and writes into `@synapcity/ui`.
 
 ## Testing
 

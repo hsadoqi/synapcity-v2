@@ -1,12 +1,17 @@
 # ADR-0001: Workspace topology and toolchain
 
-**Status:** Proposed
-**Date:** 2026-10-13
+**Status:** Proposed\
+**Date:** 2026-10-13\
 **Deciders:** Hanaa Sadoqi (repository owner)
 
 ## Context
 
-The repository was rebuilt as a Turborepo monorepo. The earlier implementation's ADRs (`docs/archive/architecture/decisions/`) describe a different workspace set (`apps/storybook`, `packages/ui/core`, four package categories, Vitest, dependency-cruiser) that no longer exists here. They are evidence, not authority (`docs/engineering/preservation-policy.md`). This ADR records the topology and toolchain that the repository actually declares today, so the documents can stop describing the old one.
+The repository was rebuilt as a Turborepo monorepo. The earlier implementation's ADRs
+(`docs/archive/architecture/decisions/`) describe a different workspace set (`apps/storybook`,
+`packages/ui/core`, four package categories, Vitest, dependency-cruiser) that no longer exists here.
+They are evidence, not authority (`docs/engineering/preservation-policy.md`). This ADR records the
+topology and toolchain that the repository actually declares today, so the documents can stop
+describing the old one.
 
 Evidence: `package.json`, `pnpm-workspace.yaml`, `turbo.json`, `.github/workflows/ci.yml`.
 
@@ -22,9 +27,9 @@ Evidence: `package.json`, `pnpm-workspace.yaml`, `turbo.json`, `.github/workflow
   | `apps/web`                          | `web`                     | The Next.js application (composition root)                  |
   | `apps/docs`                         | `docs`                    | The documentation site; a placeholder page today            |
   | `packages/frontend/ui`              | `@synapcity/ui`           | Shared shadcn components, `cn`, hooks (ADR-0002, ADR-0004)  |
-  | `packages/frontend/tailwind-config` | `@repo/tailwind-config`   | Shared Tailwind theme, tokens and PostCSS config (ADR-0002) |
-  | `packages/dev/eslint-config`        | `@repo/eslint-config`     | Shared ESLint flat config                                   |
-  | `packages/dev/typescript-config`    | `@repo/typescript-config` | Shared `tsconfig` bases                                     |
+  | `packages/frontend/tailwind-config` | `@synapcity/frontend-tailwind-config`   | Shared Tailwind theme, tokens and PostCSS config (ADR-0002) |
+  | `packages/dev/eslint-config`        | `@synapcity/dev-eslint-config`     | Shared ESLint flat config                                   |
+  | `packages/dev/typescript-config`    | `@synapcity/dev-typescript-config` | Shared `tsconfig` bases                                     |
 
 - **Language and tooling:** TypeScript 7.0.2, ESLint 10.9.1 with the shared config, Prettier 3.9.6, Knip for unused files, exports and dependencies, Next.js 16.3.8 and React 19.2.8 for the applications.
 - **Verification chain:** `pnpm verify` runs `format:check`, `lint`, `check-types`, `deps` (Knip) and `build`, in that order, and stops at the first failure.
@@ -42,11 +47,11 @@ This governs where code lives, what runs it, and what the repository-wide checks
 - A component-catalogue tool such as Storybook.
 - Deployment topology.
 - Documentation site content and tooling for `apps/docs`.
-- The npm scope policy: `@synapcity/*` and `@repo/*` are both in use (see Unresolved).
+- The npm scope policy: `@synapcity/*` and `@synapcity/dev-*` are both in use (see Unresolved).
 
 ## Unresolved
 
-- **Scope naming.** `@synapcity/ui` sits beside `@repo/tailwind-config`, `@repo/eslint-config` and `@repo/typescript-config`. Whether the scope should be `@synapcity/*` throughout, or `@repo/*` marks internal tooling only, has not been decided.
+- **Scope naming.** `@synapcity/ui` sits beside `@synapcity/frontend-tailwind-config`, `@synapcity/dev-eslint-config` and `@synapcity/dev-typescript-config`. Whether the scope should be `@synapcity/*` throughout, or `@synapcity/dev-*` marks internal tooling only, has not been decided.
 - **Node pin.** `.node-version` (24.20.0) was added on 2026-10-13 because CI reads it; `engines` still says `>=24`. Whether the pin should track the newest 24.x or stay exact has not been decided.
 - **Exceptions are not tracked.** Nothing reminds anyone to remove an override or the `braces` exception when it becomes unnecessary; that is done by hand at dependency-update time.
 - **Enforcement.** CI failures block nothing on this repository's current plan (see `docs/engineering/quality-gates.md`).

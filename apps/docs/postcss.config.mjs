@@ -1,1 +1,1 @@
-export { postcssConfig as default } from '@repo/tailwind-config/postcss';
+export { postcssConfig as default } from '@synapcity/frontend-tailwind-config/postcss';
