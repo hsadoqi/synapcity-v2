@@ -1,0 +1,37 @@
+{
+  "name": "@synapcity/dev-vitest-config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./base": "./src/base.ts",
+    "./react": "./src/react.ts",
+    "./browser": "./src/browser.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@testing-library/react": "16.3.3",
+    "@vitest/browser-playwright": "4.1.11",
+    "vitest": "4.1.11"
+  },
+  "peerDependenciesMeta": {
+    "@testing-library/react": { "optional": true },
+    "@vitest/browser-playwright": { "optional": true }
+  },
+  "devDependencies": {
+    "@synapcity/dev-typescript-config": "workspace:*",
+    "@testing-library/dom": "10.4.2",
+    "@testing-library/react": "16.3.3",
+    "@types/node": "26.4.1",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.5",
+    "@vitest/browser-playwright": "4.1.11",
+    "playwright": "1.64.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "typescript": "7.0.2",
+    "vitest": "4.1.11"
+  }
+}

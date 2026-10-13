@@ -1,0 +1,21 @@
+{
+  "name": "@synapcity/dev-playwright-config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@playwright/test": "1.64.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0",
+    "@synapcity/dev-typescript-config": "workspace:*",
+    "@types/node": "26.4.1",
+    "typescript": "7.0.2"
+  }
+}
