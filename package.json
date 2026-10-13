@@ -10,8 +10,9 @@
     "format": "prettier --write . --cache=.prettiercache",
     "format:check": "prettier --check . --cache=.prettiercache",
     "check-types": "turbo run check-types",
-    "verify": "pnpm format:check && pnpm lint && pnpm check-types && pnpm deps && pnpm build",
+    "verify": "pnpm format:check && pnpm lint && pnpm check-types && pnpm deps && pnpm brand:check && pnpm build",
     "deps": "knip",
+    "brand:check": "node scripts/check-brand-assets.mjs",
     "prepare": "git config core.hooksPath .githooks || echo 'git hooks not activated (not a git checkout)'",
     "ui:add": "pnpm dlx shadcn@latest add -c apps/web"
   },

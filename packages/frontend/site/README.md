@@ -37,4 +37,4 @@ Each app declares `alt`, `size` and `contentType` itself: the Next docs show the
 ## Rules
 
 - No `next/og`, routing, request APIs, Server Actions or imports from `apps/*`. The only Next reference is the `Metadata` type, imported as a type ([workspace conventions](../../../docs/architecture/workspace-conventions.md)).
-- Icons (`icon.svg`, `apple-icon.png`, `favicon.ico`) stay in each app's `app/` directory; Next only recognises them there. They are exports of the logo in `logo-mark.tsx`.
+- Icons (`icon.svg`, `apple-icon.png`, `favicon.ico`) stay in each app's `app/` directory; Next only recognises them there. They are exports of the logo in `logo-mark.tsx`, as are the SVG string in `src/open-graph.tsx` and `apps/web/public/brand-assets`. `pnpm brand:check` (part of `pnpm verify`) fails when the SVGs drift from the geometry or the apps' icon files differ; it cannot check the PNG and ICO rasters, so re-export those by hand.

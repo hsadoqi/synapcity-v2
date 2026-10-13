@@ -1,5 +1,29 @@
 # Task scope
 
+## Active task: brand-asset drift check (2026-10-13)
+
+Approved by the owner ("ok i'll go with ur rec", 2026-10-13): decision 1 = enforce inside `pnpm verify`, decision 2 = root `scripts/`. Phase B.
+
+- Goal and mode: make drift between `logo-mark.tsx` (the source of truth for logo geometry) and its static exports fail a check instead of going unnoticed. Mode: planning; implementing only after approval.
+- Evidence: `WORDMARK_PATH` matches exactly in `wordmark.svg` and `wordmark-monochrome.svg`; `LOGO_WORDMARK_PATH` matches exactly in `logo.svg`, `logo-monochrome.svg` and the embedded string in `packages/frontend/site/src/open-graph.tsx`. The mark and icon files carry hand-written colour-scheme CSS and the PNG and ICO are raster exports, so a generator would have to reproduce styling and rasterise (needing `sharp`, a dependency decision). Check-only is therefore proposed first; a generator is deferred.
+- Decided here: one dependency-free Node script reads `logo-mark.tsx` by pattern (no new exports, no `frontend-ui` API change) and fails, naming the file and the constant, when (1) either wordmark path constant is missing from any export that should contain it, (2) the mark geometry values (grid, square size, radius, stroke, offsets, core) disagree with `mark-light.svg`, `mark-dark.svg` and each app's `icon.svg`, or (3) the two apps' `icon.svg`, `apple-icon.png` and `favicon.ico` differ byte for byte. It cannot check that a raster matches the geometry; that stays a manual re-export and the README says so.
+- Owner decisions needed before approval:
+  1. Run it inside `pnpm verify` (recommended; CI and the pre-push hook then enforce it, but the chain is recorded in Accepted ADR-0001 and must be amended), or keep it a standalone `pnpm brand:check` that nothing enforces?
+  2. Is a root-level `scripts/` directory acceptable for it? (none exists today; the alternative is `packages/dev/`, which is build-time tooling by definition, but would be a new package.)
+- Exact destinations and budget, assuming decision 1 is "inside verify" and decision 2 is a root `scripts/`:
+  - Create 1: `scripts/check-brand-assets.mjs`.
+  - Update 7: `package.json` (root; a `brand:check` script, added to `verify` after `deps`), `AGENTS.md` (§6 list of repository-defined checks), `docs/engineering/quality-gates.md`, `docs/engineering/setup.md`, `docs/architecture/decisions/0001-workspace-topology-and-toolchain.md` (the verification-chain line only), `packages/frontend/site/README.md` (name the check), and this record.
+  - Conditional, up to 1: `knip.json`, only if Knip reports the script as an unused file.
+  - If decision 1 is "standalone": update only `package.json`, `packages/frontend/site/README.md` and this record (3), with no ADR, AGENTS.md or docs changes.
+  - Delete/move/rename 0; dependencies 0; changes to `logo-mark.tsx`, any brand file or any app 0; commits and pushes 0 until asked; external systems 0.
+- Execution result: created 1 (`scripts/check-brand-assets.mjs`); updated 7 (`package.json`, `AGENTS.md`, `docs/engineering/quality-gates.md`, `docs/engineering/setup.md`, ADR-0001's verification-chain line, `packages/frontend/site/README.md`, this record); `knip.json` untouched (Knip needed no entry). Negative runs on scratch copies under `/private/tmp` produced named failures for a changed wordmark path, a changed icon rect, a differing raster and a changed source constant.
+- System of record: `logo-mark.tsx` owns the geometry; the script only compares. The `Owns:` line of `@synapcity/frontend-site` and PRODUCT.md already name where the exports live.
+- Approvals held: the manifest, enforcement inside `pnpm verify` including the ADR-0001 verification-chain amendment, and a root `scripts/` directory (owner, 2026-10-13).
+- Preconditions to verify before executing: the constant names and formats in `logo-mark.tsx` are matched by the script's patterns on today's file; the script passes on the current tree and fails when one character of an export is changed (shown with a disposable copy under `/private/tmp`, not by editing a brand file); `pnpm verify` still reports the pre-existing unrelated failures separately from this check.
+- Verification: run the script on the current tree (expect pass); run it against a scratch copy with one changed path character, one changed rect value, and one differing icon (expect three named failures); `pnpm format:check`, `pnpm lint`, `pnpm check-types` and `pnpm deps` on the final tree; read back the edited docs. Not claimed: that rasters match the geometry, or that behaviour is tested beyond these runs (no test runner exists).
+- Recovery: delete the script and revert the listed updates from git (this scope's commit is the baseline). No reset, stash, clean or history rewrite.
+- Stop conditions: no answer to decision 1 or 2; a pattern that cannot match `logo-mark.tsx` without changing it; a need for any dependency; Knip or Prettier rejecting the script in a way that needs a change outside this manifest; a concurrent change to a destination.
+
 ## Active task: share brand assets and SEO metadata across apps (2026-10-13)
 
 Approved by the owner ("ok go", 2026-10-13) after the manifest and package name were presented. Phase B.

@@ -21,16 +21,17 @@ pnpm verify
 
 ## Commands
 
-| Command                             | What it does                                                                        |
-| ----------------------------------- | ----------------------------------------------------------------------------------- |
-| `pnpm verify`                       | Runs `format:check`, `lint`, `check-types`, `deps` and `build`; stops at first fail |
-| `pnpm format:check` / `pnpm format` | Check or apply Prettier formatting                                                  |
-| `pnpm lint`                         | ESLint in every workspace, through Turbo                                            |
-| `pnpm check-types`                  | `tsc --noEmit` in every workspace (Next apps run `next typegen` first)              |
-| `pnpm deps`                         | Knip: unused files, exports and dependencies                                        |
-| `pnpm build`                        | Builds every workspace through Turbo                                                |
-| `pnpm dev`                          | Runs every workspace's dev server; `pnpm dev:web` and `pnpm dev:docs` run one       |
-| `pnpm ui:add <component>`           | Adds a shadcn component from the root, writing into `@synapcity/frontend-ui`        |
+| Command                             | What it does                                                                                       |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `pnpm verify`                       | Runs `format:check`, `lint`, `check-types`, `deps`, `brand:check` and `build`; stops at first fail |
+| `pnpm format:check` / `pnpm format` | Check or apply Prettier formatting                                                                 |
+| `pnpm lint`                         | ESLint in every workspace, through Turbo                                                           |
+| `pnpm check-types`                  | `tsc --noEmit` in every workspace (Next apps run `next typegen` first)                             |
+| `pnpm deps`                         | Knip: unused files, exports and dependencies                                                       |
+| `pnpm brand:check`                  | Static brand exports match the logo geometry in `logo-mark.tsx` (not the rasters)                  |
+| `pnpm build`                        | Builds every workspace through Turbo                                                               |
+| `pnpm dev`                          | Runs every workspace's dev server; `pnpm dev:web` and `pnpm dev:docs` run one                      |
+| `pnpm ui:add <component>`           | Adds a shadcn component from the root, writing into `@synapcity/frontend-ui`                       |
 
 There is no test command. A passing `pnpm verify` proves the repository's formatting, lint, types, unused-code and build checks pass; it does not prove behavior, and does not prove a product feature exists, is product-required, or is product-validated.
 
