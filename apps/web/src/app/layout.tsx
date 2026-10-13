@@ -4,7 +4,8 @@ import '../styles/globals.css';
 import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import RootProviders from './providers';
-import { ModeToggle } from '@synapcity/frontend-ui/components/mode-toggle';
+import RootShell from '@synapcity/frontend-ui/blocks/root-shell';
+
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 const geistSans = localFont({
@@ -34,8 +35,7 @@ export default function RootLayout({
     >
       <body>
         <RootProviders>
-          <ModeToggle />
-          {children}
+          <RootShell>{children}</RootShell>
         </RootProviders>
       </body>
     </html>

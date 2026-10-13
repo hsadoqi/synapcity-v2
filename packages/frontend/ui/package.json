@@ -9,7 +9,9 @@
     "./core/*": "./src/components/ui/*.tsx",
     "./components": "./src/components/index.ts",
     "./components/*": "./src/components/*.tsx",
-    "./providers/*": "./src/providers/*.tsx"
+    "./providers/*": "./src/providers/*.tsx",
+    "./blocks/*": "./src/blocks/*/*.tsx",
+    "./blocks": "./src/blocks/index.ts"
   },
   "scripts": {
     "build": "tsc --build tsconfig.build.json",

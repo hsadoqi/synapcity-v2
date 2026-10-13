@@ -37,7 +37,7 @@
   }
 
   body {
-    @apply min-h-svh bg-background font-body text-base text-foreground antialiased;
+    @apply min-h-svh bg-background font-body text-base text-foreground flex antialiased max-w-screen size-full;
   }
 
   h1,

@@ -52,7 +52,7 @@ const ModeMenu = React.forwardRef<
   );
 });
 
-function ModeToggle() {
+function ModeToggle({ className }: { className?: string }) {
   const { setTheme } = useTheme();
 
   const handleModeChange = (theme: Mode) => {
@@ -61,16 +61,18 @@ function ModeToggle() {
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        render={(props) => (
-          <ModeButton aria-label="Toggle dark mode" {...props} />
-        )}
-      />
-      <DropdownMenuContent align="end">
-        <ModeMenu onUpdate={(theme) => handleModeChange(theme)} />
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className={className}>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={(props) => (
+            <ModeButton aria-label="Toggle dark mode" {...props} />
+          )}
+        />
+        <DropdownMenuContent align="end">
+          <ModeMenu onUpdate={(theme) => handleModeChange(theme)} />
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }
 
