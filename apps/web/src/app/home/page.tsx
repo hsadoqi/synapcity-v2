@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
 import { signOut } from '@/app/auth/actions';
+import { CurrentUserAvatar } from '@/components/current-user-avatar';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = { title: 'Home' };
@@ -16,6 +17,7 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-4 p-4 text-center">
+      <CurrentUserAvatar />
       <h1>You are signed in</h1>
       <p className="text-sm text-muted-foreground">{data.claims.email}</p>
       <form action={signOut}>
