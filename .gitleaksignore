@@ -6,25 +6,22 @@
 # beside a field named "password". They are not credentials for anything.
 #
 # Each line is a finding fingerprint (commit:file:rule:line), so only these exact
-# findings are ignored. The rule stays active for every other file and commit,
-# and a regenerated seed with new values will be flagged again. See
-# docs/engineering/quality-gates.md ("Secret-scan exceptions").
+# findings are ignored. The rule stays active for every other file and commit.
 #
-cec7d633b80256eb34a291a0bbde24c98c34511c:packages/dev/fixtures/seed/seed.json:generic-api-key:14
-cec7d633b80256eb34a291a0bbde24c98c34511c:packages/dev/fixtures/seed/seed.json:generic-api-key:26
-cec7d633b80256eb34a291a0bbde24c98c34511c:packages/dev/fixtures/seed/seed.json:generic-api-key:32
-cec7d633b80256eb34a291a0bbde24c98c34511c:packages/dev/fixtures/seed/seed.json:generic-api-key:38
-cec7d633b80256eb34a291a0bbde24c98c34511c:packages/dev/fixtures/seed/seed.json:generic-api-key:44
-cec7d633b80256eb34a291a0bbde24c98c34511c:packages/dev/fixtures/seed/seed.json:generic-api-key:50
-cec7d633b80256eb34a291a0bbde24c98c34511c:packages/dev/fixtures/seed/seed.json:generic-api-key:56
-cec7d633b80256eb34a291a0bbde24c98c34511c:packages/dev/fixtures/seed/seed.json:generic-api-key:62
-cec7d633b80256eb34a291a0bbde24c98c34511c:packages/dev/fixtures/seed/seed.json:generic-api-key:8
-d7076fde98188b7703a9da47141e0c0c32f3fa21:packages/dev/fixtures/seed/users.json:generic-api-key:12
-d7076fde98188b7703a9da47141e0c0c32f3fa21:packages/dev/fixtures/seed/users.json:generic-api-key:24
-d7076fde98188b7703a9da47141e0c0c32f3fa21:packages/dev/fixtures/seed/users.json:generic-api-key:30
-d7076fde98188b7703a9da47141e0c0c32f3fa21:packages/dev/fixtures/seed/users.json:generic-api-key:36
-d7076fde98188b7703a9da47141e0c0c32f3fa21:packages/dev/fixtures/seed/users.json:generic-api-key:42
-d7076fde98188b7703a9da47141e0c0c32f3fa21:packages/dev/fixtures/seed/users.json:generic-api-key:48
-d7076fde98188b7703a9da47141e0c0c32f3fa21:packages/dev/fixtures/seed/users.json:generic-api-key:54
-d7076fde98188b7703a9da47141e0c0c32f3fa21:packages/dev/fixtures/seed/users.json:generic-api-key:6
-d7076fde98188b7703a9da47141e0c0c32f3fa21:packages/dev/fixtures/seed/users.json:generic-api-key:60
+# A fingerprint contains the commit hash, so it only matches the commit it was
+# taken from. These all point at b92f40d, the commit on main that the squash
+# merge of the fixtures package created; fingerprints taken from the branch's
+# own commits stopped matching once that branch was squashed. After any squash
+# merge, rebase or history rewrite that touches seed JSON, or when the seed is
+# regenerated, run `gitleaks detect --source . --redact` on main and replace the
+# entries. See docs/engineering/quality-gates.md ("Secret-scan exceptions").
+#
+b92f40d167d36c766343835e1392c1e9f8b00ce7:packages/dev/fixtures/seed/users.json:generic-api-key:6
+b92f40d167d36c766343835e1392c1e9f8b00ce7:packages/dev/fixtures/seed/users.json:generic-api-key:12
+b92f40d167d36c766343835e1392c1e9f8b00ce7:packages/dev/fixtures/seed/users.json:generic-api-key:24
+b92f40d167d36c766343835e1392c1e9f8b00ce7:packages/dev/fixtures/seed/users.json:generic-api-key:30
+b92f40d167d36c766343835e1392c1e9f8b00ce7:packages/dev/fixtures/seed/users.json:generic-api-key:36
+b92f40d167d36c766343835e1392c1e9f8b00ce7:packages/dev/fixtures/seed/users.json:generic-api-key:42
+b92f40d167d36c766343835e1392c1e9f8b00ce7:packages/dev/fixtures/seed/users.json:generic-api-key:48
+b92f40d167d36c766343835e1392c1e9f8b00ce7:packages/dev/fixtures/seed/users.json:generic-api-key:54
+b92f40d167d36c766343835e1392c1e9f8b00ce7:packages/dev/fixtures/seed/users.json:generic-api-key:60
