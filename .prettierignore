@@ -12,3 +12,4 @@ docs/archive
 .vscode
 .pnpm-store
 coverage
+storybook-static
