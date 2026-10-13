@@ -17,6 +17,7 @@ import { sharedConfig } from './packages/dev/vitest-config/src/shared.ts';
  * process. Add a package to `projects` when it gains Vitest tests.
  */
 const projects = [
+  'apps/web',
   'packages/dev/fixtures',
   'packages/frontend/site',
   'packages/frontend/ui',
