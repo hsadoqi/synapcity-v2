@@ -22,14 +22,14 @@ Evidence: `package.json`, `pnpm-workspace.yaml`, `turbo.json`, `.github/workflow
 - **Layout:** applications live in `apps/<name>`; packages live in `packages/<category>/<name>`. The workspace globs are `apps/*` and `packages/**/*`.
 - **Current workspaces:**
 
-  | Workspace                           | Package name              | Role                                                        |
-  | ----------------------------------- | ------------------------- | ----------------------------------------------------------- |
-  | `apps/web`                          | `web`                     | The Next.js application (composition root)                  |
-  | `apps/docs`                         | `docs`                    | The documentation site; a placeholder page today            |
-  | `packages/frontend/ui`              | `@synapcity/ui`           | Shared shadcn components, `cn`, hooks (ADR-0002, ADR-0004)  |
-  | `packages/frontend/tailwind-config` | `@synapcity/frontend-tailwind-config`   | Shared Tailwind theme, tokens and PostCSS config (ADR-0002) |
-  | `packages/dev/eslint-config`        | `@synapcity/dev-eslint-config`     | Shared ESLint flat config                                   |
-  | `packages/dev/typescript-config`    | `@synapcity/dev-typescript-config` | Shared `tsconfig` bases                                     |
+  | Workspace                           | Package name                          | Role                                                        |
+  | ----------------------------------- | ------------------------------------- | ----------------------------------------------------------- |
+  | `apps/web`                          | `web`                                 | The Next.js application (composition root)                  |
+  | `apps/docs`                         | `docs`                                | The documentation site; a placeholder page today            |
+  | `packages/frontend/ui`              | `@synapcity/ui`                       | Shared shadcn components, `cn`, hooks (ADR-0002, ADR-0004)  |
+  | `packages/frontend/tailwind-config` | `@synapcity/frontend-tailwind-config` | Shared Tailwind theme, tokens and PostCSS config (ADR-0002) |
+  | `packages/dev/eslint-config`        | `@synapcity/dev-eslint-config`        | Shared ESLint flat config                                   |
+  | `packages/dev/typescript-config`    | `@synapcity/dev-typescript-config`    | Shared `tsconfig` bases                                     |
 
 - **Language and tooling:** TypeScript 7.0.2, ESLint 10.9.1 with the shared config, Prettier 3.9.6, Knip for unused files, exports and dependencies, Next.js 16.3.8 and React 19.2.8 for the applications.
 - **Verification chain:** `pnpm verify` runs `format:check`, `lint`, `check-types`, `deps` (Knip) and `build`, in that order, and stops at the first failure.

@@ -14,7 +14,7 @@ Nothing else defines a token. An app's `globals.css` contains imports and `@sour
 | `tokens/base.css`          | Base element styles, `tw-animate-css`, `:root` defaults (radius, text size)      |
 | `tokens/accessibility.css` | Reduced motion                                                                   |
 | `tokens/typeset.css`       | Vendored shadcn typeset for long-form text                                       |
-| `postcss.config.mjs`       | Exported as `@synapcity/frontend-tailwind-config/postcss`                                      |
+| `postcss.config.mjs`       | Exported as `@synapcity/frontend-tailwind-config/postcss`                        |
 
 ## Using it
 
