@@ -86,9 +86,6 @@ importers:
       '@synapcity/frontend-ui':
         specifier: workspace:*
         version: link:../../packages/frontend/ui
-      lucide-react:
-        specifier: ^1.55.0
-        version: 1.55.0(@types/react@19.2.18)(react@19.2.8)
       next:
         specifier: 16.3.8
         version: 16.3.8(@babel/core@8.0.1)(@types/node@26.4.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
