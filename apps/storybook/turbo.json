@@ -1,0 +1,22 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build-storybook": {
+      "dependsOn": ["build"],
+      "outputs": [
+        "storybook-static/**",
+        "!.next/cache/**",
+        ".next/**",
+        "!.next/dev/**"
+      ]
+    },
+    "test:storybook": {
+      "cache": false,
+      "outputs": []
+    },
+    "test:storybook:watch": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}
