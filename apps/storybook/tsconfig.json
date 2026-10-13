@@ -5,6 +5,7 @@
       "@/*": ["./src/*"]
     },
     "jsx": "react-jsx",
+    "allowImportingTsExtensions": true,
     "types": ["react", "react-dom", "vite/client", "vitest/globals", "next"]
   },
   "include": [

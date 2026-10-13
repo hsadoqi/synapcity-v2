@@ -1,11 +1,14 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { defineConfig } from 'vitest/config';
+import { defineConfig, mergeConfig } from 'vitest/config';
 
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 
-import { chromiumBrowser } from '@synapcity/dev-vitest-config/browser';
+import {
+  chromiumBrowser,
+  browserConfig,
+} from '@synapcity/dev-vitest-config/browser';
 
 const dirname =
   typeof __dirname !== 'undefined'
@@ -13,7 +16,7 @@ const dirname =
     : path.dirname(fileURLToPath(import.meta.url));
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
-export default defineConfig({
+const config = defineConfig({
   test: {
     projects: [
       {
@@ -31,3 +34,5 @@ export default defineConfig({
     ],
   },
 });
+
+export default mergeConfig(browserConfig, config);
