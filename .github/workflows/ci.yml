@@ -16,7 +16,7 @@ jobs:
   verify:
     name: verify
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # The pnpm version comes from the `packageManager` field in package.json.
@@ -27,6 +27,12 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+
+      # `pnpm install` does not download browsers. `pnpm verify` runs the web
+      # end-to-end tests and the Storybook story tests, and both drive Chromium.
+      # Every consumer pins the same Playwright version, so one install serves both.
+      - name: Install Chromium for Playwright
+        run: pnpm --filter web exec playwright install --with-deps chromium
 
       - run: pnpm verify
 
