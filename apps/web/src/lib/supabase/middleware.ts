@@ -56,6 +56,9 @@ export async function updateSession(request: NextRequest) {
       safeNextPath(request.nextUrl.searchParams.get('next')),
       request.url,
     );
+    // safeNextPath only returns same-origin paths. Assert it anyway, so a later
+    // change to that helper cannot turn this into an open redirect.
+    if (destination.origin !== request.nextUrl.origin) return supabaseResponse;
     const redirect = NextResponse.redirect(destination);
     // Carry over any session cookies getClaims() just refreshed, or this
     // redirect would drop them and sign the user out.
