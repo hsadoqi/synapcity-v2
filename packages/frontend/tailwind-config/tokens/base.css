@@ -1,8 +1,8 @@
-@import './accessibility';
-@import './utilities';
-@import './typography';
-@import './variants';
 @import 'tw-animate-css';
+@import './accessibility.css';
+@import './utilities.css';
+@import './typography.css';
+@import './variants.css';
 
 @layer base {
   :root {
