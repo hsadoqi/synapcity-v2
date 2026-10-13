@@ -57,3 +57,4 @@ next-env.d.ts
 .eslintcache
 # Storybook debug output
 debug-storybook.log
+supabase/.temp
