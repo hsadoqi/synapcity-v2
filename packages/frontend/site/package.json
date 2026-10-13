@@ -12,7 +12,9 @@
     "lint": "eslint . --cache",
     "check-types": "tsc --noEmit",
     "verify": "pnpm lint && pnpm check-types",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:watch": "vitest run --watch",
+    "test:coverage": "vitest run --coverage"
   },
   "peerDependencies": {
     "next": "16.3.8",
@@ -24,6 +26,7 @@
     "@synapcity/dev-vitest-config": "workspace:*",
     "@types/node": "26.4.1",
     "@types/react": "19.2.18",
+    "@vitest/coverage-v8": "4.1.11",
     "eslint": "10.9.1",
     "next": "16.3.8",
     "react": "19.2.8",
