@@ -35,7 +35,7 @@ ADRs are numbered sequentially (`0001-*.md`, `0002-*.md`, ...) and never renumbe
 
 Not decided. Each needs an ADR, and the owner's approval, before it is treated as settled.
 
-- **Testing strategy.** Partly addressed by Proposed [ADR-0005](0005-testing-foundation.md): shared Vitest and Playwright config packages and a few smoke tests. Still open: running tests in `pnpm verify` and CI, coverage, accessibility gating, browser matrix. `pnpm verify` still proves formatting, lint, types, unused code and builds only.
+- **Testing strategy.** Partly addressed by Proposed [ADR-0005](0005-testing-foundation.md): shared Vitest and Playwright config packages and a few smoke tests. The tests now run in `pnpm verify` and CI, pending the owner's approval of that chain change. Still open: coverage thresholds, accessibility gating, browser matrix, and how much of the code the tests must reach (coverage is thin today).
 - **Dependency direction between package categories**, and any tool that enforces it.
 - **Component catalogue** (Storybook or another).
 - **Theme editor and preference persistence** (what writes `--font-preference-*` and the other overrides).

@@ -4,7 +4,7 @@
 
 **Scope:** `@synapcity/frontend-tailwind-config`, `@synapcity/frontend-ui`, and the styling entry of `apps/web` and `apps/docs`.
 
-**Not verified:** Read from source, plus one check of the compiled CSS (noted where used). Light, dark and system-dark have not been checked by eye in a browser by the author, and the repository has no test runner.
+**Not verified:** Read from source, plus one check of the compiled CSS (noted where used). Light, dark and system-dark have not been checked by eye in a browser by the author, and no test covers it.
 
 ## The idea in one paragraph
 

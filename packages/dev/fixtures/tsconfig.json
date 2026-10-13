@@ -1,0 +1,13 @@
+{
+  "extends": "@synapcity/dev-typescript-config/base.json",
+  "compilerOptions": {
+    "strictNullChecks": true,
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "types": ["node"]
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", ".turbo"]
+}

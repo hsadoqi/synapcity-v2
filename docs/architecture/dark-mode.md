@@ -4,7 +4,7 @@
 
 **Scope:** `apps/web`, `apps/docs`, `@synapcity/frontend-ui`, `@synapcity/frontend-tailwind-config`.
 
-**Not verified:** The behavior below was read from source. It has not been checked in a browser by the author, and the repository has no test runner.
+**Not verified:** The behavior below was read from source. It has not been checked in a browser by the author, and no test covers it.
 
 ## The model in one paragraph
 

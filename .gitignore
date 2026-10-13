@@ -55,3 +55,6 @@ next-env.d.ts
 # caches
 .prettiercache
 .eslintcache
+# Storybook debug output
+debug-storybook.log
+supabase/.temp

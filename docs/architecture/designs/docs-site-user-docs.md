@@ -51,7 +51,7 @@ The page changes immediately.
 
 - Which tooling option, and who approves it.
 - Whether user-facing pages and the contributor docs under `docs/` stay separate. Contributor docs are Markdown in the repository and are not published by `apps/docs`.
-- Whether a page that describes a UI control should be tested by hand, since the repository has no test runner. The draft above has not been checked against the running app.
+- Whether a page that describes a UI control should be tested by hand or by a story test, since the shared test setup does not yet cover docs pages. The draft above has not been checked against the running app.
 - Where the mode button sits on each page. The draft deliberately does not say.
 
 ## Consequences if adopted

@@ -28,6 +28,8 @@ flowchart LR
 
 **Audit exceptions.** The `security` job's `pnpm audit` passes only because `pnpm-workspace.yaml` pins patched transitive versions (`overrides`) and records one accepted exception for `braces`, which has no patched release (`auditConfig.ignoreGhsas`; ADR-0001). A new advisory fails the job.
 
+**Secret-scan exceptions.** The `security` job's full-history gitleaks scan passes only because `.gitleaksignore` lists 18 accepted findings: fake passwords that the seeded fixture generator (`packages/dev/fixtures`, `faker.internet.password()`) wrote into the committed seed JSON, which the `generic-api-key` rule flags. Each entry is an exact finding fingerprint, so the rule stays active everywhere else. A regenerated seed produces new values and new findings; the fix is to stop committing a `password` field, or to review and add the new fingerprints, not to widen the ignore to a path. Adding any other entry needs the repository owner's approval and a recorded reason.
+
 ## Branches and pull requests
 
 - Work happens on a branch named `type/short-description` (for example `chore/phase-01-quality-gates`), never directly on `main`.
@@ -44,17 +46,17 @@ flowchart LR
 
 ## Tests
 
-No test runner is configured, so there is no test gate, and none of the gates above claims behavior is correct. Whether to add one, and which, is an open candidate decision (`docs/architecture/decisions/README.md`). When one exists:
+`pnpm verify` and CI run Vitest (`pnpm test`, `pnpm test:coverage`), a Playwright smoke test of `apps/web` (`pnpm test:e2e`) and the Storybook story tests (`pnpm test:storybook`). The setup is Proposed in ADR-0005, not yet Accepted, and the testing strategy remains an open candidate decision (`docs/architecture/decisions/README.md`): coverage thresholds, the browser matrix and accessibility gating are undecided. Coverage of the code is thin, so a passing gate does not claim behavior is correct beyond what the tests exercise. Requirements for the test gate:
 
 - Every required test surface is named explicitly by a root script and included in `pnpm verify`.
 - The test gate must fail when discovery finds no tests, so required tests cannot silently disappear.
 - A test's report names the invariant category it protects (`docs/engineering/definition-of-done.md`, item 3).
 
-Until then, a pull request states plainly that behavior was verified manually or not at all, and what that covered.
+A pull request states plainly what the tests covered and what was verified manually or not at all.
 
 ## Accessibility
 
-There is no automated accessibility check today. Semantics, keyboard behavior, focus visibility, contrast and reduced motion are reviewed manually. Reduced-motion and forced-colours handling is implemented once in `@synapcity/frontend-tailwind-config` (ADR-0002). Report accessibility as not automatically verified.
+The only automated accessibility check is the axe run inside the Storybook story tests, and it covers only components that have stories. Semantics, keyboard behavior, focus visibility, contrast and reduced motion are otherwise reviewed manually. Reduced-motion and forced-colours handling is implemented once in `@synapcity/frontend-tailwind-config` (ADR-0002). Report accessibility as verified only for the stories axe ran against.
 
 ## What is not enforced
 
