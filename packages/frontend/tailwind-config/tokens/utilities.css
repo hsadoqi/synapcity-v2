@@ -6,32 +6,12 @@
 
 @utility theme-light {
   color-scheme: light;
-  --base: var(--base-500);
-  --base-foreground: var(--base-950);
-  --base-background: var(--base-50);
-  /* Primary and accent start neutral; each ramp can be overridden independently. */
-  --primary: var(--primary-500);
-  --primary-foreground: var(--primary-950);
-  --primary-background: var(--primary-50);
-  --accent: var(--accent-500);
-  --accent-foreground: var(--accent-950);
-  --accent-background: var(--accent-50);
   --background: var(--base-background);
   --foreground: var(--base-foreground);
-  --card: var(--background);
-  --card-foreground: var(--foreground);
-  --popover: var(--background);
-  --popover-foreground: var(--foreground);
-  --shadcn-primary: var(--primary-950);
-  --shadcn-primary-foreground: var(--primary-50);
-  --shadcn-accent: var(--accent-950);
-  --shadcn-accent-foreground: var(--accent-50);
-  --secondary: var(--base-100);
-  --secondary-foreground: var(--base-900);
-  --muted: var(--base-100);
-  --muted-foreground: oklch(52% 0 0);
-  --accent: var(--accent-100);
-  --accent-foreground: var(--base-900);
+  --card: var(--base-background)/90;
+  --card-foreground: var(--base-foreground);
+  --popover: var(--base-background)/20;
+  --popover-foreground: var(--base-foreground);
   --destructive: oklch(45% 0.245 27.325);
   --destructive-foreground: var(--base-50);
   --success: oklch(46% 0.15 145);
@@ -40,14 +20,14 @@
   --warning-foreground: var(--base-900);
   --info: oklch(48% 0.16 250);
   --info-foreground: var(--base-50);
-  --border: var(--base-200);
-  --divider: var(--base-200);
-  --input: oklch(60% 0 0);
-  --ring: oklch(60% 0 0);
+  --border: var(--muted);
+  --divider: var(--muted-foreground);
+  --input: var(--muted-background);
+  --ring: var(--base);
   --sidebar: var(--base-50);
   --sidebar-foreground: var(--foreground);
-  --sidebar-primary: var(--shadcn-primary);
-  --sidebar-primary-foreground: var(--shadcn-primary-foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
   --sidebar-accent: var(--accent);
   --sidebar-accent-foreground: var(--accent-foreground);
   --sidebar-border: var(--divider);
@@ -56,32 +36,13 @@
 
 @utility theme-dark {
   color-scheme: dark;
-  --base: var(--base-500);
-  --base-foreground: var(--base-foreground);
-  --base-background: var(--base-background);
-  /* colors.css owns the ramps (50 light … 950 dark in both themes), so steps here are literal. */
-  --primary: var(--primary-500);
-  --primary-foreground: var(--primary-950);
-  --primary-background: var(--primary-50);
   --background: var(--base-background);
   --foreground: var(--base-foreground);
-  --accent: var(--accent-500);
-  --accent-foreground: var(--accent-950);
-  --accent-background: var(--accent-50);
   /* Literals so surfaces stay fixed if a ramp is overridden with a brand colour. */
   --card: oklch(20.5% 0 0);
   --card-foreground: var(--foreground);
   --popover: oklch(20.5% 0 0);
   --popover-foreground: var(--foreground);
-  --shadcn-primary: var(--primary-800);
-  --shadcn-primary-foreground: var(--primary-100);
-  --secondary: oklch(26.9% 0 0);
-  --secondary-foreground: var(--base-50);
-  --muted: oklch(26.9% 0 0);
-  --muted-foreground: oklch(70.8% 0 0);
-  --muted-background: var(--background)/10;
-  --shadcn-accent: var(--accent-200);
-  --shadcn-accent-foreground: var(--base-950);
   --destructive: oklch(76% 0.191 22.216);
   --destructive-foreground: var(--base-950);
   --success: oklch(72% 0.14 145);
@@ -90,14 +51,14 @@
   --warning-foreground: var(--base-950);
   --info: oklch(70% 0.14 250);
   --info-foreground: var(--base-950);
-  --border: oklch(100% 0 0 / 35%);
-  --divider: var(--base-800);
-  --input: oklch(100% 0 0 / 40%);
-  --ring: var(--base-500);
+  --border: var(--muted);
+  --divider: var(--muted-foreground);
+  --input: var(--muted-background);
+  --ring: var(--base)       ;
   --sidebar: var(--base-900);
   --sidebar-foreground: var(--foreground);
-  --sidebar-primary: var(--shadcn-primary);
-  --sidebar-primary-foreground: var(--shadcn-primary-foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
   --sidebar-accent: var(--accent);
   --sidebar-accent-foreground: var(--accent-foreground);
   --sidebar-border: var(--divider);

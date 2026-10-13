@@ -1,5 +1,4 @@
 @import 'tailwindcss';
-@import 'shadcn/tailwind.css';
 @import '@synapcity/frontend-ui/styles.css';
 
 @source '../';

@@ -32,4 +32,49 @@
   --accent-800: var(--base-800);
   --accent-900: var(--base-900);
   --accent-950: var(--base-950);
+  --secondary-50: var(--base-50);
+  --secondary-100: var(--base-100);
+  --secondary-200: var(--base-200);
+  --secondary-300: var(--base-300);
+  --secondary-400: var(--base-400);
+  --secondary-500: var(--base-500);
+  --secondary-600: var(--base-600);
+  --secondary-700: var(--base-700);
+  --secondary-800: var(--base-800);
+  --secondary-900: var(--base-900);
+  --secondary-950: var(--base-950);
+
+  --base: var(--base-500);
+  --primary: var(--primary-500);
+  --accent: var(--accent-500);
+  --scondary: var(--secondary-500);
+  --muted: var(--base-100);
+}
+
+.light {
+  --base-foreground: var(--base-950);
+  --base-background: var(--base-50);
+  --primary-foreground: var(--primary-950);
+  --primary-background: var(--primary-50);
+  --accent-foreground: var(--accent-950);
+  --accent-background: var(--accent-50);
+  --secondary-foreground: var(--secondary-950);
+  --secondary-background: var(--secondary-50);
+  --muted-foreground: var(--base-foreground)/20;
+  --muted-background: var(--base-foreground)/80;
+  
+}
+
+.dark {
+  --base-foreground: var(--base-50);
+  --base-background: var(--base-950);
+  --primary-foreground: var(--primary-50);
+  --primary-background: var(--primary-950);
+  --accent-foreground: var(--accent-50);
+  --accent-background: var(--accent-950);
+  --secondary-foreground: var(--secondary-50);
+  --secondary-background: var(--secondary-950);
+  --muted-foreground: var(--base-foreground)/80;
+  --muted-background: var(--base-foreground)/20;
+  
 }
