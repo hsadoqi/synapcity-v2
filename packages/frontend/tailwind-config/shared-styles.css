@@ -71,10 +71,7 @@
   /* Each role reads a user override first (--font-preference-*, written on :root by the theme
    * editor, ADR-0016) and falls back to the shipped default loaded in apps/web/src/app/layout.tsx.
    * UI follows the body choice unless a UI-specific override is set. */
-  --font-body: var(
-    --font-preference-body,
-    var(--font-inter, --font-sans, system-ui)
-  );
+  --font-body: var(--font-preference-body, var(--font-inter, system-ui));
   --font-ui: var(--font-preference-ui, var(--font-body, system-ui));
   --font-heading: var(
     --font-preference-heading,
@@ -82,7 +79,7 @@
   );
   --font-code: var(
     --font-preference-code,
-    var(--font-geist-mono, --font-mono, ui-monospace)
+    var(--font-geist-mono, ui-monospace)
   );
   --text-xs: calc(var(--text-base-size) * 13 / 15);
   --text-xs--line-height: 1.333333;

@@ -8,7 +8,8 @@ import { Button } from './ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 
@@ -28,48 +29,55 @@ const ModeButton = React.forwardRef<
     >
       <Sun className="scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
       <Moon className="absolute scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-      <span className="sr-only">Toggle Mode</span>
+      <span className="sr-only">Theme</span>
     </Button>
   );
 });
 
-const ModeMenu = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentPropsWithoutRef<'div'> & { onUpdate?: (theme: Mode) => void }
->(({ className, onUpdate, ...props }, ref) => {
+const MODES: ReadonlyArray<{ value: Mode; label: string }> = [
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+  { value: 'system', label: 'System' },
+];
+
+const isMode = (value: unknown): value is Mode =>
+  MODES.some((mode) => mode.value === value);
+
+function ModeMenu({
+  value,
+  onUpdate,
+}: {
+  value: Mode;
+  onUpdate?: (theme: Mode) => void;
+}) {
   return (
-    <div ref={ref} className={className} {...props}>
-      <DropdownMenuItem onClick={() => onUpdate?.('light')}>
-        Light
-      </DropdownMenuItem>
-      <DropdownMenuItem onClick={() => onUpdate?.('dark')}>
-        Dark
-      </DropdownMenuItem>
-      <DropdownMenuItem onClick={() => onUpdate?.('system')}>
-        System
-      </DropdownMenuItem>
-    </div>
+    <DropdownMenuRadioGroup
+      value={value}
+      onValueChange={(next) => {
+        if (isMode(next)) onUpdate?.(next);
+      }}
+    >
+      {MODES.map((mode) => (
+        <DropdownMenuRadioItem key={mode.value} value={mode.value}>
+          {mode.label}
+        </DropdownMenuRadioItem>
+      ))}
+    </DropdownMenuRadioGroup>
   );
-});
+}
 
 function ModeToggle({ className }: { className?: string }) {
-  const { setTheme } = useTheme();
-
-  const handleModeChange = (theme: Mode) => {
-    console.log('ModeToggle: handleModeChange', theme);
-    setTheme(theme);
-  };
+  const { theme, setTheme } = useTheme();
 
   return (
     <div className={className}>
       <DropdownMenu>
-        <DropdownMenuTrigger
-          render={(props) => (
-            <ModeButton aria-label="Toggle dark mode" {...props} />
-          )}
-        />
+        <DropdownMenuTrigger render={(props) => <ModeButton {...props} />} />
         <DropdownMenuContent align="end">
-          <ModeMenu onUpdate={(theme) => handleModeChange(theme)} />
+          <ModeMenu
+            value={isMode(theme) ? theme : 'system'}
+            onUpdate={setTheme}
+          />
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

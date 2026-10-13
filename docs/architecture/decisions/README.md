@@ -39,7 +39,7 @@ Not decided. Each needs an ADR, and the owner's approval, before it is treated a
 - **Component catalogue** (Storybook or another).
 - **Theme editor and preference persistence** (what writes `--font-preference-*` and the other overrides).
 - **Persistence, API, routing, authentication and state management.** Open per `PRODUCT.md`; the README's technology table is direction, not decision.
-- **Deployment topology.**
+- **Deployment topology.** Includes the production domain, which does not exist yet. Until it does, `metadataBase` is unset in `apps/web/src/app/layout.tsx` and the build warns that social image URLs resolve to `http://localhost:3000`. Set `metadataBase` once the domain is chosen.
 - **Documentation site content and tooling** for `apps/docs`.
 
 ## Template

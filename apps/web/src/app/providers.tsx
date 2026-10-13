@@ -8,7 +8,12 @@ export default function RootProviders({
   children: React.ReactNode;
 }) {
   return (
-    <ModeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ModeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
       {children}
     </ModeProvider>
   );
