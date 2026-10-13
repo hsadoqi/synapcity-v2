@@ -1,7 +1,8 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-import { isProtectedPath } from './route-access';
+import { safeNextPath } from '@/lib/auth/safe-next';
+import { isGuestOnlyPath, isProtectedPath } from './route-access';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -48,6 +49,20 @@ export async function updateSession(request: NextRequest) {
     url.search = '';
     url.searchParams.set('next', request.nextUrl.pathname);
     return NextResponse.redirect(url);
+  }
+
+  if (user && isGuestOnlyPath(request.nextUrl.pathname)) {
+    const destination = new URL(
+      safeNextPath(request.nextUrl.searchParams.get('next')),
+      request.url,
+    );
+    const redirect = NextResponse.redirect(destination);
+    // Carry over any session cookies getClaims() just refreshed, or this
+    // redirect would drop them and sign the user out.
+    supabaseResponse.cookies
+      .getAll()
+      .forEach((cookie) => redirect.cookies.set(cookie));
+    return redirect;
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.

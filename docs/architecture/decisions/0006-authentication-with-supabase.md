@@ -26,6 +26,7 @@ Upstream evidence, read 2026-10-13:
 - Authorization checks on the server use `getClaims()` (or `getUser()` where fresh user data is required), never `getSession()`.
 - Email confirmation is required before first sign-in. Email is sent through Supabase's default sender for now.
 - Sign-ins that share a verified email address resolve to one user (Supabase's automatic identity linking). Observed on 2026-10-13: one address used for password, Google and GitHub sign-in produced a single user. This is only safe while confirmation is required and every enabled provider verifies emails; adding a provider that does not is a change to this ADR.
+- Password sign-up never attaches a password to an account that already exists, including one created through Google or GitHub: Supabase returns a look-alike user and sends nothing, to prevent account discovery. The sign-up reply is therefore worded neutrally (it does not say a link was sent or name the address), and signed-in visitors are redirected away from `/auth/login` and `/auth/register`. Adding a password to a social account (Supabase documents `updateUser({ password })` while signed in) is not built; see Unresolved.
 - Application data keyed to a user (a `profiles` table) lives in the Supabase Postgres database in the `public` schema, with row-level security enabled and an owner-scoped policy.
 
 ## Scope
@@ -45,6 +46,7 @@ How users authenticate to `apps/web` and how their session is held and refreshed
 
 - Applying the schema. `supabase/migrations/20261013162633_create_profiles.sql` (columns `display_name` and `avatar_url`, a signup trigger, owner-only RLS) is approved but is run by hand in the dashboard SQL editor. Whether to link the project and use `supabase db push`, and whether the repo adopts declarative schemas, is not yet chosen. Until the SQL is run and a second-user test passes, the `profiles` verification below is outstanding.
 - Email delivery: Supabase's default sender is rate-limited and meant for development; the owner accepted it for now, and a custom SMTP provider is needed before real users.
+- How a user who signed up with Google or GitHub adds a password (an account-settings page using `updateUser({ password })`). Whether the password-reset email also works for such an account is untested and the Supabase docs do not cover it.
 - Site URL and redirect allow-list values for local, preview and production, which depend on the undecided production domain.
 - Provider-console configuration for Google and GitHub. It worked for local development on 2026-10-13, but was set up without first-party documentation having been read (see Context), so it is not verified against upstream guidance.
 
