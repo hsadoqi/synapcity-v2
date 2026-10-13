@@ -20,7 +20,9 @@ const geistMono = localFont({
   preload: false,
 });
 
-export const metadata: Metadata = createMetadata();
+export const metadata: Metadata = createMetadata({
+  siteUrl: process.env.SITE_URL,
+});
 
 export default function RootLayout({
   children,
