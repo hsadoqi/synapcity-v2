@@ -2,14 +2,17 @@
 
 **Status:** Canonical navigation index
 
-Start with `docs/architecture/principles.md` — the responsibility and ownership principles that govern all architecture work, justified by the Phase 0 evidence synthesis.
+Start with `docs/architecture/principles.md` — the responsibility and ownership principles that govern all architecture work.
 
-Accepted founder-confirmed technical directions and their scoped governance live in `docs/architecture/decisions/` as ADRs. The ADR index (`docs/architecture/decisions/README.md`) also lists candidate ADRs that remain proposed or unresolved.
+Technical directions and their scoped governance live in `docs/architecture/decisions/` as ADRs. The ADR index (`docs/architecture/decisions/README.md`) lists every current ADR with its status, and a candidate list of decisions that remain open. Read an ADR's own "Unresolved" section before assuming a question is settled.
 
-Proposed phase designs live in `docs/architecture/designs/`. They are review artifacts, not governing architecture, until their stated approval and ADR requirements are satisfied. The current proposal is [Phase 2 — Technical Foundation](designs/phase-02-technical-foundation.md).
+The ADRs in `docs/archive/architecture/decisions/` describe the previous implementation. They are evidence, not authority (`docs/engineering/preservation-policy.md`).
 
-For what is and is not architecturally decided at any given time, `docs/architecture/decisions/README.md`'s candidate list and each accepted ADR's own "Unresolved" section are authoritative — check them before assuming a package, schema, route, or storage choice has been made.
+- [Workspace conventions](workspace-conventions.md) — how the current workspaces are laid out, named and built (ADR-0001).
+- [Package creation checklist](package-creation-checklist.md) — what to answer before adding a package.
 
-This foundation deliberately does not select database technology, API style, product route design, or state-management libraries. Those are later decisions, made one at a time as real requirements justify them (see `docs/product/mvp.md` and the decision register). ADR-0003, ADR-0005, and ADR-0007 fix the workspace, four package categories, and dependency direction. Phase 2 has since added the technical-foundation workspaces `apps/web`, `apps/storybook`, and `packages/ui/core` under ADR-0010 through ADR-0013; these implementation names do not adopt a product capability name or decide the first product slice.
+`docs/architecture/designs/` is for proposed designs. It is currently empty. A design there is a review artifact, not governing architecture, until its stated approval and ADR requirements are met.
+
+This foundation deliberately does not select database technology, API style, product route design, or state-management libraries. Those are decided one at a time as real requirements justify them (see `docs/product/mvp.md`). The technology table in the root `README.md` states direction, not decision.
 
 Non-authoritative future possibilities and revisit triggers live in [`docs/discovery/`](../discovery/README.md). Discovery entries are evidence, not requirements or accepted ADRs.

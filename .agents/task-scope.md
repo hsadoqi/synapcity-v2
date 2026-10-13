@@ -1,5 +1,27 @@
 # Task scope
 
+## Active task: complete shared theme and typography (2026-10-12)
+
+- Goal and mode: implement the owner's clarified request to complete the shared Synapcity theme and typography. Mode: implementing.
+- Exact destinations and budget: update `packages/dev/tailwind-config/shared-styles.css`, `apps/web/src/app/layout.tsx`, `apps/web/src/app/page.tsx`, and this record (4 files), on the existing `fix/site-styling` branch. New files, deletions, moves, renames, dependency changes, commits, pushes, external systems, persisted schemas and component APIs: 0. Disposable verification artifacts may live under `/private/tmp`.
+- System of record: `DESIGN.md` supplies the documented visual roles and scale; the shared stylesheet owns their current implementation. The archived worktree is historical evidence, not authority; no providers, persistence, components, package topology, runtime theme editor or old imports are adopted.
+- Styling surface: extend the shared CSS with the documented neutral/base, primary and accent ramps; semantic surface/action/state/border/sidebar roles; UI/body/code/heading fonts; 13/14/15/17/19/24/30/36/45px scale; radius scale; selected surfaces and focus/selection defaults. Explicit `.light`/`.dark` tokens override OS mode. Preserve source scanning, local font files, existing responsive layout, welcome copy and reduced-motion behavior.
+- Approvals held: direct owner clarification to complete shared theme and typography, followed by explicit approval of this concrete four-file extension and its styling surface (2026-10-12).
+- Verification: installed Tailwind/PostCSS compilation; disposable token/typography fixtures with real local fonts; light/dark/system combinations; font role/size/radius/focus/reduced-motion checks; actual page responsive rendering; root format/lint/type/dependency/build checks with exact limitations reported.
+- Recovery: restore only this pass's hunks from `/private/tmp/synapcity-theme-foundation-review/baseline`, preserving earlier styling work and all other WIP.
+- Stop conditions: concurrent edits to a destination, a required new dependency, an unresolved product/architecture choice, or a mutation outside the manifest.
+
+## Active task: repair site-wide styling (2026-10-12)
+
+- Goal and mode: implement the owner's request to fix full-site styling in the existing web application. Mode: implementing.
+- Exact destinations and budget: update `packages/dev/tailwind-config/shared-styles.css`, `apps/web/src/styles/globals.css`, `apps/web/src/app/layout.tsx`, `apps/web/src/app/page.tsx`, and this record (5 files). Create 1 Git branch, `fix/site-styling`, carrying current WIP. Repository file creation/deletion/moves/renames, dependencies, persisted schemas, public APIs, commits, pushes, pull requests, and external systems: 0. Disposable review and verification artifacts may live under `/private/tmp`.
+- System of record: the existing shared stylesheet owns theme mappings and base styles; the web stylesheet owns its app/UI source scan and existing image visibility helpers; the app owns responsive page layout. This record owns execution bounds only.
+- Approvals held: direct owner request to fix site styling, followed by explicit approval of this five-file manifest and branch and confirmation overlapping edits are finished (2026-10-12).
+- Preconditions: preserve every existing user change, local Geist fonts, welcome copy, OS-based light/dark colors, the existing dark utility variant and reduced-motion overrides, PostCSS wiring, docs app, shared component APIs, and historical CSS modules. No product or architecture decisions are resolved.
+- Verification: compile the real global stylesheet with the installed Tailwind/PostCSS versions; inspect desktop/mobile light/dark rendering, font application and overflow; scoped formatting and lint; root `pnpm verify`, reporting failures and unrun checks precisely.
+- Recovery: restore only this task's own hunks from `/private/tmp/synapcity-site-styling-review/baseline`, preserving user WIP. No reset, stash, clean, or history rewrite.
+- Stop conditions: concurrent edits to a destination, a new architecture/product decision, or a required mutation outside these five files.
+
 ## Active task: delay pointer reveal of the root header (2026-10-06)
 
 - Goal and mode: implement the owner's request for a delay so the root header does not interrupt approaching the Home sidebar control. Mode: implementing.

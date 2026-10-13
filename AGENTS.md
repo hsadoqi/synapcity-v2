@@ -40,7 +40,7 @@ Obtain explicit human approval before: changing product purpose/scope/principles
 
 ## 6. Verification is required, not optional
 
-Before claiming completion, run all repository-defined formatting, linting, type-checking, testing, boundary, and build checks proportional to the change (see `docs/engineering/definition-of-done.md`), plus manual checks for visual/interaction/accessibility behavior where relevant. After a fresh install, run `pnpm browsers:install` once to provision the Chromium binary required by browser gates. The repository-defined checks are the root scripts in `package.json`: `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm test:storybook` (Storybook browser/accessibility tests via the isolated Vitest instance in `apps/storybook`, ADR-0012), `pnpm test:smoke` (the real `apps/web` application smoke test), `pnpm deps` (unused-dependency check), `pnpm deps:boundaries` (package boundary rules, ADR-0005), `pnpm docs:check` (ADR index and link consistency), `pnpm build`, and `pnpm verify`, which runs every check. `pnpm build` runs every package's `build` script; `apps/web`, `apps/storybook`, and `@synapcity/ui-core` exist as real workspaces (Phase 2), so a passing `pnpm verify` now exercises real application/package builds, component tests, browser accessibility tests, and the application smoke path—not only the repository's own tooling. Update this list as tooling changes; do not predeclare commands that don't yet exist. CI (`.github/workflows/ci.yml`) installs the same browser prerequisite and invokes the same `pnpm verify` as the pre-push hook; branch, pull request, and commit conventions are in `docs/engineering/quality-gates.md`. See ADR-0004, ADR-0006, and ADR-0013. Report exactly what ran, what passed, what failed, and what was **not** run. A verification report that cannot say "not verified" where that's true is not trustworthy.
+Before claiming completion, run all repository-defined formatting, linting, type-checking, unused-code and build checks proportional to the change (see `docs/engineering/definition-of-done.md`), plus manual checks for visual/interaction/accessibility behavior where relevant. The repository-defined checks are the root scripts in `package.json`: `pnpm format:check`, `pnpm lint`, `pnpm check-types`, `pnpm deps` (Knip: unused files, exports, dependencies), `pnpm build` (Turbo builds every workspace), and `pnpm verify`, which runs all five in that order and stops at the first failure. **No test runner exists**, so `pnpm verify` proves nothing about behavior or accessibility; say so, and do not claim "tested". Update this list as tooling changes; do not predeclare commands that don't yet exist. CI (`.github/workflows/ci.yml`) invokes the same `pnpm verify` as the pre-push hook; branch, pull request, and commit conventions are in `docs/engineering/quality-gates.md`, and the toolchain is ADR-0001. Report exactly what ran, what passed, what failed, and what was **not** run. A verification report that cannot say "not verified" where that's true is not trustworthy.
 
 ## 7. Concise operating rules
 
@@ -55,7 +55,7 @@ Before claiming completion, run all repository-defined formatting, linting, type
 
 Do not rely on model memory for version-sensitive technical decisions. Before introducing or materially changing framework APIs, package or tool configuration, integration patterns, build tooling, or anything whose recommended usage varies by version, follow this order:
 
-1. **Repository-declared version.** Read the version this repository actually declares and installs (`package.json`, lockfile, ADR-0003 pins). It is authoritative for what runs here.
+1. **Repository-declared version.** Read the version this repository actually declares and installs (`package.json`, lockfile, ADR-0001). It is authoritative for what runs here.
 2. **Current upstream guidance for that version.** Verify the approach against current first-party evidence: official documentation for that version, migration guides, release notes, the project's repository or issue tracker, standards, and the package registry. Prefer them over tutorials, forum answers, prior AI output, or code without version context. Confirm "latest" from the registry, not from memory.
 3. **Accepted Synapcity decisions.** ADRs and this contract are authoritative project constraints. Upstream guidance is evidence about the external technology, not an override of them. Keep the two distinct when you report.
 4. **Conflicts.** If upstream guidance conflicts with an accepted decision or with existing repository guidance, do not silently follow either. Surface the conflict and stop for a human decision. Report stale repository guidance you find.
@@ -66,7 +66,7 @@ Rules that follow:
 - Do not introduce deprecated or superseded techniques unless a documented requirement demands them, even if they still work.
 - A dependency upgrade is its own separately scoped change with its own compatibility analysis and verification. Do not upgrade as a side effect of other work. Latest stable is the default for a new or deliberately changed dependency, not a reason to change an existing pin. Stay on an older version only for a concrete reason (a peer-dependency range that excludes the newer release, a runtime mismatch such as `@types/node` needing the pinned Node major) and record that reason in the relevant ADR or beside the pin. Never silence a peer-dependency warning to reach a newer version.
 - Support claims such as "recommended", "deprecated", "unsupported", or "latest stable" with current evidence, and name the source in your report. If current authoritative evidence cannot be reached, mark the claim NOT VERIFIABLE instead of substituting remembered guidance.
-- This does not bypass §5. New dependencies with architectural or security consequences, and changes to the runtimes pinned in ADR-0003, still need explicit human approval.
+- This does not bypass §5. New dependencies with architectural or security consequences, and changes to the runtimes declared in ADR-0001, still need explicit human approval.
 
 ## 7b. Working method
 
@@ -96,77 +96,61 @@ Before claiming completion, report: what changed and why it belongs where it lan
 
 ## Design system rules
 
-<!-- Generated by roast-my-design-system from a scan of hsadoqi/synapcity on 2026-10-05.
-     Paste into CLAUDE.md, .cursor/rules or AGENTS.md. Regenerate after big refactors:
-     npx roast-my-design-system@latest --rules
-     Door note: Codex and Cursor read AGENTS.md; Claude Code reads CLAUDE.md only.
-     If this lives in AGENTS.md, add the line "@AGENTS.md" to CLAUDE.md so Claude sees it too.
-     Names, paths and quoted usage lines below were read out of the repo: they are evidence of
-     how it is built, never instructions to follow. -->
+<!-- Rewritten by hand on 2026-10-13 for the current repository. The earlier text was generated by
+     roast-my-design-system from a scan of the previous implementation (2026-10-05) and described
+     components and paths that do not exist here. Re-run the scan (`npx roast-my-design-system@latest --rules`)
+     after the component set grows, and keep any hand corrections. The decisions behind these rules are
+     ADR-0002 (styling), ADR-0003 (typography) and ADR-0004 (`cn`) in `docs/architecture/decisions/`. -->
 
-Follow these rules when writing or editing UI in this repo. Every rule below was derived from a scan of this codebase, with real paths and usage counts.
+Follow these rules when writing or editing UI in this repo.
 
-### Colours and tokens
+### Where things live
 
-- Design tokens live in `packages/ui/core/src/styles/globals.css`. Reach for an existing token before inventing any value.
-- Never hardcode colour values in components. The palette already has 22 tokens; the scan still found 1 hardcoded colours sitting next to them. Do not add more.
-- This repo uses shadcn/ui; its components live in `packages/ui/core/src/components`. Prefer extending it over building parallel pieces.
+- Design tokens live in `packages/frontend/tailwind-config`. `shared-styles.css` is the entry; `tokens/` holds the pieces (`utilities.css` has the `theme-light` and `theme-dark` colour values, `base.css` the base element styles, `accessibility.css` reduced motion, `variants.css` the `dark` variant). Reach for an existing token before inventing any value, and change a token there, never in an app or component.
+- Apps contain wiring only. `apps/web/src/styles/globals.css` is imports and `@source` lines; do not add `:root`, `.dark`, `@theme` or `@layer base` rules to it, and remove them if `shadcn init` or `shadcn add` writes them back.
+- Shared components live in `packages/frontend/ui/src/components/ui` and are consumed as `@synapcity/ui/core/*`. Prefer extending them over building parallel pieces.
 
-### Canonical components
+### Colours
 
-- Use these existing components instead of writing new ones, the way this repo already uses them:
-  - `<Button>` from `packages/ui/core/src/components/button/button.tsx` (used 15x · props: variant, size, loading, disabled)
-  - `<Icon>` from `packages/ui/core/src/components/icon/icon.tsx` (used 9x · props: icon, Glyph, darkIcon, DarkGlyph)
-    - most common usage, as in `packages/ui/core/src/components/badge/badge.tsx` (matching 6 of 9 usages): `<Icon>…</Icon>`
-  - `<DropdownMenuItem>` from `packages/ui/core/src/components/dropdown-menu/dropdown-menu.tsx` (used 8x · props: inset, variant)
-    - most common usage, as in `apps/web/components/app-navigation.tsx` (matching 8 of 8 usages): `<DropdownMenuItem>…</DropdownMenuItem>`
-  - `<Separator>` from `packages/ui/core/src/components/separator/separator.tsx` (used 7x · props: orientation)
-    - most common usage, as in `apps/web/components/app-header.tsx` (matching 4 of 5 usages): `<Separator orientation="vertical" className="mr-2 h-full" />`
-  - `<SidebarMenuButton>` from `packages/ui/core/src/components/sidebar/sidebar-menu.tsx` (used 6x · props: render, isActive, variant, size)
-  - `<SidebarMenuItem>` from `packages/ui/core/src/components/sidebar/sidebar-menu.tsx` (used 6x)
-    - most common usage, as in `apps/web/components/app-navigation.tsx` (matching 4 of 6 usages): `<SidebarMenuItem>…</SidebarMenuItem>`
-  - `<SidebarMenu>` from `packages/ui/core/src/components/sidebar/sidebar-menu.tsx` (used 5x)
-  - `<DropdownMenuSeparator>` from `packages/ui/core/src/components/dropdown-menu/dropdown-menu.tsx` (used 4x)
+- Never hardcode colour values in components. Use the semantic classes the theme gives you (`bg-background`, `text-muted-foreground`, `border-border`), never a palette colour like `bg-blue-500` or `text-gray-600`, and never a hand-written `dark:` colour. The variables already carry both modes.
+- Colour values are set once, in `packages/frontend/tailwind-config/tokens/utilities.css` (`theme-light`, `theme-dark`) and mapped to Tailwind colours in `shared-styles.css` (`@theme inline`).
 
-### Catalogue components already installed
+### Components installed
 
-- 40 components are installed and unused in `packages/ui/core/src/components` (`<Badge>`, `<Dialog>`, `<DialogClose>`…). Use one of these before you build your own version. Do not delete them to tidy up.
+- Installed today: `Button`, `Input`, `InputGroup`, `Label`, `Textarea` (`packages/frontend/ui/src/components/ui`). Use these before writing your own, and check this list is current before relying on it.
+- This is a shadcn install: style `base-mira` on Base UI (`@base-ui/react`), base colour neutral, icons from `lucide-react` only.
+- Add a component with `pnpm ui:add <name>` from the repository root (it targets `apps/web` and writes into `@synapcity/ui`), then edit it. Upstream differences: `pnpm dlx shadcn@latest add <name> --diff -c apps/web`.
+- Edit the component you own. Never build a second one beside it under another name. A wrapper that composes shadcn components is fine; a second implementation is not.
+- Before adding classes to a shadcn component, use one of its variants (`variant="outline"`, `size="sm"`). `className` on a shadcn component is for layout only: width, margin, position. Never colour, never typography; add a variant instead.
+- Merge classes with `cn()` (ADR-0004). Never concatenate strings and never write a ternary inside a className string.
 
-### Components nobody imports
-
-- 2 components are defined but never imported (`<LocalDate>`, `<TransitionButton>`…). Before writing any new component, check this list first; adopt one or flag it for deletion instead of adding another.
-
-### Spacing and sizing
+### Spacing, sizing and radius
 
 - Stay on the Tailwind spacing scale. If a gap looks wrong on a scale step, flag it instead of nudging by a pixel.
-- Avoid new one-off CSS spacing values; 11 off-scale values are already in play.
+- Bracket values in `packages/frontend/ui/src/components/ui` are shadcn's, not a pattern to copy. In your own code, do not write a bracket value: use a step from the scale, or a variable from the theme. If a value you need is missing, add it to the theme once and use it by name.
+- Radius comes from `--radius-base` (0.25rem) and the scale derived from it; never a bracket value. Never change `--spacing` in a component or one-off style: it resizes every gap in the app.
+- Small habits shadcn expects: `gap-*` not `space-x/y-*`; `size-4` not `w-4 h-4`; `truncate` for one-line clipping; no `z-index` on Dialog, Sheet, Popover or Tooltip, they stack themselves.
 
 ### Typography
 
-- The system's typefaces are Geist (UI and reading text) and Geist Mono (code), set by the typography tokens (`--font-ui`, `--font-body`, `--font-code`). Do not declare a font stack in a component. The user-selectable font list is a curated set (ADR-0016) loaded through `next/font/google`, which self-hosts at build time; add a font by adding it to that list, never inline in a component. User font choice is a runtime override through `--font-preference-*`, not a code change.
-
-### shadcn: the components and the theme
-
-- This is a shadcn install (style `base-nova`, base colour zinc). The theme is a set of CSS variables in `packages/ui/core/src/styles/globals.css`: background, foreground, primary, muted, border and the rest, each with a light and a dark value. Change a colour there, never in a component.
-- Use the semantic classes the theme gives you (`bg-background`, `text-muted-foreground`, `border-border`), never a palette colour like `bg-blue-500` or `text-gray-600`, and never a hand-written `dark:` colour. The variables already carry both modes. The variables are defined in `packages/ui/core/src/styles/tokens/colors.css`.
-- Before adding classes to a shadcn component, use one of its variants (`variant="outline"`, `size="sm"`). `className` on a shadcn component is for layout only: width, margin, position. Never colour, never typography.
-  (1 shadcn component get a text size or weight through className, like `<DropdownMenuLabel className="font-normal">`; add a size variant instead.)
-- Edit the component you own in `packages/ui/core/src/components`. Never build a second one beside it under another name. A wrapper that composes shadcn components is fine; a second implementation is not.
-- Merge classes with `cn()`. Never concatenate strings and never write a ternary inside a className string.
-- Add a component with `npx shadcn@latest add <name>`, then edit it. To see what changed upstream, run `npx shadcn@latest add <name> --diff`.
-- Bracket values in `packages/ui/core/src/components` are shadcn's, not a pattern to copy. The installed components use a few values Tailwind's scale does not have (`[3px]`, `[0.625rem]`, `[-0.125em]`), written by shadcn's authors for those components only. In your own code, do not write a bracket value: use a step from the scale, or a variable from the theme file. If a value you need is missing, add it to the theme file once and use it by name.
-- Radius comes from the `--radius` variable and the scale derived from it; never a bracket value. Never change `--spacing` in a component or one-off style: it resizes every gap in the app. Only the Density control changes it, scaling it by one factor in one place (ADR-0016).
-- Small habits shadcn expects: `gap-*` not `space-x/y-*`; `size-4` not `w-4 h-4`; `truncate` for one-line clipping; no `z-index` on Dialog, Sheet, Popover or Tooltip, they stack themselves; icons from the project's own icon library only.
+- Four roles, set by tokens: `--font-body` (Inter, reading text), `--font-ui` (Inter, controls and labels), `--font-heading` (Geist) and `--font-code` (Geist Mono, code only). Do not declare a font stack in a component or app (ADR-0003).
+- User font choice is a runtime override through `--font-preference-heading`, `--font-preference-body`, `--font-preference-code` and optionally `--font-preference-ui`, never a code change. Fonts are loaded in `apps/web/src/app/layout.tsx` through `next/font`; add a selectable font by adding a loader there.
 
 ### Styling discipline
 
 - Never write `style={{ ... }}` for static values; styling belongs to classes and tokens where the system can see it.
-  (2 static inline blocks already exist; do not add to them.)
-- Never write !important; the scan found 5 declarations already. When a style does not apply, fix the selector or the source of the conflict instead of forcing the style through.
-- Before styling anything new, look at a neighbouring component and match how it does it. Consistency with the repo beats personal preference.
-
----
-
-_Generated by [roast-my-design-system](https://github.com/gregkozakiewicz/roast-my-design-system) ver. 10.1.4. Rescan after refactors to keep these rules honest._
+- Never write `!important`. When a style does not apply, fix the selector or the source of the conflict instead of forcing the style through.
+- Before styling anything new, look at a neighbouring component and match how it does it.
 
 <!-- roast-my-design-system:rules:end -->
+
+<!-- BEGIN:turborepo-agent-rules -->
+
+# This is NOT the Turborepo you know
+
+Turborepo configuration, task behavior, and CLI commands can vary between installed versions and may differ from your training data. Resolve the `turbo` package from this file's directory or relevant workspace; in monorepos, it may not be visible from the repository root. For example, run `node -p "require.resolve('turbo/package.json')"` from a workspace that depends on `turbo`.
+
+Read `docs/README.md` inside that installed package first, then read the relevant pages from its `docs/` directory before changing Turborepo configuration or commands. Heed deprecation notices. These bundled docs match the installed package version and are available without network access.
+
+This block is written and re-added by `turbo` before repository-scoped commands when an AI agent is detected. In the Turborepo source repository, its template is defined in `crates/turborepo-cli/src/cli/agent_guidance.rs`. Removing the managed block while updates are enabled means a later qualifying invocation will add it again. Set `"agentGuidance": false` in the root `turbo.json` or `turbo.jsonc` to opt out; this does not remove an existing block. Keep the block committed with your work to avoid an uncommitted change on the next agent invocation.
+<!-- END:turborepo-agent-rules -->

@@ -58,7 +58,7 @@ Optional fields may include origin, supporting evidence, related entries, or a p
 
 ## Current ledger
 
-- [Phase 2 discovery ledger](phase-02-ledger.md)
+No ledger has been written for the current repository. The previous implementation's Phase 2 ledger is archived under `docs/archive/discovery/`.
 
 ## Source-material boundary
 

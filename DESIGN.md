@@ -17,25 +17,25 @@ colors:
   info: 'oklch(48% 0.16 250)'
 typography:
   feature:
-    fontFamily: 'var(--font-ui)'
+    fontFamily: 'var(--font-heading)'
     fontSize: '1.875rem'
     fontWeight: 500
     lineHeight: 1.2
     letterSpacing: '-0.02em'
   display:
-    fontFamily: 'var(--font-ui)'
+    fontFamily: 'var(--font-heading)'
     fontSize: '1.5rem'
     fontWeight: 600
     lineHeight: 1.333
     letterSpacing: '-0.02em'
   headline:
-    fontFamily: 'var(--font-ui)'
+    fontFamily: 'var(--font-heading)'
     fontSize: '1.1875rem'
     fontWeight: 600
     lineHeight: 1.4
     letterSpacing: '-0.01em'
   title:
-    fontFamily: 'var(--font-ui)'
+    fontFamily: 'var(--font-heading)'
     fontSize: '1.0625rem'
     fontWeight: 600
     lineHeight: 1.556
@@ -95,7 +95,7 @@ This system rejects the **generic SaaS dashboard**: identical card grids, hero-m
 
 ## 2. Colors
 
-One graphite ramp (`base`, `primary`, `accent` are currently identical achromatic ramps in `tokens/colors.css`), inverted for dark, plus four state colours.
+One graphite ramp (`base`, `primary`, `accent` are currently identical achromatic ramps in `tokens/utilities.css`), inverted for dark, plus four state colours.
 
 ### Themed roles
 
@@ -150,7 +150,7 @@ Caveat: `destructive`, `success` and `info` (both modes) are outside the sRGB ga
 
 ## 3. Typography
 
-**Roles, not font names.** `--font-ui` (chrome, headings; `--font-heading` aliases it), `--font-body`, `--font-code`. Geist and Geist Mono are the shipped defaults; users choose from a curated list that includes Google Fonts (ADR-0016), loaded through `next/font/google` and applied through `--font-preference-*`. Components reference roles only; no component re-declares a font stack.
+**Roles, not font names.** `--font-heading` (headings), `--font-body` (reading text), `--font-ui` (chrome: controls, labels, menus), `--font-code` (code). The shipped defaults are Inter for body and UI, Geist for headings, and Geist Mono for code only; interface controls are never set in the monospace face. Each role reads its user override first: `--font-preference-heading`, `--font-preference-body`, `--font-preference-code`, and optionally `--font-preference-ui`, which otherwise follows the body choice. The override is written on `:root`; with none set, the defaults apply. Users will choose from a curated list loaded through `next/font` (ADR-0003); the picker is not built yet. Components reference roles only; no component re-declares a font stack.
 
 The scale is a fixed ladder off `--text-base-size: 0.9375rem` (15px), never fluid, because the interface sits in a sidebar as often as it fills a page. Multipliers are chosen so every step lands on a whole pixel at the default, and each step above body is at least 1.2x the one below. **Verified** against `globals.css` `@theme inline` (`--text-*` multipliers) and `tokens/typography.css`.
 
@@ -252,7 +252,7 @@ Input 32px / `lg` radius, badge 20px / `sm` radius, sidebar 16rem / 18rem sheet 
 - Don't put a hue in chrome by default; a hue belongs to state colours, the user's content, or a deliberately themed `primary`/`accent`.
 - Don't use `border-left`/`border-right` wider than 1px as a coloured stripe.
 - Don't use gradient text, decorative glassmorphism or `backdrop-filter` as chrome.
-- Don't write bracket values; use a scale step or add a theme variable once. Don't change `--spacing` outside the Density control (ADR-0016).
+- Don't write bracket values; use a scale step or add a theme variable once. Don't change `--spacing` outside a future Density control; none exists yet.
 - Don't re-declare a font stack in a component; add fonts only to the curated list.
 - Don't rely on hover for anything needed; keyboard focus and touch must reach it.
 - Don't assume `text-base` is 16px. Don't use Unicode glyphs (a "×") as icons.
@@ -262,11 +262,11 @@ Input 32px / `lg` radius, badge 20px / `sm` radius, sidebar 16rem / 18rem sheet 
 
 | Item                                               | Document says                                        | Code today                                                                                                                                                                   | Status                                                                                        |
 | -------------------------------------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| Default theme achromatic                           | graphite primary/accent                              | `tokens/colors.css`: `base`, `primary`, `accent` all achromatic OKLCH                                                                                                        | **Aligned** (Verified)                                                                        |
+| Default theme achromatic                           | graphite primary/accent                              | `tokens/utilities.css`: `base`, `primary`, `accent` all achromatic OKLCH                                                                                                     | **Aligned** (Verified)                                                                        |
 | Colour values in §2                                | as listed                                            | match `theme-light` / `theme-dark`                                                                                                                                           | **Aligned** (Verified)                                                                        |
 | Text ladder                                        | 13 / 14 / 15px, then 17 / 19 / 24 / 30               | `--text-*` multipliers of 0.9375rem in `globals.css`                                                                                                                         | **Aligned** by source read; **not yet re-checked in a browser** after the 14px to 15px change |
 | `--text-base-size`, fixed ladder                   | required                                             | present in `typography.css`, `globals.css`                                                                                                                                   | **Aligned**                                                                                   |
-| `--font-preference-*` overrides                    | documented                                           | referenced for code in `globals.css` (`--font-code`); body/heading overrides not re-checked                                                                                  | Open Question                                                                                 |
+| `--font-preference-*` overrides                    | documented                                           | read by `--font-heading`, `--font-body`, `--font-ui` and `--font-code` in `shared-styles.css`; nothing writes them yet (the theme editor is not built)                       | Open Question                                                                                 |
 | Radius derivation                                  | `--radius-base` 0.25rem                              | present                                                                                                                                                                      | **Aligned**                                                                                   |
 | Button sizes and 150ms motion                      | 20/24/28/32px, 150ms                                 | match `button.tsx`                                                                                                                                                           | **Aligned**                                                                                   |
 | Button/icon-button 44px on touch                   | text buttons 44px                                    | `xs`, `sm`, `icon-xs`, `icon-sm` extend a 44px hit area (class-tested); `default`, `lg`, `icon`, `icon-lg` do not                                                            | **Proposed** for the unextended sizes; code lags                                              |
@@ -280,6 +280,6 @@ Input 32px / `lg` radius, badge 20px / `sm` radius, sidebar 16rem / 18rem sheet 
 
 ### Provenance
 
-- Colour, ladder and elevation values were checked against `packages/ui/core/src/styles`; contrast ratios were computed from those values.
+- Colour, ladder and elevation values were checked against `packages/frontend/tailwind-config`; contrast ratios were computed from those values.
 - The header, handle and hint behaviour was read from source and exercised in a browser (desktop and phone widths); contrast for the handle and hint text was computed from rendered colours.
 - The theme-owned framing, One Voice rule, touch-by-input-method and Real-16 rule are guidance, not verified behaviour.

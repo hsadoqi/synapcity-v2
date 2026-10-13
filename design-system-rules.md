@@ -12,14 +12,19 @@ Follow these rules when writing or editing UI in this repo. Every rule below was
 
 ### Colours and tokens
 
-- Design tokens live in `packages/ui/core/src/styles/globals.css`. Reach for an existing token before inventing any value.
-- Never hardcode colour values in components. The palette already has 22 tokens; the scan still found 1 hardcoded colours sitting next to them. Do not add more.
-- This repo uses shadcn/ui; its components live in `packages/ui/core/src/components`. Prefer extending it over building parallel pieces.
+- Design tokens live in `packages/frontend/tailwind-config/tokens` and `packages/frontend/tailwind-config/shared-styles.css`. Reach for an existing token before inventing any value.
+
+<!-- - Design tokens live in `packages/ui/core/src/styles/globals.css`. Reach for an existing token before inventing any value. -->
+<!-- - Never hardcode colour values in components. The palette already has 22 tokens; the scan still found 1 hardcoded colours sitting next to them. Do not add more.
+- This repo uses shadcn/ui; its components live in `packages/ui/core/src/components`. Prefer extending it over building parallel pieces. -->
 
 ### Canonical components
 
-- Use these existing components instead of writing new ones, the way this repo already uses them:
-  - `<Button>` from `packages/ui/core/src/components/button/button.tsx` (used 15x · props: variant, size, loading, disabled)
+- Use existing components instead of writing new ones, the way this repo already uses them. If you need a new variant or prop, add it to the component you own. A wrapper that composes components using existing components is fine, but a second implementation is not.
+
+<!-- - Use these existing components instead of writing new ones, the way this repo already uses them:
+  - `<Button>` from `packages/ui/core/src/components/button/button.tsx`
+    (used 15x · props: variant, size, loading, disabled)
   - `<Icon>` from `packages/ui/core/src/components/icon/icon.tsx` (used 9x · props: icon, Glyph, darkIcon, DarkGlyph)
     - most common usage, as in `packages/ui/core/src/components/badge/badge.tsx` (matching 6 of 9 usages): `<Icon>…</Icon>`
   - `<DropdownMenuItem>` from `packages/ui/core/src/components/dropdown-menu/dropdown-menu.tsx` (used 8x · props: inset, variant)
@@ -30,42 +35,36 @@ Follow these rules when writing or editing UI in this repo. Every rule below was
   - `<SidebarMenuItem>` from `packages/ui/core/src/components/sidebar/sidebar-menu.tsx` (used 6x)
     - most common usage, as in `apps/web/components/app-navigation.tsx` (matching 4 of 6 usages): `<SidebarMenuItem>…</SidebarMenuItem>`
   - `<SidebarMenu>` from `packages/ui/core/src/components/sidebar/sidebar-menu.tsx` (used 5x)
-  - `<DropdownMenuSeparator>` from `packages/ui/core/src/components/dropdown-menu/dropdown-menu.tsx` (used 4x)
+  - `<DropdownMenuSeparator>` from `packages/ui/core/src/components/dropdown-menu/dropdown-menu.tsx` (used 4x) -->
 
 ### Catalogue components already installed
 
-- 40 components are installed and unused in `packages/ui/core/src/components` (`<Badge>`, `<Dialog>`, `<DialogClose>`…). Use one of these before you build your own version. Do not delete them to tidy up.
-
 ### Components nobody imports
-
-- 2 components are defined but never imported (`<LocalDate>`, `<TransitionButton>`…). Before writing any new component, check this list first; adopt one or flag it for deletion instead of adding another.
 
 ### Spacing and sizing
 
 - Stay on the Tailwind spacing scale. If a gap looks wrong on a scale step, flag it instead of nudging by a pixel.
-- Avoid new one-off CSS spacing values; 11 off-scale values are already in play.
 
 ### Typography
 
-- The repo uses 2 typefaces: Geist, Geist Mono. Do not introduce another, and do not re-declare font stacks by hand; use the existing setup.
-
 ### shadcn: the components and the theme
 
-- This is a shadcn install (style `base-nova`, base colour zinc). The theme is a set of CSS variables in `packages/ui/core/src/styles/globals.css`: background, foreground, primary, muted, border and the rest, each with a light and a dark value. Change a colour there, never in a component.
-- Use the semantic classes the theme gives you (`bg-background`, `text-muted-foreground`, `border-border`), never a palette colour like `bg-blue-500` or `text-gray-600`, and never a hand-written `dark:` colour. The variables already carry both modes. The variables are defined in `packages/ui/core/src/styles/tokens/colors.css`.
+- Use the semantic classes the theme gives you (`bg-background`, `text-muted-foreground`, `border-border`), never a palette colour like `bg-blue-500` or `text-gray-600`, and never a hand-written `dark:` colour. The variables already carry both modes.
 - Before adding classes to a shadcn component, use one of its variants (`variant="outline"`, `size="sm"`). `className` on a shadcn component is for layout only: width, margin, position. Never colour, never typography.
   (1 shadcn component get a text size or weight through className, like `<DropdownMenuLabel className="font-normal">`; add a size variant instead.)
-- Edit the component you own in `packages/ui/core/src/components`. Never build a second one beside it under another name. A wrapper that composes shadcn components is fine; a second implementation is not.
+- Edit the component you own in ui packages. Never build a second one beside it under another name. A wrapper that composes components using existing components is fine, but a second implementationis not. If you need a new variant or prop, add it to the component you own.
 - Merge classes with `cn()`. Never concatenate strings and never write a ternary inside a className string.
-- Add a component with `npx shadcn@latest add <name>`, then edit it. To see what changed upstream, run `npx shadcn@latest add <name> --diff`.
+
+<!-- - Add a component with `npx shadcn@latest add <name>`, then edit it. To see what changed upstream, run `npx shadcn@latest add <name> --diff`. -->
+
 - Bracket values in `packages/ui/core/src/components` are shadcn's, not a pattern to copy. The installed components use a few values Tailwind's scale does not have (`[3px]`, `[0.625rem]`, `[-0.125em]`), written by shadcn's authors for those components only. In your own code, do not write a bracket value: use a step from the scale, or a variable from the theme file. If a value you need is missing, add it to the theme file once and use it by name.
 - Radius comes from the `--radius` variable and the scale derived from it; never a bracket value. Never change `--spacing`: it resizes every gap in the app.
-- Small habits shadcn expects: `gap-*` not `space-x/y-*`; `size-4` not `w-4 h-4`; `truncate` for one-line clipping; no `z-index` on Dialog, Sheet, Popover or Tooltip, they stack themselves; icons from the project's own icon library only.
+
+<!-- - Small habits shadcn expects: `gap-*` not `space-x/y-*`; `size-4` not `w-4 h-4`; `truncate` for one-line clipping; no `z-index` on Dialog, Sheet, Popover or Tooltip, they stack themselves; icons from the project's own icon library only. -->
 
 ### Styling discipline
 
 - Never write `style={{ ... }}` for static values; styling belongs to classes and tokens where the system can see it.
-  (2 static inline blocks already exist; do not add to them.)
 - Never write !important; the scan found 5 declarations already. When a style does not apply, fix the selector or the source of the conflict instead of forcing the style through.
 - Before styling anything new, look at a neighbouring component and match how it does it. Consistency with the repo beats personal preference.
 

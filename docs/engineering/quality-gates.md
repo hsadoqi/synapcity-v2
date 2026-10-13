@@ -1,6 +1,6 @@
 # Quality gates, branches, and pull requests
 
-**Status:** Canonical engineering workflow, defined by ADR-0006
+**Status:** Canonical engineering workflow; the toolchain it describes is ADR-0001 (Proposed)
 
 This document states what counts as "done" mechanically, and which parts of that are enforced by a machine versus by convention. It adds no rule without a mechanism behind it. The verification standard itself is `docs/engineering/definition-of-done.md`.
 
@@ -18,13 +18,15 @@ flowchart LR
 
 ## The gates
 
-| Gate                | Runs                                                                                                                                                                                                       | Blocks                                                            |
-| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| `pnpm verify`       | Every check chained in the root `package.json`, including unit/component tests, Storybook browser/accessibility tests, the web application smoke test, documentation consistency, and all workspace builds | Local pushes via the pre-push hook (skippable with `--no-verify`) |
-| CI `verify` job     | Frozen install, `pnpm browsers:install --with-deps`, then the canonical `pnpm verify` on pinned Node and pnpm                                                                                              | Nothing automatically (see "What is not enforced")                |
-| CI `pr-hygiene` job | PR title is `type: short summary`, and no closing keyword sits near an issue reference (ADR-0008)                                                                                                          | Nothing automatically                                             |
-| CI `security` job   | `pnpm audit --audit-level=moderate` and a full-history gitleaks scan                                                                                                                                       | Nothing automatically                                             |
-| Dependabot          | Weekly update pull requests for npm and GitHub Actions                                                                                                                                                     | Nothing; keeps versions current (`AGENTS.md` §7a)                 |
+| Gate                | Runs                                                                                              | Blocks                                                         |
+| ------------------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `pnpm verify`       | `format:check`, `lint`, `check-types`, `deps` (Knip), `build`, chained in the root `package.json` | Local pushes via the pre-push hook, once activated (skippable) |
+| CI `verify` job     | Frozen install, then `pnpm verify` on Node from `.node-version` and pnpm from `packageManager`    | Nothing automatically (see "What is not enforced")             |
+| CI `pr-hygiene` job | PR title is `type: short summary`, and no closing keyword sits near an issue reference            | Nothing automatically                                          |
+| CI `security` job   | `pnpm audit --audit-level=moderate` and a full-history gitleaks scan                              | Nothing automatically                                          |
+| Dependabot          | Weekly update pull requests for npm and GitHub Actions                                            | Nothing; keeps versions current (`AGENTS.md` §7a)              |
+
+**Known gap.** The CI `verify` and `security` jobs read `node-version-file: .node-version`, and the repository has no such file, so those jobs fail at the Node setup step until it is added or the workflow changes (ADR-0001, Unresolved).
 
 ## Branches and pull requests
 
@@ -42,15 +44,17 @@ flowchart LR
 
 ## Tests
 
-- Unit/component test files are named `*.test.ts` or `*.test.tsx`. Playwright application tests use `*.spec.ts`. Tests for a package live next to the code they protect; cross-cutting repository tests live in `tests/`.
-- Every required test surface is named explicitly by a root script and included in `pnpm verify`. Adding a test-owning workspace also requires registering its environment/project or root test command; the workspace glob alone does not make its tests part of the gate.
-- The test gate must fail when test discovery finds no tests, so required tests cannot silently disappear. Do not configure the test runner to pass on zero tests.
-- A test's report names the invariant category it protects (`docs/engineering/definition-of-done.md`, item 3). Tests that check a rule only against fixtures are labeled self-consistent.
-- Minimum expectation for any change: `pnpm verify` passes, and the pull request states what was and was not verified.
+No test runner is configured, so there is no test gate, and none of the gates above claims behavior is correct. Whether to add one, and which, is an open candidate decision (`docs/architecture/decisions/README.md`). When one exists:
+
+- Every required test surface is named explicitly by a root script and included in `pnpm verify`.
+- The test gate must fail when discovery finds no tests, so required tests cannot silently disappear.
+- A test's report names the invariant category it protects (`docs/engineering/definition-of-done.md`, item 3).
+
+Until then, a pull request states plainly that behavior was verified manually or not at all, and what that covered.
 
 ## Accessibility
 
-Accessibility now has three complementary layers: axe inside component tests, `@storybook/addon-a11y` in the real-browser Storybook gate, and manual review for semantics, keyboard behavior, focus visibility, and reduced motion that automation cannot establish. Playwright also drives the minimum real application smoke path. ADR-0007's originally proposed JSX accessibility lint layer is deferred because the evaluated current plugin release does not support the repository's ESLint major; the evidence and compatibility constraint are recorded in `docs/engineering/plans/phase-02-dependency-evidence.md`. Do not install it with an invalid peer range or describe the deferred layer as active enforcement.
+There is no automated accessibility check today. Semantics, keyboard behavior, focus visibility, contrast and reduced motion are reviewed manually. Reduced-motion and forced-colours handling is implemented once in `@repo/tailwind-config` (ADR-0002). Report accessibility as not automatically verified.
 
 ## What is not enforced
 

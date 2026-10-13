@@ -1,57 +1,53 @@
 # Workspace conventions
 
-**Status:** Canonical, defined by ADR-0007
+**Status:** Current direction, defined by ADR-0001 (Proposed)
 
-How packages and apps are laid out, named, built, and tested. The category rules and dependency direction are in ADR-0005. Creating a package still follows [the checklist](package-creation-checklist.md).
+How packages and apps are laid out, named and built in the current repository. Creating a package still follows [the checklist](package-creation-checklist.md).
 
 ```mermaid
 flowchart TD
-  root["repository root<br/>pnpm-workspace.yaml"]
+  root["repository root<br/>pnpm-workspace.yaml + turbo.json"]
   apps["apps/name<br/>composition roots"]
   pkgs["packages/category/name"]
-  cats["dev, shared, domain, ui"]
+  cats["dev, frontend"]
 
   root --> apps
   root --> pkgs
   pkgs --> cats
 ```
 
-## Layout and names
+## Layout
 
-- Packages live at `packages/<category>/<name>` and apps at `apps/<name>`. The workspace globs are `apps/*` and `packages/*/*`.
-- Package names are `@synapcity/<category>-<name>`, where `<category>` is the package's category folder and `<name>` is lowercase kebab-case, matches the leaf directory name (which does not repeat the category), and is unique across all categories. App names remain `@synapcity/<name>`, matching `apps/<name>`, unless a separate accepted decision changes that. (Package naming amended during the Phase 2 architecture reconciliation; it previously read `@synapcity/<name>` for both.)
-- Every package and app has a README. A package README starts with an `Owns:` line stating what information or responsibility the package is the single owner of.
+- Apps live at `apps/<name>`; packages live at `packages/<category>/<name>`. The workspace globs are `apps/*` and `packages/**/*`.
+- Current categories:
+  - `dev` — build-time tooling shared by workspaces: `@repo/eslint-config`, `@repo/typescript-config`.
+  - `frontend` — shared presentation code: `@synapcity/ui` (shadcn components, `cn`, hooks) and `@repo/tailwind-config` (theme, tokens, PostCSS config).
+- Current apps: `web` (the product application) and `docs` (still the starter template).
 - Internal dependencies use `workspace:*`.
+- A package's `exports` is its public API. Other packages import only what `exports` lists.
 
-## Package skeleton
+## Names
 
-```text
-packages/<category>/<name>/
-├── package.json    private, "type": "module", "exports" is the only public API
-├── tsconfig.json   extends ../../../tsconfig.json, includes src
-├── README.md       starts with "Owns: ..."
-└── src/            code and colocated *.test.ts files
-```
+Package names are not yet uniform: `@synapcity/ui` sits beside `@repo/*` tooling packages. Use the scope of the neighbouring packages in the same category until the scope question in ADR-0001 is resolved. App names are the directory name (`web`, `docs`).
 
-Scripts: every package defines `build`. Until a bundler is chosen, `build` is a type check: `tsc --noEmit -p tsconfig.json`. The root `pnpm build` runs `pnpm -r --if-present build`, so each package's build runs through `pnpm verify`. Tests need no script: the root `pnpm test` finds every `*.test.ts`.
+## Scripts
+
+Turborepo runs `build`, `lint`, `check-types` and `dev` from the root (`turbo.json`). A workspace defines whichever of those apply to it. `build` for an app is its framework build; `check-types` is `tsc --noEmit` (Next apps run `next typegen` first). Outputs cached by `build`: `.next/**` except the cache and dev folders.
 
 ## Where code runs (client and server)
 
-- Code that can only run on a server (Node APIs, request and response handling, secrets) lives in an app.
-- Runtime semantics are ownership-sensitive, not a blanket rule (amended during the Phase 2 architecture reconciliation; see ADR-0005 and ADR-0007):
-  - `domain` packages remain portable and runtime-neutral: no React, React DOM, browser/DOM APIs, Next.js, application routing, or application-runtime integration.
-  - `ui` packages are application-runtime agnostic but may use React, React DOM, JSX, and DOM/browser/web-platform capabilities intrinsic to reusable presentation, including a narrow `"use client"` boundary where that behavior requires it. They must not acquire Next.js routing, request APIs, Server Actions, app-specific environment integration, or imports from application workspaces.
-  - A package that needs an application-runtime-specific capability beyond this defines an interface for it and receives the implementation from an app.
-- Next.js is the accepted application framework for `apps/web` (ADR-0010). The ownership rule above remains framework-independent: a future app may compose packages differently without moving application-runtime concerns into reusable packages.
+- Server-only code (Node APIs, request handling, secrets) lives in an app.
+- `@synapcity/ui` and the other `frontend` packages are application-runtime agnostic: they may use React, JSX and web-platform APIs, and a narrow `"use client"` boundary where a component needs it. They must not import Next.js routing or request APIs, Server Actions, application environment variables, or anything from `apps/*`.
+- A package that needs an app-specific capability defines an interface for it and receives the implementation from the app.
+
+## Styling in the workspace
+
+Apps and packages never define theme tokens. `@repo/tailwind-config` owns them and an app's `globals.css` contains imports and `@source` lines only (ADR-0002). New shadcn components are added with `pnpm ui:add <name>` from the root, which targets `apps/web` and writes into `@synapcity/ui`.
 
 ## Testing
 
-- Unit tests use Vitest, colocated with the code as `*.test.ts`.
-- Component tests use Vitest with Testing Library (`@testing-library/react`, with `jest-dom` matchers) in a DOM environment. React is the accepted component layer for the current Next.js application and UI package; this does not make Lexical or React Grid Layout part of the technical-foundation package.
-- Accessibility is checked with axe inside component tests, Storybook's real-browser accessibility addon, and proportional manual checks. A complementary JSX lint layer remains deferred until a release compatible with the accepted ESLint major exists; see ADR-0007 and the Phase 2 dependency evidence.
-- Real-browser tests use Playwright for Storybook and the runnable web application.
-- Test-environment dependencies live with the consuming workspace and are checked against current documentation (`AGENTS.md` §7a).
+No test runner is configured, and none is implied. Whether and how to test is an open candidate decision (`decisions/README.md`). Do not describe a change as tested on the strength of `pnpm verify`, which checks formatting, lint, types, unused code and builds.
 
 ## Verified in this repository
 
-The current repository contains two apps and one real reusable package. `pnpm verify` type-checks and builds all three workspaces, runs the registered root and `ui-core` Vitest projects, exercises every discovered Storybook story in Chromium with accessibility assertions, runs the web application smoke path, and cruises real app/package imports for dependency violations. Boundary fixtures prove every configured rule fires on a deliberate violation; the earlier name-based package and deep-export probes remain historical manual evidence rather than durable package-resolution fixtures.
+On 2026-10-13: `pnpm lint`, `pnpm check-types` and `pnpm build` passed; `pnpm format:check` and `pnpm deps` reported failures that predate the documentation changes (see `docs/engineering/quality-gates.md`).

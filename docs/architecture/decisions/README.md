@@ -19,6 +19,30 @@ ADRs are numbered sequentially (`0001-*.md`, `0002-*.md`, ...) and never renumbe
 - **Superseded by ADR-NNNN** — replaced; the old ADR remains readable for lineage.
 - **Rejected** — considered and declined; kept for lineage, not deleted.
 
+## Index
+
+| ADR                                                   | Title                                                   | Status   |
+| ----------------------------------------------------- | ------------------------------------------------------- | -------- |
+| [0001](0001-workspace-topology-and-toolchain.md)      | Workspace topology and toolchain                        | Proposed |
+| [0002](0002-styling-foundation.md)                    | Styling foundation (Tailwind v4, shared tokens, shadcn) | Accepted |
+| [0003](0003-typography-roles-and-font-preferences.md) | Typography roles and font preferences                   | Accepted |
+| [0004](0004-class-merging-with-cn.md)                 | Class merging with the `cn` package                     | Accepted |
+
+**Lineage.** The ADRs in `docs/archive/architecture/decisions/` (0001-0016) belong to the previous implementation. They are evidence under `docs/engineering/preservation-policy.md`, not authority, and several describe workspaces that do not exist here (`apps/storybook`, `packages/ui/core`). This index restarted at 0001 for the current repository. When a current ADR needs an archived decision, it restates the decision it adopts rather than citing the archived number.
+
+## Candidate decisions
+
+Not decided. Each needs an ADR, and the owner's approval, before it is treated as settled.
+
+- **Testing strategy.** No test runner, component-test setup, accessibility automation or browser gate exists. `pnpm verify` proves formatting, lint, types, unused code and builds only.
+- **Dependency direction between package categories**, and any tool that enforces it.
+- **Component catalogue** (Storybook or another).
+- **npm scope naming** (`@synapcity/*` versus `@repo/*`), recorded under ADR-0001's Unresolved.
+- **Theme editor and preference persistence** (what writes `--font-preference-*` and the other overrides).
+- **Persistence, API, routing, authentication and state management.** Open per `PRODUCT.md`; the README's technology table is direction, not decision.
+- **Deployment topology.**
+- **Fate of `apps/docs`.**
+
 ## Template
 
 ```markdown
