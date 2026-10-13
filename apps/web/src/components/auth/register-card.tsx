@@ -38,17 +38,6 @@ export function RegisterCard({
             label="Already have an account? Sign in"
             className="mt-4"
           />
-          <p className="text-center text-xs text-muted-foreground">
-            By signing up, you agree to our{' '}
-            <a href="/terms" className="text-link hover:underline">
-              Terms of Service
-            </a>{' '}
-            and{' '}
-            <a href="/privacy" className="text-link hover:underline">
-              Privacy Policy
-            </a>
-            .
-          </p>
         </CardFooter>
       </Card>
     </div>
