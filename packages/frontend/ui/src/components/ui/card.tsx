@@ -32,11 +32,23 @@ function CardHeader({ className, ...props }: React.ComponentProps<'div'>) {
   );
 }
 
-function CardTitle({ className, ...props }: React.ComponentProps<'div'>) {
+function CardTitle({
+  as: Component = 'div',
+  size = 'default',
+  className,
+  ...props
+}: React.ComponentProps<'div'> & {
+  as?: 'div' | 'h1' | 'h2' | 'h3';
+  size?: 'default' | 'lg';
+}) {
   return (
-    <div
+    <Component
       data-slot="card-title"
-      className={cn('text-sm font-medium', className)}
+      className={cn(
+        'font-medium',
+        size === 'lg' ? 'text-lg tracking-normal' : 'text-sm',
+        className,
+      )}
       {...props}
     />
   );

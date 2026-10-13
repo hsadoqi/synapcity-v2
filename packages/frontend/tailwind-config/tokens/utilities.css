@@ -8,9 +8,10 @@
   color-scheme: light;
   --background: var(--base-background);
   --foreground: var(--base-foreground);
-  --card: var(--base-background)/90;
+  /* Literals, like theme-dark: surfaces stay fixed if a ramp is rethemed. */
+  --card: oklch(100% 0 0);
   --card-foreground: var(--base-foreground);
-  --popover: var(--base-background)/20;
+  --popover: oklch(100% 0 0);
   --popover-foreground: var(--base-foreground);
   --destructive: oklch(45% 0.245 27.325);
   --destructive-foreground: var(--base-50);
@@ -97,6 +98,24 @@
     in oklch,
     var(--background),
     var(--foreground) 14%
+  );
+}
+
+/* Filled-button states: the fill mixed toward the page, so hover and pressed stay
+   solid colours (never an alpha that reads as disabled) and the label keeps its contrast. */
+@utility bg-fill-hover {
+  background-color: color-mix(
+    in oklch,
+    var(--primary-foreground),
+    var(--background) 18%
+  );
+}
+
+@utility bg-fill-pressed {
+  background-color: color-mix(
+    in oklch,
+    var(--primary-foreground),
+    var(--background) 32%
   );
 }
 
