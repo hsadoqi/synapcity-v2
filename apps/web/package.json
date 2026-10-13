@@ -10,7 +10,8 @@
     "lint": "eslint . --cache",
     "check-types": "next typegen && tsc --noEmit",
     "verify": "pnpm lint && pnpm check-types && pnpm build",
-    "ui:add": "pnpm dlx shadcn@latest add"
+    "ui:add": "pnpm dlx shadcn@latest add",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@synapcity/frontend-site": "workspace:*",
@@ -23,7 +24,9 @@
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
+    "@playwright/test": "1.64.0",
     "@synapcity/dev-eslint-config": "workspace:*",
+    "@synapcity/dev-playwright-config": "workspace:*",
     "@synapcity/dev-typescript-config": "workspace:*",
     "@synapcity/frontend-tailwind-config": "workspace:*",
     "@types/node": "26.4.1",
