@@ -11,5 +11,5 @@ next-env.d.ts
 docs/archive
 .vscode
 .pnpm-store
-coverage
+**/coverage/**
 storybook-static

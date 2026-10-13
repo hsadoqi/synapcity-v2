@@ -13,4 +13,16 @@ export const sharedConfig = {
       reportsDirectory: 'coverage/report',
     },
   },
+  exclude: [
+    'dist/**',
+    '**/coverage/**',
+    'storybook-static/**',
+    'node_modules/**',
+    '.turbo/**',
+    '.next/**',
+    '.vercel/**',
+    '.vscode/**',
+    'pnpm-store/**',
+    'docs/archive/**',
+  ],
 };
