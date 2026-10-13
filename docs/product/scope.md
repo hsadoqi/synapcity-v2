@@ -113,4 +113,3 @@ A scope change requires:
 5. human product-owner approval.
 
 Repository presence, prototype polish, test coverage, or implementation investment is not sufficient evidence for a scope change.
-

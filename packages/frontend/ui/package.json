@@ -6,11 +6,11 @@
     "./*": "./src/*.tsx"
   },
   "scripts": {
-    "lint": "eslint . --max-warnings 0",
+    "build": "tsc --build tsconfig.build.json",
+    "lint": "eslint . --cache",
     "generate:component": "turbo gen react-component",
-    "eslint": "eslint . --max-warnings 0",
     "check-types": "tsc --noEmit",
-    "verify": "pnpm lint && pnpm check-types"
+    "verify": "pnpm lint && pnpm check-types && pnpm build"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

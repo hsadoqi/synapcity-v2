@@ -7,9 +7,9 @@
     "dev": "next dev --port 8080",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint --max-warnings 0",
+    "lint": "eslint . --cache",
     "check-types": "next typegen && tsc --noEmit",
-    "verify": "pnpm lint && pnpm check-types"
+    "verify": "pnpm lint && pnpm check-types && pnpm build"
   },
   "dependencies": {
     "@repo/ui": "workspace:*",

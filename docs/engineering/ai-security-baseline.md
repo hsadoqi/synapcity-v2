@@ -26,6 +26,6 @@ This baseline does not design any future AI product feature, agent architecture,
 
 ## Relationship to other documents
 
-- `docs/engineering/ai-development.md` governs AI-assisted *development* of Synapcity itself (this repository's own build process).
+- `docs/engineering/ai-development.md` governs AI-assisted _development_ of Synapcity itself (this repository's own build process).
 - This document governs the trust/security baseline that applies both to that development process and, later, to any AI-as-product-capability work.
 - `AGENTS.md` §5 (Approval gates) is the operational expression of principles 1, 3, 6, and 7 above for day-to-day agent work in this repository.

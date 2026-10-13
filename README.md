@@ -50,14 +50,14 @@ The aim is to support a workspace that feels personal while keeping everyday int
 
 Synapcity is being developed with a modular TypeScript architecture.
 
-| Area | Direction |
-| --- | --- |
-| Web application | Next.js and React |
-| Document editor | Lexical |
-| Spatial dashboards | React Grid Layout |
-| Styling and themes | Tailwind CSS and shared UI foundations |
-| Shared interface state | Zustand |
-| Repository tooling | pnpm and Turborepo |
+| Area                   | Direction                              |
+| ---------------------- | -------------------------------------- |
+| Web application        | Next.js and React                      |
+| Document editor        | Lexical                                |
+| Spatial dashboards     | React Grid Layout                      |
+| Styling and themes     | Tailwind CSS and shared UI foundations |
+| Shared interface state | Zustand                                |
+| Repository tooling     | pnpm and Turborepo                     |
 
 The persistence direction under consideration uses Supabase/PostgreSQL for durable workspace records, TanStack Query for fetching and caching, and local storage for device preferences.
 

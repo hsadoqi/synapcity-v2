@@ -27,7 +27,7 @@
     },
     "verify": {
       "dependsOn": ["lint", "check-types"],
-        "outputs": []
+      "outputs": []
     }
   }
 }

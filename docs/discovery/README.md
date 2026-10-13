@@ -10,14 +10,14 @@ Discovery helps future investigation remember why an idea mattered and what pres
 
 ## States
 
-| State | Meaning |
-| --- | --- |
-| **Exploration** | An interesting possibility with no commitment and insufficient evidence for formal planning. |
-| **Candidate** | A plausible future direction with some evidence and a defined reason to revisit. Still not approved. |
-| **Deferred** | Deliberately considered and postponed because the present phase does not need it or evidence is insufficient. |
-| **Revisit Triggered** | A recorded trigger has occurred. Investigation may begin; the idea is still not approved. |
-| **Promoted** | The idea has entered a formal investigation, specification, decision, or planning process. The authoritative result lives elsewhere. |
-| **Rejected** | An authorized decision declined the idea. Retained for lineage and reconsidered only with materially new evidence. |
+| State                 | Meaning                                                                                                                              |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| **Exploration**       | An interesting possibility with no commitment and insufficient evidence for formal planning.                                         |
+| **Candidate**         | A plausible future direction with some evidence and a defined reason to revisit. Still not approved.                                 |
+| **Deferred**          | Deliberately considered and postponed because the present phase does not need it or evidence is insufficient.                        |
+| **Revisit Triggered** | A recorded trigger has occurred. Investigation may begin; the idea is still not approved.                                            |
+| **Promoted**          | The idea has entered a formal investigation, specification, decision, or planning process. The authoritative result lives elsewhere. |
+| **Rejected**          | An authorized decision declined the idea. Retained for lineage and reconsidered only with materially new evidence.                   |
 
 Only an authorized human decision may move an entry to **Promoted** or **Rejected** when that movement implies product or architecture judgment. **Revisit Triggered** authorizes investigation, not implementation.
 

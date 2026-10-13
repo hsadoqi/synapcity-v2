@@ -239,15 +239,15 @@ Recovery:          restore only this task's own hunks, preserving all pre-existi
 
 Complete every row that the task could plausibly touch. Use `read only` or `none` explicitly; a blank cell grants no authority.
 
-| System / mutation class | Exact destination | Allowed action | Artifact budget | Preconditions | Verification | Recovery |
-| --------------------------------------------- | ----------------- | -------------- | --------------: | ------------- | ------------ | -------- |
-| Repository files | Paths listed in Goal scope | update | 39 | preserve existing edits; keep Next.js routing in apps/web | focused/full Storybook, web smoke, typecheck, lint, formatting | restore only own hunks |
-| Git history / branches / pull requests | none | none | 0 | none | read-only branch check | none |
-| GitHub issues / labels / milestones | none | none | 0 | none | none | none |
-| GitHub Projects or other project metadata | none | none | 0 | none | none | none |
-| Backlog, task, or planning tools | none | none | 0 | none | none | none |
-| Dependencies / packages / generated artifacts | none | none | 0 | none | none | none |
-| Other external or local operational state | none | none | 0 | none | none | none |
+| System / mutation class                       | Exact destination          | Allowed action | Artifact budget | Preconditions                                             | Verification                                                   | Recovery               |
+| --------------------------------------------- | -------------------------- | -------------- | --------------: | --------------------------------------------------------- | -------------------------------------------------------------- | ---------------------- |
+| Repository files                              | Paths listed in Goal scope | update         |              39 | preserve existing edits; keep Next.js routing in apps/web | focused/full Storybook, web smoke, typecheck, lint, formatting | restore only own hunks |
+| Git history / branches / pull requests        | none                       | none           |               0 | none                                                      | read-only branch check                                         | none                   |
+| GitHub issues / labels / milestones           | none                       | none           |               0 | none                                                      | none                                                           | none                   |
+| GitHub Projects or other project metadata     | none                       | none           |               0 | none                                                      | none                                                           | none                   |
+| Backlog, task, or planning tools              | none                       | none           |               0 | none                                                      | none                                                           | none                   |
+| Dependencies / packages / generated artifacts | none                       | none           |               0 | none                                                      | none                                                           | none                   |
+| Other external or local operational state     | none                       | none           |               0 | none                                                      | none                                                           | none                   |
 
 ## Rules
 

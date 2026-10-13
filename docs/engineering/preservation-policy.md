@@ -46,11 +46,11 @@ Any adoption from the previous implementation that has real architectural conseq
 - what was deliberately left behind or changed;
 - what risks or scars the previous version surfaced, and whether they were addressed.
 
-Do not adopt something merely because it exists, works, is tested, or represents substantial engineering investment — engineering investment is not, on its own, evidence that a concept is product-required. Requirements need independent founder or product-owner confirmation; the *implementation* still has to earn its own adoption decision separately.
+Do not adopt something merely because it exists, works, is tested, or represents substantial engineering investment — engineering investment is not, on its own, evidence that a concept is product-required. Requirements need independent founder or product-owner confirmation; the _implementation_ still has to earn its own adoption decision separately.
 
 ## Preserve negative lessons
 
-Where a failed or abandoned approach explains why a current invariant exists, preserve that lesson explicitly rather than only preserving the invariant. `docs/architecture/principles.md` records the *lessons* on their own terms — a future reader should not need to know the specific historical episode that taught a lesson in order to follow the rule it produced.
+Where a failed or abandoned approach explains why a current invariant exists, preserve that lesson explicitly rather than only preserving the invariant. `docs/architecture/principles.md` records the _lessons_ on their own terms — a future reader should not need to know the specific historical episode that taught a lesson in order to follow the rule it produced.
 
 ## Destructive changes require exact scope and recovery strategy
 

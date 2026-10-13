@@ -18,13 +18,13 @@ flowchart LR
 
 ## The gates
 
-| Gate | Runs | Blocks |
-|---|---|---|
-| `pnpm verify` | Every check chained in the root `package.json`, including unit/component tests, Storybook browser/accessibility tests, the web application smoke test, documentation consistency, and all workspace builds | Local pushes via the pre-push hook (skippable with `--no-verify`) |
-| CI `verify` job | Frozen install, `pnpm browsers:install --with-deps`, then the canonical `pnpm verify` on pinned Node and pnpm | Nothing automatically (see "What is not enforced") |
-| CI `pr-hygiene` job | PR title is `type: short summary`, and no closing keyword sits near an issue reference (ADR-0008) | Nothing automatically |
-| CI `security` job | `pnpm audit --audit-level=moderate` and a full-history gitleaks scan | Nothing automatically |
-| Dependabot | Weekly update pull requests for npm and GitHub Actions | Nothing; keeps versions current (`AGENTS.md` §7a) |
+| Gate                | Runs                                                                                                                                                                                                       | Blocks                                                            |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `pnpm verify`       | Every check chained in the root `package.json`, including unit/component tests, Storybook browser/accessibility tests, the web application smoke test, documentation consistency, and all workspace builds | Local pushes via the pre-push hook (skippable with `--no-verify`) |
+| CI `verify` job     | Frozen install, `pnpm browsers:install --with-deps`, then the canonical `pnpm verify` on pinned Node and pnpm                                                                                              | Nothing automatically (see "What is not enforced")                |
+| CI `pr-hygiene` job | PR title is `type: short summary`, and no closing keyword sits near an issue reference (ADR-0008)                                                                                                          | Nothing automatically                                             |
+| CI `security` job   | `pnpm audit --audit-level=moderate` and a full-history gitleaks scan                                                                                                                                       | Nothing automatically                                             |
+| Dependabot          | Weekly update pull requests for npm and GitHub Actions                                                                                                                                                     | Nothing; keeps versions current (`AGENTS.md` §7a)                 |
 
 ## Branches and pull requests
 

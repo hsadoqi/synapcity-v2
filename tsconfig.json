@@ -30,5 +30,13 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    ".turbo",
+    ".history",
+    ".serena",
+    ".remember",
+    ".vscode",
+    ".pnpm-store"
+  ]
 }

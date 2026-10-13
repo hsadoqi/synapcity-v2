@@ -1,8 +1,8 @@
-import Image, { type ImageProps } from "next/image";
-import { Button } from "@repo/ui/button";
-import styles from "../styles/page.module.css";
+import Image, { type ImageProps } from 'next/image';
+import { Button } from '@repo/ui/button';
+import styles from '../styles/page.module.css';
 
-type Props = Omit<ImageProps, "src"> & {
+type Props = Omit<ImageProps, 'src'> & {
   srcLight: string;
   srcDark: string;
 };
@@ -23,7 +23,7 @@ export default function Home() {
     <div className={styles.page}>
       <main className={styles.main}>
         <h1>Welcome to Synapcity Web</h1>
-        </main>
+      </main>
     </div>
   );
 }

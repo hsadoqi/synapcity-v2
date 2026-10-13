@@ -1,0 +1,13 @@
+node_modules
+dist
+.turbo
+pnpm-lock.yaml
+.history
+.remember
+.serena
+.claude
+.next
+next-env.d.ts
+docs/archive
+.vscode
+.pnpm-store

@@ -225,4 +225,3 @@ Among the highest-impact open decisions are:
 - history, restoration, deletion, archival, and recovery semantics;
 - search, relevance, and resumption semantics;
 - widget lifecycle and source/input model.
-

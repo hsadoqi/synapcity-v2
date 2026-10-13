@@ -8,17 +8,17 @@ Research must not silently become canonical. This document defines how a documen
 
 Every governing document should carry one of these statuses, either in frontmatter or in a clearly visible header line:
 
-| Status | Meaning |
-| --- | --- |
-| **Canonical** | Accepted and currently governing within its stated scope. Changing it requires the approval this document type requires (see below). |
-| **Current direction** | A selected direction whose detailed design remains open (e.g., "Lexical is the current direction for Documents" — the ADRs in `docs/architecture/decisions/` are the canonical record of current directions). |
-| **Proposed** | A candidate awaiting approval. Not governing yet. |
-| **Research / evidence** | An investigation, audit, spike, or evidence-gathering artifact for a specific decision. Describes what was found, not what is decided. Never cited as authority for a product or architecture claim — only as evidence for one. |
-| **Experimental** | Describes or lives alongside deliberately exploratory implementation. Preserved per `docs/engineering/preservation-policy.md`. Not authoritative for Synapcity. |
-| **Historical** | Retained for lineage. No longer governs, but explains how a current decision was reached or what was tried before. |
-| **Superseded by <link** | Explicitly replaced. The document remains readable; it must point to its replacement rather than being silently deleted or rewritten. |
-| **Rejected** | An approach an authorized decision explicitly declined. Kept for lineage so it isn't reconsidered without new evidence. |
-| **Unknown / unclassified** | No status has been assigned yet. Treat as non-authoritative until classified — silence about status is not silence about authority. |
+| Status                     | Meaning                                                                                                                                                                                                                         |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Canonical**              | Accepted and currently governing within its stated scope. Changing it requires the approval this document type requires (see below).                                                                                            |
+| **Current direction**      | A selected direction whose detailed design remains open (e.g., "Lexical is the current direction for Documents" — the ADRs in `docs/architecture/decisions/` are the canonical record of current directions).                   |
+| **Proposed**               | A candidate awaiting approval. Not governing yet.                                                                                                                                                                               |
+| **Research / evidence**    | An investigation, audit, spike, or evidence-gathering artifact for a specific decision. Describes what was found, not what is decided. Never cited as authority for a product or architecture claim — only as evidence for one. |
+| **Experimental**           | Describes or lives alongside deliberately exploratory implementation. Preserved per `docs/engineering/preservation-policy.md`. Not authoritative for Synapcity.                                                                 |
+| **Historical**             | Retained for lineage. No longer governs, but explains how a current decision was reached or what was tried before.                                                                                                              |
+| **Superseded by <link**    | Explicitly replaced. The document remains readable; it must point to its replacement rather than being silently deleted or rewritten.                                                                                           |
+| **Rejected**               | An approach an authorized decision explicitly declined. Kept for lineage so it isn't reconsidered without new evidence.                                                                                                         |
+| **Unknown / unclassified** | No status has been assigned yet. Treat as non-authoritative until classified — silence about status is not silence about authority.                                                                                             |
 
 ## Authority
 
@@ -58,7 +58,7 @@ Do not treat repetition across descendant documents as independent corroboration
 
 ## Stale-claim handling
 
-A Canonical or Current-direction document that no longer matches observed reality (e.g., a product document claiming a capability "is not started" when code shows otherwise) is not automatically wrong about its *decision* — it may simply be stale about *implementation state*. Handle this by:
+A Canonical or Current-direction document that no longer matches observed reality (e.g., a product document claiming a capability "is not started" when code shows otherwise) is not automatically wrong about its _decision_ — it may simply be stale about _implementation state_. Handle this by:
 
 1. Flagging the discrepancy explicitly (do not silently edit the canonical claim to match whatever the code currently does — that risks laundering an unapproved implementation into canonical status).
 2. Routing the discrepancy to the document's approval owner.

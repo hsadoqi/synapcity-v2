@@ -7,9 +7,10 @@
     "dev:web": "turbo run dev --filter=web",
     "dev:docs": "turbo run dev --filter=docs",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format": "prettier --write . --cache=.prettiercache",
+    "format:check": "prettier --check . --cache=.prettiercache",
     "check-types": "turbo run check-types",
-    "verify": "turbo run verify"
+    "verify": "pnpm format:check && pnpm lint && pnpm check-types && pnpm build"
   },
   "devDependencies": {
     "prettier": "3.9.6",

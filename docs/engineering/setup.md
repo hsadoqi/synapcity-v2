@@ -28,21 +28,21 @@ pnpm verify
 
 ## Commands
 
-| Command | What it does |
-|---|---|
-| `pnpm verify` | Runs every check below in order and stops at the first failure |
-| `pnpm format:check` / `pnpm format` | Check or apply Prettier formatting (Markdown is excluded) |
-| `pnpm lint` | ESLint with type-aware rules |
-| `pnpm browsers:install` | Installs the Chromium binary required by browser verification; run once after a fresh install |
-| `pnpm typecheck` | Type-checks the root and every current workspace through Turbo |
-| `pnpm test` | Runs the registered root and `ui-core` Vitest projects; new test-owning workspaces must be registered deliberately |
-| `pnpm test:storybook` | Runs real-browser Storybook story and accessibility tests |
-| `pnpm test:smoke` | Starts `apps/web` and drives its minimum real-application path in Chromium |
-| `pnpm deps` | Knip, unused files, exports, and dependencies |
-| `pnpm deps:boundaries` | dependency-cruiser package boundary rules |
-| `pnpm docs:check` | ADR index and documentation link consistency |
-| `pnpm build` | Builds/type-checks every current workspace through Turbo |
-| `pnpm dev` | Runs workspace development tasks in parallel through Turbo |
+| Command                             | What it does                                                                                                       |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `pnpm verify`                       | Runs every check below in order and stops at the first failure                                                     |
+| `pnpm format:check` / `pnpm format` | Check or apply Prettier formatting (Markdown is excluded)                                                          |
+| `pnpm lint`                         | ESLint with type-aware rules                                                                                       |
+| `pnpm browsers:install`             | Installs the Chromium binary required by browser verification; run once after a fresh install                      |
+| `pnpm typecheck`                    | Type-checks the root and every current workspace through Turbo                                                     |
+| `pnpm test`                         | Runs the registered root and `ui-core` Vitest projects; new test-owning workspaces must be registered deliberately |
+| `pnpm test:storybook`               | Runs real-browser Storybook story and accessibility tests                                                          |
+| `pnpm test:smoke`                   | Starts `apps/web` and drives its minimum real-application path in Chromium                                         |
+| `pnpm deps`                         | Knip, unused files, exports, and dependencies                                                                      |
+| `pnpm deps:boundaries`              | dependency-cruiser package boundary rules                                                                          |
+| `pnpm docs:check`                   | ADR index and documentation link consistency                                                                       |
+| `pnpm build`                        | Builds/type-checks every current workspace through Turbo                                                           |
+| `pnpm dev`                          | Runs workspace development tasks in parallel through Turbo                                                         |
 
 The current workspaces are `apps/web`, `apps/storybook`, and `packages/ui/core`. A passing `pnpm verify` proves their declared technical-foundation builds and tests run; it does not prove a product feature exists, is product-required, or is product-validated.
 

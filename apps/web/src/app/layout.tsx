@@ -1,19 +1,19 @@
-import type { Metadata } from "next";
-import localFont from "next/font/local";
-import "../styles/globals.css";
+import type { Metadata } from 'next';
+import localFont from 'next/font/local';
+import '../styles/globals.css';
 
 const geistSans = localFont({
-  src: "../lib/fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
+  src: '../lib/fonts/GeistVF.woff',
+  variable: '--font-geist-sans',
 });
 const geistMono = localFont({
-  src: "../lib/fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
+  src: '../lib/fonts/GeistMonoVF.woff',
+  variable: '--font-geist-mono',
 });
 
 export const metadata: Metadata = {
-  title: "Synapcity",
-  description: "A connected workspace for thinking, planning, and doing.",
+  title: 'Synapcity',
+  description: 'A connected workspace for thinking, planning, and doing.',
 };
 
 export default function RootLayout({

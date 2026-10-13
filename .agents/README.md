@@ -32,16 +32,16 @@ When the reset is triggered:
 
 ## Workflows
 
-| Workflow | Use when |
-| --- | --- |
-| [repository-investigation](workflows/repository-investigation.md) | Starting any task, before changing anything |
-| [implementation-planning](workflows/implementation-planning.md) | Turning an investigation into a plan and approval questions |
-| [planning-artifacts](workflows/planning-artifacts.md) | Creating or changing plans, tasks, issues, milestones, project metadata, or another planning surface |
-| [scoped-execution](workflows/scoped-execution.md) | Making approved changes |
-| [verification](workflows/verification.md) | Before claiming anything is done |
-| [architecture-review](workflows/architecture-review.md) | A change touches ownership, packages, or an ADR |
-| [documentation-consistency](workflows/documentation-consistency.md) | Docs, ADRs, or statuses changed |
-| [dependency-boundary-review](workflows/dependency-boundary-review.md) | Creating or changing a package, or its imports |
-| [preservation-and-destructive-change-review](workflows/preservation-and-destructive-change-review.md) | Deleting, rewriting, or changing external state |
+| Workflow                                                                                              | Use when                                                                                             |
+| ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| [repository-investigation](workflows/repository-investigation.md)                                     | Starting any task, before changing anything                                                          |
+| [implementation-planning](workflows/implementation-planning.md)                                       | Turning an investigation into a plan and approval questions                                          |
+| [planning-artifacts](workflows/planning-artifacts.md)                                                 | Creating or changing plans, tasks, issues, milestones, project metadata, or another planning surface |
+| [scoped-execution](workflows/scoped-execution.md)                                                     | Making approved changes                                                                              |
+| [verification](workflows/verification.md)                                                             | Before claiming anything is done                                                                     |
+| [architecture-review](workflows/architecture-review.md)                                               | A change touches ownership, packages, or an ADR                                                      |
+| [documentation-consistency](workflows/documentation-consistency.md)                                   | Docs, ADRs, or statuses changed                                                                      |
+| [dependency-boundary-review](workflows/dependency-boundary-review.md)                                 | Creating or changing a package, or its imports                                                       |
+| [preservation-and-destructive-change-review](workflows/preservation-and-destructive-change-review.md) | Deleting, rewriting, or changing external state                                                      |
 
 Bound each task with a [task scope](task-scope.md).

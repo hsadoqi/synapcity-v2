@@ -16,8 +16,12 @@
   align-items: center;
   justify-items: center;
   min-height: 100svh;
-  padding: calc(var(--page-spacing-unit) * 10); /* Ten 8px steps preserve the desktop page inset. */
-  gap: calc(var(--page-spacing-unit) * 8); /* Eight 8px steps separate the page grid rows. */
+  padding: calc(
+    var(--page-spacing-unit) * 10
+  ); /* Ten 8px steps preserve the desktop page inset. */
+  gap: calc(
+    var(--page-spacing-unit) * 8
+  ); /* Eight 8px steps separate the page grid rows. */
   font-synthesis: none;
 }
 
@@ -35,7 +39,9 @@
 .main {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--page-spacing-unit) * 4); /* Four 8px steps separate the main content blocks. */
+  gap: calc(
+    var(--page-spacing-unit) * 4
+  ); /* Four 8px steps separate the main content blocks. */
   grid-row-start: 2;
 }
 
@@ -43,42 +49,58 @@
   font-family: var(--font-geist-mono);
   padding-left: 0;
   margin: 0;
-  font-size: var(--page-text-small); /* Compact list and mobile CTA text uses the existing 14px size. */
+  font-size: var(
+    --page-text-small
+  ); /* Compact list and mobile CTA text uses the existing 14px size. */
   line-height: 24px; /* Three 8px steps keep the compact list readable. */
   letter-spacing: -0.01em;
   list-style-position: inside;
 }
 
 .main li:not(:last-of-type) {
-  margin-bottom: var(--page-spacing-unit); /* One existing 8px step separates list items. */
+  margin-bottom: var(
+    --page-spacing-unit
+  ); /* One existing 8px step separates list items. */
 }
 
 .main code {
   font-family: inherit;
   background: var(--gray-alpha-100);
-  padding: calc(var(--page-spacing-unit) * 0.25) calc(var(--page-spacing-unit) * 0.5); /* Quarter and half 8px steps keep inline code compact. */
-  border-radius: var(--page-radius-code); /* A half 8px step rounds inline code without a pill shape. */
+  padding: calc(var(--page-spacing-unit) * 0.25)
+    calc(var(--page-spacing-unit) * 0.5); /* Quarter and half 8px steps keep inline code compact. */
+  border-radius: var(
+    --page-radius-code
+  ); /* A half 8px step rounds inline code without a pill shape. */
   font-weight: 600;
 }
 
 .ctas {
   display: flex;
-  gap: calc(var(--page-spacing-unit) * 2); /* Two 8px steps separate adjacent actions. */
+  gap: calc(
+    var(--page-spacing-unit) * 2
+  ); /* Two 8px steps separate adjacent actions. */
 }
 
 .ctas a {
   appearance: none;
-  border-radius: var(--page-radius-control); /* The oversized radius deliberately keeps controls pill-shaped. */
+  border-radius: var(
+    --page-radius-control
+  ); /* The oversized radius deliberately keeps controls pill-shaped. */
   height: 48px; /* Six 8px steps preserve the desktop control target. */
   padding: 0 calc(var(--page-spacing-unit) * 2.5); /* Two and a half 8px steps preserve control label breathing room. */
   font-family: var(--font-geist-sans);
   border: 1px solid transparent;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--page-text-body); /* Controls retain the existing 16px body text size. */
+  font-size: var(
+    --page-text-body
+  ); /* Controls retain the existing 16px body text size. */
   line-height: 20px; /* This line height centers one-line labels in the 48px controls. */
   font-weight: 500;
 }
@@ -86,7 +108,9 @@
 a.primary {
   background: var(--foreground);
   color: var(--background);
-  gap: var(--page-spacing-unit); /* One existing 8px step separates icons and labels. */
+  gap: var(
+    --page-spacing-unit
+  ); /* One existing 8px step separates icons and labels. */
 }
 
 a.secondary {
@@ -96,17 +120,24 @@ a.secondary {
 
 button.secondary {
   appearance: none;
-  border-radius: var(--page-radius-control); /* The oversized radius deliberately keeps controls pill-shaped. */
+  border-radius: var(
+    --page-radius-control
+  ); /* The oversized radius deliberately keeps controls pill-shaped. */
   height: 48px; /* Six 8px steps preserve the desktop control target. */
   padding: 0 calc(var(--page-spacing-unit) * 2.5); /* Two and a half 8px steps preserve control label breathing room. */
   font-family: var(--font-geist-sans);
   border: 1px solid transparent;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--page-text-body); /* Controls retain the existing 16px body text size. */
+  font-size: var(
+    --page-text-body
+  ); /* Controls retain the existing 16px body text size. */
   line-height: 20px; /* This line height centers one-line labels in the 48px controls. */
   font-weight: 500;
   background: transparent;
@@ -118,13 +149,17 @@ button.secondary {
   font-family: var(--font-geist-sans);
   grid-row-start: 3;
   display: flex;
-  gap: calc(var(--page-spacing-unit) * 3); /* Three 8px steps separate footer links. */
+  gap: calc(
+    var(--page-spacing-unit) * 3
+  ); /* Three 8px steps separate footer links. */
 }
 
 .footer a {
   display: flex;
   align-items: center;
-  gap: var(--page-spacing-unit); /* One existing 8px step separates icons and labels. */
+  gap: var(
+    --page-spacing-unit
+  ); /* One existing 8px step separates icons and labels. */
 }
 
 .footer img {
@@ -151,8 +186,12 @@ button.secondary {
 
 @media (max-width: 600px) {
   .page {
-    padding: calc(var(--page-spacing-unit) * 4); /* Four 8px steps preserve the narrower mobile page inset. */
-    padding-bottom: calc(var(--page-spacing-unit) * 10); /* Ten 8px steps preserve space below the mobile footer. */
+    padding: calc(
+      var(--page-spacing-unit) * 4
+    ); /* Four 8px steps preserve the narrower mobile page inset. */
+    padding-bottom: calc(
+      var(--page-spacing-unit) * 10
+    ); /* Ten 8px steps preserve space below the mobile footer. */
   }
 
   .main {
@@ -168,7 +207,9 @@ button.secondary {
   }
 
   .ctas a {
-    font-size: var(--page-text-small); /* Compact list and mobile CTA text uses the existing 14px size. */
+    font-size: var(
+      --page-text-small
+    ); /* Compact list and mobile CTA text uses the existing 14px size. */
     height: 40px; /* Five 8px steps keep mobile actions compact. */
     padding: 0 calc(var(--page-spacing-unit) * 2); /* Two 8px steps retain mobile control label padding. */
   }

@@ -2,72 +2,72 @@
 name: Synapcity
 description: A quiet, compact working environment. The default theme is achromatic so the user's content carries the colour; primary and accent are themeable.
 colors:
-  background: "oklch(100% 0 0)"
-  foreground: "oklch(14.5% 0 0)"
-  muted: "oklch(97% 0 0)"
-  sidebar: "oklch(98.5% 0 0)"
-  muted-foreground: "oklch(52% 0 0)"
-  border: "oklch(92.2% 0 0)"
-  input: "oklch(60% 0 0)"
-  primary: "oklch(20.5% 0 0)"
-  primary-foreground: "oklch(98.5% 0 0)"
-  destructive: "oklch(45% 0.245 27.325)"
-  success: "oklch(46% 0.15 145)"
-  warning: "oklch(82% 0.16 85)"
-  info: "oklch(48% 0.16 250)"
+  background: 'oklch(100% 0 0)'
+  foreground: 'oklch(14.5% 0 0)'
+  muted: 'oklch(97% 0 0)'
+  sidebar: 'oklch(98.5% 0 0)'
+  muted-foreground: 'oklch(52% 0 0)'
+  border: 'oklch(92.2% 0 0)'
+  input: 'oklch(60% 0 0)'
+  primary: 'oklch(20.5% 0 0)'
+  primary-foreground: 'oklch(98.5% 0 0)'
+  destructive: 'oklch(45% 0.245 27.325)'
+  success: 'oklch(46% 0.15 145)'
+  warning: 'oklch(82% 0.16 85)'
+  info: 'oklch(48% 0.16 250)'
 typography:
   feature:
-    fontFamily: "var(--font-ui)"
-    fontSize: "1.875rem"
+    fontFamily: 'var(--font-ui)'
+    fontSize: '1.875rem'
     fontWeight: 500
     lineHeight: 1.2
-    letterSpacing: "-0.02em"
+    letterSpacing: '-0.02em'
   display:
-    fontFamily: "var(--font-ui)"
-    fontSize: "1.5rem"
+    fontFamily: 'var(--font-ui)'
+    fontSize: '1.5rem'
     fontWeight: 600
     lineHeight: 1.333
-    letterSpacing: "-0.02em"
+    letterSpacing: '-0.02em'
   headline:
-    fontFamily: "var(--font-ui)"
-    fontSize: "1.1875rem"
+    fontFamily: 'var(--font-ui)'
+    fontSize: '1.1875rem'
     fontWeight: 600
     lineHeight: 1.4
-    letterSpacing: "-0.01em"
+    letterSpacing: '-0.01em'
   title:
-    fontFamily: "var(--font-ui)"
-    fontSize: "1.0625rem"
+    fontFamily: 'var(--font-ui)'
+    fontSize: '1.0625rem'
     fontWeight: 600
     lineHeight: 1.556
   body:
-    fontFamily: "var(--font-body)"
-    fontSize: "0.9375rem"
+    fontFamily: 'var(--font-body)'
+    fontSize: '0.9375rem'
     fontWeight: 400
     lineHeight: 1.5
   label:
-    fontFamily: "var(--font-ui)"
-    fontSize: "0.875rem"
+    fontFamily: 'var(--font-ui)'
+    fontSize: '0.875rem'
     fontWeight: 500
     lineHeight: 1.429
   caption:
-    fontFamily: "var(--font-body)"
-    fontSize: "0.8125rem"
+    fontFamily: 'var(--font-body)'
+    fontSize: '0.8125rem'
     fontWeight: 400
     lineHeight: 1.333
 rounded:
-  xs: "2px"
-  sm: "2.4px"
-  md: "3.2px"
-  lg: "4px"
-  xl: "5.6px"
+  xs: '2px'
+  sm: '2.4px'
+  md: '3.2px'
+  lg: '4px'
+  xl: '5.6px'
 spacing:
-  hairline: "1px"
-  xs: "4px"
-  sm: "8px"
-  md: "16px"
-  header: "56px"
-  sidebar: "256px"
-  sidebar-icon: "48px"
+  hairline: '1px'
+  xs: '4px'
+  sm: '8px'
+  md: '16px'
+  header: '56px'
+  sidebar: '256px'
+  sidebar-icon: '48px'
 ---
 
 # Design System: Synapcity
@@ -125,18 +125,18 @@ Interactive fills are **solid** mixes of existing tokens (hover and pressed shif
 
 ### Measured contrast (WCAG ratio, computed from the token values; NOT a substitute for the test file)
 
-| Pair | Light | Dark |
-| --- | --- | --- |
-| foreground / background | 19.79 | 18.96 |
-| muted-foreground / background | 5.51 | 7.63 |
-| muted-foreground / muted | 5.05 | 5.83 |
-| primary-foreground / primary | 17.16 | 14.22 |
-| destructive-foreground / destructive | 6.63 | 7.66 |
-| success-foreground / success | 6.37 | 8.41 |
-| warning-foreground / warning | 10.15 | 11.25 |
-| info-foreground / info | 6.18 | 7.44 |
-| input / background (needs 3:1, non-text) | 3.95 | not measured (alpha) |
-| border / background | 1.26 (decorative divider) | not measured (alpha) |
+| Pair                                     | Light                     | Dark                 |
+| ---------------------------------------- | ------------------------- | -------------------- |
+| foreground / background                  | 19.79                     | 18.96                |
+| muted-foreground / background            | 5.51                      | 7.63                 |
+| muted-foreground / muted                 | 5.05                      | 5.83                 |
+| primary-foreground / primary             | 17.16                     | 14.22                |
+| destructive-foreground / destructive     | 6.63                      | 7.66                 |
+| success-foreground / success             | 6.37                      | 8.41                 |
+| warning-foreground / warning             | 10.15                     | 11.25                |
+| info-foreground / info                   | 6.18                      | 7.44                 |
+| input / background (needs 3:1, non-text) | 3.95                      | not measured (alpha) |
+| border / background                      | 1.26 (decorative divider) | not measured (alpha) |
 
 Caveat: `destructive`, `success` and `info` (both modes) are outside the sRGB gamut, so browsers clip them on sRGB displays. The ratios above clip the same way and are approximate for those three. Whether to bring them in gamut is an open question for the token review, not decided here.
 
@@ -156,15 +156,15 @@ The scale is a fixed ladder off `--text-base-size: 0.9375rem` (15px), never flui
 
 ### Hierarchy (**Verified** values; supersedes the previous 12 / 13 / 14px ladder off 0.875rem)
 
-| Role | Utility | Multiplier | Size (px) | Line height | Used for |
-| --- | --- | --- | --- | --- | --- |
-| Feature | `text-3xl` | 2 | 30 | 1.2 | the one lead heading of a full-page surface (e.g. the theme editor host); never inside a panel |
-| Display | `text-2xl` | 1.6 | 24 | 1.333 | page and panel titles (`h1`) |
-| Headline | `text-xl` | 1.2667 | 19 | 1.4 | section headings (`h2`) |
-| Title | `text-lg` | 1.1333 | 17 | 1.556 | sub-section and card titles |
-| Body | `text-base` | 1 | 15 | 1.5 | default text, inputs |
-| Label | `text-sm` | 0.9333 | 14 | 1.429 | buttons, form labels |
-| Caption | `text-xs` | 0.8667 | 13 | 1.333 | sidebar items, badges, metadata |
+| Role     | Utility     | Multiplier | Size (px) | Line height | Used for                                                                                       |
+| -------- | ----------- | ---------- | --------- | ----------- | ---------------------------------------------------------------------------------------------- |
+| Feature  | `text-3xl`  | 2          | 30        | 1.2         | the one lead heading of a full-page surface (e.g. the theme editor host); never inside a panel |
+| Display  | `text-2xl`  | 1.6        | 24        | 1.333       | page and panel titles (`h1`)                                                                   |
+| Headline | `text-xl`   | 1.2667     | 19        | 1.4         | section headings (`h2`)                                                                        |
+| Title    | `text-lg`   | 1.1333     | 17        | 1.556       | sub-section and card titles                                                                    |
+| Body     | `text-base` | 1          | 15        | 1.5         | default text, inputs                                                                           |
+| Label    | `text-sm`   | 0.9333     | 14        | 1.429       | buttons, form labels                                                                           |
+| Caption  | `text-xs`   | 0.8667     | 13        | 1.333       | sidebar items, badges, metadata                                                                |
 
 `text-4xl` (36px) and `text-5xl` (45px) stay in the ladder for display moments; product chrome does not use them. Weights: 600 for display to title, 500 for label and feature, 400 otherwise (**Proposed**; not re-verified per component).
 
@@ -260,23 +260,23 @@ Input 32px / `lg` radius, badge 20px / `sm` radius, sidebar 16rem / 18rem sheet 
 
 ## 9. Implementation status
 
-| Item | Document says | Code today | Status |
-| --- | --- | --- | --- |
-| Default theme achromatic | graphite primary/accent | `tokens/colors.css`: `base`, `primary`, `accent` all achromatic OKLCH | **Aligned** (Verified) |
-| Colour values in §2 | as listed | match `theme-light` / `theme-dark` | **Aligned** (Verified) |
-| Text ladder | 13 / 14 / 15px, then 17 / 19 / 24 / 30 | `--text-*` multipliers of 0.9375rem in `globals.css` | **Aligned** by source read; **not yet re-checked in a browser** after the 14px to 15px change |
-| `--text-base-size`, fixed ladder | required | present in `typography.css`, `globals.css` | **Aligned** |
-| `--font-preference-*` overrides | documented | referenced for code in `globals.css` (`--font-code`); body/heading overrides not re-checked | Open Question |
-| Radius derivation | `--radius-base` 0.25rem | present | **Aligned** |
-| Button sizes and 150ms motion | 20/24/28/32px, 150ms | match `button.tsx` | **Aligned** |
-| Button/icon-button 44px on touch | text buttons 44px | `xs`, `sm`, `icon-xs`, `icon-sm` extend a 44px hit area (class-tested); `default`, `lg`, `icon`, `icon-lg` do not | **Proposed** for the unextended sizes; code lags |
-| Inputs, badges, sidebar, header specifics | as listed | not re-checked | Open Question |
-| Out-of-gamut state colours | n/a | destructive, success, info exceed sRGB | **Known Problem**; decision for token review |
-| Header auto-hide on home routes | slides away for fine pointers, always shown on touch | implemented in `root-header.tsx` and `use-root-header-reveal.ts`, **switched off** by `HEADER_AUTO_HIDE_ENABLED`; the earlier browser check predates the reliability problem | **Off** (not enabled) |
-| Press-to-reveal on handle and top edge | reveals at once; hover waits 500ms | unit-tested and browser-checked on desktop | **Aligned** (Verified) |
-| First-run hint on `/home` | one line, dismissible, fine pointers only | `home-shell-hint.tsx`; dismissal remembered in the browser | **Proposed**; copy and storage choice await the owner |
-| Handle and hint in dark mode, with a screen reader | n/a | not tested | Open Question |
-| Token names | repo names (`muted`, `border`, `input`, `sidebar`) | same | **Aligned**; no new vocabulary introduced |
+| Item                                               | Document says                                        | Code today                                                                                                                                                                   | Status                                                                                        |
+| -------------------------------------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Default theme achromatic                           | graphite primary/accent                              | `tokens/colors.css`: `base`, `primary`, `accent` all achromatic OKLCH                                                                                                        | **Aligned** (Verified)                                                                        |
+| Colour values in §2                                | as listed                                            | match `theme-light` / `theme-dark`                                                                                                                                           | **Aligned** (Verified)                                                                        |
+| Text ladder                                        | 13 / 14 / 15px, then 17 / 19 / 24 / 30               | `--text-*` multipliers of 0.9375rem in `globals.css`                                                                                                                         | **Aligned** by source read; **not yet re-checked in a browser** after the 14px to 15px change |
+| `--text-base-size`, fixed ladder                   | required                                             | present in `typography.css`, `globals.css`                                                                                                                                   | **Aligned**                                                                                   |
+| `--font-preference-*` overrides                    | documented                                           | referenced for code in `globals.css` (`--font-code`); body/heading overrides not re-checked                                                                                  | Open Question                                                                                 |
+| Radius derivation                                  | `--radius-base` 0.25rem                              | present                                                                                                                                                                      | **Aligned**                                                                                   |
+| Button sizes and 150ms motion                      | 20/24/28/32px, 150ms                                 | match `button.tsx`                                                                                                                                                           | **Aligned**                                                                                   |
+| Button/icon-button 44px on touch                   | text buttons 44px                                    | `xs`, `sm`, `icon-xs`, `icon-sm` extend a 44px hit area (class-tested); `default`, `lg`, `icon`, `icon-lg` do not                                                            | **Proposed** for the unextended sizes; code lags                                              |
+| Inputs, badges, sidebar, header specifics          | as listed                                            | not re-checked                                                                                                                                                               | Open Question                                                                                 |
+| Out-of-gamut state colours                         | n/a                                                  | destructive, success, info exceed sRGB                                                                                                                                       | **Known Problem**; decision for token review                                                  |
+| Header auto-hide on home routes                    | slides away for fine pointers, always shown on touch | implemented in `root-header.tsx` and `use-root-header-reveal.ts`, **switched off** by `HEADER_AUTO_HIDE_ENABLED`; the earlier browser check predates the reliability problem | **Off** (not enabled)                                                                         |
+| Press-to-reveal on handle and top edge             | reveals at once; hover waits 500ms                   | unit-tested and browser-checked on desktop                                                                                                                                   | **Aligned** (Verified)                                                                        |
+| First-run hint on `/home`                          | one line, dismissible, fine pointers only            | `home-shell-hint.tsx`; dismissal remembered in the browser                                                                                                                   | **Proposed**; copy and storage choice await the owner                                         |
+| Handle and hint in dark mode, with a screen reader | n/a                                                  | not tested                                                                                                                                                                   | Open Question                                                                                 |
+| Token names                                        | repo names (`muted`, `border`, `input`, `sidebar`)   | same                                                                                                                                                                         | **Aligned**; no new vocabulary introduced                                                     |
 
 ### Provenance
 

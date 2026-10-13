@@ -72,17 +72,29 @@ Owner:
 Date:
 
 ## Problem and user workflow
+
 ## Hypothesis
+
 ## Included capabilities
+
 ## Explicit exclusions
+
 ## Product terminology used and its status
+
 ## Required architecture decisions
+
 ## Decisions intentionally deferred
+
 ## Success evidence
+
 ## Failure and recovery expectations
+
 ## Accessibility expectations
+
 ## Evaluation window or trigger
+
 ## Outcome
+
 ## Follow-up decision
 ```
 
@@ -96,4 +108,3 @@ The MVP decision is complete only when the human product owner approves:
 4. the decision or experiment that follows each likely outcome.
 
 Until then, agents may investigate and propose slices but must not create a repository topology that presumes one.
-

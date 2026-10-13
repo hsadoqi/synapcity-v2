@@ -73,4 +73,3 @@ Use cases explain intent. They do not automatically establish entities, enums, s
 ## 18. Uncertainty remains visible
 
 An unresolved decision is part of the product record. It must not be hidden in a route, fixture, schema, package, default, or implementation convenience.
-
