@@ -1,0 +1,112 @@
+@import './accessibility';
+@import './utilities';
+@import './typography';
+@import './variants';
+@import 'tw-animate-css';
+
+@layer base {
+  :root {
+    --text-base-size: 0.9375rem;
+    --radius-base: 0.25rem;
+    --radius: var(--radius-base);
+    @apply theme-light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not(.light):not(.dark) {
+      @apply theme-dark;
+    }
+  }
+
+  .light {
+    @apply theme-light;
+  }
+
+  .dark {
+    @apply theme-dark;
+  }
+
+  *,
+  *::before,
+  *::after {
+    @apply border-border;
+  }
+
+  html {
+    min-height: 100%;
+  }
+
+  body {
+    @apply min-h-svh bg-background font-body text-base text-foreground antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-heading font-semibold;
+    text-wrap: balance;
+  }
+
+  h1 {
+    @apply text-2xl tracking-tight;
+  }
+
+  h2 {
+    @apply text-xl;
+  }
+
+  h3 {
+    @apply text-lg;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    @apply font-code;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    @apply font-ui text-sm;
+  }
+
+  button:not(:disabled):not([aria-disabled='true']),
+  a[href]:not([aria-disabled='true']) {
+    cursor: pointer;
+  }
+
+  :disabled,
+  [aria-disabled='true'] {
+    cursor: not-allowed;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
+
+  ::selection {
+    @apply bg-accent text-accent-foreground;
+  }
+
+  table {
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (forced-colors: active) {
+    :focus-visible {
+      outline-color: Highlight;
+    }
+
+    ::selection {
+      color: HighlightText;
+      background-color: Highlight;
+    }
+  }
+}

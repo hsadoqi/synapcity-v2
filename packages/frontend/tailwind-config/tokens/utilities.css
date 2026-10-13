@@ -1,0 +1,165 @@
+@utility scrollbar-hidden {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility theme-light {
+  color-scheme: light;
+  --base-50: oklch(98.5% 0 0);
+  --base-100: oklch(97% 0 0);
+  --base-200: oklch(92.2% 0 0);
+  --base-300: oklch(87% 0 0);
+  --base-400: oklch(70.8% 0 0);
+  --base-500: oklch(55.6% 0 0);
+  --base-600: oklch(43.9% 0 0);
+  --base-700: oklch(37.1% 0 0);
+  --base-800: oklch(26.9% 0 0);
+  --base-900: oklch(20.5% 0 0);
+  --base-950: oklch(14.5% 0 0);
+  /* Primary and accent start neutral; each ramp can be overridden independently. */
+  --primary-50: var(--base-50);
+  --primary-100: var(--base-100);
+  --primary-200: var(--base-200);
+  --primary-300: var(--base-300);
+  --primary-400: var(--base-400);
+  --primary-500: var(--base-500);
+  --primary-600: var(--base-600);
+  --primary-700: var(--base-700);
+  --primary-800: var(--base-800);
+  --primary-900: var(--base-900);
+  --primary-950: var(--base-950);
+  --accent-50: var(--base-50);
+  --accent-100: var(--base-100);
+  --accent-200: var(--base-200);
+  --accent-300: var(--base-300);
+  --accent-400: var(--base-400);
+  --accent-500: var(--base-500);
+  --accent-600: var(--base-600);
+  --accent-700: var(--base-700);
+  --accent-800: var(--base-800);
+  --accent-900: var(--base-900);
+  --accent-950: var(--base-950);
+  --background: oklch(100% 0 0);
+  --foreground: var(--base-950);
+  --card: var(--background);
+  --card-foreground: var(--foreground);
+  --popover: var(--background);
+  --popover-foreground: var(--foreground);
+  --shadcn-primary: var(--primary-900);
+  --shadcn-primary-foreground: var(--primary-50);
+  --secondary: var(--base-100);
+  --secondary-foreground: var(--base-900);
+  --muted: var(--base-100);
+  --muted-foreground: oklch(52% 0 0);
+  --accent: var(--accent-100);
+  --accent-foreground: var(--base-900);
+  --destructive: oklch(45% 0.245 27.325);
+  --destructive-foreground: var(--base-50);
+  --success: oklch(46% 0.15 145);
+  --success-foreground: var(--base-50);
+  --warning: oklch(82% 0.16 85);
+  --warning-foreground: var(--base-900);
+  --info: oklch(48% 0.16 250);
+  --info-foreground: var(--base-50);
+  --border: var(--base-200);
+  --divider: var(--base-200);
+  --input: oklch(60% 0 0);
+  --ring: oklch(60% 0 0);
+  --sidebar: var(--base-50);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--shadcn-primary);
+  --sidebar-primary-foreground: var(--shadcn-primary-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-border: var(--divider);
+  --sidebar-ring: var(--ring);
+}
+
+@utility theme-dark {
+  color-scheme: dark;
+  --base-50: oklch(14.5% 0 0);
+  --base-100: oklch(20.5% 0 0);
+  --base-200: oklch(26.9% 0 0);
+  --base-300: oklch(37.1% 0 0);
+  --base-400: oklch(43.9% 0 0);
+  --base-500: oklch(55.6% 0 0);
+  --base-600: oklch(70.8% 0 0);
+  --base-700: oklch(87% 0 0);
+  --base-800: oklch(92.2% 0 0);
+  --base-900: oklch(97% 0 0);
+  --base-950: oklch(98.5% 0 0);
+  /* Primary and accent start neutral; each ramp can be overridden independently. */
+  --primary-50: var(--base-50);
+  --primary-100: var(--base-100);
+  --primary-200: var(--base-200);
+  --primary-300: var(--base-300);
+  --primary-400: var(--base-400);
+  --primary-500: var(--base-500);
+  --primary-600: var(--base-600);
+  --primary-700: var(--base-700);
+  --primary-800: var(--base-800);
+  --primary-900: var(--base-900);
+  --primary-950: var(--base-950);
+  --accent-50: var(--base-50);
+  --accent-100: var(--base-100);
+  --accent-200: var(--base-200);
+  --accent-300: var(--base-300);
+  --accent-400: var(--base-400);
+  --accent-500: var(--base-500);
+  --accent-600: var(--base-600);
+  --accent-700: var(--base-700);
+  --accent-800: var(--base-800);
+  --accent-900: var(--base-900);
+  --accent-950: var(--base-950);
+  --background: var(--base-50);
+  --foreground: var(--base-950);
+  --card: var(--base-100);
+  --card-foreground: var(--foreground);
+  --popover: var(--base-100);
+  --popover-foreground: var(--foreground);
+  --shadcn-primary: var(--primary-800);
+  --shadcn-primary-foreground: var(--primary-100);
+  --secondary: var(--base-200);
+  --secondary-foreground: var(--base-950);
+  --muted: var(--base-200);
+  --muted-foreground: var(--base-600);
+  --accent: var(--accent-200);
+  --accent-foreground: var(--base-950);
+  --destructive: oklch(76% 0.191 22.216);
+  --destructive-foreground: var(--base-50);
+  --success: oklch(72% 0.14 145);
+  --success-foreground: var(--base-50);
+  --warning: oklch(82% 0.14 85);
+  --warning-foreground: var(--base-50);
+  --info: oklch(70% 0.14 250);
+  --info-foreground: var(--base-50);
+  --border: oklch(100% 0 0 / 35%);
+  --divider: var(--base-200);
+  --input: oklch(100% 0 0 / 40%);
+  --ring: var(--base-500);
+  --sidebar: var(--base-100);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--shadcn-primary);
+  --sidebar-primary-foreground: var(--shadcn-primary-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-border: var(--divider);
+  --sidebar-ring: var(--ring);
+}
+
+@utility bg-selected {
+  background-color: color-mix(
+    in oklch,
+    var(--background),
+    var(--shadcn-primary) 14%
+  );
+}
+
+@utility bg-sidebar-selected {
+  background-color: color-mix(
+    in oklch,
+    var(--sidebar),
+    var(--shadcn-primary) 14%
+  );
+}

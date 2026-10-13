@@ -1,0 +1,112 @@
+@import './tokens/base.css';
+
+@theme inline {
+  --color-base-50: var(--base-50);
+  --color-base-100: var(--base-100);
+  --color-base-200: var(--base-200);
+  --color-base-300: var(--base-300);
+  --color-base-400: var(--base-400);
+  --color-base-500: var(--base-500);
+  --color-base-600: var(--base-600);
+  --color-base-700: var(--base-700);
+  --color-base-800: var(--base-800);
+  --color-base-900: var(--base-900);
+  --color-base-950: var(--base-950);
+  --color-primary-50: var(--primary-50);
+  --color-primary-100: var(--primary-100);
+  --color-primary-200: var(--primary-200);
+  --color-primary-300: var(--primary-300);
+  --color-primary-400: var(--primary-400);
+  --color-primary-500: var(--primary-500);
+  --color-primary-600: var(--primary-600);
+  --color-primary-700: var(--primary-700);
+  --color-primary-800: var(--primary-800);
+  --color-primary-900: var(--primary-900);
+  --color-primary-950: var(--primary-950);
+  --color-accent-50: var(--accent-50);
+  --color-accent-100: var(--accent-100);
+  --color-accent-200: var(--accent-200);
+  --color-accent-300: var(--accent-300);
+  --color-accent-400: var(--accent-400);
+  --color-accent-500: var(--accent-500);
+  --color-accent-600: var(--accent-600);
+  --color-accent-700: var(--accent-700);
+  --color-accent-800: var(--accent-800);
+  --color-accent-900: var(--accent-900);
+  --color-accent-950: var(--accent-950);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-border: var(--border);
+  --color-divider: var(--divider);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-primary: var(--shadcn-primary);
+  --color-primary-foreground: var(--shadcn-primary-foreground);
+  /* Each role reads a user override first (--font-preference-*, written on :root by the theme
+   * editor, ADR-0016) and falls back to the shipped default loaded in apps/web/src/app/layout.tsx.
+   * UI follows the body choice unless a UI-specific override is set. */
+  --font-body: var(--font-preference-body, var(--font-inter, system-ui));
+  --font-ui: var(--font-preference-ui, var(--font-body));
+  --font-heading: var(
+    --font-preference-heading,
+    var(--font-geist-sans, system-ui)
+  );
+  --font-code: var(
+    --font-preference-code,
+    var(--font-geist-mono, ui-monospace)
+  );
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-code);
+  --text-xs: calc(var(--text-base-size) * 13 / 15);
+  --text-xs--line-height: 1.333333;
+  --text-sm: calc(var(--text-base-size) * 14 / 15);
+  --text-sm--line-height: 1.428571;
+  --text-base: var(--text-base-size);
+  --text-base--line-height: 1.5;
+  --text-lg: calc(var(--text-base-size) * 17 / 15);
+  --text-lg--line-height: 1.555556;
+  --text-xl: calc(var(--text-base-size) * 19 / 15);
+  --text-xl--line-height: 1.4;
+  --text-2xl: calc(var(--text-base-size) * 24 / 15);
+  --text-2xl--line-height: 1.333333;
+  --text-3xl: calc(var(--text-base-size) * 30 / 15);
+  --text-3xl--line-height: 1.2;
+  --text-4xl: calc(var(--text-base-size) * 36 / 15);
+  --text-4xl--line-height: 1.111111;
+  --text-5xl: calc(var(--text-base-size) * 45 / 15);
+  --text-5xl--line-height: 1;
+  --radius-xs: calc(var(--radius-base) * 0.5);
+  --radius-sm: calc(var(--radius-base) * 0.6);
+  --radius-md: calc(var(--radius-base) * 0.8);
+  --radius-lg: calc(var(--radius-base) * 1);
+  --radius-xl: calc(var(--radius-base) * 1.4);
+  --radius-2xl: calc(var(--radius-base) * 1.8);
+  --radius-3xl: calc(var(--radius-base) * 2.2);
+  --radius-4xl: calc(var(--radius-base) * 2.6);
+}

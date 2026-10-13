@@ -1,0 +1,10 @@
+@custom-variant dark {
+  &:is(.dark *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:not(:is(.light *)) {
+      @slot;
+    }
+  }
+}
