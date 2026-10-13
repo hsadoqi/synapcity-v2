@@ -1,0 +1,43 @@
+{
+  "name": "storybook",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "lint": "eslint . --cache",
+    "dev": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "dependencies": {
+    "@synapcity/frontend-ui": "workspace:*",
+    "next": "16.3.8",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "shadcn": "^4.21.4"
+  },
+  "devDependencies": {
+    "@storybook/addon-a11y": "10.6.1",
+    "@storybook/addon-docs": "10.6.1",
+    "@storybook/addon-themes": "^10.6.1",
+    "@storybook/addon-vitest": "10.6.1",
+    "@storybook/nextjs-vite": "10.6.1",
+    "@synapcity/dev-eslint-config": "workspace:*",
+    "@synapcity/dev-typescript-config": "workspace:*",
+    "@synapcity/frontend-tailwind-config": "workspace:*",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@tailwindcss/vite": "^4",
+    "@types/node": "26.4.1",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.5",
+    "@vitest/browser-playwright": "^4",
+    "@vitest/coverage-v8": "^4",
+    "eslint": "10.9.1",
+    "playwright": "1.64.0",
+    "storybook": "10.6.1",
+    "tailwindcss": "^4",
+    "typescript": "7.0.2",
+    "vite": "8.3.4",
+    "vitest": "^4"
+  },
+  "packageManager": "pnpm@11.25.0"
+}

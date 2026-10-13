@@ -1,0 +1,12 @@
+@import 'tailwindcss';
+@import 'shadcn/tailwind.css';
+@import '@synapcity/frontend-ui/styles.css';
+
+@source '../';
+@source '../../../../packages/frontend/ui/src';
+@source '../../../docs/src';
+@source '../../../web/src';
+
+.docs-story {
+  @apply bg-background text-foreground size-full;
+}

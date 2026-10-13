@@ -1,0 +1,18 @@
+{
+  "extends": "@synapcity/dev-typescript-config/nextjs.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    ".storybook/**/*.ts",
+    ".storybook/**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "*/*.mts",
+    "global.d.ts"
+  ],
+  "exclude": ["node_modules"]
+}
