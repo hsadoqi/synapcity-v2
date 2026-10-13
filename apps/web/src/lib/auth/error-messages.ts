@@ -1,0 +1,34 @@
+/**
+ * Turns a Supabase Auth error code (`error.code`, for example
+ * `invalid_credentials`) into text shown to the user. Never pass `error.message`
+ * through: it can reveal whether an account exists.
+ *
+ * Codes that confirm whether an account exists (`user_not_found`,
+ * `user_already_exists`, `email_exists`) are deliberately left to the default
+ * reply, so the forms cannot be used to discover registered emails.
+ * Codes are from https://supabase.com/docs/guides/auth/debugging/error-codes.
+ */
+export function authErrorMessage(code: string | undefined): string {
+  switch (code) {
+    case 'invalid_credentials':
+      return 'Email or password is incorrect.';
+    case 'email_not_confirmed':
+      return 'Confirm your email first. Check your inbox for the link.';
+    case 'weak_password':
+      return 'That password is too weak. Try a longer one with a mix of characters.';
+    case 'same_password':
+      return 'Choose a password different from your current one.';
+    case 'email_address_invalid':
+    case 'validation_failed':
+      return 'Check the email address and try again.';
+    case 'email_address_not_authorized':
+      return 'We cannot send email to that address yet.';
+    case 'over_email_send_rate_limit':
+    case 'over_request_rate_limit':
+      return 'Too many attempts. Wait a few minutes and try again.';
+    case 'signup_disabled':
+      return 'Sign-ups are closed right now.';
+    default:
+      return 'Something went wrong. Try again.';
+  }
+}

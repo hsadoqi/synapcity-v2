@@ -14,7 +14,8 @@ type NextLinkProps = Omit<React.ComponentProps<typeof Link>, 'href'>;
 type LinkButtonProps = NativeLinkProps &
   NextLinkProps &
   Pick<ButtonProps, 'variant' | 'size'> & { href: string; disabled?: boolean };
-
+type LinkButtonVariant = LinkButtonProps['variant'];
+type LinkButtonSize = LinkButtonProps['size'];
 const LinkButton = React.forwardRef<HTMLAnchorElement, LinkButtonProps>(
   ({ variant, size, className, href, disabled, onClick, ...props }, ref) => {
     return (
@@ -40,4 +41,4 @@ const LinkButton = React.forwardRef<HTMLAnchorElement, LinkButtonProps>(
 LinkButton.displayName = 'LinkButton';
 
 export { LinkButton };
-export type { LinkButtonProps };
+export type { LinkButtonProps, LinkButtonVariant, LinkButtonSize };
