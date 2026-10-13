@@ -66,7 +66,7 @@ New workspaces are created through `docs/architecture/package-creation-checklist
 
 ## Verification expectations
 
-`pnpm verify` passes on a fresh `pnpm install --frozen-lockfile`. The report states which of its steps ran. Until a test gate exists, a passing `verify` shows formatting, lint, types, unused code and builds are clean; it shows nothing about behavior.
+`pnpm verify` passes on a fresh `pnpm install --frozen-lockfile`. The report states which of its steps ran. A passing `verify` shows formatting, lint, types, unused code, builds and the existing tests are clean. Test coverage is thin, so it shows behavior only where a test exercises it.
 
 ## Reconsideration conditions
 

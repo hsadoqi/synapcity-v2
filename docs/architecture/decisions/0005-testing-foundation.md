@@ -23,13 +23,17 @@ Pins: `vitest` and `@vitest/browser-playwright` 4.1.11 to match `apps/storybook`
 
 Coverage uses the `v8` provider (`@vitest/coverage-v8` 4.1.11, matching the Vitest pin; `apps/storybook` already depended on it). It is opt-in through `pnpm test:coverage` (`vitest run --coverage` per workspace, Turborepo task `test:coverage`), with text and HTML reports in `coverage/report`. No thresholds are set. Decided 2026-10-13.
 
+## Verification chain
+
+The owner approved (2026-10-13) moving the tests into `pnpm verify`, and therefore into the pre-push hook and CI. CI installs Chromium before running it (`pnpm --filter web exec playwright install --with-deps chromium`), because `pnpm install` does not download browsers. ADR-0001 records the chain.
+
 ## Scope
 
 The shared presets, which workspaces use them, the pins above, and the root scripts and Turborepo tasks.
 
 ## What this does NOT decide
 
-- Whether tests run inside `pnpm verify`, CI or the pre-push hook. They do not today, because that chain is recorded in ADR-0001.
+- Whether the Storybook story tests (including their axe checks) stay a gate beyond the current setup. They are in the chain today.
 - Coverage thresholds, and whether coverage runs in CI.
 - Which browsers and viewports end-to-end tests cover (Chromium only for now), and visual-regression tooling.
 - Whether Storybook story tests (including their axe checks) become a gate.
@@ -37,8 +41,7 @@ The shared presets, which workspaces use them, the pins above, and the root scri
 
 ## Unresolved
 
-- Adding `test` to `pnpm verify` and CI, and the browser-install step CI would need (`playwright install chromium`).
-- `apps/storybook` currently has failing story tests from real accessibility findings: `link-button` "Variants" (axe violation on `.text-primary`) and `mode-toggle` "Menu" (`aria-required-parent` on menu radio items). The preset did not cause them; they predate this ADR and are unfixed.
+- The two story-test failures recorded when this ADR was drafted (`link-button` "Variants", an axe violation on `.text-primary`; `mode-toggle` "Menu", `aria-required-parent`) were fixed afterwards: all 30 story tests passed on 2026-10-13.
 - Moving to Vitest 5 (its own change, touching the config package and the pins).
 
 ## Governance boundary

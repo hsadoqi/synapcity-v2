@@ -46,7 +46,7 @@ Apps and packages never define theme tokens. `@synapcity/frontend-tailwind-confi
 
 ## Testing
 
-No test runner is configured, and none is implied. Whether and how to test is an open candidate decision (`decisions/README.md`). Do not describe a change as tested on the strength of `pnpm verify`, which checks formatting, lint, types, unused code and builds.
+Vitest, a Playwright smoke test and Storybook story tests run through the root `test*` scripts and `pnpm verify` (ADR-0005, Proposed). Coverage of the code is thin, and the wider testing strategy is an open candidate decision (`decisions/README.md`). Do not describe a change as tested unless a test exercises it.
 
 ## Verified in this repository
 
