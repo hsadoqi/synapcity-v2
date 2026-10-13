@@ -5,13 +5,16 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "!.next/dev/**",
+        "storybook-static/**"
+      ]
     },
     "lint": {
-      "dependsOn": ["^lint"]
-    },
-    "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": ["^lint"],
+      "outputs": [".prettiercache"]
     },
     "dev": {
       "cache": false,
@@ -25,8 +28,28 @@
       "cache": false,
       "persistent": true
     },
+    "storybook": {
+      "cache": false,
+      "persistent": true
+    },
     "verify": {
-      "dependsOn": ["lint", "check-types"],
+      "dependsOn": ["lint", "typecheck", "deps", "build", "brand:check"],
+      "outputs": []
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"],
+      "outputs": []
+    },
+    "check-types": {
+      "dependsOn": ["^check-types"],
+      "outputs": []
+    },
+    "brand:check": {
+      "dependsOn": ["^brand:check"],
+      "outputs": []
+    },
+    "deps": {
+      "dependsOn": ["^deps"],
       "outputs": []
     }
   }

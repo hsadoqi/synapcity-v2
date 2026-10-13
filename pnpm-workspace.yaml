@@ -3,6 +3,8 @@ packages:
   - 'packages/**/*'
 allowBuilds:
   core-js: true
+  esbuild: true
+  unrs-resolver: false
 
 # Transitive security fixes. These pin patched versions of packages reached only through
 # tooling (eslint, @next/eslint-plugin-next, shadcn) and next's own pinned postcss/sharp.
@@ -21,3 +23,7 @@ overrides:
 auditConfig:
   ignoreGhsas:
     - GHSA-vfj7-8cjw-p6xm
+
+minimumReleaseAgeExclude:
+  - postcss@8.5.30
+  - '@chromatic-com/storybook@5.5.1'
