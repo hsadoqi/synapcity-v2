@@ -16,8 +16,7 @@
     "**/*.tsx",
     "next-env.d.ts",
     "next.config.js",
-    ".next/types/**/*.ts",
-    "../../packages/frontend/ui/src/providers/mode-provider.tsx"
+    ".next/types/**/*.d.ts"
   ],
   "exclude": ["node_modules"]
 }
