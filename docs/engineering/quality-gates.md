@@ -28,6 +28,8 @@ flowchart LR
 
 **Audit exceptions.** The `security` job's `pnpm audit` passes only because `pnpm-workspace.yaml` pins patched transitive versions (`overrides`) and records one accepted exception for `braces`, which has no patched release (`auditConfig.ignoreGhsas`; ADR-0001). A new advisory fails the job.
 
+**Secret-scan exceptions.** The `security` job's full-history gitleaks scan passes only because `.gitleaksignore` lists 18 accepted findings: fake passwords that the seeded fixture generator (`packages/dev/fixtures`, `faker.internet.password()`) wrote into the committed seed JSON, which the `generic-api-key` rule flags. Each entry is an exact finding fingerprint, so the rule stays active everywhere else. A regenerated seed produces new values and new findings; the fix is to stop committing a `password` field, or to review and add the new fingerprints, not to widen the ignore to a path. Adding any other entry needs the repository owner's approval and a recorded reason.
+
 ## Branches and pull requests
 
 - Work happens on a branch named `type/short-description` (for example `chore/phase-01-quality-gates`), never directly on `main`.

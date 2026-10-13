@@ -1,0 +1,30 @@
+# Accepted secret-scan findings. gitleaks reads this file automatically.
+#
+# Every entry below is a FAKE password written by the seeded fixture generator
+# (packages/dev/fixtures/src/index.ts: `faker.internet.password()`) into
+# committed seed JSON. The generic-api-key rule fires on any high-entropy value
+# beside a field named "password". They are not credentials for anything.
+#
+# Each line is a finding fingerprint (commit:file:rule:line), so only these exact
+# findings are ignored. The rule stays active for every other file and commit,
+# and a regenerated seed with new values will be flagged again. See
+# docs/engineering/quality-gates.md ("Secret-scan exceptions").
+#
+cec7d633b80256eb34a291a0bbde24c98c34511c:packages/dev/fixtures/seed/seed.json:generic-api-key:14
+cec7d633b80256eb34a291a0bbde24c98c34511c:packages/dev/fixtures/seed/seed.json:generic-api-key:26
+cec7d633b80256eb34a291a0bbde24c98c34511c:packages/dev/fixtures/seed/seed.json:generic-api-key:32
+cec7d633b80256eb34a291a0bbde24c98c34511c:packages/dev/fixtures/seed/seed.json:generic-api-key:38
+cec7d633b80256eb34a291a0bbde24c98c34511c:packages/dev/fixtures/seed/seed.json:generic-api-key:44
+cec7d633b80256eb34a291a0bbde24c98c34511c:packages/dev/fixtures/seed/seed.json:generic-api-key:50
+cec7d633b80256eb34a291a0bbde24c98c34511c:packages/dev/fixtures/seed/seed.json:generic-api-key:56
+cec7d633b80256eb34a291a0bbde24c98c34511c:packages/dev/fixtures/seed/seed.json:generic-api-key:62
+cec7d633b80256eb34a291a0bbde24c98c34511c:packages/dev/fixtures/seed/seed.json:generic-api-key:8
+d7076fde98188b7703a9da47141e0c0c32f3fa21:packages/dev/fixtures/seed/users.json:generic-api-key:12
+d7076fde98188b7703a9da47141e0c0c32f3fa21:packages/dev/fixtures/seed/users.json:generic-api-key:24
+d7076fde98188b7703a9da47141e0c0c32f3fa21:packages/dev/fixtures/seed/users.json:generic-api-key:30
+d7076fde98188b7703a9da47141e0c0c32f3fa21:packages/dev/fixtures/seed/users.json:generic-api-key:36
+d7076fde98188b7703a9da47141e0c0c32f3fa21:packages/dev/fixtures/seed/users.json:generic-api-key:42
+d7076fde98188b7703a9da47141e0c0c32f3fa21:packages/dev/fixtures/seed/users.json:generic-api-key:48
+d7076fde98188b7703a9da47141e0c0c32f3fa21:packages/dev/fixtures/seed/users.json:generic-api-key:54
+d7076fde98188b7703a9da47141e0c0c32f3fa21:packages/dev/fixtures/seed/users.json:generic-api-key:6
+d7076fde98188b7703a9da47141e0c0c32f3fa21:packages/dev/fixtures/seed/users.json:generic-api-key:60
