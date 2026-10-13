@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
+import '../styles/globals.css';
 import { Inter } from 'next/font/google';
-import '@/styles/globals.css';
-
+import { cn } from '@/lib/utils';
+import RootProviders from './providers';
+import { ModeToggle } from '@synapcity/frontend-ui/components/mode-toggle';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 const geistSans = localFont({
@@ -15,9 +17,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'Synapcity Docs',
-  description:
-    'Documentation for Synapcity, a connected workspace for thinking, planning, and doing.',
+  title: 'Synapcity',
+  description: 'A connected workspace for thinking, planning, and doing.',
 };
 
 export default function RootLayout({
@@ -26,14 +27,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-      </head>
-      <body
-        className={`${inter.variable} ${geistSans.variable} ${geistMono.variable}`}
-      >
-        {children}
+    <html
+      lang="en"
+      className={cn(inter.variable, geistSans.variable, geistMono.variable)}
+      suppressHydrationWarning
+    >
+      <body>
+        <RootProviders>
+          <ModeToggle />
+          {children}
+        </RootProviders>
       </body>
     </html>
   );

@@ -23,8 +23,8 @@
   },
   "devDependencies": {
     "@synapcity/dev-eslint-config": "workspace:*",
-    "@synapcity/frontend-tailwind-config": "workspace:*",
     "@synapcity/dev-typescript-config": "workspace:*",
+    "@synapcity/frontend-tailwind-config": "workspace:*",
     "@types/node": "26.4.1",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.5",

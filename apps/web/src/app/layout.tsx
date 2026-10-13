@@ -3,7 +3,8 @@ import localFont from 'next/font/local';
 import '../styles/globals.css';
 import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
-
+import RootProviders from './providers';
+import { ModeToggle } from '@synapcity/frontend-ui/components/mode-toggle';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 const geistSans = localFont({
@@ -29,8 +30,14 @@ export default function RootLayout({
     <html
       lang="en"
       className={cn(inter.variable, geistSans.variable, geistMono.variable)}
+      suppressHydrationWarning
     >
-      <body>{children}</body>
+      <body>
+        <RootProviders>
+          <ModeToggle />
+          {children}
+        </RootProviders>
+      </body>
     </html>
   );
 }

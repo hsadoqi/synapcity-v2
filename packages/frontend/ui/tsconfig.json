@@ -5,7 +5,10 @@
     "rootDir": "src",
     "strictNullChecks": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/components/ui/*": ["./src/components/ui/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/providers/*": ["./src/providers/*"]
     },
     "module": "preserve",
     "moduleResolution": "bundler",
