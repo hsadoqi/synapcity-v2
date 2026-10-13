@@ -5,7 +5,7 @@ import { defineConfig } from 'vitest/config';
 
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 
-import { playwright } from '@vitest/browser-playwright';
+import { chromiumBrowser } from '@synapcity/dev-vitest-config/browser';
 
 const dirname =
   typeof __dirname !== 'undefined'
@@ -25,12 +25,7 @@ export default defineConfig({
         ],
         test: {
           name: 'storybook',
-          browser: {
-            enabled: true,
-            headless: true,
-            provider: playwright({}),
-            instances: [{ browser: 'chromium' }],
-          },
+          browser: chromiumBrowser(),
         },
       },
     ],

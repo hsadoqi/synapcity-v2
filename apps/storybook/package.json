@@ -6,7 +6,8 @@
     "check-types": "tsc --noEmit",
     "lint": "eslint . --cache",
     "dev": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "test": "vitest run"
   },
   "dependencies": {
     "@synapcity/frontend-ui": "workspace:*",
@@ -23,6 +24,7 @@
     "@storybook/nextjs-vite": "10.6.1",
     "@synapcity/dev-eslint-config": "workspace:*",
     "@synapcity/dev-typescript-config": "workspace:*",
+    "@synapcity/dev-vitest-config": "workspace:*",
     "@synapcity/frontend-tailwind-config": "workspace:*",
     "@tailwindcss/postcss": "^4.3.3",
     "@tailwindcss/vite": "^4",
