@@ -11,6 +11,7 @@ const people = fx.list(5, fx.person);
 
 - **Seeded.** Every call to `createFixtures(seed)` builds its own isolated Faker instance and fixes the reference date, so output is identical across runs and across consumers.
 - **Generic primitives only** (`id`, `person`, `title`, `paragraph`, `recent`, `list`). No Synapcity domain entity is modelled: the data model is undecided. Add a named factory here once an entity is accepted and named in `docs/glossary.md`.
+- **No credentials in the data.** `person` has no `password`: committed seed JSON with a `password` key trips CI's secret scan (gitleaks `generic-api-key`) however fake the value is. A test that needs one sets it inline, as an override.
 - **Dev-only.** Declare it in `devDependencies`, and import it only from tests, stories, e2e specs and seed scripts, never from shipped app code.
 - Source is exported as TypeScript (`./src/index.ts`), like the other `dev-*` packages.
 

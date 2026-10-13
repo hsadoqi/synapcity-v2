@@ -13,11 +13,15 @@ import { Faker, base, en } from '@faker-js/faker';
 export const DEFAULT_SEED = 1;
 const REFERENCE_DATE = new Date('2026-01-01T00:00:00.000Z');
 
+/*
+ * No password field, on purpose: committed seed JSON with a `password` key
+ * trips the CI secret scan (gitleaks `generic-api-key`) however fake the value
+ * is. Tests that need a password should set one inline, as an override.
+ */
 export type Person = {
   id: string;
   name: string;
   email: string;
-  password: string; // optional for testing, but not in production
 };
 
 export function createFixtures(seed: number = DEFAULT_SEED) {
@@ -31,7 +35,6 @@ export function createFixtures(seed: number = DEFAULT_SEED) {
       id: faker.string.uuid(),
       name: faker.person.fullName(),
       email: faker.internet.email().toLowerCase(),
-      password: faker.internet.password(),
       ...overrides,
     }),
     title: (): string => faker.lorem.words({ min: 2, max: 6 }),
