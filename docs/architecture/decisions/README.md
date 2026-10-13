@@ -21,12 +21,13 @@ ADRs are numbered sequentially (`0001-*.md`, `0002-*.md`, ...) and never renumbe
 
 ## Index
 
-| ADR                                                   | Title                                                   | Status   |
-| ----------------------------------------------------- | ------------------------------------------------------- | -------- |
-| [0001](0001-workspace-topology-and-toolchain.md)      | Workspace topology and toolchain                        | Accepted |
-| [0002](0002-styling-foundation.md)                    | Styling foundation (Tailwind v4, shared tokens, shadcn) | Accepted |
-| [0003](0003-typography-roles-and-font-preferences.md) | Typography roles and font preferences                   | Accepted |
-| [0004](0004-class-merging-with-cn.md)                 | Class merging with the `cn` package                     | Accepted |
+| ADR                                                   | Title                                                      | Status   |
+| ----------------------------------------------------- | ---------------------------------------------------------- | -------- |
+| [0001](0001-workspace-topology-and-toolchain.md)      | Workspace topology and toolchain                           | Accepted |
+| [0002](0002-styling-foundation.md)                    | Styling foundation (Tailwind v4, shared tokens, shadcn)    | Accepted |
+| [0003](0003-typography-roles-and-font-preferences.md) | Typography roles and font preferences                      | Accepted |
+| [0004](0004-class-merging-with-cn.md)                 | Class merging with the `cn` package                        | Accepted |
+| [0005](0005-testing-foundation.md)                    | Testing foundation (Vitest and Playwright config packages) | Proposed |
 
 **Lineage.** The ADRs in `docs/archive/architecture/decisions/` (0001-0016) belong to the previous implementation. They are evidence under `docs/engineering/preservation-policy.md`, not authority, and several describe workspaces that do not exist here (`apps/storybook`, `packages/ui/core`). This index restarted at 0001 for the current repository. When a current ADR needs an archived decision, it restates the decision it adopts rather than citing the archived number.
 
@@ -34,7 +35,7 @@ ADRs are numbered sequentially (`0001-*.md`, `0002-*.md`, ...) and never renumbe
 
 Not decided. Each needs an ADR, and the owner's approval, before it is treated as settled.
 
-- **Testing strategy.** No test runner, component-test setup, accessibility automation or browser gate exists. `pnpm verify` proves formatting, lint, types, unused code and builds only.
+- **Testing strategy.** Partly addressed by Proposed [ADR-0005](0005-testing-foundation.md): shared Vitest and Playwright config packages and a few smoke tests. Still open: running tests in `pnpm verify` and CI, coverage, accessibility gating, browser matrix. `pnpm verify` still proves formatting, lint, types, unused code and builds only.
 - **Dependency direction between package categories**, and any tool that enforces it.
 - **Component catalogue** (Storybook or another).
 - **Theme editor and preference persistence** (what writes `--font-preference-*` and the other overrides).

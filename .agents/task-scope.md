@@ -1,5 +1,15 @@
 # Task scope
 
+## Active task: shared Vitest and Playwright config packages (2026-10-13)
+
+Approved by the owner (2026-10-13): ADR plus packages in one change, packages under `packages/dev/`, consumers `frontend-ui`, `frontend-site`, `storybook` and `web`, and Vitest staying on 4.1.11. Phase B.
+
+- Goal and mode: shared test config for the workspaces, with a smoke test in each consumer. Mode: implementing.
+- Created: `packages/dev/vitest-config`, `packages/dev/playwright-config`, `docs/architecture/decisions/0005-testing-foundation.md` (Proposed), and one config and smoke test per consumer.
+- Updated: root `package.json` and `turbo.json` (`test`, `test:e2e`), `.gitignore`, the four consumer manifests, `apps/storybook/vitest.config.ts`, the ADR index, `pnpm-lock.yaml`.
+- Left undecided: tests in `pnpm verify` and CI, coverage, browser matrix, accessibility gating. `AGENTS.md` still says no test runner exists; update it when ADR-0005 is accepted.
+- Not claimed: that the story tests pass (two fail on existing accessibility findings), or any coverage.
+
 ## Active task: brand-asset drift check (2026-10-13)
 
 Approved by the owner ("ok i'll go with ur rec", 2026-10-13): decision 1 = enforce inside `pnpm verify`, decision 2 = root `scripts/`. Phase B.
