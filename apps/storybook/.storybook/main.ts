@@ -1,37 +1,36 @@
-import { fileURLToPath } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import type { StorybookConfig } from '@storybook/nextjs-vite';
-import { dirname } from 'node:path';
-/**
- * This function is used to resolve the absolute path of a package.
- * It is needed in projects that use Yarn PnP or are set up within a monorepo.
- */
-function getAbsolutePath(value: string) {
-  return dirname(fileURLToPath(import.meta.resolve(`${value}/package.json`)));
-}
-const config = {
+import { defineMain } from '@storybook/nextjs-vite/node';
+
+const config: StorybookConfig = {
   stories: [
-    // "../src/**/*.mdx",
-    // "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"
-    '../../../packages/frontend/ui/src/blocks/**/*.stories.@(js|jsx|mjs|ts|tsx)',
-    '../../../packages/frontend/ui/src/components/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    '../../../packages/frontend/ui/src/components/**/*.stories.@(ts|tsx)',
+    '../../../packages/frontend/ui/src/blocks/**/*.stories.@(ts|tsx)',
   ],
   addons: [
-    getAbsolutePath('@storybook/addon-vitest'),
-    getAbsolutePath('@storybook/addon-a11y'),
-    getAbsolutePath('@storybook/addon-docs'),
-    getAbsolutePath('@storybook/addon-themes'),
+    '@storybook/addon-docs',
+    '@storybook/addon-vitest',
+    '@storybook/addon-a11y',
+    '@storybook/addon-themes',
   ],
+  staticDirs: ['../public'],
+  typescript: {
+    // Storybook's default `react-docgen` is used on purpose. `react-docgen-typescript` would
+    // document props inherited from external types, but its Vite plugin
+    // (@joshwooding/vite-plugin-react-docgen-typescript, latest 0.9.0) declares
+    // `typescript: >=4.3.0 <7 || >=7.1.0-0 <8`, so on the pinned TypeScript 7.0.x it crashes
+    // at startup (`ts.sys` is undefined). Revisit when the repo moves to TypeScript >=7.1.
+  },
   framework: {
-    name: getAbsolutePath('@storybook/nextjs-vite'),
+    name: '@storybook/nextjs-vite',
     options: {},
   },
-  staticDirs: ['../public'],
   async viteFinal(viteConfig) {
     const { mergeConfig } = await import('vite');
     return mergeConfig(viteConfig, {
       plugins: [tailwindcss()],
     });
   },
-} as StorybookConfig;
-export default config;
+};
+
+export default defineMain(config);

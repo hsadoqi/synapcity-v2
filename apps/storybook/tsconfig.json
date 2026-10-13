@@ -3,16 +3,22 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "jsx": "react-jsx",
+    "types": ["react", "react-dom", "vite/client", "vitest/globals", "next"]
   },
   "include": [
     "next-env.d.ts",
-    ".storybook/**/*.ts",
-    ".storybook/**/*.tsx",
+    "**/*.ts",
+    "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "*/*.mts",
-    "global.d.ts"
+    "global.d.ts",
+    "**/*.d.ts",
+    ".storybook/**/*",
+    "@types/**/*",
+    "src/**/*"
   ],
   "exclude": ["node_modules"]
 }
