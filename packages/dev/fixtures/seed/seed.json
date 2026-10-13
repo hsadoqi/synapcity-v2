@@ -1,0 +1,65 @@
+{
+  "seed": 1,
+  "people": [
+    {
+      "id": "6b042125-686a-43e0-8a68-23cf5bee102e",
+      "name": "Kenyatta Halvorson",
+      "email": "yolanda44@yahoo.com",
+      "password": "a5OWXcHbHSQzXvm"
+    },
+    {
+      "id": "62e5cbe9-c54e-46fa-b91f-7963e90958e5",
+      "name": "Trenton Zieme",
+      "email": "arthur_walker12@gmail.com",
+      "password": "8rTUpXVm7mEsgU6"
+    },
+    {
+      "id": "b801f934-b39f-4d37-99d2-017995f968ba",
+      "name": "Luisa Romaguera",
+      "email": "liam73@gmail.com",
+      "password": "wy7UwFOZUxxF1Qo"
+    },
+    {
+      "id": "0252c5f9-ede7-48c4-b790-96c5e92c906a",
+      "name": "Ira Moen-Simonis",
+      "email": "myah32@hotmail.com",
+      "password": "KEHGIa3IAltv_8r"
+    },
+    {
+      "id": "8c9b8c97-5161-4f2c-adb9-275394ee4137",
+      "name": "Rubie Morissette",
+      "email": "chaim.okon75@gmail.com",
+      "password": "RksqTsorcZljf99"
+    },
+    {
+      "id": "a5c7cf42-e8fa-4f88-8250-2b05dbb379f3",
+      "name": "Jena Lang",
+      "email": "lexie54@yahoo.com",
+      "password": "mdM6ImciAqIoLhF"
+    },
+    {
+      "id": "b7777c6e-0c29-4080-8fec-e2239efbbe63",
+      "name": "Brielle Schuppe",
+      "email": "erica_kerluke93@yahoo.com",
+      "password": "euRrVbLWRxI8Dyz"
+    },
+    {
+      "id": "de313529-6d2b-4395-803a-7829fd9fe901",
+      "name": "Mrs. Vivianne Wiza",
+      "email": "flossie.koss13@yahoo.com",
+      "password": "i5ARhMPajRmbKwO"
+    },
+    {
+      "id": "ddaa948a-5d3b-44c6-bc53-c4bb3332601a",
+      "name": "Clementina Rath",
+      "email": "torrey_cassin15@gmail.com",
+      "password": "IGf2h5ZhYfzIkp3"
+    },
+    {
+      "id": "641e5872-3184-451c-b1f2-90c38b283cb2",
+      "name": "Laney Rosenbaum",
+      "email": "tia_larson@yahoo.com",
+      "password": "jhGcjv75tTLKoIA"
+    }
+  ]
+}
