@@ -1,4 +1,5 @@
 import { playwright } from '@vitest/browser-playwright';
+import { sharedConfig } from './shared.ts';
 
 /*
  * Real-browser mode for a vitest project: headless Chromium through Playwright.
@@ -13,3 +14,11 @@ export function chromiumBrowser() {
     instances: [{ browser: 'chromium' as const }],
   };
 }
+
+export const browserConfig = {
+  ...sharedConfig,
+  test: {
+    ...sharedConfig.test,
+    browser: chromiumBrowser(),
+  },
+};

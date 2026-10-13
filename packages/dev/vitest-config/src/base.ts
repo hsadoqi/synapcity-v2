@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitest/config';
-
+import { sharedConfig } from './shared.ts';
 /*
  * Node-environment unit tests. A test file sits beside the code it covers as
  * `*.test.ts(x)`. Globals stay off: tests import `describe`, `it` and `expect`
@@ -7,6 +7,7 @@ import { defineConfig } from 'vitest/config';
  */
 export const baseConfig = defineConfig({
   test: {
+    ...sharedConfig.test,
     include: ['src/**/*.test.{ts,tsx}'],
     environment: 'node',
     globals: false,
