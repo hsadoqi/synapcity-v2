@@ -5,6 +5,7 @@ import { Button } from '@synapcity/frontend-ui/core/button';
 
 import { resendConfirmation, type AuthState } from '@/app/auth/actions';
 import { FormMessage } from '../form/form-message';
+import { useCooldown } from '../form/use-cooldown';
 
 const initialState: AuthState = {};
 
@@ -20,6 +21,7 @@ export function ResendConfirmation({
     resendConfirmation,
     initialState,
   );
+  const wait = useCooldown(state);
 
   return (
     <form action={formAction} className="flex flex-col gap-2">
@@ -31,10 +33,14 @@ export function ResendConfirmation({
         variant="outline"
         size="lg"
         className="w-full"
-        disabled={pending}
+        disabled={pending || wait > 0}
         aria-busy={pending}
       >
-        {pending ? 'Resending…' : 'Resend link'}
+        {pending
+          ? 'Resending…'
+          : wait > 0
+            ? `Resend in ${wait}s`
+            : 'Resend link'}
       </Button>
     </form>
   );

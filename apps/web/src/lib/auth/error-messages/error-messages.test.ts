@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { authErrorFields, authErrorMessage } from './error-messages';
+import {
+  authErrorFields,
+  authErrorMessage,
+  MIN_PASSWORD_LENGTH,
+} from './error-messages';
 
 const GENERIC = 'Something went wrong. Try again.';
 
@@ -33,6 +37,9 @@ describe('authErrorMessage', () => {
 
   it('gives weak passwords a hint without quoting a server message', () => {
     expect(authErrorMessage('weak_password')).toMatch(/too weak/i);
+    expect(authErrorMessage('weak_password')).toContain(
+      `${MIN_PASSWORD_LENGTH} characters`,
+    );
   });
 
   it('answers wrong password and unknown email identically', () => {

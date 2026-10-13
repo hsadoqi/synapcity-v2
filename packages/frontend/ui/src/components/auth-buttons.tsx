@@ -34,6 +34,12 @@ function AuthButtons({
   // Marks the link for the page already open, so assistive tech announces it.
   const pathname = usePathname();
   const current = (href: string) => (pathname === href ? 'page' : undefined);
+  // On an auth page the form owns the one filled button, so the header links
+  // go quiet: the link for the page already open takes a tonal fill, the other
+  // stays plain. Elsewhere "Sign up" stays the filled call to action.
+  const onAuthPage = variant === 'header' && pathname?.startsWith('/auth');
+  const quiet = (href: string) =>
+    current(href) ? ('secondary' as const) : ('ghost' as const);
 
   return (
     <div
@@ -45,6 +51,7 @@ function AuthButtons({
         href="/auth/login"
         aria-current={current('/auth/login')}
         {...SIGN_IN[variant]}
+        {...(onAuthPage ? { variant: quiet('/auth/login') } : {})}
       >
         Sign in
       </LinkButton>
@@ -52,6 +59,7 @@ function AuthButtons({
         href="/auth/register"
         aria-current={current('/auth/register')}
         {...SIGN_UP[variant]}
+        {...(onAuthPage ? { variant: quiet('/auth/register') } : {})}
       >
         Sign up
       </LinkButton>

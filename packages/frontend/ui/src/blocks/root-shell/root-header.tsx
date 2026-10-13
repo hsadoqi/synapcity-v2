@@ -31,7 +31,10 @@ const RootLogoLink = ({ userId }: { userId?: string | null }) => {
     }
   }, [userId]);
   return (
-    <Link href={`${logoPath}`}>
+    <Link
+      href={`${logoPath}`}
+      className="inline-flex min-h-6 items-center pointer-coarse:min-h-11"
+    >
       <SynapcityLogo size="sm" className="text-foreground" />
     </Link>
   );

@@ -19,7 +19,7 @@ export default async function LoginPage({
   return (
     <AuthShell
       title="Sign in"
-      description="Use your email and password, or continue with a provider."
+      description="Use your email and password, or continue with Google or GitHub."
       footer={
         <AuthLinkButton
           type="register"

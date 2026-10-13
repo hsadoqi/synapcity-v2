@@ -25,7 +25,10 @@ export function AuthField({
   type,
   ...props
 }: AuthFieldProps) {
-  const hintId = hint ? `${id}-hint` : undefined;
+  // While the field is invalid the message below carries the rule, so the
+  // hint steps aside instead of repeating it directly above the error.
+  const showHint = Boolean(hint) && !invalid;
+  const hintId = showHint ? `${id}-hint` : undefined;
   const describedBy =
     [hintId, invalid ? messageId : undefined].filter(Boolean).join(' ') ||
     undefined;
@@ -49,7 +52,7 @@ export function AuthField({
         aria-describedby={describedBy}
         {...props}
       />
-      {hint ? (
+      {showHint ? (
         <p id={hintId} className="text-xs text-muted-foreground">
           {hint}
         </p>

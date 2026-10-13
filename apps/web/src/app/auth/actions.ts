@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 import {
   authErrorFields,
   authErrorMessage,
+  MIN_PASSWORD_LENGTH,
   type AuthFieldName,
 } from '@/lib/auth/error-messages/error-messages';
 import { homePathFor } from '@/lib/auth/home-path/home-path';
@@ -36,7 +37,6 @@ type UserData = {
   name?: string;
 };
 
-const MIN_PASSWORD_LENGTH = 8;
 const OAUTH_PROVIDERS = ['google', 'github'] as const;
 type OAuthProvider = (typeof OAUTH_PROVIDERS)[number];
 

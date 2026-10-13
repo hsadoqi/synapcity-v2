@@ -3,6 +3,7 @@
 import { Button } from '@synapcity/frontend-ui/core/button';
 
 import type { AuthState } from '@/app/auth/actions';
+import { MIN_PASSWORD_LENGTH } from '@/lib/auth/error-messages/error-messages';
 import { MAX_NAME_LENGTH } from '@/lib/auth/name/name';
 import { AuthField } from '../form/auth-field';
 import { useFocusFirstError } from '../form/use-focus-first-error';
@@ -49,8 +50,8 @@ export function RegisterForm({
         label="Password"
         type="password"
         autoComplete="new-password"
-        hint="Use at least 8 characters."
-        minLength={8}
+        hint={`Use at least ${MIN_PASSWORD_LENGTH} characters.`}
+        minLength={MIN_PASSWORD_LENGTH}
         required
       />
       <FormMessage state={state} />

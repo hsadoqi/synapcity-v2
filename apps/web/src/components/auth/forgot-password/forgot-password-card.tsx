@@ -1,13 +1,13 @@
 'use client';
 
 import { useActionState } from 'react';
-import { Button } from '@synapcity/frontend-ui/core/button';
-
 import { requestPasswordReset, type AuthState } from '@/app/auth/actions';
 import { AuthLinkButton } from '../buttons/auth-link-button';
 import { AuthConfirmation } from '../shell/auth-confirmation';
 import { AuthShell } from '../shell/auth-shell';
+import { useConfirmation } from '../form/use-confirmation';
 import { ForgotPasswordForm } from './forgot-password-form';
+import { ResendResetLink } from './resend-reset-link';
 
 const initialState: AuthState = {};
 
@@ -17,12 +17,13 @@ export function ForgotPasswordCard({ expired = false }: { expired?: boolean }) {
     initialState,
   );
   const email = state.data?.user?.email ?? '';
+  const { confirmed, edit, formState } = useConfirmation(state);
 
   return (
     <AuthShell
-      title={state.success ? 'Check your email' : 'Reset your password'}
+      title={confirmed ? 'Check your email' : 'Reset your password'}
       description={
-        state.success
+        confirmed
           ? undefined
           : expired
             ? 'That reset link has expired or was already used. Enter your email for a new one.'
@@ -30,25 +31,13 @@ export function ForgotPasswordCard({ expired = false }: { expired?: boolean }) {
       }
       footer={<AuthLinkButton type="login" />}
     >
-      {state.success ? (
-        <AuthConfirmation message={state.message} email={email}>
-          <form action={formAction}>
-            <input type="hidden" name="email" value={email} />
-            <Button
-              type="submit"
-              variant="outline"
-              size="lg"
-              className="w-full"
-              disabled={pending}
-              aria-busy={pending}
-            >
-              {pending ? 'Resending…' : 'Resend link'}
-            </Button>
-          </form>
+      {confirmed ? (
+        <AuthConfirmation message={state.message} email={email} onEdit={edit}>
+          <ResendResetLink email={email} />
         </AuthConfirmation>
       ) : (
         <ForgotPasswordForm
-          state={state}
+          state={formState}
           formAction={formAction}
           pending={pending}
         />

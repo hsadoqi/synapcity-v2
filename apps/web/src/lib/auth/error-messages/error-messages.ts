@@ -1,3 +1,6 @@
+/** The shortest password the forms accept; the weak-password reply states it. */
+export const MIN_PASSWORD_LENGTH = 8;
+
 /** Form fields an auth error can point at, so the form can mark them invalid. */
 export type AuthFieldName = 'name' | 'email' | 'password' | 'confirm';
 
@@ -18,7 +21,7 @@ export function authErrorMessage(code: string | undefined): string {
     case 'email_not_confirmed':
       return 'Confirm your email first. Check your inbox for the link.';
     case 'weak_password':
-      return 'That password is too weak. Try a longer one with a mix of characters.';
+      return `That password is too weak. Use at least ${MIN_PASSWORD_LENGTH} characters with a mix of letters, numbers and symbols.`;
     case 'same_password':
       return 'Choose a password different from your current one.';
     case 'email_address_invalid':
