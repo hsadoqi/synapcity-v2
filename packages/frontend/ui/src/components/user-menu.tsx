@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useTransition, type ReactNode } from 'react';
+import Link from 'next/link';
 
-import { BellIcon, HomeIcon, LogOutIcon, UserRound } from 'lucide-react';
+import { Cog, HomeIcon, LogOutIcon, UserRound } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
@@ -12,6 +13,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuLinkItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
@@ -21,7 +23,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from './ui/tooltip';
-import { LinkButton } from './link-button';
 
 type UserMenuProps = {
   id: string;
@@ -71,7 +72,6 @@ function UserMenu({
             }
           >
             <Avatar>
-              {/* TODO: Add dark mode/light mode versions for the default image/avatar */}
               {imageUrl && <AvatarImage src={imageUrl} alt="" />}
               {/* An icon, not initials: visible text in this button would have to be
               part of its accessible name (WCAG 2.5.3), and axe flags it. */}
@@ -94,30 +94,14 @@ function UserMenu({
         {children}
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <LinkButton
-              href={`/${id}/home`}
-              variant="ghost"
-              size="icon"
-              aria-label="Home"
-              className="w-full justify-start bg-transparent items-center hover:bg-transparent focus:bg-transparent active:bg-transparent focus:text-foreground gap-2 transition-all duration-200 ease-in-out"
-            >
-              <HomeIcon />
-              Home
-            </LinkButton>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <LinkButton
-              href={`/${id}/settings`}
-              variant="ghost"
-              size="icon"
-              aria-label="Settings"
-              className="w-full justify-start bg-transparent items-center hover:bg-transparent focus:bg-transparent active:bg-transparent focus:text-foreground gap-2 transition-all duration-200 ease-in-out"
-            >
-              <BellIcon />
-              Settings
-            </LinkButton>
-          </DropdownMenuItem>
+          <DropdownMenuLinkItem render={<Link href={`/${id}/home`} />}>
+            <HomeIcon aria-hidden />
+            Home
+          </DropdownMenuLinkItem>
+          <DropdownMenuLinkItem render={<Link href={`/${id}/settings`} />}>
+            <Cog aria-hidden />
+            Settings
+          </DropdownMenuLinkItem>
         </DropdownMenuGroup>
         {onSignOut ? (
           <>

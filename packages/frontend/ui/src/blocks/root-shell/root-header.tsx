@@ -1,12 +1,9 @@
-'use client';
-
 import type { ReactNode } from 'react';
 import { SynapcityLogo } from '../../components/logo-mark';
 import { ModeToggle } from '../../components/mode-toggle';
 import Link from 'next/link';
 import { LinkButton } from '../../components/link-button';
 import { Cog } from 'lucide-react';
-import React from 'react';
 import { cn } from '../../lib/utils';
 import { SidebarTrigger } from '../../components/ui/sidebar';
 import { Separator } from '../../components/ui/separator';
@@ -55,15 +52,12 @@ const RootLogoLink = ({
   userId?: string | null;
   className?: string;
 }) => {
-  const [logoPath, setLogoPath] = React.useState<string | null>('/');
-  React.useEffect(() => {
-    if (userId) {
-      setLogoPath(`/${userId}/home`);
-    }
-  }, [userId]);
+  // Derived from the prop, not synced into state: state plus an effect would
+  // server-render `/` for a signed-in user and only correct it after hydration.
+  const logoPath = userId ? `/${userId}/home` : '/';
   return (
     <Link
-      href={`${logoPath}`}
+      href={logoPath}
       className={cn(
         'inline-flex min-h-6 items-center pointer-coarse:min-h-11',
         className,
@@ -74,9 +68,7 @@ const RootLogoLink = ({
   );
 };
 
-const SettingsLinkIcon = ({ userId }: { userId?: string | null }) => {
-  // TODO: Implement user ID retrieval logic here. For now, we can use a placeholder or mock value.
-  // const userId = useUserId(); // Replace with your actual user ID retrieval logic
+const SettingsLinkIcon = ({ userId }: { userId: string }) => {
   return (
     <LinkButton
       variant="ghost"

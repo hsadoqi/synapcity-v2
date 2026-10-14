@@ -16,6 +16,10 @@ import { ChevronRightIcon, CheckIcon } from 'lucide-react';
 const itemState =
   'group/dropdown-menu-item data-highlighted:bg-popover-hover data-disabled:pointer-events-none data-disabled:opacity-50';
 
+/** Layout of a plain row, shared by Item and LinkItem so a link looks like its siblings. */
+const itemRow =
+  "relative flex min-h-7 pointer-coarse:min-h-11 cursor-pointer items-center gap-2 rounded-md px-2 py-1 text-xs/relaxed outline-hidden select-none data-inset:pl-7.5 data-[variant=destructive]:text-destructive data-[variant=destructive]:data-highlighted:bg-destructive-hover [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5 data-[variant=destructive]:*:[svg]:text-destructive";
+
 function DropdownMenu({ ...props }: MenuPrimitive.Root.Props) {
   return <MenuPrimitive.Root data-slot="dropdown-menu" {...props} />;
 }
@@ -100,11 +104,27 @@ function DropdownMenuItem({
       data-slot="dropdown-menu-item"
       data-inset={inset}
       data-variant={variant}
-      className={cn(
-        "relative flex min-h-7 pointer-coarse:min-h-11 cursor-pointer items-center gap-2 rounded-md px-2 py-1 text-xs/relaxed outline-hidden select-none data-inset:pl-7.5 data-[variant=destructive]:text-destructive data-[variant=destructive]:data-highlighted:bg-destructive-hover [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5 data-[variant=destructive]:*:[svg]:text-destructive",
-        itemState,
-        className,
-      )}
+      className={cn(itemRow, itemState, className)}
+      {...props}
+    />
+  );
+}
+
+/**
+ * A row that navigates. Renders an anchor that is itself the `menuitem`, so
+ * there is no link nested inside a menu item. Pass `render={<Link href="…" />}`
+ * for client-side navigation, or `href` for a plain anchor.
+ */
+function DropdownMenuLinkItem({
+  className,
+  inset,
+  ...props
+}: MenuPrimitive.LinkItem.Props & { inset?: boolean }) {
+  return (
+    <MenuPrimitive.LinkItem
+      data-slot="dropdown-menu-link-item"
+      data-inset={inset}
+      className={cn(itemRow, itemState, className)}
       {...props}
     />
   );
@@ -275,6 +295,7 @@ export {
   DropdownMenuGroup,
   DropdownMenuLabel,
   DropdownMenuItem,
+  DropdownMenuLinkItem,
   DropdownMenuCheckboxItem,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,

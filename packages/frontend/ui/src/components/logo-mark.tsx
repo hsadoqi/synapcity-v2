@@ -81,7 +81,8 @@ const logoSizes: Record<BrandSize, string> = {
 };
 
 function isPreset(size: unknown): size is BrandSize {
-  return typeof size === 'string' && size in markSizes;
+  // Own keys only: `in` also matches inherited names such as "toString".
+  return typeof size === 'string' && Object.keys(markSizes).includes(size);
 }
 
 /* ---------- Shared props ---------- */

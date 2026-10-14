@@ -83,4 +83,27 @@ describe('UserMenu', () => {
     await screen.findByRole('menu');
     expect(screen.queryByRole('menuitem', { name: 'Sign out' })).toBeNull();
   });
+
+  it('offers Home and Settings as links that are themselves the menu items', async () => {
+    render(
+      <UserMenu
+        id="user-1"
+        name="Hanaa"
+        email="h@example.com"
+        imageUrl={null}
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Account menu' }));
+
+    const home = await screen.findByRole('menuitem', { name: 'Home' });
+    const settings = await screen.findByRole('menuitem', { name: 'Settings' });
+
+    expect(home.tagName).toBe('A');
+    expect(home.getAttribute('href')).toBe('/user-1/home');
+    expect(settings.tagName).toBe('A');
+    expect(settings.getAttribute('href')).toBe('/user-1/settings');
+    // Nothing interactive is nested inside a menu item.
+    expect(home.querySelector('a, button')).toBeNull();
+    expect(settings.querySelector('a, button')).toBeNull();
+  });
 });

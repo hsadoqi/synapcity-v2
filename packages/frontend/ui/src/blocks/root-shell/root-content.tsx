@@ -1,5 +1,3 @@
-'use client';
-
 import type { ReactNode } from 'react';
 
 export const RootContent = ({ children }: { children: ReactNode }) => {
