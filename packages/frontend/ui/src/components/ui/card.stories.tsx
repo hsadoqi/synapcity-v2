@@ -10,7 +10,7 @@ import {
 } from './card';
 
 const meta: Meta<typeof Card> = {
-  title: 'Core/Card',
+  title: 'Components/Card',
   component: Card,
   tags: ['autodocs'],
 };

@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useState, useTransition, type ReactNode } from 'react';
 
-import { UserRound } from 'lucide-react';
+import { BellIcon, HomeIcon, LogOutIcon, UserRound } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
@@ -10,6 +10,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -20,16 +21,34 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from './ui/tooltip';
+import { LinkButton } from './link-button';
 
 type UserMenuProps = {
+  id: string;
   name: string | null;
   email: string | null;
   imageUrl: string | null;
   children?: ReactNode;
+  /**
+   * Ends the session. The app owns how (a server action), so this package
+   * stays free of app imports. The item is not rendered without it, rather
+   * than shown as a control that does nothing.
+   */
+  onSignOut?: () => void | Promise<void>;
 };
 
-function UserMenu({ name, email, imageUrl, children }: UserMenuProps) {
+function UserMenu({
+  id,
+  name,
+  email,
+  imageUrl,
+  children,
+  onSignOut,
+}: UserMenuProps) {
   const [open, setOpen] = useState(false);
+  // A transition, so a server action's redirect() is handled by React/Next
+  // and the item can show a pending state.
+  const [signingOut, startSigningOut] = useTransition();
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -64,15 +83,54 @@ function UserMenu({ name, email, imageUrl, children }: UserMenuProps) {
           <TooltipContent>Account menu</TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="w-64">
         <DropdownMenuGroup>
-          <DropdownMenuLabel className="flex flex-col gap-0.5">
-            {name && <span className="text-foreground">{name}</span>}
-            {email && <span>{email}</span>}
+          <DropdownMenuLabel className="flex flex-col justify-start gap-0.5">
+            {name && <span className="text-xs text-foreground">{name}</span>}
+            {email && <span className="text-xs text-foreground">{email}</span>}
           </DropdownMenuLabel>
         </DropdownMenuGroup>
-        {children && <DropdownMenuSeparator />}
+        {children ? <DropdownMenuSeparator /> : null}
         {children}
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem>
+            <LinkButton
+              href={`/${id}/home`}
+              variant="ghost"
+              size="icon"
+              aria-label="Home"
+              className="w-full justify-start bg-transparent items-center hover:bg-transparent focus:bg-transparent active:bg-transparent focus:text-foreground gap-2 transition-all duration-200 ease-in-out"
+            >
+              <HomeIcon />
+              Home
+            </LinkButton>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <LinkButton
+              href={`/${id}/settings`}
+              variant="ghost"
+              size="icon"
+              aria-label="Settings"
+              className="w-full justify-start bg-transparent items-center hover:bg-transparent focus:bg-transparent active:bg-transparent focus:text-foreground gap-2 transition-all duration-200 ease-in-out"
+            >
+              <BellIcon />
+              Settings
+            </LinkButton>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        {onSignOut ? (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              disabled={signingOut}
+              onClick={() => startSigningOut(onSignOut)}
+            >
+              <LogOutIcon aria-hidden />
+              {signingOut ? 'Signing out…' : 'Sign out'}
+            </DropdownMenuItem>
+          </>
+        ) : null}
       </DropdownMenuContent>
     </DropdownMenu>
   );

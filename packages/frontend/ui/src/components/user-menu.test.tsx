@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { UserMenu } from './user-menu';
 import { DropdownMenuItem } from './ui/dropdown-menu';
@@ -7,7 +7,12 @@ import { DropdownMenuItem } from './ui/dropdown-menu';
 describe('UserMenu', () => {
   it('names the trigger for assistive tech', () => {
     render(
-      <UserMenu name="Hanaa Sadoqi" email="h@example.com" imageUrl={null} />,
+      <UserMenu
+        id="user-1"
+        name="Hanaa Sadoqi"
+        email="h@example.com"
+        imageUrl={null}
+      />,
     );
 
     expect(screen.getByRole('button', { name: 'Account menu' })).toBeTruthy();
@@ -15,7 +20,7 @@ describe('UserMenu', () => {
 
   it('keeps its toggle state in sync when Escape dismisses the menu', async () => {
     render(
-      <UserMenu name="Hanaa" email="h@example.com" imageUrl={null}>
+      <UserMenu id="user-1" name="Hanaa" email="h@example.com" imageUrl={null}>
         <DropdownMenuItem>Sign out</DropdownMenuItem>
       </UserMenu>,
     );
@@ -35,10 +40,47 @@ describe('UserMenu', () => {
   });
 
   it('shows an account tooltip on focus', async () => {
-    render(<UserMenu name="Hanaa" email="h@example.com" imageUrl={null} />);
+    render(
+      <UserMenu
+        id="user-1"
+        name="Hanaa"
+        email="h@example.com"
+        imageUrl={null}
+      />,
+    );
     fireEvent.focus(screen.getByRole('button', { name: 'Account menu' }));
     const tooltip = await screen.findByText('Account menu');
     expect(tooltip.getAttribute('data-slot')).toBe('tooltip-content');
     expect(tooltip.hasAttribute('data-open')).toBe(true);
+  });
+
+  it('calls onSignOut when Sign out is chosen', async () => {
+    const onSignOut = vi.fn();
+    render(
+      <UserMenu
+        id="user-1"
+        name="Hanaa"
+        email="h@example.com"
+        imageUrl={null}
+        onSignOut={onSignOut}
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Account menu' }));
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Sign out' }));
+    await waitFor(() => expect(onSignOut).toHaveBeenCalledTimes(1));
+  });
+
+  it('offers no Sign out item without onSignOut', async () => {
+    render(
+      <UserMenu
+        id="user-1"
+        name="Hanaa"
+        email="h@example.com"
+        imageUrl={null}
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Account menu' }));
+    await screen.findByRole('menu');
+    expect(screen.queryByRole('menuitem', { name: 'Sign out' })).toBeNull();
   });
 });
