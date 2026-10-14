@@ -256,14 +256,20 @@ function SidebarTrigger({
   onClick,
   ...props
 }: React.ComponentProps<typeof Button>) {
-  const { toggleSidebar } = useSidebar();
+  const { state, isMobile, openMobile, toggleSidebar } = useSidebar();
+  const expanded = isMobile ? openMobile : state === 'expanded';
+  const label = expanded ? 'Close navigation' : 'Open navigation';
 
   return (
     <Button
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
+      toggle
+      pressed={expanded}
       variant="ghost"
       size="icon-sm"
+      label={label}
+      aria-keyshortcuts="Control+B Meta+B"
       className={cn(className)}
       onClick={(event) => {
         onClick?.(event);
@@ -272,7 +278,6 @@ function SidebarTrigger({
       {...props}
     >
       <PanelLeftIcon />
-      <span className="sr-only">Toggle Sidebar</span>
     </Button>
   );
 }

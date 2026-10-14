@@ -29,6 +29,7 @@ type UserMenuProps = AccountLinks & {
   name: string | null;
   email: string | null;
   imageUrl: string | null;
+  statusLabel?: string;
   children?: ReactNode;
   /**
    * Ends the session. The app owns how (a server action), so this package
@@ -44,6 +45,7 @@ function UserMenu({
   name,
   email,
   imageUrl,
+  statusLabel,
   children,
   onSignOut,
 }: UserMenuProps) {
@@ -86,9 +88,20 @@ function UserMenu({
       </TooltipProvider>
       <DropdownMenuContent align="end" className="w-64">
         <DropdownMenuGroup>
-          <DropdownMenuLabel className="flex flex-col justify-start gap-0.5">
-            {name && <span className="text-xs text-foreground">{name}</span>}
-            {email && <span className="text-xs text-foreground">{email}</span>}
+          <DropdownMenuLabel className="flex flex-col items-start gap-1">
+            {statusLabel && (
+              <span className="font-ui text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                {statusLabel}
+              </span>
+            )}
+            {name && (
+              <span className="font-ui text-sm text-foreground">{name}</span>
+            )}
+            {email && (
+              <span className="max-w-full truncate font-ui text-xs text-muted-foreground">
+                {email}
+              </span>
+            )}
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         {children ? <DropdownMenuSeparator /> : null}

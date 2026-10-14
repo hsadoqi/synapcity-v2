@@ -5,6 +5,7 @@ import { UserMenu } from '@synapcity/frontend-ui/components/user-menu';
 import { signOut } from '@/features/auth/server/actions';
 import { accountLinksFor, homePathFor } from '@/lib/routing/user-paths';
 import { getCurrentUser } from '@/features/auth/server/session';
+import { developmentAuthBypassEnabled } from '@/features/auth/shared/development-auth';
 
 /**
  * Reads the verified session claims on the server (ADR-0006) so the first paint
@@ -42,7 +43,10 @@ export async function AuthStatus({
       name={user.name}
       email={user.email}
       imageUrl={user.imageUrl}
-      onSignOut={signOut}
+      statusLabel={
+        developmentAuthBypassEnabled ? 'Development session' : undefined
+      }
+      onSignOut={developmentAuthBypassEnabled ? undefined : signOut}
     />
   );
 }
