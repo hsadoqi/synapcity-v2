@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
-import { ProfileForm } from '@/components/auth/profile/profile-form';
-import { profileFromClaims } from '@/lib/auth/profile/profile';
-import { requireOwner } from '@/lib/auth/require-owner/require-owner';
+import { ProfileForm } from '@/features/account/components/profile-form';
+import { profileFromClaims } from '@/features/auth/shared/current-user';
+import { requireOwner } from '@/lib/access/require-owner';
 
 export const metadata: Metadata = { title: 'Account settings' };
 

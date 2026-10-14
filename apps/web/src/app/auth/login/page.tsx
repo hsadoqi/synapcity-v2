@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 
-import { LoginForm } from '@/components/auth/login/login-form';
-import { OAuthButtons } from '@/components/auth/buttons/oauth-buttons';
-import { safeNextPath } from '@/lib/auth/safe-next/safe-next';
-import { AuthLinkButton } from '@/components/auth/buttons/auth-link-button';
-import { AuthShell } from '@/components/auth/shell/auth-shell';
+import { LoginForm } from '@/features/auth/components/login-form';
+import { OAuthButtons } from '@/features/auth/components/oauth-buttons';
+import { safeNextPath } from '@/lib/routing/safe-next';
+import { AuthLinkButton } from '@/features/auth/components/auth-link-button';
+import { AuthShell } from '@/features/auth/components/auth-shell';
 
 export const metadata: Metadata = { title: 'Sign in' };
 

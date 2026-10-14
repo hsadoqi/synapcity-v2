@@ -1,4 +1,4 @@
-import { requireOwner } from '@/lib/auth/require-owner/require-owner';
+import { requireOwner } from '@/lib/access/require-owner';
 
 export default async function Page({
   params,

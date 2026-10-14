@@ -1,4 +1,4 @@
-import { AuthStatus } from '@/components/auth/display/auth-status';
+import { AuthStatus } from '@/features/auth/components/auth-status';
 
 export default function Home() {
   return (

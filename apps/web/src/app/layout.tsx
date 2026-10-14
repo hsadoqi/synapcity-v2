@@ -4,12 +4,12 @@ import '../styles/globals.css';
 import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import RootProviders from './providers';
-import { AuthStatus } from '@/components/auth/display/auth-status';
+import { AuthStatus } from '@/features/auth/components/auth-status';
 import { RootShell } from '@synapcity/frontend-ui/blocks/root-shell';
 import { createMetadata } from '@synapcity/frontend-site/metadata';
-import { UserProvider } from '@/components/auth/provider/user-provider';
-import { getCurrentUser } from '@/lib/auth/session';
-import { accountLinksFor } from '@/lib/auth/home-path/home-path';
+import { UserProvider } from '@/features/auth/client/user-provider';
+import { getCurrentUser } from '@/features/auth/server/session';
+import { accountLinksFor } from '@/lib/routing/user-paths';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 const geistSans = localFont({
