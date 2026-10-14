@@ -83,7 +83,7 @@ The parent plan's table is still the base. These items did not exist when it was
 | `field()`                                 | `lib/auth/form-data/form-data.ts`               | `features/auth/server/form-data.ts` or kept with actions              |
 | `callbackUrl()`                           | `lib/auth/auth-flow/auth-flow.ts`               | `lib/routing/auth-flow.ts` with the rest of that file                 |
 | `accountLinksFor()`                       | `lib/auth/home-path/home-path.ts`               | `lib/routing/user-paths.ts`                                           |
-| `app/auth/actions.test.ts`                | `app/auth/actions.test.ts`                      | `features/auth/server/actions.test.ts` (the plan's destination)       |
+| `app/auth/actions.test.ts`                | `app/auth/actions.test.ts`                      | `features/auth/server/actions.test.ts` (the plan's cdestination)      |
 | `@/` alias in `apps/web/vitest.config.ts` | present                                         | stays; it mirrors `tsconfig` `paths`                                  |
 | `AccountLinks`                            | `packages/frontend/ui/src/lib/account-links.ts` | stays; part of the UI package's public contract                       |
 
