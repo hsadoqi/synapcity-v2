@@ -7,6 +7,7 @@ import type { AuthState } from '@/features/auth/shared/form-state';
 import { AuthLinkButton } from './auth-link-button';
 import { OAuthButtons } from './oauth-buttons';
 import { AuthConfirmation } from './auth-confirmation';
+import { AuthDivider } from './auth-divider';
 import { AuthShell } from './auth-shell';
 import { useConfirmation } from '@/features/auth/client/use-confirmation';
 import { RegisterForm } from './register-form';
