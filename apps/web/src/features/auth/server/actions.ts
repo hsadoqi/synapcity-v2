@@ -23,6 +23,8 @@ import { getOrigin } from '@/features/auth/server/site-origin';
 import { safeNextPath } from '@/lib/routing/safe-next';
 import { createClient } from '@/lib/supabase/server';
 
+import { registerWithPassword, requestRecoveryEmail } from './operations';
+
 const OAUTH_PROVIDERS = ['google', 'github'] as const;
 type OAuthProvider = (typeof OAUTH_PROVIDERS)[number];
 
@@ -81,28 +83,25 @@ export async function signUp(
     return authFailure(PASSWORD_TOO_SHORT_MESSAGE, user, ['password']);
   }
 
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({
+  const outcome = await registerWithPassword({
     email,
     password,
-    options: {
-      emailRedirectTo: callbackUrl(getOrigin(), next, 'confirm'),
-      // Same key OAuth providers fill, so one reader covers both sign-up paths.
-      data: { full_name: name },
-    },
+    name,
+    confirmationRedirect: callbackUrl(getOrigin(), next, 'confirm'),
   });
-  if (error)
+  if (outcome.kind === 'provider-error') {
     return authFailure(
-      authErrorMessage(error.code),
+      authErrorMessage(outcome.code),
       user,
-      authErrorFields(error.code),
+      authErrorFields(outcome.code),
     );
+  }
 
   // A session exists only when the project does not require email
   // confirmation. ADR-0006 requires it, so this is the unusual branch.
-  if (data.session && data.user) {
+  if (outcome.kind === 'signed-in') {
     revalidatePath('/', 'layout');
-    redirect(next || homePathFor(data.user.id));
+    redirect(next || homePathFor(outcome.userId));
   }
   // Worded so it stays true when the address already has an account, in which
   // case Supabase sends nothing (it hides that to prevent account discovery).
@@ -146,16 +145,16 @@ export async function requestPasswordReset(
   const user = { email, name: '' };
   if (!email) return authFailure(ENTER_EMAIL, user, ['email']);
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: callbackUrl(getOrigin(), '/auth/update-password', 'reset'),
+  const outcome = await requestRecoveryEmail({
+    email,
+    resetRedirect: callbackUrl(getOrigin(), '/auth/update-password', 'reset'),
   });
   // Both limits, as in `resendConfirmation`. Only the email one used to be
   // handled, so a request-rate limit was reported as "a reset link is on its
   // way". Changed with the repository owner's approval; it departs from
   // "preserve recovery's failure policy" in ADR-0008 and the refactor plan.
-  if (isRateLimited(error?.code)) {
-    return authFailure(authErrorMessage(error?.code), user);
+  if (outcome.kind === 'rate-limited') {
+    return authFailure(authErrorMessage(outcome.code), user);
   }
 
   // The same reply whether or not the address has an account, so the form

@@ -26,7 +26,7 @@ const SERVER_ONLY = [
   /^lib\/supabase\/server$/,
   /^lib\/supabase\/middleware$/,
   /^next\/headers$/,
-  /^features\/[^/]+\/server\/(session|site-origin|form-data)$/,
+  /^features\/[^/]+\/server\/(session|site-origin|form-data|operations)$/,
   /^lib\/access\/.+/,
 ];
 

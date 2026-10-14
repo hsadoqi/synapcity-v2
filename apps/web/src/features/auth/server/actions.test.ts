@@ -358,3 +358,81 @@ describe('signOut', () => {
     expect(mocks.revalidatePath).toHaveBeenCalledWith('/', 'layout');
   });
 });
+
+describe('results never echo a password', () => {
+  const PASSWORD = 'sentinel-password-5c1d';
+  const valid = { email: 'a@b.co', name: 'Ada', password: PASSWORD };
+
+  it('after a refused sign-in', async () => {
+    mocks.signInWithPassword.mockResolvedValue({
+      data: {},
+      error: { code: 'invalid_credentials' },
+    });
+
+    const state = await signInWithPassword({}, form(valid));
+
+    expect(state.error).toBeDefined();
+    expect(JSON.stringify(state)).not.toContain(PASSWORD);
+  });
+
+  it('after a validation failure and a provider failure at sign-up', async () => {
+    const invalid = await signUp({}, form({ ...valid, name: ' ' }));
+    expect(invalid.error).toBeDefined();
+    expect(JSON.stringify(invalid)).not.toContain(PASSWORD);
+
+    mocks.signUp.mockResolvedValue({
+      data: { user: null, session: null },
+      error: { code: 'weak_password', message: PASSWORD },
+    });
+    const refused = await signUp({}, form(valid));
+    expect(refused.error).toBeDefined();
+    expect(JSON.stringify(refused)).not.toContain(PASSWORD);
+  });
+
+  it('after a successful sign-up that asks for confirmation', async () => {
+    mocks.signUp.mockResolvedValue({
+      data: { user: { id: USER_ID }, session: null },
+      error: null,
+    });
+
+    const state = await signUp({}, form(valid));
+
+    expect(state.success).toBe(true);
+    expect(JSON.stringify(state)).not.toContain(PASSWORD);
+  });
+
+  it('after a mismatched or refused password change', async () => {
+    const mismatch = await updatePassword(
+      {},
+      form({ password: PASSWORD, confirm: 'different-password' }),
+    );
+    expect(JSON.stringify(mismatch)).not.toContain(PASSWORD);
+
+    mocks.updateUser.mockResolvedValue({
+      data: {},
+      error: { code: 'same_password' },
+    });
+    const refused = await updatePassword(
+      {},
+      form({ password: PASSWORD, confirm: PASSWORD }),
+    );
+    expect(refused.error).toBeDefined();
+    expect(JSON.stringify(refused)).not.toContain(PASSWORD);
+  });
+});
+
+describe('invalid submissions never reach the provider', () => {
+  it.each([
+    ['resendConfirmation', () => resendConfirmation({}, form({ email: ' ' }))],
+    [
+      'requestPasswordReset',
+      () => requestPasswordReset({}, form({ email: '' })),
+    ],
+  ])('%s with no email', async (_, run) => {
+    const state = await run();
+
+    expect(state.fields).toEqual(['email']);
+    expect(mocks.resend).not.toHaveBeenCalled();
+    expect(mocks.resetPasswordForEmail).not.toHaveBeenCalled();
+  });
+});
