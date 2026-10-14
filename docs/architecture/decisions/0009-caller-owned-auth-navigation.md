@@ -26,7 +26,7 @@ New URLs, a route registry, redirect policy, link-renderer redesign, additional 
 
 ## Unresolved
 
-Whether future auth presentation needs a caller-supplied link-rendering capability is deferred. The current LinkButton behavior remains in place; this ADR does not prescribe changes for hypothetical frameworks.
+Decided 2026-10-14: shared `frontend` packages keep using `next/link` and the client navigation hooks directly, and [workspace conventions](../workspace-conventions.md) permit it, because every consumer is a Next.js app. A caller-supplied link-rendering capability stays deferred until a consumer that is not Next.js exists; that is the reconsideration condition for this point.
 
 ## Governance boundary
 

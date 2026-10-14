@@ -21,13 +21,27 @@ Tests: Vitest unit tests sit beside the code they cover as `*.test.ts` (`pnpm te
 
 Set these in `apps/web/.env.local` (git-ignored) and, for deployments, in the hosting provider. Authentication is governed by [ADR-0006](../../docs/architecture/decisions/0006-authentication-with-supabase.md).
 
-| Variable                               | Exposed to the browser | Purpose                                                                                                                                                   |
-| -------------------------------------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_SUPABASE_URL`             | yes                    | Supabase project URL                                                                                                                                      |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | yes                    | Supabase publishable key. Never put the secret or service-role key in this app                                                                            |
-| `SITE_URL`                             | no                     | Public origin of this app, for example `http://localhost:8080`. Used to build email and OAuth redirect URLs; it must be on Supabase's redirect allow-list |
+| Variable                               | Exposed to the browser | Purpose                                                                                                                          |
+| -------------------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`             | yes                    | Supabase project URL                                                                                                             |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | yes                    | Supabase publishable key. Never put the secret or service-role key in this app                                                   |
+| `SITE_URL`                             | no                     | Public origin of this app. Used to build email and OAuth redirect URLs; it must be on Supabase's redirect allow-list (see below) |
 
-The app throws on the first sign-up, reset or OAuth call if `SITE_URL` is missing. Preview deployments need their own value. Turborepo filters task environments to declared variables, so `SITE_URL` is listed under `globalPassThroughEnv` in `turbo.json`: tasks receive it, and changing it does not invalidate the build cache because it is read at request time, not compiled in.
+The app throws on the first sign-up, reset or OAuth call if `SITE_URL` is missing.
+
+### `SITE_URL` per environment
+
+Each environment has its own `SITE_URL`, and the emailed link only works if Supabase accepts it. In the Supabase dashboard (Authentication, URL Configuration), add one **Redirect URLs** entry per environment, written as `<SITE_URL>/auth/callback**`. The app appends `?next=…&flow=…` to the callback, and Supabase documents `**` as "any sequence of characters", so that entry covers it. Supabase's guide says the `redirectTo` must match the list, and it says nothing about whether an entry without the `**` also matches a URL carrying a query string, so confirm with a real sign-up before relying on that form.
+
+| Environment | `SITE_URL`                             | Redirect URLs entry                              |
+| ----------- | -------------------------------------- | ------------------------------------------------ |
+| Local       | `http://localhost:8080`                | `http://localhost:8080/auth/callback**`          |
+| Preview     | that deployment's own URL              | one exact entry per deployment; no wildcard host |
+| Production  | the production domain (not chosen yet) | `https://<domain>/auth/callback**`               |
+
+Also set Supabase's own **Site URL** (the same page) to the production origin: it is the fallback when a redirect is not on the list, and it is what the email templates use as `{{ .SiteURL }}`. A wildcard host such as `*.vercel.app` needs the owner's approval ([ADR-0006](../../docs/architecture/decisions/0006-authentication-with-supabase.md)); Supabase's own preview-URL example scopes it to a team slug, which is narrower but still a wildcard.
+
+Previews are the sharp edge: a deployment URL that is not on the list does not get its auth links honoured, so auth email from an unlisted preview will not come back to that preview. Turborepo filters task environments to declared variables, so `SITE_URL` is listed under `globalPassThroughEnv` in `turbo.json`: tasks receive it, and changing it does not invalidate the build cache because it is read at request time, not compiled in.
 
 If `NEXT_PUBLIC_SUPABASE_URL` or `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` is missing, every request fails (the session proxy runs on all pages) with an error that names the variable. They are read at build time for the browser bundle, so CI and deployments must set them before `next build`; CI uses placeholders.
 

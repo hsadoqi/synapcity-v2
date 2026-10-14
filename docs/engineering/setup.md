@@ -45,7 +45,7 @@ A passing `pnpm verify` proves the repository's formatting, lint, types, unused-
 
 ## Environment variables
 
-- `apps/web` needs three: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `SITE_URL`. Copy `apps/web/.env.example` to `apps/web/.env.local` and fill them in; the README table in `apps/web` says what each is for.
+- `apps/web` needs three: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `SITE_URL`. Copy `apps/web/.env.example` to `apps/web/.env.local` and fill them in; the README in `apps/web` says what each is for and which Supabase redirect allow-list entry each environment's `SITE_URL` needs.
 - When another variable is added, add it to the committed `.env.example` with a placeholder value in the same change.
 - Real values go in an untracked `.env` or `.env*.local` file, both git-ignored. Never commit secrets. The `security` CI job scans history for them.
 

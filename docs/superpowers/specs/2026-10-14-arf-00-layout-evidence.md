@@ -96,11 +96,11 @@ The parent plan's table is still the base. These items did not exist when it was
 
 ## 7. Decisions this needs from the owner
 
-| Decision                                            | Needed because                                                       |
-| --------------------------------------------------- | -------------------------------------------------------------------- |
-| Select a candidate under ADR-0007                   | It gates every file move and ADR-0008's operations extraction        |
-| Approve an import-enforcement tool, if any          | ADR-0007 lists it unresolved and it is a tooling change              |
-| Decide how `frontend-ui` should reach Next.js links | Either amend the convention or add a caller-supplied link capability |
+| Decision                                            | Needed because                                                                                                                  |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Select a candidate under ADR-0007                   | It gates every file move and ADR-0008's operations extraction                                                                   |
+| Approve an import-enforcement tool, if any          | ADR-0007 lists it unresolved and it is a tooling change                                                                         |
+| Decide how `frontend-ui` should reach Next.js links | Decided 2026-10-14: it imports `next/link` directly and the convention was amended; revisit only if a non-Next consumer appears |
 
 ## 8. Addendum: execution (2026-10-14)
 

@@ -48,7 +48,7 @@ How users authenticate to `apps/web` and how their session is held and refreshed
 - Email delivery: Supabase's default sender is rate-limited and meant for development; the owner accepted it for now, and a custom SMTP provider is needed before real users.
 - Leaked password protection (checking passwords against HaveIBeenPwned) is unavailable on the Free plan. It should be enabled if the project moves to a paid plan; until then the minimum length of 8 and optional character-type rules are the only password-strength controls.
 - How a user who signed up with Google or GitHub adds a password (an account-settings page using `updateUser({ password })`). Whether the password-reset email also works for such an account is untested and the Supabase docs do not cover it.
-- Site URL and redirect allow-list values for local, preview and production, which depend on the undecided production domain.
+- The production domain, and with it the production `SITE_URL` and its redirect allow-list entry. The per-environment rule is decided (2026-10-14): one `SITE_URL` per environment, each on the allow-list as `<SITE_URL>/auth/callback**` with exact hosts and no wildcard host, as set out in the `apps/web` README. Supabase's [Redirect URLs guide](https://supabase.com/docs/guides/auth/redirect-urls) was read for this; it does not state whether an entry without `**` matches a redirect that carries a query string, so that form is unverified.
 - Provider-console configuration for Google and GitHub. It worked for local development on 2026-10-13, but was set up without first-party documentation having been read (see Context), so it is not verified against upstream guidance.
 
 ## Governance boundary
