@@ -1,31 +1,31 @@
 # Caller-owned auth navigation: task plan
 
-**Status:** Proposed; no implementation authorized or started.  
+**Status:** Proposed; this plan does not authorize implementation. Recheck current navigation behavior before source changes.  
 **Date:** 2026-10-13.  
 **Decision prerequisite:** [ADR-0009](../../architecture/decisions/0009-caller-owned-auth-navigation.md).  
 **Parent:** [Inventory, sequence and final verification](2026-10-13-auth-refactor.md).
 
-This file owns ARF-10 and ARF-11 and their checkboxes. The API decision is independently reviewable; this coordinated plan schedules its implementation after ARF-09 to avoid overlapping foundation moves. A standalone implementation before migration would require a revised manifest using current source locations.
+This file owns ARF-10 and ARF-11 and their checkboxes. The API decision is independently reviewable; this coordinated plan schedules its implementation after ARF-09 to avoid overlapping foundation moves. ARF-00 selects physical placement. A standalone implementation before migration is also possible with an approved manifest using live source locations; the auth package decision need not be forced by this presentation API.
 
-## Exact proposed file set
+## Candidate file set pending selected topology
 
 - `packages/frontend/ui/src/components/auth-buttons.tsx`
 - `packages/frontend/ui/src/components/auth-buttons.test.tsx`
 - `packages/frontend/ui/src/components/auth-buttons.stories.tsx`
 - `packages/frontend/ui/src/blocks/root-shell/root-header.stories.tsx`
-- `apps/web/src/features/auth/components/auth-status.tsx` (proposed post-foundation path)
+- `apps/web/src/features/auth/components/auth-status.tsx` (app-local candidate post-foundation path; use selected module/package consumer after ARF-00)
 
-Re-inventory every AuthButtons consumer before execution. New consumers require a scope revision, not an opportunistic update. No export name, package configuration, route URL or LinkButton behavior changes.
+Re-inventory every AuthButtons consumer before execution. New consumers require a scope revision, not an opportunistic update. This navigation task preserves export names, route URLs and LinkButton behavior. Package configuration belongs to the selected foundation scope, not an exclusion of packages from the refactor.
 
 ## Tasks
 
 ### ARF-10: make destination props required and update all consumers atomically
 
 **Depends on:** ARF-09, owner acceptance of ADR-0009 and approval of the shared-component API change.  
-**Files:** the exact five-file set above.
+**Files:** a fresh exact manifest after ARF-00 resolves the consumer path. The five-file set above is the app-local candidate.
 
 - [ ] Add required `signInHref` and `signUpHref` string props and render them through existing LinkButton.
-- [ ] Remove only the shared component's hardcoded app destinations; preserve variants, labels, semantic styling and layout.
+- [ ] Remove the shared component's hardcoded app destinations under the approved API scope; preserve current active-link/quiet-header behavior, variants, labels, semantic styling and layout. The live component currently reads pathname; reconcile any adapter/prop needs with the selected runtime contract before changing that behavior.
 - [ ] Supply the existing login/register destinations from the app's AuthStatus.
 - [ ] Supply example destinations in both component stories and the root-header story; update existing test renders for the required props.
 - [ ] Type-check all consumers in the same change, so no intermediate missing-prop state is left at the checkpoint.

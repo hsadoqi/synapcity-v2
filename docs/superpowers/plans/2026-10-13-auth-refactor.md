@@ -4,14 +4,14 @@
 **Date:** 2026-10-13.  
 **Specification:** [Auth organization refactor](../specs/2026-10-13-auth-refactor-design.md).
 
-This file owns the proposed migration inventory, task order and final verification task ARF-12. [Foundation](2026-10-13-auth-refactor-foundation.md), [operations](2026-10-13-auth-refactor-operations.md) and [navigation](2026-10-13-auth-refactor-navigation.md) child plans alone own their task definitions and checkboxes. ADRs own proposed/accepted decisions; the spec owns behavioral requirements. A fresh task scope will bound approved execution. No status is mirrored into an external tracker.
+This file owns the proposed migration inventory, task order and final verification task ARF-12. The app-local migration inventory is a candidate, not an adopted destination map. [Foundation](2026-10-13-auth-refactor-foundation.md), [operations](2026-10-13-auth-refactor-operations.md) and [navigation](2026-10-13-auth-refactor-navigation.md) child plans alone own their task definitions and checkboxes. ADRs own proposed/accepted decisions; the spec owns behavioral requirements. A fresh task scope will bound approved execution. No status is mirrored into an external tracker.
 
 ## 1. Preconditions and approval
 
 Before any source mutation:
 
-1. Obtain owner acceptance of the relevant Proposed ADRs: [0007](../../architecture/decisions/0007-app-local-auth-and-account-ownership.md) before foundation tasks, [0008](../../architecture/decisions/0008-auth-actions-and-server-operations.md) before operation tasks, and [0009](../../architecture/decisions/0009-caller-owned-auth-navigation.md) before the required-prop UI change. ADR acceptance and exact task-scope approval are separate gates. No workspace package is included.
-2. Re-read current ADR-0006 and the workspace conventions. This proposal preserves app-local auth. If the owner instead wants a package, stop and revise the proposal/decision scope before executing.
+1. Complete ARF-00's package comparison and obtain a concrete topology selection under [ADR-0007](../../architecture/decisions/0007-app-local-auth-and-account-ownership.md), with any category/runtime amendments approved before source work. App-local, one auth package, feature/service packages and account separation are eligible. Approve [ADR-0008](../../architecture/decisions/0008-auth-actions-and-server-operations.md) for operations and [ADR-0009](../../architecture/decisions/0009-caller-owned-auth-navigation.md) for the shared navigation API where those tasks proceed.
+2. Preserve ADR-0006's provider/session/security choices. Its initial app-local placement is not a topology restriction. Review current workspace conventions/checklist as constraints to reconcile for each candidate, not evidence of owner opposition to packages.
 3. Re-inventory the live files and imports. The source snapshot includes concurrent uncommitted auth work; including `AuthConfirmation`, `useFocusFirstError`, registration state handling, the existing resend-confirmation action/control and flow-specific callback/error recovery. The existing Draft auth-UI plan does not establish a stable baseline.
 4. Capture the relevant original contents and diff in an approved recovery location. Never reset, stash, clean, stage or commit mixed WIP. Decide how the baseline is preserved before authorizing moves; tracked Git history alone cannot recover currently untracked files.
 5. Build an exact execution manifest from the migration table and consumer list below. Resolve every destination and operation choice, list numeric create/update/move/remove budgets, and include test/config changes only if named. Check for collisions before moving anything.
@@ -19,9 +19,9 @@ Before any source mutation:
 
 The current authoring scope creates three Proposed ADRs and three child task plans, and updates the ADR index, spec, parent plan and scope entry only. The code tables below remain proposed targets, not mutation authority.
 
-## 2. Proposed migration map
+## 2. App-local candidate migration map
 
-Paths in this table are relative to `apps/web/src/`. Source paths existed in the live snapshot unless a row explicitly says new. Target paths are proposed and must be checked again at execution time. Keep function/component names initially; changing file ownership should not silently rename behavior.
+Paths in this table are relative to `apps/web/src/`. Source paths existed in the live snapshot unless a row explicitly says new. Target paths illustrate only the app-local candidate. If packages are selected, replace the destination column and affected consumer/configuration scopes with the approved package layout before source tasks run. These rows are not ready-to-execute package instructions. Keep function/component names initially; changing file ownership should not silently rename behavior.
 
 | Current source                                             | Proposed destination                                | Treatment                                                                     |
 | ---------------------------------------------------------- | --------------------------------------------------- | ----------------------------------------------------------------------------- |
@@ -54,12 +54,15 @@ Paths in this table are relative to `apps/web/src/`. Source paths existed in the
 | `components/auth/form/auth-field.tsx`                      | `components/forms/form-field.tsx`                   | Move presentation; keep exported component name initially                     |
 | `components/auth/form/form-message.tsx`                    | `components/forms/form-message.tsx`                 | Move message/id presentation with minimal error/message prop contract         |
 | `components/auth/form/use-focus-first-error.ts`            | `components/forms/use-focus-first-error.ts`         | Move current focus hook; use minimal presentation contract                    |
+| `components/auth/form/use-confirmation.ts`                 | `features/auth/client/use-confirmation.ts`          | Candidate move of existing auth-specific confirmation/edit hook               |
+| `components/auth/form/use-cooldown.ts`                     | `features/auth/client/use-cooldown.ts`              | Candidate move preserving current auth-resend cooldown behavior               |
 | `fieldErrorProps` in previous row                          | `features/auth/shared/form-feedback.ts`             | Extract auth-specific field association; reuse message ID                     |
 | `components/auth/login/login-form.tsx`                     | `features/auth/components/login-form.tsx`           | Move                                                                          |
 | `components/auth/register/register-card.tsx`               | `features/auth/components/register-card.tsx`        | Move                                                                          |
 | `components/auth/register/resend-confirmation.tsx`         | `features/auth/components/resend-confirmation.tsx`  | Move current resend control and preserve its existing action                  |
 | `components/auth/register/register-form.tsx`               | `features/auth/components/register-form.tsx`        | Move                                                                          |
 | `components/auth/forgot-password/forgot-password-card.tsx` | `features/auth/components/forgot-password-card.tsx` | Move                                                                          |
+| `components/auth/forgot-password/resend-reset-link.tsx`    | `features/auth/components/resend-reset-link.tsx`    | Candidate move preserving existing reset-resend control                       |
 | `components/auth/forgot-password/forgot-password-form.tsx` | `features/auth/components/forgot-password-form.tsx` | Move                                                                          |
 | `components/auth/update-password/update-password-card.tsx` | `features/auth/components/update-password-card.tsx` | Move                                                                          |
 | `components/auth/update-password/update-password-form.tsx` | `features/auth/components/update-password-form.tsx` | Move                                                                          |
@@ -79,7 +82,7 @@ Paths in this table are relative to `apps/web/src/`. Source paths existed in the
 
 Do not count split rows as independent moves from the same source. The execution manifest must enumerate each actual file operation once, distinguish moving files from extracting symbols, and approve removal of superseded source copies only after all consumers are updated. No compatibility copy or forwarding file is proposed by default.
 
-## 3. Existing consumers and shared component changes
+## 3. Current consumers and candidate shared component changes
 
 In addition to imports within the moved sources, the current consumer inventory includes these app files:
 
@@ -113,30 +116,31 @@ packages/frontend/ui/src/blocks/root-shell/root-header.stories.tsx
 
 Add required destination props; update every consumer and story. Do not change component exports, add Supabase/Next.js runtime imports, or move auth behavior into the shared UI package.
 
-Existing regression locations: `apps/web/e2e/auth.e2e.ts` and `apps/web/e2e/home.e2e.ts`. Do not edit them merely because files moved. Any missing assertion or new test destination belongs in the approved execution manifest. `knip.json`, manifests, lockfile, tooling and other planning documents are outside the proposed code migration; stop and revise scope if a real check requires them.
+Existing regression locations: `apps/web/e2e/auth.e2e.ts` and `apps/web/e2e/home.e2e.ts`. Do not edit them merely because files moved. Any missing assertion or new test destination belongs in the approved execution manifest. For the app-local candidate, package/configuration files are outside the illustrative migration. For a selected package candidate, ARF-00 must enumerate required package manifests/exports, dependency ownership, consumer manifests, lockfile, build/test discovery, Knip and canonical amendments in a new exact scope. Package scaffolding is permitted after that approval, not forbidden by this document.
 
 ## 4. Task sequence and ownership
 
-Each task is defined and checked off in exactly one owning plan. All are proposed and unstarted. The table records dependencies and links only, not duplicate completion status. Source-affecting work requires fresh approved scope even after decision acceptance.
+Each task is defined and checked off in exactly one owning plan. Tasks remain proposed; checkboxes are not evidence that concurrent source work has or has not implemented overlapping behavior. ARF-00 re-evaluates topology and the baseline first. The table records dependencies and links only, not duplicate completion status. Source-affecting work requires fresh approved scope even after decision acceptance.
 
-| Task   | Outcome                                                         | Depends on                             | Owning plan                                          |
-| ------ | --------------------------------------------------------------- | -------------------------------------- | ---------------------------------------------------- |
-| ARF-01 | Approved source manifest and recoverable live baseline          | Owner acceptance of ADR-0007 and scope | [Foundation](2026-10-13-auth-refactor-foundation.md) |
-| ARF-02 | Safe shared contracts and common form/focus behavior            | ARF-01                                 | [Foundation](2026-10-13-auth-refactor-foundation.md) |
-| ARF-03 | App-owned routing, flow recovery and owner guard                | ARF-02                                 | [Foundation](2026-10-13-auth-refactor-foundation.md) |
-| ARF-04 | Account profile implementation and route wiring                 | ARF-03                                 | [Foundation](2026-10-13-auth-refactor-foundation.md) |
-| ARF-05 | Cohesive auth feature and updated consumers                     | ARF-04                                 | [Foundation](2026-10-13-auth-refactor-foundation.md) |
-| ARF-06 | Foundation behavior verified before further extraction          | ARF-05                                 | [Foundation](2026-10-13-auth-refactor-foundation.md) |
-| ARF-07 | Registration operation and outcome tests                        | ARF-06; ADR-0008 accepted              | [Operations](2026-10-13-auth-refactor-operations.md) |
-| ARF-08 | Recovery operation with neutral/rate-limit behavior preserved   | ARF-07                                 | [Operations](2026-10-13-auth-refactor-operations.md) |
-| ARF-09 | Real action integration and server/client boundary verification | ARF-08                                 | [Operations](2026-10-13-auth-refactor-operations.md) |
-| ARF-10 | Required href props and every consumer updated together         | ARF-09; ADR-0009 accepted              | [Navigation](2026-10-13-auth-refactor-navigation.md) |
-| ARF-11 | Custom links, story/a11y and app navigation verified            | ARF-10                                 | [Navigation](2026-10-13-auth-refactor-navigation.md) |
-| ARF-12 | Final approved diff, root gates and evidence report             | ARF-11                                 | This parent plan                                     |
+| Task   | Outcome                                                         | Depends on                                                                             | Owning plan                                          |
+| ------ | --------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| ARF-00 | Compare package/module layouts and obtain selected topology     | Approved documentation evaluation scope; owner selects recommendation before migration | [Foundation](2026-10-13-auth-refactor-foundation.md) |
+| ARF-01 | Approved source manifest and recoverable live baseline          | ARF-00; owner selection, required governance amendments and scope approved             | [Foundation](2026-10-13-auth-refactor-foundation.md) |
+| ARF-02 | Safe shared contracts and common form/focus behavior            | ARF-01                                                                                 | [Foundation](2026-10-13-auth-refactor-foundation.md) |
+| ARF-03 | App-owned routing, flow recovery and owner guard                | ARF-02                                                                                 | [Foundation](2026-10-13-auth-refactor-foundation.md) |
+| ARF-04 | Account profile implementation and route wiring                 | ARF-03                                                                                 | [Foundation](2026-10-13-auth-refactor-foundation.md) |
+| ARF-05 | Cohesive auth feature and updated consumers                     | ARF-04                                                                                 | [Foundation](2026-10-13-auth-refactor-foundation.md) |
+| ARF-06 | Foundation behavior verified before further extraction          | ARF-05                                                                                 | [Foundation](2026-10-13-auth-refactor-foundation.md) |
+| ARF-07 | Registration operation and outcome tests                        | ARF-06; ADR-0008 accepted                                                              | [Operations](2026-10-13-auth-refactor-operations.md) |
+| ARF-08 | Recovery operation with neutral/rate-limit behavior preserved   | ARF-07                                                                                 | [Operations](2026-10-13-auth-refactor-operations.md) |
+| ARF-09 | Real action integration and server/client boundary verification | ARF-08                                                                                 | [Operations](2026-10-13-auth-refactor-operations.md) |
+| ARF-10 | Required href props and every consumer updated together         | ARF-09; ADR-0009 accepted                                                              | [Navigation](2026-10-13-auth-refactor-navigation.md) |
+| ARF-11 | Custom links, story/a11y and app navigation verified            | ARF-10                                                                                 | [Navigation](2026-10-13-auth-refactor-navigation.md) |
+| ARF-12 | Final approved diff, root gates and evidence report             | ARF-11                                                                                 | This parent plan                                     |
 
 ### ARF-12: verify the complete approved refactor and report evidence
 
-**Depends on:** ARF-11; all relevant ADRs Accepted and execution scope approved.  
+**Depends on:** ARF-11; selected topology, relevant ADRs/canonical amendments and execution scope approved.  
 **Code scope:** read-only final diff and approved source/consumer inventory; repairs return to the owning task within its manifest. No additional production/configuration/planning mutation is granted here.
 
 - [ ] Compare final file operations and source hunks with the exact approved manifest and recoverable WIP baseline; verify old imports/duplicate copies are gone.
@@ -178,4 +182,4 @@ Each checkpoint should be recoverable from the captured live baseline. Restore o
 
 Report final ownership and why each piece belongs there; preserved observable behavior; decisions left open (packages, profile storage, broader authorization and routing architecture); exact checks and results; unrun stages; pre-existing failures; live-provider cases verified/not verified; remaining uncommitted artifacts; and any unresolved risk or next safe action.
 
-**Authoring result:** Proposed ADRs and task plans are prepared; no source implementation or runtime verification task has run. Checkboxes in the owning plans remain unchecked. Authoring these files does not accept the ADRs or approve code execution.
+**Authoring result:** Proposed ADRs and task plans are prepared; this documentation correction has performed no source implementation or runtime verification. Assess existing overlapping work at ARF-00 rather than treating unchecked tasks as proof that no other implementation exists. Checkboxes in the owning plans remain unchecked. Authoring these files does not accept the ADRs or approve code execution.

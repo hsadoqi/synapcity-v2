@@ -1,23 +1,23 @@
 # Auth server operations: task plan
 
-**Status:** Proposed; no implementation authorized or started.  
+**Status:** Proposed; this plan does not authorize implementation. Physical placement follows ARF-00.  
 **Date:** 2026-10-13.  
 **Decision prerequisite:** [ADR-0008](../../architecture/decisions/0008-auth-actions-and-server-operations.md), following Accepted ADR-0007.  
 **Parent:** [Inventory, order and final verification](2026-10-13-auth-refactor.md).  
 **Requirements:** [Auth refactor spec](../specs/2026-10-13-auth-refactor-design.md).
 
-This file alone owns ARF-07 through ARF-09 and their checkboxes. Tasks depend on verified ARF-06 from the [foundation plan](2026-10-13-auth-refactor-foundation.md). No workspace service package or forwarding layer for every SDK call is included.
+This file alone owns ARF-07 through ARF-09 and their checkboxes. Tasks depend on verified ARF-06 from the [foundation plan](2026-10-13-auth-refactor-foundation.md). An auth package or separate service package is permitted if selected at ARF-00. A forwarding wrapper for every SDK call is not required; further splitting is assessed against actual responsibility boundaries.
 
-## Exact proposed file set
+## App-local candidate file set
 
-Paths are relative to `apps/web/src` and become eligible only after an approved scope and foundation migration:
+These paths illustrate the app-local candidate relative to `apps/web/src`. Selected package destinations/exports, framework adapters and test configuration must replace this set in a fresh approved manifest after ARF-00:
 
 - Update `features/auth/server/actions.ts`.
 - Create `features/auth/server/operations.ts` and `features/auth/server/operations.test.ts`.
 - Create `features/auth/server/actions.test.ts` for action integration assertions.
 - Read existing origin, routing/flow/error helpers and Supabase server factory; change none of their behavior.
 
-The operations create clients using the existing request-bound server factory. Test that boundary with mocks; do not invent an injected service/provider interface or a new test dependency. Keep one operations file until its real size/responsibilities justify splitting.
+Client provisioning follows the selected request-adapter contract. App-local construction through the existing server factory is one option; a package can receive a client/factory capability without importing app code. Test the chosen boundary and safe outcomes. Provider interfaces and further splitting are available when useful; dependencies/configuration require explicit scope rather than being ruled out by this plan.
 
 ## Tasks
 
@@ -27,7 +27,7 @@ The operations create clients using the existing request-bound server factory. T
 **Files:** actions, operations and operations test from the set above.
 
 - [ ] Add typed registration input: validated email/password/name and action-constructed confirmation redirect destination.
-- [ ] Implement `registerWithPassword` with per-call server client creation and the existing signUp options, including full_name metadata.
+- [ ] Implement `registerWithPassword` using the approved request-bound client/adapter contract and existing signUp options, including full_name metadata.
 - [ ] Return the minimal registration outcome: confirmation-required, signed-in user ID, or provider-error code.
 - [ ] Adapt signUp action to consume that outcome while preserving its FormData validation, safe field/message results and uncommon session-present redirect.
 - [ ] Test confirmation-required, session-present and provider-error branches; assert redirect options contain the configured destination and `confirm` flow.
@@ -64,7 +64,7 @@ The operations create clients using the existing request-bound server factory. T
 - [ ] Check client import paths: Server Actions are explicit entry points, ordinary operations/session helpers are not exposed through a client barrel.
 - [ ] Run the existing auth browser suite and record exactly which behaviors it reaches.
 
-**Acceptance:** workflow tests and action effects support the preserved contract; no extra action endpoint, global client, provider interface or tooling dependency has appeared.  
+**Acceptance:** workflow tests/action effects support the preserved contract; no extra client-callable behavior or cross-user client appears. Any package/provider interface and tooling dependencies match the selected, approved scope.  
 **Verification:** web unit/type/e2e checks; installed-framework import-boundary review. If enforcing the server boundary requires a new dependency/configuration, stop for separately scoped approval.  
 **Recovery:** preserve checkpoint evidence; reverse only approved operation/action test hunks if separately authorized.
 

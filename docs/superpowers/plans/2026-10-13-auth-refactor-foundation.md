@@ -1,22 +1,40 @@
 # Auth refactor foundation: task plan
 
-**Status:** Proposed; no implementation authorized or started.  
+**Status:** Proposed; this plan does not authorize implementation. Reassess overlapping live work at ARF-00.  
 **Date:** 2026-10-13.  
 **Decision prerequisite:** [ADR-0007](../../architecture/decisions/0007-app-local-auth-and-account-ownership.md).  
 **Parent inventory and sequence:** [Auth refactor plan](2026-10-13-auth-refactor.md).  
 **Requirements:** [Auth refactor spec](../specs/2026-10-13-auth-refactor-design.md).
 
-This file owns tasks ARF-01 through ARF-06 and their execution checkboxes. Source/destination mappings live only in the parent inventory. Paths below identify task membership; all are relative to `apps/web/src` unless stated otherwise. The approved implementer performs the tasks; the repository owner accepts decisions/scope. Do not treat file lists as current mutation authority.
+This file owns tasks ARF-00 through ARF-06 and their execution checkboxes. The parent inventory shows the app-local candidate. Package layouts require an approved replacement destination/configuration map before migration; the existing paths below do not preselect topology. Paths below identify task membership; all are relative to `apps/web/src` unless stated otherwise. The approved implementer performs the tasks; the repository owner accepts decisions/scope. Do not treat file lists as current mutation authority.
 
 ## Preconditions
 
-ADR-0007 must be Accepted, and the exact source mutation manifest/budgets and recovery baseline approved. The live working tree contains concurrent uncommitted auth work. Refresh it before execution, including callback flow reasons, the error-focus hook and the current resend-confirmation control/action. Preserve all current behavior; do not use the earlier auth-UI plan as execution authority.
+ARF-00 is a documentation/investigation task requiring its own approved scope, not prior selection of an app-local design. Before ARF-01 and subsequent source work, the owner must select a concrete topology under ADR-0007, approve any required category/runtime amendments and approve the exact mutation manifest/budgets and recovery baseline. The live working tree contains concurrent uncommitted auth work. Refresh it before execution, including callback flow reasons, the error-focus hook and the current resend-confirmation control/action. Preserve all current behavior; do not use the earlier auth-UI plan as execution authority.
 
 ## Tasks
 
+### ARF-00: compare package layouts and obtain a concrete selection
+
+**Depends on:** owner-authorized investigation/planning scope; no prior package selection required.  
+**Code scope:** read-only live auth/account/adapter/route consumers, package manifests/exports and canonical workspace conventions/checklist.  
+**Document outputs:** a reviewed candidate comparison and recommendation in ADR-0007; align the spec and parent/child inventories within an approved documentation scope. No package or source file is created by this task.
+
+- [ ] Classify current code by auth, account, form presentation, provider/platform effects and app composition; map actual imports and client/server execution needs.
+- [ ] Compare app-local modules, one auth package with narrow entry points, feature/service packages and account separation. Consider cohesion, independent tests, enforced imports, request context, exported API, coupling and maintenance cost. Do not require a second consumer.
+- [ ] For each candidate, show who owns Server Actions, session access, provider clients, browser events, forms and app-specific routing. Distinguish framework-specific packages from framework-independent contracts.
+- [ ] Identify exact names/categories, dependencies/exports, request-adapter contracts and canonical amendments the recommended package layout would need. Existing conventions are review constraints, not a reason to exclude it.
+- [ ] Give a concrete recommendation with tradeoffs and first-party/installed-version evidence for any version-sensitive technique; leave provider/session and profile-storage decisions unchanged.
+- [ ] Obtain owner selection of the layout and separately scoped approval of required governance changes.
+- [ ] Replace the app-local candidate map and task scopes with selected destinations, manifests/lockfile/configuration budgets and recovery requirements before ARF-01 executes. If app-local is selected, record why; do not treat it as the default imposed by ADR-0006.
+
+**Acceptance:** the owner can review a concrete layout, its contracts and costs against alternatives; the approved destination/configuration map matches that selection. No source migration or package creation occurs in this evaluation task.  
+**Verification:** read back candidate evidence, local links, names/exports/dependency direction and source inventory; check versions/docs where proposed techniques depend on them. No runtime result is inferred from a paper comparison.  
+**Recovery:** retain the proposal/evidence and revise only approved documentation hunks if the recommendation is declined. Do not remove or migrate source.
+
 ### ARF-01: approve scope and capture a recoverable baseline
 
-**Depends on:** owner acceptance of ADR-0007; approved execution scope.  
+**Depends on:** ARF-00; owner-selected topology, required governance amendments and exact execution scope approved.  
 **Code scope:** read-only inventory of the parent migration/consumer lists; no product source edits.
 
 - [ ] Reconcile every source, destination and consumer against the live tree; record collisions and new consumers.
@@ -32,14 +50,14 @@ ADR-0007 must be Accepted, and the exact source mutation manifest/budgets and re
 ### ARF-02: separate safe contracts and common form behavior
 
 **Depends on:** ARF-01.  
-**Source groups:** `app/auth/actions.ts`, `app/[userId]/settings/actions.ts`; `lib/auth/error-messages/error-messages.ts` and its test; `lib/auth/profile/profile.ts` and its test; `lib/auth/name/name.ts` and its test; `components/auth/form/auth-field.tsx`, `form-message.tsx`, `use-focus-first-error.ts` in that same directory.  
-**Targets:** the parent's auth/account shared contracts, current-user mapper, account metadata helper/name validator, common form components/hook and auth form-feedback helper.  
+**Source groups:** `app/auth/actions.ts`, `app/[userId]/settings/actions.ts`; `lib/auth/error-messages/error-messages.ts` and its test; `lib/auth/profile/profile.ts` and its test; `lib/auth/name/name.ts` and its test; `components/auth/form/auth-field.tsx`, `form-message.tsx`, `use-focus-first-error.ts`, `use-confirmation.ts`, `use-cooldown.ts` in that same directory.  
+**Targets:** selected-layout destinations for the capability contracts, current-user mapper, metadata/name helpers, common form/focus behavior and auth feedback; the parent currently illustrates app-local paths only.  
 **Consumer updates:** current auth login/register/resend/recovery/password forms and account profile form; auth actions; settings action/page; session reader; auth display/provider consumers. Include exact paths in the approved execution manifest.
 
 - [ ] Extract AuthState/AuthFieldName and ProfileState to their mapped shared feature contracts without changing returned data.
 - [ ] Split display-profile mapping from metadata-write preservation; keep every existing test assertion under the corresponding owner.
 - [ ] Move pure name validation to account's shared module and update registration's narrow dependency.
-- [ ] Move common field/message rendering and focus hook to `components/forms`; use a minimal presentation-state contract rather than importing AuthState.
+- [ ] Place common field/message rendering and error-focus behavior with the selected common presentation owner; `components/forms` is the app-local candidate. Keep auth-specific confirmation/edit state and resend cooldown behavior with auth. Use a minimal presentation-state contract for common forms rather than importing AuthState.
 - [ ] Keep auth field-error association feature-owned and reuse the common message ID; update all affected imports.
 - [ ] Verify error announcements, first-invalid/empty-field focus, message fallback focus and profile-form focus remain intact.
 
@@ -52,7 +70,7 @@ ADR-0007 must be Accepted, and the exact source mutation manifest/budgets and re
 
 **Depends on:** ARF-02.  
 **Source groups:** `lib/auth/home-path`, `lib/auth/safe-next`, `lib/auth/auth-flow`, `lib/auth/require-owner` (each exact implementation/test pair in the parent table), and `lib/supabase/route-access.ts`/`.test.ts`.  
-**Targets:** parent's `lib/routing` and `lib/access` rows.  
+**Targets:** selected app-policy and identity-adapter destinations; parent's `lib/routing` and `lib/access` rows are the app-local example, not a requirement that reusable identity helpers remain app-local.  
 **Consumers:** auth actions/callback/error page/status/link controls; user layout/pages; Supabase middleware adapter. Leave `proxy.ts` stable when its delegation is unchanged.
 
 - [ ] Move destination/encoding, safe-next, flow/recovery path and route-classification helpers without algorithm or constant changes.
@@ -69,7 +87,7 @@ ADR-0007 must be Accepted, and the exact source mutation manifest/budgets and re
 
 **Depends on:** ARF-03.  
 **Sources:** `components/auth/profile/profile-form.tsx`, `app/[userId]/settings/actions.ts`.  
-**Targets:** `features/account/components/profile-form.tsx`, `features/account/server/actions.ts`; shared contract/metadata/name helpers established by ARF-02.  
+**Targets:** selected account module/package and framework-adapter locations; the app-local examples are `features/account/components/profile-form.tsx` and `features/account/server/actions.ts`, with helpers established by ARF-02.  
 **Existing consumer:** `app/[userId]/settings/page.tsx`.
 
 - [ ] Move the profile form/action and update its route consumer.
@@ -84,11 +102,11 @@ ADR-0007 must be Accepted, and the exact source mutation manifest/budgets and re
 ### ARF-05: consolidate auth implementation and wire its consumers
 
 **Depends on:** ARF-04.  
-**Source groups:** `app/auth/actions.ts`; `lib/auth/session.ts`; `lib/auth/origin` implementation/test; `lib/auth/auth-events` implementation/test; `components/auth/provider/user-provider.tsx`; all mapped auth button/display/login/register/resend/recovery/password/shell components.  
-**Targets:** parent auth feature rows; no operation extraction yet.  
+**Source groups:** `app/auth/actions.ts`; `lib/auth/session.ts`; `lib/auth/origin` implementation/test; `lib/auth/auth-events` implementation/test; `components/auth/provider/user-provider.tsx`; all mapped auth button/display/login/register/resend/recovery/password/shell components, including `components/auth/forgot-password/resend-reset-link.tsx`.  
+**Targets:** approved auth package/module and adapter map; parent auth feature rows are one candidate. If packages are selected, include their approved manifests/exports/build/test discovery and consumer updates in the exact scope. No operation extraction yet.  
 **Consumer scope:** parent's existing app route/layout list and moved feature files. Browser/server Supabase factories remain in place.
 
-- [ ] Move auth actions, server readers/origin helper, client provider/event filter and auth components to mapped destinations.
+- [ ] Move auth actions, server readers/origin helper, client provider/event filter and auth components to selected destinations, including approved package boundaries where chosen.
 - [ ] Keep client directives, action entry points, request caching, server/client separation and current render behavior intact.
 - [ ] Update route/layout imports and preserve callback/proxy framework adapters.
 - [ ] Search for superseded imports before removing old copies within the approved move budget.
@@ -114,4 +132,4 @@ ADR-0007 must be Accepted, and the exact source mutation manifest/budgets and re
 
 ## Exit
 
-ARF-06 provides the prerequisite evidence for the operation plan. Every checkbox starts unchecked; neither this document nor acceptance of an ADR claims completed implementation.
+ARF-06 provides the prerequisite evidence for the operation plan. All checkboxes remain unchecked. Existing source changes may overlap tasks; assess and verify them rather than inferring implementation absence or completion from these documents. Package selection is still open.
