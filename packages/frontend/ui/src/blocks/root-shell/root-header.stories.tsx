@@ -31,7 +31,12 @@ export const SignedOut: Story = {
 export const SignedIn: Story = {
   args: {
     actions: (
-      <UserMenu name="Hanaa Sadoqi" email="hanaa@example.com" imageUrl={null} />
+      <UserMenu
+        id="user-1"
+        name="Hanaa Sadoqi"
+        email="hanaa@example.com"
+        imageUrl={null}
+      />
     ),
   },
 };
