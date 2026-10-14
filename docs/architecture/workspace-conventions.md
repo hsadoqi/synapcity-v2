@@ -37,7 +37,7 @@ Turborepo runs `build`, `lint`, `check-types` and `dev` from the root (`turbo.js
 ## Where code runs (client and server)
 
 - Server-only code (Node APIs, request handling, secrets) lives in an app.
-- `@synapcity/frontend-ui` and the other `frontend` packages are application-runtime agnostic: they may use React, JSX and web-platform APIs, and a narrow `"use client"` boundary where a component needs it. They must not import Next.js routing or request APIs, Server Actions, application environment variables, or anything from `apps/*`.
+- `@synapcity/frontend-ui` and the other `frontend` packages are free of the server runtime: they may use React, JSX and web-platform APIs, and a narrow `"use client"` boundary where a component needs it. They may use `next/link` and the client navigation hooks of `next/navigation` (for example `usePathname`) for links and active state, because every consumer is a Next.js app and a caller-supplied link component would be an abstraction with no second implementation. They must not import request APIs (`next/headers`, `next/server`), Server Actions, application environment variables, or anything from `apps/*`. Where a link points is the app's decision and arrives as a prop (ADR-0009).
 - A package that needs an app-specific capability defines an interface for it and receives the implementation from the app.
 
 ## Styling in the workspace

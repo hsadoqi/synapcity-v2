@@ -3,7 +3,8 @@
 **Status:** Research / evidence for [ADR-0007](../../architecture/decisions/0007-app-local-auth-and-account-ownership.md). Not authority, no layout selected, no source migration authorized.  
 **Date:** 2026-10-14.  
 **Source snapshot:** branch `refactor/auth-actions`, working tree after the ADR-0009 `account` change. Re-inventory before acting on any count here.  
-**Task:** [ARF-00](../plans/2026-10-13-auth-refactor-foundation.md). This document is its comparison input; the recommendation still needs the owner's selection.
+**Task:** [ARF-00](../plans/2026-10-13-auth-refactor-foundation.md). This document is its comparison input.  
+**Outcome (2026-10-14):** the owner accepted the recommendation; [ADR-0007](../../architecture/decisions/0007-app-local-auth-and-account-ownership.md) records the selection and the migration was executed. Sections 1 to 4 describe the tree before the move; section 5 and the addendum describe what was done.
 
 ## 1. What this is for
 
@@ -37,7 +38,7 @@ The "no framework" count is conservative. A first pass that looked only at direc
 
 ### 2.4 What enforces boundaries today
 
-No import-boundary lint rule is configured and ADR-0007 lists enforcement as unresolved. Today the only mechanical enforcement is a package's `exports` map. Folder layout inside an app is convention only.
+No import-boundary rule was configured when this was written, and ADR-0007 lists enforcement as unresolved. While adding one, a further fact turned up that changes what "lint" means in this repository: **ESLint does not lint TypeScript in `apps/web`.** The shared Next.js config contains no `files` entry for `.ts`/`.tsx`, so ESLint's flat config skips them. A deliberately syntactically broken `.ts` file at the pre-migration commit produced no output and exit code 0, in both `apps/web` and `packages/frontend/ui`. `pnpm lint` therefore passes for those workspaces without reading their source; `pnpm typecheck` is what covers it. Two further constraints sit behind that: the shared config parses TypeScript with Babel's `preset-typescript` without TSX handling, so merely turning TS linting on makes every `.tsx` file a parse error; and `eslint-plugin-only-warn` downgrades rule errors to warnings.
 
 ## 3. Candidates
 
@@ -99,7 +100,17 @@ The parent plan's table is still the base. These items did not exist when it was
 | Approve an import-enforcement tool, if any          | ADR-0007 lists it unresolved and it is a tooling change              |
 | Decide how `frontend-ui` should reach Next.js links | Either amend the convention or add a caller-supplied link capability |
 
-## 8. Limits
+## 8. Addendum: execution (2026-10-14)
+
+Executed on `refactor/auth-features` under candidate A with D within A:
+
+- 52 files moved and 1 removed with a script that resolved every import to a file and rewrote 129 specifiers, asserting zero unresolved targets before applying. Four symbols were extracted by hand: `AuthFieldName` to the form contract, `fieldErrorProps` to `features/auth/shared/form-feedback.ts`, `ProfileState` to `features/account/shared/form-state.ts` and `withFullName` to `features/account/server/profile-metadata.ts`.
+- The unused `components/index.ts` barrel was removed. It re-exported auth components from `components/`, the wrong direction for the new layering, and nothing imported it.
+- Rows added beyond the parent plan's table: `features/auth/components/resend-button.tsx`, `features/auth/server/form-data.ts` and `features/auth/shared/form-feedback.ts`.
+- Enforcement is `apps/web/src/architecture.test.ts` (six rules), not ESLint, for the reason in section 2.4. Each rule was proven to fail against a planted violation before it was trusted.
+- Not done: ADR-0008's operations extraction, which the plan sequences after this move.
+
+## 9. Limits
 
 - File counts come from a script's reading of import statements, not of runtime behavior.
 - The configuration costs in section 3 are estimates from this repository's conventions and checklist, not measured.

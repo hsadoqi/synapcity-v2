@@ -1,8 +1,8 @@
 # ADR-0007: Auth responsibility boundaries and package layout evaluation
 
-**Status:** Proposed  
-**Date:** 2026-10-13  
-**Deciders:** Hanaa Sadoqi (repository owner); topology selection and acceptance pending.
+**Status:** Accepted  
+**Date:** 2026-10-13 (accepted 2026-10-14)  
+**Deciders:** Hanaa Sadoqi (repository owner); accepted by the owner's direct instruction to proceed on recommendations.
 
 ## Context
 
@@ -67,3 +67,12 @@ ARF-00 compares actual imports/consumers and states the candidate recommendation
 ## Reconsideration conditions
 
 Observed coupling, runtime needs, testing/API boundaries or maintenance costs differ from the selected design. Reconsideration may lead to fewer or more packages; it is not contingent on another app appearing.
+
+## Selection (2026-10-14)
+
+Candidate A, app-local modules, with account as a sibling module (D within A): `apps/web/src/features/auth` and `apps/web/src/features/account`, each split into `shared`, `server`, `client` and `components`. Application routing policy sits in `lib/routing` and `lib/access`; common form presentation in `components/forms`. The comparison and measurements are in [ARF-00 evidence](../../superpowers/specs/2026-10-14-arf-00-layout-evidence.md).
+
+- **Convention amendments:** none for the layout. Separately, [workspace conventions](../workspace-conventions.md) now allow `next/link` and the client navigation hooks in `frontend` packages.
+- **Import enforcement:** a Vitest test, `apps/web/src/architecture.test.ts`, which runs in the root gate. An ESLint rule was not used: ESLint does not lint TypeScript in `apps/web` today (the shared config has no `.ts`/`.tsx` `files` entry) and the shared config's `eslint-plugin-only-warn` would downgrade the rule to a warning.
+- **Reconsideration triggers** are the ones the evidence document lists: a second app needing sign-in, boundary violations that the test cannot prevent, or provider operations that change independently of the actions.
+- **Executed** on `refactor/auth-features`: 52 file moves, 1 removal, four symbol extractions; behavior preserved and verified by the existing unit, story and Playwright suites.
