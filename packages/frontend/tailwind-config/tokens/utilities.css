@@ -103,14 +103,14 @@
 
 /* Menu item states. bg-hover mixes into --background, which in dark sits below the popover
    (14.5% against 20.5%), so on a menu it lands at 1.02:1 and disappears. These mix into the
-   popover itself: the highlight is about 1.3:1 against the menu in light and 1.24:1 in dark,
-   with text on it at 13:1 or better. Solid mixes, never alpha (the Solid Mix Rule).
-   TODO(human): tune the highlight strength below (currently 10%) by eye in both themes. */
+   popover itself: the highlight is about 1.36:1 against the menu in light and 1.31:1 in dark,
+   with text on it at 12:1 or better. Solid mixes, never alpha (the Solid Mix Rule). 12% matches
+   bg-destructive-hover so the two highlights stay in step; the fill is also the keyboard cue. */
 @utility bg-popover-hover {
   background-color: color-mix(
     in oklch,
     var(--popover),
-    var(--popover-foreground) 10%
+    var(--popover-foreground) 12%
   );
 }
 
