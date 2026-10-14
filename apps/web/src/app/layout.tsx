@@ -9,6 +9,7 @@ import { RootShell } from '@synapcity/frontend-ui/blocks/root-shell';
 import { createMetadata } from '@synapcity/frontend-site/metadata';
 import { UserProvider } from '@/components/auth/provider/user-provider';
 import { getCurrentUser } from '@/lib/auth/session';
+import { accountLinksFor } from '@/lib/auth/home-path/home-path';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 const geistSans = localFont({
@@ -39,7 +40,7 @@ export default async function RootLayout({
         <RootProviders>
           <UserProvider user={user}>
             <RootShell
-              userId={user?.id ?? null}
+              account={user ? accountLinksFor(user.id) : null}
               headerActions={<AuthStatus variant="header" />}
             >
               {children}

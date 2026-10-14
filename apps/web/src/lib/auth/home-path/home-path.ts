@@ -17,3 +17,11 @@ export function homePathFor(userId: string): string {
 export function settingsPathFor(userId: string): string {
   return userPath(userId, 'settings');
 }
+
+/** The account links the shared shell and menu are given, from one id. */
+export function accountLinksFor(userId: string) {
+  return {
+    homeHref: homePathFor(userId),
+    settingsHref: settingsPathFor(userId),
+  };
+}

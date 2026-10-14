@@ -3,7 +3,7 @@ import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
 import { UserMenu } from '@synapcity/frontend-ui/components/user-menu';
 
 import { signOut } from '@/app/auth/actions';
-import { homePathFor } from '@/lib/auth/home-path/home-path';
+import { accountLinksFor, homePathFor } from '@/lib/auth/home-path/home-path';
 import { getCurrentUser } from '@/lib/auth/session';
 
 /**
@@ -38,7 +38,7 @@ export async function AuthStatus({
 
   return (
     <UserMenu
-      id={user.id}
+      {...accountLinksFor(user.id)}
       name={user.name}
       email={user.email}
       imageUrl={user.imageUrl}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { homePathFor, settingsPathFor } from './home-path';
+import { accountLinksFor, homePathFor, settingsPathFor } from './home-path';
 
 describe('homePathFor', () => {
   it('puts the user id in front of /home', () => {
@@ -24,5 +24,21 @@ describe('settingsPathFor', () => {
     expect(settingsPathFor('u1')).toBe('/u1/settings');
     expect(settingsPathFor('a/b')).toBe('/a%2Fb/settings');
     expect(settingsPathFor('..')).toBe('/%2E%2E/settings');
+  });
+});
+
+describe('accountLinksFor', () => {
+  it('pairs the home and settings paths for one id', () => {
+    expect(accountLinksFor('u1')).toEqual({
+      homeHref: '/u1/home',
+      settingsHref: '/u1/settings',
+    });
+  });
+
+  it('keeps the one-segment encoding for both links', () => {
+    expect(accountLinksFor('..')).toEqual({
+      homeHref: '/%2E%2E/home',
+      settingsHref: '/%2E%2E/settings',
+    });
   });
 });
