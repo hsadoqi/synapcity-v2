@@ -302,9 +302,11 @@ function SidebarRail({ className, ...props }: React.ComponentProps<'button'>) {
   );
 }
 
-function SidebarInset({ className, ...props }: React.ComponentProps<'main'>) {
+// A plain container, not <main>: the shell owns the page's single main
+// landmark (RootContent) so the header and footer stay top-level landmarks.
+function SidebarInset({ className, ...props }: React.ComponentProps<'div'>) {
   return (
-    <main
+    <div
       data-slot="sidebar-inset"
       className={cn(
         'relative flex w-full flex-1 flex-col bg-background md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2',

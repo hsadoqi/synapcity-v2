@@ -16,28 +16,34 @@ export default function RootShell({
 }) {
   const content = (
     <>
-      <SkipLinkButton />
       <RootContent>{children}</RootContent>
       <RootFooter />
     </>
   );
 
+  // The skip link comes first in the DOM so it is the first Tab stop, ahead
+  // of the header and sidebar. It is position: fixed, so this costs no layout.
   if (userId) {
     return (
-      <SidebarShell
-        header={<RootHeader userId={userId} actions={headerActions} />}
-      >
-        {content}
-      </SidebarShell>
+      <>
+        <SkipLinkButton />
+        <SidebarShell
+          header={<RootHeader userId={userId} actions={headerActions} />}
+          userId={userId}
+        >
+          {content}
+        </SidebarShell>
+      </>
     );
   }
 
+  // Pages position themselves (the home page centers, auth sits near the top),
+  // so this column only stacks header, content and footer.
   return (
     <div className="flex flex-col flex-1">
+      <SkipLinkButton />
       <RootHeader userId={userId} actions={headerActions} />
-      <div className="flex flex-1 flex-col overflow-hidden items-center justify-center">
-        {content}
-      </div>
+      <div className="flex flex-1 flex-col">{content}</div>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { ContextSwitcher } from '../../blocks/context-switcher';
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -16,11 +17,14 @@ import {
   SidebarRail,
 } from '../../components/ui/sidebar';
 import Link from 'next/link';
+import { Cog } from 'lucide-react';
+import { ModeToggle } from '../../components/mode-toggle';
 import { data } from './sidebar-data';
 
 export function RootSidebar({
+  userId,
   ...props
-}: React.ComponentProps<typeof Sidebar>) {
+}: React.ComponentProps<typeof Sidebar> & { userId: string }) {
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -56,6 +60,26 @@ export function RootSidebar({
           </SidebarGroup>
         ))}
       </SidebarContent>
+      {/* The header carries these from md up; below md they live here, so the
+          sheet is the one place a phone user can reach them. */}
+      <SidebarFooter className="md:hidden">
+        <SidebarMenu>
+          <SidebarMenuItem className="flex items-center gap-2">
+            <SidebarMenuButton
+              className="flex-1"
+              render={(props) => {
+                return (
+                  <Link href={`/${userId}/settings`} {...props}>
+                    <Cog />
+                    Settings
+                  </Link>
+                );
+              }}
+            />
+            <ModeToggle variant="ghost" />
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );

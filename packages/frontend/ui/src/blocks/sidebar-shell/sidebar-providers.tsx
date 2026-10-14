@@ -11,7 +11,12 @@ export const SidebarProviders = ({
 }) => {
   return (
     <TooltipProvider>
-      <SidebarProvider>{children}</SidebarProvider>
+      <SidebarProvider
+        defaultOpen={false}
+        className="min-h-svh max-w-screen size-full"
+      >
+        {children}
+      </SidebarProvider>
     </TooltipProvider>
   );
 };
