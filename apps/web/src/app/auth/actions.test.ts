@@ -233,32 +233,19 @@ describe('resendConfirmation', () => {
 });
 
 describe('requestPasswordReset', () => {
-  it('reports the email send limit instead of claiming a link is on its way', async () => {
-    mocks.resetPasswordForEmail.mockResolvedValue({
-      error: { code: 'over_email_send_rate_limit' },
-    });
+  it.each(['over_email_send_rate_limit', 'over_request_rate_limit'])(
+    'reports the %s limit instead of claiming a link is on its way',
+    async (code) => {
+      mocks.resetPasswordForEmail.mockResolvedValue({ error: { code } });
 
-    const state = await requestPasswordReset({}, form({ email: 'a@b.co' }));
+      const state = await requestPasswordReset({}, form({ email: 'a@b.co' }));
 
-    expect(state.error).toBe(
-      'Too many attempts. Wait a few minutes and try again.',
-    );
-    expect(state.success).toBeUndefined();
-  });
-
-  // Characterization, not endorsement: this pins today's behaviour because the
-  // auth-refactor plan says to preserve recovery's failure policy. Reporting
-  // this limit as `resendConfirmation` does is an open owner decision.
-  it('answers neutrally for the request limit, as it did before', async () => {
-    mocks.resetPasswordForEmail.mockResolvedValue({
-      error: { code: 'over_request_rate_limit' },
-    });
-
-    const state = await requestPasswordReset({}, form({ email: 'a@b.co' }));
-
-    expect(state.success).toBe(true);
-    expect(state.error).toBeUndefined();
-  });
+      expect(state.error).toBe(
+        'Too many attempts. Wait a few minutes and try again.',
+      );
+      expect(state.success).toBeUndefined();
+    },
+  );
 
   it('answers the same whether or not the address has an account', async () => {
     mocks.resetPasswordForEmail.mockResolvedValue({

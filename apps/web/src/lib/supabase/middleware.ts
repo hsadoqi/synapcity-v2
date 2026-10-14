@@ -46,7 +46,13 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = '/auth/login';
     url.search = '';
-    url.searchParams.set('next', request.nextUrl.pathname);
+    // Keep the query so the visitor lands on the same view after signing in.
+    // `request.nextUrl` is untouched by the clone above; the value is still
+    // validated by `safeNextPath` where it is used.
+    url.searchParams.set(
+      'next',
+      `${request.nextUrl.pathname}${request.nextUrl.search}`,
+    );
     return NextResponse.redirect(url);
   }
 

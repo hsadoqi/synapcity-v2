@@ -150,10 +150,11 @@ export async function requestPasswordReset(
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: callbackUrl(getOrigin(), '/auth/update-password', 'reset'),
   });
-  // Only the email limit is reported here; `resendConfirmation` also reports
-  // the request limit. Kept as it was: ADR-0008 and the auth-refactor plan say
-  // to preserve recovery's failure policy, so changing it is the owner's call.
-  if (error?.code === 'over_email_send_rate_limit') {
+  // Both limits, as in `resendConfirmation`. Only the email one used to be
+  // handled, so a request-rate limit was reported as "a reset link is on its
+  // way". Changed with the repository owner's approval; it departs from
+  // "preserve recovery's failure policy" in ADR-0008 and the refactor plan.
+  if (isRateLimited(error?.code)) {
     return authFailure(authErrorMessage(error?.code), user);
   }
 
