@@ -1,6 +1,20 @@
 /** The shortest password the forms accept; the weak-password reply states it. */
 export const MIN_PASSWORD_LENGTH = 8;
 
+/** The reply when a password is shorter than `MIN_PASSWORD_LENGTH`. */
+export const PASSWORD_TOO_SHORT_MESSAGE = `Use a password of at least ${MIN_PASSWORD_LENGTH} characters.`;
+
+/**
+ * Whether a Supabase Auth error code means "slow down". These say nothing about
+ * any account, so they are safe to show even where every other error is
+ * answered identically to avoid account discovery.
+ */
+export function isRateLimited(code: string | undefined): boolean {
+  return (
+    code === 'over_email_send_rate_limit' || code === 'over_request_rate_limit'
+  );
+}
+
 /** Form fields an auth error can point at, so the form can mark them invalid. */
 export type AuthFieldName = 'name' | 'email' | 'password' | 'confirm';
 

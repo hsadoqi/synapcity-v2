@@ -13,6 +13,20 @@ export function parseAuthFlow(raw: string | null | undefined): AuthFlow | null {
     : null;
 }
 
+/**
+ * The link an email or provider sends someone back to. `next` is the
+ * already-validated destination and `flow` tags it so a failure can be
+ * explained; see `parseAuthFlow` for the reading side.
+ */
+export function callbackUrl(
+  origin: string,
+  next: string,
+  flow: AuthFlow,
+): string {
+  const params = new URLSearchParams({ next, flow });
+  return `${origin}/auth/callback?${params}`;
+}
+
 /** Where to send someone when a flow fails, carrying the reason when known. */
 export function authErrorPath(flow: AuthFlow | null): string {
   return flow ? `/auth/error?reason=${flow}` : '/auth/error';

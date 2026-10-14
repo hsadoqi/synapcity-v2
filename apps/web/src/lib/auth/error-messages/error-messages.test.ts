@@ -3,10 +3,34 @@ import { describe, expect, it } from 'vitest';
 import {
   authErrorFields,
   authErrorMessage,
+  isRateLimited,
   MIN_PASSWORD_LENGTH,
+  PASSWORD_TOO_SHORT_MESSAGE,
 } from './error-messages';
 
 const GENERIC = 'Something went wrong. Try again.';
+
+describe('isRateLimited', () => {
+  it.each(['over_email_send_rate_limit', 'over_request_rate_limit'])(
+    'treats %s as rate limiting',
+    (code) => {
+      expect(isRateLimited(code)).toBe(true);
+    },
+  );
+
+  it.each([undefined, '', 'invalid_credentials', 'user_already_exists'])(
+    'does not treat %j as rate limiting',
+    (code) => {
+      expect(isRateLimited(code)).toBe(false);
+    },
+  );
+});
+
+describe('PASSWORD_TOO_SHORT_MESSAGE', () => {
+  it('states the real minimum', () => {
+    expect(PASSWORD_TOO_SHORT_MESSAGE).toContain(String(MIN_PASSWORD_LENGTH));
+  });
+});
 
 describe('authErrorMessage', () => {
   it.each([
