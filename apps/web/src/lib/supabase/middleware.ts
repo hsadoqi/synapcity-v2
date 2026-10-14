@@ -1,10 +1,10 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-import { homePathFor } from '@/lib/auth/home-path/home-path';
-import { safeNextPath } from '@/lib/auth/safe-next/safe-next';
+import { homePathFor } from '@/lib/routing/user-paths';
+import { safeNextPath } from '@/lib/routing/safe-next';
 import { getSupabaseEnv } from './env';
-import { isGuestOnlyPath, isProtectedPath } from './route-access';
+import { isGuestOnlyPath, isProtectedPath } from '../routing/route-access';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({

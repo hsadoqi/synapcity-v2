@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { accountLinksFor, homePathFor, settingsPathFor } from './home-path';
+import { accountLinksFor, homePathFor, settingsPathFor } from './user-paths';
 
 describe('homePathFor', () => {
   it('puts the user id in front of /home', () => {

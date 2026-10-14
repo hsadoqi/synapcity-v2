@@ -1,7 +1,7 @@
 import { notFound, redirect } from 'next/navigation';
 
-import { homePathFor } from '../home-path/home-path';
-import { getVerifiedClaims } from '../session';
+import { homePathFor } from '../routing/user-paths';
+import { getVerifiedClaims } from '../../features/auth/server/session';
 
 /**
  * Guards a `/[userId]/...` route: the visitor must be signed in AND be that
