@@ -13,8 +13,9 @@ const require = createRequire(import.meta.url);
  * undefined, and declaration merging as redeclaration. The compiler (`pnpm
  * typecheck`) already enforces undefined names and redeclarations.
  *
- * `no-unused-vars` is off for the same reason, which leaves unused locals
- * unchecked until `noUnusedLocals` is enabled in the TypeScript config.
+ * `no-unused-vars` is off for the same reason. Unused locals and parameters
+ * are caught by the compiler instead (`noUnusedLocals` and
+ * `noUnusedParameters` in the shared base tsconfig).
  */
 const typescriptCoveredByTheCompiler = {
   'no-undef': 'off',
