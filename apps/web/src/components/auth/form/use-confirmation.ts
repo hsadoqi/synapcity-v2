@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import type { AuthState } from '@/app/auth/actions';
+import type { AuthState } from '@/lib/auth/auth-state/auth-state';
 
 /**
  * Lets a "Check your email" state be left again without losing what was typed.

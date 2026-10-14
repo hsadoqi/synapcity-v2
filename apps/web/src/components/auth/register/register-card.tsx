@@ -2,7 +2,8 @@
 
 import { useActionState } from 'react';
 
-import { signUp, type AuthState } from '@/app/auth/actions';
+import { signUp } from '@/app/auth/actions';
+import type { AuthState } from '@/lib/auth/auth-state/auth-state';
 import { AuthLinkButton } from '../buttons/auth-link-button';
 import { OAuthButtons } from '../buttons/oauth-buttons';
 import { AuthConfirmation } from '../shell/auth-confirmation';

@@ -1,7 +1,8 @@
 'use client';
 
 import { useActionState } from 'react';
-import { requestPasswordReset, type AuthState } from '@/app/auth/actions';
+import { requestPasswordReset } from '@/app/auth/actions';
+import type { AuthState } from '@/lib/auth/auth-state/auth-state';
 import { AuthLinkButton } from '../buttons/auth-link-button';
 import { AuthConfirmation } from '../shell/auth-confirmation';
 import { AuthShell } from '../shell/auth-shell';

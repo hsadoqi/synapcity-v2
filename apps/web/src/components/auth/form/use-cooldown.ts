@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import type { AuthState } from '@/app/auth/actions';
+import type { AuthState } from '@/lib/auth/auth-state/auth-state';
 
 /**
  * Seconds to wait before another email can be requested. A courtesy so the

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 
-import type { AuthState } from '@/app/auth/actions';
+import type { AuthState } from '@/lib/auth/auth-state/auth-state';
 import { FORM_MESSAGE_ID } from './form-message';
 
 /**

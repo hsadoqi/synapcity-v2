@@ -1,4 +1,4 @@
-import type { AuthState } from '@/app/auth/actions';
+import type { AuthState } from '@/lib/auth/auth-state/auth-state';
 import type { AuthFieldName } from '@/lib/auth/error-messages/error-messages';
 
 /** Shared id so fields can point `aria-describedby` at the message. */

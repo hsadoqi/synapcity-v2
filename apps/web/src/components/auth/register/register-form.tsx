@@ -2,7 +2,7 @@
 
 import { Button } from '@synapcity/frontend-ui/core/button';
 
-import type { AuthState } from '@/app/auth/actions';
+import type { AuthState } from '@/lib/auth/auth-state/auth-state';
 import { MIN_PASSWORD_LENGTH } from '@/lib/auth/error-messages/error-messages';
 import { MAX_NAME_LENGTH } from '@/lib/auth/name/name';
 import { AuthField } from '../form/auth-field';

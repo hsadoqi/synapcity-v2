@@ -2,7 +2,8 @@
 
 import { useActionState } from 'react';
 
-import { requestPasswordReset, type AuthState } from '@/app/auth/actions';
+import { requestPasswordReset } from '@/app/auth/actions';
+import type { AuthState } from '@/lib/auth/auth-state/auth-state';
 import { FormMessage } from '../form/form-message';
 import { ResendButton } from '../form/resend-button';
 import { useCooldown } from '../form/use-cooldown';

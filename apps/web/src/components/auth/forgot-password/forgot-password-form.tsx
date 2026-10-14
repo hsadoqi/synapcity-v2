@@ -2,7 +2,7 @@
 
 import { Button } from '@synapcity/frontend-ui/core/button';
 
-import type { AuthState } from '@/app/auth/actions';
+import type { AuthState } from '@/lib/auth/auth-state/auth-state';
 import { AuthField } from '../form/auth-field';
 import { useFocusFirstError } from '../form/use-focus-first-error';
 import { fieldErrorProps, FormMessage } from '../form/form-message';
