@@ -9,7 +9,9 @@ test('home page renders its heading and call to action', async ({ page }) => {
   await expect(
     page.getByRole('main').getByRole('link', { name: 'Go to your workspace' }),
   ).toHaveAttribute('href', '/developer/home');
-  await expect(page.getByRole('button', { name: 'Account menu' })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Account menu' }),
+  ).toBeVisible();
 });
 
 for (const colorScheme of ['light', 'dark'] as const) {
