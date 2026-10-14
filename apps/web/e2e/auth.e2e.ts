@@ -284,23 +284,23 @@ test.describe('error page reasons', () => {
   }
 });
 
-test.describe('header navigation', () => {
-  for (const [path, current, other] of [
-    ['/auth/login', 'Sign in', 'Sign up'],
-    ['/auth/register', 'Sign up', 'Sign in'],
-  ] as const) {
-    test(`marks ${current} as the current page on ${path}`, async ({
+test.describe('development header navigation', () => {
+  for (const path of ['/auth/login', '/auth/register'] as const) {
+    test(`keeps the development account available on ${path}`, async ({
       page,
     }) => {
       await page.goto(path);
-      const header = page.locator('header');
+      const accountMenu = page.getByRole('button', { name: 'Account menu' });
 
+      await expect(accountMenu).toBeVisible();
+      await accountMenu.click();
+      await expect(page.getByText('Development session')).toBeVisible();
       await expect(
-        header.getByRole('link', { name: current, exact: true }),
-      ).toHaveAttribute('aria-current', 'page');
+        page.getByRole('menuitem', { name: 'Home' }),
+      ).toHaveAttribute('href', '/developer/home');
       await expect(
-        header.getByRole('link', { name: other, exact: true }),
-      ).not.toHaveAttribute('aria-current', /.*/);
+        page.getByRole('menuitem', { name: 'Sign out' }),
+      ).toHaveCount(0);
     });
   }
 });

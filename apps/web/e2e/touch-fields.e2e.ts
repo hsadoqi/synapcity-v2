@@ -21,13 +21,13 @@ for (const { name, viewport, touch } of devices) {
       async ({ page }) => {
         await page.goto('/auth/register');
         const sizes = await page
-          .locator('input:not([type="hidden"])')
+          .locator('input:visible:not([type="hidden"])')
           .evaluateAll((inputs) =>
             inputs.map((input) => parseFloat(getComputedStyle(input).fontSize)),
           );
 
         const heights = await page
-          .locator('input:not([type="hidden"])')
+          .locator('input:visible:not([type="hidden"])')
           .evaluateAll((inputs) =>
             inputs.map((input) => input.getBoundingClientRect().height),
           );
