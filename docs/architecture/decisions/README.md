@@ -31,7 +31,7 @@ ADRs are numbered sequentially (`0001-*.md`, `0002-*.md`, ...) and never renumbe
 | [0006](0006-authentication-with-supabase.md)          | Authentication with Supabase Auth                            | Accepted |
 | [0007](0007-app-local-auth-and-account-ownership.md)  | Auth responsibility boundaries and package layout evaluation | Proposed |
 | [0008](0008-auth-actions-and-server-operations.md)    | Auth actions and server operations                           | Proposed |
-| [0009](0009-caller-owned-auth-navigation.md)          | Caller-owned auth navigation                                 | Proposed |
+| [0009](0009-caller-owned-auth-navigation.md)          | Caller-owned auth navigation                                 | Accepted |
 
 **Lineage.** The ADRs in `docs/archive/architecture/decisions/` (0001-0016) belong to the previous implementation. They are evidence under `docs/engineering/preservation-policy.md`, not authority, and several describe workspaces that do not exist here (`apps/storybook`, `packages/ui/core`). This index restarted at 0001 for the current repository. When a current ADR needs an archived decision, it restates the decision it adopts rather than citing the archived number.
 

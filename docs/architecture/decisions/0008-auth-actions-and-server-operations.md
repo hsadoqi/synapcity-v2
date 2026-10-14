@@ -3,6 +3,7 @@
 **Status:** Proposed  
 **Date:** 2026-10-13  
 **Deciders:** Hanaa Sadoqi (repository owner); acceptance pending.
+**Implementation note (2026-10-14):** partially landed, status unchanged; see the end of this file.
 
 ## Context
 
@@ -57,3 +58,11 @@ Run the existing auth browser tests and root verification chain. Mock tests do n
 ## Reconsideration conditions
 
 Another real consumer needs the operations, shared authorization/data rules require a broader server layer, or outcome reduction proves insufficient for an adopted workflow. Revise the scope explicitly rather than growing a general auth service by accumulation.
+
+## Implementation note (2026-10-14)
+
+Not accepted, and the operations extraction (`registerWithPassword`, `requestRecoveryEmail`) has not been done. What did land on `refactor/auth-actions`, so a later reviewer is not surprised:
+
+- Item 7 only: `AuthState` moved out of the `'use server'` module to `lib/auth/auth-state`, with shared `authFailure`/`authSuccess` result builders, `field()` in `lib/auth/form-data` and `callbackUrl()` in `lib/auth/auth-flow`. These sit in the existing `lib/auth/` tree and are provisional until ADR-0007 selects a layout.
+- Verification expectations: action integration tests now exist at `app/auth/actions.test.ts` and call the real action functions with Supabase and Next boundaries mocked. This needed a `@/` alias in `apps/web/vitest.config.ts`, a tooling change the owner approved.
+- **Deviation from item 6:** `requestPasswordReset` now reports `over_request_rate_limit` as well as `over_email_send_rate_limit`, matching `resendConfirmation`. Previously the request limit was answered with the neutral "a reset link is on its way" reply. The owner approved this as a bug fix, so it departs from "preserve the existing neutral accepted reply for other provider outcomes"; the rate-limit codes carry no account information.
