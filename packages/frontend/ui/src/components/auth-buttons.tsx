@@ -25,9 +25,22 @@ const SIGN_UP: Record<
 };
 
 function AuthButtons({
+  signInHref,
+  signUpHref,
+  quietPathPrefix,
   variant = 'header',
   className,
 }: {
+  /** Where "Sign in" goes. The destination belongs to the consuming app. */
+  signInHref: string;
+  /** Where "Sign up" goes. The destination belongs to the consuming app. */
+  signUpHref: string;
+  /**
+   * Header only. Under this path the form owns the one filled button, so the
+   * links go quiet. Omit it and "Sign up" always stays the filled call to
+   * action.
+   */
+  quietPathPrefix?: string;
   variant?: AuthButtonsVariant;
   className?: string;
 }) {
@@ -37,7 +50,10 @@ function AuthButtons({
   // On an auth page the form owns the one filled button, so the header links
   // go quiet: the link for the page already open is underlined, the other
   // stays plain. Elsewhere "Sign up" stays the filled call to action.
-  const onAuthPage = variant === 'header' && pathname?.startsWith('/auth');
+  const onAuthPage =
+    variant === 'header' &&
+    quietPathPrefix !== undefined &&
+    Boolean(pathname?.startsWith(quietPathPrefix));
   const quiet = (href: string) =>
     current(href) ? ('selected' as const) : ('ghost' as const);
 
@@ -48,18 +64,18 @@ function AuthButtons({
       className={cn('flex items-center gap-2', className)}
     >
       <LinkButton
-        href="/auth/login"
-        aria-current={current('/auth/login')}
+        href={signInHref}
+        aria-current={current(signInHref)}
         {...SIGN_IN[variant]}
-        {...(onAuthPage ? { variant: quiet('/auth/login') } : {})}
+        {...(onAuthPage ? { variant: quiet(signInHref) } : {})}
       >
         Sign in
       </LinkButton>
       <LinkButton
-        href="/auth/register"
-        aria-current={current('/auth/register')}
+        href={signUpHref}
+        aria-current={current(signUpHref)}
         {...SIGN_UP[variant]}
-        {...(onAuthPage ? { variant: quiet('/auth/register') } : {})}
+        {...(onAuthPage ? { variant: quiet(signUpHref) } : {})}
       >
         Sign up
       </LinkButton>

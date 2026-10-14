@@ -17,7 +17,16 @@ export async function AuthStatus({
 }) {
   const user = await getCurrentUser();
 
-  if (!user) return <AuthButtons variant={variant} />;
+  if (!user) {
+    return (
+      <AuthButtons
+        signInHref="/auth/login"
+        signUpHref="/auth/register"
+        quietPathPrefix="/auth"
+        variant={variant}
+      />
+    );
+  }
 
   if (variant === 'hero') {
     return (

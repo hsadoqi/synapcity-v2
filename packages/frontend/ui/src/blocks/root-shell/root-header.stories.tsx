@@ -25,7 +25,15 @@ export const Default: Story = {
 };
 
 export const SignedOut: Story = {
-  args: { actions: <AuthButtons variant="header" /> },
+  args: {
+    actions: (
+      <AuthButtons
+        signInHref="/sign-in"
+        signUpHref="/sign-up"
+        variant="header"
+      />
+    ),
+  },
 };
 
 export const SignedIn: Story = {

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { AuthButtons } from './auth-buttons';
+import { AuthButtons } from '@synapcity/frontend-ui/components/auth-buttons';
 
 const meta: Meta<typeof AuthButtons> = {
   title: 'Components/AuthButtons',
@@ -16,5 +16,9 @@ const meta: Meta<typeof AuthButtons> = {
 export default meta;
 type Story = StoryObj<typeof AuthButtons>;
 
-export const Header: Story = { args: { variant: 'header' } };
-export const Hero: Story = { args: { variant: 'hero' } };
+const destinations = { signInHref: '/sign-in', signUpHref: '/sign-up' };
+
+export const Header: Story = {
+  args: { ...destinations, variant: 'header' },
+};
+export const Hero: Story = { args: { ...destinations, variant: 'hero' } };
