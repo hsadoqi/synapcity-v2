@@ -26,6 +26,8 @@ export type AuthState = {
   fields?: AuthFieldName[];
   message?: string;
   success?: boolean;
+  /** The address is valid but unconfirmed, so the form can offer a new link. */
+  unconfirmed?: boolean;
   data?: {
     user?: UserData;
   };
@@ -80,6 +82,7 @@ export async function signInWithPassword(
     return {
       error: authErrorMessage(error.code),
       fields: authErrorFields(error.code),
+      unconfirmed: error.code === 'email_not_confirmed',
       data: { user: { email } },
     };
 

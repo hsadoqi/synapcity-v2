@@ -23,7 +23,7 @@ export function RegisterCard({ next }: { next: string }) {
       description={
         confirmed
           ? undefined
-          : 'Use your email and a password, or continue with Google or GitHub.'
+          : 'Create your account with an email and password, or use Google or GitHub.'
       }
       footer={
         <AuthLinkButton

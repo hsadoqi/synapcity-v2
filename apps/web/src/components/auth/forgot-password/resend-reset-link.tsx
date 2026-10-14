@@ -1,10 +1,10 @@
 'use client';
 
 import { useActionState } from 'react';
-import { Button } from '@synapcity/frontend-ui/core/button';
 
 import { requestPasswordReset, type AuthState } from '@/app/auth/actions';
 import { FormMessage } from '../form/form-message';
+import { ResendButton } from '../form/resend-button';
 import { useCooldown } from '../form/use-cooldown';
 
 const initialState: AuthState = {};
@@ -29,20 +29,12 @@ export function ResendResetLink({ email }: { email: string }) {
     <form action={formAction} className="flex flex-col gap-2">
       <input type="hidden" name="email" value={email} />
       <FormMessage state={shown} />
-      <Button
-        type="submit"
-        variant="outline"
-        size="lg"
-        className="w-full"
-        disabled={pending || wait > 0}
-        aria-busy={pending}
-      >
-        {pending
-          ? 'Resending…'
-          : wait > 0
-            ? `Resend in ${wait}s`
-            : 'Resend link'}
-      </Button>
+      <ResendButton
+        label="Resend link"
+        pending={pending}
+        wait={wait}
+        hintId="resend-reset-hint"
+      />
     </form>
   );
 }

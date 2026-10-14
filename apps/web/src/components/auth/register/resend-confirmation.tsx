@@ -1,47 +1,47 @@
 'use client';
 
 import { useActionState } from 'react';
-import { Button } from '@synapcity/frontend-ui/core/button';
 
 import { resendConfirmation, type AuthState } from '@/app/auth/actions';
 import { FormMessage } from '../form/form-message';
+import { ResendButton } from '../form/resend-button';
 import { useCooldown } from '../form/use-cooldown';
 
 const initialState: AuthState = {};
 
-/** A second chance at the confirmation email, from the screen that promised it. */
+/**
+ * A second chance at the confirmation email. Shown from the screen that
+ * promised it, where the first email was just sent (`waitFirst`), and from a
+ * sign-in that was refused for an unconfirmed address, where none was.
+ */
 export function ResendConfirmation({
   email,
   next,
+  label = 'Resend link',
+  waitFirst = true,
 }: {
   email: string;
   next: string;
+  label?: string;
+  waitFirst?: boolean;
 }) {
   const [state, formAction, pending] = useActionState(
     resendConfirmation,
     initialState,
   );
-  const wait = useCooldown(state);
+  const wait = useCooldown(state, waitFirst);
 
   return (
     <form action={formAction} className="flex flex-col gap-2">
       <input type="hidden" name="email" value={email} />
       <input type="hidden" name="next" value={next} />
       <FormMessage state={state} />
-      <Button
-        type="submit"
-        variant="outline"
-        size="lg"
-        className="w-full"
-        disabled={pending || wait > 0}
-        aria-busy={pending}
-      >
-        {pending
-          ? 'Resending…'
-          : wait > 0
-            ? `Resend in ${wait}s`
-            : 'Resend link'}
-      </Button>
+      <ResendButton
+        label={label}
+        pending={pending}
+        wait={wait}
+        hintId="resend-confirmation-hint"
+      />
     </form>
   );
 }

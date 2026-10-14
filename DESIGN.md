@@ -243,6 +243,7 @@ Input 28px on a mouse (44px with 16px text on touch), `md` radius: **Verified** 
 - Keep every interactive component's full state set: default, hover, focus, active, disabled, loading, error.
 - Hold body and label text at 4.5:1 or better on every surface it can land on, in both themes, **including after a theme changes primary/accent**.
 - Size touch targets by input method (`pointer-coarse:`), not window width.
+- Let native constraint validation (`required`, `minLength`, `type="email"`) speak first in forms and keep `noValidate` off. The server's message is the designed voice for everything it decides, and a resend control stays focusable (`aria-disabled`) while it waits.
 - Give each scroll region one `ScrollArea`.
 - Separate with hairlines and spacing; reserve shadows for the button edge and the inset panel.
 - Keep transitions to 150 to 250ms with a `motion-reduce` fallback.

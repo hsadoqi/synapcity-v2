@@ -35,11 +35,11 @@ function AuthButtons({
   const pathname = usePathname();
   const current = (href: string) => (pathname === href ? 'page' : undefined);
   // On an auth page the form owns the one filled button, so the header links
-  // go quiet: the link for the page already open takes a hairline outline, the other
+  // go quiet: the link for the page already open takes the selected fill, the other
   // stays plain. Elsewhere "Sign up" stays the filled call to action.
   const onAuthPage = variant === 'header' && pathname?.startsWith('/auth');
   const quiet = (href: string) =>
-    current(href) ? ('outline' as const) : ('ghost' as const);
+    current(href) ? ('selected' as const) : ('ghost' as const);
 
   return (
     <div

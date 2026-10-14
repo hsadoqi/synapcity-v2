@@ -18,9 +18,11 @@ const RESEND_COOLDOWN_SECONDS = 60;
  */
 export function useCooldown(
   state: AuthState,
+  /** False when no email was just sent, so the first request is free. */
+  waitFirst = true,
   seconds = RESEND_COOLDOWN_SECONDS,
 ) {
-  const [left, setLeft] = useState(seconds);
+  const [left, setLeft] = useState(waitFirst ? seconds : 0);
   const [seen, setSeen] = useState(state);
 
   // Restart on a new accepted result. Adjusting state while rendering is the
