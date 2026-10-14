@@ -15,9 +15,11 @@ const buttonVariants = cva(
           'border-1 border-border bg-primary-background hover:border-foreground/40 hover:bg-hover hover:text-foreground active:bg-pressed aria-expanded:bg-hover aria-expanded:text-foreground aria-pressed:bg-hover aria-pressed:text-foreground dark:bg-input/30',
         secondary:
           'bg-secondary text-secondary-foreground hover:bg-secondary-hover active:bg-secondary-pressed aria-expanded:bg-secondary-hover aria-expanded:text-secondary-foreground aria-pressed:bg-secondary-hover aria-pressed:text-secondary-foreground',
-        // The current location in a set of links: the same solid mix of page
-        // and primary that marks a selected row, so the primary marks what is active.
-        selected: 'bg-selected text-foreground',
+        // The current location in a set of links. An underline, not a fill: on
+        // the page background `bg-selected` resolves to the page colour itself,
+        // and a fill would read as the hover state besides.
+        selected:
+          'text-foreground underline decoration-2 underline-offset-4 hover:bg-hover active:bg-pressed',
         ghost:
           'bg-transparent text-foreground hover:bg-hover active:bg-pressed aria-expanded:bg-hover aria-expanded:text-foreground aria-pressed:bg-hover aria-pressed:text-foreground',
         destructive:

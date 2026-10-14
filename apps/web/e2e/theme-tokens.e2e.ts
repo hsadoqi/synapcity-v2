@@ -12,7 +12,8 @@ for (const colorScheme of ['light', 'dark'] as const) {
     test('card, muted text and field borders keep their contrast', async ({
       page,
     }) => {
-      await page.goto('/auth/login');
+      // Register carries a card description (muted text); sign-in does not.
+      await page.goto('/auth/register');
       await page.waitForLoadState('networkidle');
 
       const measured = await page.evaluate(() => {
