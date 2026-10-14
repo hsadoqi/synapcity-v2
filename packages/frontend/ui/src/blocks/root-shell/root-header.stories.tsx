@@ -40,7 +40,8 @@ export const SignedIn: Story = {
   args: {
     actions: (
       <UserMenu
-        id="user-1"
+        homeHref="/user-1/home"
+        settingsHref="/user-1/settings"
         name="Hanaa Sadoqi"
         email="hanaa@example.com"
         imageUrl={null}

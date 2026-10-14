@@ -25,9 +25,12 @@ beforeAll(() => {
  * through state and an effect would still be wrong.
  */
 function html(userId: string | null) {
+  const account = userId
+    ? { homeHref: `/${userId}/home`, settingsHref: `/${userId}/settings` }
+    : null;
   return renderToString(
     <ModeProvider>
-      <RootHeaderContent userId={userId} />
+      <RootHeaderContent account={account} />
     </ModeProvider>,
   );
 }

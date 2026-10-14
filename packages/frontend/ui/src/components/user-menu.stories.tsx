@@ -8,6 +8,8 @@ const meta: Meta<typeof UserMenu> = {
   component: UserMenu,
   tags: ['autodocs'],
   args: {
+    homeHref: '/user-1/home',
+    settingsHref: '/user-1/settings',
     name: 'Hanaa Sadoqi',
     email: 'hanaa@example.com',
     imageUrl: null,

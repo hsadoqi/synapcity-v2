@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 import { Cog, HomeIcon, LogOutIcon, UserRound } from 'lucide-react';
 
+import type { AccountLinks } from '../lib/account-links';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
 import {
@@ -24,8 +25,7 @@ import {
   TooltipTrigger,
 } from './ui/tooltip';
 
-type UserMenuProps = {
-  id: string;
+type UserMenuProps = AccountLinks & {
   name: string | null;
   email: string | null;
   imageUrl: string | null;
@@ -39,7 +39,8 @@ type UserMenuProps = {
 };
 
 function UserMenu({
-  id,
+  homeHref,
+  settingsHref,
   name,
   email,
   imageUrl,
@@ -94,11 +95,11 @@ function UserMenu({
         {children}
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuLinkItem render={<Link href={`/${id}/home`} />}>
+          <DropdownMenuLinkItem render={<Link href={homeHref} />}>
             <HomeIcon aria-hidden />
             Home
           </DropdownMenuLinkItem>
-          <DropdownMenuLinkItem render={<Link href={`/${id}/settings`} />}>
+          <DropdownMenuLinkItem render={<Link href={settingsHref} />}>
             <Cog aria-hidden />
             Settings
           </DropdownMenuLinkItem>

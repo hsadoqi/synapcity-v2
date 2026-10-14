@@ -31,13 +31,16 @@ export const WithHeaderActions: Story = {
 export const LoggedIn: Story = {
   args: {
     children: <div>Main content goes here</div>,
-    userId: 'user-123',
+    account: {
+      homeHref: '/user-123/home',
+      settingsHref: '/user-123/settings',
+    },
   },
 };
 
 export const LoggedOut: Story = {
   args: {
     children: <div>Main content goes here</div>,
-    userId: null,
+    account: null,
   },
 };

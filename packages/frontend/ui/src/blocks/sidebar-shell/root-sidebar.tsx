@@ -22,9 +22,9 @@ import { ModeToggle } from '../../components/mode-toggle';
 import { data } from './sidebar-data';
 
 export function RootSidebar({
-  userId,
+  settingsHref,
   ...props
-}: React.ComponentProps<typeof Sidebar> & { userId: string }) {
+}: React.ComponentProps<typeof Sidebar> & { settingsHref: string }) {
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -69,7 +69,7 @@ export function RootSidebar({
               className="flex-1"
               render={(props) => {
                 return (
-                  <Link href={`/${userId}/settings`} {...props}>
+                  <Link href={settingsHref} {...props}>
                     <Cog />
                     Settings
                   </Link>

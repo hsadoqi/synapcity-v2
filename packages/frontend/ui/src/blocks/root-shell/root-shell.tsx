@@ -4,15 +4,17 @@ import { RootFooter } from './root-footer';
 import { RootContent } from './root-content';
 import { SidebarShell } from '../sidebar-shell/sidebar-shell';
 import React from 'react';
+import type { AccountLinks } from '../../lib/account-links';
 
 export default function RootShell({
   children,
   headerActions,
-  userId,
+  account,
 }: {
   children: React.ReactNode;
   headerActions?: React.ReactNode;
-  userId?: string | null;
+  /** Present when someone is signed in; the app supplies where they lead. */
+  account?: AccountLinks | null;
 }) {
   const content = (
     <>
@@ -23,13 +25,13 @@ export default function RootShell({
 
   // The skip link comes first in the DOM so it is the first Tab stop, ahead
   // of the header and sidebar. It is position: fixed, so this costs no layout.
-  if (userId) {
+  if (account) {
     return (
       <>
         <SkipLinkButton />
         <SidebarShell
-          header={<RootHeader userId={userId} actions={headerActions} />}
-          userId={userId}
+          header={<RootHeader account={account} actions={headerActions} />}
+          account={account}
         >
           {content}
         </SidebarShell>
@@ -42,7 +44,7 @@ export default function RootShell({
   return (
     <div className="flex flex-col flex-1">
       <SkipLinkButton />
-      <RootHeader userId={userId} actions={headerActions} />
+      <RootHeader account={account} actions={headerActions} />
       <div className="flex flex-1 flex-col">{content}</div>
     </div>
   );
