@@ -48,7 +48,7 @@ export function RegisterCard({ next }: { next: string }) {
       ) : (
         <>
           <OAuthButtons next={next} />
-          <p className="text-center text-xs text-muted-foreground">or</p>
+          <AuthDivider label="or continue with email" />
           <RegisterForm
             next={next}
             state={formState}

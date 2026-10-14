@@ -5,6 +5,7 @@ import { OAuthButtons } from '@/features/auth/components/oauth-buttons';
 import { safeNextPath } from '@/lib/routing/safe-next';
 import { AuthLinkButton } from '@/features/auth/components/auth-link-button';
 import { AuthShell } from '@/features/auth/components/auth-shell';
+import { AuthDivider } from '@/features/auth/components/auth-divider';
 
 export const metadata: Metadata = { title: 'Sign in' };
 
@@ -28,7 +29,7 @@ export default async function LoginPage({
       }
     >
       <OAuthButtons next={next} />
-      <p className="text-center text-xs text-muted-foreground">or</p>
+      <AuthDivider label="or continue with email" />
       <LoginForm next={next} />
     </AuthShell>
   );
