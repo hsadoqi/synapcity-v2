@@ -35,7 +35,7 @@ export function AuthField({
   const Control = type === 'password' ? PasswordInput : Input;
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2.5">
       {labelAction ? (
         <div className="flex items-center justify-between gap-2">
           <Label htmlFor={id}>{label}</Label>

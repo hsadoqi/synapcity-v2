@@ -35,7 +35,7 @@ export const RootHeader = ({ account, ...props }: RootHeaderProps) => {
   // Same gutters as RootContent and RootFooter so the logo lines up with the
   // page below it.
   return (
-    <div className="flex h-14 shrink-0 items-stretch border-b border-divider pointer-coarse:h-16">
+    <div className="flex h-16 shrink-0 items-stretch border-b border-divider bg-background/95 supports-backdrop-filter:backdrop-blur-sm">
       {account && (
         <>
           <div className="flex shrink-0 items-center px-3">
@@ -47,7 +47,7 @@ export const RootHeader = ({ account, ...props }: RootHeaderProps) => {
       <header
         className={cn(
           'flex flex-1 items-center',
-          account ? 'px-4 lg:px-6' : 'px-6 sm:px-12 lg:px-24',
+          account ? 'px-4 lg:px-6' : 'px-6 sm:px-10 lg:px-16',
         )}
       >
         <RootHeaderContent account={account} {...props} />

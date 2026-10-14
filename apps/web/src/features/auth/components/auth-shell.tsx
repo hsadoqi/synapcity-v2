@@ -28,8 +28,8 @@ export function AuthShell({
   footer,
 }: AuthShellProps) {
   return (
-    <Card size="lg">
-      <CardHeader className="gap-2">
+    <Card size="lg" className="w-full">
+      <CardHeader className="gap-2.5">
         <CardTitle
           as="h1"
           size="lg"
@@ -42,7 +42,7 @@ export function AuthShell({
         {description ? <CardDescription>{description}</CardDescription> : null}
       </CardHeader>
       {children ? (
-        <CardContent className="flex flex-col gap-5">{children}</CardContent>
+        <CardContent className="flex flex-col gap-6">{children}</CardContent>
       ) : null}
       {footer ? (
         <CardFooter className="justify-center gap-2 border-t">
