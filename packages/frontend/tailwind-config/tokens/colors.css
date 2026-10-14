@@ -56,7 +56,7 @@
   --primary-foreground: var(--primary-950);
   --primary-background: var(--primary-50);
   --accent-foreground: var(--accent-950);
-  --accent-background: var(--accent-50);
+  --accent-background: var(--accent-100);
   --secondary-foreground: var(--secondary-950);
   --secondary-background: var(--secondary-50);
   --muted: var(--base-200);
