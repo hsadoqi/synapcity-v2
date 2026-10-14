@@ -1,12 +1,17 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
+import { developmentAuthBypassEnabled } from '@/features/auth/shared/development-auth';
 import { homePathFor } from '@/lib/routing/user-paths';
 import { safeNextPath } from '@/lib/routing/safe-next';
 import { getSupabaseEnv } from './env';
 import { isGuestOnlyPath, isProtectedPath } from '../routing/route-access';
 
 export async function updateSession(request: NextRequest) {
+  if (developmentAuthBypassEnabled) {
+    return NextResponse.next({ request });
+  }
+
   let supabaseResponse = NextResponse.next({
     request,
   });
