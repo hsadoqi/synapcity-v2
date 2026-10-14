@@ -40,6 +40,8 @@ The "no framework" count is conservative. A first pass that looked only at direc
 
 No import-boundary rule was configured when this was written, and ADR-0007 lists enforcement as unresolved. While adding one, a further fact turned up that changes what "lint" means in this repository: **ESLint does not lint TypeScript in `apps/web`.** The shared Next.js config contains no `files` entry for `.ts`/`.tsx`, so ESLint's flat config skips them. A deliberately syntactically broken `.ts` file at the pre-migration commit produced no output and exit code 0, in both `apps/web` and `packages/frontend/ui`. `pnpm lint` therefore passes for those workspaces without reading their source; `pnpm typecheck` is what covers it. Two further constraints sit behind that: the shared config parses TypeScript with Babel's `preset-typescript` without TSX handling, so merely turning TS linting on makes every `.tsx` file a parse error; and `eslint-plugin-only-warn` downgrades rule errors to warnings.
 
+**Resolved the same day.** The shared config now has `.ts`/`.tsx` entries, and the two constraints were handled as follows. typescript-eslint was not adopted: the installed 8.71.1 throws `typescript-eslint does not support TS 7.0` against this repository's TypeScript 7.0.2, so the parser stays Babel, with the `jsx` and `typescript` syntax plugins set directly (Babel 8 removed the preset's `isTSX` option and infers it from the filename, which ESLint does not reliably pass). Core rules that misreport types (`no-undef`, `no-redeclare`, `no-dupe-class-members`, `no-unused-vars`) are off for TypeScript, so unused locals are unchecked until `noUnusedLocals` is enabled. Every workspace's `lint` script now passes `--max-warnings 0`, because the only-warn plugin turns every rule into a warning. Linting TypeScript for the first time surfaced three real issues, all fixed: a disable comment for a rule the package never loads, a `useIsMobile` effect that set state synchronously (now `useSyncExternalStore`), and `SITE_URL` read at runtime without being declared to Turborepo (now `globalPassThroughEnv`).
+
 ## 3. Candidates
 
 Criteria are the ones ADR-0007 names: cohesion, independent testing, enforceable imports, runtime isolation, change coupling, plus the configuration cost a package adds.
@@ -108,7 +110,7 @@ Executed on `refactor/auth-features` under candidate A with D within A:
 - The unused `components/index.ts` barrel was removed. It re-exported auth components from `components/`, the wrong direction for the new layering, and nothing imported it.
 - Rows added beyond the parent plan's table: `features/auth/components/resend-button.tsx`, `features/auth/server/form-data.ts` and `features/auth/shared/form-feedback.ts`.
 - Enforcement is `apps/web/src/architecture.test.ts` (six rules), not ESLint, for the reason in section 2.4. Each rule was proven to fail against a planted violation before it was trusted.
-- Not done: ADR-0008's operations extraction, which the plan sequences after this move.
+- ADR-0008's operations extraction followed in the same branch and is recorded in that ADR.
 
 ## 9. Limits
 

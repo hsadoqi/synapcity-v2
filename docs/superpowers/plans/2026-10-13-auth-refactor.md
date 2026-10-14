@@ -1,6 +1,6 @@
 # Auth organization refactor: proposed implementation plan
 
-**Status:** Proposed parent plan. Layout selected and the file moves of section 2 executed 2026-10-14 (see section 5); operations extraction (ADR-0008) is not executed.  
+**Status:** Proposed parent plan. Layout selected, the file moves of section 2 and the operations extraction (ADR-0008) executed 2026-10-14 (see section 5).  
 **Date:** 2026-10-13.  
 **Specification:** [Auth organization refactor](../specs/2026-10-13-auth-refactor-design.md).
 
@@ -195,4 +195,4 @@ Report final ownership and why each piece belongs there; preserved observable be
 - `features/auth/server/actions.test.ts` already existed from the earlier slice and moved with `actions.ts`.
 - `apps/web/src/architecture.test.ts` enforces the layer boundaries.
 
-Not executed: `features/auth/server/operations.ts` and its tests (ADR-0008 remains Proposed).
+`features/auth/server/operations.ts` and `operations.test.ts` were then added per ADR-0008 (registration and recovery only; `resendConfirmation` stays in its action). ADR-0008 and ADR-0007 are Accepted.

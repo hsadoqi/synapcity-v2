@@ -1,9 +1,8 @@
 # ADR-0008: Auth actions and server operations
 
-**Status:** Proposed  
-**Date:** 2026-10-13  
-**Deciders:** Hanaa Sadoqi (repository owner); acceptance pending.
-**Implementation note (2026-10-14):** partially landed, status unchanged; see the end of this file.
+**Status:** Accepted  
+**Date:** 2026-10-13 (accepted 2026-10-14)  
+**Deciders:** Hanaa Sadoqi (repository owner); accepted by the owner's direct instruction to proceed on recommendations. One deviation from item 6 is recorded under Implementation.
 
 ## Context
 
@@ -59,10 +58,14 @@ Run the existing auth browser tests and root verification chain. Mock tests do n
 
 Another real consumer needs the operations, shared authorization/data rules require a broader server layer, or outcome reduction proves insufficient for an adopted workflow. Revise the scope explicitly rather than growing a general auth service by accumulation.
 
-## Implementation note (2026-10-14)
+## Implementation (2026-10-14)
 
-Not accepted, and the operations extraction (`registerWithPassword`, `requestRecoveryEmail`) has not been done. What did land on `refactor/auth-actions`, so a later reviewer is not surprised:
+Landed on `refactor/auth-features`, at the layout [ADR-0007](0007-app-local-auth-and-account-ownership.md) selected:
 
-- Item 7 only: `AuthState` moved out of the `'use server'` module to `features/auth/shared/form-state`, with shared `authFailure`/`authSuccess` result builders, `field()` in `features/auth/server/form-data` and `callbackUrl()` in `lib/routing/auth-flow`. ADR-0007 selected the app-local `features/*` layout, so these are at their final locations.
-- Verification expectations: action integration tests now exist at `features/auth/server/actions.test.ts` and call the real action functions with Supabase and Next boundaries mocked. This needed a `@/` alias in `apps/web/vitest.config.ts`, a tooling change the owner approved.
-- **Deviation from item 6:** `requestPasswordReset` now reports `over_request_rate_limit` as well as `over_email_send_rate_limit`, matching `resendConfirmation`. Previously the request limit was answered with the neutral "a reset link is on its way" reply. The owner approved this as a bug fix, so it departs from "preserve the existing neutral accepted reply for other provider outcomes"; the rate-limit codes carry no account information.
+- **Operations** (`features/auth/server/operations.ts`): `registerWithPassword` and `requestRecoveryEmail`, each building its own request-bound server client per call. Outcomes are tagged scalars (`confirmation-required`, `signed-in` with a user id, `provider-error` with a code; `accepted`, `rate-limited` with a code). They are ordinary module functions, not Server Actions, and the `use client` boundary test forbids importing them from client code.
+- **Actions** keep FormData extraction, validation, the user-facing message, revalidation and navigation. `resendConfirmation` was deliberately not extracted, as the operations plan specifies.
+- **Item 7:** `AuthState` and its builders are in `features/auth/shared/form-state`; provider outcomes stay internal to the server.
+- **Tests:** operation tests assert the exact SDK inputs and the exact allowed outcome shape with sentinel credentials, tokens and a raw provider error, and that no password, token, raw user or provider message reaches an outcome. Action integration tests call the real action functions with Supabase and Next boundaries mocked.
+- **Deviation from item 6:** `requestPasswordReset` reports `over_request_rate_limit` as well as `over_email_send_rate_limit`, matching `resendConfirmation`. Previously the request limit was answered with the neutral "a reset link is on its way" reply. The owner approved this as a bug fix. Rate-limit codes carry no account information, and every other provider outcome is still answered neutrally.
+
+Not verified by this work: email delivery, OAuth, or a live Supabase session. Mocked tests prove the contract at the SDK boundary, and the Playwright suite reaches the form and navigation behaviour, not the provider.

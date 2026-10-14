@@ -26,7 +26,7 @@ pnpm verify
 | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `pnpm verify`                       | Runs `format:check`, `lint`, `typecheck`, `deps`, `brand:check`, `test`, `test:coverage`, `test:e2e`, `test:storybook` and `build`; stops at first fail |
 | `pnpm format:check` / `pnpm format` | Check or apply Prettier formatting                                                                                                                      |
-| `pnpm lint`                         | ESLint in every workspace, through Turbo                                                                                                                |
+| `pnpm lint`                         | ESLint in every workspace, through Turbo; reads `.ts` and `.tsx` and fails on any warning                                                               |     |
 | `pnpm check-types`                  | `tsc --noEmit` in every workspace (Next apps run `next typegen` first)                                                                                  |
 | `pnpm deps`                         | Knip: unused files, exports and dependencies                                                                                                            |
 | `pnpm brand:check`                  | Static brand exports match the logo geometry in `logo-mark.tsx` (not the rasters)                                                                       |
