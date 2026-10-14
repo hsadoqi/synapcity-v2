@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from 'react';
 
-import type { AuthState } from '@/lib/auth/auth-state/auth-state';
 import { FORM_MESSAGE_ID } from './form-message';
 
 /**
@@ -14,7 +13,7 @@ import { FORM_MESSAGE_ID } from './form-message';
  * password but keeps the email, so the password is what needs retyping), then
  * the first marked field, then the message itself when no field is marked.
  */
-export function useFocusFirstError(state: AuthState) {
+export function useFocusFirstError(state: { error?: string }) {
   const form = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
