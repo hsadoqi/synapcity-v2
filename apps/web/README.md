@@ -27,7 +27,7 @@ Set these in `apps/web/.env.local` (git-ignored) and, for deployments, in the ho
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | yes                    | Supabase publishable key. Never put the secret or service-role key in this app                                                                            |
 | `SITE_URL`                             | no                     | Public origin of this app, for example `http://localhost:8080`. Used to build email and OAuth redirect URLs; it must be on Supabase's redirect allow-list |
 
-The app throws on the first sign-up, reset or OAuth call if `SITE_URL` is missing. Preview deployments need their own value.
+The app throws on the first sign-up, reset or OAuth call if `SITE_URL` is missing. Preview deployments need their own value. Turborepo filters task environments to declared variables, so `SITE_URL` is listed under `globalPassThroughEnv` in `turbo.json`: tasks receive it, and changing it does not invalidate the build cache because it is read at request time, not compiled in.
 
 If `NEXT_PUBLIC_SUPABASE_URL` or `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` is missing, every request fails (the session proxy runs on all pages) with an error that names the variable. They are read at build time for the browser bundle, so CI and deployments must set them before `next build`; CI uses placeholders.
 

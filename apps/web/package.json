@@ -7,7 +7,7 @@
     "dev": "next dev --port 8080",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --cache",
+    "lint": "eslint . --cache --max-warnings 0",
     "check-types": "next typegen && tsc --noEmit",
     "verify": "pnpm lint && pnpm check-types && pnpm build",
     "ui:add": "pnpm dlx shadcn@latest add",
