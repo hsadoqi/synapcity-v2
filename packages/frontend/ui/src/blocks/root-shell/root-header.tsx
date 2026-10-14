@@ -35,14 +35,21 @@ export const RootHeader = ({ account, ...props }: RootHeaderProps) => {
   // Same gutters as RootContent and RootFooter so the logo lines up with the
   // page below it.
   return (
-    <div className="flex items-center">
+    <div className="flex h-14 shrink-0 items-stretch border-b border-divider pointer-coarse:h-16">
       {account && (
         <>
-          <SidebarTrigger className="shrink-0 mx-2" size="icon-lg" />
-          <Separator orientation="vertical" className="h-full" />
+          <div className="flex shrink-0 items-center px-3">
+            <SidebarTrigger size="icon-lg" />
+          </div>
+          <Separator orientation="vertical" />
         </>
       )}
-      <header className="flex items-center gap-2 px-2 lg:px-6 py-2  flex-1">
+      <header
+        className={cn(
+          'flex flex-1 items-center',
+          account ? 'px-4 lg:px-6' : 'px-6 sm:px-12 lg:px-24',
+        )}
+      >
         <RootHeaderContent account={account} {...props} />
       </header>
     </div>
@@ -91,7 +98,7 @@ const RootIconActions = ({
   children?: ReactNode;
 }) => {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1 sm:gap-2">
       <ModeToggle variant="ghost" size="lg" />
       {settingsHref && <SettingsLinkIcon href={settingsHref} />}
       {children}
