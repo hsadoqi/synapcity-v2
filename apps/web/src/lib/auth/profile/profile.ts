@@ -9,6 +9,8 @@ export type CurrentUser = DisplayProfile & { id: string };
 
 type ClaimsLike = {
   email?: unknown;
+  name?: unknown;
+  userId?: string | null;
   user_metadata?: Record<string, unknown> | null;
 };
 
