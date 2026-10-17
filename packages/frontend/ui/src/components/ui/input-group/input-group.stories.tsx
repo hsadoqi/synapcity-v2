@@ -53,7 +53,7 @@ export const WithButton: Story = {
     <InputGroup>
       <InputGroupInput aria-label="Invite email" placeholder="Email" />
       <InputGroupAddon align="inline-end">
-        <InputGroupButton variant="outline">Invite</InputGroupButton>
+        <InputGroupButton variant="secondary">Invite</InputGroupButton>
       </InputGroupAddon>
     </InputGroup>
   ),
