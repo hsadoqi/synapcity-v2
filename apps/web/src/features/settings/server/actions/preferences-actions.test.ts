@@ -30,7 +30,10 @@ beforeEach(() => {
     data: { user: { id: 'user-1' } },
     error: null,
   });
-  mocks.select.mockResolvedValue({ data: [{ user_id: 'user-1' }], error: null });
+  mocks.select.mockResolvedValue({
+    data: [{ user_id: 'user-1' }],
+    error: null,
+  });
   mocks.upsert.mockReturnValue({ select: mocks.select });
   mocks.from.mockReturnValue({ upsert: mocks.upsert });
 });
@@ -101,9 +104,7 @@ describe('saveAccountPreferences', () => {
     ['no row written', { data: [], error: null }],
   ])('reports a failed save on %s', async (_case, response) => {
     mocks.select.mockResolvedValue(response);
-    await expect(
-      saveAccountPreferences(preferences, 'UTC'),
-    ).resolves.toEqual({
+    await expect(saveAccountPreferences(preferences, 'UTC')).resolves.toEqual({
       ok: false,
       error: 'Could not save your changes. Try again.',
     });

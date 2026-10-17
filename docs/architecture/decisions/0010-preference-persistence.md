@@ -22,7 +22,6 @@ It addresses part of two candidate decisions in the [index](README.md): "Theme e
 
 ## Decision
 
-
 ### 1. Split preferences into account and device scope
 
 | Scope       | Sections and fields                                                                                                                              | Stored in                                         | Why                                                                                                                              |
@@ -62,8 +61,8 @@ A JSON document, rather than one column per field, follows the existing schema. 
 ### 3. Reads and writes
 
 - **Read:** the settings route's server component reads the row with the request's Supabase client and passes the account preferences to `SettingsProvider`, the same way it already passes `name`. The provider merges them as authoritative over the local copy.
-- **Write:** account-scope changes go through a server action that parses with `settingsSchema`, upserts the row and returns the stored value. Device-scope changes stay local. The provider keeps updating local state and `localStorage` immediately, so the interface does not wait on the network.
-- **Conflict rule:** the database wins for account scope. The local copy is a cache, and it is replaced by what the server returns. There is no multi-device merge beyond last write wins, which is acceptable for single-user, low-frequency settings.
+- **Write:** account-scope changes go through a server action (`saveAccountPreferences`) that validates the account document with the same Zod schemas, upserts the caller's own row and reports whether it was written. Device-scope changes stay local. The provider keeps updating local state and `localStorage` immediately, so the interface does not wait on the network.
+- **Conflict rule:** the database wins for account scope. The local copy is a cache, replaced by the stored row each time the settings page loads. There is no multi-device merge beyond last write wins, which is acceptable for single-user, low-frequency settings.
 - **First sign-in adoption:** if a signed-in user has no row and the local copy holds account preferences that differ from the defaults, the first load writes them up once. Choices made before signing in are kept, not reset.
 - **Failure:** if a write fails, the local value stays applied, the status line says the change was not saved to the account, and the next successful write supersedes it.
 
