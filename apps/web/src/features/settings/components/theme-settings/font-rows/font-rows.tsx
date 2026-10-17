@@ -32,9 +32,10 @@ function FontPreferenceRow<T extends FontChoice>({
   sample: string;
   fonts: readonly T[];
 }) {
+  // The choice first, then what it looks like: the sample sits under the select
+  // it answers to, so screen readers and narrow layouts meet them in that order.
   return (
     <div className="flex flex-col gap-3">
-      <FontPreview role={role}>{sample}</FontPreview>
       <SettingRow id={id} label={label} description={description}>
         <SettingsSelect<T>
           id={id}
@@ -46,6 +47,7 @@ function FontPreferenceRow<T extends FontChoice>({
           }))}
         />
       </SettingRow>
+      <FontPreview role={role}>{sample}</FontPreview>
     </div>
   );
 }

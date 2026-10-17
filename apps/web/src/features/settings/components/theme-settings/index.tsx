@@ -25,7 +25,9 @@ export function ThemeSettings() {
       <Separator />
       <section className="flex flex-col gap-4">
         <h3 className="text-sm font-medium">Fonts</h3>
-        <FieldGroup>
+        {/* Wider than the gap inside a row, so each sample reads as part of the
+            choice above it rather than the next one. */}
+        <FieldGroup className="gap-8">
           <HeadingFontRow
             value={theme.headingFont}
             onChange={(headingFont) => updateTheme({ headingFont })}

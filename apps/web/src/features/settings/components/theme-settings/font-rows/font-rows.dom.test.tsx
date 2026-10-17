@@ -32,13 +32,13 @@ describe('font rows', () => {
     expect(figure.textContent).toContain('Preview');
   });
 
-  it('puts the preview before the select', () => {
+  it('puts the preview after the select it belongs to', () => {
     render(<HeadingFontRow value="default" onChange={() => {}} />);
 
     const figure = screen.getByRole('figure');
     const select = screen.getByRole('combobox');
     expect(
-      figure.compareDocumentPosition(select) & Node.DOCUMENT_POSITION_FOLLOWING,
+      select.compareDocumentPosition(figure) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
   });
 

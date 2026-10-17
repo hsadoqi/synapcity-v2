@@ -29,7 +29,7 @@ export function FontPreview({
   return (
     <figure
       aria-label={`${roleNames[role]} font preview`}
-      className="ml-4 flex flex-col gap-1.5 rounded-md border border-dashed border-border bg-muted/30 px-4 py-3"
+      className="ms-4 flex flex-col gap-1.5 rounded-md border border-dashed border-border bg-muted/30 px-4 py-3"
     >
       <figcaption className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
         Preview
