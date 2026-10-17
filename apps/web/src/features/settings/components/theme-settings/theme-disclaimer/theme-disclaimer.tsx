@@ -2,11 +2,13 @@ import type { Mode } from '@synapcity/frontend-ui/providers/mode-provider';
 import { Monitor } from 'lucide-react';
 
 // Whole sentences, not "always in ${mode} mode": a translation can then reorder
-// or inflect the mode name instead of inheriting the English word order.
+// or inflect the mode name instead of inheriting the English word order. Each
+// describes the option, not the workspace, so it reads true for a choice that
+// is still unsaved as well as a saved one.
 const messages: Record<Mode, string> = {
-  system: 'Your theme will change automatically with your device.',
-  light: 'Your workspace is always in light mode.',
-  dark: 'Your workspace is always in dark mode.',
+  system: 'Follows your device, switching between light and dark with it.',
+  light: 'Always light, whatever your device is set to.',
+  dark: 'Always dark, whatever your device is set to.',
 };
 
 export const ThemeDisclaimer = ({ theme }: { theme: { mode: Mode } }) => {

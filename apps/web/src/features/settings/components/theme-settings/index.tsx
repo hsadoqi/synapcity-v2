@@ -15,7 +15,7 @@ import { BodyFontRow, CodeFontRow, HeadingFontRow } from './font-rows';
  * switches only when they are saved.
  */
 export function ThemeSettings() {
-  const { draft, change, save, hasChanges } = useThemeDraft();
+  const { draft, change, save, discard, hasChanges } = useThemeDraft();
   return (
     <SettingsTabShell
       title="Theme"
@@ -57,6 +57,14 @@ export function ThemeSettings() {
         <p role="status" className="text-xs text-muted-foreground">
           {hasChanges ? 'You have unsaved changes.' : ''}
         </p>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={!hasChanges}
+          onClick={discard}
+        >
+          Discard
+        </Button>
         <Button type="button" disabled={!hasChanges} onClick={save}>
           Save changes
         </Button>

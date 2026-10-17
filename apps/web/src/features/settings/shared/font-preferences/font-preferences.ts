@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-
 import {
   fontPreferenceVariables,
   fontStack,
@@ -53,7 +51,7 @@ function connectToGoogle(doc: Document) {
 }
 
 /** Adds the family's stylesheet the first time it is needed, and never again. */
-function loadFont(doc: Document, id: GoogleFontId) {
+export function loadFont(doc: Document, id: GoogleFontId) {
   if (doc.getElementById(fontLinkId(id))) return;
   connectToGoogle(doc);
   addLink(doc, {
@@ -104,13 +102,6 @@ export function previewFontStyle(fonts: FontFields): Record<string, string> {
       previewFontValue(fonts[roleFields[role]]),
     ]),
   );
-}
-
-/** Fetches the family a preview shows, once, without applying it to the page. */
-export function usePreviewFont(choice: FontChoice) {
-  useEffect(() => {
-    if (choice !== 'default') loadFont(document, choice);
-  }, [choice]);
 }
 
 const bootCatalog = Object.fromEntries(

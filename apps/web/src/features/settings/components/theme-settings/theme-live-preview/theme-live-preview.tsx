@@ -1,11 +1,11 @@
+'use client';
+
 import { useId } from 'react';
 import { PanelLeft, FileText, Plus, ArrowUpRight, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePrefersDark } from '../../../hooks/use-prefers-dark';
-import {
-  previewFontStyle,
-  usePreviewFont,
-} from '../../../shared/font-preferences';
+import { previewFontStyle } from '../../../shared/font-preferences';
+import { usePreviewFont } from '../../../hooks/use-preview-font';
 import type { ThemeSettings } from '../../../types/theme';
 
 /**

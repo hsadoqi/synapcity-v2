@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ModeProvider } from '@synapcity/frontend-ui/providers/mode-provider';
 
@@ -44,13 +50,12 @@ describe('SettingsContent', () => {
       .map((tab) => [tab.label, tab.value]),
   )('titles the %s page without naming another tab', async (label, value) => {
     window.location.hash = value;
-    const { container } = show();
-    await screen.findByRole('tabpanel', {}, { timeout: 5000 });
+    show();
+    // Only the open panel: tabs opened earlier stay mounted, hidden.
+    const panel = await screen.findByRole('tabpanel', {}, { timeout: 5000 });
     const title = await waitFor(
       () => {
-        const node = container.querySelector(
-          '[role="tabpanel"] [data-slot="card-title"]',
-        );
+        const node = panel.querySelector('[data-slot="card-title"]');
         if (!node?.textContent) throw new Error('title not loaded');
         return node.textContent;
       },
@@ -83,9 +88,9 @@ describe('SettingsContent', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Theme' }));
 
     await waitFor(() => expect(colorTheme().textContent).toContain('Dark'));
-    expect(screen.getByRole('status', { name: '' }).textContent).toBe(
-      'You have unsaved changes.',
-    );
+    expect(
+      within(screen.getByRole('tabpanel')).getByRole('status').textContent,
+    ).toBe('You have unsaved changes.');
   });
 
   it('opens on the theme tab and loads its content', async () => {

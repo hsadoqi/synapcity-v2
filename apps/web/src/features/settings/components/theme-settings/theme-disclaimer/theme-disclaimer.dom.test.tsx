@@ -9,7 +9,7 @@ describe('ThemeDisclaimer', () => {
 
     expect(
       screen.getByText(
-        'Your theme will change automatically with your device.',
+        'Follows your device, switching between light and dark with it.',
       ),
     ).toBeTruthy();
   });
@@ -18,7 +18,7 @@ describe('ThemeDisclaimer', () => {
     render(<ThemeDisclaimer theme={{ mode }} />);
 
     expect(
-      screen.getByText(`Your workspace is always in ${mode} mode.`),
+      screen.getByText(`Always ${mode}, whatever your device is set to.`),
     ).toBeTruthy();
   });
 });

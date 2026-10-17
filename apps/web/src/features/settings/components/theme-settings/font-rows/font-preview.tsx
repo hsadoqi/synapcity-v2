@@ -1,13 +1,13 @@
+'use client';
+
 import { cn } from '@/lib/utils';
-import {
-  previewFontValue,
-  usePreviewFont,
-} from '../../../shared/font-preferences';
+import { previewFontValue } from '../../../shared/font-preferences';
 import {
   fontPreferenceVariables,
   type FontChoice,
   type FontRole,
 } from '../../../types/fonts';
+import { usePreviewFont } from '../../../hooks/use-preview-font';
 
 const roleStyles: Record<FontRole, string> = {
   heading: 'font-heading text-xl font-semibold tracking-tight',

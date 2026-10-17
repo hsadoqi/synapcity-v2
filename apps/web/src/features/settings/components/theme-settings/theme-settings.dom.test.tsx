@@ -27,7 +27,7 @@ describe('ThemeSettings', () => {
     expect(screen.getByRole('figure', { name: 'Live preview' })).toBeTruthy();
     expect(
       screen.getByText(
-        'Your theme will change automatically with your device.',
+        'Follows your device, switching between light and dark with it.',
       ),
     ).toBeTruthy();
   });
@@ -55,7 +55,7 @@ describe('ThemeSettings', () => {
 
     await waitFor(() =>
       expect(
-        screen.getByText('Your workspace is always in dark mode.'),
+        screen.getByText('Always dark, whatever your device is set to.'),
       ).toBeTruthy(),
     );
     expect(screen.getByRole('status').textContent).toBe(
@@ -94,6 +94,44 @@ describe('ThemeSettings', () => {
           .hasAttribute('disabled'),
       ).toBe(true),
     );
+  });
+
+  it('discards unsaved choices', async () => {
+    await renderWithSettings(<ThemeSettings />);
+
+    await pick('Color theme', 'Dark');
+    await waitFor(() =>
+      expect(
+        screen.getByText('Always dark, whatever your device is set to.'),
+      ).toBeTruthy(),
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Discard' }));
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole('combobox', { name: 'Color theme' }).textContent,
+      ).toContain('System default'),
+    );
+    expect(currentSettings().theme.mode).toBe('system');
+    expect(
+      screen.getByRole('button', { name: 'Discard' }).hasAttribute('disabled'),
+    ).toBe(true);
+  });
+
+  it('asks before the page closes only while choices are unsaved', async () => {
+    await renderWithSettings(<ThemeSettings />);
+    const leave = () => {
+      const event = new Event('beforeunload', { cancelable: true });
+      window.dispatchEvent(event);
+      return event.defaultPrevented;
+    };
+    expect(leave()).toBe(false);
+
+    await pick('Color theme', 'Dark');
+    await waitFor(() => expect(leave()).toBe(true));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save changes' }));
+    await waitFor(() => expect(leave()).toBe(false));
   });
 
   it('shows a font select and preview for headings, body and code', async () => {
