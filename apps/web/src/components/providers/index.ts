@@ -1,1 +1,1 @@
-export * from "./root-providers";
+export * from './root-providers';
