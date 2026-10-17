@@ -61,7 +61,9 @@ export async function GET(request: NextRequest) {
     !searchParams.has('error_code')
   ) {
     const back = safeNextPath(next, '/');
-    return NextResponse.redirect(`${origin}${withNotice(back, 'email-change-step')}`);
+    return NextResponse.redirect(
+      `${origin}${withNotice(back, 'email-change-step')}`,
+    );
   }
 
   return NextResponse.redirect(`${origin}${authErrorPath(flow)}`);

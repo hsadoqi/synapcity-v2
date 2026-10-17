@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 
-import { ProfileForm } from '@/features/account/components/profile-form';
-import { profileFromClaims } from '@/features/auth/shared/current-user';
+import { PendingEmailProvider } from '@/features/auth/client';
+import { getPendingEmail } from '@/features/auth/server/session';
+import { profileFromClaims } from '@/features/auth/shared';
 import { requireOwner } from '@/lib/access/require-owner';
+import { SettingsContent } from '@/features/settings/shared/settings-page/settings-content';
 
 export const metadata: Metadata = { title: 'Account settings' };
 
@@ -13,18 +15,12 @@ export default async function SettingsPage({
 }) {
   const claims = await requireOwner((await params).userId);
   const { name } = profileFromClaims(claims);
+  // Only this page needs it, and it costs a call to the provider.
+  const pendingEmail = await getPendingEmail();
 
   return (
-    <div className="flex w-full max-w-sm flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <h1>Account settings</h1>
-        <p className="text-sm text-muted-foreground">
-          Update your account settings below. Changes to your name will be
-          reflected across the site, but changes to your email or password will
-          require you to re-verify your account.
-        </p>
-      </div>
-      <ProfileForm defaultName={name ?? ''} />
-    </div>
+    <PendingEmailProvider pendingEmail={pendingEmail}>
+      <SettingsContent name={name} />
+    </PendingEmailProvider>
   );
 }

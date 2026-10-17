@@ -265,4 +265,145 @@ describe('GET /auth/callback', () => {
       expect(location(response)).toBe(`${ORIGIN}/auth/error?reason=oauth`);
     });
   });
+
+  describe('a confirmed email change', () => {
+    const SETTINGS = '/user-123/settings';
+    const arrives = (path: string) => `${ORIGIN}${path}`;
+
+    it('returns to where it was asked for, saying the address was updated', async () => {
+      exchangeSucceeds();
+
+      const response = await GET(
+        request({ code: 'abc', flow: 'email-change', next: SETTINGS }),
+      );
+
+      expect(location(response)).toBe(
+        arrives(`${SETTINGS}?notice=email-updated`),
+      );
+    });
+
+    it('goes to their own home when no destination came back', async () => {
+      exchangeSucceeds();
+
+      const response = await GET(
+        request({ code: 'abc', flow: 'email-change' }),
+      );
+
+      expect(location(response)).toBe(arrives(`${HOME}?notice=email-updated`));
+    });
+
+    it('never follows an unsafe destination off the origin', async () => {
+      exchangeSucceeds();
+
+      const response = await GET(
+        request({
+          code: 'abc',
+          flow: 'email-change',
+          next: '//evil.test/steal',
+        }),
+      );
+
+      expect(location(response)).toBe(arrives(`${HOME}?notice=email-updated`));
+      expect(new URL(location(response)).origin).toBe(ORIGIN);
+    });
+
+    it('is not sent to confirm a profile, even on a brand-new account', async () => {
+      mocks.exchangeCodeForSession.mockResolvedValue({
+        data: {
+          user: {
+            id: USER_ID,
+            created_at: new Date().toISOString(),
+            user_metadata: {},
+          },
+        },
+        error: null,
+      });
+
+      const response = await GET(
+        request({ code: 'abc', flow: 'email-change', next: SETTINGS }),
+      );
+
+      expect(location(response)).not.toContain('/auth/welcome');
+    });
+
+    it('names its own flow when the link fails', async () => {
+      mocks.exchangeCodeForSession.mockResolvedValue({
+        data: { user: null },
+        error: { code: 'otp_expired', message: 'secret-provider-text' },
+      });
+
+      const response = await GET(
+        request({ code: 'abc', flow: 'email-change' }),
+      );
+
+      expect(location(response)).toBe(
+        arrives('/auth/error?reason=email-change'),
+      );
+    });
+
+    describe('the first of two confirmations', () => {
+      const accepted = (extra: Record<string, string> = {}) =>
+        request({
+          flow: 'email-change',
+          next: SETTINGS,
+          message:
+            'Confirmation link accepted. Please proceed to confirm link sent to the other email',
+          ...extra,
+        });
+
+      it('is not a failure: it comes back with a message and no code', async () => {
+        const response = await GET(accepted());
+
+        expect(mocks.exchangeCodeForSession).not.toHaveBeenCalled();
+        expect(location(response)).toBe(
+          arrives(`${SETTINGS}?notice=email-change-step`),
+        );
+      });
+
+      it("shows our wording, never the provider's message text", async () => {
+        const response = await GET(
+          accepted({ message: 'sentinel-provider-text' }),
+        );
+
+        expect(location(response)).not.toMatch(/sentinel/);
+      });
+
+      it('is still a failure if the provider reports an error', async () => {
+        const failures: Record<string, string>[] = [
+          { error: 'access_denied' },
+          { error_code: 'otp_expired' },
+        ];
+        for (const error of failures) {
+          const response = await GET(accepted(error));
+
+          expect(location(response)).toBe(
+            arrives('/auth/error?reason=email-change'),
+          );
+        }
+      });
+
+      it('needs the email-change tag, so other flows are not affected', async () => {
+        const response = await GET(
+          request({ flow: 'confirm', message: 'anything' }),
+        );
+
+        expect(location(response)).toBe(arrives('/auth/error?reason=confirm'));
+      });
+
+      it('is a failure with no message at all', async () => {
+        const response = await GET(request({ flow: 'email-change' }));
+
+        expect(location(response)).toBe(
+          arrives('/auth/error?reason=email-change'),
+        );
+      });
+
+      it('never leaves the origin, whatever destination it was given', async () => {
+        const response = await GET(accepted({ next: '//evil.test/steal' }));
+
+        expect(new URL(location(response)).origin).toBe(ORIGIN);
+        expect(location(response)).toBe(arrives('/?notice=email-change-step'));
+      });
+    });
+  });
 });
