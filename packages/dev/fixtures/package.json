@@ -14,7 +14,8 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@faker-js/faker": "10.6.0"
+    "@faker-js/faker": "10.6.0",
+    "lucide-react": "^1.55.0"
   },
   "devDependencies": {
     "@synapcity/dev-typescript-config": "workspace:*",

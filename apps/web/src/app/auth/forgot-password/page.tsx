@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { ForgotPasswordCard } from '@/components/auth/forgot-password/forgot-password-card';
+import { ForgotPasswordCard } from '@/features/auth/components/forgot-password-card';
 
 export const metadata: Metadata = { title: 'Reset your password' };
 

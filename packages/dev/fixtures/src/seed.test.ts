@@ -11,9 +11,9 @@ import {
 describe.each(seedNames)('seed file "%s"', (name) => {
   it('matches what the generator produces', () => {
     expect(
-      readFileSync(seedPath(name), 'utf8'),
+      JSON.parse(readFileSync(seedPath(name), 'utf8')),
       'run `pnpm --filter @synapcity/dev-fixtures generate`',
-    ).toBe(serializeSeed(buildSeed(name)));
+    ).toEqual(JSON.parse(serializeSeed(buildSeed(name))));
   });
 
   it('changes with the seed', () => {

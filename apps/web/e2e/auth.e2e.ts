@@ -197,15 +197,16 @@ test.describe('server-side field errors', () => {
     await page.goto('/auth/login');
     await submitWithoutNativeValidation(page, 'Sign in');
 
-    await expect(page.locator('form').getByRole('alert')).toHaveText(
-      'Enter your email and password.',
-    );
+    const alert = page.locator('form').getByRole('alert');
+    await expect(alert).toHaveText('Enter your email and password.');
+    const messageId = await alert.getAttribute('id');
+    expect(messageId).toBeTruthy();
     for (const field of [
       page.getByLabel('Email'),
       page.getByLabel('Password', { exact: true }),
     ]) {
       await expect(field).toHaveAttribute('aria-invalid', 'true');
-      await expect(field).toHaveAttribute('aria-describedby', /form-message/);
+      await expect(field).toHaveAttribute('aria-describedby', messageId!);
     }
   });
 
@@ -217,13 +218,14 @@ test.describe('server-side field errors', () => {
     await submitWithoutNativeValidation(page, 'Create account');
 
     const password = page.getByLabel('Password', { exact: true });
-    await expect(page.locator('form').getByRole('alert')).toHaveText(
-      'Use a password of at least 8 characters.',
-    );
+    const alert = page.locator('form').getByRole('alert');
+    await expect(alert).toHaveText('Use a password of at least 8 characters.');
+    const messageId = await alert.getAttribute('id');
+    expect(messageId).toBeTruthy();
     await expect(password).toHaveAttribute('aria-invalid', 'true');
     // The message carries the rule while the field is invalid, so the hint
     // steps aside instead of repeating it above the error.
-    await expect(password).toHaveAttribute('aria-describedby', 'form-message');
+    await expect(password).toHaveAttribute('aria-describedby', messageId!);
     await expect(page.getByText('Use at least 8 characters.')).toHaveCount(0);
     await expect(page.getByLabel('Email')).not.toHaveAttribute(
       'aria-invalid',

@@ -1,5 +1,5 @@
 // Fails when a static brand export drifts from the logo geometry in
-// packages/frontend/ui/src/components/logo-mark.tsx, which is the source of
+// packages/frontend/ui/src/components/logo-mark/logo-mark.tsx, which is the source of
 // truth. Run with `pnpm brand:check`; it is part of `pnpm verify`.
 //
 // What it checks: the wordmark path and the mark geometry inside the static
@@ -29,7 +29,7 @@ const read = (path) => {
 
 /* ---------- Source of truth ---------- */
 
-const SOURCE = 'packages/frontend/ui/src/components/logo-mark.tsx';
+const SOURCE = 'packages/frontend/ui/src/components/logo-mark/logo-mark.tsx';
 const source = read(SOURCE);
 if (source === null) report();
 

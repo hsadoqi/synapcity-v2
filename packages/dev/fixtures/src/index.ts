@@ -1,5 +1,5 @@
 import { Faker, base, en } from '@faker-js/faker';
-
+import { LayoutDashboard, type LucideIcon } from 'lucide-react';
 /*
  * Seeded fake data for tests, stories and local development. Generic
  * primitives only: no Synapcity domain entity is modelled here, because the
@@ -24,11 +24,71 @@ export type Person = {
   email: string;
 };
 
+export type CommonEntityProps = {
+  id: string;
+  title: string;
+  icon: LucideIcon;
+  ownerId: string;
+  tags: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+};
+
+export const defaultCommonEntityProps: CommonEntityProps = {
+  id: '',
+  title: 'Untitled',
+  icon: LayoutDashboard,
+  ownerId: '',
+  tags: [],
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  deletedAt: null,
+};
+
+export type Workspace = CommonEntityProps & {
+  category: string;
+};
+
+export const exampleCategories = [
+  'Design',
+  'Development',
+  'Marketing',
+  'Sales',
+  'HR',
+  'Finance',
+  'Operations',
+  'Support',
+  'Legal',
+  'IT',
+];
+
+export type Document = CommonEntityProps & {
+  content?: string;
+};
+
+export type Dashboard = CommonEntityProps & {
+  widgets: string[];
+};
+
 export function createFixtures(seed: number = DEFAULT_SEED) {
   const faker = new Faker({ locale: [en, base] });
   faker.seed(seed);
   faker.setDefaultRefDate(REFERENCE_DATE);
 
+  const defaultFixtures = {
+    id: faker.string.uuid(),
+    ownerId: faker.string.uuid(),
+    icon: LayoutDashboard,
+    tags: faker.helpers.arrayElements(['tag1', 'tag2', 'tag3', 'tag4'], {
+      min: 0,
+      max: 3,
+    }),
+    title: faker.lorem.words({ min: 2, max: 6 }),
+    createdAt: faker.date.past({ years: 1 }),
+    updatedAt: faker.date.recent({ days: 30 }),
+    deletedAt: null,
+  };
   return {
     id: (): string => faker.string.uuid(),
     person: (overrides: Partial<Person> = {}): Person => ({
@@ -42,6 +102,21 @@ export function createFixtures(seed: number = DEFAULT_SEED) {
     recent: (): Date => faker.date.recent({ days: 30 }),
     list: <T>(count: number, factory: () => T): T[] =>
       Array.from({ length: count }, factory),
+    workspace: (overrides: Partial<Workspace> = {}): Workspace => ({
+      ...defaultFixtures,
+      category: faker.helpers.arrayElement(exampleCategories),
+      ...overrides,
+    }),
+    document: (overrides: Partial<Document> = {}): Document => ({
+      ...defaultFixtures,
+      content: faker.lorem.paragraphs({ min: 1, max: 5 }),
+      ...overrides,
+    }),
+    dashboard: (overrides: Partial<Dashboard> = {}): Dashboard => ({
+      ...defaultFixtures,
+      widgets: [],
+      ...overrides,
+    }),
   };
 }
 

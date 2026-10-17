@@ -5,18 +5,18 @@
   "exports": {
     "./styles.css": "./src/styles/globals.css",
     "./lib/*": "./src/lib/*.ts",
-    "./core/*": "./src/components/ui/*.tsx",
+    "./hooks/*": "./src/hooks/*.ts",
+    "./utils/*": "./src/utils/*.ts",
+    "./core/*": "./src/components/ui/*/index.ts",
     "./components": "./src/components/index.ts",
-    "./components/*": "./src/components/*.tsx",
-    "./providers/*": "./src/providers/*.tsx",
+    "./components/*": "./src/components/*/index.ts",
+    "./providers/*": "./src/providers/*/index.ts",
     "./blocks": "./src/blocks/index.ts",
-    "./blocks/root-shell": "./src/blocks/root-shell/index.ts",
-    "./blocks/*": "./src/blocks/*.tsx",
-    "./utils/*": "./src/utils/*.ts"
+    "./blocks/*": "./src/blocks/*/index.ts"
   },
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
-    "lint": "eslint . --cache",
+    "lint": "eslint . --cache --max-warnings 0",
     "generate:component": "turbo gen react-component",
     "check-types": "tsc --noEmit",
     "verify": "pnpm lint && pnpm check-types && pnpm build",
