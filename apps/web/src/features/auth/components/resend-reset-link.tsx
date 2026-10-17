@@ -5,7 +5,7 @@ import { useActionState, useId } from 'react';
 import { requestPasswordReset } from '@/features/auth/server/actions';
 import type { AuthState } from '@/features/auth/shared/form-state';
 import { FormMessage } from '@/components/forms/form-message';
-import { ResendButton } from './resend-button';
+import { ResendButton } from '../shared/resend-button';
 import { useCooldown } from '@/features/auth/client/use-cooldown';
 
 const initialState: AuthState = {};

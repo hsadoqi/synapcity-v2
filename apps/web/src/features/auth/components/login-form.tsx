@@ -6,8 +6,8 @@ import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
 
 import { signInWithPassword } from '@/features/auth/server/actions';
 import type { AuthState } from '@/features/auth/shared/form-state';
-import { AuthField } from '@/components/forms/form-field';
-import { useFocusFirstError } from '@/components/forms/use-focus-first-error';
+import { AuthField } from '@/features/auth/shared/auth-field';
+import { useFocusFirstError } from '@/hooks/use-focus-first-error';
 import { FormMessage } from '@/components/forms/form-message';
 import { fieldErrorProps } from '@/features/auth/shared/form-feedback';
 import { ResendConfirmation } from './resend-confirmation';

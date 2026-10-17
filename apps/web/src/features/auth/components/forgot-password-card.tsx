@@ -3,9 +3,9 @@
 import { useActionState } from 'react';
 import { requestPasswordReset } from '@/features/auth/server/actions';
 import type { AuthState } from '@/features/auth/shared/form-state';
-import { AuthLinkButton } from './auth-link-button';
-import { AuthConfirmation } from './auth-confirmation';
-import { AuthShell } from './auth-shell';
+import { AuthLinkButton } from '../shared/auth-link-button';
+import { AuthConfirmation } from '../shared/auth-confirmation';
+import { AuthShell } from '../shared/auth-shell';
 import { useConfirmation } from '@/features/auth/client/use-confirmation';
 import { ForgotPasswordForm } from './forgot-password-form';
 import { ResendResetLink } from './resend-reset-link';

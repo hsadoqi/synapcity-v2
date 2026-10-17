@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 
 import { LoginForm } from '@/features/auth/components/login-form';
-import { OAuthButtons } from '@/features/auth/components/oauth-buttons';
+import { OAuthButtons } from '@/features/auth/shared/oauth-buttons';
 import { safeNextPath } from '@/lib/routing/safe-next';
-import { AuthLinkButton } from '@/features/auth/components/auth-link-button';
-import { AuthShell } from '@/features/auth/components/auth-shell';
-import { AuthDivider } from '@/features/auth/components/auth-divider';
+import { AuthLinkButton } from '@/features/auth/shared/auth-link-button';
+import { AuthShell } from '@/features/auth/shared/auth-shell';
+import { AuthDivider } from '@/features/auth/shared/auth-divider';
 
 export const metadata: Metadata = { title: 'Sign in' };
 

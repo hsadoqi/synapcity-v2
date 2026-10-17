@@ -6,8 +6,8 @@ import { Button } from '@synapcity/frontend-ui/core/button';
 import type { AuthState } from '@/features/auth/shared/form-state';
 import { MIN_PASSWORD_LENGTH } from '@/features/auth/shared/error-messages';
 import { MAX_NAME_LENGTH } from '@/features/account/shared/name';
-import { AuthField } from '@/components/forms/form-field';
-import { useFocusFirstError } from '@/components/forms/use-focus-first-error';
+import { AuthField } from '@/features/auth/shared/auth-field';
+import { useFocusFirstError } from '@/hooks/use-focus-first-error';
 import { FormMessage } from '@/components/forms/form-message';
 import { fieldErrorProps } from '@/features/auth/shared/form-feedback';
 

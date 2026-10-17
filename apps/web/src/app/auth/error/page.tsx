@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
-import { AuthLinkButton } from '@/features/auth/components/auth-link-button';
-import { AuthShell } from '@/features/auth/components/auth-shell';
+import { AuthLinkButton } from '@/features/auth/shared/auth-link-button';
+import { AuthShell } from '@/features/auth/shared/auth-shell';
 import { parseAuthFlow, type AuthFlow } from '@/lib/routing/auth-flow';
 
 export const metadata: Metadata = { title: 'Sign-in problem' };

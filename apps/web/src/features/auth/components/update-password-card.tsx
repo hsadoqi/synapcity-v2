@@ -1,4 +1,4 @@
-import { AuthShell } from './auth-shell';
+import { AuthShell } from '../shared/auth-shell';
 import { UpdatePasswordForm } from './update-password-form';
 
 export function UpdatePasswordCard() {
