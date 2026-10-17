@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { MAX_NAME_LENGTH, checkName } from './name';
+import { checkName } from './name';
+import { MAX_NAME_LENGTH, profileSchema } from '../../types';
 
 describe('checkName', () => {
   it('accepts a name and trims it', () => {
@@ -20,5 +21,16 @@ describe('checkName', () => {
 
   it('keeps non-latin names intact', () => {
     expect(checkName('أحمد المنصوري')).toEqual({ name: 'أحمد المنصوري' });
+  });
+});
+
+describe('profileSchema', () => {
+  it('is the single source of the name rule', () => {
+    expect(profileSchema.safeParse({ name: ' Ada ' })).toMatchObject({
+      success: true,
+      data: { name: 'Ada' },
+    });
+    expect(profileSchema.safeParse({ name: '' }).success).toBe(false);
+    expect(profileSchema.safeParse({}).success).toBe(false);
   });
 });

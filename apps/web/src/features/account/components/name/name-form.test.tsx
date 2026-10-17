@@ -1,7 +1,8 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { ProfileState } from '@/features/account/shared/form-state';
+import type { ProfileState } from '@/features/account/types';
+import { MAX_NAME_LENGTH } from '@/features/account/types';
 
 /**
  * Renders the real form with the state a submit returned. `useActionState` is
@@ -14,11 +15,11 @@ vi.mock('react', async (original) => ({
   ...(await original<typeof import('react')>()),
   useActionState: () => [result.state, () => {}, false],
 }));
-vi.mock('@/features/account/server/actions', () => ({
-  updateProfile: async () => ({}),
+vi.mock('@/features/account/server/actions/name-actions', () => ({
+  updateName: async () => ({}),
 }));
 
-import { ProfileForm } from './profile-form';
+import { NameForm } from './name-form';
 
 /** The attributes of the first rendered tag that matches (the test runs in node, without a DOM). */
 function attributesOf(html: string, tag: RegExp): Record<string, string> {
@@ -33,14 +34,15 @@ function attributesOf(html: string, tag: RegExp): Record<string, string> {
 }
 
 const NAME_INPUT = /<input[^>]*\bid="name"[^>]*>/;
+const FORM = /<form[^>]*>/;
 const ALERT = /<p[^>]*\brole="alert"[^>]*>/;
 
 function render(state: ProfileState): string {
   result.state = state;
-  return renderToStaticMarkup(<ProfileForm defaultName="Ada" />);
+  return renderToStaticMarkup(<NameForm defaultName="Ada" />);
 }
 
-describe('ProfileForm', () => {
+describe('NameForm', () => {
   it('marks the name invalid and points it at the error that explains why', () => {
     const html = render({
       error: 'Enter your name.',
@@ -57,12 +59,34 @@ describe('ProfileForm', () => {
 
   it('leaves the name alone for an error about no one field', () => {
     const html = render({
-      error: 'Sign in again to update your profile.',
+      error: 'Sign in again to update your Name.',
       name: 'Ada',
     });
 
     const input = attributesOf(html, NAME_INPUT);
     expect(input['aria-invalid']).toBeUndefined();
-    expect(input['aria-describedby']).toBeUndefined();
+    // The error is not about this field, so only the hint describes it.
+    expect(input['aria-describedby']).toBe('name-hint');
+  });
+
+  it('describes the name with its length limit until an error replaces it', () => {
+    const calm = render({ name: 'Ada' });
+    const input = attributesOf(calm, NAME_INPUT);
+    const hint = calm.match(/<p[^>]*\bid="name-hint"[^>]*>([^<]*)</);
+    expect(hint?.[1]).toBe(`Up to ${MAX_NAME_LENGTH} characters.`);
+    expect(input['aria-describedby']).toBe('name-hint');
+
+    const failed = render({
+      error: 'Enter your name.',
+      fields: ['name'],
+      name: '',
+    });
+    expect(failed).not.toContain('name-hint');
+  });
+
+  it('leaves validation to the server so its message is the one shown', () => {
+    const form = attributesOf(render({ name: 'Ada' }), FORM);
+    // A static render prints React's own spelling of the attribute.
+    expect('noValidate' in form).toBe(true);
   });
 });

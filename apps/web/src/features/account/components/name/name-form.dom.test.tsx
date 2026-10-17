@@ -1,16 +1,22 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { ProfileState } from '@/features/account/shared/form-state';
-
-/** Only the Server Action boundary is replaced; React runs the real form. */
-const mocks = vi.hoisted(() => ({ updateProfile: vi.fn() }));
-
-vi.mock('@/features/account/server/actions', () => ({
-  updateProfile: mocks.updateProfile,
+/** The toast is the success feedback: replace it so the tests can see what it was given. */
+const toasts = vi.hoisted(() => ({ add: vi.fn() }));
+vi.mock('@synapcity/frontend-ui/core/toast', () => ({
+  toast: { add: toasts.add },
 }));
 
-import { ProfileForm } from './profile-form';
+import type { ProfileState } from '@/features/account/types';
+
+/** Only the Server Action boundary is replaced; React runs the real form. */
+const mocks = vi.hoisted(() => ({ updateName: vi.fn() }));
+
+vi.mock('@/features/account/server/actions/name-actions', () => ({
+  updateName: mocks.updateName,
+}));
+
+import { NameForm } from './name-form';
 
 /** Lets a test hold a submit open, then finish it with a chosen result. */
 function deferred() {
@@ -27,45 +33,55 @@ const submit = () =>
     fireEvent.submit(nameInput().form!);
   });
 
-describe('ProfileForm submit', () => {
+describe('NameForm submit', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('sends the typed name to the action', async () => {
-    mocks.updateProfile.mockResolvedValue({ name: 'Grace', message: 'Saved' });
-    render(<ProfileForm defaultName="Ada" />);
+    mocks.updateName.mockResolvedValue({
+      name: 'Grace',
+      message: 'Saved',
+      saved: true,
+    });
+    render(<NameForm defaultName="Ada" />);
     fireEvent.change(nameInput(), { target: { value: 'Grace' } });
     await submit();
 
-    expect(mocks.updateProfile).toHaveBeenCalledTimes(1);
-    const formData = mocks.updateProfile.mock.calls[0]![1] as FormData;
+    expect(mocks.updateName).toHaveBeenCalledTimes(1);
+    const formData = mocks.updateName.mock.calls[0]![1] as FormData;
     expect(formData.get('name')).toBe('Grace');
   });
 
   it('disables the button while saving and shows the status afterwards', async () => {
     const pending = deferred();
-    mocks.updateProfile.mockReturnValue(pending.promise);
-    render(<ProfileForm defaultName="Ada" />);
+    mocks.updateName.mockReturnValue(pending.promise);
+    render(<NameForm defaultName="Ada" />);
     await submit();
 
     const button = screen.getByRole('button', { name: 'Saving…' });
     expect(button.hasAttribute('disabled')).toBe(true);
     expect(button.getAttribute('aria-busy')).toBe('true');
 
-    await act(async () => pending.finish({ name: 'Ada', message: 'Saved.' }));
-    expect(screen.getByRole('status').textContent).toBe('Saved.');
+    await act(async () =>
+      pending.finish({ name: 'Ada', message: 'Saved.', saved: true }),
+    );
+    expect(toasts.add).toHaveBeenCalledWith({
+      type: 'success',
+      title: 'Saved.',
+    });
+    expect(screen.queryByRole('status')).toBeNull();
     const again = screen.getByRole('button', { name: 'Save changes' });
     expect(again.hasAttribute('disabled')).toBe(false);
   });
 
   it('marks the name invalid, explains why and focuses it after a field error', async () => {
-    mocks.updateProfile.mockResolvedValue({
+    mocks.updateName.mockResolvedValue({
       error: 'Enter your name.',
       fields: ['name'],
       name: '',
     });
-    render(<ProfileForm defaultName="Ada" />);
+    render(<NameForm defaultName="Ada" />);
     await submit();
 
     const alert = screen.getByRole('alert');
@@ -76,11 +92,11 @@ describe('ProfileForm submit', () => {
   });
 
   it('focuses the message when the error is about no one field', async () => {
-    mocks.updateProfile.mockResolvedValue({
+    mocks.updateName.mockResolvedValue({
       error: 'Sign in again to update your profile.',
       name: 'Ada',
     });
-    render(<ProfileForm defaultName="Ada" />);
+    render(<NameForm defaultName="Ada" />);
     await submit();
 
     expect(nameInput().getAttribute('aria-invalid')).toBeNull();
