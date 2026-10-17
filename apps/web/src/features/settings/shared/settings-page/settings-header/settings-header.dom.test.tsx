@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ModeProvider } from '@synapcity/frontend-ui/providers/mode-provider';
 
 import { stubBrowser } from '../../../test-harness';
-import { SettingsProvider } from '../../../providers/settings-provider';
+import { SettingsProvider } from '../../../providers/settings-provider/settings-provider';
 import { SettingsHeader } from '../settings-header';
 
 beforeEach(stubBrowser);

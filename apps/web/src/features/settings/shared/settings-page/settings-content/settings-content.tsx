@@ -1,4 +1,4 @@
-import { SettingsProvider } from '../../../providers/settings-provider';
+import { SettingsProvider } from '../../../providers/settings-provider/settings-provider';
 import { SettingsHeader } from '../settings-header/settings-header';
 import { SettingsTabs } from '../../settings-tabs/settings-tabs';
 import { SettingsFooter } from '../settings-footer/settings-footer';
