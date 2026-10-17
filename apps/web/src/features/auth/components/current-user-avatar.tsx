@@ -20,7 +20,9 @@ function initialsOf(name: string | null): string {
 }
 
 export function CurrentUserAvatar() {
-  const { name, imageUrl } = useCurrentUserProfile();
+  const user = useCurrentUser();
+  const name = user?.name ?? null;
+  const imageUrl = user?.imageUrl ?? null;
 
   return (
     <Avatar>
