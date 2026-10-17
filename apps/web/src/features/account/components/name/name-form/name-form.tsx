@@ -4,8 +4,8 @@ import { Button } from '@synapcity/frontend-ui/core/button';
 
 import { updateName } from '@/features/account/server/actions/name-actions';
 import type { ProfileState } from '@/features/account/types';
-import { NameField } from './name-field';
-import { ProfileFormShell } from '../profile/profile-form-shell';
+import { NameField } from '../name-field/name-field';
+import { ProfileFormShell } from '../../profile';
 
 /** Edits just the display name. */
 export function NameForm({

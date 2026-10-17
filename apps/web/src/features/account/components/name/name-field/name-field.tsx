@@ -3,7 +3,7 @@
 import { FormField } from '@/components/forms/form-field';
 import { fieldErrorProps } from '@/components/forms/form-feedback';
 import { MAX_NAME_LENGTH } from '@/features/account/types';
-import { useProfileForm } from '../profile/profile-form-shell';
+import { useProfileForm } from '../../profile';
 
 /** The display-name input. Place it inside a `ProfileFormShell`. */
 export function NameField({
