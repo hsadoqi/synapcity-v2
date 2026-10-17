@@ -3,8 +3,7 @@
 import { useSyncExternalStore } from 'react';
 
 export type NotificationPermissionState =
-  | NotificationPermission
-  | 'unsupported';
+  NotificationPermission | 'unsupported';
 
 const isSupported = () =>
   typeof window !== 'undefined' && 'Notification' in window;

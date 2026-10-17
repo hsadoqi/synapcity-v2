@@ -42,7 +42,9 @@ export const NotificationRow = ({
     <SettingRow
       id={id}
       label={label}
-      description={blockedReason ? `${description} ${blockedReason}` : description}
+      description={
+        blockedReason ? `${description} ${blockedReason}` : description
+      }
     >
       <Switch
         id={id}
