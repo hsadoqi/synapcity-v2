@@ -15,7 +15,24 @@ describe('NotificationRow', () => {
     );
     expect(
       document.getElementById('notifications-email-description')?.textContent,
-    ).toBe('Keep your preference for occasional updates by email.');
+    ).toBe('Account and security alerts, and occasional product news.');
+  });
+
+  it('adds the blocked reason to the description and makes the switch read-only', () => {
+    render(
+      <NotificationRow
+        kind="push"
+        checked={false}
+        onChange={() => {}}
+        blockedReason="Blocked by the browser."
+      />,
+    );
+    const toggle = screen.getByRole('switch', { name: 'Push notifications' });
+
+    expect(toggle.getAttribute('aria-readonly')).toBe('true');
+    expect(
+      document.getElementById('notifications-push-description')?.textContent,
+    ).toMatch(/Blocked by the browser\.$/);
   });
 
   it('reflects the checked value', () => {

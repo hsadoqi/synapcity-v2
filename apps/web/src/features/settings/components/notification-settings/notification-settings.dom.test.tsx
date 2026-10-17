@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react';
+import { act, fireEvent, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -12,7 +12,24 @@ import {
 } from '../../types/notifications';
 import { NotificationSettings } from './index';
 
-beforeEach(stubBrowser);
+/** A browser whose notification permission starts at `permission` and becomes `answer` when asked. */
+function stubNotification(
+  permission: NotificationPermission,
+  answer: NotificationPermission = permission,
+) {
+  const requestPermission = vi.fn(async () => {
+    fake.permission = answer;
+    return answer;
+  });
+  const fake = { permission, requestPermission };
+  vi.stubGlobal('Notification', fake);
+  return requestPermission;
+}
+
+beforeEach(() => {
+  stubBrowser();
+  stubNotification('granted');
+});
 afterEach(() => vi.unstubAllGlobals());
 
 const names = {
@@ -20,6 +37,8 @@ const names = {
   push: 'Push notifications',
   sound: 'Notification sounds',
 } as const;
+
+const pushSwitch = () => screen.getByRole('switch', { name: names.push });
 
 describe('NotificationSettings', () => {
   it('has one switch per notification setting, in schema order', async () => {
@@ -32,6 +51,12 @@ describe('NotificationSettings', () => {
     ).toEqual(
       notificationKinds.map((kind) => `notifications-${kind}-description`),
     );
+  });
+
+  it('says that nothing is sent yet', async () => {
+    await renderWithSettings(<NotificationSettings />);
+
+    expect(screen.getByText(/Nothing is sent yet/)).toBeTruthy();
   });
 
   it.each(notificationKinds)(
@@ -53,7 +78,9 @@ describe('NotificationSettings', () => {
       await renderWithSettings(<NotificationSettings />);
       const before = currentSettings().notifications;
 
-      fireEvent.click(screen.getByRole('switch', { name: names[kind] }));
+      await act(async () => {
+        fireEvent.click(screen.getByRole('switch', { name: names[kind] }));
+      });
 
       expect(currentSettings().notifications).toEqual({
         ...before,
@@ -66,4 +93,70 @@ describe('NotificationSettings', () => {
       ).toBe(String(!before[kind]));
     },
   );
+});
+
+describe('push notifications and browser permission', () => {
+  it('asks the browser before turning push on, and saves it once granted', async () => {
+    const requestPermission = stubNotification('default', 'granted');
+    await renderWithSettings(<NotificationSettings />);
+
+    await act(async () => {
+      fireEvent.click(pushSwitch());
+    });
+
+    expect(requestPermission).toHaveBeenCalledOnce();
+    expect(currentSettings().notifications.push).toBe(true);
+    expect(pushSwitch().getAttribute('aria-checked')).toBe('true');
+  });
+
+  it('leaves push off when the person declines the browser prompt', async () => {
+    stubNotification('default', 'denied');
+    await renderWithSettings(<NotificationSettings />);
+
+    await act(async () => {
+      fireEvent.click(pushSwitch());
+    });
+
+    expect(currentSettings().notifications.push).toBe(false);
+    expect(pushSwitch().getAttribute('aria-checked')).toBe('false');
+  });
+
+  it('turns push off without asking the browser anything', async () => {
+    const requestPermission = stubNotification('granted');
+    await renderWithSettings(<NotificationSettings />);
+    await act(async () => {
+      fireEvent.click(pushSwitch());
+    });
+    requestPermission.mockClear();
+
+    await act(async () => {
+      fireEvent.click(pushSwitch());
+    });
+
+    expect(requestPermission).not.toHaveBeenCalled();
+    expect(currentSettings().notifications.push).toBe(false);
+  });
+
+  it('shows push as off, read-only, and says why when the browser blocks it', async () => {
+    stubNotification('denied');
+    await renderWithSettings(<NotificationSettings />);
+
+    expect(pushSwitch().getAttribute('aria-checked')).toBe('false');
+    expect(pushSwitch().getAttribute('aria-readonly')).toBe('true');
+    expect(
+      document.getElementById('notifications-push-description')?.textContent,
+    ).toMatch(/blocked for this site in your browser settings/);
+  });
+
+  it('says so when the browser cannot show notifications', async () => {
+    vi.stubGlobal('Notification', undefined);
+    // `'Notification' in window` stays true for an undefined stub, so remove it.
+    delete (window as { Notification?: unknown }).Notification;
+    await renderWithSettings(<NotificationSettings />);
+
+    expect(pushSwitch().getAttribute('aria-readonly')).toBe('true');
+    expect(
+      document.getElementById('notifications-push-description')?.textContent,
+    ).toMatch(/cannot show notifications/);
+  });
 });
