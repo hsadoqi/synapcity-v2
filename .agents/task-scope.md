@@ -1,19 +1,5 @@
 # Task scope
 
-## Active task: auth refactor ARF-01 manifest and baseline (2026-10-17)
-
-- Goal and mode: bound the foundation file moves (ARF-02 to ARF-06) for the selected app-local layout. Mode: planning; this entry is the manifest. No source file changes under it.
-- Direct authority: on 2026-10-17 the owner selected layout A ("ok sounds good" to: record A, fix PR #24's conflicts, then start the file moves, one PR per step). That approves this manifest's preparation. Each ARF-02 to ARF-06 step still opens as its own PR for review.
-- Source readiness (`fix/auth-ui` at `6c511d7`, after merging `main`): all 47 source paths in the parent plan's section 2 exist; none of the 47 destinations exists (no collisions). The auth-area files outside the map are route entry points and adapters that stay (`app/auth/**/page.tsx`, `app/auth/layout.tsx`, `app/auth/callback/route.ts`, `app/[userId]/settings/page.tsx`, `lib/supabase/{client,server,middleware,env}.ts` and `env.test.ts`). The importers of moved files outside the moved set are exactly the parent plan's 14-file consumer list; no new consumer since 2026-10-13. All earlier "uncommitted WIP" is committed on the branch.
-- Budget for ARF-02 to ARF-06 together, all under `apps/web/src`: moves 47 (with import-path edits inside moved files); new files 5 (`features/auth/shared/form-state.ts`, `features/auth/shared/form-feedback.ts`, `features/account/shared/form-state.ts`, `features/account/server/profile-metadata.ts`, `features/account/server/profile-metadata.test.ts`, each extracted from an existing file); consumer updates 14 (the parent plan's list, import paths only); deletes 0 beyond the moved-from paths; renames of exported symbols 0; behavior changes 0. Outside `apps/web/src`: 0, including `packages/frontend/ui`, e2e tests, tooling config, `knip.json`, dependencies and the lockfile. ARF-07 to ARF-11 are out of this budget and need ADR-0008/0009 accepted first.
-- Systems of record: the parent plan owns the destination map; the foundation plan owns ARF-01 to ARF-06 checkboxes; this entry owns the budget. Git history on `fix/auth-ui` is the recovery store, since nothing is untracked.
-- Baseline (2026-10-17, cloud container): `pnpm --filter web test` 11 files, 143 tests passed; `pnpm --filter web check-types` passed; `pnpm --filter web test:e2e` NOT RUN (Playwright 1.64's Chromium build cannot be downloaded in this container; CI runs it). Repository-wide: `main` currently fails unit tests on the react 19.2.8 / react-dom 19.3.0 mismatch, which another thread owns; treat that failure as pre-existing.
-- Risks to watch: `knip.json` ignores `apps/web/src/lib/**` only, so files moved to `features/` and `components/forms` become visible to Knip and may report unused exports. If `pnpm deps` flags them, stop and report rather than editing `knip.json` under this budget.
-- Verification per step: `pnpm --filter web test`, `pnpm --filter web check-types`, `pnpm lint`, `pnpm deps`, `pnpm format:check`; CI runs the full `pnpm verify` including e2e. A grep for old import paths returns nothing once a step's moves land.
-- Recovery: revert the step's PR or commit. No reset, stash or clean on shared branches.
-- Stop conditions: a new consumer or source drift on `fix/auth-ui`, a destination collision, a needed change outside the budget, a behavior change, or a human correction.
-- Not authorized: ARF-07 to ARF-11, accepting ADR-0008/0009, package creation, provider/session/storage changes, merging PRs.
-
 ## Active task: correct auth package constraints (2026-10-13)
 
 - Goal and mode: correct the auth decision/spec/task-plan set so auth packages and further splitting are evaluated on their merits. Mode: documentation correction only.
