@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 import { removeOldAvatars } from '@/features/account/server/save-avatar';
 import { deleteOwnAccount } from '@/features/auth/server/operations';
 import { withNotice } from '@/lib/routing/notices';
+import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 
 export type DeleteAccountState = {
   error?: string;
@@ -26,6 +27,7 @@ export async function confirmAccountDeletion(
   _previous: DeleteAccountState,
   _formData: FormData,
 ): Promise<DeleteAccountState> {
+  if (fixtureModeEnabled()) return { error: FIXTURE_MESSAGE };
   const outcome = await deleteOwnAccount({
     // Best effort, and every file in the caller's own folder: that folder is
     // all the storage rules let this session reach.

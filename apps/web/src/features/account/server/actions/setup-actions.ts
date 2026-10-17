@@ -15,6 +15,7 @@ import { saveAvatar } from '../save-avatar';
 import { saveName } from '../save-name';
 import { withProfileConfirmed } from '../profile-metadata';
 import { createClient } from '@/lib/supabase/server';
+import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 
 /**
  * Confirms the name and photo a new account starts with. The name may come
@@ -27,6 +28,9 @@ export async function completeProfile(
   formData: FormData,
 ): Promise<ProfileState> {
   const shown = previous.avatarUrl;
+  if (fixtureModeEnabled()) {
+    return { error: FIXTURE_MESSAGE, name: '', avatarUrl: shown };
+  }
   const raw = formData.get('name');
   const { name, error } = checkName(typeof raw === 'string' ? raw : '');
   if (error) return { error, fields: ['name'], name, avatarUrl: shown };
@@ -88,6 +92,7 @@ export async function completeProfile(
  * step may be offered once more at the next sign-in.
  */
 export async function skipProfileSetup(): Promise<{ saved: boolean }> {
+  if (fixtureModeEnabled()) return { saved: false };
   const supabase = await createClient();
   const found = await getCaller(supabase);
   if (!('caller' in found)) return { saved: false };

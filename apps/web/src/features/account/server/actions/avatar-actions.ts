@@ -6,6 +6,7 @@ import type { ProfileState } from '@/features/account/types';
 import { getCaller, mirrorToSession, SHOWS_LATER } from '../caller';
 import { saveAvatar } from '../save-avatar';
 import { createClient } from '@/lib/supabase/server';
+import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 
 /**
  * Uploads a new avatar, or removes the uploaded one when the submit came from
@@ -17,6 +18,7 @@ export async function updateAvatar(
 ): Promise<ProfileState> {
   // A failed submit keeps showing the picture the person already has.
   const shown = previous.avatarUrl;
+  if (fixtureModeEnabled()) return { error: FIXTURE_MESSAGE, avatarUrl: shown };
   const removing = formData.get('intent') === 'remove';
 
   const supabase = await createClient();

@@ -1,6 +1,13 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { loadAccountPreferences } from './account-preferences';
+const createClient = vi.hoisted(() => vi.fn());
+
+vi.mock('@/lib/supabase/server', () => ({ createClient }));
+
+import {
+  getAccountPreferences,
+  loadAccountPreferences,
+} from './account-preferences';
 import type { Supabase } from '@/features/account/server/caller';
 import { settingsDefaults } from '../types/settings';
 
@@ -47,5 +54,21 @@ describe('loadAccountPreferences', () => {
     await expect(
       loadAccountPreferences(supabase, 'user-1'),
     ).resolves.toBeUndefined();
+  });
+});
+
+describe('getAccountPreferences in development fixture mode', () => {
+  beforeEach(() => {
+    vi.stubEnv('NODE_ENV', 'development');
+    vi.stubEnv('SYNAPCITY_DEV_AUTH', 'fixture');
+  });
+  afterEach(() => vi.unstubAllEnvs());
+
+  // The root layout asks on every page, so this must not reach Supabase.
+  it('is undefined without building a Supabase client', async () => {
+    await expect(
+      getAccountPreferences('fixture-user'),
+    ).resolves.toBeUndefined();
+    expect(createClient).not.toHaveBeenCalled();
   });
 });

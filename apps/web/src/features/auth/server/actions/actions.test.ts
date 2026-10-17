@@ -19,6 +19,7 @@ const mocks = vi.hoisted(() => ({
   signInWithOtp: vi.fn(),
   getUserIdentities: vi.fn(),
   unlinkIdentity: vi.fn(),
+  createClient: vi.fn(),
 }));
 
 /** Stands in for Next's `redirect`, which never returns. */
@@ -38,23 +39,26 @@ vi.mock('@/features/auth/server/site-origin', () => ({
   getOrigin: () => 'https://app.test',
 }));
 vi.mock('@/lib/supabase/server', () => ({
-  createClient: async () => ({
-    auth: {
-      signInWithPassword: mocks.signInWithPassword,
-      signUp: mocks.signUp,
-      resend: mocks.resend,
-      resetPasswordForEmail: mocks.resetPasswordForEmail,
-      updateUser: mocks.updateUser,
-      signInWithOAuth: mocks.signInWithOAuth,
-      signOut: mocks.signOut,
-      getClaims: mocks.getClaims,
-      getUser: mocks.getUser,
-      linkIdentity: mocks.linkIdentity,
-      signInWithOtp: mocks.signInWithOtp,
-      getUserIdentities: mocks.getUserIdentities,
-      unlinkIdentity: mocks.unlinkIdentity,
-    },
-  }),
+  createClient: async () => {
+    mocks.createClient();
+    return {
+      auth: {
+        signInWithPassword: mocks.signInWithPassword,
+        signUp: mocks.signUp,
+        resend: mocks.resend,
+        resetPasswordForEmail: mocks.resetPasswordForEmail,
+        updateUser: mocks.updateUser,
+        signInWithOAuth: mocks.signInWithOAuth,
+        signOut: mocks.signOut,
+        getClaims: mocks.getClaims,
+        getUser: mocks.getUser,
+        linkIdentity: mocks.linkIdentity,
+        signInWithOtp: mocks.signInWithOtp,
+        getUserIdentities: mocks.getUserIdentities,
+        unlinkIdentity: mocks.unlinkIdentity,
+      },
+    };
+  },
 }));
 
 import {
@@ -1257,5 +1261,62 @@ describe('disconnectAccount', () => {
       'Connecting accounts is not turned on for this app yet.',
     );
     expect(JSON.stringify(warn.mock.calls)).not.toContain('ada@example.com');
+  });
+});
+
+describe('development fixture mode', () => {
+  beforeEach(() => {
+    vi.stubEnv('NODE_ENV', 'development');
+    vi.stubEnv('SYNAPCITY_DEV_AUTH', 'fixture');
+  });
+  afterEach(() => vi.unstubAllEnvs());
+
+  const valid = form({
+    email: 'a@b.test',
+    password: STRONG,
+    confirm: STRONG,
+    name: 'Ada',
+    provider: 'google',
+  });
+
+  // Includes the actions that check `getCurrentUser()`, which in fixture mode
+  // returns the fixture user: the guard must stop them before that check.
+  it('rejects every form action before a Supabase client is built', async () => {
+    const results = await Promise.all([
+      signInWithPassword({}, valid),
+      signUp({}, valid),
+      resendConfirmation({}, valid),
+      requestPasswordReset({}, valid),
+      updatePassword({}, valid),
+      requestEmailChange({}, valid),
+      resendEmailChange({}, valid),
+      requestOwnPasswordReset({}, valid),
+      connectAccount({}, valid),
+      requestAccountDeletion({}, valid),
+      disconnectAccount({}, valid),
+    ]);
+
+    for (const result of results) {
+      expect(result.error).toContain('Fixture mode');
+    }
+    expect(mocks.createClient).not.toHaveBeenCalled();
+  });
+
+  it('sends OAuth to the error page and sign-out home without a client', async () => {
+    expect(await redirectOf(signInWithOAuth(valid))).toContain('/auth/error');
+    expect(await redirectOf(signOut())).toBe('/');
+    expect(mocks.createClient).not.toHaveBeenCalled();
+  });
+
+  it('does not apply in production even with the flag set', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    mocks.signInWithPassword.mockResolvedValue({
+      data: null,
+      error: { code: 'invalid_credentials' },
+    });
+
+    await signInWithPassword({}, valid);
+
+    expect(mocks.createClient).toHaveBeenCalled();
   });
 });

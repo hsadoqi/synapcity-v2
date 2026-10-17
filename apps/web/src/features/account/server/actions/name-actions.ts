@@ -12,6 +12,7 @@ import {
 } from '../caller';
 import { saveName } from '../save-name';
 import { createClient } from '@/lib/supabase/server';
+import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 
 /**
  * Updates the signed-in user's display name. A name change needs no
@@ -21,6 +22,7 @@ export async function updateName(
   _previous: ProfileState,
   formData: FormData,
 ): Promise<ProfileState> {
+  if (fixtureModeEnabled()) return { error: FIXTURE_MESSAGE, name: '' };
   const raw = formData.get('name');
   const { name, error } = checkName(typeof raw === 'string' ? raw : '');
   if (error) return { error, fields: ['name'], name };

@@ -1,14 +1,83 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const mocks = vi.hoisted(() => ({ getUser: vi.fn(), getClaims: vi.fn() }));
-
-vi.mock('@/lib/supabase/server', () => ({
-  createClient: async () => ({
-    auth: { getUser: mocks.getUser, getClaims: mocks.getClaims },
-  }),
+const mocks = vi.hoisted(() => ({
+  getUser: vi.fn(),
+  getClaims: vi.fn(),
+  createClient: vi.fn(),
 }));
 
-import { getConnectedAccounts, getPendingEmail } from './session';
+// `cache` would carry one test's result into the next; each call is fresh here.
+vi.mock('react', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('react')>()),
+  cache: <T>(fn: T) => fn,
+}));
+vi.mock('@/lib/supabase/server', () => ({
+  createClient: async () => {
+    mocks.createClient();
+    return { auth: { getUser: mocks.getUser, getClaims: mocks.getClaims } };
+  },
+}));
+
+import {
+  getConnectedAccounts,
+  getCurrentUser,
+  getPendingEmail,
+  getVerifiedClaims,
+} from './session';
+
+describe('session', () => {
+  beforeEach(() => vi.clearAllMocks());
+  afterEach(() => vi.unstubAllEnvs());
+
+  it('verifies claims with the provider and never returns a fixture', async () => {
+    vi.stubEnv('NODE_ENV', 'development');
+    vi.stubEnv('SYNAPCITY_DEV_AUTH', 'fixture');
+    mocks.getClaims.mockResolvedValue({ data: null });
+
+    await expect(getVerifiedClaims()).resolves.toBeNull();
+    expect(mocks.getClaims).toHaveBeenCalledOnce();
+  });
+
+  it('shows the fixture user for display in fixture mode without Supabase', async () => {
+    vi.stubEnv('NODE_ENV', 'development');
+    vi.stubEnv('SYNAPCITY_DEV_AUTH', 'fixture');
+
+    const user = await getCurrentUser();
+
+    expect(user).toMatchObject({ id: 'fixture-user', fixture: true });
+    expect(mocks.createClient).not.toHaveBeenCalled();
+  });
+
+  it('reads no provider record in fixture mode', async () => {
+    vi.stubEnv('NODE_ENV', 'development');
+    vi.stubEnv('SYNAPCITY_DEV_AUTH', 'fixture');
+
+    await expect(getPendingEmail()).resolves.toBeNull();
+    await expect(getConnectedAccounts()).resolves.toEqual([]);
+    expect(mocks.createClient).not.toHaveBeenCalled();
+  });
+
+  it('derives the display user from verified claims otherwise', async () => {
+    vi.stubEnv('NODE_ENV', 'development');
+    mocks.getClaims.mockResolvedValue({
+      data: { claims: { sub: 'u1', email: 'a@b.co' } },
+    });
+
+    await expect(getCurrentUser()).resolves.toMatchObject({
+      id: 'u1',
+      email: 'a@b.co',
+    });
+  });
+
+  it('ignores the flag in production', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('SYNAPCITY_DEV_AUTH', 'fixture');
+    mocks.getClaims.mockResolvedValue({ data: null });
+
+    await expect(getCurrentUser()).resolves.toBeNull();
+    expect(mocks.getClaims).toHaveBeenCalled();
+  });
+});
 
 describe('getPendingEmail', () => {
   beforeEach(() => {

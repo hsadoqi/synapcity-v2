@@ -6,6 +6,7 @@ import {
   SAVE_FAILED,
 } from '@/features/account/server/caller';
 import { createClient } from '@/lib/supabase/server';
+import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import type { SavePreferencesResult } from '../../lib/account-sync';
 import { accountPreferencesSchema } from '../../lib/scope';
 import { isSupportedTimezone } from '../../types/regional';
@@ -22,6 +23,7 @@ export async function saveAccountPreferences(
   input: unknown,
   deviceTimezone: unknown,
 ): Promise<SavePreferencesResult> {
+  if (fixtureModeEnabled()) return { ok: false, error: FIXTURE_MESSAGE };
   const parsed = accountPreferencesSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: INVALID };
   const timezone =

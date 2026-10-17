@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
+import { fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import { createClient } from '@/lib/supabase/server';
 import { safeNextPath } from '@/lib/routing/safe-next';
 import { UpdatePasswordCard } from '@/features/auth/components/password/update-password/update-password-card';
@@ -12,6 +13,9 @@ export default async function UpdatePasswordPage({
 }: {
   searchParams: Promise<{ next?: string }>;
 }) {
+  // Fixture mode has no session, so there is nothing to update.
+  if (fixtureModeEnabled()) redirect('/');
+
   // The reset link signs the user in through /auth/callback. Without that
   // session there is nothing to update, so send them back to start over.
   const supabase = await createClient();

@@ -1,6 +1,6 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
-  "globalPassThroughEnv": ["SITE_URL"],
+  "globalPassThroughEnv": ["SITE_URL", "SYNAPCITY_DEV_AUTH"],
   "ui": "tui",
   "tasks": {
     "build": {

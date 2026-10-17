@@ -1,5 +1,14 @@
 # Task scope
 
+## Active task: merge `main` into `feat/settings-page` (2026-10-17)
+
+- Goal and mode: owner asked to resolve the conflicts from merging `origin/main` (#39 to #43) into `feat/settings-page` for PR #44, keeping the better side or combining both. Mode: implementing a merge; no new decision.
+- Resolution rule: keep the branch's restructured modules and settings work, and carry main's development fixture mode (ADR-0006 development amendment, AHF-02) into them, so its invariant holds on the branch's larger surface: every server action refuses before a Supabase client is built, and `getVerifiedClaims` never returns a fixture.
+- Exact changes beyond the conflicted files: the fixture guard in every server action the branch adds (`features/auth/server/actions/actions.ts`, `features/account/server/actions/*-actions.ts`, `features/settings/server/actions/preferences-actions.ts`, `app/auth/delete-account/actions.ts`); in `features/auth/server/session/session.ts` and `features/settings/server/account-preferences.ts`, so the root layout and settings page read nothing from Supabase in fixture mode; an optional `notice` on `SettingsContent` for main's fixture message; tests beside each. Main's files at the pre-move paths are removed in favour of the moved ones.
+- Mutation budgets: no new dependency, schema, route, environment variable or public API.
+- Verification: the touched tests, web typecheck, lint, then `pnpm verify`. Not covered: a browser run of fixture mode.
+- Recovery: `git merge --abort` before the merge commit; after it, revert the merge commit.
+
 ## Active task: review data-privacy settings end to end (2026-10-17)
 
 - Authority and mode: owner asked to review the data-privacy settings (schema, tracking, rendered controls) and add UI for any setting without one. Mode: reviewing, then implementing only a missing guard; any new privacy field is a persisted-schema change (AGENTS section 5) and is reported, not built.
@@ -82,6 +91,33 @@
 - Verification: baseline/final web typecheck; merge/import and provider DOM regressions; targeted format/lint; web tests; root verify and remaining gates as appropriate; browser check where available. Report exact blockers and unrun checks.
 - Recovery: restore only task-owned changes against `/private/tmp/synapcity-settings-provider-baseline-20261017`, preserving concurrent work. Stop for overlapping edits or a required change outside these destinations.
 
+## Active task: auth review follow-ups, execution record in the plan (2026-10-17)
+
+- Goal and mode: implement the "update this plan only for its own task state/evidence" allowance of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`: tick the items of AHF-01 to AHF-07 whose evidence exists on `main`, and annotate each with the PR or test that provides it.
+- Exact change: update that plan (checkboxes, per-item notes, one execution-record note) and this entry. No source, config, ADR or other document changes.
+- Mutation budgets: updates 2; creates 0; source, dependencies, schema 0. Four older branches were also copied to `archive/*` branches through the GitHub API (4 creates, no deletions), with the owner's cleanup approval.
+- Not ticked: AHF-00 (not run as specified), AHF-05's browser-suite item, AHF-08 and AHF-09.
+- Verification: every cited test file and PR checked against `main`. No live check was run.
+- Recovery: revert the PR.
+
+## Active task: auth review follow-ups AHF-07 part 2, original checklist evidence (2026-10-17)
+
+- Goal and mode: implement the checklist item of AHF-07 of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`: tick items in the four original ARF plans only where acceptance evidence exists, and annotate every item with that evidence or the reason it stays open.
+- Exact change: update `docs/superpowers/plans/2026-10-13-auth-refactor{,-foundation,-operations,-navigation}.md` (checkboxes, per-item notes, one reconciliation note each) and this entry. No decision, status label of an ADR or spec, or source file changes.
+- Reference: `main` at `6e66224`. Items that need the original ARF-01 baseline stay open because that baseline was never recovered. `2026-10-13-auth-ui.md` is a separate plan and is not touched.
+- Mutation budgets: updates 5; creates 0; source, config, dependencies, schema 0.
+- Verification: every cited path and test name checked to exist on `main`; CI `verify` on PR #41 passed the full chain. No live email, OAuth or second-account check was run.
+- Recovery: revert the PR.
+
+## Active task: auth review follow-ups AHF-02, development identity (2026-10-17)
+
+- Goal and mode: implement AHF-02 (and the D1 part of AHF-01) of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`; the owner approved recommendation D1 on 2026-10-17: real auth by default in development, fixture browsing only as an explicit server-side opt-in named `SYNAPCITY_DEV_AUTH` (value `fixture`, development only).
+- Exact change: creates `apps/web/src/lib/access/dev-fixture.ts` and its test, and `apps/web/src/features/auth/server/session.test.ts`. Updates `session.ts`, `lib/access/require-owner.ts` (now returns `{ kind, claims }`), `lib/supabase/middleware.ts`, `features/auth/server/actions.ts`, `features/account/server/actions.ts`, `features/auth/client/user-provider.tsx`, `features/auth/components/auth-status.tsx`, `features/auth/shared/current-user.ts`, `app/[userId]/home/page.tsx`, `app/[userId]/settings/page.tsx`, `app/auth/update-password/page.tsx`, their existing tests, `turbo.json` (flag declaration), `apps/web/README.md` and ADR-0006 (dated amendment).
+- Not carried over: the original `development-auth.ts` bypass on `v0/supabase-environment-error-df72e1eb` (kept there as evidence).
+- Mutation budgets: creates 3 source or test files; dependencies, schema, routes, public API 0; one new environment variable name (approved).
+- Verification: mode-matrix tests (development with and without the flag, test, production with the flag) for the helper, `requireOwner`, session, middleware, every auth action and the profile action; disabling the helper makes 16 of them fail. Not covered: a browser run of fixture mode, live Supabase, the e2e suite.
+- Recovery: revert the PR.
+
 ## Active task: auth review follow-ups AHF-07 part 1, status text reconciliation (2026-10-17)
 
 - Goal and mode: implement the status-text items of AHF-07 of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`: dated reconciliation notes where the spec and ADR-0007 contradict the accepted decisions, and the web README's test paragraph.
@@ -89,6 +125,14 @@
 - Mutation budgets: updates 4; creates 0; dependencies, source, config, schema 0.
 - Not done in this part: ticking the 67 unchecked items in the four original ARF plans (each needs its own acceptance evidence), the original ARF-01 baseline note, and the D1 development contract in the README (waits for D1).
 - Verification: `pnpm format:check`; README claims checked against the named test files. No runtime checks apply.
+- Recovery: revert the PR.
+
+## Active task: remove the stale knip ignore entry (2026-10-17)
+
+- Goal and mode: implement the owner's "sure" to redoing the cleanup from `fix/auth-ui` commit ead0c31 against `main`. That commit deleted 24 UI files written for the old flat layout; on `main` every one of those components still has a real consumer (checked by import search: `auth-buttons`, `user-menu`, `avatar`, `password-input`, `separator` in `apps/web`; `skip-link`, `sidebar-shell`, `sheet`, `skeleton`, `tooltip`, `textarea`, `context-switcher`, `search-form` inside the UI package), so none is removed.
+- Exact change: update `knip.json` to drop `apps/web/src/components/index.ts` from `ignore` (the file no longer exists; Knip prints a "Remove from ignore" hint) and update this entry.
+- Mutation budgets: updates 2; deletions 0; creates 0; dependencies, source, schema 0.
+- Verification: `pnpm deps` passes without the entry and the hint is gone; `pnpm format:check`.
 - Recovery: revert the PR.
 
 ## Active task: auth review follow-ups AHF-05 part 1, DOM test setup (2026-10-17)

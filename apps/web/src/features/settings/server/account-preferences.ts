@@ -2,6 +2,7 @@ import { cache } from 'react';
 
 import { logFailure, type Supabase } from '@/features/account/server/caller';
 import { createClient } from '@/lib/supabase/server';
+import { fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import type { StoredAccountPreferences } from '../lib/account-sync';
 import { readAccountPreferences } from '../lib/scope';
 
@@ -34,7 +35,13 @@ export async function loadAccountPreferences(
  * The signed-in user's row, read once per request however many readers ask:
  * the root layout (page language, and the account copy applied on every page)
  * and the settings page share one query.
+ *
+ * Development fixture mode has no account to read (its user is not a session),
+ * so it is undefined there: every page then works from browser storage alone.
  */
-export const getAccountPreferences = cache(async (userId: string) =>
-  loadAccountPreferences(await createClient(), userId),
+export const getAccountPreferences = cache(
+  async (userId: string): Promise<StoredAccountPreferences | undefined> => {
+    if (fixtureModeEnabled()) return undefined;
+    return loadAccountPreferences(await createClient(), userId);
+  },
 );

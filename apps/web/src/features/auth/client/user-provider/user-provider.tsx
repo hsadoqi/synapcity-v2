@@ -33,7 +33,12 @@ export function UserProvider({
     knownUserId.current = user?.id ?? null;
   }, [user?.id]);
 
+  const fixture = user?.fixture === true;
+
   useEffect(() => {
+    // A fixture user has no session; the browser client would only report
+    // signed-out events and refresh the page away from it.
+    if (fixture) return;
     const { data } = createClient().auth.onAuthStateChange((event, session) => {
       // Synchronous work only: awaiting Supabase calls in here can deadlock.
       if (
@@ -47,7 +52,7 @@ export function UserProvider({
       }
     });
     return () => data.subscription.unsubscribe();
-  }, [router]);
+  }, [router, fixture]);
 
   return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
 }

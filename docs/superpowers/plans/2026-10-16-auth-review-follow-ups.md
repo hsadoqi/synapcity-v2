@@ -1,5 +1,7 @@
 # Auth review follow-ups: implementation and verification plan
 
+> **Execution record 2026-10-17:** AHF-01 to AHF-07 were carried out as PRs #29 to #31, #34 to #38, #41 and #42, and are ticked below with the evidence for each. AHF-00 was not run as written, AHF-08 was run locally except the e2e and Storybook steps (CI ran the full chain), and AHF-09 (live acceptance) has not started and needs the owner's explicit scope.
+
 **Status:** Proposed implementation plan; authoring authorized 2026-10-16. No source changes, dependency additions, new fixture-auth policy or live-provider operations are authorized by authoring this file.  
 **Owner / approval authority:** Hanaa Sadoqi.  
 **Baseline:** `refactor/auth-features`, HEAD `773060f`, plus the five WIP paths listed below, reviewed 2026-10-16. Refresh before execution.  
@@ -100,10 +102,10 @@ Execution batches are sequential by default. Independent tasks do not require co
 
 ### AHF-00 — capture the live baseline and preservation evidence
 
-- [ ] Confirm checkout, branch, HEAD, source status and concurrent ownership; re-read the five WIP files and all intended consumers.
-- [ ] Save tracked diffs and complete copies of untracked originals in an approved recovery directory. Include a manifest of paths/checksums and the actual HEAD; a patch alone does not preserve untracked content.
-- [ ] Capture the ordinary web unit result and the development-mode ownership/middleware probe before repairing it. Record expected failures separately from environmental failures.
-- [ ] Write the next batch's exact create/update/move/remove list and numeric budgets into `.agents/task-scope.md`. Recheck files immediately before mutation; stop on concurrent changes.
+- [ ] Confirm checkout, branch, HEAD, source status and concurrent ownership; re-read the five WIP files and all intended consumers. _(2026-10-17: open: not recorded: the original WIP lived on the owner's Mac; its pushed copy is on `archive/v0-supabase-environment-error`.)_
+- [ ] Save tracked diffs and complete copies of untracked originals in an approved recovery directory. Include a manifest of paths/checksums and the actual HEAD; a patch alone does not preserve untracked content. _(2026-10-17: open: not done as specified; archive branches preserve the pushed WIP and the other branches' tips.)_
+- [ ] Capture the ordinary web unit result and the development-mode ownership/middleware probe before repairing it. Record expected failures separately from environmental failures. _(2026-10-17: open: not captured before the repair.)_
+- [ ] Write the next batch's exact create/update/move/remove list and numeric budgets into `.agents/task-scope.md`. Recheck files immediately before mutation; stop on concurrent changes. _(2026-10-17: open: per-task entries exist in `.agents/task-scope.md`, but not as a single next-batch list.)_
 
 **Files:** `.agents/task-scope.md`; this plan only for its own execution evidence. Source is read-only at this checkpoint. Recovery files/logs stay outside the repository under the approved temporary directory; never include secrets in a report.
 
@@ -111,10 +113,10 @@ Execution batches are sequential by default. Independent tasks do not require co
 
 ### AHF-01 — record selected contracts and dependency preflight
 
-- [ ] Present D1's concrete mode/access/mutation matrix and proposed environment contract for approval. Preserve current URLs unless a separately approved contract requires otherwise.
-- [ ] Present D3's exact dependency versions, compatibility evidence, manifest/lockfile changes and Node-versus-DOM test setup. Recheck installed Vitest 4 APIs rather than relying on latest-site examples alone.
-- [ ] Record accepted behavior changes as dated ADR-0006 amendments and updated web setup guidance where applicable; retain rejected/deferred alternatives as evidence, not active runtime paths.
-- [ ] Produce a final AHF-02 manifest from the chosen mode contract. Count all route/provider/action consumers and any retirement of the untracked shared helper explicitly.
+- [x] Present D1's concrete mode/access/mutation matrix and proposed environment contract for approval. Preserve current URLs unless a separately approved contract requires otherwise. _(2026-10-17: evidence: proposal at `/mnt/project-files/auth-refactor/d1-d3-proposals.md`, approved by the owner 2026-10-17; matrix recorded in the ADR-0006 amendment (#41).)_
+- [x] Present D3's exact dependency versions, compatibility evidence, manifest/lockfile changes and Node-versus-DOM test setup. Recheck installed Vitest 4 APIs rather than relying on latest-site examples alone. _(2026-10-17: evidence: approved 2026-10-17; three exact dev pins and a two-project Vitest config in #34.)_
+- [x] Record accepted behavior changes as dated ADR-0006 amendments and updated web setup guidance where applicable; retain rejected/deferred alternatives as evidence, not active runtime paths. _(2026-10-17: evidence: ADR-0006 amendment, `apps/web/README.md` fixture section (#41); web README test paragraph (#38).)_
+- [x] Produce a final AHF-02 manifest from the chosen mode contract. Count all route/provider/action consumers and any retirement of the untracked shared helper explicitly. _(2026-10-17: evidence: `.agents/task-scope.md` entry for AHF-02 (#41) lists every consumer; the untracked helper was not carried over.)_
 
 **Candidate documents/configuration:** ADR-0006; `apps/web/README.md`; `.agents/task-scope.md`; this plan; `apps/web/package.json`; `pnpm-lock.yaml`; `apps/web/vitest.config.ts`; `turbo.json` only if the approved fixture flag requires a declaration. Dependency/runtime changes are not executed merely by recording this task.
 
@@ -122,13 +124,13 @@ Execution batches are sequential by default. Independent tasks do not require co
 
 ### AHF-02 — repair the development identity path
 
-- [ ] Write failing mode-matrix tests first: development without opt-in, development with opt-in, test, and production even when opt-in is present. Isolate environment/module evaluation and restore stubs after every case.
-- [ ] Restore provider verification as the meaning of `getVerifiedClaims`; keep React request-scoped memoization and request-bound client construction. Never globally cache an authenticated client.
-- [ ] Implement only the approved fixture presentation/access contract. Normal development must exercise guest redirects, owner matching and session refresh. Fixture access must be visibly and structurally distinct from verified claims.
-- [ ] If fixture mode is retained, bypass real browser subscriptions and reject sign-in/up, OAuth, resend, recovery, profile and password mutations at their server entry points before SDK construction. Provide the approved UI explanation; a disabled control alone is insufficient.
-- [ ] Preserve cookie/cache-header propagation on all real-auth middleware branches. Test that production cannot take the fixture branch regardless of flag values.
-- [ ] Adapt every enumerated consumer and verify no fixture display is combined with a hidden real mutation identity. Preserve the optional menu status presentation unless an explicitly approved API change removes it.
-- [ ] Archive/retire the original untracked helper only within the approved exact removal/move scope. Do not leave a duplicate active authority or unused source file to evade preservation requirements.
+- [x] Write failing mode-matrix tests first: development without opt-in, development with opt-in, test, and production even when opt-in is present. Isolate environment/module evaluation and restore stubs after every case. _(2026-10-17: evidence: mode-matrix tests in #41; disabling the helper makes 16 of them fail. Test-before-code ordering was not recorded.)_
+- [x] Restore provider verification as the meaning of `getVerifiedClaims`; keep React request-scoped memoization and request-bound client construction. Never globally cache an authenticated client. _(2026-10-17: evidence: `getVerifiedClaims` unchanged and covered by `session.test.ts` (#41).)_
+- [x] Implement only the approved fixture presentation/access contract. Normal development must exercise guest redirects, owner matching and session refresh. Fixture access must be visibly and structurally distinct from verified claims. _(2026-10-17: evidence: `requireOwner` returns `{ kind, claims }`; header label and settings text (#41).)_
+- [x] If fixture mode is retained, bypass real browser subscriptions and reject sign-in/up, OAuth, resend, recovery, profile and password mutations at their server entry points before SDK construction. Provide the approved UI explanation; a disabled control alone is insufficient. _(2026-10-17: evidence: provider skips the subscription; every auth and profile action rejects before `createClient` (#41 tests).)_
+- [x] Preserve cookie/cache-header propagation on all real-auth middleware branches. Test that production cannot take the fixture branch regardless of flag values. _(2026-10-17: evidence: existing `middleware.test.ts` cases unchanged; production-with-flag case added (#41).)_
+- [x] Adapt every enumerated consumer and verify no fixture display is combined with a hidden real mutation identity. Preserve the optional menu status presentation unless an explicitly approved API change removes it. _(2026-10-17: evidence: home, settings, update-password, header, provider, proxy and actions adapted (#41).)_
+- [x] Archive/retire the original untracked helper only within the approved exact removal/move scope. Do not leave a duplicate active authority or unused source file to evade preservation requirements. _(2026-10-17: evidence: not carried over; retained as evidence on `archive/v0-supabase-environment-error`.)_
 
 **Existing source candidates, relative to the repository root:**
 
@@ -145,12 +147,12 @@ Execution batches are sequential by default. Independent tasks do not require co
 
 ### AHF-03 — close the demonstrated boundary-check gaps
 
-- [ ] Add negative cases reproducing all four review misses: comment before specifier, previously unlisted ordinary server helper, shared browser-client import and shared environment-reader import.
-- [ ] Retain regression cases for side-effect, multiline, relative, alias, `.js`, index, re-export and literal dynamic imports; include leading comments and directive prologues.
-- [ ] Classify server modules by ownership/directives. A module-level `use server` action entry point remains callable from clients; ordinary server functions and mixed barrels remain forbidden.
-- [ ] Scan all client-marked source modules and enforce the documented shared-layer restrictions. Assert permitted imports too, so enforcement cannot pass by forbidding every import.
-- [ ] Emit importer, target and rule in failures. Ensure scanner discovery is nonempty and include a temporary-file fixture that proves a real forbidden source import fails the integrated check.
-- [ ] Document direct-import and supported-syntax limits. Update the stale comment claiming TypeScript is not linted; current ESLint does lint it.
+- [x] Add negative cases reproducing all four review misses: comment before specifier, previously unlisted ordinary server helper, shared browser-client import and shared environment-reader import. _(2026-10-17: evidence: `architecture.test.ts` (#31).)_
+- [x] Retain regression cases for side-effect, multiline, relative, alias, `.js`, index, re-export and literal dynamic imports; include leading comments and directive prologues. _(2026-10-17: evidence: `architecture.test.ts` (#31).)_
+- [x] Classify server modules by ownership/directives. A module-level `use server` action entry point remains callable from clients; ordinary server functions and mixed barrels remain forbidden. _(2026-10-17: evidence: `architecture.test.ts` (#31).)_
+- [x] Scan all client-marked source modules and enforce the documented shared-layer restrictions. Assert permitted imports too, so enforcement cannot pass by forbidding every import. _(2026-10-17: evidence: `architecture.test.ts` (#31).)_
+- [x] Emit importer, target and rule in failures. Ensure scanner discovery is nonempty and include a temporary-file fixture that proves a real forbidden source import fails the integrated check. _(2026-10-17: evidence: `architecture.test.ts` throwaway-tree fixture (#31).)_
+- [x] Document direct-import and supported-syntax limits. Update the stale comment claiming TypeScript is not linted; current ESLint does lint it. _(2026-10-17: evidence: limits and corrected comment in `architecture.test.ts` (#31).)_
 
 **Files:** `apps/web/src/architecture.test.ts`. Prefer keeping the repair there. If extraction improves clarity, approve exactly `apps/web/src/architecture/import-boundaries.ts` and `import-boundaries.test.ts` before creation and include their own layer classification. No dependency addition is planned.
 
@@ -158,10 +160,10 @@ Execution batches are sequential by default. Independent tasks do not require co
 
 ### AHF-04 — handle sign-out failures without hiding them
 
-- [ ] Add tests invoking the real `signOut` action for success and a returned provider error. Assert sign-out is called once, layout revalidation and redirect still occur, and the failure is observed through the approved logging contract.
-- [ ] Implement the previously recommended behavior: redirect anyway and log a sanitized operation/code. Never log the SDK object, cookie, JWT, password, email or complete session. Assert sentinel secret strings cannot appear in emitted logs.
-- [ ] Define thrown/unexpected SDK failures explicitly before implementation. Recommend the same redirect with sanitized failure logging for this action; obtain approval if only returned-error handling was authorized. Do not swallow framework redirect control flow inside a broad catch.
-- [ ] Retain real SDK sign-out semantics; do not add manual cookie deletion, a new session store or unapproved global-revocation behavior.
+- [x] Add tests invoking the real `signOut` action for success and a returned provider error. Assert sign-out is called once, layout revalidation and redirect still occur, and the failure is observed through the approved logging contract. _(2026-10-17: evidence: `actions.test.ts` (#30).)_
+- [x] Implement the previously recommended behavior: redirect anyway and log a sanitized operation/code. Never log the SDK object, cookie, JWT, password, email or complete session. Assert sentinel secret strings cannot appear in emitted logs. _(2026-10-17: evidence: `signOut` logs only code and status, then redirects (#30).)_
+- [x] Define thrown/unexpected SDK failures explicitly before implementation. Recommend the same redirect with sanitized failure logging for this action; obtain approval if only returned-error handling was authorized. Do not swallow framework redirect control flow inside a broad catch. _(2026-10-17: evidence: thrown failures logged as `thrown: true` and redirected (#30).)_
+- [x] Retain real SDK sign-out semantics; do not add manual cookie deletion, a new session store or unapproved global-revocation behavior. _(2026-10-17: evidence: no cookie deletion or session store added (#30).)_
 
 **Files:** `apps/web/src/features/auth/server/actions.ts` and `actions.test.ts` only, plus execution scope/evidence.
 
@@ -169,13 +171,13 @@ Execution batches are sequential by default. Independent tasks do not require co
 
 ### AHF-05 — test the client and form behavior that the current suite misses
 
-- [ ] Add the approved consumer-owned DOM dependencies/configuration, keeping Node tests in Node and applying shared setup only where needed. Validate that a new component test is actually discovered by the normal root test command.
-- [ ] Mount the real `UserProvider` with a stubbed SDK subscription. Assert server-prop updates reach consumers; meaningful events refresh once; unchanged sign-in/initial-session/token-refresh events follow the existing filter; unmount unsubscribes; fixture mode never subscribes when that policy is selected. Do not copy sessions into state for test convenience.
-- [ ] Exercise `useConfirmation` through a rendered consumer: success enters confirmation, edit returns to populated non-secret fields and focuses email, and a later successful result shows confirmation again. Ensure passwords are not restored from state.
-- [ ] Exercise `useCooldown` with controlled time: initial wait/no-wait, countdown to zero, accepted resend restart, failed resend behavior and timer cleanup. Advance timers within React update boundaries and restore real timers.
-- [ ] Extend profile-form coverage to a real submit through `useActionState` with only the server-action boundary mocked. Assert invalid-name focus/association, general-error message focus, success status and pending/re-enabled controls. Keep the existing static rendering tests where they still add distinct value.
-- [ ] Test `AuthConfirmation` heading focus and the shared error-focus hook's first-empty, first-invalid and message-fallback order. Render simultaneous form messages and assert distinct IDs and correct associations.
-- [ ] Extend the existing browser suite for approved confirmation/edit/resend behavior where deterministic public-boundary control is possible. Do not add a production test-only action, endpoint, global hook or broad provider mock to make the test pass.
+- [x] Add the approved consumer-owned DOM dependencies/configuration, keeping Node tests in Node and applying shared setup only where needed. Validate that a new component test is actually discovered by the normal root test command. _(2026-10-17: evidence: #34; the `dom` project discovers `*.dom.test.tsx`.)_
+- [x] Mount the real `UserProvider` with a stubbed SDK subscription. Assert server-prop updates reach consumers; meaningful events refresh once; unchanged sign-in/initial-session/token-refresh events follow the existing filter; unmount unsubscribes; fixture mode never subscribes when that policy is selected. Do not copy sessions into state for test convenience. _(2026-10-17: evidence: `user-provider.dom.test.tsx` (#35).)_
+- [x] Exercise `useConfirmation` through a rendered consumer: success enters confirmation, edit returns to populated non-secret fields and focuses email, and a later successful result shows confirmation again. Ensure passwords are not restored from state. _(2026-10-17: evidence: `use-confirmation.dom.test.tsx` (#34).)_
+- [x] Exercise `useCooldown` with controlled time: initial wait/no-wait, countdown to zero, accepted resend restart, failed resend behavior and timer cleanup. Advance timers within React update boundaries and restore real timers. _(2026-10-17: evidence: `use-cooldown.dom.test.tsx` (#34).)_
+- [x] Extend profile-form coverage to a real submit through `useActionState` with only the server-action boundary mocked. Assert invalid-name focus/association, general-error message focus, success status and pending/re-enabled controls. Keep the existing static rendering tests where they still add distinct value. _(2026-10-17: evidence: `profile-form.dom.test.tsx` (#37).)_
+- [x] Test `AuthConfirmation` heading focus and the shared error-focus hook's first-empty, first-invalid and message-fallback order. Render simultaneous form messages and assert distinct IDs and correct associations. _(2026-10-17: evidence: `auth-confirmation.dom.test.tsx`, `use-focus-first-error.dom.test.tsx` (#36).)_
+- [ ] Extend the existing browser suite for approved confirmation/edit/resend behavior where deterministic public-boundary control is possible. Do not add a production test-only action, endpoint, global hook or broad provider mock to make the test pass. _(2026-10-17: open: not done: no deterministic public-boundary control was identified, and no production test-only hook was added.)_
 
 **Existing update candidates:** `apps/web/package.json`, `pnpm-lock.yaml`, `apps/web/vitest.config.ts`, `apps/web/src/features/account/components/profile-form.test.tsx`, `apps/web/e2e/auth.e2e.ts`.
 
@@ -185,11 +187,11 @@ Execution batches are sequential by default. Independent tasks do not require co
 
 ### AHF-06 — cover the actual callback handler
 
-- [ ] Invoke the real exported callback `GET` using `NextRequest`, stubbing only Supabase exchange at the adapter boundary.
-- [ ] Cover a valid code/user and safe next path; missing/unsafe next falls back to the authenticated user's home; external and normalized protocol-relative destinations cannot escape the app.
-- [ ] Cover missing code, exchange error and absent returned user across confirm/reset/OAuth/unknown flow reasons. Assert the exact recovery destination and that missing code never calls the exchange.
-- [ ] Assert raw provider messages/session/token sentinels never appear in redirect locations or client-visible responses.
-- [ ] Keep existing callback origin, PKCE, flow semantics and cookie integration unchanged. If a test exposes a response-cookie/cache defect, reproduce it against installed SDK/framework behavior and scope the repair separately before editing the adapter.
+- [x] Invoke the real exported callback `GET` using `NextRequest`, stubbing only Supabase exchange at the adapter boundary. _(2026-10-17: evidence: `app/auth/callback/route.test.ts` (#29).)_
+- [x] Cover a valid code/user and safe next path; missing/unsafe next falls back to the authenticated user's home; external and normalized protocol-relative destinations cannot escape the app. _(2026-10-17: evidence: `route.test.ts` (#29).)_
+- [x] Cover missing code, exchange error and absent returned user across confirm/reset/OAuth/unknown flow reasons. Assert the exact recovery destination and that missing code never calls the exchange. _(2026-10-17: evidence: `route.test.ts` (#29).)_
+- [x] Assert raw provider messages/session/token sentinels never appear in redirect locations or client-visible responses. _(2026-10-17: evidence: `route.test.ts` (#29).)_
+- [x] Keep existing callback origin, PKCE, flow semantics and cookie integration unchanged. If a test exposes a response-cookie/cache defect, reproduce it against installed SDK/framework behavior and scope the repair separately before editing the adapter. _(2026-10-17: evidence: route unchanged; no defect reproduced (#29).)_
 
 **Files:** create `apps/web/src/app/auth/callback/route.test.ts`; read `route.ts`, routing helpers and Supabase server adapter. Update `route.ts` only for a demonstrated defect within a separately approved repair manifest. Existing safe-next/flow helper tests remain.
 
@@ -197,12 +199,12 @@ Execution batches are sequential by default. Independent tasks do not require co
 
 ### AHF-07 — reconcile original documents using evidence
 
-- [ ] Read the accepted decision text and implementation addenda together. Separate already accepted choices from genuinely open questions; preserve the owner's willingness to create auth/service packages.
-- [ ] Correct the spec's outdated ADR/status claims and the selected-layout/enforcement contradictions. Preserve proposal history through a dated reconciliation note rather than silently rewriting history or declaring all requirements approved.
-- [ ] In each original owning ARF plan, mark an item complete only when its actual acceptance evidence exists. For mixed implementation/manual items, explain the remaining work rather than treating source existence as verification.
-- [ ] Record the original ARF-01 manifest/baseline evidence as unavailable unless it is actually recovered. A fresh AHF-00 snapshot is not a substitute for that historical proof. Do not claim original execution sequencing from current tests.
-- [ ] Update the web README's outdated claim that actions/proxy are untested and document the approved development/test contract. Keep live-email/OAuth/RLS limitations explicit.
-- [ ] Keep profile metadata versus `profiles` ownership, broader permissions, package reconsideration, testing ADR and deployment questions open where governing decisions leave them open.
+- [x] Read the accepted decision text and implementation addenda together. Separate already accepted choices from genuinely open questions; preserve the owner's willingness to create auth/service packages. _(2026-10-17: evidence: ADR-0007 to 0009 read with the plans (#38, #42).)_
+- [x] Correct the spec's outdated ADR/status claims and the selected-layout/enforcement contradictions. Preserve proposal history through a dated reconciliation note rather than silently rewriting history or declaring all requirements approved. _(2026-10-17: evidence: spec status line and ADR-0007 note (#38).)_
+- [x] In each original owning ARF plan, mark an item complete only when its actual acceptance evidence exists. For mixed implementation/manual items, explain the remaining work rather than treating source existence as verification. _(2026-10-17: evidence: 48 of 67 items ticked with evidence, 19 left open with reasons (#42).)_
+- [x] Record the original ARF-01 manifest/baseline evidence as unavailable unless it is actually recovered. A fresh AHF-00 snapshot is not a substitute for that historical proof. Do not claim original execution sequencing from current tests. _(2026-10-17: evidence: recorded as unavailable in each plan's reconciliation note (#42).)_
+- [x] Update the web README's outdated claim that actions/proxy are untested and document the approved development/test contract. Keep live-email/OAuth/RLS limitations explicit. _(2026-10-17: evidence: test paragraph (#38); fixture section (#41); live-email, OAuth and RLS limits kept.)_
+- [x] Keep profile metadata versus `profiles` ownership, broader permissions, package reconsideration, testing ADR and deployment questions open where governing decisions leave them open. _(2026-10-17: evidence: left open in ADR-0007 (#38).)_
 
 **Exact document candidates:** ADR-0007, ADR-0008, ADR-0009; `docs/superpowers/specs/2026-10-13-auth-refactor-design.md`; `docs/superpowers/specs/2026-10-14-arf-00-layout-evidence.md`; the four original ARF plans linked in section 1; `apps/web/README.md`. ADR-0006 is additionally eligible only for the approved D1 amendment. Update this AHF plan only for its own task state/evidence and `.agents/task-scope.md` for bounds. No PRODUCT, glossary, engineering-policy or unrelated ADR changes are included.
 

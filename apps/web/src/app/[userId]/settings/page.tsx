@@ -9,6 +9,7 @@ import {
   getPendingEmail,
 } from '@/features/auth/server/session';
 import { profileFromClaims } from '@/features/auth/shared';
+import { FIXTURE_MESSAGE } from '@/lib/access/dev-fixture';
 import { requireOwner } from '@/lib/access/require-owner';
 import { getAccountPreferences } from '@/features/settings/server/account-preferences';
 import { saveAccountPreferences } from '@/features/settings/server/actions/preferences-actions';
@@ -21,10 +22,11 @@ export default async function SettingsPage({
 }: {
   params: Promise<{ userId: string }>;
 }) {
-  const claims = await requireOwner((await params).userId);
+  const { kind, claims } = await requireOwner((await params).userId);
   const { name } = profileFromClaims(claims);
   // Only this page needs these, and they cost a call to the provider (made
-  // once: both read the same memoized lookup).
+  // once: both read the same memoized lookup). In fixture mode none of them
+  // reaches Supabase: there is no pending email, no linked account and no row.
   const [pendingEmail, accounts, stored] = await Promise.all([
     getPendingEmail(),
     getConnectedAccounts(),
@@ -37,7 +39,11 @@ export default async function SettingsPage({
   return (
     <PendingEmailProvider pendingEmail={pendingEmail}>
       <ConnectedAccountsProvider accounts={accounts}>
-        <SettingsContent name={name} account={account} />
+        <SettingsContent
+          name={name}
+          account={account}
+          notice={kind === 'fixture' ? FIXTURE_MESSAGE : undefined}
+        />
       </ConnectedAccountsProvider>
     </PendingEmailProvider>
   );

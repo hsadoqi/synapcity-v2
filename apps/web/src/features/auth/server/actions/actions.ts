@@ -32,6 +32,7 @@ import { withNotice } from '@/lib/routing/notices';
 import { getOrigin } from '@/features/auth/server/site-origin';
 import { safeNextPath } from '@/lib/routing/safe-next';
 import { createClient } from '@/lib/supabase/server';
+import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 
 import { getCurrentUser } from '../session';
 import {
@@ -45,10 +46,21 @@ import {
   startAccountLink,
 } from '../operations';
 
+/**
+ * Development fixture mode has no session (ADR-0006, development amendment),
+ * so every action refuses before a Supabase client is built. It must stay the
+ * first statement: some actions treat `getCurrentUser()` as the signed-in
+ * check, and in fixture mode that returns the fixture user.
+ */
+function fixtureRefusal(): AuthState {
+  return authFailure(FIXTURE_MESSAGE, { email: '' });
+}
+
 export async function signInWithPassword(
   _previous: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  if (fixtureModeEnabled()) return fixtureRefusal();
   const parsed = signInSchema.safeParse({
     email: field(formData, 'email'),
     password: field(formData, 'password'),
@@ -87,6 +99,7 @@ export async function signUp(
   _previous: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  if (fixtureModeEnabled()) return fixtureRefusal();
   // Empty when the visitor gave no destination: the callback then falls back
   // to the new user's own home.
   const next = safeNextPath(field(formData, 'next'), '');
@@ -142,6 +155,7 @@ export async function resendConfirmation(
   _previous: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  if (fixtureModeEnabled()) return fixtureRefusal();
   const next = safeNextPath(field(formData, 'next'), '');
   const parsed = emailRequestSchema.safeParse({
     email: field(formData, 'email'),
@@ -177,6 +191,7 @@ export async function requestPasswordReset(
   _previous: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  if (fixtureModeEnabled()) return fixtureRefusal();
   const parsed = emailRequestSchema.safeParse({
     email: field(formData, 'email'),
   });
@@ -215,6 +230,7 @@ export async function updatePassword(
   _previous: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  if (fixtureModeEnabled()) return fixtureRefusal();
   const user = { email: '', name: '' };
   // Where a reset started from settings goes back to. Untrusted, so checked.
   const next = safeNextPath(field(formData, 'next'), '');
@@ -250,6 +266,7 @@ export async function updatePassword(
 }
 
 export async function signInWithOAuth(formData: FormData): Promise<void> {
+  if (fixtureModeEnabled()) redirect(authErrorPath('oauth'));
   const provider = field(formData, 'provider');
   if (!isOAuthProvider(provider)) redirect(authErrorPath('oauth'));
 
@@ -270,6 +287,7 @@ export async function signInWithOAuth(formData: FormData): Promise<void> {
 }
 
 export async function signOut(): Promise<void> {
+  if (fixtureModeEnabled()) redirect('/');
   const supabase = await createClient();
   // Redirect either way: the person asked to leave and has no recovery step to
   // take. Log only the operation and the code, never the error object, so a
@@ -314,6 +332,7 @@ export async function requestEmailChange(
   _previous: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  if (fixtureModeEnabled()) return fixtureRefusal();
   const typed = field(formData, 'email').trim();
   const parsed = emailRequestSchema.safeParse({ email: typed });
   if (!parsed.success) {
@@ -358,6 +377,7 @@ export async function resendEmailChange(
   _previous: AuthState,
   _formData: FormData,
 ): Promise<AuthState> {
+  if (fixtureModeEnabled()) return fixtureRefusal();
   const redirectTo = await emailChangeRedirect();
   if (!redirectTo) return signedOutFailure('');
 
@@ -391,6 +411,7 @@ export async function requestOwnPasswordReset(
   _previous: AuthState,
   _formData: FormData,
 ): Promise<AuthState> {
+  if (fixtureModeEnabled()) return fixtureRefusal();
   const user = await getCurrentUser();
   if (!user) return signedOutFailure('');
 
@@ -432,6 +453,7 @@ export async function connectAccount(
   _previous: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  if (fixtureModeEnabled()) return fixtureRefusal();
   const provider = field(formData, 'provider');
   if (!isOAuthProvider(provider)) return authFailure(TRY_AGAIN, { email: '' });
 
@@ -468,6 +490,7 @@ export async function requestAccountDeletion(
   _previous: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  if (fixtureModeEnabled()) return fixtureRefusal();
   const typed = field(formData, 'email').trim();
   const parsed = emailRequestSchema.safeParse({ email: typed });
   if (!parsed.success) {
@@ -521,6 +544,7 @@ export async function disconnectAccount(
   _previous: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  if (fixtureModeEnabled()) return fixtureRefusal();
   const provider = field(formData, 'provider');
   if (!isOAuthProvider(provider)) return authFailure(TRY_AGAIN, { email: '' });
 

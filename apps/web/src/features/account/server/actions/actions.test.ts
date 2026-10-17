@@ -1,7 +1,8 @@
 import { AuthRetryableFetchError } from '@supabase/supabase-js';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
+  createClient: vi.fn(),
   revalidatePath: vi.fn(),
   getUser: vi.fn(),
   updateUser: vi.fn(),
@@ -19,15 +20,18 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('next/cache', () => ({ revalidatePath: mocks.revalidatePath }));
 vi.mock('@/lib/supabase/server', () => ({
-  createClient: async () => ({
-    auth: {
-      getUser: mocks.getUser,
-      updateUser: mocks.updateUser,
-      refreshSession: mocks.refreshSession,
-    },
-    from: mocks.from,
-    storage: { from: mocks.bucket },
-  }),
+  createClient: async () => {
+    mocks.createClient();
+    return {
+      auth: {
+        getUser: mocks.getUser,
+        updateUser: mocks.updateUser,
+        refreshSession: mocks.refreshSession,
+      },
+      from: mocks.from,
+      storage: { from: mocks.bucket },
+    };
+  },
 }));
 
 import { updateAvatar } from './avatar-actions';
@@ -706,5 +710,31 @@ describe('skipProfileSetup', () => {
 
     expect(await skipProfileSetup()).toEqual({ saved: false });
     warn.mockRestore();
+  });
+});
+
+describe('development fixture mode', () => {
+  beforeEach(() => {
+    vi.stubEnv('NODE_ENV', 'development');
+    vi.stubEnv('SYNAPCITY_DEV_AUTH', 'fixture');
+  });
+  afterEach(() => vi.unstubAllEnvs());
+
+  it('rejects every profile action before a Supabase client is built', async () => {
+    const shown = 'https://cdn.test/avatars/old.png';
+    const results = await Promise.all([
+      updateName({}, form('Ada')),
+      updateAvatar({ avatarUrl: shown }, avatarForm(PNG)),
+      completeProfile({ avatarUrl: shown }, setupForm('Ada')),
+    ]);
+
+    for (const result of results) {
+      expect(result.error).toContain('Fixture mode');
+    }
+    // A refused submit keeps showing the picture the person already has.
+    expect(results[1]?.avatarUrl).toBe(shown);
+    expect(await skipProfileSetup()).toEqual({ saved: false });
+    expect(mocks.createClient).not.toHaveBeenCalled();
+    expect(mocks.updateUser).not.toHaveBeenCalled();
   });
 });

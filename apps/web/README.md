@@ -32,6 +32,10 @@ Set these in `apps/web/.env.local` (git-ignored) and, for deployments, in the ho
 
 The app throws on the first sign-up, reset or OAuth call if `SITE_URL` is missing.
 
+### Development fixture mode
+
+By default, development uses real Supabase auth like every other environment. To browse the signed-in pages without a Supabase project, set `SYNAPCITY_DEV_AUTH=fixture` in `apps/web/.env.local` and restart the dev server. You are then a fixed fixture user at `/fixture-user/home`; the header shows "Fixture mode", and sign-in, sign-up, recovery, OAuth, sign-out and every account change (name, photo, email, password, connected accounts, account deletion and synced preferences) are rejected before any Supabase call. Settings still work, from browser storage only. It only works when `NODE_ENV` is `development`; test and production ignore it. See the amendment in [ADR-0006](../../docs/architecture/decisions/0006-authentication-with-supabase.md).
+
 ### Error reports (Sentry)
 
 Error reports are off for everyone until a person turns them on in Settings, under Data privacy; until then the Sentry SDK is not even downloaded. With `NEXT_PUBLIC_SENTRY_DSN` unset, nothing is sent at all. The app sends browser errors only, without breadcrumbs, user data, cookies, headers or query strings, and replaces ids in URLs. In the Sentry project settings, also turn on **Prevent Storing of IP Addresses** (Security & Privacy), because Sentry can see the address a report was sent from, and the privacy notice at `/privacy` says reports carry nothing that identifies the person.

@@ -1,6 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
+  createClient: vi.fn(),
   getUser: vi.fn(),
   from: vi.fn(),
   upsert: vi.fn(),
@@ -8,10 +9,10 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('@/lib/supabase/server', () => ({
-  createClient: async () => ({
-    auth: { getUser: mocks.getUser },
-    from: mocks.from,
-  }),
+  createClient: async () => {
+    mocks.createClient();
+    return { auth: { getUser: mocks.getUser }, from: mocks.from };
+  },
 }));
 
 import { saveAccountPreferences } from './preferences-actions';
@@ -108,5 +109,22 @@ describe('saveAccountPreferences', () => {
       ok: false,
       error: 'Could not save your changes. Try again.',
     });
+  });
+});
+
+describe('saveAccountPreferences in development fixture mode', () => {
+  beforeEach(() => {
+    vi.stubEnv('NODE_ENV', 'development');
+    vi.stubEnv('SYNAPCITY_DEV_AUTH', 'fixture');
+  });
+  afterEach(() => vi.unstubAllEnvs());
+
+  it('is rejected before a Supabase client is built', async () => {
+    const result = await saveAccountPreferences(preferences, 'Europe/Paris');
+
+    expect(result).toMatchObject({ ok: false });
+    expect(!result.ok && result.error).toContain('Fixture mode');
+    expect(mocks.createClient).not.toHaveBeenCalled();
+    expect(mocks.upsert).not.toHaveBeenCalled();
   });
 });

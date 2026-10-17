@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   deleteOwnAccount: vi.fn(),
@@ -104,5 +104,22 @@ describe('confirmAccountDeletion', () => {
     expect(warn).toHaveBeenCalledWith('confirmAccountDeletion failed', {
       code: 'PGRST202',
     });
+  });
+});
+
+describe('confirmAccountDeletion in development fixture mode', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.stubEnv('NODE_ENV', 'development');
+    vi.stubEnv('SYNAPCITY_DEV_AUTH', 'fixture');
+  });
+  afterEach(() => vi.unstubAllEnvs());
+
+  it('deletes nothing and never reaches the deletion operation', async () => {
+    const result = await run();
+
+    expect(result.error).toContain('Fixture mode');
+    expect(mocks.deleteOwnAccount).not.toHaveBeenCalled();
+    expect(mocks.removeOldAvatars).not.toHaveBeenCalled();
   });
 });

@@ -1,6 +1,7 @@
 import { cache } from 'react';
 
 import { createClient } from '@/lib/supabase/server';
+import { fixtureModeEnabled, fixtureUser } from '@/lib/access/dev-fixture';
 import {
   connectedAccountsFrom,
   type ConnectedAccount,
@@ -22,8 +23,12 @@ export const getVerifiedClaims = cache(async () => {
   return data?.claims ?? null;
 });
 
-/** Display-only view of the signed-in user. Never authorize with it. */
+/**
+ * Display-only view of the signed-in user. Never authorize with it. In
+ * development fixture mode it is the fixture user, which is not a session.
+ */
 export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
+  if (fixtureModeEnabled()) return fixtureUser();
   const claims = await getVerifiedClaims();
   return claims ? currentUserFromClaims(claims) : null;
 });
@@ -32,8 +37,11 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
  * The provider's own record of the signed-in user (a network call), shared by
  * everything that needs more than the token's claims carry. Memoized per
  * request, so the settings page asks once however many readers it has.
+ * Fixture mode has no provider record, so readers see no pending email and no
+ * linked accounts.
  */
 const getProviderUser = cache(async () => {
+  if (fixtureModeEnabled()) return null;
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
   return data.user ?? null;

@@ -4,8 +4,12 @@ export type DisplayProfile = {
   imageUrl: string | null;
 };
 
-/** The signed-in user as the UI sees it: an id plus display-only fields. */
-export type CurrentUser = DisplayProfile & { id: string };
+/**
+ * The signed-in user as the UI sees it: an id plus display-only fields.
+ * `fixture` is set only by development fixture mode; such a user has no
+ * session, so the browser must not subscribe to auth events for it.
+ */
+export type CurrentUser = DisplayProfile & { id: string; fixture?: true };
 
 type ClaimsLike = {
   email?: unknown;
