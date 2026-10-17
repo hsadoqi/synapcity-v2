@@ -36,13 +36,16 @@ export async function GET(request: NextRequest) {
       const welcome =
         (flow === 'oauth' || flow === 'confirm') &&
         needsProfileSetup(data.user);
-      // A confirmed email change lands back where it was asked for, saying so.
+      // A confirmed email change, or a newly connected account, lands back
+      // where it was asked for, saying so.
       const arrival =
         flow === 'email-change'
           ? withNotice(destination, 'email-updated')
-          : welcome
-            ? welcomePath(destination)
-            : destination;
+          : flow === 'link'
+            ? withNotice(destination, 'account-connected')
+            : welcome
+              ? welcomePath(destination)
+              : destination;
       return NextResponse.redirect(`${origin}${arrival}`);
     }
   }

@@ -1,14 +1,25 @@
 'use client';
 
+import '../styles/globals.css';
+
 import { useEffect } from 'react';
+import { Button, buttonVariants } from '@synapcity/frontend-ui/core/button';
+import { ModeProvider } from '@synapcity/frontend-ui/providers/mode-provider';
+
+import {
+  MESSAGE_HEADING_ID,
+  MessagePage,
+} from '@/components/shells/message-page';
+import { fontVariables } from './fonts';
 
 /**
  * The last resort: what shows when the root layout itself fails, which
- * `error.tsx` cannot catch. It replaces the whole document, so none of the
- * app's styles, fonts, components or providers exist here. It is plain
- * semantic HTML on purpose, and `color-scheme` lets the browser pick readable
- * light or dark defaults. Anything the app can still render is handled by
- * `error.tsx`, which keeps the real design.
+ * `error.tsx` cannot catch. It replaces the whole document, so it brings what
+ * the layout would have: the stylesheet, the font variables and the theme
+ * provider (same settings as the root providers, so light and dark follow the
+ * person's choice). It uses only CSS-driven pieces, nothing that needs the
+ * router, the user or the Supabase client, because whatever failed may be any
+ * of those.
  */
 export default function GlobalError({
   error,
@@ -21,32 +32,42 @@ export default function GlobalError({
     // The digest matches the server log entry; the message can hold details
     // that must not be repeated here.
     console.error('Unexpected error', { digest: error.digest });
+    document.getElementById(MESSAGE_HEADING_ID)?.focus();
   }, [error]);
 
   return (
-    <html lang="en">
+    <html lang="en" className={fontVariables} suppressHydrationWarning>
       <head>
-        <meta name="color-scheme" content="light dark" />
         <title>Something went wrong</title>
       </head>
       <body>
-        <main>
-          <h1>Something went wrong</h1>
-          <p>
-            An unexpected problem stopped the app from loading. Try again. If it
-            keeps happening, wait a few minutes first.
-          </p>
-          <p>
-            <button type="button" onClick={() => retry()}>
-              Try again
-            </button>{' '}
-            {/* A full page load on purpose: the root layout failed, so the
-                router and any state that caused it are not to be trusted.
-                `next/link` would depend on exactly that. */}
-            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-            <a href="/">Go to the home page</a>
-          </p>
-        </main>
+        <ModeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <main className="flex min-h-svh px-4 py-8">
+            <MessagePage
+              title="Something went wrong"
+              description="An unexpected problem stopped the app from loading. Try again. If it keeps happening, wait a few minutes first."
+            >
+              <Button type="button" size="lg" onClick={() => retry()}>
+                Try again
+              </Button>
+              {/* A full page load on purpose: the root layout failed, so the
+                  router and any state that caused it are not to be trusted.
+                  `next/link` would depend on exactly that. */}
+              {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+              <a
+                href="/"
+                className={buttonVariants({ variant: 'outline', size: 'lg' })}
+              >
+                Go to the home page
+              </a>
+            </MessagePage>
+          </main>
+        </ModeProvider>
       </body>
     </html>
   );

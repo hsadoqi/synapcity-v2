@@ -1,5 +1,8 @@
 import { renderToStaticMarkup } from 'react-dom/server';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+// The font loaders only run inside Next's build; here they are replaced.
+vi.mock('./fonts', () => ({ fontVariables: 'font-inter-var font-geist-var' }));
 
 import GlobalError from './global-error';
 
@@ -12,26 +15,62 @@ const render = (message = 'db password is hunter2') =>
   );
 
 describe('the global error page', () => {
+  beforeEach(() => {
+    // jsdom has no matchMedia, which the theme provider asks about.
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({
+        matches: false,
+        media: '(prefers-color-scheme: dark)',
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      })),
+    );
+  });
+
   it('is a whole document, since it replaces the root layout', () => {
     const html = render();
 
-    expect(html).toMatch(/^<html lang="en">/);
+    expect(html).toMatch(/^<html lang="en"/);
     expect(html).toContain('<body>');
   });
 
-  it('says something went wrong and offers a retry and a way home', () => {
+  it('brings the font variables the layout would have put on the document', () => {
+    expect(render()).toMatch(
+      /^<html[^>]*class="font-inter-var font-geist-var"/,
+    );
+  });
+
+  it("uses the app's own message card, not bare HTML", () => {
     const html = render();
 
-    expect(html).toContain('<h1>Something went wrong</h1>');
-    expect(html).toMatch(/<button[^>]*type="button"[^>]*>Try again<\/button>/);
-    expect(html).toContain('<a href="/">Go to the home page</a>');
+    expect(html).toContain('data-slot="card"');
+    expect(html).toMatch(/<h1[^>]*>Something went wrong<\/h1>/);
     expect(html.match(/<h1/g)).toHaveLength(1);
   });
 
-  it('lets the browser choose readable light or dark colours', () => {
-    expect(render()).toContain(
-      '<meta name="color-scheme" content="light dark"',
-    );
+  it("offers a retry and a way home, both in the app's button styles", () => {
+    const html = render();
+
+    const retry = html.match(/<button[^>]*>Try again<\/button>/)?.[0] ?? '';
+    expect(retry).toContain('data-slot="button"');
+    expect(retry).toContain('type="button"');
+    const home = html.match(/<a[^>]*>Go to the home page<\/a>/)?.[0] ?? '';
+    expect(home).toContain('href="/"');
+    // The same classes the Button component gives its outline variant.
+    expect(home).toContain('inline-flex');
+    expect(home).toContain('border');
+  });
+
+  it('lets the heading take focus without joining the tab order', () => {
+    expect(render()).toMatch(/<h1[^>]*tabindex="-1"/);
+  });
+
+  it('carries the theme provider, so light and dark follow the on-device choice', () => {
+    const html = render();
+
+    expect(html).toContain('prefers-color-scheme: dark');
+    expect(html).toContain('localStorage.getItem');
   });
 
   it('shows none of the error, which can hold details that must stay private', () => {
@@ -40,9 +79,7 @@ describe('the global error page', () => {
     expect(html).not.toMatch(/hunter2|password|abc123/i);
   });
 
-  it('uses no styles of its own, because none of the app styles exist here', () => {
-    const html = render();
-
-    expect(html).not.toMatch(/style=|class=/);
+  it('uses no hard-coded styles of its own', () => {
+    expect(render()).not.toMatch(/style="/);
   });
 });

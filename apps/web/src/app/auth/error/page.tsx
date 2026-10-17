@@ -43,6 +43,12 @@ const RECOVERY: Record<AuthFlow | 'unknown', Recovery> = {
       'It may have expired, been used already, or been opened in a different browser from the one you asked in. Sign in and ask for the change again from your settings.',
     primary: { type: 'login', label: 'Sign in' },
   },
+  link: {
+    title: 'That account could not be connected',
+    description:
+      'The sign-in may have been cancelled, or that Google or GitHub account may already be connected to another account. Sign in and try again from your settings.',
+    primary: { type: 'login', label: 'Sign in' },
+  },
   unknown: {
     title: 'That link did not work',
     description:
