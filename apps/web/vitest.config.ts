@@ -25,8 +25,7 @@ export default defineConfig({
         test: {
           ...reactConfig.test,
           name: 'dom',
-          include: ['src/**/*.dom.test.{ts,tsx}'],
-        },
+          include: ['src/**/*.dom.test.{ts,tsx}'],        },
       },
     ],
   },

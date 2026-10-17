@@ -134,7 +134,9 @@ test.describe('register', () => {
 
     await expect(
       page.getByLabel('Password', { exact: true }),
-    ).toHaveAccessibleDescription('Use at least 8 characters.');
+    ).toHaveAccessibleDescription(
+      'At least 8 characters, with a lowercase letter, an uppercase letter, a number and a symbol.',
+    );
   });
 
   test('carries the destination back to sign in', async ({ page }) => {
