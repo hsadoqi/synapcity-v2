@@ -2,8 +2,9 @@ import { Switch } from '@synapcity/frontend-ui/core/switch';
 import type { PrivacyPurpose } from '../../types/data-privacy';
 import { SettingRow } from '../../shared/setting-row/setting-row';
 
-// Say what each purpose collects. Who receives it is added once a collector
-// is chosen; changing that wording means raising PRIVACY_POLICY_VERSION.
+// Say what each purpose collects and who receives it, matching the privacy
+// notice at /privacy. Changing what either says means raising
+// PRIVACY_POLICY_VERSION, so people are asked again.
 const purposeCopy: Record<
   PrivacyPurpose,
   { label: string; description: string }
@@ -16,7 +17,7 @@ const purposeCopy: Record<
   errorReports: {
     label: 'Error reports',
     description:
-      'Send a report when something breaks, so it can be fixed. Off by default.',
+      'When something breaks, send the error to Sentry, our error-monitoring service, so it can be fixed. Off by default.',
   },
   sharing: {
     label: 'Data sharing with third parties',

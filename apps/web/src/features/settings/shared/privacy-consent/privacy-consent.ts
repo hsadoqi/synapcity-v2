@@ -1,4 +1,3 @@
-import { useSyncExternalStore } from 'react';
 import {
   PRIVACY_POLICY_VERSION,
   type DataPrivacySettings,
@@ -8,8 +7,9 @@ import {
 /** What the browser asks for, read at runtime and never saved. */
 export type PrivacySignals = { globalPrivacyControl: boolean };
 
-// Global Privacy Control asks sites not to sell or share data. It says nothing
-// about first-party analytics or error reports, so it only blocks sharing.
+// Global Privacy Control asks sites not to sell or share data. It does not
+// cover analytics or error reports run on the site's behalf, so it only blocks
+// sharing.
 const blockedByGlobalPrivacyControl: ReadonlySet<PrivacyPurpose> = new Set([
   'sharing',
 ]);
@@ -39,20 +39,4 @@ export function canCollect(
     privacy[purpose].granted &&
     !isBlockedBySignals(purpose, signals)
   );
-}
-
-function readGlobalPrivacyControl() {
-  // Not in the DOM types yet; browsers without it leave it undefined.
-  const { globalPrivacyControl } = navigator as Navigator & {
-    globalPrivacyControl?: boolean;
-  };
-  return globalPrivacyControl === true;
-}
-
-// The signal is fixed for the life of the page; there is no change event.
-const subscribe = () => () => {};
-
-/** Whether the browser sends Global Privacy Control. False on the server. */
-export function useGlobalPrivacyControl() {
-  return useSyncExternalStore(subscribe, readGlobalPrivacyControl, () => false);
 }

@@ -1,21 +1,10 @@
-import { renderHook } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import {
   PRIVACY_POLICY_VERSION,
   dataPrivacySchema,
 } from '../../types/data-privacy';
-import {
-  canCollect,
-  isBlockedBySignals,
-  useGlobalPrivacyControl,
-} from './privacy-consent';
-
-afterEach(() => {
-  vi.unstubAllGlobals();
-  // Set as an own property by the Global Privacy Control tests.
-  delete (navigator as { globalPrivacyControl?: boolean }).globalPrivacyControl;
-});
+import { canCollect, isBlockedBySignals } from './privacy-consent';
 
 const none = { globalPrivacyControl: false };
 const gpc = { globalPrivacyControl: true };
@@ -54,19 +43,5 @@ describe('canCollect', () => {
     expect(canCollect(allGranted, 'errorReports', gpc)).toBe(true);
     expect(isBlockedBySignals('sharing', gpc)).toBe(true);
     expect(isBlockedBySignals('sharing', none)).toBe(false);
-  });
-});
-
-describe('useGlobalPrivacyControl', () => {
-  it('reads the browser signal', () => {
-    Object.defineProperty(navigator, 'globalPrivacyControl', {
-      value: true,
-      configurable: true,
-    });
-    expect(renderHook(useGlobalPrivacyControl).result.current).toBe(true);
-  });
-
-  it('is false when the browser does not send it', () => {
-    expect(renderHook(useGlobalPrivacyControl).result.current).toBe(false);
   });
 });

@@ -1,11 +1,21 @@
 import { ShieldCheck } from 'lucide-react';
+import { LinkButton } from '@synapcity/frontend-ui/components';
 
 export const DataPrivacyDisclaimer = () => {
   return (
-    <p className="flex items-start gap-2 text-sm text-muted-foreground">
-      <ShieldCheck className="size-4 shrink-0" />
-      These choices are stored only in this browser. This page does not send
-      usage data to anyone.
-    </p>
+    <div className="flex flex-col gap-2">
+      <p className="flex items-start gap-2 text-sm text-muted-foreground">
+        <ShieldCheck className="size-4 shrink-0" />
+        Nothing is collected or sent unless you turn it on above.
+      </p>
+      <LinkButton
+        href="/privacy"
+        variant="link"
+        size="sm"
+        className="self-start"
+      >
+        Read the privacy notice
+      </LinkButton>
+    </div>
   );
 };

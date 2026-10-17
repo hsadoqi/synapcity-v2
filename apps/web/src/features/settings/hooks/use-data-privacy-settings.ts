@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import { useGlobalPrivacyControl } from '../shared/privacy-consent';
+import { useGlobalPrivacyControl } from './use-global-privacy-control';
 import {
   PRIVACY_POLICY_VERSION,
   type DataPrivacySettingsPatch,

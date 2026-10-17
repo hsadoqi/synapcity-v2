@@ -27,7 +27,7 @@ describe('DataPrivacySettings', () => {
     for (const toggle of screen.getAllByRole('switch')) {
       expect(toggle.getAttribute('aria-checked')).toBe('false');
     }
-    expect(screen.getByText(/stored only in this browser/)).toBeTruthy();
+    expect(screen.getByText(/Nothing is collected or sent/)).toBeTruthy();
   });
 
   it.each([

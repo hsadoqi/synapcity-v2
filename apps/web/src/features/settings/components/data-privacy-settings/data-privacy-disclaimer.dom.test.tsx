@@ -4,10 +4,14 @@ import { describe, expect, it } from 'vitest';
 import { DataPrivacyDisclaimer } from './data-privacy-disclaimer';
 
 describe('DataPrivacyDisclaimer', () => {
-  it('says the choices stay in this browser and no usage data is sent', () => {
+  it('says nothing is collected without consent and links the notice', () => {
     render(<DataPrivacyDisclaimer />);
 
-    expect(screen.getByText(/stored only in this browser/)).toBeTruthy();
-    expect(screen.getByText(/does not send\s+usage data/)).toBeTruthy();
+    expect(screen.getByText(/Nothing is collected or sent/)).toBeTruthy();
+    expect(
+      screen
+        .getByRole('link', { name: 'Read the privacy notice' })
+        .getAttribute('href'),
+    ).toBe('/privacy');
   });
 });

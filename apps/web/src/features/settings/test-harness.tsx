@@ -14,6 +14,8 @@ import { SettingsProvider } from './providers/settings-provider';
 /** jsdom has no matchMedia, ResizeObserver or getAnimations, which the providers and Base UI read. */
 export function stubBrowser() {
   localStorage.clear();
+  // The Theme tab keeps its unsaved draft here.
+  sessionStorage.clear();
   // Appearance attributes live on <html>, which every test in a file shares.
   for (const key of Object.keys(document.documentElement.dataset)) {
     delete document.documentElement.dataset[key];

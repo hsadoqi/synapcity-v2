@@ -1,5 +1,1 @@
-export {
-  canCollect,
-  isBlockedBySignals,
-  useGlobalPrivacyControl,
-} from './privacy-consent';
+export { canCollect, isBlockedBySignals } from './privacy-consent';
