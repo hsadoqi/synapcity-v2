@@ -131,7 +131,15 @@ export async function updatePassword(
 
   const supabase = await createClient();
   const { error } = await supabase.auth.updateUser({ password });
-  if (error) return { error: authErrorMessage(error.code) };
+  if (error) {
+    // Log the code (never the message or the password) so a failure that shows
+    // the generic reply can be traced in the server logs.
+    console.warn('updatePassword failed', {
+      code: error.code,
+      status: error.status,
+    });
+    return { error: authErrorMessage(error.code) };
+  }
 
   revalidatePath('/', 'layout');
   redirect(safeNextPath(null));

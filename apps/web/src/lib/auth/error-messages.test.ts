@@ -41,6 +41,12 @@ describe('authErrorMessage', () => {
     });
   });
 
+  it('does not ask for a current password the form cannot take', () => {
+    const message = authErrorMessage('current_password_required');
+    expect(message).not.toBe(GENERIC);
+    expect(message).not.toMatch(/current password/i);
+  });
+
   it('gives weak passwords a hint without quoting a server message', () => {
     expect(authErrorMessage('weak_password')).toMatch(/too weak/i);
   });
