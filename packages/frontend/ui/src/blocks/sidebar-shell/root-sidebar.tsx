@@ -27,14 +27,14 @@ export function RootSidebar({
 }: React.ComponentProps<typeof Sidebar> & { userId: string }) {
   return (
     <Sidebar {...props} key={userId}>
-      <SidebarHeader>
+      <SidebarHeader key={'sidebar-header-' + userId}>
         <ContextSwitcher
           versions={data.versions}
           defaultVersion={data.versions[0]!}
         />
         <SearchForm />
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent key={'sidebar-content-' + userId}>
         {/* We create a SidebarGroup for each parent. */}
         {data.navMain.map((item) => (
           <SidebarGroup key={item.title}>
@@ -66,7 +66,7 @@ export function RootSidebar({
       </SidebarContent>
       {/* The header carries these from md up; below md they live here, so the
           sheet is the one place a phone user can reach them. */}
-      <SidebarFooter className="md:hidden">
+      <SidebarFooter className="md:hidden" key={'sidebar-footer-' + userId}>
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center gap-2">
             <SidebarMenuButton
@@ -88,7 +88,7 @@ export function RootSidebar({
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-      <SidebarRail />
+      <SidebarRail key={'sidebar-rail-' + userId} />
     </Sidebar>
   );
 }

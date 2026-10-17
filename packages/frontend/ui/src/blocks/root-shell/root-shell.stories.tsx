@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import RootShell from './root-shell';
+import RootShell from '@synapcity/frontend-ui/blocks/root-shell/root-shell';
 
 const meta: Meta<typeof RootShell> = {
   title: 'Blocks/RootShell',
