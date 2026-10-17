@@ -1,5 +1,6 @@
 'use client';
 
+import { useId } from 'react';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
 import type { AuthState } from '@/features/auth/shared/form-state';
@@ -22,13 +23,14 @@ export function RegisterForm({
   pending: boolean;
 }) {
   const formRef = useFocusFirstError(state);
+  const messageId = useId();
 
   return (
     <form ref={formRef} action={formAction} className="flex flex-col gap-4">
       <input type="hidden" name="next" value={next} />
       <AuthField
         id="name"
-        {...fieldErrorProps(state, 'name')}
+        {...fieldErrorProps(state, 'name', messageId)}
         label="Name"
         type="text"
         autoComplete="name"
@@ -38,7 +40,7 @@ export function RegisterForm({
       />
       <AuthField
         id="email"
-        {...fieldErrorProps(state, 'email')}
+        {...fieldErrorProps(state, 'email', messageId)}
         label="Email"
         type="email"
         autoComplete="email"
@@ -47,7 +49,7 @@ export function RegisterForm({
       />
       <AuthField
         id="password"
-        {...fieldErrorProps(state, 'password')}
+        {...fieldErrorProps(state, 'password', messageId)}
         label="Password"
         type="password"
         autoComplete="new-password"
@@ -55,7 +57,7 @@ export function RegisterForm({
         minLength={MIN_PASSWORD_LENGTH}
         required
       />
-      <FormMessage state={state} />
+      <FormMessage id={messageId} state={state} />
       <Button type="submit" size="lg" disabled={pending} aria-busy={pending}>
         {pending ? 'Creating account…' : 'Create account'}
       </Button>

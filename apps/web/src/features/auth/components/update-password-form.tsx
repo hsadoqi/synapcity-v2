@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useId } from 'react';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
 import { updatePassword } from '@/features/auth/server/actions';
@@ -20,12 +20,13 @@ export function UpdatePasswordForm() {
   );
 
   const formRef = useFocusFirstError(state);
+  const messageId = useId();
 
   return (
     <form ref={formRef} action={formAction} className="flex flex-col gap-4">
       <AuthField
         id="password"
-        {...fieldErrorProps(state, 'password')}
+        {...fieldErrorProps(state, 'password', messageId)}
         label="New password"
         type="password"
         autoComplete="new-password"
@@ -35,14 +36,14 @@ export function UpdatePasswordForm() {
       />
       <AuthField
         id="confirm"
-        {...fieldErrorProps(state, 'confirm')}
+        {...fieldErrorProps(state, 'confirm', messageId)}
         label="Confirm new password"
         type="password"
         autoComplete="new-password"
         minLength={MIN_PASSWORD_LENGTH}
         required
       />
-      <FormMessage state={state} />
+      <FormMessage id={messageId} state={state} />
       <Button type="submit" size="lg" disabled={pending} aria-busy={pending}>
         {pending ? 'Updating…' : 'Update password'}
       </Button>

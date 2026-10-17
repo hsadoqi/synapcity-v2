@@ -1,5 +1,6 @@
 'use client';
 
+import { useId } from 'react';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
 import type { AuthState } from '@/features/auth/shared/form-state';
@@ -18,19 +19,20 @@ export function ForgotPasswordForm({
   pending: boolean;
 }) {
   const formRef = useFocusFirstError(state);
+  const messageId = useId();
 
   return (
     <form ref={formRef} action={formAction} className="flex flex-col gap-4">
       <AuthField
         id="email"
-        {...fieldErrorProps(state, 'email')}
+        {...fieldErrorProps(state, 'email', messageId)}
         label="Email"
         type="email"
         autoComplete="email"
         defaultValue={state.data?.user?.email}
         required
       />
-      <FormMessage state={state} />
+      <FormMessage id={messageId} state={state} />
       <Button type="submit" size="lg" disabled={pending} aria-busy={pending}>
         {pending ? 'Sending…' : 'Send reset link'}
       </Button>

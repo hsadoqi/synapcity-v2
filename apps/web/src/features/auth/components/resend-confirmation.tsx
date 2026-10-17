@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useId } from 'react';
 
 import { resendConfirmation } from '@/features/auth/server/actions';
 import type { AuthState } from '@/features/auth/shared/form-state';
@@ -31,12 +31,13 @@ export function ResendConfirmation({
     initialState,
   );
   const wait = useCooldown(state, waitFirst);
+  const messageId = useId();
 
   return (
     <form action={formAction} className="flex flex-col gap-2">
       <input type="hidden" name="email" value={email} />
       <input type="hidden" name="next" value={next} />
-      <FormMessage state={state} />
+      <FormMessage id={messageId} state={state} />
       <ResendButton
         label={label}
         pending={pending}

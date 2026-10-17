@@ -19,7 +19,7 @@ export async function updateProfile(
 ): Promise<ProfileState> {
   const raw = formData.get('name');
   const { name, error } = checkName(typeof raw === 'string' ? raw : '');
-  if (error) return { error, name };
+  if (error) return { error, fields: ['name'], name };
 
   const supabase = await createClient();
   const { data: current, error: userError } = await supabase.auth.getUser();

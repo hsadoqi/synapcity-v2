@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useId } from 'react';
 
 import { requestPasswordReset } from '@/features/auth/server/actions';
 import type { AuthState } from '@/features/auth/shared/form-state';
@@ -22,6 +22,7 @@ export function ResendResetLink({ email }: { email: string }) {
     initialState,
   );
   const wait = useCooldown(state);
+  const messageId = useId();
   const shown: AuthState = state.success
     ? { message: 'Requested again. It can take a minute to arrive.' }
     : state;
@@ -29,7 +30,7 @@ export function ResendResetLink({ email }: { email: string }) {
   return (
     <form action={formAction} className="flex flex-col gap-2">
       <input type="hidden" name="email" value={email} />
-      <FormMessage state={shown} />
+      <FormMessage id={messageId} state={shown} />
       <ResendButton
         label="Resend link"
         pending={pending}

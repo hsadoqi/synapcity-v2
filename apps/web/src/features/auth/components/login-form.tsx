@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useId } from 'react';
 import { Button } from '@synapcity/frontend-ui/core/button';
 import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
 
@@ -21,6 +21,7 @@ export function LoginForm({ next }: { next: string }) {
   );
 
   const formRef = useFocusFirstError(state);
+  const messageId = useId();
 
   const email = state.data?.user?.email ?? '';
 
@@ -30,7 +31,7 @@ export function LoginForm({ next }: { next: string }) {
         <input type="hidden" name="next" value={next} />
         <AuthField
           id="email"
-          {...fieldErrorProps(state, 'email')}
+          {...fieldErrorProps(state, 'email', messageId)}
           label="Email"
           type="email"
           autoComplete="email"
@@ -39,7 +40,7 @@ export function LoginForm({ next }: { next: string }) {
         />
         <AuthField
           id="password"
-          {...fieldErrorProps(state, 'password')}
+          {...fieldErrorProps(state, 'password', messageId)}
           label="Password"
           type="password"
           autoComplete="current-password"
@@ -55,7 +56,7 @@ export function LoginForm({ next }: { next: string }) {
           }
           required
         />
-        <FormMessage state={state} />
+        <FormMessage id={messageId} state={state} />
         <Button type="submit" size="lg" disabled={pending} aria-busy={pending}>
           {pending ? 'Signing in…' : 'Sign in'}
         </Button>
