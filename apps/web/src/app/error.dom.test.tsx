@@ -1,6 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+const reportCaughtError = vi.hoisted(() => vi.fn());
+vi.mock('@/features/error-reports/client', () => ({ reportCaughtError }));
+
 import RouteError from './error';
 
 const fail = (message = 'internal detail', digest = 'abc123') =>
@@ -46,5 +49,13 @@ describe('the app error boundary', () => {
     expect(container.textContent).not.toMatch(/hunter2|internal/i);
     expect(log).toHaveBeenCalledWith('Unexpected error', { digest: 'abc123' });
     expect(JSON.stringify(log.mock.calls)).not.toMatch(/hunter2/);
+  });
+
+  it('hands the caught error to error reports, which send it only with consent', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const error = fail();
+    render(<RouteError error={error} retry={() => {}} />);
+
+    expect(reportCaughtError).toHaveBeenCalledWith(error);
   });
 });

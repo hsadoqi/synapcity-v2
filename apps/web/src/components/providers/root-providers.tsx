@@ -5,6 +5,7 @@ import { ModeProvider } from '@synapcity/frontend-ui/providers/mode-provider';
 import { Toaster } from '@synapcity/frontend-ui/core/toast';
 
 import { NoticeToast } from '@/components/notices/notice-toast';
+import { ErrorReports } from '@/features/error-reports/client';
 
 export default function RootProviders({
   children,
@@ -27,6 +28,8 @@ export default function RootProviders({
       <Suspense fallback={null}>
         <NoticeToast />
       </Suspense>
+      {/* Loads nothing unless the person has turned error reports on. */}
+      <ErrorReports />
     </ModeProvider>
   );
 }

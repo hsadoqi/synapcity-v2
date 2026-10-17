@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { reportCaughtError } from '@/features/error-reports/client';
 import { Button } from '@synapcity/frontend-ui/core/button';
 import { LinkButton } from '@synapcity/frontend-ui/components';
 
@@ -28,6 +29,8 @@ export default function RouteError({
     // The digest matches the server log entry; the message can hold details
     // that must not be repeated here.
     console.error('Unexpected error', { digest: error.digest });
+    // Sent only if the person turned error reports on; scrubbed first.
+    reportCaughtError(error);
     document.getElementById(MESSAGE_HEADING_ID)?.focus();
   }, [error]);
 
