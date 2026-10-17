@@ -9,6 +9,14 @@
 - Verification: `pnpm format:check`; README claims checked against the named test files. No runtime checks apply.
 - Recovery: revert the PR.
 
+## Active task: remove the stale knip ignore entry (2026-10-17)
+
+- Goal and mode: implement the owner's "sure" to redoing the cleanup from `fix/auth-ui` commit ead0c31 against `main`. That commit deleted 24 UI files written for the old flat layout; on `main` every one of those components still has a real consumer (checked by import search: `auth-buttons`, `user-menu`, `avatar`, `password-input`, `separator` in `apps/web`; `skip-link`, `sidebar-shell`, `sheet`, `skeleton`, `tooltip`, `textarea`, `context-switcher`, `search-form` inside the UI package), so none is removed.
+- Exact change: update `knip.json` to drop `apps/web/src/components/index.ts` from `ignore` (the file no longer exists; Knip prints a "Remove from ignore" hint) and update this entry.
+- Mutation budgets: updates 2; deletions 0; creates 0; dependencies, source, schema 0.
+- Verification: `pnpm deps` passes without the entry and the hint is gone; `pnpm format:check`.
+- Recovery: revert the PR.
+
 ## Active task: auth review follow-ups AHF-05 part 1, DOM test setup (2026-10-17)
 
 - Goal and mode: implement the first part of AHF-05 of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`; the owner approved recommendation D3 on 2026-10-17: add `@testing-library/react` 16.3.3, `@testing-library/dom` 10.4.2 and `jsdom` 30.1.2 to `apps/web` as dev dependencies (the pins `frontend/ui` and the shared preset already use; no other package changes).
