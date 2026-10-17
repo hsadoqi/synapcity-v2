@@ -33,7 +33,7 @@
     "@synapcity/dev-vitest-config": "workspace:*",
     "@testing-library/dom": "10.4.2",
     "@testing-library/react": "16.3.3",
-    "@types/node": "26.4.1",
+    "@types/node": "26.6.5",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.5",
     "@vitest/coverage-v8": "4.1.11",
