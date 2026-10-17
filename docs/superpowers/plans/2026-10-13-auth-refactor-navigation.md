@@ -1,5 +1,7 @@
 # Caller-owned auth navigation: task plan
 
+> **Reconciliation 2026-10-17 (AHF-07):** items are ticked only where the cited evidence exists in the repository or in CI. The original ARF-01 manifest and baseline were never recovered, so items that depend on comparing against that baseline stay open with a note. Nothing here claims live email, OAuth or second-account verification. The work this plan describes was carried out on `refactor/auth-features` and merged to `main` (PR #28); the Status line below is the original.
+
 **Status:** Proposed; this plan does not authorize implementation. Recheck current navigation behavior before source changes.  
 **Date:** 2026-10-13.  
 **Decision prerequisite:** [ADR-0009](../../architecture/decisions/0009-caller-owned-auth-navigation.md).  
@@ -24,11 +26,11 @@ Re-inventory every AuthButtons consumer before execution. New consumers require 
 **Depends on:** ARF-09, owner acceptance of ADR-0009 and approval of the shared-component API change.  
 **Files:** a fresh exact manifest after ARF-00 resolves the consumer path. The five-file set above is the app-local candidate.
 
-- [ ] Add required `signInHref` and `signUpHref` string props and render them through existing LinkButton.
-- [ ] Remove the shared component's hardcoded app destinations under the approved API scope; preserve current active-link/quiet-header behavior, variants, labels, semantic styling and layout. The live component currently reads pathname; reconcile any adapter/prop needs with the selected runtime contract before changing that behavior.
-- [ ] Supply the existing login/register destinations from the app's AuthStatus.
-- [ ] Supply example destinations in both component stories and the root-header story; update existing test renders for the required props.
-- [ ] Type-check all consumers in the same change, so no intermediate missing-prop state is left at the checkpoint.
+- [x] Add required `signInHref` and `signUpHref` string props and render them through existing LinkButton. _(2026-10-17: evidence: `auth-buttons.tsx` props are required strings.)_
+- [x] Remove the shared component's hardcoded app destinations under the approved API scope; preserve current active-link/quiet-header behavior, variants, labels, semantic styling and layout. The live component currently reads pathname; reconcile any adapter/prop needs with the selected runtime contract before changing that behavior. _(2026-10-17: evidence: the component holds no app destinations; `auth-buttons.test.tsx`.)_
+- [x] Supply the existing login/register destinations from the app's AuthStatus. _(2026-10-17: evidence: `features/auth/components/auth-status.tsx`.)_
+- [x] Supply example destinations in both component stories and the root-header story; update existing test renders for the required props. _(2026-10-17: evidence: `auth-buttons.stories.tsx` and `root-header.stories.tsx`.)_
+- [x] Type-check all consumers in the same change, so no intermediate missing-prop state is left at the checkpoint. _(2026-10-17: evidence: `pnpm typecheck` passes; CI `verify` on PR #41 (run 39027783915, commit 8ea886a) runs the full `pnpm verify` chain and passed.)_
 
 **Acceptance:** shared UI owns presentation; each caller owns destinations; observable web URLs remain identical. Required props have no app-specific defaults.  
 **Verification:** UI unit tests, root `pnpm typecheck`, scoped formatting and consumer inventory. A missing prop or unintended link change is a failure, not a reason to add defaults silently.  
@@ -39,11 +41,11 @@ Re-inventory every AuthButtons consumer before execution. New consumers require 
 **Depends on:** ARF-10.  
 **Files:** existing AuthButtons test/stories; no production mutation expected. Production repair remains limited to the approved five-file set.
 
-- [ ] Assert caller-provided destinations are used in header and hero variants, with stable accessible labels.
-- [ ] Retain existing variant assertions and verify stories/root-header composition with explicit args.
-- [ ] Run UI tests and Storybook/a11y checks.
-- [ ] Run current web browser tests and manually follow header/root auth links where the approved environment permits.
-- [ ] Record route behavior separately from story rendering and mocked auth/provider evidence.
+- [x] Assert caller-provided destinations are used in header and hero variants, with stable accessible labels. _(2026-10-17: evidence: `auth-buttons.test.tsx` `links to the destinations it is given`.)_
+- [x] Retain existing variant assertions and verify stories/root-header composition with explicit args. _(2026-10-17: evidence: `auth-buttons.test.tsx` variant cases; stories pass explicit args.)_
+- [x] Run UI tests and Storybook/a11y checks. _(2026-10-17: evidence: CI `verify` on PR #41 (run 39027783915, commit 8ea886a) runs the full `pnpm verify` chain and passed (includes `test:storybook`).)_
+- [ ] Run current web browser tests and manually follow header/root auth links where the approved environment permits. _(2026-10-17: open: e2e `header navigation` runs in CI; no manual link-following was recorded.)_
+- [ ] Record route behavior separately from story rendering and mocked auth/provider evidence. _(2026-10-17: open: no separate record was written.)_
 
 **Acceptance:** custom-path tests would fail if the component ignored its props; no missing consumers, visual regressions or navigation changes are observed within the actual evidence.  
 **Verification:** `pnpm --filter @synapcity/frontend-ui test`, `pnpm test:storybook`, `pnpm --filter web test:e2e`, plus manual navigation. Do not create a snapshot test that only repeats the implementation.  

@@ -1,5 +1,14 @@
 # Task scope
 
+## Active task: auth review follow-ups AHF-07 part 2, original checklist evidence (2026-10-17)
+
+- Goal and mode: implement the checklist item of AHF-07 of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`: tick items in the four original ARF plans only where acceptance evidence exists, and annotate every item with that evidence or the reason it stays open.
+- Exact change: update `docs/superpowers/plans/2026-10-13-auth-refactor{,-foundation,-operations,-navigation}.md` (checkboxes, per-item notes, one reconciliation note each) and this entry. No decision, status label of an ADR or spec, or source file changes.
+- Reference: `main` at `6e66224`. Items that need the original ARF-01 baseline stay open because that baseline was never recovered. `2026-10-13-auth-ui.md` is a separate plan and is not touched.
+- Mutation budgets: updates 5; creates 0; source, config, dependencies, schema 0.
+- Verification: every cited path and test name checked to exist on `main`; CI `verify` on PR #41 passed the full chain. No live email, OAuth or second-account check was run.
+- Recovery: revert the PR.
+
 ## Active task: auth review follow-ups AHF-02, development identity (2026-10-17)
 
 - Goal and mode: implement AHF-02 (and the D1 part of AHF-01) of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`; the owner approved recommendation D1 on 2026-10-17: real auth by default in development, fixture browsing only as an explicit server-side opt-in named `SYNAPCITY_DEV_AUTH` (value `fixture`, development only).
