@@ -3,12 +3,7 @@
 import { revalidatePath } from 'next/cache';
 
 import type { ProfileState } from '@/features/account/types';
-import {
-  getCaller,
-  mirrorToSession,
-  SHOWS_LATER,
-  SIGN_IN_AGAIN,
-} from '../caller';
+import { getCaller, mirrorToSession, SHOWS_LATER } from '../caller';
 import { saveAvatar } from '../save-avatar';
 import { createClient } from '@/lib/supabase/server';
 
@@ -25,8 +20,9 @@ export async function updateAvatar(
   const removing = formData.get('intent') === 'remove';
 
   const supabase = await createClient();
-  const caller = await getCaller(supabase);
-  if (!caller) return { error: SIGN_IN_AGAIN, avatarUrl: shown };
+  const found = await getCaller(supabase);
+  if (!('caller' in found)) return { error: found.failure, avatarUrl: shown };
+  const { caller } = found;
 
   const saved = await saveAvatar(
     supabase,

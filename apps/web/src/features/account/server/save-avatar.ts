@@ -3,6 +3,7 @@ import { providerImageFrom } from '@/features/account/shared/provider-image';
 import { detectImageType, extensionFor } from './image-type';
 import { withAvatarUrl } from './profile-metadata';
 import {
+  logFailure,
   SAVE_FAILED,
   type Caller,
   type MetadataPatch,
@@ -84,17 +85,27 @@ export async function saveAvatar(
         cacheControl: '31536000',
         upsert: false,
       });
-    if (uploadError) return { ok: false, error: SAVE_FAILED };
+    if (uploadError) {
+      logFailure('saveAvatar.upload', uploadError);
+      return { ok: false, error: SAVE_FAILED };
+    }
 
     avatarUrl = supabase.storage.from(AVATAR_BUCKET).getPublicUrl(path)
       .data.publicUrl;
   }
 
-  const { error: profileError } = await supabase
+  // `select` returns the changed rows: an update that matches nothing is not
+  // an error to Postgres, but nothing was saved, so it must not look saved.
+  const { data: changed, error: profileError } = await supabase
     .from('profiles')
     .update({ avatar_url: avatarUrl })
-    .eq('id', caller.id);
-  if (profileError) {
+    .eq('id', caller.id)
+    .select('id');
+  if (profileError || !changed?.length) {
+    logFailure(
+      'saveAvatar.profile',
+      profileError ?? { code: 'profile_row_missing' },
+    );
     // The picture is not recorded, so do not leave an orphaned file behind.
     if (path) await supabase.storage.from(AVATAR_BUCKET).remove([path]);
     return { ok: false, error: SAVE_FAILED };

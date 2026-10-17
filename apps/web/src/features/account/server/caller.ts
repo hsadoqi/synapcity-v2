@@ -1,3 +1,5 @@
+import { isAuthRetryableFetchError } from '@supabase/supabase-js';
+
 import { createClient } from '@/lib/supabase/server';
 
 export type Supabase = Awaited<ReturnType<typeof createClient>>;
@@ -20,13 +22,39 @@ export const SIGN_IN_AGAIN = 'Sign in again to update your profile.';
 export const SAVE_FAILED = 'Could not save your changes. Try again.';
 export const SHOWS_LATER = 'It may take a little while to show everywhere.';
 
+/** Who is asking, or the message to show instead. */
+export type CallerResult = { caller: Caller } | { failure: string };
+
 /**
- * The verified caller from their own session, or `null`. Every profile action
- * acts on this user only, so there is no user id to forge.
+ * The verified caller from their own session. Every profile action acts on
+ * this user only, so there is no user id to forge.
+ *
+ * A dropped connection is not a signed-out session: telling someone to sign in
+ * again during an outage sends them to a sign-in that cannot work either, so
+ * the two get different messages.
  */
-export async function getCaller(supabase: Supabase): Promise<Caller | null> {
+export async function getCaller(supabase: Supabase): Promise<CallerResult> {
   const { data, error } = await supabase.auth.getUser();
-  return error || !data.user ? null : data.user;
+  if (!error && data.user) return { caller: data.user };
+  logFailure('getCaller', error);
+  return {
+    failure: isAuthRetryableFetchError(error) ? SAVE_FAILED : SIGN_IN_AGAIN,
+  };
+}
+
+/**
+ * Records that an operation failed, by code only. The error object, its
+ * message, the session and the person's details never reach the logs, so a
+ * failure can be traced without leaking any of them.
+ */
+export function logFailure(
+  operation: string,
+  error: { code?: string; status?: number } | null | undefined,
+): void {
+  console.warn(`${operation} failed`, {
+    code: error?.code,
+    status: error?.status,
+  });
 }
 
 /**
@@ -45,7 +73,11 @@ export async function mirrorToSession(
     { ...caller.user_metadata },
   );
   const { error: updateError } = await supabase.auth.updateUser({ data });
-  if (updateError) return false;
+  if (updateError) {
+    logFailure('mirrorToSession.updateUser', updateError);
+    return false;
+  }
   const { error: refreshError } = await supabase.auth.refreshSession();
+  if (refreshError) logFailure('mirrorToSession.refreshSession', refreshError);
   return !refreshError;
 }

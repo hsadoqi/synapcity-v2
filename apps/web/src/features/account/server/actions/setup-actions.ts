@@ -9,7 +9,6 @@ import {
   mirrorToSession,
   SAVE_FAILED,
   SHOWS_LATER,
-  SIGN_IN_AGAIN,
   type MetadataPatch,
 } from '../caller';
 import { saveAvatar } from '../save-avatar';
@@ -32,8 +31,11 @@ export async function completeProfile(
   if (error) return { error, fields: ['name'], name, avatarUrl: shown };
 
   const supabase = await createClient();
-  const caller = await getCaller(supabase);
-  if (!caller) return { error: SIGN_IN_AGAIN, name, avatarUrl: shown };
+  const found = await getCaller(supabase);
+  if (!('caller' in found)) {
+    return { error: found.failure, name, avatarUrl: shown };
+  }
+  const { caller } = found;
 
   const patches: MetadataPatch[] = [];
   let avatarUrl = shown;

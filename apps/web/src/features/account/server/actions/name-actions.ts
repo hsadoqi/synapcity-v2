@@ -9,7 +9,6 @@ import {
   mirrorToSession,
   SAVE_FAILED,
   SHOWS_LATER,
-  SIGN_IN_AGAIN,
 } from '../caller';
 import { saveName } from '../save-name';
 import { createClient } from '@/lib/supabase/server';
@@ -27,8 +26,9 @@ export async function updateName(
   if (error) return { error, fields: ['name'], name };
 
   const supabase = await createClient();
-  const caller = await getCaller(supabase);
-  if (!caller) return { error: SIGN_IN_AGAIN, name };
+  const found = await getCaller(supabase);
+  if (!('caller' in found)) return { error: found.failure, name };
+  const { caller } = found;
 
   const saved = await saveName(supabase, caller, name);
   if (!saved.ok) return { error: SAVE_FAILED, name };

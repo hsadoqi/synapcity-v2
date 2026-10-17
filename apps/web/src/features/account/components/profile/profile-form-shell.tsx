@@ -14,7 +14,7 @@ import { toast } from '@synapcity/frontend-ui/core/toast';
 
 import type { ProfileState } from '@/features/account/types';
 import { FormMessage } from '@/components/forms/form-message';
-import { useFocusFirstError } from '@/hooks/use-focus-first-error';
+import { useFocusFirstError } from '@/hooks/use-focus-first-error/use-focus-first-error';
 
 type ProfileFormContextValue = {
   state: ProfileState;

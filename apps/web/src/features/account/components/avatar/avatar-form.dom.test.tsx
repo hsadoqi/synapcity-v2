@@ -7,7 +7,7 @@ vi.mock('@synapcity/frontend-ui/core/toast', () => ({
   toast: { add: toasts.add },
 }));
 
-import type { ProfileState } from '@/features/account/types';
+import { MAX_AVATAR_BYTES, type ProfileState } from '@/features/account/types';
 
 /** Only the Server Action boundary is replaced; React runs the real form. */
 const mocks = vi.hoisted(() => ({ updateAvatar: vi.fn() }));
@@ -143,5 +143,59 @@ describe('AvatarForm', () => {
     expect(
       screen.getByRole('button', { name: 'Use default photo' }),
     ).toBeTruthy();
+  });
+
+  describe('choosing a file', () => {
+    // Testing Library fakes `files` with a plain property, which setting
+    // `value` cannot clear as a browser would, so watch the clearing call.
+    const cleared = vi.fn();
+    beforeEach(() => cleared.mockClear());
+    const choose = (file: File) => {
+      Object.defineProperty(photoInput(), 'value', {
+        configurable: true,
+        get: () => '',
+        set: cleared,
+      });
+      fireEvent.change(photoInput(), { target: { files: [file] } });
+    };
+    const png = (bytes: number, name = 'me.png', type = 'image/png') =>
+      new File([new Uint8Array(bytes)], name, { type });
+
+    it('refuses a file over the size limit before anything is sent', () => {
+      render(<AvatarForm name="Ada" imageUrl={null} />);
+
+      choose(png(MAX_AVATAR_BYTES + 1));
+
+      const alert = screen.getByRole('alert');
+      expect(alert.textContent).toBe('Use an image of at most 2 MB.');
+      expect(photoInput().getAttribute('aria-invalid')).toBe('true');
+      expect(photoInput().getAttribute('aria-describedby')).toBe(alert.id);
+      expect(cleared).toHaveBeenCalledWith('');
+      expect(mocks.updateAvatar).not.toHaveBeenCalled();
+    });
+
+    it('refuses a type that is not allowed, such as SVG', () => {
+      render(<AvatarForm name="Ada" imageUrl={null} />);
+
+      choose(png(10, 'logo.svg', 'image/svg+xml'));
+
+      expect(screen.getByRole('alert').textContent).toBe(
+        'Use a PNG, JPEG or WebP image.',
+      );
+      expect(cleared).toHaveBeenCalledWith('');
+    });
+
+    it('accepts a file at the limit and clears an earlier complaint', () => {
+      render(<AvatarForm name="Ada" imageUrl={null} />);
+      choose(png(MAX_AVATAR_BYTES + 1));
+      expect(screen.getByRole('alert')).toBeTruthy();
+      cleared.mockClear();
+
+      choose(png(MAX_AVATAR_BYTES));
+
+      expect(screen.queryByRole('alert')).toBeNull();
+      expect(photoInput().getAttribute('aria-invalid')).toBeNull();
+      expect(cleared).not.toHaveBeenCalled();
+    });
   });
 });

@@ -1,3 +1,4 @@
+import { AuthRetryableFetchError } from '@supabase/supabase-js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
@@ -6,6 +7,7 @@ const mocks = vi.hoisted(() => ({
   updateUser: vi.fn(),
   refreshSession: vi.fn(),
   profileEq: vi.fn(),
+  profileSelect: vi.fn(),
   profileUpdate: vi.fn(),
   from: vi.fn(),
   upload: vi.fn(),
@@ -48,7 +50,11 @@ beforeEach(() => {
   mocks.getUser.mockResolvedValue(signedIn());
   mocks.updateUser.mockResolvedValue({ data: {}, error: null });
   mocks.refreshSession.mockResolvedValue({ data: {}, error: null });
-  mocks.profileEq.mockResolvedValue({ error: null });
+  mocks.profileSelect.mockResolvedValue({
+    data: [{ id: 'user-1' }],
+    error: null,
+  });
+  mocks.profileEq.mockReturnValue({ select: mocks.profileSelect });
   mocks.profileUpdate.mockReturnValue({ eq: mocks.profileEq });
   mocks.from.mockReturnValue({ update: mocks.profileUpdate });
   mocks.upload.mockResolvedValue({ error: null });
@@ -125,7 +131,10 @@ describe('updateName', () => {
   });
 
   it('reports a failed profile save as a form error and mirrors nothing', async () => {
-    mocks.profileEq.mockResolvedValue({ error: { code: '42501' } });
+    mocks.profileSelect.mockResolvedValue({
+      data: null,
+      error: { code: '42501' },
+    });
 
     const state = await updateName({}, form('Ada'));
 
@@ -286,7 +295,10 @@ describe('updateAvatar', () => {
   });
 
   it('deletes the new file and keeps the old picture when the profile row cannot be saved', async () => {
-    mocks.profileEq.mockResolvedValue({ error: { code: '23514' } });
+    mocks.profileSelect.mockResolvedValue({
+      data: null,
+      error: { code: '23514' },
+    });
 
     const state = await updateAvatar(
       { avatarUrl: 'https://old.test/a.png' },
@@ -484,9 +496,9 @@ describe('completeProfile', () => {
 describe('completeProfile when the name cannot be saved after the photo was', () => {
   it('reports the failure but keeps showing the photo that did save', async () => {
     // First profile write (the photo) works, the second (the name) fails.
-    mocks.profileEq
-      .mockResolvedValueOnce({ error: null })
-      .mockResolvedValueOnce({ error: { code: '42501' } });
+    mocks.profileSelect
+      .mockResolvedValueOnce({ data: [{ id: 'user-1' }], error: null })
+      .mockResolvedValueOnce({ data: null, error: { code: '42501' } });
 
     const state = await completeProfile({}, setupForm('Ada', pngFile()));
 
@@ -496,5 +508,135 @@ describe('completeProfile when the name cannot be saved after the photo was', ()
     expect(state.name).toBe('Ada');
     expect(state.avatarUrl).toBe(`https://cdn.test/avatars/${path}`);
     expect(mocks.updateUser).not.toHaveBeenCalled();
+  });
+});
+
+const SIGN_IN_AGAIN = 'Sign in again to update your profile.';
+const SAVE_FAILED = 'Could not save your changes. Try again.';
+
+const removeForm = () => {
+  const data = new FormData();
+  data.set('intent', 'remove');
+  return data;
+};
+
+describe('when the session cannot be checked', () => {
+  it.each([
+    ['updateName', () => updateName({}, form('Ada'))],
+    ['updateAvatar', () => updateAvatar({}, avatarForm(PNG))],
+    ['completeProfile', () => completeProfile({}, setupForm('Ada'))],
+  ])('%s tells someone with no session to sign in again', async (_n, run) => {
+    mocks.getUser.mockResolvedValue({
+      data: { user: null },
+      error: { code: 'session_not_found' },
+    });
+
+    expect((await run()).error).toBe(SIGN_IN_AGAIN);
+  });
+
+  it.each([
+    ['updateName', () => updateName({}, form('Ada'))],
+    ['updateAvatar', () => updateAvatar({}, avatarForm(PNG))],
+    ['completeProfile', () => completeProfile({}, setupForm('Ada'))],
+  ])(
+    '%s does not call a dropped connection a signed-out session',
+    async (_name, run) => {
+      mocks.getUser.mockResolvedValue({
+        data: { user: null },
+        error: new AuthRetryableFetchError('fetch failed', 0),
+      });
+
+      const state = await run();
+
+      expect(state.error).toBe(SAVE_FAILED);
+      expect(mocks.profileUpdate).not.toHaveBeenCalled();
+      expect(mocks.upload).not.toHaveBeenCalled();
+    },
+  );
+});
+
+describe('an update that changes no row', () => {
+  beforeEach(() => {
+    // Postgres reports no error when the filter matches nothing.
+    mocks.profileSelect.mockResolvedValue({ data: [], error: null });
+  });
+
+  it('is not reported as a saved name', async () => {
+    const state = await updateName({}, form('Ada'));
+
+    expect(state.error).toBe(SAVE_FAILED);
+    expect(state.saved).toBeUndefined();
+    expect(mocks.updateUser).not.toHaveBeenCalled();
+  });
+
+  it('is not reported as a saved photo, and the upload is not left behind', async () => {
+    const state = await updateAvatar({}, avatarForm(PNG));
+
+    const path = mocks.upload.mock.calls[0]![0] as string;
+    expect(state.error).toBe(SAVE_FAILED);
+    expect(state.saved).toBeUndefined();
+    expect(mocks.remove).toHaveBeenCalledWith([path]);
+  });
+
+  it('is not reported as a removed photo', async () => {
+    const state = await updateAvatar({}, removeForm());
+
+    expect(state.error).toBe(SAVE_FAILED);
+    expect(state.saved).toBeUndefined();
+  });
+});
+
+describe('failure logging', () => {
+  it('records the operation and code but never the message, session or name', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    mocks.profileSelect.mockResolvedValue({
+      data: null,
+      error: {
+        code: '42501',
+        status: 403,
+        message: 'secret-detail ada@example.com',
+      },
+    });
+
+    await updateName({}, form('Secret Name'));
+
+    expect(warn).toHaveBeenCalledWith('saveName failed', {
+      code: '42501',
+      status: 403,
+    });
+    expect(JSON.stringify(warn.mock.calls)).not.toMatch(
+      /secret|ada@example|Secret Name/i,
+    );
+    warn.mockRestore();
+  });
+
+  it('records a missing profile row by its own code', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    mocks.profileSelect.mockResolvedValue({ data: [], error: null });
+
+    await updateName({}, form('Ada'));
+
+    expect(warn).toHaveBeenCalledWith('saveName failed', {
+      code: 'profile_row_missing',
+      status: undefined,
+    });
+    warn.mockRestore();
+  });
+
+  it('records a failed token mirror by operation, and still confirms the save', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    mocks.updateUser.mockResolvedValue({
+      data: {},
+      error: { code: 'over_request_rate_limit', status: 429 },
+    });
+
+    const state = await updateName({}, form('Ada'));
+
+    expect(warn).toHaveBeenCalledWith('mirrorToSession.updateUser failed', {
+      code: 'over_request_rate_limit',
+      status: 429,
+    });
+    expect(state.saved).toBe(true);
+    warn.mockRestore();
   });
 });
