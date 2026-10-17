@@ -2,9 +2,11 @@ import { screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AppearanceSettings } from './components/appearance-settings';
+import { RegionalSettings } from './components/regional-settings';
 import { ThemeSettings } from './components/theme-settings';
 import { renderWithSettings, stubBrowser } from './test-harness';
 import { appearanceSchema } from './types/appearance';
+import { regionalSchema } from './types/regional';
 import { themeSchema } from './types/theme';
 
 beforeEach(stubBrowser);
@@ -12,7 +14,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 type Control = { role: 'combobox' | 'switch'; name: string };
 
-// Every setting the Theme and Appearance tabs own has a control named here. A
+// Every setting the Theme, Appearance and Regional tabs own has a control named here. A
 // field added to either schema fails this test until it gets one, so a setting
 // cannot be saved, exported and imported without anyone being able to change it.
 // `colorScheme` is the one exception: it mirrors `theme.mode`, which the Theme
@@ -35,6 +37,15 @@ const appearanceControls: Record<
   reducedMotion: { role: 'switch', name: 'Reduce motion' },
 };
 
+const regionalControls: Record<keyof typeof regionalSchema.shape, Control> = {
+  language: { role: 'combobox', name: 'Preferred language' },
+  timezone: { role: 'combobox', name: 'Timezone' },
+  timeFormat: { role: 'combobox', name: 'Time format' },
+  dateFormat: { role: 'combobox', name: 'Date format' },
+  firstDayOfWeek: { role: 'combobox', name: 'First day of the week' },
+  numberFormat: { role: 'combobox', name: 'Number format' },
+};
+
 describe('settings with a control', () => {
   it('names a control for every theme setting', () => {
     expect(Object.keys(themeControls).sort()).toEqual(
@@ -50,6 +61,12 @@ describe('settings with a control', () => {
     );
   });
 
+  it('names a control for every regional setting', () => {
+    expect(Object.keys(regionalControls).sort()).toEqual(
+      Object.keys(regionalSchema.shape).sort(),
+    );
+  });
+
   it.each(Object.entries(themeControls))(
     'the Theme tab renders %s',
     async (_key, { role, name }) => {
@@ -62,6 +79,14 @@ describe('settings with a control', () => {
     'the Appearance tab renders %s',
     async (_key, { role, name }) => {
       await renderWithSettings(<AppearanceSettings />);
+      expect(screen.getByRole(role, { name })).toBeTruthy();
+    },
+  );
+
+  it.each(Object.entries(regionalControls))(
+    'the Regional tab renders %s',
+    async (_key, { role, name }) => {
+      await renderWithSettings(<RegionalSettings />);
       expect(screen.getByRole(role, { name })).toBeTruthy();
     },
   );

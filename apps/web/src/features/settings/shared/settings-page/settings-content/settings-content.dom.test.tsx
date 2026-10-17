@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ModeProvider } from '@synapcity/frontend-ui/providers/mode-provider';
 
@@ -33,6 +33,31 @@ describe('SettingsContent', () => {
     expect(screen.getAllByRole('tab')).toHaveLength(tabs.length);
     expect(screen.getByRole('contentinfo')).toBeTruthy();
   });
+
+  // A page titled with another tab's name sends people looking in the wrong
+  // place (the Theme page was once titled "Appearance" beside an Appearance tab).
+  it.each(tabs.map((tab) => [tab.label, tab.value]))(
+    'titles the %s page without naming another tab',
+    async (label, value) => {
+      window.location.hash = value;
+      const { container } = show();
+      await screen.findByRole('tabpanel', {}, { timeout: 5000 });
+      const title = await waitFor(
+        () => {
+          const node = container.querySelector(
+            '[role="tabpanel"] [data-slot="card-title"]',
+          );
+          if (!node?.textContent) throw new Error('title not loaded');
+          return node.textContent;
+        },
+        { timeout: 5000 },
+      );
+      const otherLabels = tabs
+        .map((tab) => tab.label)
+        .filter((other) => other !== label);
+      expect(otherLabels).not.toContain(title);
+    },
+  );
 
   it('opens on the theme tab and loads its content', async () => {
     show();
