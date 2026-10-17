@@ -1,5 +1,13 @@
 # Task scope
 
+## Active task: bring refactor/auth-features into main (2026-10-17)
+
+- Goal and mode: implement the owner's request to merge `refactor/auth-features` with `main` (PR #28). `main` holds the older auth UI as one squashed commit, so the merge conflicted in 66 files, mostly old-layout copies of files the branch had already moved.
+- Resolution: keep the branch's layout for `apps/web` and `packages/frontend/ui`; take `main`'s lockfile, react 19.3.0 pins, `.pnpm-store` ignore and docs; port the `updatePassword` failure log to `features/auth/server/actions.ts`; keep ADRs 0007 to 0009 as the branch records them (Accepted).
+- Budgets: no new dependencies, schema, routes or public APIs beyond what the branch already carries; the branch's follow-up plan (`docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`) is not executed here.
+- Verification: `pnpm format:check`, `lint`, `typecheck`, `deps`, `brand:check`, `test` and `build` passed locally, plus the Storybook story tests (13 files, 37 tests). `pnpm test:e2e` and live auth were not run (no Chromium download in the container).
+- Recovery: revert the merge commit on `merge/auth-features-into-main`; `refactor/auth-features` and `main` are untouched until the PR merges.
+
 ## Active task: repair auth import-boundary verification failure (2026-10-16)
 
 - Goal and mode: implement the owner's request to fix failures from `pnpm verify`. The clean baseline is `91561a7` on `refactor/auth-features`; the reproduced failure is six forbidden imports in four recently relocated auth components.
