@@ -65,6 +65,25 @@ describe('error reports client', () => {
     });
   });
 
+  it('labels reports with the Vercel environment and commit, or NODE_ENV', async () => {
+    vi.stubEnv('NEXT_PUBLIC_VERCEL_ENV', 'preview');
+    vi.stubEnv('NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA', 'abc123');
+    client.startErrorReports();
+    await vi.waitFor(() => expect(sentry.init).toHaveBeenCalledOnce());
+    expect(sentry.options).toMatchObject({
+      environment: 'preview',
+      release: 'abc123',
+    });
+  });
+
+  it('falls back to NODE_ENV outside Vercel', async () => {
+    vi.stubEnv('NEXT_PUBLIC_VERCEL_ENV', undefined);
+    vi.stubEnv('NODE_ENV', 'development');
+    client.startErrorReports();
+    await vi.waitFor(() => expect(sentry.init).toHaveBeenCalledOnce());
+    expect(sentry.options!.environment).toBe('development');
+  });
+
   it('drops events at once when stopped, then closes the client', async () => {
     client.startErrorReports();
     await vi.waitFor(() => expect(sentry.init).toHaveBeenCalled());

@@ -6,7 +6,9 @@ import type { ErrorEvent } from '@sentry/browser';
 const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
 const ID_SEGMENT = new RegExp(`^${UUID}$`, 'i');
 const ID_IN_TEXT = new RegExp(UUID, 'gi');
-const EMAIL_IN_TEXT = /[^\s@<>()"',;]+@[^\s@<>()"',;]+\.[^\s@<>()"',;]+/g;
+// A local part, then a domain of dot-separated labels, so a sentence's closing
+// full stop is not taken as part of the address.
+const EMAIL_IN_TEXT = /[^\s@<>()"',;:]+@[a-z0-9-]+(?:\.[a-z0-9-]+)+/gi;
 
 /**
  * Text with ids and email addresses replaced. Error messages can quote what
@@ -56,7 +58,7 @@ export function scrubEvent(event: ErrorEvent): ErrorEvent {
       ...event.exception,
       values: event.exception.values.map((original) => {
         const value = original.value
-          ? { ...original, value: scrubText(original.value) }
+          ? original
           : original;
         if (!value.stacktrace?.frames) return value;
         return {

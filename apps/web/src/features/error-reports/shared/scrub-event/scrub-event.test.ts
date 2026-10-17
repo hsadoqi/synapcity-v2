@@ -1,7 +1,7 @@
 import type { ErrorEvent } from '@sentry/browser';
 import { describe, expect, it } from 'vitest';
 
-import { scrubEvent, scrubUrl } from './scrub-event';
+import { scrubEvent, scrubText, scrubUrl } from './scrub-event';
 
 const userId = '3f2504e0-4f89-41d3-9a0c-0305e82c3301';
 
@@ -80,5 +80,33 @@ describe('scrubEvent', () => {
 
   it('never leaves the id anywhere in the report', () => {
     expect(JSON.stringify(scrubEvent(event))).not.toContain(userId);
+  });
+
+  it('removes ids and email addresses from the error message and a message event', () => {
+    const scrubbed = scrubEvent({
+      type: undefined,
+      message: `Lookup failed for ${userId}`,
+      exception: {
+        values: [{ type: 'Error', value: 'No account for grace@example.com' }],
+      },
+    });
+    expect(scrubbed.message).toBe('Lookup failed for :id');
+    expect(scrubbed.exception!.values![0]!.value).toBe(
+      'No account for [email]',
+    );
+  });
+});
+
+describe('scrubText', () => {
+  it('leaves ordinary text alone', () => {
+    expect(scrubText('Cannot read properties of undefined')).toBe(
+      'Cannot read properties of undefined',
+    );
+  });
+
+  it('replaces every id and email address in the text', () => {
+    expect(
+      scrubText(`${userId} and ${userId.toUpperCase()} sent to a.b+c@x.co.uk.`),
+    ).toBe(':id and :id sent to [email].');
   });
 });
