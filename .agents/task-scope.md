@@ -1,5 +1,14 @@
 # Task scope
 
+## Active task: auth review follow-ups AHF-09, live acceptance results (2026-10-17)
+
+- Goal and mode: record the outcome of the bounded live pass in `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`. The owner authorized it on 2026-10-17: the owner's dev Supabase project, app origin `http://localhost:8080`, all auth flows permitted, mailboxes `hsadoqi+ahf1@gmail.com` and `+ahf2` (plus-addresses of the owner's own inbox), test users removed by the owner in the Supabase dashboard.
+- Exact change: update AHF-09 in that plan (item notes and a results table) and this entry. No source, config, ADR or other document changes.
+- Mutation budgets: updates 2; creates 0; source, dependencies, schema 0. Live system: 2 test users created in the dev project and 3 emails requested (one sign-up confirmation, one rejected sign-up, one rejected reset); provider settings 0.
+- Not run: reset link and password update, resend, second-account ownership, Google, GitHub, deployed cache isolation, RLS.
+- Verification: each recorded result is a browser run of the real app against the dev project. Nothing was run on the production build.
+- Recovery: revert the PR. The two test users still need deleting in the Supabase dashboard (owner).
+
 ## Active task: auth review follow-ups, execution record in the plan (2026-10-17)
 
 - Goal and mode: implement the "update this plan only for its own task state/evidence" allowance of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`: tick the items of AHF-01 to AHF-07 whose evidence exists on `main`, and annotate each with the PR or test that provides it.
