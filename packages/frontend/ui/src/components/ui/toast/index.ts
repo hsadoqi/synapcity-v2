@@ -12,4 +12,4 @@ export {
   createToastManager,
   toast,
   useToastManager,
-} from "./toast";
+} from './toast';

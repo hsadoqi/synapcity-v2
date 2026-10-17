@@ -109,13 +109,13 @@ export default function RootShell({
           account={account}
         >
           <ShellContent>{children}</ShellContent>
-                </SidebarShell>
+        </SidebarShell>
       ) : (
         <div className="flex flex-1 flex-col">
           <RootHeader actions={headerActions} />
           <ShellContent>{children}</ShellContent>
         </div>
       )}
-    </div>  
-  )
+    </div>
+  );
 }
