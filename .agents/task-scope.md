@@ -1,5 +1,14 @@
 # Task scope
 
+## Active task: auth review follow-ups, execution record in the plan (2026-10-17)
+
+- Goal and mode: implement the "update this plan only for its own task state/evidence" allowance of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`: tick the items of AHF-01 to AHF-07 whose evidence exists on `main`, and annotate each with the PR or test that provides it.
+- Exact change: update that plan (checkboxes, per-item notes, one execution-record note) and this entry. No source, config, ADR or other document changes.
+- Mutation budgets: updates 2; creates 0; source, dependencies, schema 0. Four older branches were also copied to `archive/*` branches through the GitHub API (4 creates, no deletions), with the owner's cleanup approval.
+- Not ticked: AHF-00 (not run as specified), AHF-05's browser-suite item, AHF-08 and AHF-09.
+- Verification: every cited test file and PR checked against `main`. No live check was run.
+- Recovery: revert the PR.
+
 ## Active task: auth review follow-ups AHF-07 part 2, original checklist evidence (2026-10-17)
 
 - Goal and mode: implement the checklist item of AHF-07 of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`: tick items in the four original ARF plans only where acceptance evidence exists, and annotate every item with that evidence or the reason it stays open.
