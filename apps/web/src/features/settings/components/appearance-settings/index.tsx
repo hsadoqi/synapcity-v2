@@ -24,7 +24,7 @@ export function AppearanceSettings() {
   return (
     <SettingsTabShell
       title="Display"
-      description="The small details that make this space yours."
+      description="Text size, contrast and motion across the app."
     >
       <section className="flex flex-col gap-4">
         <h3 className="text-sm font-medium">Readability</h3>
@@ -38,6 +38,7 @@ export function AppearanceSettings() {
             onChange={(contrastMode) => updateAppearance({ contrastMode })}
           />
           <ShowBordersRow
+            highContrast={appearance.contrastMode === 'high'}
             value={appearance.showBorders}
             onChange={(showBorders) => updateAppearance({ showBorders })}
           />
@@ -54,6 +55,7 @@ export function AppearanceSettings() {
             }
           />
           <ReducedMotionRow
+            animationsOff={!appearance.animationsEnabled}
             value={appearance.reducedMotion}
             onChange={(reducedMotion) => updateAppearance({ reducedMotion })}
           />

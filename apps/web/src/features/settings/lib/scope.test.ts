@@ -34,7 +34,7 @@ describe('setting scope (ADR-0010)', () => {
   it.each(Object.keys(settingScope) as (keyof typeof settingScope)[])(
     'gives every %s field exactly one scope',
     (section) => {
-      expect(Object.keys(settingScope[section]).sort()).toEqual(
+      expect(Object.keys(settingScope[section] ?? {}).sort()).toEqual(
         unwrapShape(section),
       );
     },
