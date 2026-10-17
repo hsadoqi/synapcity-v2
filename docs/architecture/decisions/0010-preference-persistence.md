@@ -45,7 +45,7 @@ create table public.user_preferences (
   device_timezone text,
   updated_at      timestamptz not null default now(),
   constraint user_preferences_is_object check (jsonb_typeof(preferences) = 'object'),
-  constraint user_preferences_size check (pg_column_size(preferences) <= 16384)
+  constraint user_preferences_size check (octet_length(preferences::text) <= 16384)
 );
 ```
 
@@ -60,7 +60,8 @@ A JSON document, rather than one column per field, follows the existing schema. 
 
 ### 3. Reads and writes
 
-- **Read:** the settings route's server component reads the row with the request's Supabase client and passes the account preferences to `SettingsProvider`, the same way it already passes `name`. The provider merges them as authoritative over the local copy.
+- **Read:** the root layout reads the signed-in user's row once per request (`getAccountPreferences`, memoized with React `cache`, so the settings page shares the same query). It server-renders `<html lang>` from the account's language, and `AccountPreferencesSync` applies the account copy over this browser's cache on every page and caches it, so fonts and the display override follow the person everywhere, not only on the settings page. The settings page also passes the row to `SettingsProvider`, which merges it the same way (the same `reconcile`).
+- **Settings page only:** first sign-in adoption and reporting the device timezone, because both save to the account.
 - **Write:** account-scope changes go through a server action (`saveAccountPreferences`) that validates the account document with the same Zod schemas, upserts the caller's own row and reports whether it was written. Device-scope changes stay local. The provider keeps updating local state and `localStorage` immediately, so the interface does not wait on the network.
 - **Conflict rule:** the database wins for account scope. The local copy is a cache, replaced by the stored row each time the settings page loads. There is no multi-device merge beyond last write wins, which is acceptable for single-user, low-frequency settings.
 - **First sign-in adoption:** if a signed-in user has no row and the local copy holds account preferences that differ from the defaults, the first load writes them up once. Choices made before signing in are kept, not reset.

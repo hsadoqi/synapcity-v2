@@ -1,4 +1,7 @@
+import { cache } from 'react';
+
 import { logFailure, type Supabase } from '@/features/account/server/caller';
+import { createClient } from '@/lib/supabase/server';
 import type { StoredAccountPreferences } from '../lib/account-sync';
 import { readAccountPreferences } from '../lib/scope';
 
@@ -26,3 +29,12 @@ export async function loadAccountPreferences(
       typeof data.device_timezone === 'string' ? data.device_timezone : null,
   };
 }
+
+/**
+ * The signed-in user's row, read once per request however many readers ask:
+ * the root layout (page language, and the account copy applied on every page)
+ * and the settings page share one query.
+ */
+export const getAccountPreferences = cache(async (userId: string) =>
+  loadAccountPreferences(await createClient(), userId),
+);
