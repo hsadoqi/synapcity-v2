@@ -22,6 +22,7 @@ vi.mock('@/features/auth/server/actions/actions', () => ({
   resendEmailChange: vi.fn(),
   requestOwnPasswordReset: vi.fn(),
   connectAccount: vi.fn(),
+  disconnectAccount: vi.fn(),
   requestAccountDeletion: vi.fn(),
 }));
 vi.mock('next/navigation', () => ({

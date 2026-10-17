@@ -18,6 +18,9 @@ export function stubBrowser() {
   for (const key of Object.keys(document.documentElement.dataset)) {
     delete document.documentElement.dataset[key];
   }
+  // Chosen fonts live on <html>'s style and as <link>s in <head>, also shared.
+  document.documentElement.removeAttribute('style');
+  document.head.innerHTML = '';
   vi.stubGlobal(
     'matchMedia',
     vi.fn(() => ({
