@@ -9,7 +9,7 @@
     "./open-graph": "./src/open-graph.tsx"
   },
   "scripts": {
-    "lint": "eslint . --cache",
+    "lint": "eslint . --cache --max-warnings 0",
     "check-types": "tsc --noEmit",
     "verify": "pnpm lint && pnpm check-types",
     "test": "vitest run",

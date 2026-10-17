@@ -39,7 +39,7 @@ export function OpenGraphCard() {
         background: '#fafafa',
       }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element -- rendered by ImageResponse, not the DOM */}
+      {/* An <img> on purpose: ImageResponse renders this tree, not the DOM. */}
       <img
         src={LOGO_SRC}
         width={LOGO_WIDTH}

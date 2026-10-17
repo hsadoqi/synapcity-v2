@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import RootShell from './root-shell';
+import RootShell from '@synapcity/frontend-ui/blocks/root-shell/root-shell';
 
 // No `nextjs.appDirectory`: the app-router mock in @storybook/nextjs-vite 10.6 does not
 // provide the layout cache node that next 16.4's useRouter reads, so every story crashed.
@@ -30,13 +30,16 @@ export const WithHeaderActions: Story = {
 export const LoggedIn: Story = {
   args: {
     children: <div>Main content goes here</div>,
-    userId: 'user-123',
+    account: {
+      homeHref: '/user-123/home',
+      settingsHref: '/user-123/settings',
+    },
   },
 };
 
 export const LoggedOut: Story = {
   args: {
     children: <div>Main content goes here</div>,
-    userId: null,
+    account: null,
   },
 };

@@ -1,0 +1,110 @@
+import { NextRequest } from 'next/server';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+/**
+ * The adapter between Next's proxy and `@supabase/ssr`. The SDK is stubbed at
+ * its boundary: `getClaims()` plays the part of a token refresh by calling the
+ * adapter's `setAll` with a cookie and the cache headers the SDK sends with it.
+ */
+
+type CookieToSet = {
+  name: string;
+  value: string;
+  options: Record<string, unknown>;
+};
+type SetAll = (cookies: CookieToSet[], headers: Record<string, string>) => void;
+
+const CACHE_HEADERS = {
+  'Cache-Control': 'private, no-cache, no-store, must-revalidate, max-age=0',
+  Expires: '0',
+  Pragma: 'no-cache',
+};
+const REFRESHED = {
+  name: 'sb-test-auth-token',
+  value: 'refreshed',
+  options: {},
+};
+
+const sdk = vi.hoisted(() => ({
+  claims: null as { sub: string } | null,
+  refreshes: true,
+}));
+
+vi.mock('./env', () => ({
+  getSupabaseEnv: () => ({
+    url: 'https://project.test',
+    publishableKey: 'pk',
+  }),
+}));
+vi.mock('@supabase/ssr', () => ({
+  createServerClient: (
+    _url: string,
+    _key: string,
+    { cookies }: { cookies: { setAll: SetAll } },
+  ) => ({
+    auth: {
+      getClaims: async () => {
+        if (sdk.refreshes) cookies.setAll([REFRESHED], CACHE_HEADERS);
+        return { data: sdk.claims ? { claims: sdk.claims } : null };
+      },
+    },
+  }),
+}));
+
+import { updateSession } from './middleware';
+
+const request = (path: string) =>
+  new NextRequest(new URL(path, 'https://app.test'));
+
+function expectSessionCarried(response: Response) {
+  for (const [name, value] of Object.entries(CACHE_HEADERS)) {
+    expect(response.headers.get(name)).toBe(value);
+  }
+  expect(response.headers.get('set-cookie')).toContain(
+    `${REFRESHED.name}=${REFRESHED.value}`,
+  );
+}
+
+beforeEach(() => {
+  sdk.claims = null;
+  sdk.refreshes = true;
+});
+
+describe('updateSession', () => {
+  it('passes the refreshed cookie and the cache headers on', async () => {
+    sdk.claims = { sub: 'user-1' };
+
+    const response = await updateSession(request('/user-1/home'));
+
+    expect(response.headers.get('location')).toBeNull();
+    expectSessionCarried(response);
+  });
+
+  it('keeps both on the redirect away from a guest-only page', async () => {
+    sdk.claims = { sub: 'user-1' };
+
+    const response = await updateSession(request('/auth/login'));
+
+    expect(response.headers.get('location')).toBe(
+      'https://app.test/user-1/home',
+    );
+    expectSessionCarried(response);
+  });
+
+  it('keeps both on the redirect to sign in', async () => {
+    const response = await updateSession(request('/user-1/settings?tab=a'));
+
+    expect(response.headers.get('location')).toBe(
+      'https://app.test/auth/login?next=%2Fuser-1%2Fsettings%3Ftab%3Da',
+    );
+    expectSessionCarried(response);
+  });
+
+  it('adds no cache headers when the SDK wrote no cookies', async () => {
+    sdk.refreshes = false;
+
+    const response = await updateSession(request('/'));
+
+    expect(response.headers.get('cache-control')).toBeNull();
+  });
+});

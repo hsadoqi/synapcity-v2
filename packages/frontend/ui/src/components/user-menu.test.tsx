@@ -8,7 +8,8 @@ describe('UserMenu', () => {
   it('names the trigger for assistive tech', () => {
     render(
       <UserMenu
-        id="user-1"
+        homeHref="/user-1/home"
+        settingsHref="/user-1/settings"
         name="Hanaa Sadoqi"
         email="h@example.com"
         imageUrl={null}
@@ -20,7 +21,13 @@ describe('UserMenu', () => {
 
   it('keeps its toggle state in sync when Escape dismisses the menu', async () => {
     render(
-      <UserMenu id="user-1" name="Hanaa" email="h@example.com" imageUrl={null}>
+      <UserMenu
+        homeHref="/user-1/home"
+        settingsHref="/user-1/settings"
+        name="Hanaa"
+        email="h@example.com"
+        imageUrl={null}
+      >
         <DropdownMenuItem>Sign out</DropdownMenuItem>
       </UserMenu>,
     );
@@ -42,7 +49,8 @@ describe('UserMenu', () => {
   it('shows an account tooltip on focus', async () => {
     render(
       <UserMenu
-        id="user-1"
+        homeHref="/user-1/home"
+        settingsHref="/user-1/settings"
         name="Hanaa"
         email="h@example.com"
         imageUrl={null}
@@ -58,7 +66,8 @@ describe('UserMenu', () => {
     const onSignOut = vi.fn();
     render(
       <UserMenu
-        id="user-1"
+        homeHref="/user-1/home"
+        settingsHref="/user-1/settings"
         name="Hanaa"
         email="h@example.com"
         imageUrl={null}
@@ -73,7 +82,8 @@ describe('UserMenu', () => {
   it('offers no Sign out item without onSignOut', async () => {
     render(
       <UserMenu
-        id="user-1"
+        homeHref="/user-1/home"
+        settingsHref="/user-1/settings"
         name="Hanaa"
         email="h@example.com"
         imageUrl={null}
@@ -82,5 +92,29 @@ describe('UserMenu', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Account menu' }));
     await screen.findByRole('menu');
     expect(screen.queryByRole('menuitem', { name: 'Sign out' })).toBeNull();
+  });
+
+  it('offers Home and Settings as links that are themselves the menu items', async () => {
+    render(
+      <UserMenu
+        homeHref="/user-1/home"
+        settingsHref="/user-1/settings"
+        name="Hanaa"
+        email="h@example.com"
+        imageUrl={null}
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Account menu' }));
+
+    const home = await screen.findByRole('menuitem', { name: 'Home' });
+    const settings = await screen.findByRole('menuitem', { name: 'Settings' });
+
+    expect(home.tagName).toBe('A');
+    expect(home.getAttribute('href')).toBe('/user-1/home');
+    expect(settings.tagName).toBe('A');
+    expect(settings.getAttribute('href')).toBe('/user-1/settings');
+    // Nothing interactive is nested inside a menu item.
+    expect(home.querySelector('a, button')).toBeNull();
+    expect(settings.querySelector('a, button')).toBeNull();
   });
 });

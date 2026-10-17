@@ -21,7 +21,7 @@ function PasswordInput({ className, ...props }: PasswordInputProps) {
     <div className="relative">
       <Input
         type={visible ? 'text' : 'password'}
-        className={cn('pr-8', className)}
+        className={cn('pr-10', className)}
         {...props}
       />
       <Button

@@ -1,13 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { Button } from './ui/button';
-import { UserMenu } from './user-menu';
+import { Button } from '@synapcity/frontend-ui/components/ui/button';
+import { UserMenu } from '@synapcity/frontend-ui/components/user-menu';
 
 const meta: Meta<typeof UserMenu> = {
   title: 'Components/UserMenu',
   component: UserMenu,
   tags: ['autodocs'],
   args: {
+    homeHref: '/user-1/home',
+    settingsHref: '/user-1/settings',
     name: 'Hanaa Sadoqi',
     email: 'hanaa@example.com',
     imageUrl: null,

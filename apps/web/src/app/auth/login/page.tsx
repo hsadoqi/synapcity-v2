@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 
-import { LoginForm } from '@/components/auth/login/login-form';
-import { OAuthButtons } from '@/components/auth/buttons/oauth-buttons';
-import { safeNextPath } from '@/lib/auth/safe-next/safe-next';
-import { AuthLinkButton } from '@/components/auth/buttons/auth-link-button';
-import { AuthShell } from '@/components/auth/shell/auth-shell';
+import { LoginForm } from '@/features/auth/components/login-form';
+import { OAuthButtons } from '@/features/auth/components/oauth-buttons';
+import { safeNextPath } from '@/lib/routing/safe-next';
+import { AuthLinkButton } from '@/features/auth/shared/auth-link-button';
+import { AuthShell } from '@/features/auth/shared/auth-shell';
+import { AuthDivider } from '@/features/auth/shared/auth-divider';
 
 export const metadata: Metadata = { title: 'Sign in' };
 
@@ -28,7 +29,7 @@ export default async function LoginPage({
       }
     >
       <OAuthButtons next={next} />
-      <p className="text-center text-xs text-muted-foreground">or</p>
+      <AuthDivider label="or continue with email" />
       <LoginForm next={next} />
     </AuthShell>
   );

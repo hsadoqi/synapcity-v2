@@ -1,5 +1,3 @@
-'use client';
-
 import type { ReactNode } from 'react';
 
 export const RootContent = ({ children }: { children: ReactNode }) => {
@@ -10,7 +8,7 @@ export const RootContent = ({ children }: { children: ReactNode }) => {
       <main
         id="main-content"
         tabIndex={-1}
-        className="flex flex-1 px-6 py-12 outline-none sm:px-12 lg:px-24"
+        className="flex flex-1 px-6 py-10 outline-none sm:px-10 sm:py-14 lg:px-16 lg:py-16"
       >
         {children}
       </main>

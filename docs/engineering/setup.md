@@ -26,8 +26,8 @@ pnpm verify
 | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `pnpm verify`                       | Runs `format:check`, `lint`, `typecheck`, `deps`, `brand:check`, `test`, `test:coverage`, `test:e2e`, `test:storybook` and `build`; stops at first fail |
 | `pnpm format:check` / `pnpm format` | Check or apply Prettier formatting                                                                                                                      |
-| `pnpm lint`                         | ESLint in every workspace, through Turbo                                                                                                                |
-| `pnpm check-types`                  | `tsc --noEmit` in every workspace (Next apps run `next typegen` first)                                                                                  |
+| `pnpm lint`                         | ESLint in every workspace, through Turbo; reads `.ts` and `.tsx` and fails on any warning                                                               |     |
+| `pnpm check-types`                  | `tsc --noEmit` in every workspace, including unused locals and parameters (Next apps run `next typegen` first)                                          |
 | `pnpm deps`                         | Knip: unused files, exports and dependencies                                                                                                            |
 | `pnpm brand:check`                  | Static brand exports match the logo geometry in `logo-mark.tsx` (not the rasters)                                                                       |
 | `pnpm test`                         | Vitest unit tests in every workspace that has them, through Turbo                                                                                       |
@@ -45,7 +45,7 @@ A passing `pnpm verify` proves the repository's formatting, lint, types, unused-
 
 ## Environment variables
 
-- `apps/web` needs three: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `SITE_URL`. Copy `apps/web/.env.example` to `apps/web/.env.local` and fill them in; the README table in `apps/web` says what each is for.
+- `apps/web` needs three: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `SITE_URL`. Copy `apps/web/.env.example` to `apps/web/.env.local` and fill them in; the README in `apps/web` says what each is for and which Supabase redirect allow-list entry each environment's `SITE_URL` needs.
 - When another variable is added, add it to the committed `.env.example` with a placeholder value in the same change.
 - Real values go in an untracked `.env` or `.env*.local` file, both git-ignored. Never commit secrets. The `security` CI job scans history for them.
 

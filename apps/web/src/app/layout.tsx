@@ -3,12 +3,13 @@ import localFont from 'next/font/local';
 import '../styles/globals.css';
 import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
-import RootProviders from './providers';
-import { AuthStatus } from '@/components/auth/display/auth-status';
+import RootProviders from '../components/providers/root-providers';
+import { AuthStatus } from '@/features/auth/components/auth-status';
 import { RootShell } from '@synapcity/frontend-ui/blocks/root-shell';
 import { createMetadata } from '@synapcity/frontend-site/metadata';
-import { UserProvider } from '@/components/auth/provider/user-provider';
-import { getCurrentUser } from '@/lib/auth/session';
+import { UserProvider } from '@/features/auth/client/user-provider';
+import { getCurrentUser } from '@/features/auth/server/session';
+import { accountLinksFor } from '@/lib/routing/user-paths';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 const geistSans = localFont({
@@ -42,7 +43,7 @@ export default async function RootLayout({
         <RootProviders>
           <UserProvider user={user}>
             <RootShell
-              userId={user?.id ?? null}
+              account={user ? accountLinksFor(user.id) : null}
               headerActions={<AuthStatus variant="header" />}
             >
               {children}

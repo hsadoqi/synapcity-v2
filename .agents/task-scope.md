@@ -1,5 +1,96 @@
 # Task scope
 
+## Active task: bring refactor/auth-features into main (2026-10-17)
+
+- Goal and mode: implement the owner's request to merge `refactor/auth-features` with `main` (PR #28). `main` holds the older auth UI as one squashed commit, so the merge conflicted in 66 files, mostly old-layout copies of files the branch had already moved.
+- Resolution: keep the branch's layout for `apps/web` and `packages/frontend/ui`; take `main`'s lockfile, react 19.3.0 pins, `.pnpm-store` ignore and docs; port the `updatePassword` failure log to `features/auth/server/actions.ts`; keep ADRs 0007 to 0009 as the branch records them (Accepted).
+- Budgets: no new dependencies, schema, routes or public APIs beyond what the branch already carries; the branch's follow-up plan (`docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`) is not executed here.
+- Verification: `pnpm format:check`, `lint`, `typecheck`, `deps`, `brand:check`, `test` and `build` passed locally, plus the Storybook story tests (13 files, 37 tests). `pnpm test:e2e` and live auth were not run (no Chromium download in the container).
+- Recovery: revert the merge commit on `merge/auth-features-into-main`; `refactor/auth-features` and `main` are untouched until the PR merges.
+
+## Active task: repair auth import-boundary verification failure (2026-10-16)
+
+- Goal and mode: implement the owner's request to fix failures from `pnpm verify`. The clean baseline is `91561a7` on `refactor/auth-features`; the reproduced failure is six forbidden imports in four recently relocated auth components.
+- Direct authority: the current verification-repair request; preserve ADR-0007's selected dependency boundaries and the existing verification chain.
+- Exact destinations: move `apps/web/src/features/auth/shared/{auth-status,current-user-avatar,oauth-buttons,sign-out-button}.tsx` to the same filenames in `apps/web/src/features/auth/components/`; update their imports in `apps/web/src/app/page.tsx`, `apps/web/src/app/layout.tsx`, `apps/web/src/app/[userId]/home/page.tsx`, `apps/web/src/app/auth/login/page.tsx`, and `apps/web/src/features/auth/components/register-card.tsx`; update this scope entry.
+- Mutation budgets: file moves 4; existing-file updates 6 including this entry; creates/deletes 0; dependencies, architecture decisions, other planning artifacts, Git history/branches/commits/PRs, external systems and provider state 0. Disposable logs and backups may live under `/private/tmp/synapcity-verify-repair-20261016`.
+- System of record: ADR-0007 owns the selected layout; source files own runtime behavior; this entry bounds execution only. No task status is mirrored elsewhere.
+- Preconditions: preserve component bodies, client directives, routes, auth behavior and all other recent refactor changes. Recheck clean/current source before mutation.
+- Verification: reproduce the existing failing boundary test, rerun it after import repairs, then run root `pnpm verify` and inspect the final diff. Report exact stage outcomes and behavior not covered by tests.
+- Recovery: reverse only this task's moves and import changes against the baseline; preserve concurrent work. No reset, stash, clean or history changes.
+- Stop conditions: concurrent changes to a scoped destination, another failure needing additional source changes, or an unresolved architecture/security decision.
+
+### Approved scope extension: complete the auth page wrapper extraction
+
+- Direct authority: the owner confirmed the newly added wrapper is finished and selected "Finished—complete the wrapper extraction and verify" during this repair.
+- Additional exact destinations: update the owner's new page wrapper (initially `apps/web/src/components/shells/auth-shell.tsx`, subsequently renamed by the owner to `apps/web/src/components/shells/auth-page-shell.tsx`) and `apps/web/src/app/auth/layout.tsx`. Preserve the owner's rename. The wrapper owns page centring/width; the existing feature `AuthShell` keeps card/heading responsibility. Use the distinct local name `AuthPageShell` and consume it from the route layout, preserving rendered markup.
+- Revised total budgets: file moves 4; existing-file updates 8 including this scope and the owner's untracked wrapper; creates/deletes 0; all other mutation classes remain 0. Preserve the owner's wrapper file and keep its pre-edit contents under the disposable backup directory. Verification and recovery remain as above.
+
+## Active task: author auth review follow-up implementation plan (2026-10-16)
+
+- Goal and mode: turn the owner's completed auth review into a detailed implementation plan. Mode: planning/documentation authoring only; no application implementation or acceptance of proposed behavior.
+- Direct authority: the owner's current request, "create a detailed implementation plan pls", following the read-only review of `refactor/auth-features` at `773060f` and its five existing WIP paths.
+- Exact destinations and budget: create `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md` (1 create); update `.agents/task-scope.md` (1 update). Other repository changes, source changes, dependency changes, moves/renames/deletes, commits/branches/PRs, GitHub objects, provider configuration, live accounts and external planning surfaces: 0. Disposable authoring backups/check output may live under `/private/tmp/synapcity-auth-plan-authoring-20261016`.
+- Systems of record: accepted ADRs retain decision authority; original ARF plans retain ARF task completion; the new Proposed plan owns only AHF-00 through AHF-09 follow-up definitions, dependencies and eventual completion. Its historical baseline is evidence, not a second ARF status ledger. This entry bounds authoring only.
+- Content scope: preserve current topology/package options; specify the development-auth decision and identity invariant, boundary-check repairs, sign-out failure handling, meaningful test gaps, evidence-based documentation reconciliation and separate live-provider verification. Record unresolved choices and implementation approval gates without resolving them through plan wording.
+- Preconditions: re-read live source/status, accepted decisions and planning workflow; preserve four modified source files and untracked `features/auth/shared/development-auth.ts`; do not silently adopt stale spec statuses or infer historical baseline proof from current tests.
+- Verification: scoped Prettier write/check, relative Markdown link and named-path read-back, unique AHF task IDs/dependency order, diff/whitespace inspection and unchanged source/WIP comparison. Runtime checks are not rerun for this authoring-only change; prior review results are explicitly dated evidence.
+- Recovery: remove only the newly authored plan and reverse only this entry if separately requested; the original scope is captured at `/private/tmp/synapcity-auth-plan-authoring-20261016/task-scope.before.md`. Preserve every pre-existing scope and source change; no reset/stash/clean.
+- Stop conditions: concurrent changes to either authoring destination; an additional mutation class; a requested architectural decision being mistaken for approval; or an exact implementation destination needing a fresh scope. Execution of the plan requires its stated approvals and per-batch manifests.
+
+## Active task: repair pnpm verify fixture failures (2026-10-16)
+
+- Goal and mode: implement the owner's request to fix `pnpm verify`; preserve existing uncommitted work and the four seed files, which exactly match seed 42.
+- Direct authority: the owner's current verification-repair request. No product, terminology, schema, ownership, dependency or verification-chain decision is changed.
+- Exact destinations: update `packages/dev/fixtures/src/seed.ts`, `packages/dev/fixtures/src/seed.test.ts`, `packages/dev/fixtures/README.md`, and this entry (4 updates). The fixture package owns deterministic generation and its drift tests; this entry records execution bounds only.
+- Mutation manifest: default seed-file generation to the existing files' seed 42 independently of the generic fixture default; compare parsed JSON so Prettier whitespace does not cause drift failures; document that contract.
+- Budgets: repository updates 4; creates/deletes/moves/renames 0; dependencies 0; Git history/branches/commits/PRs 0; external systems and other planning artifacts 0. Disposable verification logs may live under `/private/tmp`.
+- Verification: reproduce the four drift failures, run the fixture suite and scoped formatting, then rerun `pnpm verify`; report any remaining failures and stages not reached.
+- Recovery: restore only this task's hunks, preserving pre-existing changes; no reset, stash or clean.
+- Stop conditions: concurrent edits to these destinations, an unresolved decision, or another failure needing a broader mutation scope.
+
+## Active task: auth review follow-ups, batches A–E (2026-10-14)
+
+- Goal and mode: close the code and test gaps from the 2026-10-14 review of `refactor/auth-features` (`0cc15d7`). Mode: implementing, test-first.
+- Direct authority: the owner approved batches A–E, a hardened-regex boundary check (no new dependency), and deferred F (sign-out: redirect anyway, log the error) and G (documentation reconciliation) to a follow-up.
+- Update: `apps/web/src/lib/supabase/middleware.ts` (A); `apps/web/src/architecture.test.ts` (B); `apps/web/src/features/account/{shared/form-state.ts,server/actions.ts,components/profile-form.tsx}` (C); `apps/web/src/components/forms/*`, `apps/web/src/features/auth/shared/form-feedback.ts` and the auth forms that render `FormMessage` (D); `apps/storybook/vitest.config.ts` (E); `apps/web/e2e/auth.e2e.ts` (two assertions that hard-coded the old shared `form-message` id, added during D once the gate showed them); this entry.
+- Create: `apps/web/src/lib/supabase/middleware.test.ts`, `apps/web/src/features/account/server/actions.test.ts`, one pure form-message contract module under `apps/web/src/components/forms/`.
+- Budget: dependencies 0; deletes/renames 0; ADR/spec/plan edits 0; Supabase or provider configuration 0; commits/branches/PRs 0.
+- Verification: each batch's tests seen failing first, then `pnpm verify`.
+- Recovery: revert only these hunks with `git checkout -- <path>` per file on request; no reset, stash or clean.
+- Stop conditions: a fix that needs a new dependency, a provider or routing behaviour change beyond the review's findings, or concurrent edits to a listed file.
+
+## Active task: repair pnpm verify failures (2026-10-17)
+
+- Goal and authority: implement the owner's request to fix pnpm verify. Existing checks and architecture remain in place. Branch fix/auth-ui began clean at e451b2d.
+- Evidence: ordinary verify stops at sandbox port restrictions; unrestricted verify passes 43 web end-to-end tests and reaches the reproduced Storybook failures. Storybook 10.6.1 supplies parentCacheNode while installed Next.js 16.4.0 useRouter reads parentRenderTree.data.bfcacheId; its RedirectBoundary throws before stories render.
+- Exact destinations and budgets: update this scope, pnpm-workspace.yaml and pnpm-lock.yaml (3 updates); create patches/@<storybook__nextjs-vite@10.6.1.patch> (1 create). Patch only the installed Storybook framework's AppRouterProvider fixture to supply the missing render-tree cache data. No dependency upgrades, application/source/test changes, deletions/moves/renames, Git operations, external planning mutations or new package identities. Existing browser and accessibility assertions stay enabled.
+- Systems of record: pnpm patchedDependencies and its patch own the version-specific fixture repair; the lockfile owns reproducible resolution. This entry bounds execution only. Operational allowance: pnpm patch/install, tests/builds and generated outputs; temporary baselines/extraction/logs under /private/tmp.
+- Verification: reproduce the original stories failing; strict-peer install and frozen lockfile; full Storybook browser tests and production build; direct root pnpm verify through completion with localhost/network access. Report cache hits, failures, remaining warnings and live-service limitations.
+- Recovery: restore only this task's hunks using /private/tmp/synapcity-verify-repair-baseline-20261017; preserve the unpatched extracted package under /private/tmp. No reset/stash/clean or history changes.
+- Stop: concurrent edits to scoped files, a required runtime/architecture change, another destination or an unrelated code failure requiring a revised manifest. Product, naming, package ownership, auth architecture and testing-strategy decisions remain unchanged.
+
+## Active task: exclude local pnpm database from latest commit (2026-10-17)
+
+- Goal and authority: the owner requested correcting the recent commit to exclude index.db; amend only local commit 3de596fcb6b8d4d8142d5666a67917c613b8451f, preserving every other committed change.
+- Exact scope and budgets: update `.gitignore` and this scope record (2 files); untrack `.pnpm-store/v11/index.db` (1 index removal, no filesystem deletion); amend HEAD once, retaining its message and parent. New files, branch changes, pushes, external mutations and other source/dependency changes: 0.
+- Preconditions: clean worktree/index; latest commit introduces the database; current remote fix/auth-ui tip does not contain HEAD. System of record: Git history and root ignore rules; this entry records bounds only.
+- Verification: confirm amended tree differs only at these three paths, the database still exists locally and is ignored, and the worktree/index are clean. No runtime changes; runtime checks not required.
+- Recovery: original commit 3de596fcb6b8d4d8142d5666a67917c613b8451f remains in the reflog; original documents and hash captured in /private/tmp/synapcity-exclude-index-db-20261017. Any restoration requires separately scoped authority.
+- Stop: concurrent changes, a published latest commit, or a required mutation outside these destinations.
+
+## Active task: repair React and TypeScript peer dependencies (2026-10-17)
+
+- Goal and mode: implement the owner's request to fix the supplied peer-dependency errors. Dependency compatibility repair only.
+- Authority and readiness: direct owner fix request; current versions and consumers inspected, npm metadata verified, pnpm 11.25.0 package extensions tested in an isolated strict-peer fixture. Preserve existing staged UI manifest and lockfile work. Branch: `fix/auth-ui`.
+- Exact updates (8 maximum): this scope record; `apps/docs/package.json`; `apps/storybook/package.json`; `apps/web/package.json`; `packages/frontend/site/package.json`; `packages/dev/vitest-config/package.json`; `pnpm-workspace.yaml`; `pnpm-lock.yaml`.
+- Manifest: align remaining React consumers to the owner's already-staged React 19.3.0 and @types/react 19.3.0 pins, preserving existing React DOM 19.3.0; supply TypeScript 5.9.3 as a dependency of eslint-plugin-storybook 10.6.1 and vite-tsconfig-paths 5.1.4 through packageExtensions. TypeScript 5.9.3 satisfies both tooling chains, including tsconfck's ^5 peer constraint; retain TypeScript 7.0.2 as the compiler. Regenerate the lockfile without unrelated upgrades. No peer-range relaxation.
+- Systems of record: package manifests own direct dependencies; pnpm-workspace.yaml owns transitive compatibility configuration; pnpm-lock.yaml owns resolution; this entry records execution bounds only.
+- Budgets: existing repository files 8; creates/deletes/moves/renames 0; new package identities 0; source/test/API/schema changes 0; Git staging/commits/branches/PRs 0; external issues/projects/planning surfaces 0. Local operational changes: pnpm install and generated verification outputs only; disposable evidence/baselines under /private/tmp.
+- Verification: strict-peer install and frozen-lockfile replay; resolve actual installed compiler/tooling versions; root pnpm verify, reporting the first failure and every unreached gate. Additional focused checks if the full gate stops on unrelated failures.
+- Recovery: restore only this task's hunks from /private/tmp/synapcity-peer-baseline-20261017, preserving staged and concurrent work. No reset, stash, clean or history operations.
+- Stop conditions: concurrent content changes to a destination, incompatible upstream requirement that needs compiler/runtime or architecture changes, or repair requiring additional files. Existing product, topology, auth and testing-strategy decisions remain untouched.
+
 ## Active task: auth refactor ARF-01 manifest and baseline (2026-10-17)
 
 - Goal and mode: bound the foundation file moves (ARF-02 to ARF-06) for the selected app-local layout. Mode: planning; this entry is the manifest. No source file changes under it.

@@ -1,19 +1,18 @@
-'use client';
-
 import type { ReactNode } from 'react';
-import { SynapcityLogo } from '../../components/logo-mark';
+import { SynapcityLogo, SynapcityMark } from '../../components/logo-mark';
 import { ModeToggle } from '../../components/mode-toggle';
 import Link from 'next/link';
 import { LinkButton } from '../../components/link-button';
 import { Cog } from 'lucide-react';
-import React from 'react';
 import { cn } from '../../lib/utils';
+import type { AccountLinks } from '../../lib/account-links';
 import { SidebarTrigger } from '../../components/ui/sidebar';
 import { Separator } from '../../components/ui/separator';
 
 type RootHeaderProps = {
   actions?: ReactNode;
-  userId?: string | null;
+  /** Present when someone is signed in. The app decides where these lead. */
+  account?: AccountLinks | null;
 };
 
 /**
@@ -21,67 +20,79 @@ type RootHeaderProps = {
  * sidebar shell places it inside its own header bar; RootHeader wraps it for
  * the signed-out page. Neither nests one <header> inside another.
  */
-export const RootHeaderContent = ({ actions, userId }: RootHeaderProps) => {
+export const RootHeaderContent = ({ actions, account }: RootHeaderProps) => {
   return (
-    <div className="flex flex-1 items-center justify-between gap-4">
-      <RootLogoLink userId={userId} />
-      <RootIconActions userId={userId}>{actions}</RootIconActions>
+    <div className="flex min-w-0 flex-1 items-center justify-between gap-4">
+      <RootLogoLink homeHref={account?.homeHref} />
+      <RootIconActions settingsHref={account?.settingsHref}>
+        {actions}
+      </RootIconActions>
     </div>
   );
 };
 
-export const RootHeader = ({ userId, ...props }: RootHeaderProps) => {
+export const RootHeader = ({ account, ...props }: RootHeaderProps) => {
   // Same gutters as RootContent and RootFooter so the logo lines up with the
   // page below it.
   return (
-    <div className="flex items-center">
-      {userId && (
+    <div className="sticky top-0 flex h-16 shrink-0 items-stretch border-b border-divider bg-background/95 supports-backdrop-filter:backdrop-blur-sm">
+      {account && (
         <>
-          <SidebarTrigger className="shrink-0 mx-2" size="icon-xl" />
-          <Separator orientation="vertical" className="h-full" />
+          <div className="flex shrink-0 items-center px-2 sm:px-3">
+            <SidebarTrigger size="icon-lg" />
+          </div>
+          <Separator orientation="vertical" />
         </>
       )}
-      <header className="flex items-center gap-2 px-2 md:px-6 py-2 lg:px-12 flex-1">
-        <RootHeaderContent userId={userId} {...props} />
+      <header
+        className={cn(
+          'flex min-w-0 flex-1 items-center',
+          account ? 'px-3 sm:px-4 lg:px-6' : 'px-4 sm:px-10 lg:px-16',
+        )}
+      >
+        <RootHeaderContent account={account} {...props} />
       </header>
     </div>
   );
 };
 
 const RootLogoLink = ({
-  userId,
+  homeHref = '/',
   className,
 }: {
-  userId?: string | null;
+  /** Where the logo leads. The landing page until someone is signed in. */
+  homeHref?: string;
   className?: string;
 }) => {
-  const [logoPath, setLogoPath] = React.useState<string | null>('/');
-  React.useEffect(() => {
-    if (userId) {
-      setLogoPath(`/${userId}/home`);
-    }
-  }, [userId]);
   return (
     <Link
-      href={`${logoPath}`}
+      href={homeHref}
+      aria-label="Synapcity home"
       className={cn(
-        'inline-flex min-h-6 items-center pointer-coarse:min-h-11',
+        'inline-flex min-h-10 shrink-0 items-center rounded-sm outline-none transition-opacity hover:opacity-70 focus-visible:ring-2 focus-visible:ring-ring/50 pointer-coarse:min-h-11',
         className,
       )}
     >
-      <SynapcityLogo size="sm" className="text-foreground" />
+      <SynapcityMark
+        size="md"
+        title={null}
+        className="text-foreground sm:hidden"
+      />
+      <SynapcityLogo
+        size="sm"
+        title={null}
+        className="hidden text-foreground sm:block"
+      />
     </Link>
   );
 };
 
-const SettingsLinkIcon = ({ userId }: { userId?: string | null }) => {
-  // TODO: Implement user ID retrieval logic here. For now, we can use a placeholder or mock value.
-  // const userId = useUserId(); // Replace with your actual user ID retrieval logic
+const SettingsLinkIcon = ({ href }: { href: string }) => {
   return (
     <LinkButton
       variant="ghost"
-      href={`/${userId}/settings`}
-      size="icon-xl"
+      href={href}
+      size="icon-lg"
       aria-label="Settings"
     >
       <Cog />
@@ -90,17 +101,21 @@ const SettingsLinkIcon = ({ userId }: { userId?: string | null }) => {
 };
 
 const RootIconActions = ({
-  userId,
+  settingsHref,
   children,
 }: {
-  userId?: string | null;
+  settingsHref?: string;
   children?: ReactNode;
 }) => {
   return (
-    <div className="flex items-center gap-2">
-      <ModeToggle variant="ghost" size="xl" />
-      {userId && <SettingsLinkIcon userId={userId} />}
+    <nav
+      aria-label="Account and appearance"
+      className="flex items-center gap-1"
+    >
+      {' '}
+      <ModeToggle variant="ghost" size="lg" />
+      {settingsHref && <SettingsLinkIcon href={settingsHref} />}
       {children}
-    </div>
+    </nav>
   );
 };

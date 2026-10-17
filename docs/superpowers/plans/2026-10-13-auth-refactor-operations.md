@@ -1,6 +1,6 @@
 # Auth server operations: task plan
 
-**Status:** Proposed; this plan does not authorize implementation. Physical placement follows ARF-00.  
+**Status:** Executed 2026-10-14 under the owner's instruction at the app-local layout (ADR-0007 and ADR-0008 Accepted). The checkboxes below are not ticked; the record is in [ADR-0008](../../architecture/decisions/0008-auth-actions-and-server-operations.md#implementation-2026-10-14).  
 **Date:** 2026-10-13.  
 **Decision prerequisite:** [ADR-0008](../../architecture/decisions/0008-auth-actions-and-server-operations.md), following Accepted ADR-0007.  
 **Parent:** [Inventory, order and final verification](2026-10-13-auth-refactor.md).  

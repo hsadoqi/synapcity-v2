@@ -6,6 +6,18 @@ allowBuilds:
   esbuild: true
   unrs-resolver: false
 
+# These tools need TypeScript's JavaScript API. Keep the project compiler on 7.0.2
+# and give their dependency chains 5.9.3, which satisfies tsconfck's ^5 requirement
+# and typescript-eslint's >=4.8.4 <6.1.0 requirement. Remove each extension when its
+# tool supports the project compiler; do not widen upstream peer ranges.
+packageExtensions:
+  'eslint-plugin-storybook@10.6.1':
+    dependencies:
+      typescript: 5.9.3
+  'vite-tsconfig-paths@5.1.4':
+    dependencies:
+      typescript: 5.9.3
+
 # Transitive security fixes. These pin patched versions of packages reached only through
 # tooling (eslint, @next/eslint-plugin-next, shadcn) and next's own pinned postcss/sharp.
 # Drop an entry once its parent ships a patched range. Recorded in ADR-0001.
@@ -27,3 +39,6 @@ auditConfig:
 minimumReleaseAgeExclude:
   - postcss@8.5.30
   - '@chromatic-com/storybook@5.5.1'
+
+patchedDependencies:
+  '@storybook/nextjs-vite@10.6.1': patches/@storybook__nextjs-vite@10.6.1.patch
