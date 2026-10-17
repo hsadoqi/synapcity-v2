@@ -1,5 +1,15 @@
 # Task scope
 
+## Active task: repair pnpm verify failures (2026-10-17)
+
+- Goal and authority: implement the owner's request to fix pnpm verify. Existing checks and architecture remain in place. Branch fix/auth-ui began clean at e451b2d.
+- Evidence: ordinary verify stops at sandbox port restrictions; unrestricted verify passes 43 web end-to-end tests and reaches the reproduced Storybook failures. Storybook 10.6.1 supplies parentCacheNode while installed Next.js 16.4.0 useRouter reads parentRenderTree.data.bfcacheId; its RedirectBoundary throws before stories render.
+- Exact destinations and budgets: update this scope, pnpm-workspace.yaml and pnpm-lock.yaml (3 updates); create patches/@storybook__nextjs-vite@10.6.1.patch (1 create). Patch only the installed Storybook framework's AppRouterProvider fixture to supply the missing render-tree cache data. No dependency upgrades, application/source/test changes, deletions/moves/renames, Git operations, external planning mutations or new package identities. Existing browser and accessibility assertions stay enabled.
+- Systems of record: pnpm patchedDependencies and its patch own the version-specific fixture repair; the lockfile owns reproducible resolution. This entry bounds execution only. Operational allowance: pnpm patch/install, tests/builds and generated outputs; temporary baselines/extraction/logs under /private/tmp.
+- Verification: reproduce the original stories failing; strict-peer install and frozen lockfile; full Storybook browser tests and production build; direct root pnpm verify through completion with localhost/network access. Report cache hits, failures, remaining warnings and live-service limitations.
+- Recovery: restore only this task's hunks using /private/tmp/synapcity-verify-repair-baseline-20261017; preserve the unpatched extracted package under /private/tmp. No reset/stash/clean or history changes.
+- Stop: concurrent edits to scoped files, a required runtime/architecture change, another destination or an unrelated code failure requiring a revised manifest. Product, naming, package ownership, auth architecture and testing-strategy decisions remain unchanged.
+
 ## Active task: exclude local pnpm database from latest commit (2026-10-17)
 
 - Goal and authority: the owner requested correcting the recent commit to exclude index.db; amend only local commit 3de596fcb6b8d4d8142d5666a67917c613b8451f, preserving every other committed change.

@@ -14,6 +14,9 @@ overrides:
 
 packageExtensionsChecksum: sha256-wxciMy7cXwpKBkLD9HcxcXUUfE6fRYSKhJ1mmV4zDKU=
 
+patchedDependencies:
+  '@storybook/nextjs-vite@10.6.1': 35fae2308e93029a0d109ae60f8290e3fcdbd0ae1fdf6ae7ea3733e66e57b8df
+
 importers:
 
   .:
@@ -124,7 +127,7 @@ importers:
         version: 10.6.1(@vitest/browser-playwright@4.1.11)(@vitest/browser@4.1.11)(@vitest/runner@4.1.11)(react@19.3.0)(storybook@10.6.1(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(vitest@4.1.11)
       '@storybook/nextjs-vite':
         specifier: 10.6.1
-        version: 10.6.1(@babel/core@8.0.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(next@16.4.0(@babel/core@8.0.1)(@playwright/test@1.64.0)(@types/node@26.6.5)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(storybook@10.6.1(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(supports-color@7.2.0)(typescript@5.9.3)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
+        version: 10.6.1(patch_hash=35fae2308e93029a0d109ae60f8290e3fcdbd0ae1fdf6ae7ea3733e66e57b8df)(@babel/core@8.0.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(next@16.4.0(@babel/core@8.0.1)(@playwright/test@1.64.0)(@types/node@26.6.5)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(storybook@10.6.1(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(supports-color@7.2.0)(typescript@5.9.3)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
       '@synapcity/dev-eslint-config':
         specifier: workspace:*
         version: link:../../packages/dev/eslint-config
@@ -447,7 +450,7 @@ importers:
     devDependencies:
       '@storybook/nextjs-vite':
         specifier: 10.6.1
-        version: 10.6.1(@babel/core@8.0.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(next@16.4.0(@babel/core@8.0.1)(@playwright/test@1.64.0)(@types/node@26.6.5)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(storybook@10.6.1(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(supports-color@7.2.0)(typescript@7.0.2)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
+        version: 10.6.1(patch_hash=35fae2308e93029a0d109ae60f8290e3fcdbd0ae1fdf6ae7ea3733e66e57b8df)(@babel/core@8.0.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(next@16.4.0(@babel/core@8.0.1)(@playwright/test@1.64.0)(@types/node@26.6.5)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(storybook@10.6.1(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(supports-color@7.2.0)(typescript@7.0.2)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
       '@synapcity/dev-eslint-config':
         specifier: workspace:*
         version: link:../../dev/eslint-config
@@ -6065,7 +6068,7 @@ snapshots:
     dependencies:
       react: 19.3.0
 
-  '@storybook/nextjs-vite@10.6.1(@babel/core@8.0.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(next@16.4.0(@babel/core@8.0.1)(@playwright/test@1.64.0)(@types/node@26.6.5)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(storybook@10.6.1(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(supports-color@7.2.0)(typescript@5.9.3)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))':
+  '@storybook/nextjs-vite@10.6.1(patch_hash=35fae2308e93029a0d109ae60f8290e3fcdbd0ae1fdf6ae7ea3733e66e57b8df)(@babel/core@8.0.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(next@16.4.0(@babel/core@8.0.1)(@playwright/test@1.64.0)(@types/node@26.6.5)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(storybook@10.6.1(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(supports-color@7.2.0)(typescript@5.9.3)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))':
     dependencies:
       '@storybook/builder-vite': 10.6.1(storybook@10.6.1(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
       '@storybook/react': 10.6.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(storybook@10.6.1(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(supports-color@7.2.0)(typescript@5.9.3)
@@ -6087,7 +6090,7 @@ snapshots:
       - rollup
       - supports-color
 
-  '@storybook/nextjs-vite@10.6.1(@babel/core@8.0.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(next@16.4.0(@babel/core@8.0.1)(@playwright/test@1.64.0)(@types/node@26.6.5)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(storybook@10.6.1(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(supports-color@7.2.0)(typescript@7.0.2)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))':
+  '@storybook/nextjs-vite@10.6.1(patch_hash=35fae2308e93029a0d109ae60f8290e3fcdbd0ae1fdf6ae7ea3733e66e57b8df)(@babel/core@8.0.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(next@16.4.0(@babel/core@8.0.1)(@playwright/test@1.64.0)(@types/node@26.6.5)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(storybook@10.6.1(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(supports-color@7.2.0)(typescript@7.0.2)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))':
     dependencies:
       '@storybook/builder-vite': 10.6.1(storybook@10.6.1(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
       '@storybook/react': 10.6.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(storybook@10.6.1(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(supports-color@7.2.0)(typescript@7.0.2)

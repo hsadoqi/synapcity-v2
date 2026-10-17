@@ -39,3 +39,6 @@ auditConfig:
 minimumReleaseAgeExclude:
   - postcss@8.5.30
   - '@chromatic-com/storybook@5.5.1'
+
+patchedDependencies:
+  '@storybook/nextjs-vite@10.6.1': patches/@storybook__nextjs-vite@10.6.1.patch
