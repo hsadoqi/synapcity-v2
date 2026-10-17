@@ -1,5 +1,7 @@
 # Auth organization refactor: proposed implementation plan
 
+> **Reconciliation 2026-10-17 (AHF-07):** items are ticked only where the cited evidence exists in the repository or in CI. The original ARF-01 manifest and baseline were never recovered, so items that depend on comparing against that baseline stay open with a note. Nothing here claims live email, OAuth or second-account verification. The work this plan describes was carried out on `refactor/auth-features` and merged to `main` (PR #28); the Status line below is the original.
+
 **Status:** Proposed parent plan. Layout selected, the file moves of section 2 and the operations extraction (ADR-0008) executed 2026-10-14 (see section 5).  
 **Date:** 2026-10-13.  
 **Specification:** [Auth organization refactor](../specs/2026-10-13-auth-refactor-design.md).
@@ -143,11 +145,11 @@ Each task is defined and checked off in exactly one owning plan. Tasks remain pr
 **Depends on:** ARF-11; selected topology, relevant ADRs/canonical amendments and execution scope approved.  
 **Code scope:** read-only final diff and approved source/consumer inventory; repairs return to the owning task within its manifest. No additional production/configuration/planning mutation is granted here.
 
-- [ ] Compare final file operations and source hunks with the exact approved manifest and recoverable WIP baseline; verify old imports/duplicate copies are gone.
-- [ ] Confirm helper assertions, current flow/error-focus behavior and observable auth/profile invariants were preserved; document anything the evidence does not reach.
-- [ ] Run `pnpm verify` after focused task checkpoints pass. Record each stage, its result, any pre-existing failure and remaining unrun stages if the chain stops.
-- [ ] Perform available authorized manual checks of account/header refresh, ownership and browser navigation; record live email/OAuth/second-account cases separately as verified or not verified.
-- [ ] Produce a final report using section 7, with remaining uncommitted artifacts, open decisions and next safe action. Do not commit/push/create a PR without separate instructions.
+- [ ] Compare final file operations and source hunks with the exact approved manifest and recoverable WIP baseline; verify old imports/duplicate copies are gone. _(2026-10-17: open: original baseline unavailable (see the AHF-07 note).)_
+- [ ] Confirm helper assertions, current flow/error-focus behavior and observable auth/profile invariants were preserved; document anything the evidence does not reach. _(2026-10-17: open: original baseline unavailable (see the AHF-07 note); current tests cover today's behavior.)_
+- [x] Run `pnpm verify` after focused task checkpoints pass. Record each stage, its result, any pre-existing failure and remaining unrun stages if the chain stops. _(2026-10-17: evidence: CI `verify` on PR #41 (run 39027783915, commit 8ea886a) runs the full `pnpm verify` chain and passed; stage-by-stage results live in the CI log.)_
+- [ ] Perform available authorized manual checks of account/header refresh, ownership and browser navigation; record live email/OAuth/second-account cases separately as verified or not verified. _(2026-10-17: open: manual checks of 2026-10-13 are in ADR-0006; none was recorded for the refactor, and the second-account case is unverified.)_
+- [ ] Produce a final report using section 7, with remaining uncommitted artifacts, open decisions and next safe action. Do not commit/push/create a PR without separate instructions. _(2026-10-17: open: no final report was written for the original refactor.)_
 
 **Acceptance:** the final approved diff preserves adopted behavior and verification is accurately bounded. A green gate alone is not complete auth coverage.  
 **Recovery:** preserve evidence and propose rollback of only authorized refactor hunks from the live baseline if needed; never reset/stash/clean mixed work.  

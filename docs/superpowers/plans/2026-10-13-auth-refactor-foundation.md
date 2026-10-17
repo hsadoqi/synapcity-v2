@@ -1,5 +1,7 @@
 # Auth refactor foundation: task plan
 
+> **Reconciliation 2026-10-17 (AHF-07):** items are ticked only where the cited evidence exists in the repository or in CI. The original ARF-01 manifest and baseline were never recovered, so items that depend on comparing against that baseline stay open with a note. Nothing here claims live email, OAuth or second-account verification. The work this plan describes was carried out on `refactor/auth-features` and merged to `main` (PR #28); the Status line below is the original.
+
 **Status:** Proposed; this plan does not authorize implementation. Reassess overlapping live work at ARF-00.  
 **Date:** 2026-10-13.  
 **Decision prerequisite:** [ADR-0007](../../architecture/decisions/0007-app-local-auth-and-account-ownership.md).  
@@ -20,13 +22,13 @@ ARF-00 is a documentation/investigation task requiring its own approved scope, n
 **Code scope:** read-only live auth/account/adapter/route consumers, package manifests/exports and canonical workspace conventions/checklist.  
 **Document outputs:** a reviewed candidate comparison and recommendation in ADR-0007; align the spec and parent/child inventories within an approved documentation scope. No package or source file is created by this task.
 
-- [ ] Classify current code by auth, account, form presentation, provider/platform effects and app composition; map actual imports and client/server execution needs.
-- [ ] Compare app-local modules, one auth package with narrow entry points, feature/service packages and account separation. Consider cohesion, independent tests, enforced imports, request context, exported API, coupling and maintenance cost. Do not require a second consumer.
-- [ ] For each candidate, show who owns Server Actions, session access, provider clients, browser events, forms and app-specific routing. Distinguish framework-specific packages from framework-independent contracts.
-- [ ] Identify exact names/categories, dependencies/exports, request-adapter contracts and canonical amendments the recommended package layout would need. Existing conventions are review constraints, not a reason to exclude it.
-- [ ] Give a concrete recommendation with tradeoffs and first-party/installed-version evidence for any version-sensitive technique; leave provider/session and profile-storage decisions unchanged.
-- [ ] Obtain owner selection of the layout and separately scoped approval of required governance changes.
-- [ ] Replace the app-local candidate map and task scopes with selected destinations, manifests/lockfile/configuration budgets and recovery requirements before ARF-01 executes. If app-local is selected, record why; do not treat it as the default imposed by ADR-0006.
+- [x] Classify current code by auth, account, form presentation, provider/platform effects and app composition; map actual imports and client/server execution needs. _(2026-10-17: evidence: `specs/2026-10-14-arf-00-layout-evidence.md` §2.)_
+- [x] Compare app-local modules, one auth package with narrow entry points, feature/service packages and account separation. Consider cohesion, independent tests, enforced imports, request context, exported API, coupling and maintenance cost. Do not require a second consumer. _(2026-10-17: evidence: evidence document §3 (candidates) and its outcome line.)_
+- [x] For each candidate, show who owns Server Actions, session access, provider clients, browser events, forms and app-specific routing. Distinguish framework-specific packages from framework-independent contracts. _(2026-10-17: evidence: evidence document §3.)_
+- [x] Identify exact names/categories, dependencies/exports, request-adapter contracts and canonical amendments the recommended package layout would need. Existing conventions are review constraints, not a reason to exclude it. _(2026-10-17: evidence: evidence document §5 (destination map deltas) and ADR-0007.)_
+- [x] Give a concrete recommendation with tradeoffs and first-party/installed-version evidence for any version-sensitive technique; leave provider/session and profile-storage decisions unchanged. _(2026-10-17: evidence: evidence document §4 (recommendation); ADR-0007.)_
+- [x] Obtain owner selection of the layout and separately scoped approval of required governance changes. _(2026-10-17: evidence: ADR-0007 Accepted (app-local layout selected 2026-10-14).)_
+- [x] Replace the app-local candidate map and task scopes with selected destinations, manifests/lockfile/configuration budgets and recovery requirements before ARF-01 executes. If app-local is selected, record why; do not treat it as the default imposed by ADR-0006. _(2026-10-17: evidence: `2026-10-13-auth-refactor.md` §5 execution record.)_
 
 **Acceptance:** the owner can review a concrete layout, its contracts and costs against alternatives; the approved destination/configuration map matches that selection. No source migration or package creation occurs in this evaluation task.  
 **Verification:** read back candidate evidence, local links, names/exports/dependency direction and source inventory; check versions/docs where proposed techniques depend on them. No runtime result is inferred from a paper comparison.  
@@ -37,11 +39,11 @@ ARF-00 is a documentation/investigation task requiring its own approved scope, n
 **Depends on:** ARF-00; owner-selected topology, required governance amendments and exact execution scope approved.  
 **Code scope:** read-only inventory of the parent migration/consumer lists; no product source edits.
 
-- [ ] Reconcile every source, destination and consumer against the live tree; record collisions and new consumers.
-- [ ] Establish an exact task-scope manifest with one numeric budget per mutation class; approve recovery storage and preserve both tracked and untracked originals.
-- [ ] Read relevant installed-version docs and confirm existing scripts/environment prerequisites without changing tooling.
-- [ ] Run baseline web unit/type checks and existing auth/home browser tests where the approved environment supports them; record failures and not-run cases.
-- [ ] Confirm no source file changed since the captured baseline.
+- [ ] Reconcile every source, destination and consumer against the live tree; record collisions and new consumers. _(2026-10-17: open: original baseline unavailable (see the AHF-07 note).)_
+- [ ] Establish an exact task-scope manifest with one numeric budget per mutation class; approve recovery storage and preserve both tracked and untracked originals. _(2026-10-17: open: the original ARF-01 manifest is not recoverable; later manifests are in `.agents/task-scope.md`.)_
+- [ ] Read relevant installed-version docs and confirm existing scripts/environment prerequisites without changing tooling. _(2026-10-17: open: no record of the original read survives.)_
+- [ ] Run baseline web unit/type checks and existing auth/home browser tests where the approved environment supports them; record failures and not-run cases. _(2026-10-17: open: original baseline unavailable (see the AHF-07 note).)_
+- [ ] Confirm no source file changed since the captured baseline. _(2026-10-17: open: original baseline unavailable (see the AHF-07 note).)_
 
 **Acceptance:** every intended file operation is bounded and recoverable; evidence distinguishes pre-existing failures and unavailable live-provider behavior. No earlier Draft task scope grants source mutation authority.  
 **Verification:** inventory/diff read-back; `pnpm --filter web test`, `pnpm --filter web check-types`, `pnpm --filter web test:e2e`. These baseline commands do not constitute final refactor verification.  
@@ -54,12 +56,12 @@ ARF-00 is a documentation/investigation task requiring its own approved scope, n
 **Targets:** selected-layout destinations for the capability contracts, current-user mapper, metadata/name helpers, common form/focus behavior and auth feedback; the parent currently illustrates app-local paths only.  
 **Consumer updates:** current auth login/register/resend/recovery/password forms and account profile form; auth actions; settings action/page; session reader; auth display/provider consumers. Include exact paths in the approved execution manifest.
 
-- [ ] Extract AuthState/AuthFieldName and ProfileState to their mapped shared feature contracts without changing returned data.
-- [ ] Split display-profile mapping from metadata-write preservation; keep every existing test assertion under the corresponding owner.
-- [ ] Move pure name validation to account's shared module and update registration's narrow dependency.
-- [ ] Place common field/message rendering and error-focus behavior with the selected common presentation owner; `components/forms` is the app-local candidate. Keep auth-specific confirmation/edit state and resend cooldown behavior with auth. Use a minimal presentation-state contract for common forms rather than importing AuthState.
-- [ ] Keep auth field-error association feature-owned and reuse the common message ID; update all affected imports.
-- [ ] Verify error announcements, first-invalid/empty-field focus, message fallback focus and profile-form focus remain intact.
+- [x] Extract AuthState/AuthFieldName and ProfileState to their mapped shared feature contracts without changing returned data. _(2026-10-17: evidence: `features/auth/shared/form-state.ts`, `features/account/shared/form-state.ts` with `form-state.test.ts`.)_
+- [x] Split display-profile mapping from metadata-write preservation; keep every existing test assertion under the corresponding owner. _(2026-10-17: evidence: `features/auth/shared/current-user.ts` and `features/account/server/profile-metadata.ts`, each with tests.)_
+- [x] Move pure name validation to account's shared module and update registration's narrow dependency. _(2026-10-17: evidence: `features/account/shared/name.ts` with `name.test.ts`; `signUp` imports it.)_
+- [x] Place common field/message rendering and error-focus behavior with the selected common presentation owner; `components/forms` is the app-local candidate. Keep auth-specific confirmation/edit state and resend cooldown behavior with auth. Use a minimal presentation-state contract for common forms rather than importing AuthState. _(2026-10-17: evidence: `components/forms/{form-feedback,form-message}`; auth confirmation and resend stay in `features/auth`.)_
+- [x] Keep auth field-error association feature-owned and reuse the common message ID; update all affected imports. _(2026-10-17: evidence: `features/auth/shared/form-feedback.ts` wraps the common helper.)_
+- [x] Verify error announcements, first-invalid/empty-field focus, message fallback focus and profile-form focus remain intact. _(2026-10-17: evidence: e2e `focus after a failed submit` and `server-side field errors`; `use-focus-first-error.dom.test.tsx`, `profile-form.dom.test.tsx`; CI `verify` on PR #41 (run 39027783915, commit 8ea886a) runs the full `pnpm verify` chain and passed.)_
 
 **Acceptance:** account UI no longer imports auth state/presentation; contracts expose no secrets; every helper assertion survives; focus targeting and dependencies remain correct.  
 **Verification:** moved helper suites via web tests, web type checks, existing browser field-error/focus cases. Add assertions only for a demonstrated gap at explicitly approved test destinations.  
@@ -73,10 +75,10 @@ ARF-00 is a documentation/investigation task requiring its own approved scope, n
 **Targets:** selected app-policy and identity-adapter destinations; parent's `lib/routing` and `lib/access` rows are the app-local example, not a requirement that reusable identity helpers remain app-local.  
 **Consumers:** auth actions/callback/error page/status/link controls; user layout/pages; Supabase middleware adapter. Leave `proxy.ts` stable when its delegation is unchanged.
 
-- [ ] Move destination/encoding, safe-next, flow/recovery path and route-classification helpers without algorithm or constant changes.
-- [ ] Move the owner guard and its existing tests; retain server verification and the current response for a stranger's ID.
-- [ ] Update every real consumer and preserve `confirm`, `reset`, `oauth` and unknown-flow fallback behavior.
-- [ ] Confirm route paths, protected/guest classification, callback URL shape and proxy behavior have not changed.
+- [x] Move destination/encoding, safe-next, flow/recovery path and route-classification helpers without algorithm or constant changes. _(2026-10-17: evidence: `lib/routing/*` with unit tests (`auth-flow`, `safe-next`, `route-access`, `user-paths`).)_
+- [x] Move the owner guard and its existing tests; retain server verification and the current response for a stranger's ID. _(2026-10-17: evidence: `lib/access/require-owner.ts` and its test (a stranger's id is a 404).)_
+- [x] Update every real consumer and preserve `confirm`, `reset`, `oauth` and unknown-flow fallback behavior. _(2026-10-17: evidence: `auth-flow.test.ts` covers `confirm`, `reset`, `oauth` and the unknown-flow fallback.)_
+- [ ] Confirm route paths, protected/guest classification, callback URL shape and proxy behavior have not changed. _(2026-10-17: open: original baseline unavailable (see the AHF-07 note); `route-access.test.ts` and `middleware.test.ts` cover today's behavior only.)_
 
 **Acceptance:** route policy is outside the Supabase adapter; flow reason helpers are accounted for; URL inputs remain untrusted and ownership checks remain effective.  
 **Verification:** moved path/flow/guard tests, web types, existing auth error-reason and access browser cases where covered.  
@@ -90,10 +92,10 @@ ARF-00 is a documentation/investigation task requiring its own approved scope, n
 **Targets:** selected account module/package and framework-adapter locations; the app-local examples are `features/account/components/profile-form.tsx` and `features/account/server/actions.ts`, with helpers established by ARF-02.  
 **Existing consumer:** `app/[userId]/settings/page.tsx`.
 
-- [ ] Move the profile form/action and update its route consumer.
-- [ ] Preserve caller verification, metadata preservation, token refresh and partial-success feedback.
-- [ ] Use common fields/messages/focus behavior without imports into auth presentation or action contracts.
-- [ ] Confirm no storage query, schema, profile source-of-record choice or route change was introduced.
+- [x] Move the profile form/action and update its route consumer. _(2026-10-17: evidence: `features/account/{components,server}`; settings page imports them.)_
+- [x] Preserve caller verification, metadata preservation, token refresh and partial-success feedback. _(2026-10-17: evidence: `features/account/server/actions.test.ts` (verification, metadata preservation, refresh, partial success).)_
+- [x] Use common fields/messages/focus behavior without imports into auth presentation or action contracts. _(2026-10-17: evidence: `src/architecture.test.ts`: account may use auth only through `shared`.)_
+- [ ] Confirm no storage query, schema, profile source-of-record choice or route change was introduced. _(2026-10-17: open: original baseline unavailable (see the AHF-07 note).)_
 
 **Acceptance:** the name-edit capability is independently locatable and its behavior unchanged.  
 **Verification:** web unit/type checks and existing metadata tests; manual name-edit/header-refresh check only in an authorized live environment. Report it not verified otherwise.  
@@ -106,11 +108,11 @@ ARF-00 is a documentation/investigation task requiring its own approved scope, n
 **Targets:** approved auth package/module and adapter map; parent auth feature rows are one candidate. If packages are selected, include their approved manifests/exports/build/test discovery and consumer updates in the exact scope. No operation extraction yet.  
 **Consumer scope:** parent's existing app route/layout list and moved feature files. Browser/server Supabase factories remain in place.
 
-- [ ] Move auth actions, server readers/origin helper, client provider/event filter and auth components to selected destinations, including approved package boundaries where chosen.
-- [ ] Keep client directives, action entry points, request caching, server/client separation and current render behavior intact.
-- [ ] Update route/layout imports and preserve callback/proxy framework adapters.
-- [ ] Search for superseded imports before removing old copies within the approved move budget.
-- [ ] Check signed-in/out presentation, confirmation/resend behavior and focus, pending states and cross-tab refresh behavior with appropriate evidence.
+- [x] Move auth actions, server readers/origin helper, client provider/event filter and auth components to selected destinations, including approved package boundaries where chosen. _(2026-10-17: evidence: `features/auth/{server,client,components,shared}`.)_
+- [ ] Keep client directives, action entry points, request caching, server/client separation and current render behavior intact. _(2026-10-17: open: enforced for import direction by `architecture.test.ts`; render behavior unchanged cannot be proven without the baseline.)_
+- [x] Update route/layout imports and preserve callback/proxy framework adapters. _(2026-10-17: evidence: the app builds and type-checks; CI `verify` on PR #41 (run 39027783915, commit 8ea886a) runs the full `pnpm verify` chain and passed.)_
+- [x] Search for superseded imports before removing old copies within the approved move budget. _(2026-10-17: evidence: `architecture.test.ts` and Knip (`pnpm deps`) pass; old paths no longer exist.)_
+- [ ] Check signed-in/out presentation, confirmation/resend behavior and focus, pending states and cross-tab refresh behavior with appropriate evidence. _(2026-10-17: open: unit and DOM tests cover the provider, confirmation and cooldown; cross-tab refresh and pending states have no browser or live evidence.)_
 
 **Acceptance:** route files no longer own reusable actions/contracts; auth is cohesive; no duplicate implementations or mixed server/client barrel exists.  
 **Verification:** scoped formatting, web tests/types, auth/home browser tests and import review. Browser mocks do not establish a live session or OAuth.  
@@ -121,10 +123,10 @@ ARF-00 is a documentation/investigation task requiring its own approved scope, n
 **Depends on:** ARF-05.  
 **Code scope:** no production changes; existing `apps/web/e2e/auth.e2e.ts` and `apps/web/e2e/home.e2e.ts` only if a demonstrated regression gap needs an approved assertion.
 
-- [ ] Compare the foundation diff against the exact manifest and preserved baseline.
-- [ ] Verify account-to-auth presentation/state dependencies and old source imports are gone.
-- [ ] Run focused web checks and available browser/manual invariants; retain evidence for any uncovered live-provider behavior.
-- [ ] Stop on a behavior regression; do not hide it by changing expected results or broadening scope.
+- [ ] Compare the foundation diff against the exact manifest and preserved baseline. _(2026-10-17: open: original baseline unavailable (see the AHF-07 note).)_
+- [x] Verify account-to-auth presentation/state dependencies and old source imports are gone. _(2026-10-17: evidence: `architecture.test.ts` finds no broken rule in the source tree.)_
+- [ ] Run focused web checks and available browser/manual invariants; retain evidence for any uncovered live-provider behavior. _(2026-10-17: open: unit and e2e checks pass in CI; live-provider behavior remains unverified.)_
+- [ ] Stop on a behavior regression; do not hide it by changing expected results or broadening scope. _(2026-10-17: open: process rule, not an acceptance item.)_
 
 **Acceptance:** foundation behavior is supported by the recorded evidence; missing coverage and baseline blockers are explicit. Operation tasks remain blocked until this checkpoint passes or the owner explicitly revises scope.  
 **Verification:** web unit/type/e2e checks and scoped source formatting. Final whole-repository verification is exclusively ARF-12 in the parent plan.  
