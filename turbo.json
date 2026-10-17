@@ -68,7 +68,7 @@
       "outputs": ["playwright-report/**", "test-results/**"]
     },
     "storybook#test:storybook": {
-      "cache": false,
+      "dependsOn": ["transit"],
       "outputs": []
     },
     "test:watch": {

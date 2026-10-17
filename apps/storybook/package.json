@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "check-types": "tsc --noEmit",
-    "lint": "eslint . --cache --max-warnings 0",
+    "lint": "eslint . --cache --cache-strategy content --max-warnings 0",
     "dev": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test:storybook": "vitest run",
