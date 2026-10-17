@@ -3,7 +3,12 @@
  * The actions tag each redirect URL with it, so a failure can be explained in
  * terms of what the person was actually doing.
  */
-export const AUTH_FLOWS = ['oauth', 'confirm', 'reset'] as const;
+export const AUTH_FLOWS = [
+  'oauth',
+  'confirm',
+  'reset',
+  'email-change',
+] as const;
 export type AuthFlow = (typeof AUTH_FLOWS)[number];
 
 /** Reads an untrusted query value; anything unknown is `null`. */
@@ -30,4 +35,16 @@ export function callbackUrl(
 /** Where to send someone when a flow fails, carrying the reason when known. */
 export function authErrorPath(flow: AuthFlow | null): string {
   return flow ? `/auth/error?reason=${flow}` : '/auth/error';
+}
+
+/** Where a brand-new account confirms its name and photo before moving on. */
+export const WELCOME_PATH = '/auth/welcome';
+
+/**
+ * The welcome step, then on to `next`. `next` must already be a validated
+ * same-origin path (see `safeNextPath`); it is encoded so it cannot add or
+ * change parameters of its own.
+ */
+export function welcomePath(next: string): string {
+  return `${WELCOME_PATH}?${new URLSearchParams({ next })}`;
 }

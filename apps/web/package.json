@@ -16,13 +16,11 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@base-ui/react": "^1.9.0",
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.117.3",
     "@synapcity/frontend-site": "workspace:*",
     "@synapcity/frontend-ui": "workspace:*",
     "@tailwindcss/postcss": "^4.3.3",
-    "cn": "^0.4.0",
     "lucide-react": "^1.55.0",
     "next": "16.4.0",
     "react": "19.3.0",

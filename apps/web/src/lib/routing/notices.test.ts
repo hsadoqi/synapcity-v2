@@ -57,3 +57,12 @@ describe('withNotice', () => {
     expect(withNotice('/abc/home', 'password-updated')).not.toMatch(/^\/\//);
   });
 });
+
+describe('the email notices', () => {
+  it('say the address was updated, and what to do after the first of two links', () => {
+    expect(isNoticeKey('email-updated')).toBe(true);
+    expect(NOTICES['email-updated']).toBe('Email address updated.');
+    expect(isNoticeKey('email-change-step')).toBe(true);
+    expect(NOTICES['email-change-step']).toMatch(/other address/i);
+  });
+});

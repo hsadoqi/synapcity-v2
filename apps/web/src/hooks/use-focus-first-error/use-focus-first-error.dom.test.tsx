@@ -1,7 +1,7 @@
 import { act, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { useFocusFirstError } from '@/hooks/use-focus-first-error';
+import { useFocusFirstError } from './use-focus-first-error';
 
 type State = { error?: string };
 
