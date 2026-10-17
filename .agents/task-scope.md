@@ -1,5 +1,13 @@
 # Task scope
 
+## Active task: auth review follow-ups AHF-06, callback route tests (2026-10-17)
+
+- Goal and mode: implement AHF-06 of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`; authorized by the owner's instruction to continue the plan.
+- Exact change: create `apps/web/src/app/auth/callback/route.test.ts`, which calls the real `GET` with `NextRequest` and replaces only the Supabase code exchange.
+- Mutation budgets: creates 1 test file plus this entry; source files, dependencies, config, schema and provider state 0. `route.ts` changes only if a test shows a defect, under a separate manifest.
+- Verification: `pnpm format:check`, `lint`, `typecheck`, `deps`, `test` and `build`. The mocked exchange does not prove a real PKCE link or OAuth session; the end-to-end suite and live auth are not run here.
+- Recovery: delete the test file; nothing else changes.
+
 ## Active task: bring refactor/auth-features into main (2026-10-17)
 
 - Goal and mode: implement the owner's request to merge `refactor/auth-features` with `main` (PR #28). `main` holds the older auth UI as one squashed commit, so the merge conflicted in 66 files, mostly old-layout copies of files the branch had already moved.
