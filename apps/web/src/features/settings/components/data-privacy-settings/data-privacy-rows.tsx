@@ -57,7 +57,7 @@ export const PrivacyConsentRow = ({
         checked={checked}
         // Read-only rather than disabled, so it can still be focused and its
         // description (which says why) is announced.
-        readOnly={blocked}
+        readOnly={false}
         onCheckedChange={(granted) => onChange(granted)}
       />
     </SettingRow>

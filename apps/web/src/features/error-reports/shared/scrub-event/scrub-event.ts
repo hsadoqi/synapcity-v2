@@ -58,7 +58,7 @@ export function scrubEvent(event: ErrorEvent): ErrorEvent {
       ...event.exception,
       values: event.exception.values.map((original) => {
         const value = original.value
-          ? original
+          ? { ...original, value: scrubText(original.value) }
           : original;
         if (!value.stacktrace?.frames) return value;
         return {
