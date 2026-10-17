@@ -221,7 +221,20 @@ export async function signInWithOAuth(formData: FormData): Promise<void> {
 
 export async function signOut(): Promise<void> {
   const supabase = await createClient();
-  await supabase.auth.signOut();
+  // Redirect either way: the person asked to leave and has no recovery step to
+  // take. Log only the operation and the code, never the error object, so a
+  // failure can be traced without a session, token or email reaching the logs.
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.warn('signOut failed', {
+        code: error.code,
+        status: error.status,
+      });
+    }
+  } catch {
+    console.warn('signOut failed', { thrown: true });
+  }
 
   revalidatePath('/', 'layout');
   redirect('/');
