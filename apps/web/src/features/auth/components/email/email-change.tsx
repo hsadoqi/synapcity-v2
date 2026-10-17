@@ -37,6 +37,16 @@ export function EmailChange({ email }: { email: string | null }) {
   const formRef = useFocusFirstError(state);
   const messageId = useId();
 
+  // The form's state cannot be reset, so remember which result was already
+  // there when the form was opened and show only what comes after it. Without
+  // this, cancelling and reopening would show the last attempt's error again.
+  const [baseline, setBaseline] = useState(state);
+  const shown = state === baseline ? initialState : state;
+  const openForm = () => {
+    setBaseline(state);
+    setEditing(true);
+  };
+
   // Once a request is accepted, close the form: the waiting state takes over.
   const [seen, setSeen] = useState(state);
   if (seen !== state) {
@@ -60,6 +70,15 @@ export function EmailChange({ email }: { email: string | null }) {
     };
   }, [pendingEmail, router]);
 
+  // A request that was accepted may have changed the address at once (a
+  // project that confirms without email), and this session still has the old
+  // one. Pull the new one in; harmless when a link was sent instead.
+  useEffect(() => {
+    if (!state.success) return;
+    const refresh = () => router.refresh();
+    void createClient().auth.refreshSession().then(refresh, refresh);
+  }, [state, router]);
+
   // When a waiting change stops waiting, pull the new address into this
   // session. A link opened in another browser changes the account but not this
   // browser's token, which would keep showing the old address for up to an hour.
@@ -82,16 +101,16 @@ export function EmailChange({ email }: { email: string | null }) {
       >
         <FormField
           id="email"
-          {...fieldErrorProps(state, 'email', messageId)}
+          {...fieldErrorProps(shown, 'email', messageId)}
           label="New email address"
           hint="We will send a link to confirm it. Your email does not change until you use it."
           type="email"
           autoComplete="email"
-          defaultValue={state.data?.user?.email}
+          defaultValue={shown.data?.user?.email}
           autoFocus
           required
         />
-        <FormMessage id={messageId} state={{ error: state.error }} />
+        <FormMessage id={messageId} state={{ error: shown.error }} />
         <div className="flex flex-wrap gap-2">
           <Button
             type="submit"
@@ -124,12 +143,7 @@ export function EmailChange({ email }: { email: string | null }) {
           </span>
         </div>
         {pendingEmail ? null : (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => setEditing(true)}
-          >
+          <Button type="button" variant="outline" size="sm" onClick={openForm}>
             Change email
           </Button>
         )}
@@ -162,7 +176,7 @@ export function EmailChange({ email }: { email: string | null }) {
             variant="ghost"
             size="sm"
             className="self-start"
-            onClick={() => setEditing(true)}
+            onClick={openForm}
           >
             Use a different address
           </Button>
