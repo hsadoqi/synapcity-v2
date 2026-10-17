@@ -1,21 +1,14 @@
 @import './typeset.css';
 
 .typeset-docs {
-  --typeset-font-body: var(--font-inter);
-  --typeset-font-heading: var(--font-geist);
-  --typeset-font-mono: var(--font-geist-mono);
+  --typeset-font-body: var(--font-body);
+  --typeset-font-heading: var(--font-heading);
+  --typeset-font-mono: var(--font-code);
   --typeset-size: 14px;
   --typeset-leading: 1.6;
   --typeset-flow: 1em;
 }
 
 :root {
-  --font-inter: 'Inter', system-ui;
-  --font-geist: 'Geist', 'Geist Sans', system-ui;
-  --font-geist-mono: 'Geist Mono', ui-monospace;
-  --font-preference-body: var(--font-inter, system-ui);
-  --font-preference-ui: var(--font-inter, system-ui);
-  --font-preference-heading: var(--font-geist, system-ui);
-  --font-preference-code: var(--font-geist-mono, ui-monospace);
   --text-base-size: 0.9375rem;
 }

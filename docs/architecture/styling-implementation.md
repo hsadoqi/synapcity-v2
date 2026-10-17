@@ -113,7 +113,7 @@ Found while writing this; none has been edited, because both are Canonical docum
 ## Observations for you to triage
 
 - **A suspect fallback.** `shared-styles.css` defines `--font-body: var(--font-preference-body, var(--font-inter, --font-sans, system-ui))` and the compiled CSS keeps it literally. `--font-sans` there is a bare word, not `var(--font-sans)`, so it is read as a font family name, not a variable. It has no effect while `--font-inter` is set by the layout, but it looks unintended. Not changed.
-- **`--font-preference-*` always exist.** `typography.css` defines them in `@theme`, so the fallback chain in `--font-body` normally stops at the preference variable. Nothing overrides them yet; the theme editor that would is not built (ADR-0003).
+- **`--font-preference-*` are unset by default.** Nothing defines them until the theme editor (ADR-0003) writes them, so each role falls through to the font the app loads.
 - **Duplicated `@source`.** Already recorded as unresolved in ADR-0002.
 
 ## Revisit triggers
