@@ -24,6 +24,20 @@ describe('ThemeSettings', () => {
     ).toBeTruthy();
   });
 
+  it('outlines the tab as its title, then the Fonts section, and nothing else', async () => {
+    await renderWithSettings(<ThemeSettings />);
+
+    expect(
+      screen.getAllByRole('heading').map((heading) => ({
+        level: Number(heading.tagName.slice(1)),
+        text: heading.textContent,
+      })),
+    ).toEqual([
+      { level: 2, text: 'Theme' },
+      { level: 3, text: 'Fonts' },
+    ]);
+  });
+
   it('saves a chosen mode and updates the disclaimer', async () => {
     await renderWithSettings(<ThemeSettings />);
 
@@ -46,7 +60,13 @@ describe('ThemeSettings', () => {
     for (const name of ['Heading font', 'Body font', 'Monospace font']) {
       expect(screen.getByRole('combobox', { name })).toBeTruthy();
     }
-    expect(screen.getAllByRole('figure')).toHaveLength(3);
+    for (const name of [
+      'Heading font preview',
+      'Body font preview',
+      'Code font preview',
+    ]) {
+      expect(screen.getByRole('figure', { name })).toBeTruthy();
+    }
   });
 
   it('saves a chosen font and fetches only that family', async () => {

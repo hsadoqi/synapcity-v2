@@ -14,7 +14,7 @@ export function ThemeSettings() {
   return (
     <SettingsTabShell
       title="Theme"
-      description="A familiar space, in the light that suits you."
+      description="Choose the light and the type you work best in."
     >
       <FieldGroup>
         <ThemeModeRow

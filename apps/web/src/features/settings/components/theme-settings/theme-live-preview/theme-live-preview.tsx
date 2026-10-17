@@ -11,18 +11,27 @@ export const ThemeLivePreview = ({
 }) => {
   // System mode inherits the root ModeProvider, including system changes.
   const resolvedMode = theme.mode === 'system' ? undefined : theme.mode;
+  // A figure, so the mockup is announced once, by its name, as an illustration.
+  // Its sample sidebar, heading and text are hidden from assistive tech: read
+  // aloud they would pass for real page content, and the heading would join the
+  // settings outline.
   return (
-    <div className={cn('flex flex-col gap-3', resolvedMode)}>
-      <div className="flex items-center justify-between">
-        <p className="text-xs font-medium text-muted-foreground">PREVIEW</p>
+    <figure
+      aria-label="Live workspace preview"
+      className={cn('flex flex-col gap-3', resolvedMode)}
+    >
+      <figcaption className="flex items-center justify-between">
+        <span className="text-xs font-medium uppercase text-muted-foreground">
+          Preview
+        </span>
         <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <span className="size-1.5 rounded-sm bg-primary" />
           Live preview
         </span>
-      </div>
+      </figcaption>
       <div
-        className="preview-window overflow-hidden rounded-lg border border-border bg-background"
-        aria-label="Live workspace preview"
+        aria-hidden
+        className="overflow-hidden rounded-lg border border-border bg-background"
       >
         <div className="flex h-9 items-center justify-between border-b border-border bg-muted/40 px-3">
           <div className="flex gap-1.5">
@@ -64,9 +73,9 @@ export const ThemeLivePreview = ({
               <ArrowUpRight className="size-3 text-muted-foreground" />
             </div>
             <div className="flex flex-col gap-2">
-              <h3 className="text-lg font-medium tracking-tight">
+              <p className="font-heading text-lg font-medium tracking-tight text-balance">
                 A little room to think.
-              </h3>
+              </p>
               <p className="max-w-sm text-xs leading-relaxed text-muted-foreground">
                 Collect your ideas. Connect the dots. Make something that
                 matters to you.
@@ -85,6 +94,6 @@ export const ThemeLivePreview = ({
           </div>
         </div>
       </div>
-    </div>
+    </figure>
   );
 };
