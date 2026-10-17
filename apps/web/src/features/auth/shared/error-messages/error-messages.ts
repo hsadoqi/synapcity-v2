@@ -84,3 +84,25 @@ export function authErrorFields(code: string | undefined): AuthFieldName[] {
       return [];
   }
 }
+
+/**
+ * The wording for changing an email, where the person is already signed in.
+ * An address that cannot be used is worded so it does not say whether another
+ * account has it; everything else is the ordinary wording.
+ */
+export function emailChangeErrorMessage(code: string | undefined): string {
+  if (code === 'email_exists' || code === 'user_already_exists') {
+    return 'That address cannot be used. Try a different one.';
+  }
+  return authErrorMessage(code);
+}
+
+/** The field to mark for an email-change error: the new address, for one it cannot use. */
+export function emailChangeErrorFields(
+  code: string | undefined,
+): AuthFieldName[] {
+  if (code === 'email_exists' || code === 'user_already_exists') {
+    return ['email'];
+  }
+  return authErrorFields(code);
+}

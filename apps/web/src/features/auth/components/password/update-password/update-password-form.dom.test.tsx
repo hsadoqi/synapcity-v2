@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MIN_PASSWORD_LENGTH, type AuthState } from '@/features/auth/types';
 
 const mocks = vi.hoisted(() => ({ updatePassword: vi.fn() }));
-vi.mock('@/features/auth/server/actions', () => ({
+vi.mock('@/features/auth/server/actions/actions', () => ({
   updatePassword: mocks.updatePassword,
 }));
 

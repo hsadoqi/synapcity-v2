@@ -1,0 +1,177 @@
+'use client';
+
+import { useActionState, useEffect, useId, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
+import { Button } from '@synapcity/frontend-ui/core/button';
+
+import { requestEmailChange } from '@/features/auth/server/actions/actions';
+import { usePendingEmail } from '@/features/auth/client';
+import type { AuthState } from '@/features/auth/types';
+import { FormField } from '@/components/forms/form-field';
+import { FormMessage } from '@/components/forms/form-message';
+import { fieldErrorProps } from '@/components/forms/form-feedback';
+import { useFocusFirstError } from '@/hooks/use-focus-first-error';
+import { createClient } from '@/lib/supabase/client';
+import { ResendEmailChange } from './resend-email-change';
+
+const initialState: AuthState = {};
+
+/** How often a waiting change is looked at again while the page stays open. */
+const LOOK_AGAIN_MS = 15_000;
+
+/**
+ * The email address, and changing it. Nothing changes when the form is sent:
+ * a confirmation link goes out, and the page shows the change as waiting until
+ * the link is used. What is waiting comes from the server (`usePendingEmail`),
+ * so it survives a reload and shows on every device.
+ */
+export function EmailChange({ email }: { email: string | null }) {
+  const pendingEmail = usePendingEmail();
+  const router = useRouter();
+  const [editing, setEditing] = useState(false);
+  const [state, formAction, sending] = useActionState(
+    requestEmailChange,
+    initialState,
+  );
+  const formRef = useFocusFirstError(state);
+  const messageId = useId();
+
+  // Once a request is accepted, close the form: the waiting state takes over.
+  const [seen, setSeen] = useState(state);
+  if (seen !== state) {
+    setSeen(state);
+    if (state.success) setEditing(false);
+  }
+
+  // While a change waits, look again now and then and whenever the tab comes
+  // back into view: the link is usually opened somewhere else.
+  useEffect(() => {
+    if (!pendingEmail) return;
+    const lookAgain = () => router.refresh();
+    const timer = setInterval(lookAgain, LOOK_AGAIN_MS);
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') lookAgain();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [pendingEmail, router]);
+
+  // When a waiting change stops waiting, pull the new address into this
+  // session. A link opened in another browser changes the account but not this
+  // browser's token, which would keep showing the old address for up to an hour.
+  const wasWaiting = useRef(pendingEmail);
+  useEffect(() => {
+    if (wasWaiting.current && !pendingEmail) {
+      const refresh = () => router.refresh();
+      void createClient().auth.refreshSession().then(refresh, refresh);
+    }
+    wasWaiting.current = pendingEmail;
+  }, [pendingEmail, router]);
+
+  if (editing) {
+    return (
+      <form
+        ref={formRef}
+        action={formAction}
+        noValidate
+        className="flex flex-col gap-4"
+      >
+        <FormField
+          id="email"
+          {...fieldErrorProps(state, 'email', messageId)}
+          label="New email address"
+          hint="We will send a link to confirm it. Your email does not change until you use it."
+          type="email"
+          autoComplete="email"
+          defaultValue={state.data?.user?.email}
+          autoFocus
+          required
+        />
+        <FormMessage id={messageId} state={{ error: state.error }} />
+        <div className="flex flex-wrap gap-2">
+          <Button
+            type="submit"
+            size="lg"
+            disabled={sending}
+            aria-busy={sending}
+          >
+            {sending ? 'Sending…' : 'Send confirmation link'}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="lg"
+            onClick={() => setEditing(false)}
+          >
+            Cancel
+          </Button>
+        </div>
+      </form>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <span className="text-xs text-muted-foreground">Email</span>
+          <span className="text-sm font-medium">
+            {email ?? 'No email on this account'}
+          </span>
+        </div>
+        {pendingEmail ? null : (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setEditing(true)}
+          >
+            Change email
+          </Button>
+        )}
+      </div>
+
+      {pendingEmail ? (
+        <>
+          <div role="status" className="flex items-start gap-3">
+            <Loader2
+              aria-hidden
+              className="mt-0.5 size-4 shrink-0 text-muted-foreground motion-safe:animate-spin"
+            />
+            <div className="flex flex-col gap-1">
+              <p className="text-sm font-medium">
+                Waiting for you to confirm {pendingEmail}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {email
+                  ? `Your email is still ${email}. `
+                  : 'Your email has not changed yet. '}
+                Open the link we sent to {pendingEmail}. If we also sent one to
+                your current address, confirm that one too. This page updates by
+                itself.
+              </p>
+            </div>
+          </div>
+          <ResendEmailChange justRequested={Boolean(state.success)} />
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="self-start"
+            onClick={() => setEditing(true)}
+          >
+            Use a different address
+          </Button>
+        </>
+      ) : state.success ? (
+        // The request was accepted but the server has not reported it waiting
+        // yet; say so rather than show nothing.
+        <FormMessage id={messageId} state={{ message: state.message }} />
+      ) : null}
+    </div>
+  );
+}

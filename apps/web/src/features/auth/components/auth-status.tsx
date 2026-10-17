@@ -2,7 +2,7 @@ import { AuthButtons } from '@synapcity/frontend-ui/components/auth-buttons';
 import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
 import { UserMenu } from '@synapcity/frontend-ui/components/user-menu';
 
-import { signOut } from '@/features/auth/server/actions';
+import { signOut } from '@/features/auth/server/actions/actions';
 import { accountLinksFor, homePathFor } from '@/lib/routing/user-paths';
 import { getCurrentUser } from '@/features/auth/server/session';
 

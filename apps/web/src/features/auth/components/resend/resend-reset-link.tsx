@@ -2,7 +2,7 @@
 
 import { useActionState, useId } from 'react';
 
-import { requestPasswordReset } from '@/features/auth/server/actions';
+import { requestPasswordReset } from '@/features/auth/server/actions/actions';
 import type { AuthState } from '@/features/auth/types';
 import { FormMessage } from '@/components/forms/form-message';
 import { ResendButton } from '../../shared/resend-button';

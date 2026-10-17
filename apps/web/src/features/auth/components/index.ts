@@ -6,3 +6,4 @@ export * from './resend';
 export * from './password';
 export * from './sign-out';
 export * from './auth-status';
+export * from './email';

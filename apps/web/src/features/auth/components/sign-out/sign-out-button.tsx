@@ -3,7 +3,7 @@
 import { useFormStatus } from 'react-dom';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
-import { signOut } from '@/features/auth/server/actions';
+import { signOut } from '@/features/auth/server/actions/actions';
 
 function SubmitButton() {
   const { pending } = useFormStatus();

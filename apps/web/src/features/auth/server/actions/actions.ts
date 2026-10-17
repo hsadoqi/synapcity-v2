@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 
 import { authErrorPath, callbackUrl } from '@/lib/routing/auth-flow';
 import {
+  ALREADY_YOUR_EMAIL,
   authFailure,
   authSuccess,
   emailRequestSchema,
@@ -18,15 +19,24 @@ import {
 import {
   authErrorFields,
   authErrorMessage,
+  emailChangeErrorFields,
+  emailChangeErrorMessage,
   isRateLimited,
 } from '@/features/auth/shared/error-messages';
 import { field } from '@/features/auth/server/form-data';
-import { homePathFor } from '@/lib/routing/user-paths';
+import { homePathFor, settingsPathFor } from '@/lib/routing/user-paths';
+import { withNotice } from '@/lib/routing/notices';
 import { getOrigin } from '@/features/auth/server/site-origin';
 import { safeNextPath } from '@/lib/routing/safe-next';
 import { createClient } from '@/lib/supabase/server';
 
-import { registerWithPassword, requestRecoveryEmail } from '../operations';
+import { getCurrentUser } from '../session';
+import {
+  changeEmail,
+  registerWithPassword,
+  requestRecoveryEmail,
+  resendEmailChange as resendEmailChangeOperation,
+} from '../operations';
 
 const OAUTH_PROVIDERS = ['google', 'github'] as const;
 type OAuthProvider = (typeof OAUTH_PROVIDERS)[number];
@@ -233,7 +243,8 @@ export async function updatePassword(
   }
 
   revalidatePath('/', 'layout');
-  redirect(homePathFor(data.user.id));
+  // The page they land on shows this once (see NoticeToast).
+  redirect(withNotice(homePathFor(data.user.id), 'password-updated'));
 }
 
 export async function signInWithOAuth(formData: FormData): Promise<void> {
@@ -275,4 +286,88 @@ export async function signOut(): Promise<void> {
 
   revalidatePath('/', 'layout');
   redirect('/');
+}
+
+const SIGNED_OUT = authErrorMessage('session_not_found');
+const TRY_AGAIN = authErrorMessage(undefined);
+
+/** Where the confirmation link brings someone back to: their settings. */
+async function emailChangeRedirect(): Promise<string | null> {
+  const user = await getCurrentUser();
+  if (!user) return null;
+  return callbackUrl(getOrigin(), settingsPathFor(user.id), 'email-change');
+}
+
+/**
+ * Asks to change the signed-in person's email. Nothing changes now: the
+ * provider sends a confirmation link and the address changes only when it is
+ * used. The waiting state is read back from the provider, not remembered here.
+ */
+export async function requestEmailChange(
+  _previous: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const typed = field(formData, 'email').trim();
+  const parsed = emailRequestSchema.safeParse({ email: typed });
+  if (!parsed.success) {
+    const { message, fields } = firstRefusal(parsed.error);
+    return authFailure(message, { email: typed }, fields);
+  }
+  const { email } = parsed.data;
+
+  const redirectTo = await emailChangeRedirect();
+  if (!redirectTo) return authFailure(SIGNED_OUT, { email });
+
+  const outcome = await changeEmail({ newEmail: email, redirectTo });
+  switch (outcome.kind) {
+    case 'signed-out':
+      return authFailure(SIGNED_OUT, { email });
+    case 'unavailable':
+      return authFailure(TRY_AGAIN, { email });
+    case 'same-email':
+      return authFailure(ALREADY_YOUR_EMAIL, { email }, ['email']);
+    case 'provider-error':
+      // The code only, never the message, which can hold the address.
+      console.warn('requestEmailChange failed', { code: outcome.code });
+      return authFailure(
+        emailChangeErrorMessage(outcome.code),
+        { email },
+        emailChangeErrorFields(outcome.code),
+      );
+    case 'requested':
+      revalidatePath('/', 'layout');
+      return authSuccess(
+        `We sent a confirmation link to ${email}. Your email stays the same until you use it. You may get one at your current address too; if so, confirm that one as well.`,
+        { email },
+      );
+  }
+}
+
+/** Sends the confirmation for a pending email change again. */
+export async function resendEmailChange(
+  _previous: AuthState,
+  _formData: FormData,
+): Promise<AuthState> {
+  const redirectTo = await emailChangeRedirect();
+  if (!redirectTo) return authFailure(SIGNED_OUT, { email: '' });
+
+  const outcome = await resendEmailChangeOperation({ redirectTo });
+  switch (outcome.kind) {
+    case 'signed-out':
+      return authFailure(SIGNED_OUT, { email: '' });
+    case 'unavailable':
+      return authFailure(TRY_AGAIN, { email: '' });
+    case 'nothing-pending':
+      revalidatePath('/', 'layout');
+      return authFailure('There is no email change waiting to be confirmed.', {
+        email: '',
+      });
+    case 'provider-error':
+      console.warn('resendEmailChange failed', { code: outcome.code });
+      return authFailure(authErrorMessage(outcome.code), { email: '' });
+    case 'sent':
+      return authSuccess('Requested again. It can take a minute to arrive.', {
+        email: outcome.email,
+      });
+  }
 }

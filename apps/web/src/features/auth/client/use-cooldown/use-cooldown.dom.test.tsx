@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { useCooldown } from '@/features/auth/client/use-cooldown';
+import { useCooldown } from '@/features/auth/client';
 import type { AuthState } from '@/features/auth/types';
 
 const idle: AuthState = {};

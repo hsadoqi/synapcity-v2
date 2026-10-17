@@ -4,11 +4,21 @@ const mocks = vi.hoisted(() => ({
   createClient: vi.fn(),
   signUp: vi.fn(),
   resetPasswordForEmail: vi.fn(),
+  getUser: vi.fn(),
+  updateUser: vi.fn(),
+  resend: vi.fn(),
 }));
 
 vi.mock('@/lib/supabase/server', () => ({ createClient: mocks.createClient }));
 
-import { registerWithPassword, requestRecoveryEmail } from './operations';
+import { AuthRetryableFetchError } from '@supabase/supabase-js';
+
+import {
+  changeEmail,
+  registerWithPassword,
+  requestRecoveryEmail,
+  resendEmailChange,
+} from './operations';
 
 const PASSWORD = 'sentinel-password-9f3a';
 const ACCESS_TOKEN = 'sentinel-access-token';
@@ -40,6 +50,9 @@ beforeEach(() => {
     auth: {
       signUp: mocks.signUp,
       resetPasswordForEmail: mocks.resetPasswordForEmail,
+      getUser: mocks.getUser,
+      updateUser: mocks.updateUser,
+      resend: mocks.resend,
     },
   }));
 });
@@ -208,5 +221,145 @@ describe('requestRecoveryEmail', () => {
     await requestRecoveryEmail(recovery);
 
     expect(mocks.createClient).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('changeEmail', () => {
+  const input = {
+    newEmail: 'grace@example.com',
+    redirectTo:
+      'https://app.test/auth/callback?next=%2Fu%2Fsettings&flow=email-change',
+  };
+  const user = (extra: Record<string, unknown> = {}) => ({
+    data: { user: { id: 'user-1', email: 'ada@example.com', ...extra } },
+    error: null,
+  });
+
+  it('asks for the change with the redirect, once, and reports only that it was requested', async () => {
+    mocks.getUser.mockResolvedValue(user());
+    mocks.updateUser.mockResolvedValue({ data: {}, error: null });
+
+    const outcome = await changeEmail(input);
+
+    expect(mocks.updateUser).toHaveBeenCalledExactlyOnceWith(
+      { email: 'grace@example.com' },
+      { emailRedirectTo: input.redirectTo },
+    );
+    expect(outcome).toEqual({ kind: 'requested' });
+  });
+
+  it("compares with the provider's current address, ignoring case", async () => {
+    mocks.getUser.mockResolvedValue(user());
+
+    expect(
+      await changeEmail({ ...input, newEmail: 'ADA@Example.com' }),
+    ).toEqual({
+      kind: 'same-email',
+    });
+    expect(mocks.updateUser).not.toHaveBeenCalled();
+  });
+
+  it('tells a missing session from an unreachable service', async () => {
+    mocks.getUser.mockResolvedValue({
+      data: { user: null },
+      error: { code: 'session_not_found' },
+    });
+    expect(await changeEmail(input)).toEqual({ kind: 'signed-out' });
+
+    mocks.getUser.mockResolvedValue({
+      data: { user: null },
+      error: new AuthRetryableFetchError('fetch failed', 0),
+    });
+    expect(await changeEmail(input)).toEqual({ kind: 'unavailable' });
+    expect(mocks.updateUser).not.toHaveBeenCalled();
+  });
+
+  it('reduces a provider error to its code, with no SDK object in the outcome', async () => {
+    mocks.getUser.mockResolvedValue(user());
+    mocks.updateUser.mockResolvedValue({
+      data: {},
+      error: { code: 'email_exists', message: 'sentinel-message', status: 422 },
+    });
+
+    const outcome = await changeEmail(input);
+
+    expect(outcome).toEqual({ kind: 'provider-error', code: 'email_exists' });
+    expect(JSON.stringify(outcome)).not.toContain('sentinel');
+  });
+});
+
+describe('resendEmailChange', () => {
+  const redirectTo = 'https://app.test/auth/callback?flow=email-change';
+
+  it('sends to the pending address the provider holds', async () => {
+    mocks.getUser.mockResolvedValue({
+      data: {
+        user: {
+          id: 'user-1',
+          email: 'ada@example.com',
+          new_email: 'grace@example.com',
+        },
+      },
+      error: null,
+    });
+    mocks.resend.mockResolvedValue({ data: {}, error: null });
+
+    const outcome = await resendEmailChange({ redirectTo });
+
+    expect(mocks.resend).toHaveBeenCalledExactlyOnceWith({
+      type: 'email_change',
+      email: 'grace@example.com',
+      options: { emailRedirectTo: redirectTo },
+    });
+    expect(outcome).toEqual({ kind: 'sent', email: 'grace@example.com' });
+  });
+
+  it('has nothing to send when no change is pending', async () => {
+    mocks.getUser.mockResolvedValue({
+      data: { user: { id: 'user-1', email: 'ada@example.com' } },
+      error: null,
+    });
+
+    expect(await resendEmailChange({ redirectTo })).toEqual({
+      kind: 'nothing-pending',
+    });
+    expect(mocks.resend).not.toHaveBeenCalled();
+  });
+
+  it('tells a missing session from an unreachable service', async () => {
+    mocks.getUser.mockResolvedValue({
+      data: { user: null },
+      error: { code: 'session_not_found' },
+    });
+    expect(await resendEmailChange({ redirectTo })).toEqual({
+      kind: 'signed-out',
+    });
+
+    mocks.getUser.mockResolvedValue({
+      data: { user: null },
+      error: new AuthRetryableFetchError('fetch failed', 0),
+    });
+    expect(await resendEmailChange({ redirectTo })).toEqual({
+      kind: 'unavailable',
+    });
+  });
+
+  it('reduces a provider error to its code', async () => {
+    mocks.getUser.mockResolvedValue({
+      data: { user: { id: 'u', new_email: 'grace@example.com' } },
+      error: null,
+    });
+    mocks.resend.mockResolvedValue({
+      data: {},
+      error: { code: 'over_email_send_rate_limit', message: 'sentinel' },
+    });
+
+    const outcome = await resendEmailChange({ redirectTo });
+
+    expect(outcome).toEqual({
+      kind: 'provider-error',
+      code: 'over_email_send_rate_limit',
+    });
+    expect(JSON.stringify(outcome)).not.toContain('sentinel');
   });
 });

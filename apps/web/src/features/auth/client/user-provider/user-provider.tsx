@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { shouldRefreshOnAuthEvent } from '@/features/auth/client/auth-events';
+import { shouldRefreshOnAuthEvent } from '@/features/auth/client';
 import type { CurrentUser } from '@/features/auth/shared/current-user';
 import { createClient } from '@/lib/supabase/client';
 

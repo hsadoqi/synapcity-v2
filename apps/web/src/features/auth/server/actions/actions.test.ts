@@ -1,3 +1,4 @@
+import { AuthRetryableFetchError } from '@supabase/supabase-js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
@@ -9,6 +10,8 @@ const mocks = vi.hoisted(() => ({
   updateUser: vi.fn(),
   signInWithOAuth: vi.fn(),
   signOut: vi.fn(),
+  getClaims: vi.fn(),
+  getUser: vi.fn(),
 }));
 
 /** Stands in for Next's `redirect`, which never returns. */
@@ -37,19 +40,23 @@ vi.mock('@/lib/supabase/server', () => ({
       updateUser: mocks.updateUser,
       signInWithOAuth: mocks.signInWithOAuth,
       signOut: mocks.signOut,
+      getClaims: mocks.getClaims,
+      getUser: mocks.getUser,
     },
   }),
 }));
 
 import {
+  requestEmailChange,
   requestPasswordReset,
   resendConfirmation,
+  resendEmailChange,
   signInWithOAuth,
   signInWithPassword,
   signOut,
   signUp,
   updatePassword,
-} from '.';
+} from './actions';
 
 function form(values: Record<string, string>): FormData {
   const data = new FormData();
@@ -293,7 +300,7 @@ describe('updatePassword', () => {
     expect(mocks.updateUser).not.toHaveBeenCalled();
   });
 
-  it('goes to the user home after changing it', async () => {
+  it('goes to the user home after changing it, carrying the notice', async () => {
     mocks.updateUser.mockResolvedValue({
       data: { user: { id: USER_ID } },
       error: null,
@@ -306,7 +313,7 @@ describe('updatePassword', () => {
       ),
     );
 
-    expect(url).toBe(`/${USER_ID}/home`);
+    expect(url).toBe(`/${USER_ID}/home?notice=password-updated`);
   });
 });
 
@@ -485,5 +492,251 @@ describe('invalid submissions never reach the provider', () => {
     expect(state.fields).toEqual(['email']);
     expect(mocks.resend).not.toHaveBeenCalled();
     expect(mocks.resetPasswordForEmail).not.toHaveBeenCalled();
+  });
+});
+
+describe('changing the email', () => {
+  const CURRENT = 'ada@example.com';
+  const NEW = 'grace@example.com';
+  const REDIRECT =
+    'https://app.test/auth/callback?next=%2Fuser-1%2Fsettings&flow=email-change';
+  const SIGNED_OUT =
+    'For your security, sign out, sign in again, then try once more.';
+
+  /** Who is signed in: the token's claims and the provider's record agree. */
+  function signedIn(user: { email?: string; new_email?: string } = {}) {
+    mocks.getClaims.mockResolvedValue({
+      data: { claims: { sub: USER_ID, email: CURRENT } },
+      error: null,
+    });
+    mocks.getUser.mockResolvedValue({
+      data: { user: { id: USER_ID, email: CURRENT, ...user } },
+      error: null,
+    });
+  }
+  function signedOut() {
+    mocks.getClaims.mockResolvedValue({ data: null, error: null });
+    mocks.getUser.mockResolvedValue({
+      data: { user: null },
+      error: { code: 'session_not_found' },
+    });
+  }
+
+  beforeEach(() => {
+    signedIn();
+    mocks.updateUser.mockResolvedValue({ data: {}, error: null });
+    mocks.resend.mockResolvedValue({ data: {}, error: null });
+  });
+
+  describe('requestEmailChange', () => {
+    it('asks for an address before calling the provider', async () => {
+      const state = await requestEmailChange({}, form({ email: '   ' }));
+
+      expect(state).toMatchObject({
+        error: 'Enter your email.',
+        fields: ['email'],
+      });
+      expect(mocks.updateUser).not.toHaveBeenCalled();
+    });
+
+    it('needs a session', async () => {
+      signedOut();
+
+      const state = await requestEmailChange({}, form({ email: NEW }));
+
+      expect(state.error).toBe(SIGNED_OUT);
+      expect(state.success).toBeUndefined();
+      expect(mocks.updateUser).not.toHaveBeenCalled();
+    });
+
+    it('does not mistake an outage for a signed-out session', async () => {
+      mocks.getUser.mockResolvedValue({
+        data: { user: null },
+        error: new AuthRetryableFetchError('fetch failed', 0),
+      });
+
+      const state = await requestEmailChange({}, form({ email: NEW }));
+
+      expect(state.error).toBe('Something went wrong. Try again.');
+      expect(state.error).not.toBe(SIGNED_OUT);
+    });
+
+    it.each([CURRENT, CURRENT.toUpperCase(), `  ${CURRENT} `])(
+      'refuses the address they already have (%s)',
+      async (typed) => {
+        const state = await requestEmailChange({}, form({ email: typed }));
+
+        expect(state.error).toBe('That is already your email address.');
+        expect(state.fields).toEqual(['email']);
+        expect(mocks.updateUser).not.toHaveBeenCalledWith(
+          expect.objectContaining({ email: expect.anything() }),
+          expect.anything(),
+        );
+      },
+    );
+
+    it('asks the provider for a confirmation, returning to their settings, and changes nothing now', async () => {
+      const state = await requestEmailChange({}, form({ email: ` ${NEW} ` }));
+
+      expect(mocks.updateUser).toHaveBeenCalledExactlyOnceWith(
+        { email: NEW },
+        { emailRedirectTo: REDIRECT },
+      );
+      expect(mocks.revalidatePath).toHaveBeenCalledWith('/', 'layout');
+      expect(state.success).toBe(true);
+      expect(state.message).toContain(NEW);
+      expect(state.message).toContain('stays the same until you use it');
+      expect(state.error).toBeUndefined();
+    });
+
+    it('words the success so it is true whether or not the current address must confirm too', async () => {
+      const state = await requestEmailChange({}, form({ email: NEW }));
+
+      expect(state.message).toMatch(/may get one at your current address/i);
+      expect(state.message).not.toMatch(/both|must/i);
+    });
+
+    it('says an address cannot be used without saying why', async () => {
+      mocks.updateUser.mockResolvedValue({
+        data: {},
+        error: {
+          code: 'email_exists',
+          message: 'A user with this email already exists',
+        },
+      });
+
+      const state = await requestEmailChange({}, form({ email: NEW }));
+
+      expect(state.error).toBe(
+        'That address cannot be used. Try a different one.',
+      );
+      expect(state.fields).toEqual(['email']);
+      expect(state.error).not.toMatch(/already|exists|account|registered/i);
+      expect(state.data?.user?.email).toBe(NEW);
+    });
+
+    it('shows a rate limit as the request-wide problem it is', async () => {
+      mocks.updateUser.mockResolvedValue({
+        data: {},
+        error: { code: 'over_email_send_rate_limit' },
+      });
+
+      const state = await requestEmailChange({}, form({ email: NEW }));
+
+      expect(state.error).toBe(
+        'Too many attempts. Wait a few minutes and try again.',
+      );
+      expect(state.fields).toEqual([]);
+    });
+
+    it('logs a failure by code only, never the message or the address', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      mocks.updateUser.mockResolvedValue({
+        data: {},
+        error: {
+          code: 'unexpected_failure',
+          message: `could not email ${NEW}`,
+        },
+      });
+
+      const state = await requestEmailChange({}, form({ email: NEW }));
+
+      expect(state.error).toBe('Something went wrong. Try again.');
+      expect(warn).toHaveBeenCalledWith('requestEmailChange failed', {
+        code: 'unexpected_failure',
+      });
+      expect(JSON.stringify(warn.mock.calls)).not.toContain(NEW);
+      warn.mockRestore();
+    });
+
+    it('echoes the typed address on a refusal so it can be corrected', async () => {
+      mocks.updateUser.mockResolvedValue({
+        data: {},
+        error: { code: 'email_address_invalid' },
+      });
+
+      const state = await requestEmailChange(
+        {},
+        form({ email: 'nope@test.example' }),
+      );
+
+      expect(state.data?.user?.email).toBe('nope@test.example');
+      expect(state.fields).toEqual(['email']);
+    });
+  });
+
+  describe('resendEmailChange', () => {
+    it('sends again to the address the provider holds as pending, never one from the form', async () => {
+      signedIn({ new_email: NEW });
+
+      const state = await resendEmailChange(
+        {},
+        form({ email: 'attacker@evil.test' }),
+      );
+
+      expect(mocks.resend).toHaveBeenCalledExactlyOnceWith({
+        type: 'email_change',
+        email: NEW,
+        options: { emailRedirectTo: REDIRECT },
+      });
+      expect(JSON.stringify(mocks.resend.mock.calls)).not.toContain('attacker');
+      expect(state.success).toBe(true);
+      expect(state.message).toBe(
+        'Requested again. It can take a minute to arrive.',
+      );
+    });
+
+    it('has nothing to send when no change is waiting', async () => {
+      signedIn();
+
+      const state = await resendEmailChange({}, form({}));
+
+      expect(state.error).toBe(
+        'There is no email change waiting to be confirmed.',
+      );
+      expect(mocks.resend).not.toHaveBeenCalled();
+      expect(mocks.revalidatePath).toHaveBeenCalledWith('/', 'layout');
+    });
+
+    it('needs a session', async () => {
+      signedOut();
+
+      const state = await resendEmailChange({}, form({}));
+
+      expect(state.error).toBe(SIGNED_OUT);
+      expect(mocks.resend).not.toHaveBeenCalled();
+    });
+
+    it('shows a rate limit', async () => {
+      signedIn({ new_email: NEW });
+      mocks.resend.mockResolvedValue({
+        data: {},
+        error: { code: 'over_email_send_rate_limit' },
+      });
+
+      const state = await resendEmailChange({}, form({}));
+
+      expect(state.error).toBe(
+        'Too many attempts. Wait a few minutes and try again.',
+      );
+    });
+
+    it('logs any other failure by code only', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      signedIn({ new_email: NEW });
+      mocks.resend.mockResolvedValue({
+        data: {},
+        error: { code: 'unexpected_failure', message: `failed for ${NEW}` },
+      });
+
+      const state = await resendEmailChange({}, form({}));
+
+      expect(state.error).toBe('Something went wrong. Try again.');
+      expect(warn).toHaveBeenCalledWith('resendEmailChange failed', {
+        code: 'unexpected_failure',
+      });
+      expect(JSON.stringify(warn.mock.calls)).not.toContain(NEW);
+      warn.mockRestore();
+    });
   });
 });

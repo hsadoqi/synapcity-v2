@@ -12,6 +12,9 @@ const ENTER_EMAIL = 'Enter your email.';
 const ENTER_EMAIL_AND_PASSWORD = 'Enter your email and password.';
 const PASSWORDS_DO_NOT_MATCH = 'The passwords do not match.';
 
+/** The reply when someone "changes" their email to the one they have. */
+export const ALREADY_YOUR_EMAIL = 'That is already your email address.';
+
 /**
  * Presence only. Whether an address is well formed is the provider's call: it
  * answers `validation_failed`, which `authErrorMessage` words, and a stricter

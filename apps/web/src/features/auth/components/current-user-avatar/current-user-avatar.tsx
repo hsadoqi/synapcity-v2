@@ -1,7 +1,7 @@
 'use client';
 
 import { ProfileAvatar } from '@/features/account/shared/profile-avatar';
-import { useCurrentUser } from '@/features/auth/client/user-provider';
+import { useCurrentUser } from '@/features/auth/client';
 
 export function CurrentUserAvatar() {
   const user = useCurrentUser();

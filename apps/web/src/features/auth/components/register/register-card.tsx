@@ -2,7 +2,7 @@
 
 import { useActionState } from 'react';
 
-import { signUp } from '@/features/auth/server/actions';
+import { signUp } from '@/features/auth/server/actions/actions';
 import type { AuthState } from '@/features/auth/types';
 import { AuthLinkButton } from '../../shared/auth-link-button';
 import { OAuthButtons } from '../oauth-buttons';

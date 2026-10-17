@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/features/auth/server/actions', () => ({
+vi.mock('@/features/auth/server/actions/actions', () => ({
   signInWithOAuth: vi.fn(),
 }));
 

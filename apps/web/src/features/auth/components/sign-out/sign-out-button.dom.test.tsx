@@ -2,9 +2,11 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({ signOut: vi.fn() }));
-vi.mock('@/features/auth/server/actions', () => ({ signOut: mocks.signOut }));
+vi.mock('@/features/auth/server/actions/actions', () => ({
+  signOut: mocks.signOut,
+}));
 
-import { SignOutButton } from '../sign-out-button';
+import { SignOutButton } from './sign-out-button';
 
 describe('SignOutButton', () => {
   beforeEach(() => {

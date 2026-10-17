@@ -23,3 +23,14 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   const claims = await getVerifiedClaims();
   return claims ? currentUserFromClaims(claims) : null;
 });
+
+/**
+ * The address a pending email change is waiting on, or null. The token's
+ * claims do not carry it, so this asks the provider (a network call): use it
+ * only where it is shown, not on every page.
+ */
+export const getPendingEmail = cache(async (): Promise<string | null> => {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getUser();
+  return data.user?.new_email ?? null;
+});

@@ -4,6 +4,8 @@ import { MIN_PASSWORD_LENGTH, PASSWORD_TOO_SHORT_MESSAGE } from '../../types';
 import {
   authErrorFields,
   authErrorMessage,
+  emailChangeErrorFields,
+  emailChangeErrorMessage,
   isRateLimited,
 } from './error-messages';
 
@@ -164,5 +166,32 @@ describe('authErrorFields', () => {
     undefined,
   ])('marks nothing for %s', (code) => {
     expect(authErrorFields(code)).toEqual([]);
+  });
+});
+
+describe('changing an email', () => {
+  it.each(['email_exists', 'user_already_exists'])(
+    'says %s cannot be used, without saying another account has it',
+    (code) => {
+      const message = emailChangeErrorMessage(code);
+
+      expect(message).toBe('That address cannot be used. Try a different one.');
+      expect(message).not.toMatch(
+        /already|exists|account|registered|taken|in use/i,
+      );
+      expect(emailChangeErrorFields(code)).toEqual(['email']);
+    },
+  );
+
+  it.each([
+    'over_email_send_rate_limit',
+    'email_address_invalid',
+    'validation_failed',
+    'session_expired',
+    'something_unknown',
+    undefined,
+  ])('uses the ordinary wording and fields for %j', (code) => {
+    expect(emailChangeErrorMessage(code)).toBe(authErrorMessage(code));
+    expect(emailChangeErrorFields(code)).toEqual(authErrorFields(code));
   });
 });

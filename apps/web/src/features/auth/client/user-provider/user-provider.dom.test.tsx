@@ -1,10 +1,7 @@
 import { act, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import {
-  UserProvider,
-  useCurrentUser,
-} from '@/features/auth/client/user-provider';
+import { UserProvider, useCurrentUser } from '@/features/auth/client';
 import type { CurrentUser } from '@/features/auth/shared/current-user';
 
 const mocks = vi.hoisted(() => ({

@@ -1,3 +1,5 @@
+import { isAuthRetryableFetchError } from '@supabase/supabase-js';
+
 import { isRateLimited } from '@/features/auth/shared/error-messages';
 import { createClient } from '@/lib/supabase/server';
 
@@ -81,4 +83,84 @@ export async function requestRecoveryEmail(
     return { kind: 'rate-limited', code: error.code };
   }
   return { kind: 'accepted' };
+}
+
+export type EmailChangeInput = {
+  newEmail: string;
+  /** Where the confirmation link returns to. Built by the action from configured origin. */
+  redirectTo: string;
+};
+
+export type EmailChangeOutcome =
+  /** A confirmation link is on its way; the address changes only once it is used. */
+  | { kind: 'requested' }
+  /** Nothing to do: it is already the address on the account. */
+  | { kind: 'same-email' }
+  /** There is no session, so there is no account to change. */
+  | { kind: 'signed-out' }
+  /** The auth service could not be reached; trying again may work. */
+  | { kind: 'unavailable' }
+  | { kind: 'provider-error'; code: string | undefined };
+
+/**
+ * Asks to change the signed-in person's email. The provider changes nothing
+ * until a link is confirmed, and depending on the project's "Secure email
+ * change" setting that is the new address alone or both addresses. The current
+ * address is read fresh from the provider: the token's copy can be an hour old.
+ */
+export async function changeEmail(
+  input: EmailChangeInput,
+): Promise<EmailChangeOutcome> {
+  const supabase = await createClient();
+  const { data, error: userError } = await supabase.auth.getUser();
+  if (userError || !data.user) {
+    return isAuthRetryableFetchError(userError)
+      ? { kind: 'unavailable' }
+      : { kind: 'signed-out' };
+  }
+  if (data.user.email?.toLowerCase() === input.newEmail.toLowerCase()) {
+    return { kind: 'same-email' };
+  }
+
+  const { error } = await supabase.auth.updateUser(
+    { email: input.newEmail },
+    { emailRedirectTo: input.redirectTo },
+  );
+  if (error) return { kind: 'provider-error', code: error.code };
+  return { kind: 'requested' };
+}
+
+export type ResendEmailChangeOutcome =
+  | { kind: 'sent'; email: string }
+  /** There is no change waiting, so there is nothing to send again. */
+  | { kind: 'nothing-pending' }
+  | { kind: 'signed-out' }
+  | { kind: 'unavailable' }
+  | { kind: 'provider-error'; code: string | undefined };
+
+/**
+ * Sends the confirmation for a pending email change again. The address comes
+ * from the provider's record of the pending change, never from the caller, so
+ * this cannot be pointed at an address the person has not asked to change to.
+ */
+export async function resendEmailChange(input: {
+  redirectTo: string;
+}): Promise<ResendEmailChangeOutcome> {
+  const supabase = await createClient();
+  const { data, error: userError } = await supabase.auth.getUser();
+  if (userError || !data.user) {
+    return isAuthRetryableFetchError(userError)
+      ? { kind: 'unavailable' }
+      : { kind: 'signed-out' };
+  }
+  const pending = data.user.new_email;
+  if (!pending) return { kind: 'nothing-pending' };
+
+  const { error } = await supabase.auth.resend({
+    type: 'email_change',
+    email: pending,
+    options: { emailRedirectTo: input.redirectTo },
+  });
+  if (error) return { kind: 'provider-error', code: error.code };
+  return { kind: 'sent', email: pending };
 }

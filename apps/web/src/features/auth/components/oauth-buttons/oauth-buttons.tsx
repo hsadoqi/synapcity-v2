@@ -1,6 +1,6 @@
 import { Button } from '@synapcity/frontend-ui/core/button';
 
-import { signInWithOAuth } from '@/features/auth/server/actions';
+import { signInWithOAuth } from '@/features/auth/server/actions/actions';
 
 export function OAuthButtons({ next }: { next: string }) {
   return (

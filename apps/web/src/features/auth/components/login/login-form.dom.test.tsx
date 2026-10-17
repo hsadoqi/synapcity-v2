@@ -8,7 +8,7 @@ const mocks = vi.hoisted(() => ({
   resendConfirmation: vi.fn(),
 }));
 
-vi.mock('@/features/auth/server/actions', () => ({
+vi.mock('@/features/auth/server/actions/actions', () => ({
   signInWithPassword: mocks.signInWithPassword,
   resendConfirmation: mocks.resendConfirmation,
 }));
