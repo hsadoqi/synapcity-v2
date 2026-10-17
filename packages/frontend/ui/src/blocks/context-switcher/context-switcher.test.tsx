@@ -44,11 +44,7 @@ describe('ContextSwitcher', () => {
     expect(second!.querySelector('svg')).toBeNull();
   });
 
-  // Known gap, not fixed here: the items use `onSelect`, a DOM text-selection
-  // event, so Base UI's menu never calls it. `onClick` is the Base UI handler.
-  // `it.fails` turns green-to-red the day this is fixed, which is the cue to
-  // make it a plain `it`.
-  it.fails('switches version when one is chosen', async () => {
+  it('switches version when one is chosen', async () => {
     renderSwitcher();
     fireEvent.click(screen.getByRole('button'));
     fireEvent.click(

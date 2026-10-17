@@ -20,6 +20,14 @@ describe('Separator', () => {
     expect(separator.getAttribute('data-orientation')).toBe('vertical');
   });
 
+  it('styles on the data-orientation attribute Base UI sets', () => {
+    render(<Separator orientation="vertical" />);
+    const { className } = screen.getByRole('separator');
+
+    expect(className).toContain('data-[orientation=vertical]:w-px');
+    expect(className).not.toContain('data-vertical:');
+  });
+
   it('merges a caller className', () => {
     render(<Separator className="my-4" />);
 
