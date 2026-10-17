@@ -10,7 +10,7 @@ This file owns tasks ARF-00 through ARF-06 and their execution checkboxes. The p
 
 ## Preconditions
 
-ARF-00 is a documentation/investigation task requiring its own approved scope, not prior selection of an app-local design. Before ARF-01 and subsequent source work, the owner must select a concrete topology under ADR-0007, approve any required category/runtime amendments and approve the exact mutation manifest/budgets and recovery baseline. The live working tree contains concurrent uncommitted auth work. Refresh it before execution, including callback flow reasons, the error-focus hook and the current resend-confirmation control/action. Preserve all current behavior; do not use the earlier auth-UI plan as execution authority.
+ARF-00 is a documentation/investigation task requiring its own approved scope, not prior selection of an app-local design. The owner selected app-local modules under ADR-0007 on 2026-10-17; no category/runtime amendment is needed. Before ARF-02 and subsequent source work, the owner approves ARF-01's exact mutation manifest/budgets and recovery baseline. The live working tree contains concurrent uncommitted auth work. Refresh it before execution, including callback flow reasons, the error-focus hook and the current resend-confirmation control/action. Preserve all current behavior; do not use the earlier auth-UI plan as execution authority.
 
 ## Tasks
 
@@ -20,13 +20,13 @@ ARF-00 is a documentation/investigation task requiring its own approved scope, n
 **Code scope:** read-only live auth/account/adapter/route consumers, package manifests/exports and canonical workspace conventions/checklist.  
 **Document outputs:** a reviewed candidate comparison and recommendation in ADR-0007; align the spec and parent/child inventories within an approved documentation scope. No package or source file is created by this task.
 
-- [ ] Classify current code by auth, account, form presentation, provider/platform effects and app composition; map actual imports and client/server execution needs.
-- [ ] Compare app-local modules, one auth package with narrow entry points, feature/service packages and account separation. Consider cohesion, independent tests, enforced imports, request context, exported API, coupling and maintenance cost. Do not require a second consumer.
-- [ ] For each candidate, show who owns Server Actions, session access, provider clients, browser events, forms and app-specific routing. Distinguish framework-specific packages from framework-independent contracts.
-- [ ] Identify exact names/categories, dependencies/exports, request-adapter contracts and canonical amendments the recommended package layout would need. Existing conventions are review constraints, not a reason to exclude it.
-- [ ] Give a concrete recommendation with tradeoffs and first-party/installed-version evidence for any version-sensitive technique; leave provider/session and profile-storage decisions unchanged.
-- [ ] Obtain owner selection of the layout and separately scoped approval of required governance changes.
-- [ ] Replace the app-local candidate map and task scopes with selected destinations, manifests/lockfile/configuration budgets and recovery requirements before ARF-01 executes. If app-local is selected, record why; do not treat it as the default imposed by ADR-0006.
+- [x] Classify current code by auth, account, form presentation, provider/platform effects and app composition; map actual imports and client/server execution needs.
+- [x] Compare app-local modules, one auth package with narrow entry points, feature/service packages and account separation. Consider cohesion, independent tests, enforced imports, request context, exported API, coupling and maintenance cost. Do not require a second consumer.
+- [x] For each candidate, show who owns Server Actions, session access, provider clients, browser events, forms and app-specific routing. Distinguish framework-specific packages from framework-independent contracts.
+- [x] Identify exact names/categories, dependencies/exports, request-adapter contracts and canonical amendments the recommended package layout would need. Existing conventions are review constraints, not a reason to exclude it.
+- [x] Give a concrete recommendation with tradeoffs and first-party/installed-version evidence for any version-sensitive technique; leave provider/session and profile-storage decisions unchanged.
+- [x] Obtain owner selection of the layout and separately scoped approval of required governance changes.
+- [x] Replace the app-local candidate map and task scopes with selected destinations, manifests/lockfile/configuration budgets and recovery requirements before ARF-01 executes. If app-local is selected, record why; do not treat it as the default imposed by ADR-0006. Selected 2026-10-17: app-local, recorded in ADR-0007; the parent map is confirmed with `resend-button.tsx` added. Budgets move to the ARF-01 manifest.
 
 **Acceptance:** the owner can review a concrete layout, its contracts and costs against alternatives; the approved destination/configuration map matches that selection. No source migration or package creation occurs in this evaluation task.  
 **Verification:** read back candidate evidence, local links, names/exports/dependency direction and source inventory; check versions/docs where proposed techniques depend on them. No runtime result is inferred from a paper comparison.  

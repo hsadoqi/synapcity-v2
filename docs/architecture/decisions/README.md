@@ -29,7 +29,7 @@ ADRs are numbered sequentially (`0001-*.md`, `0002-*.md`, ...) and never renumbe
 | [0004](0004-class-merging-with-cn.md)                 | Class merging with the `cn` package                          | Accepted |
 | [0005](0005-testing-foundation.md)                    | Testing foundation (Vitest and Playwright config packages)   | Proposed |
 | [0006](0006-authentication-with-supabase.md)          | Authentication with Supabase Auth                            | Accepted |
-| [0007](0007-app-local-auth-and-account-ownership.md)  | Auth responsibility boundaries and package layout evaluation | Proposed |
+| [0007](0007-app-local-auth-and-account-ownership.md)  | Auth responsibility boundaries and package layout evaluation | Accepted |
 | [0008](0008-auth-actions-and-server-operations.md)    | Auth actions and server operations                           | Proposed |
 | [0009](0009-caller-owned-auth-navigation.md)          | Caller-owned auth navigation                                 | Proposed |
 

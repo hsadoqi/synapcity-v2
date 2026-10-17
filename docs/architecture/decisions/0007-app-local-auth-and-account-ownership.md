@@ -1,8 +1,8 @@
 # ADR-0007: Auth responsibility boundaries and package layout evaluation
 
-**Status:** Proposed  
-**Date:** 2026-10-13  
-**Deciders:** Hanaa Sadoqi (repository owner); topology selection and acceptance pending.
+**Status:** Accepted (2026-10-17)  
+**Date:** 2026-10-13; layout selected 2026-10-17  
+**Deciders:** Hanaa Sadoqi (repository owner).
 
 ## Context
 
@@ -36,7 +36,7 @@ A second app or multiple consumers is not a prerequisite. `apps/web` is already 
 
 ## ARF-00 evaluation (2026-10-17)
 
-**Status of this section:** a recommendation for the owner to accept or decline. It selects nothing. The ADR stays Proposed and the parent plan's migration map is unchanged until the owner chooses a candidate.
+**Selection:** on 2026-10-17 the owner selected **A, app-local modules, with account as a sibling module** (D as a module), the recommendation below. The rest of this section is the evaluation that selection was made from.
 
 **Evidence base:** `fix/auth-ui` at `3395298`, read without changes. Import lists come from the files' own `import` lines, not from the earlier plan inventory. The "concurrent uncommitted work" the plans mention (`AuthConfirmation`, `useFocusFirstError`, resend controls, flow-specific recovery) is now committed on this branch. No runtime check was run for this comparison.
 
@@ -127,11 +127,11 @@ What the package layout would need before ARF-01, all subject to separate approv
 
 ### Unchanged by this evaluation
 
-Provider and session behavior (ADR-0006), profile storage, URLs, ADR-0008 and ADR-0009 are untouched. After the owner selects a candidate, ARF-00's remaining items apply: record the selection here, then replace or confirm the parent plan's migration map, add `resend-button.tsx` to it, and set the execution budgets before ARF-01.
+Provider and session behavior (ADR-0006), profile storage, URLs, ADR-0008 and ADR-0009 are untouched. The selection confirms the parent plan's app-local migration map as the destination map (with `resend-button.tsx` added). No workspace category, package or governance amendment is needed for A. Execution budgets are set by ARF-01's manifest before any source moves.
 
 ## Scope
 
-Responsibility classification and evidence-based comparison of app-local and package layouts for current auth/profile functionality. [ARF-00 in the foundation plan](../../superpowers/plans/2026-10-13-auth-refactor-foundation.md) owns the comparison and review deliverable. The [parent plan](../../superpowers/plans/2026-10-13-auth-refactor.md) retains the app-local migration map as one candidate, not the selected architecture.
+Responsibility classification and evidence-based comparison of app-local and package layouts for current auth/profile functionality. [ARF-00 in the foundation plan](../../superpowers/plans/2026-10-13-auth-refactor-foundation.md) owns the comparison and review deliverable. The [parent plan](../../superpowers/plans/2026-10-13-auth-refactor.md)'s app-local migration map is the selected destination map.
 
 ## What this does NOT decide
 
@@ -139,15 +139,14 @@ The final package count, names, categories, exported APIs or framework coupling;
 
 ## Unresolved
 
-- Choose a candidate and its exact ownership/import/runtime contracts after ARF-00.
-- Current [workspace conventions](../workspace-conventions.md) put server/application-runtime code in apps and permit `dev`/`frontend` categories. A server-capable or framework-specific auth package may require a separately reviewed category/runtime amendment. Record the needed change rather than excluding the candidate or silently overriding the convention.
+- Resolved 2026-10-17: candidate A selected (see the evaluation above). The workspace-conventions category question no longer applies, because A creates no package. It returns if a package is reconsidered.
 - The [package checklist](../package-creation-checklist.md) requires a real use case and responsibility; it does not require two consumers.
 - Auth metadata and the approved `profiles` table remain distinct sources; future profile storage/ownership is a separate decision.
 - Automated import-boundary enforcement remains open; no enforcement tool is selected.
 
 ## Governance boundary
 
-The owner approved correcting the restrictive documentation, not a concrete package layout. Record a recommendation and alternatives, then obtain explicit selection and any required canonical amendments before source migration or package creation. Acceptance of responsibility principles alone does not approve physical destinations. A fresh exact mutation manifest must preserve concurrent tracked/untracked work.
+The owner approved correcting the restrictive documentation, then selected layout A on 2026-10-17 after the ARF-00 comparison. Package creation still requires a new decision. Acceptance of responsibility principles alone does not approve physical destinations. A fresh exact mutation manifest must preserve concurrent tracked/untracked work.
 
 ## Integration expectations
 

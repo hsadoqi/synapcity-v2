@@ -4,13 +4,13 @@
 **Date:** 2026-10-13.  
 **Specification:** [Auth organization refactor](../specs/2026-10-13-auth-refactor-design.md).
 
-This file owns the proposed migration inventory, task order and final verification task ARF-12. The app-local migration inventory is a candidate, not an adopted destination map. [Foundation](2026-10-13-auth-refactor-foundation.md), [operations](2026-10-13-auth-refactor-operations.md) and [navigation](2026-10-13-auth-refactor-navigation.md) child plans alone own their task definitions and checkboxes. ADRs own proposed/accepted decisions; the spec owns behavioral requirements. A fresh task scope will bound approved execution. No status is mirrored into an external tracker.
+This file owns the proposed migration inventory, task order and final verification task ARF-12. The app-local migration inventory is the selected destination map (ADR-0007, Accepted 2026-10-17). [Foundation](2026-10-13-auth-refactor-foundation.md), [operations](2026-10-13-auth-refactor-operations.md) and [navigation](2026-10-13-auth-refactor-navigation.md) child plans alone own their task definitions and checkboxes. ADRs own proposed/accepted decisions; the spec owns behavioral requirements. A fresh task scope will bound approved execution. No status is mirrored into an external tracker.
 
 ## 1. Preconditions and approval
 
 Before any source mutation:
 
-1. Complete ARF-00's package comparison and obtain a concrete topology selection under [ADR-0007](../../architecture/decisions/0007-app-local-auth-and-account-ownership.md), with any category/runtime amendments approved before source work. App-local, one auth package, feature/service packages and account separation are eligible. Approve [ADR-0008](../../architecture/decisions/0008-auth-actions-and-server-operations.md) for operations and [ADR-0009](../../architecture/decisions/0009-caller-owned-auth-navigation.md) for the shared navigation API where those tasks proceed.
+1. Done 2026-10-17: ARF-00 compared the layouts and the owner selected app-local modules with account as a sibling module under [ADR-0007](../../architecture/decisions/0007-app-local-auth-and-account-ownership.md). No category/runtime amendment is needed. Approve [ADR-0008](../../architecture/decisions/0008-auth-actions-and-server-operations.md) for operations and [ADR-0009](../../architecture/decisions/0009-caller-owned-auth-navigation.md) for the shared navigation API where those tasks proceed.
 2. Preserve ADR-0006's provider/session/security choices. Its initial app-local placement is not a topology restriction. Review current workspace conventions/checklist as constraints to reconcile for each candidate, not evidence of owner opposition to packages.
 3. Re-inventory the live files and imports. The source snapshot includes concurrent uncommitted auth work; including `AuthConfirmation`, `useFocusFirstError`, registration state handling, the existing resend-confirmation action/control and flow-specific callback/error recovery. The existing Draft auth-UI plan does not establish a stable baseline.
 4. Capture the relevant original contents and diff in an approved recovery location. Never reset, stash, clean, stage or commit mixed WIP. Decide how the baseline is preserved before authorizing moves; tracked Git history alone cannot recover currently untracked files.
@@ -19,9 +19,9 @@ Before any source mutation:
 
 The current authoring scope creates three Proposed ADRs and three child task plans, and updates the ADR index, spec, parent plan and scope entry only. The code tables below remain proposed targets, not mutation authority.
 
-## 2. App-local candidate migration map
+## 2. App-local migration map (selected)
 
-Paths in this table are relative to `apps/web/src/`. Source paths existed in the live snapshot unless a row explicitly says new. Target paths illustrate only the app-local candidate. If packages are selected, replace the destination column and affected consumer/configuration scopes with the approved package layout before source tasks run. These rows are not ready-to-execute package instructions. Keep function/component names initially; changing file ownership should not silently rename behavior.
+Paths in this table are relative to `apps/web/src/`. Source paths existed in the live snapshot unless a row explicitly says new. Target paths are the selected app-local destinations. The ARF-01 manifest turns these rows into exact file operations and budgets; the rows alone are not mutation authority. Keep function/component names initially; changing file ownership should not silently rename behavior.
 
 | Current source                                             | Proposed destination                                | Treatment                                                                     |
 | ---------------------------------------------------------- | --------------------------------------------------- | ----------------------------------------------------------------------------- |
@@ -54,6 +54,7 @@ Paths in this table are relative to `apps/web/src/`. Source paths existed in the
 | `components/auth/form/auth-field.tsx`                      | `components/forms/form-field.tsx`                   | Move presentation; keep exported component name initially                     |
 | `components/auth/form/form-message.tsx`                    | `components/forms/form-message.tsx`                 | Move message/id presentation with minimal error/message prop contract         |
 | `components/auth/form/use-focus-first-error.ts`            | `components/forms/use-focus-first-error.ts`         | Move current focus hook; use minimal presentation contract                    |
+| `components/auth/form/resend-button.tsx`                   | `features/auth/components/resend-button.tsx`        | Move shared resend button used by both resend controls (added at ARF-00)      |
 | `components/auth/form/use-confirmation.ts`                 | `features/auth/client/use-confirmation.ts`          | Candidate move of existing auth-specific confirmation/edit hook               |
 | `components/auth/form/use-cooldown.ts`                     | `features/auth/client/use-cooldown.ts`              | Candidate move preserving current auth-resend cooldown behavior               |
 | `fieldErrorProps` in previous row                          | `features/auth/shared/form-feedback.ts`             | Extract auth-specific field association; reuse message ID                     |
@@ -116,7 +117,7 @@ packages/frontend/ui/src/blocks/root-shell/root-header.stories.tsx
 
 Add required destination props; update every consumer and story. Do not change component exports, add Supabase/Next.js runtime imports, or move auth behavior into the shared UI package.
 
-Existing regression locations: `apps/web/e2e/auth.e2e.ts` and `apps/web/e2e/home.e2e.ts`. Do not edit them merely because files moved. Any missing assertion or new test destination belongs in the approved execution manifest. For the app-local candidate, package/configuration files are outside the illustrative migration. For a selected package candidate, ARF-00 must enumerate required package manifests/exports, dependency ownership, consumer manifests, lockfile, build/test discovery, Knip and canonical amendments in a new exact scope. Package scaffolding is permitted after that approval, not forbidden by this document.
+Existing regression locations: `apps/web/e2e/auth.e2e.ts` and `apps/web/e2e/home.e2e.ts`. Do not edit them merely because files moved. Any missing assertion or new test destination belongs in the approved execution manifest. With the app-local layout selected, package/configuration files are outside the migration. Creating a package later needs a new decision and its own exact scope.
 
 ## 4. Task sequence and ownership
 
