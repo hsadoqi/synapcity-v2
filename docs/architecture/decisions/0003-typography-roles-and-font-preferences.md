@@ -42,7 +42,7 @@ The font roles, their defaults and the override variable names.
 ## Unresolved
 
 - Whether `--font-preference-ui` is exposed to users or stays an internal escape hatch.
-- The `.typeset-docs` rule in `shared-styles.css` sets `--typeset-font-heading: var(--font-geist)`, but no `--font-geist` variable exists (the loaded one is `--font-geist-sans`). It should reference a role token instead.
+- ~~The `.typeset-docs` rule referenced a `--font-geist` variable that did not exist.~~ Resolved: `typography.css` no longer declares `--font-inter`, `--font-geist`, `--font-geist-mono` or default `--font-preference-*` values on `:root`, which had shadowed the `next/font` variables and left headings on `system-ui`. `.typeset-docs` now references the role tokens.
 
 ## Governance boundary
 
