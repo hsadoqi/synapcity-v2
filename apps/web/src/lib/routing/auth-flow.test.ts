@@ -30,7 +30,7 @@ describe('callbackUrl', () => {
 });
 
 describe('parseAuthFlow', () => {
-  it.each(['oauth', 'confirm', 'reset', 'email-change'] as const)(
+  it.each(['oauth', 'confirm', 'reset', 'email-change', 'link'] as const)(
     'accepts %s',
     (flow) => {
       expect(parseAuthFlow(flow)).toBe(flow);
@@ -80,5 +80,14 @@ describe('the email-change flow', () => {
     expect(authErrorPath('email-change')).toBe(
       '/auth/error?reason=email-change',
     );
+  });
+});
+
+describe('the link flow', () => {
+  it('tags a callback so a failed connection can be explained', () => {
+    expect(callbackUrl('https://app.test', '/u/settings', 'link')).toBe(
+      'https://app.test/auth/callback?next=%2Fu%2Fsettings&flow=link',
+    );
+    expect(authErrorPath('link')).toBe('/auth/error?reason=link');
   });
 });

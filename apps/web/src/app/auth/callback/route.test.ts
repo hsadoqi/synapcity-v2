@@ -406,4 +406,87 @@ describe('GET /auth/callback', () => {
       });
     });
   });
+
+  describe('a connected account', () => {
+    const SETTINGS = '/user-123/settings';
+
+    it('returns to where it was asked for, saying the account was connected', async () => {
+      exchangeSucceeds();
+
+      const response = await GET(
+        request({ code: 'abc', flow: 'link', next: SETTINGS }),
+      );
+
+      expect(location(response)).toBe(
+        `${ORIGIN}${SETTINGS}?notice=account-connected`,
+      );
+    });
+
+    it('goes to their own home when no destination came back', async () => {
+      exchangeSucceeds();
+
+      const response = await GET(request({ code: 'abc', flow: 'link' }));
+
+      expect(location(response)).toBe(
+        `${ORIGIN}${HOME}?notice=account-connected`,
+      );
+    });
+
+    it('never follows an unsafe destination off the origin', async () => {
+      exchangeSucceeds();
+
+      const response = await GET(
+        request({ code: 'abc', flow: 'link', next: '//evil.test/steal' }),
+      );
+
+      expect(new URL(location(response)).origin).toBe(ORIGIN);
+      expect(location(response)).toBe(
+        `${ORIGIN}${HOME}?notice=account-connected`,
+      );
+    });
+
+    it('is not sent to confirm a profile, even on a brand-new account', async () => {
+      mocks.exchangeCodeForSession.mockResolvedValue({
+        data: {
+          user: {
+            id: USER_ID,
+            created_at: new Date().toISOString(),
+            user_metadata: {},
+          },
+        },
+        error: null,
+      });
+
+      const response = await GET(
+        request({ code: 'abc', flow: 'link', next: SETTINGS }),
+      );
+
+      expect(location(response)).not.toContain('/auth/welcome');
+    });
+
+    it('names its own flow when the provider reports a failure, such as an account already linked elsewhere', async () => {
+      const response = await GET(
+        request({
+          flow: 'link',
+          error: 'server_error',
+          error_code: 'identity_already_exists',
+        }),
+      );
+
+      expect(mocks.exchangeCodeForSession).not.toHaveBeenCalled();
+      expect(location(response)).toBe(`${ORIGIN}/auth/error?reason=link`);
+    });
+
+    it('names its own flow when the code cannot be exchanged', async () => {
+      mocks.exchangeCodeForSession.mockResolvedValue({
+        data: { user: null },
+        error: { code: 'bad_code_verifier', message: 'sentinel' },
+      });
+
+      const response = await GET(request({ code: 'abc', flow: 'link' }));
+
+      expect(location(response)).toBe(`${ORIGIN}/auth/error?reason=link`);
+      expect(location(response)).not.toMatch(/sentinel/);
+    });
+  });
 });

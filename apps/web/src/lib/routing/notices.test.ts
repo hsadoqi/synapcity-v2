@@ -66,3 +66,10 @@ describe('the email notices', () => {
     expect(NOTICES['email-change-step']).toMatch(/other address/i);
   });
 });
+
+describe('the account-connected notice', () => {
+  it('is a listed key with plain wording', () => {
+    expect(isNoticeKey('account-connected')).toBe(true);
+    expect(NOTICES['account-connected']).toBe('Account connected.');
+  });
+});
