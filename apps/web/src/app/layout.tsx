@@ -8,6 +8,7 @@ import { createMetadata } from '@synapcity/frontend-site/metadata';
 import { UserProvider } from '@/features/auth/client';
 import { getCurrentUser } from '@/features/auth/server';
 import { appearanceBootScript } from '@/features/settings/shared/appearance-attributes';
+import { fontBootScript } from '@/features/settings/shared/font-preferences';
 import { accountLinksFor } from '@/lib/routing/user-paths';
 export const metadata: Metadata = createMetadata({
   siteUrl: process.env.SITE_URL,
@@ -24,6 +25,8 @@ export default async function RootLayout({
       <head>
         {/* Applies saved text size, contrast and motion before first paint. */}
         <script dangerouslySetInnerHTML={{ __html: appearanceBootScript }} />
+        {/* Applies saved font choices, and fetches only those, before first paint. */}
+        <script dangerouslySetInnerHTML={{ __html: fontBootScript }} />
       </head>
       <body>
         <RootProviders>
