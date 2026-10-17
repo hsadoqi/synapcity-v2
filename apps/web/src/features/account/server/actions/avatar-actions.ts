@@ -21,7 +21,13 @@ export async function updateAvatar(
 
   const supabase = await createClient();
   const found = await getCaller(supabase);
-  if (!('caller' in found)) return { error: found.failure, avatarUrl: shown };
+  if (!('caller' in found)) {
+    return {
+      error: found.failure,
+      signedOut: found.signedOut,
+      avatarUrl: shown,
+    };
+  }
   const { caller } = found;
 
   const saved = await saveAvatar(

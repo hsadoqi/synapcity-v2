@@ -2,7 +2,11 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 /** The toast is the success feedback: replace it so the tests can see what it was given. */
-const toasts = vi.hoisted(() => ({ add: vi.fn() }));
+const toasts = vi.hoisted(() => ({
+  add: vi.fn(),
+  path: '/u1/settings' as string | null,
+}));
+vi.mock('next/navigation', () => ({ usePathname: () => toasts.path }));
 vi.mock('@synapcity/frontend-ui/core/toast', () => ({
   toast: { add: toasts.add },
 }));
@@ -146,6 +150,60 @@ describe('ProfileFormShell', () => {
     action.mockResolvedValueOnce({ saved: true });
     await submit();
     expect(onSaved).toHaveBeenCalledTimes(1);
+  });
+
+  describe('when the session has gone', () => {
+    const run = async () => {
+      render(
+        <ProfileFormShell action={action} initialState={{}} submitLabel="Save">
+          <Probe />
+        </ProfileFormShell>,
+      );
+      await submit();
+    };
+
+    it('offers a way to sign in that returns to this page', async () => {
+      toasts.path = '/u1/settings';
+      action.mockResolvedValue({
+        error: 'Sign in again to update your profile.',
+        signedOut: true,
+      });
+
+      await run();
+
+      expect(screen.getByRole('alert').textContent).toBe(
+        'Sign in again to update your profile.',
+      );
+      expect(
+        screen
+          .getByRole('link', { name: 'Sign in again' })
+          .getAttribute('href'),
+      ).toBe('/auth/login?next=%2Fu1%2Fsettings');
+    });
+
+    it('falls back to the home page when the path is not known', async () => {
+      toasts.path = null;
+      action.mockResolvedValue({ error: 'x', signedOut: true });
+
+      await run();
+
+      expect(
+        screen
+          .getByRole('link', { name: 'Sign in again' })
+          .getAttribute('href'),
+      ).toBe('/auth/login?next=%2F');
+    });
+
+    it('offers no link for any other error', async () => {
+      toasts.path = '/u1/settings';
+      action.mockResolvedValue({
+        error: 'Could not save your changes. Try again.',
+      });
+
+      await run();
+
+      expect(screen.queryByRole('link', { name: 'Sign in again' })).toBeNull();
+    });
   });
 
   it('shows a secondary action beside the submit button', () => {

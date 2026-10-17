@@ -13,6 +13,7 @@ import {
 } from '../caller';
 import { saveAvatar } from '../save-avatar';
 import { saveName } from '../save-name';
+import { withProfileConfirmed } from '../profile-metadata';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -33,11 +34,17 @@ export async function completeProfile(
   const supabase = await createClient();
   const found = await getCaller(supabase);
   if (!('caller' in found)) {
-    return { error: found.failure, name, avatarUrl: shown };
+    return {
+      error: found.failure,
+      signedOut: found.signedOut,
+      name,
+      avatarUrl: shown,
+    };
   }
   const { caller } = found;
 
-  const patches: MetadataPatch[] = [];
+  // Finishing the step is what marks it done, so it is not offered again.
+  const patches: MetadataPatch[] = [withProfileConfirmed];
   let avatarUrl = shown;
 
   // An empty file input still submits an empty file: that means "no change".
@@ -72,4 +79,22 @@ export async function completeProfile(
     avatarUrl,
     message: mirrored ? 'Profile saved.' : `Profile saved. ${SHOWS_LATER}`,
   };
+}
+
+/**
+ * Marks the name-and-photo step as done without changing anything, for someone
+ * who chooses to skip it. Where to go afterwards is the caller's decision, and
+ * it should go there whether or not this saved: a failure here only means the
+ * step may be offered once more at the next sign-in.
+ */
+export async function skipProfileSetup(): Promise<{ saved: boolean }> {
+  const supabase = await createClient();
+  const found = await getCaller(supabase);
+  if (!('caller' in found)) return { saved: false };
+
+  const mirrored = await mirrorToSession(supabase, found.caller, [
+    withProfileConfirmed,
+  ]);
+  revalidatePath('/', 'layout');
+  return { saved: mirrored };
 }

@@ -27,7 +27,9 @@ export async function updateName(
 
   const supabase = await createClient();
   const found = await getCaller(supabase);
-  if (!('caller' in found)) return { error: found.failure, name };
+  if (!('caller' in found)) {
+    return { error: found.failure, signedOut: found.signedOut, name };
+  }
   const { caller } = found;
 
   const saved = await saveName(supabase, caller, name);

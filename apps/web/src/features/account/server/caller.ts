@@ -23,7 +23,8 @@ export const SAVE_FAILED = 'Could not save your changes. Try again.';
 export const SHOWS_LATER = 'It may take a little while to show everywhere.';
 
 /** Who is asking, or the message to show instead. */
-export type CallerResult = { caller: Caller } | { failure: string };
+export type CallerResult =
+  { caller: Caller } | { failure: string; signedOut?: true };
 
 /**
  * The verified caller from their own session. Every profile action acts on
@@ -37,9 +38,8 @@ export async function getCaller(supabase: Supabase): Promise<CallerResult> {
   const { data, error } = await supabase.auth.getUser();
   if (!error && data.user) return { caller: data.user };
   logFailure('getCaller', error);
-  return {
-    failure: isAuthRetryableFetchError(error) ? SAVE_FAILED : SIGN_IN_AGAIN,
-  };
+  if (isAuthRetryableFetchError(error)) return { failure: SAVE_FAILED };
+  return { failure: SIGN_IN_AGAIN, signedOut: true };
 }
 
 /**

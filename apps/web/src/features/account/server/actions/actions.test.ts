@@ -32,7 +32,7 @@ vi.mock('@/lib/supabase/server', () => ({
 
 import { updateAvatar } from './avatar-actions';
 import { updateName } from './name-actions';
-import { completeProfile } from './setup-actions';
+import { completeProfile, skipProfileSetup } from './setup-actions';
 
 function form(name: string): FormData {
   const data = new FormData();
@@ -101,6 +101,7 @@ describe('updateName', () => {
 
     expect(state).toEqual({
       error: 'Sign in again to update your profile.',
+      signedOut: true,
       name: 'Ada',
     });
     expect(mocks.profileUpdate).not.toHaveBeenCalled();
@@ -462,7 +463,7 @@ describe('completeProfile', () => {
     expect(mocks.profileUpdate).toHaveBeenCalledWith({ display_name: 'Ada' });
     expect(mocks.updateUser).toHaveBeenCalledTimes(1);
     expect(mocks.updateUser).toHaveBeenCalledWith({
-      data: { full_name: 'Ada', avatar_url: url },
+      data: { full_name: 'Ada', avatar_url: url, profile_confirmed: true },
     });
     expect(mocks.refreshSession).toHaveBeenCalledTimes(1);
     expect(state).toMatchObject({ saved: true, name: 'Ada', avatarUrl: url });
@@ -531,7 +532,10 @@ describe('when the session cannot be checked', () => {
       error: { code: 'session_not_found' },
     });
 
-    expect((await run()).error).toBe(SIGN_IN_AGAIN);
+    const state = await run();
+
+    expect(state.error).toBe(SIGN_IN_AGAIN);
+    expect(state.signedOut).toBe(true);
   });
 
   it.each([
@@ -549,6 +553,8 @@ describe('when the session cannot be checked', () => {
       const state = await run();
 
       expect(state.error).toBe(SAVE_FAILED);
+      // Signing in again would not help during an outage, so no link is offered.
+      expect(state.signedOut).toBeUndefined();
       expect(mocks.profileUpdate).not.toHaveBeenCalled();
       expect(mocks.upload).not.toHaveBeenCalled();
     },
@@ -637,6 +643,68 @@ describe('failure logging', () => {
       status: 429,
     });
     expect(state.saved).toBe(true);
+    warn.mockRestore();
+  });
+});
+
+describe('the name-and-photo step is marked done', () => {
+  it('when it is finished, even with just a name', async () => {
+    await completeProfile({}, setupForm('Ada'));
+
+    expect(mocks.updateUser).toHaveBeenCalledWith({
+      data: { full_name: 'Ada', profile_confirmed: true },
+    });
+  });
+
+  it('but not by an ordinary edit of the name or the photo', async () => {
+    await updateName({}, form('Ada'));
+    await updateAvatar({}, avatarForm(PNG));
+
+    for (const [argument] of mocks.updateUser.mock.calls) {
+      expect(JSON.stringify(argument)).not.toContain('profile_confirmed');
+    }
+  });
+});
+
+describe('skipProfileSetup', () => {
+  it('marks the step done and changes nothing else', async () => {
+    mocks.getUser.mockResolvedValue(
+      signedIn({ full_name: 'Ada', avatar_url: 'https://gh.test/a.png' }),
+    );
+
+    const result = await skipProfileSetup();
+
+    expect(result).toEqual({ saved: true });
+    expect(mocks.updateUser).toHaveBeenCalledWith({
+      data: {
+        full_name: 'Ada',
+        avatar_url: 'https://gh.test/a.png',
+        profile_confirmed: true,
+      },
+    });
+    expect(mocks.profileUpdate).not.toHaveBeenCalled();
+    expect(mocks.upload).not.toHaveBeenCalled();
+    expect(mocks.revalidatePath).toHaveBeenCalledWith('/', 'layout');
+  });
+
+  it('reports not saved, and touches nothing, when there is no session', async () => {
+    mocks.getUser.mockResolvedValue({
+      data: { user: null },
+      error: { code: 'session_not_found' },
+    });
+
+    expect(await skipProfileSetup()).toEqual({ saved: false });
+    expect(mocks.updateUser).not.toHaveBeenCalled();
+  });
+
+  it('reports not saved when the session cannot be updated', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    mocks.updateUser.mockResolvedValue({
+      data: {},
+      error: { code: 'over_request_rate_limit', status: 429 },
+    });
+
+    expect(await skipProfileSetup()).toEqual({ saved: false });
     warn.mockRestore();
   });
 });

@@ -23,4 +23,9 @@ export type ProfileState = {
   avatarUrl?: string | null;
   /** True once the change was saved, so a caller can close an editor or move on. */
   saved?: boolean;
+  /**
+   * True when the error is that there is no session any more, so the form can
+   * offer a way to sign in. A dropped connection is not this.
+   */
+  signedOut?: boolean;
 };

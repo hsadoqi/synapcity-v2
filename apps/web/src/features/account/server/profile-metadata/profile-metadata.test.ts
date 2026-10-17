@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { withAvatarUrl, withFullName } from './profile-metadata';
+import {
+  withAvatarUrl,
+  withFullName,
+  withProfileConfirmed,
+} from './profile-metadata';
 
 describe('withFullName', () => {
   it('sets full_name and keeps every other field, such as an OAuth avatar', () => {
@@ -58,5 +62,27 @@ describe('withAvatarUrl', () => {
     const existing = { avatar_url: 'https://old.test/a.png' };
     withAvatarUrl(existing, null);
     expect(existing).toEqual({ avatar_url: 'https://old.test/a.png' });
+  });
+});
+
+describe('withProfileConfirmed', () => {
+  it('sets the flag and keeps every other field', () => {
+    expect(
+      withProfileConfirmed({
+        full_name: 'Ada',
+        avatar_url: 'https://x.test/a.png',
+      }),
+    ).toEqual({
+      full_name: 'Ada',
+      avatar_url: 'https://x.test/a.png',
+      profile_confirmed: true,
+    });
+  });
+
+  it('works with no metadata and does not mutate its input', () => {
+    expect(withProfileConfirmed(null)).toEqual({ profile_confirmed: true });
+    const existing = { full_name: 'Ada' };
+    withProfileConfirmed(existing);
+    expect(existing).toEqual({ full_name: 'Ada' });
   });
 });

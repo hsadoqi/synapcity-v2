@@ -1,3 +1,5 @@
+import { PROFILE_CONFIRMED_KEY } from '@/features/account/shared/profile-confirmed';
+
 /**
  * Metadata to send to `auth.updateUser({ data })` when the name changes. It
  * carries every existing field, so the result is the same whether the server
@@ -21,4 +23,11 @@ export function withAvatarUrl(
 ): Record<string, unknown> {
   const { avatar_url: _previous, ...rest } = existing ?? {};
   return url ? { ...rest, avatar_url: url } : rest;
+}
+
+/** Marks the name-and-photo step as done (finished or skipped). */
+export function withProfileConfirmed(
+  existing: Record<string, unknown> | null | undefined,
+): Record<string, unknown> {
+  return { ...existing, [PROFILE_CONFIRMED_KEY]: true };
 }

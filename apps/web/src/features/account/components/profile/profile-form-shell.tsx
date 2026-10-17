@@ -9,12 +9,14 @@ import {
   useId,
   type ReactNode,
 } from 'react';
+import { usePathname } from 'next/navigation';
 import { Button } from '@synapcity/frontend-ui/core/button';
+import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
 import { toast } from '@synapcity/frontend-ui/core/toast';
 
 import type { ProfileState } from '@/features/account/types';
 import { FormMessage } from '@/components/forms/form-message';
-import { useFocusFirstError } from '@/hooks/use-focus-first-error/use-focus-first-error';
+import { useFocusFirstError } from '@/hooks/use-focus-first-error';
 
 type ProfileFormContextValue = {
   state: ProfileState;
@@ -60,6 +62,8 @@ export function ProfileFormShell({
   const [state, formAction, pending] = useActionState(action, initialState);
   const formRef = useFocusFirstError(state);
   const messageId = useId();
+  // Where to come back to after signing in again. The sign-in page checks it.
+  const here = usePathname() ?? '/';
 
   const handleSaved = useEffectEvent((saved: ProfileState) => {
     toast.add({ type: 'success', title: saved.message ?? 'Saved.' });
@@ -81,6 +85,16 @@ export function ProfileFormShell({
         {/* A saved change is confirmed by the toast. The message here is only
             for errors: they stay beside the field, linked to it and focused. */}
         <FormMessage id={messageId} state={{ error: state.error }} />
+        {state.signedOut ? (
+          <LinkButton
+            href={`/auth/login?next=${encodeURIComponent(here)}`}
+            variant="link"
+            size="sm"
+            className="self-start"
+          >
+            Sign in again
+          </LinkButton>
+        ) : null}
         <div className="flex flex-wrap gap-2">
           <Button
             type="submit"
