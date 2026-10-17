@@ -1,5 +1,13 @@
 # Task scope
 
+## Active task: auth review follow-ups AHF-05 part 4, profile form submit tests (2026-10-17)
+
+- Goal and mode: implement the profile-form item of AHF-05 of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`, on the DOM test setup from #34.
+- Exact change: create `apps/web/src/features/account/components/profile-form.dom.test.tsx` and update this entry. It runs the real form and real `useActionState`, replacing only the `updateProfile` Server Action. The existing static-render test stays, since it still covers server-rendered markup.
+- Mutation budgets: creates 1 test file; updates 1 (this entry); dependencies, config, production code, schema and provider state 0.
+- Verification: `pnpm format:check`, `lint`, `typecheck`, `deps`, `test`; removing the focus hook or the pending state makes tests fail. Not covered: the browser suite and live provider behavior.
+- Recovery: revert the PR; nothing else changes.
+
 ## Active task: auth review follow-ups AHF-05 part 1, DOM test setup (2026-10-17)
 
 - Goal and mode: implement the first part of AHF-05 of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`; the owner approved recommendation D3 on 2026-10-17: add `@testing-library/react` 16.3.3, `@testing-library/dom` 10.4.2 and `jsdom` 30.1.2 to `apps/web` as dev dependencies (the pins `frontend/ui` and the shared preset already use; no other package changes).
