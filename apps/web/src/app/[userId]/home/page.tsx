@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
-import { CurrentUserAvatar } from '@/features/auth/shared/current-user-avatar';
-import { SignOutButton } from '@/features/auth/shared/sign-out-button';
+import { CurrentUserAvatar } from '@/features/auth/components/current-user-avatar';
+import { SignOutButton } from '@/features/auth/components/sign-out-button';
 import { requireOwner } from '@/lib/access/require-owner';
 
 export const metadata: Metadata = { title: 'Home' };

@@ -5,7 +5,7 @@ import { useActionState } from 'react';
 import { signUp } from '@/features/auth/server/actions';
 import type { AuthState } from '@/features/auth/shared/form-state';
 import { AuthLinkButton } from '../shared/auth-link-button';
-import { OAuthButtons } from '../shared/oauth-buttons';
+import { OAuthButtons } from './oauth-buttons';
 import { AuthConfirmation } from '../shared/auth-confirmation';
 import { AuthShell } from '../shared/auth-shell';
 import { useConfirmation } from '@/features/auth/client/use-confirmation';

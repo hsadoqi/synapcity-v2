@@ -4,7 +4,7 @@ import '../styles/globals.css';
 import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import RootProviders from '../components/providers/root-providers';
-import { AuthStatus } from '@/features/auth/shared/auth-status';
+import { AuthStatus } from '@/features/auth/components/auth-status';
 import { RootShell } from '@synapcity/frontend-ui/blocks/root-shell';
 import { createMetadata } from '@synapcity/frontend-site/metadata';
 import { UserProvider } from '@/features/auth/client/user-provider';

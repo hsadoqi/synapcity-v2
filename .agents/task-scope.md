@@ -1,5 +1,23 @@
 # Task scope
 
+## Active task: repair auth import-boundary verification failure (2026-10-16)
+
+- Goal and mode: implement the owner's request to fix failures from `pnpm verify`. The clean baseline is `91561a7` on `refactor/auth-features`; the reproduced failure is six forbidden imports in four recently relocated auth components.
+- Direct authority: the current verification-repair request; preserve ADR-0007's selected dependency boundaries and the existing verification chain.
+- Exact destinations: move `apps/web/src/features/auth/shared/{auth-status,current-user-avatar,oauth-buttons,sign-out-button}.tsx` to the same filenames in `apps/web/src/features/auth/components/`; update their imports in `apps/web/src/app/page.tsx`, `apps/web/src/app/layout.tsx`, `apps/web/src/app/[userId]/home/page.tsx`, `apps/web/src/app/auth/login/page.tsx`, and `apps/web/src/features/auth/components/register-card.tsx`; update this scope entry.
+- Mutation budgets: file moves 4; existing-file updates 6 including this entry; creates/deletes 0; dependencies, architecture decisions, other planning artifacts, Git history/branches/commits/PRs, external systems and provider state 0. Disposable logs and backups may live under `/private/tmp/synapcity-verify-repair-20261016`.
+- System of record: ADR-0007 owns the selected layout; source files own runtime behavior; this entry bounds execution only. No task status is mirrored elsewhere.
+- Preconditions: preserve component bodies, client directives, routes, auth behavior and all other recent refactor changes. Recheck clean/current source before mutation.
+- Verification: reproduce the existing failing boundary test, rerun it after import repairs, then run root `pnpm verify` and inspect the final diff. Report exact stage outcomes and behavior not covered by tests.
+- Recovery: reverse only this task's moves and import changes against the baseline; preserve concurrent work. No reset, stash, clean or history changes.
+- Stop conditions: concurrent changes to a scoped destination, another failure needing additional source changes, or an unresolved architecture/security decision.
+
+### Approved scope extension: complete the auth page wrapper extraction
+
+- Direct authority: the owner confirmed the newly added wrapper is finished and selected "Finished—complete the wrapper extraction and verify" during this repair.
+- Additional exact destinations: update the owner's new page wrapper (initially `apps/web/src/components/shells/auth-shell.tsx`, subsequently renamed by the owner to `apps/web/src/components/shells/auth-page-shell.tsx`) and `apps/web/src/app/auth/layout.tsx`. Preserve the owner's rename. The wrapper owns page centring/width; the existing feature `AuthShell` keeps card/heading responsibility. Use the distinct local name `AuthPageShell` and consume it from the route layout, preserving rendered markup.
+- Revised total budgets: file moves 4; existing-file updates 8 including this scope and the owner's untracked wrapper; creates/deletes 0; all other mutation classes remain 0. Preserve the owner's wrapper file and keep its pre-edit contents under the disposable backup directory. Verification and recovery remain as above.
+
 ## Active task: author auth review follow-up implementation plan (2026-10-16)
 
 - Goal and mode: turn the owner's completed auth review into a detailed implementation plan. Mode: planning/documentation authoring only; no application implementation or acceptance of proposed behavior.
