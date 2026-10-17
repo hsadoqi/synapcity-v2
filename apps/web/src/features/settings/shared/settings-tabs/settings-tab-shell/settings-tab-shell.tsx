@@ -19,7 +19,8 @@ export const SettingsTabShell = ({
   return (
     <Card className="flex-1 flex flex-col overflow-hidden">
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
+        {/* The page's h1 is "Settings"; each tab's title is the next level down. */}
+        <CardTitle as="h2">{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 overflow-auto">
