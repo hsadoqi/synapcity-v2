@@ -10,7 +10,7 @@
  * `public.delete_own_account()`, which is the check that counts. Anything not
  * listed is refused, so a method name that turns out different fails closed.
  */
-export const LINK_SIGN_IN_METHODS = ['otp', 'magiclink'] as const;
+const LINK_SIGN_IN_METHODS = ['otp', 'magiclink'] as const;
 
 /** How long after the emailed link the deletion may still be confirmed. */
 export const LINK_SIGN_IN_WINDOW_MINUTES = 10;
