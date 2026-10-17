@@ -3,7 +3,10 @@ import { z } from 'zod';
 import { mergeSettings, parseImportPatch } from './settings';
 import { appearanceSchema } from '../types/appearance';
 import { dataPrivacyDefaults, dataPrivacySchema } from '../types/data-privacy';
-import { notificationsDefaults, notificationsSchema } from '../types/notifications';
+import {
+  notificationsDefaults,
+  notificationsSchema,
+} from '../types/notifications';
 import { regionalDefaults, regionalSchema } from '../types/regional';
 import { settingsDefaults, type Settings } from '../types/settings';
 import { themeDefaults, themeSchema } from '../types/theme';
@@ -14,7 +17,10 @@ import { themeDefaults, themeSchema } from '../types/theme';
  * field, so a new setting does not compile until it is given a scope.
  */
 export const settingScope: {
-  [Section in keyof Settings]: Record<keyof Settings[Section], 'account' | 'device'>;
+  [Section in keyof Settings]: Record<
+    keyof Settings[Section],
+    'account' | 'device'
+  >;
 } = {
   regional: {
     language: 'account',
@@ -97,7 +103,7 @@ export function accountPart(
 }
 
 /** The device part of `settings`, for export. */
-export function devicePart(settings: Settings) {
+function devicePart(settings: Settings) {
   return {
     theme: { mode: settings.theme.mode },
     appearance: settings.appearance,
@@ -168,7 +174,9 @@ export function withAccount(
     notifications: account.notifications,
     privacy: account.privacy,
     theme: account.theme,
-    ...(account.appearanceOverride && { appearance: account.appearanceOverride }),
+    ...(account.appearanceOverride && {
+      appearance: account.appearanceOverride,
+    }),
   });
 }
 

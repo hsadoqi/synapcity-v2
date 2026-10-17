@@ -15,7 +15,7 @@ const firstDaysOfWeek = ['sunday', 'monday', 'saturday'] as const;
 /** Follow the device's timezone instead of a fixed one. */
 export const SYSTEM_TIMEZONE = 'system';
 
-function isSupportedTimezone(timezone: string) {
+export function isSupportedTimezone(timezone: string) {
   // Use the same timezone support as the runtime that formats dates.
   try {
     new Intl.DateTimeFormat('en', { timeZone: timezone });

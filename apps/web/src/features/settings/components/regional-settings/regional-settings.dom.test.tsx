@@ -325,6 +325,9 @@ describe('regional previews', () => {
       name: null,
       updateName: vi.fn(),
       isReady: true,
+      syncsToAccount: false,
+      displayOnAllDevices: false,
+      setDisplayOnAllDevices: () => {},
     };
     const content = (
       <SettingsContext.Provider value={context}>
