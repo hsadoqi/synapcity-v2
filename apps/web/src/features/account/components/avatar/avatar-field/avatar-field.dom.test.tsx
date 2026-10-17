@@ -7,7 +7,7 @@ vi.mock('@synapcity/frontend-ui/core/toast', () => ({
 }));
 
 import { MAX_AVATAR_BYTES, type ProfileState } from '@/features/account/types';
-import { ProfileFormShell } from '../profile/profile-form-shell';
+import { ProfileFormShell } from '../../profile';
 import { AvatarField } from './avatar-field';
 
 const UPLOADED =

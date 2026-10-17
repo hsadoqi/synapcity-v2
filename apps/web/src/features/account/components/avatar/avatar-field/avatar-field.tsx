@@ -3,16 +3,14 @@
 import { useId, useState } from 'react';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
-import { FormField } from '@/components/forms/form-field';
-import { fieldErrorProps } from '@/components/forms/form-feedback';
-import { isUploadedAvatar } from '@/features/account/shared/avatar-url';
+import { FormField, fieldErrorProps } from '@/components/forms';
 import {
   AVATAR_ACCEPT,
   MAX_AVATAR_BYTES,
   avatarFileSchema,
 } from '@/features/account/types';
-import { ProfileAvatar } from '@/features/account/shared/profile-avatar';
-import { useProfileForm } from '../profile/profile-form-shell';
+import { ProfileAvatar, isUploadedAvatar } from '@/features/account/shared';
+import { useProfileForm } from '../../profile';
 
 const MAX_MB = MAX_AVATAR_BYTES / 1024 / 1024;
 
