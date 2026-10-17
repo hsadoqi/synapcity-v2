@@ -32,7 +32,7 @@ ADRs are numbered sequentially (`0001-*.md`, `0002-*.md`, ...) and never renumbe
 | [0007](0007-app-local-auth-and-account-ownership.md)  | Auth responsibility boundaries and package layout evaluation | Accepted |
 | [0008](0008-auth-actions-and-server-operations.md)    | Auth actions and server operations                           | Accepted |
 | [0009](0009-caller-owned-auth-navigation.md)          | Caller-owned auth navigation                                 | Accepted |
-| [0010](0010-preference-persistence.md)                | Preference persistence (account and device preferences)      | Proposed |
+| [0010](0010-preference-persistence.md)                | Preference persistence (account and device preferences)      | Accepted |
 
 **Lineage.** The ADRs in `docs/archive/architecture/decisions/` (0001-0016) belong to the previous implementation. They are evidence under `docs/engineering/preservation-policy.md`, not authority, and several describe workspaces that do not exist here (`apps/storybook`, `packages/ui/core`). This index restarted at 0001 for the current repository. When a current ADR needs an archived decision, it restates the decision it adopts rather than citing the archived number.
 
@@ -43,7 +43,7 @@ Not decided. Each needs an ADR, and the owner's approval, before it is treated a
 - **Testing strategy.** Partly addressed by Proposed [ADR-0005](0005-testing-foundation.md): shared Vitest and Playwright config packages and a few smoke tests. The tests now run in `pnpm verify` and CI, pending the owner's approval of that chain change. Still open: coverage thresholds, accessibility gating, browser matrix, and how much of the code the tests must reach (coverage is thin today).
 - **Dependency direction between package categories**, and any tool that enforces it.
 - **Component catalogue** (Storybook or another).
-- **Theme editor and preference persistence** (what writes `--font-preference-*` and the other overrides). Preference storage is addressed by Proposed [ADR-0010](0010-preference-persistence.md); the theme editor is still open.
+- **Theme editor and preference persistence** (what writes `--font-preference-*` and the other overrides). Preference storage is decided by [ADR-0010](0010-preference-persistence.md); the theme editor is still open.
 - **Persistence, API, routing and state management.** Open per `PRODUCT.md`; the README's technology table is direction, not decision. Authentication is decided separately by [ADR-0006](0006-authentication-with-supabase.md) (Supabase Auth, for identity only).
 - **Deployment topology.** Includes the production domain, which does not exist yet. Until it does, `metadataBase` is unset in `apps/web/src/app/layout.tsx` and the build warns that social image URLs resolve to `http://localhost:3000`. Set `metadataBase` once the domain is chosen.
 - **Documentation site content and tooling** for `apps/docs`.

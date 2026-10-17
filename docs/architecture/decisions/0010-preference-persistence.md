@@ -1,8 +1,8 @@
 # ADR-0010: Preference persistence (account and device preferences)
 
-**Status:** Proposed
-**Date:** 2026-10-17
-**Deciders:** Hanaa Sadoqi (repository owner). Not yet approved.
+**Status:** Accepted
+**Date:** 2026-10-17 (accepted 2026-10-17)
+**Deciders:** Hanaa Sadoqi (repository owner); accepted by the owner's direct instruction ("accept ADR-0010").
 
 ## Context
 
@@ -22,7 +22,6 @@ It addresses part of two candidate decisions in the [index](README.md): "Theme e
 
 ## Decision
 
-If accepted:
 
 ### 1. Split preferences into account and device scope
 
@@ -32,6 +31,10 @@ If accepted:
 | **Device**  | `theme.mode`, `appearance` (`fontSize`, `contrastMode`, `showBorders`, `animationsEnabled`, `reducedMotion`; `colorScheme` mirrors `theme.mode`) | `localStorage` only                               | Depends on the screen and surroundings; must apply before first paint; a dark office and a bright phone want different values    |
 
 Signed-out visitors keep everything in `localStorage`, as today.
+
+**Account overrides for display settings.** Device scope is the default, and the person may override it. The Appearance tab gets one switch, "Use these display settings on all my devices". When it is on, the current `appearance` values are saved to the account and apply on every device, replacing that device's own values. When it is off, the account copy is removed and each device goes back to its own values. Precedence for each `appearance` field: account override, then the device's saved value, then the default (which may come from the operating system, as `reducedMotion` does). `theme.mode` stays device-only, since light or dark follows the surroundings. (Decided by the owner, 2026-10-17: "device by default and person just overrides the values".)
+
+**Fonts are account scope.** The boot script applies fonts from the local copy before first paint. On a device or browser that has never loaded the account, the first visit draws in the default fonts and switches to the chosen ones when the preferences arrive; later visits use the cached copy. The owner accepted that trade for fonts that follow the person (2026-10-17).
 
 ### 2. One table, `public.user_preferences`, holding a validated JSON document
 
@@ -47,7 +50,7 @@ create table public.user_preferences (
 );
 ```
 
-- `preferences` holds only the **account** sections, in the same shape the Zod schema already parses. The application validates every write with `settingsSchema` (one source of truth for fields and enums). The database checks the outer shape and size only.
+- `preferences` holds the **account** sections, plus an optional `appearanceOverride` object holding only the display settings the person chose to apply everywhere, in the same shape the Zod schema already parses. The application validates every write with `settingsSchema` (one source of truth for fields and enums). The database checks the outer shape and size only.
 - `schema_version` lets a later change migrate stored documents. This one does what `firstDayOfWeek`'s preprocess does in code today.
 - `device_timezone` is the last IANA zone a signed-in browser reported. It is needed because `regional.timezone` may be `'system'` ("follow the device"), which a server job cannot resolve. Server code uses `regional.timezone` when it is a real zone, otherwise `device_timezone`, otherwise `UTC`.
 - Row-level security follows `profiles`: owner-only `select` and `update`, explicit grants, the shared `set_updated_at()` trigger. Rows are created by an `insert` policy limited to the owner. The signup trigger stays untouched, so an existing user gets a row on their first save.
@@ -64,9 +67,24 @@ A JSON document, rather than one column per field, follows the existing schema. 
 - **First sign-in adoption:** if a signed-in user has no row and the local copy holds account preferences that differ from the defaults, the first load writes them up once. Choices made before signing in are kept, not reset.
 - **Failure:** if a write fails, the local value stays applied, the status line says the change was not saved to the account, and the next successful write supersedes it.
 
-### 4. Not stored on the server
+### 4. Export and import label the scope
 
-Device-scope preferences, the old `account` key that `withoutStoredAccount` already strips, and nothing from `auth.users` (email stays there, as in `profiles`).
+An export becomes `{ "version": 2, "account": { ... }, "device": { ... } }`, so a person can see which settings follow them and which stay with the browser. Import accepts this shape and the current flat shape (which `parseImportPatch` already reads), so files exported before this change still import. Importing while signed in saves the `account` part to the account and the `device` part locally. (Decided by the owner, 2026-10-17.)
+
+### 5. Migrations are applied with `supabase db push`
+
+Migrations in `supabase/migrations/` are applied with the Supabase CLI instead of being pasted into the dashboard SQL editor. (Decided by the owner, 2026-10-17.) One-time setup, done by the owner because it needs their Supabase login:
+
+1. `supabase init` adds `supabase/config.toml` (committed; holds no secrets).
+2. `supabase login`, then `supabase link --project-ref <ref>`.
+3. The five migrations already run by hand are not in the remote migration history, so `db push` would try to run them again and fail on `create table public.profiles`. Mark them applied first: `supabase migration repair --status applied 20261013162633 20261013184213 20261017113500 20261017122000 20261017140000`, after confirming in the dashboard that each one really was applied.
+4. From then on: `supabase db push --dry-run` to see what will run, then `supabase db push`.
+
+Pushing changes a shared database and cannot be undone by reverting a commit, so an agent proposes the push and the owner runs it, or approves each one explicitly.
+
+### 6. Not stored on the server
+
+Device-scope preferences (except an `appearanceOverride` the person turned on), the old `account` key that `withoutStoredAccount` already strips, and nothing from `auth.users` (email stays there, as in `profiles`).
 
 ## Scope
 
@@ -84,10 +102,7 @@ The scope split, the `user_preferences` table and its access policy, and the rea
 
 ## Unresolved
 
-- Whether `appearance` accessibility settings (`contrastMode`, `reducedMotion`, `fontSize`) should be account scope instead. A person with low vision may want them everywhere; the proposal keeps them on the device because the operating system already reports reduced motion and contrast per device. Owner's call.
-- Whether to keep theme fonts in account scope. The proposal says yes. The boot script then needs the cached local copy to avoid a flash of the default fonts on a new device until the first load completes.
-- Whether migrations are applied by hand in the dashboard, as the existing ones say, or with `supabase db push` once the project is linked.
-- Whether export and import should label which preferences are account and which are device, or keep one flat file as today.
+- Whether the "all my devices" override is one switch for every display setting (proposed) or a switch per setting.
 
 ## Governance boundary
 
@@ -107,7 +122,9 @@ The owner approves this ADR before the migration is written or run, as the proje
 - Unit tests for the scope split: each `settingsSchema` field is classified exactly once, so a new field fails a test until it is placed. This mirrors `settings-coverage.dom.test.tsx`.
 - Provider tests for: server value overriding a stale local copy; first-sign-in adoption; a failed write keeping the local value and reporting it; signed-out behaviour unchanged.
 - The existing import, export and storage tests still pass.
-- A manual two-browser check: change the language in one, reload the other, see it follow; change colour mode in one, see the other unchanged.
+- A manual two-browser check: change the language in one, reload the other, see it follow; change colour mode in one, see the other unchanged; turn on the display override in one, see the other take its text size.
+- Import tests for both export shapes (`version: 2` and the flat shape).
+- `supabase db push --dry-run` lists only the new migration before the real push.
 
 ## Reconsideration conditions
 
