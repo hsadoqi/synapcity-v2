@@ -2,6 +2,8 @@
 
 import { useState, useTransition, type ReactNode } from 'react';
 
+import Link from 'next/link';
+
 import { BellIcon, HomeIcon, LogOutIcon, UserRound } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
@@ -21,7 +23,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from './ui/tooltip';
-import { LinkButton } from './link-button';
 
 type UserMenuProps = {
   id: string;
@@ -94,29 +95,13 @@ function UserMenu({
         {children}
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <LinkButton
-              href={`/${id}/home`}
-              variant="ghost"
-              size="icon"
-              aria-label="Home"
-              className="w-full justify-start bg-transparent items-center hover:bg-transparent focus:bg-transparent active:bg-transparent focus:text-foreground gap-2 transition-all duration-200 ease-in-out"
-            >
-              <HomeIcon />
-              Home
-            </LinkButton>
+          <DropdownMenuItem render={<Link href={`/${id}/home`} />}>
+            <HomeIcon aria-hidden />
+            Home
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <LinkButton
-              href={`/${id}/settings`}
-              variant="ghost"
-              size="icon"
-              aria-label="Settings"
-              className="w-full justify-start bg-transparent items-center hover:bg-transparent focus:bg-transparent active:bg-transparent focus:text-foreground gap-2 transition-all duration-200 ease-in-out"
-            >
-              <BellIcon />
-              Settings
-            </LinkButton>
+          <DropdownMenuItem render={<Link href={`/${id}/settings`} />}>
+            <BellIcon aria-hidden />
+            Settings
           </DropdownMenuItem>
         </DropdownMenuGroup>
         {onSignOut ? (
