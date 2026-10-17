@@ -8,7 +8,7 @@ vi.mock('@/lib/supabase/server', () => ({
   }),
 }));
 
-import { getPendingEmail } from './session';
+import { getConnectedAccounts, getPendingEmail } from './session';
 
 describe('getPendingEmail', () => {
   beforeEach(() => {
@@ -46,5 +46,54 @@ describe('getPendingEmail', () => {
     });
 
     expect(await getPendingEmail()).toBeNull();
+  });
+});
+
+describe('getConnectedAccounts', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('lists the linked Google and GitHub accounts as display rows, nothing more', async () => {
+    mocks.getUser.mockResolvedValue({
+      data: {
+        user: {
+          id: 'u1',
+          identities: [
+            { provider: 'email', identity_data: { email: 'ada@example.com' } },
+            {
+              provider: 'github',
+              identity_data: { user_name: 'ada-l', secret: 'sentinel-token' },
+            },
+          ],
+        },
+      },
+      error: null,
+    });
+
+    const accounts = await getConnectedAccounts();
+
+    expect(accounts).toEqual([{ provider: 'github', detail: 'ada-l' }]);
+    expect(JSON.stringify(accounts)).not.toContain('sentinel');
+  });
+
+  it('is empty when nothing is linked, there are no identities, or there is no session', async () => {
+    mocks.getUser.mockResolvedValue({
+      data: { user: { id: 'u1', identities: [] } },
+      error: null,
+    });
+    expect(await getConnectedAccounts()).toEqual([]);
+
+    mocks.getUser.mockResolvedValue({
+      data: { user: { id: 'u1' } },
+      error: null,
+    });
+    expect(await getConnectedAccounts()).toEqual([]);
+
+    mocks.getUser.mockResolvedValue({
+      data: { user: null },
+      error: { code: 'session_not_found' },
+    });
+    expect(await getConnectedAccounts()).toEqual([]);
   });
 });

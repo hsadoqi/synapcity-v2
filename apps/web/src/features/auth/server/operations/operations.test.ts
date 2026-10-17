@@ -7,11 +7,15 @@ const mocks = vi.hoisted(() => ({
   getUser: vi.fn(),
   updateUser: vi.fn(),
   resend: vi.fn(),
+  linkIdentity: vi.fn(),
 }));
 
 vi.mock('@/lib/supabase/server', () => ({ createClient: mocks.createClient }));
 
-import { AuthRetryableFetchError } from '@supabase/supabase-js';
+import {
+  AuthRetryableFetchError,
+  AuthSessionMissingError,
+} from '@supabase/supabase-js';
 
 import {
   changeEmail,
@@ -19,6 +23,7 @@ import {
   requestRecoveryEmail,
   resendEmailChange,
   sendOwnPasswordReset,
+  startAccountLink,
 } from './operations';
 
 const PASSWORD = 'sentinel-password-9f3a';
@@ -54,6 +59,7 @@ beforeEach(() => {
       getUser: mocks.getUser,
       updateUser: mocks.updateUser,
       resend: mocks.resend,
+      linkIdentity: mocks.linkIdentity,
     },
   }));
 });
@@ -488,5 +494,78 @@ describe('sendOwnPasswordReset', () => {
       code: 'unexpected_failure',
     });
     expect(JSON.stringify([limited, failed])).not.toContain('sentinel');
+  });
+});
+
+describe('startAccountLink', () => {
+  const input = {
+    provider: 'github' as const,
+    redirectTo: 'https://app.test/auth/callback?next=%2Fu%2Fsettings&flow=link',
+  };
+
+  it('asks the provider to link, returning to the callback, and hands back where to send the browser', async () => {
+    mocks.linkIdentity.mockResolvedValue({
+      data: {
+        provider: 'github',
+        url: 'https://github.com/login/oauth/authorize?x=1',
+      },
+      error: null,
+    });
+
+    const outcome = await startAccountLink(input);
+
+    expect(mocks.linkIdentity).toHaveBeenCalledExactlyOnceWith({
+      provider: 'github',
+      options: { redirectTo: input.redirectTo },
+    });
+    expect(outcome).toEqual({
+      kind: 'redirect',
+      url: 'https://github.com/login/oauth/authorize?x=1',
+    });
+  });
+
+  it('tells a missing session from an unreachable service', async () => {
+    mocks.linkIdentity.mockResolvedValue({
+      data: { provider: 'github', url: null },
+      error: new AuthSessionMissingError(),
+    });
+    expect(await startAccountLink(input)).toEqual({ kind: 'signed-out' });
+
+    mocks.linkIdentity.mockResolvedValue({
+      data: { provider: 'github', url: null },
+      error: new AuthRetryableFetchError('fetch failed', 0),
+    });
+    expect(await startAccountLink(input)).toEqual({ kind: 'unavailable' });
+  });
+
+  it('reduces a provider error to its code, such as linking being switched off', async () => {
+    mocks.linkIdentity.mockResolvedValue({
+      data: { provider: 'github', url: null },
+      error: {
+        code: 'manual_linking_disabled',
+        message: 'sentinel',
+        status: 422,
+      },
+    });
+
+    const outcome = await startAccountLink(input);
+
+    expect(outcome).toEqual({
+      kind: 'provider-error',
+      code: 'manual_linking_disabled',
+    });
+    expect(JSON.stringify(outcome)).not.toContain('sentinel');
+  });
+
+  it('does not send the browser anywhere when there is no address to send it to', async () => {
+    mocks.linkIdentity.mockResolvedValue({
+      data: { provider: 'github', url: null },
+      error: null,
+    });
+
+    expect(await startAccountLink(input)).toEqual({
+      kind: 'provider-error',
+      code: undefined,
+    });
   });
 });

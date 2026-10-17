@@ -11,6 +11,7 @@ import {
   emailChangeErrorFields,
   emailChangeErrorMessage,
   isRateLimited,
+  linkErrorMessage,
 } from './error-messages';
 
 const GENERIC = 'Something went wrong. Try again.';
@@ -199,5 +200,31 @@ describe('changing an email', () => {
   ])('uses the ordinary wording and fields for %j', (code) => {
     expect(emailChangeErrorMessage(code)).toBe(authErrorMessage(code));
     expect(emailChangeErrorFields(code)).toEqual(authErrorFields(code));
+  });
+});
+
+describe('connecting an account', () => {
+  it.each([
+    [
+      'manual_linking_disabled',
+      'Connecting accounts is not turned on for this app yet.',
+    ],
+    ['provider_disabled', 'That sign-in method is not available right now.'],
+    [
+      'oauth_provider_not_supported',
+      'That sign-in method is not available right now.',
+    ],
+    ['identity_already_exists', 'That account is already connected.'],
+  ])('words %s for the person', (code, message) => {
+    expect(linkErrorMessage(code)).toBe(message);
+  });
+
+  it.each([
+    'over_request_rate_limit',
+    'session_expired',
+    'something_unknown',
+    undefined,
+  ])('uses the ordinary wording for %j', (code) => {
+    expect(linkErrorMessage(code)).toBe(authErrorMessage(code));
   });
 });

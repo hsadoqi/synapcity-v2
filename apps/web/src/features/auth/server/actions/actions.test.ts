@@ -1,4 +1,7 @@
-import { AuthRetryableFetchError } from '@supabase/supabase-js';
+import {
+  AuthRetryableFetchError,
+  AuthSessionMissingError,
+} from '@supabase/supabase-js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
@@ -12,6 +15,7 @@ const mocks = vi.hoisted(() => ({
   signOut: vi.fn(),
   getClaims: vi.fn(),
   getUser: vi.fn(),
+  linkIdentity: vi.fn(),
 }));
 
 /** Stands in for Next's `redirect`, which never returns. */
@@ -42,11 +46,13 @@ vi.mock('@/lib/supabase/server', () => ({
       signOut: mocks.signOut,
       getClaims: mocks.getClaims,
       getUser: mocks.getUser,
+      linkIdentity: mocks.linkIdentity,
     },
   }),
 }));
 
 import {
+  connectAccount,
   requestEmailChange,
   requestOwnPasswordReset,
   requestPasswordReset,
@@ -976,4 +982,115 @@ describe('when the session has gone, the form is told so it can link to sign-in'
       expect(state.signedOut).toBeUndefined();
     },
   );
+});
+
+describe('connectAccount', () => {
+  const PROVIDER_URL = 'https://accounts.google.com/o/oauth2/v2/auth?x=1';
+  const SIGNED_OUT =
+    'For your security, sign out, sign in again, then try once more.';
+
+  beforeEach(() => {
+    mocks.getClaims.mockResolvedValue({
+      data: { claims: { sub: USER_ID, email: 'ada@example.com' } },
+      error: null,
+    });
+    mocks.linkIdentity.mockResolvedValue({
+      data: { provider: 'google', url: PROVIDER_URL },
+      error: null,
+    });
+  });
+
+  it('sends the browser to the provider, asking to come back to settings through the link flow', async () => {
+    const url = await redirectOf(
+      connectAccount({}, form({ provider: 'google' })),
+    );
+
+    expect(url).toBe(PROVIDER_URL);
+    expect(mocks.linkIdentity).toHaveBeenCalledExactlyOnceWith({
+      provider: 'google',
+      options: {
+        redirectTo:
+          'https://app.test/auth/callback?next=%2Fuser-1%2Fsettings&flow=link',
+      },
+    });
+  });
+
+  it.each(['', 'facebook', 'Google', '<script>', 'constructor'])(
+    'refuses %j as a provider, without calling the provider',
+    async (provider) => {
+      const state = await connectAccount({}, form({ provider }));
+
+      expect(state.error).toBe('Something went wrong. Try again.');
+      expect(mocks.linkIdentity).not.toHaveBeenCalled();
+    },
+  );
+
+  it('needs a session, and flags it so the form can link to sign-in', async () => {
+    mocks.getClaims.mockResolvedValue({ data: null, error: null });
+
+    const state = await connectAccount({}, form({ provider: 'google' }));
+
+    expect(state.error).toBe(SIGNED_OUT);
+    expect(state.signedOut).toBe(true);
+    expect(mocks.linkIdentity).not.toHaveBeenCalled();
+  });
+
+  it('flags a session the provider no longer knows', async () => {
+    mocks.linkIdentity.mockResolvedValue({
+      data: { provider: 'google', url: null },
+      error: new AuthSessionMissingError(),
+    });
+
+    const state = await connectAccount({}, form({ provider: 'google' }));
+
+    expect(state.signedOut).toBe(true);
+  });
+
+  it('does not call an outage a signed-out session', async () => {
+    mocks.linkIdentity.mockResolvedValue({
+      data: { provider: 'google', url: null },
+      error: new AuthRetryableFetchError('fetch failed', 0),
+    });
+
+    const state = await connectAccount({}, form({ provider: 'google' }));
+
+    expect(state.error).toBe('Something went wrong. Try again.');
+    expect(state.signedOut).toBeUndefined();
+  });
+
+  it('says plainly when connecting accounts is switched off for the project', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    mocks.linkIdentity.mockResolvedValue({
+      data: { provider: 'google', url: null },
+      error: {
+        code: 'manual_linking_disabled',
+        message: 'secret detail ada@example.com',
+      },
+    });
+
+    const state = await connectAccount({}, form({ provider: 'google' }));
+
+    expect(state.error).toBe(
+      'Connecting accounts is not turned on for this app yet.',
+    );
+    expect(warn).toHaveBeenCalledWith('connectAccount failed', {
+      provider: 'google',
+      code: 'manual_linking_disabled',
+    });
+    expect(JSON.stringify(warn.mock.calls)).not.toMatch(/secret|ada@example/);
+    warn.mockRestore();
+  });
+
+  it('shows a rate limit', async () => {
+    mocks.linkIdentity.mockResolvedValue({
+      data: { provider: 'google', url: null },
+      error: { code: 'over_request_rate_limit' },
+    });
+
+    const state = await connectAccount({}, form({ provider: 'google' }));
+
+    expect(state.error).toBe(
+      'Too many attempts. Wait a few minutes and try again.',
+    );
+  });
 });
