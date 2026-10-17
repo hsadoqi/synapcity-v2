@@ -3,11 +3,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AppearanceSettings } from './components/appearance-settings';
 import { DataPrivacySettings } from './components/data-privacy-settings';
+import { NotificationSettings } from './components/notification-settings';
 import { RegionalSettings } from './components/regional-settings';
 import { ThemeSettings } from './components/theme-settings';
 import { renderWithSettings, stubBrowser } from './test-harness';
 import { appearanceSchema } from './types/appearance';
 import { dataPrivacySchema } from './types/data-privacy';
+import { transferSchema } from './types/import-export';
+import { notificationsSchema } from './types/notifications';
 import { regionalSchema } from './types/regional';
 import { themeSchema } from './types/theme';
 
@@ -16,8 +19,8 @@ afterEach(() => vi.unstubAllGlobals());
 
 type Control = { role: 'combobox' | 'switch'; name: string };
 
-// Every setting the Theme, Appearance, Regional and Data privacy tabs own has a control named here. A
-// field added to either schema fails this test until it gets one, so a setting
+// Every setting the Theme, Appearance, Regional, Notifications and Data privacy
+// tabs own has a control named here. A field added to any of those schemas fails this test until it gets one, so a setting
 // cannot be saved, exported and imported without anyone being able to change it.
 // `colorScheme` is the one exception: it mirrors `theme.mode`, which the Theme
 // tab owns, and mergeSettings keeps the two equal.
@@ -48,15 +51,31 @@ const regionalControls: Record<keyof typeof regionalSchema.shape, Control> = {
   numberFormat: { role: 'combobox', name: 'Number format' },
 };
 
-// `policyVersion` is recorded with each choice, not chosen.
-const privacyControls: Record<
-  Exclude<keyof typeof dataPrivacySchema.shape, 'policyVersion'>,
-  Control
-> = {
+const privacyControls: Record<keyof typeof dataPrivacySchema.shape, Control> = {
   analytics: { role: 'switch', name: 'Activity tracking' },
   errorReports: { role: 'switch', name: 'Error reports' },
   sharing: { role: 'switch', name: 'Data sharing with third parties' },
 };
+
+const notificationControls: Record<
+  keyof typeof notificationsSchema.shape,
+  Control
+> = {
+  email: { role: 'switch', name: 'Email notifications' },
+  push: { role: 'switch', name: 'Push notifications' },
+  sound: { role: 'switch', name: 'Notification sounds' },
+};
+
+// Every section an export file carries is listed here, so a section added to
+// the transfer cannot be exported and imported without a tab to change it.
+const transferredSections: Record<keyof typeof transferSchema.shape, unknown> =
+  {
+    theme: themeControls,
+    appearance: appearanceControls,
+    regional: regionalControls,
+    privacy: privacyControls,
+    notifications: notificationControls,
+  };
 
 describe('settings with a control', () => {
   it('names a control for every theme setting', () => {
@@ -79,11 +98,21 @@ describe('settings with a control', () => {
     );
   });
 
+  it('names a control for every notification setting', () => {
+    expect(Object.keys(notificationControls).sort()).toEqual(
+      Object.keys(notificationsSchema.shape).sort(),
+    );
+  });
+
   it('names a control for every data privacy setting', () => {
     expect(Object.keys(privacyControls).sort()).toEqual(
-      Object.keys(dataPrivacySchema.shape)
-        .filter((key) => key !== 'policyVersion')
-        .sort(),
+      Object.keys(dataPrivacySchema.shape).sort(),
+    );
+  });
+
+  it('covers every section an export file carries', () => {
+    expect(Object.keys(transferredSections).sort()).toEqual(
+      Object.keys(transferSchema.shape).sort(),
     );
   });
 
@@ -107,6 +136,14 @@ describe('settings with a control', () => {
     'the Regional tab renders %s',
     async (_key, { role, name }) => {
       await renderWithSettings(<RegionalSettings />);
+      expect(screen.getByRole(role, { name })).toBeTruthy();
+    },
+  );
+
+  it.each(Object.entries(notificationControls))(
+    'the Notifications tab renders %s',
+    async (_key, { role, name }) => {
+      await renderWithSettings(<NotificationSettings />);
       expect(screen.getByRole(role, { name })).toBeTruthy();
     },
   );

@@ -4,7 +4,7 @@ import { FieldGroup } from '@synapcity/frontend-ui/core/field';
 import { Separator } from '@synapcity/frontend-ui/core/separator';
 import { useAppearanceSettings } from '../../hooks/use-appearance-settings';
 import { useSettings } from '../../hooks/use-settings';
-import { SettingsTabShell } from '../../shared';
+import { SettingsSection, SettingsTabShell } from '../../shared';
 import {
   AllDevicesRow,
   ContrastModeRow,
@@ -26,8 +26,7 @@ export function AppearanceSettings() {
       title="Display"
       description="Text size, contrast and motion across the app."
     >
-      <section className="flex flex-col gap-4">
-        <h3 className="text-sm font-medium">Readability</h3>
+      <SettingsSection title="Readability">
         <FieldGroup>
           <FontSizeRow
             value={appearance.fontSize}
@@ -43,10 +42,9 @@ export function AppearanceSettings() {
             onChange={(showBorders) => updateAppearance({ showBorders })}
           />
         </FieldGroup>
-      </section>
+      </SettingsSection>
       <Separator />
-      <section className="flex flex-col gap-4">
-        <h3 className="text-sm font-medium">Motion</h3>
+      <SettingsSection title="Motion">
         <FieldGroup>
           <EnableAnimationsRow
             value={appearance.animationsEnabled}
@@ -60,19 +58,18 @@ export function AppearanceSettings() {
             onChange={(reducedMotion) => updateAppearance({ reducedMotion })}
           />
         </FieldGroup>
-      </section>
+      </SettingsSection>
       {syncsToAccount && (
         <>
           <Separator />
-          <section className="flex flex-col gap-4">
-            <h3 className="text-sm font-medium">Devices</h3>
+          <SettingsSection title="Devices">
             <FieldGroup>
               <AllDevicesRow
                 value={displayOnAllDevices}
                 onChange={setDisplayOnAllDevices}
               />
             </FieldGroup>
-          </section>
+          </SettingsSection>
         </>
       )}
     </SettingsTabShell>

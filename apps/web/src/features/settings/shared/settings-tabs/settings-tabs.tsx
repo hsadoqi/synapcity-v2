@@ -30,7 +30,7 @@ export const SettingsTabs = () => {
   useEffect(() => {
     const sync = () => {
       const value = window.location.hash.slice(1);
-      setTab(tabs.some((tab) => tab.value === value) ? value : 'theme');
+      setTab(tabs.some((tab) => tab.value === value) ? value : 'account');
     };
 
     sync();

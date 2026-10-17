@@ -64,6 +64,20 @@ describe('AppearanceSettings', () => {
     expect(screen.queryByText('Color theme')).toBeNull();
   });
 
+  it('locks reduced motion on while animations are off, keeping its saved value', async () => {
+    await renderWithSettings(<AppearanceSettings />);
+    const reduce = () => screen.getByRole('switch', { name: 'Reduce motion' });
+
+    fireEvent.click(screen.getByRole('switch', { name: 'Enable animations' }));
+    expect(reduce().getAttribute('aria-checked')).toBe('true');
+    expect(reduce().hasAttribute('data-disabled')).toBe(true);
+    expect(currentSettings().appearance.reducedMotion).toBe(false);
+
+    fireEvent.click(screen.getByRole('switch', { name: 'Enable animations' }));
+    expect(reduce().getAttribute('aria-checked')).toBe('false');
+    expect(reduce().hasAttribute('data-disabled')).toBe(false);
+  });
+
   it('saves reduced motion on its own', async () => {
     await renderWithSettings(<AppearanceSettings />);
 

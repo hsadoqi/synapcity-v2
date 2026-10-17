@@ -50,6 +50,30 @@ describe.each([
   });
 });
 
+describe.each([
+  [
+    'borders',
+    () => <ShowBordersRow highContrast value={false} onChange={() => {}} />,
+    'High contrast always shows borders.',
+  ],
+  [
+    'reduced-motion',
+    () => <ReducedMotionRow animationsOff value={false} onChange={() => {}} />,
+    'Animations are off, so nothing slides or zooms.',
+  ],
+])('%s row when another setting supersedes it', (id, renderRow, reason) => {
+  it('shows on, is disabled, and says why', () => {
+    render(renderRow());
+    const toggle = screen.getByRole('switch');
+
+    expect(toggle.getAttribute('aria-checked')).toBe('true');
+    expect(toggle.hasAttribute('data-disabled')).toBe(true);
+    expect(document.getElementById(`${id}-description`)?.textContent).toBe(
+      reason,
+    );
+  });
+});
+
 function expectSelect(id: string, label: string, shown: string) {
   const trigger = screen.getByRole('combobox', { name: label });
 
