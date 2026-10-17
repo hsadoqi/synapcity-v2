@@ -4,7 +4,7 @@ import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
 import { signOut } from '@/app/auth/actions';
-import { CurrentUserAvatar } from '@/components/current-user-avatar';
+import { CurrentUserAvatar } from '../../components';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = { title: 'Home' };
