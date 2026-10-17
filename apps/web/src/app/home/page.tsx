@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
 import { signOut } from '@/app/auth/actions';
@@ -18,6 +19,9 @@ export default async function HomePage() {
     <div className="flex flex-1 flex-col items-center justify-center gap-4 p-4 text-center">
       <h1>You are signed in</h1>
       <p className="text-sm text-muted-foreground">{data.claims.email}</p>
+      <LinkButton href="/auth/update-password" variant="link" size="lg">
+        Set or change your password
+      </LinkButton>
       <form action={signOut}>
         <Button type="submit" variant="outline" size="lg" label="Sign out">
           Sign out
