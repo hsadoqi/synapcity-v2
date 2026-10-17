@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
-import { AuthLinkButton } from '@/features/auth/shared/auth-link-button';
-import { AuthShell } from '@/features/auth/shared/auth-shell';
+import { AuthLinkButton } from '@/features/auth/shared';
+import { AuthShell } from '@/features/auth/shared';
 import { parseAuthFlow, type AuthFlow } from '@/lib/routing/auth-flow';
 
 export const metadata: Metadata = { title: 'Sign-in problem' };
@@ -36,6 +36,12 @@ const RECOVERY: Record<AuthFlow | 'unknown', Recovery> = {
       'It may have expired or already been used. Request a new one to choose your password.',
     primary: { type: 'forgot-password', label: 'Request a new link' },
     secondary: { type: 'login', label: 'Sign in' },
+  },
+  'email-change': {
+    title: 'That email confirmation link did not work',
+    description:
+      'It may have expired, been used already, or been opened in a different browser from the one you asked in. Sign in and ask for the change again from your settings.',
+    primary: { type: 'login', label: 'Sign in' },
   },
   unknown: {
     title: 'That link did not work',

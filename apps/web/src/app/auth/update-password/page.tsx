@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { createClient } from '@/lib/supabase/server';
-import { UpdatePasswordCard } from '@/features/auth/components/update-password-card';
+import { UpdatePasswordCard } from '@/features/auth/components/password/update-password/update-password-card';
 
 export const metadata: Metadata = { title: 'Choose a password' };
 

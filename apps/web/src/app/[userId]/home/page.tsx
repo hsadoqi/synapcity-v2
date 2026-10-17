@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
 
 import { CurrentUserAvatar } from '@/features/auth/components/current-user-avatar';
-import { SignOutButton } from '@/features/auth/components/sign-out-button';
+import { SignOutButton } from '@/features/auth/components/sign-out';
 import { requireOwner } from '@/lib/access/require-owner';
 
 export const metadata: Metadata = { title: 'Home' };

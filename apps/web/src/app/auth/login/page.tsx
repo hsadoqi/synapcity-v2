@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { LoginForm } from '@/features/auth/components/login-form';
+import { LoginForm } from '@/features/auth/components/login/login-form';
 import { OAuthButtons } from '@/features/auth/components/oauth-buttons';
 import { safeNextPath } from '@/lib/routing/safe-next';
 import { AuthLinkButton } from '@/features/auth/shared/auth-link-button';

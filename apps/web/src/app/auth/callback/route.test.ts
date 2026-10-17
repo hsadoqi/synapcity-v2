@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({ exchangeCodeForSession: vi.fn() }));
 
@@ -145,6 +145,124 @@ describe('GET /auth/callback', () => {
       const where = location(response);
       expect(where).not.toMatch(/sentinel/);
       expect(await response.text()).not.toMatch(/sentinel/);
+    });
+  });
+
+  describe('a new account', () => {
+    const DAY = 24 * 60 * 60 * 1000;
+    const NOW = Date.parse('2026-10-17T12:00:00Z');
+
+    const signsIn = (user: Record<string, unknown>) =>
+      mocks.exchangeCodeForSession.mockResolvedValue({
+        data: { user: { id: USER_ID, ...user } },
+        error: null,
+      });
+    const fresh = { created_at: new Date(NOW - DAY).toISOString() };
+    const welcome = (next: string) =>
+      `${ORIGIN}/auth/welcome?next=${encodeURIComponent(next)}`;
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(NOW);
+    });
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it.each(['oauth', 'confirm'])(
+      'is sent to confirm its name and photo after a %s sign-in',
+      async (flow) => {
+        signsIn({ ...fresh, user_metadata: {} });
+
+        const response = await GET(request({ code: 'abc', flow }));
+
+        expect(location(response)).toBe(welcome(HOME));
+      },
+    );
+
+    it('carries the destination it was going to, validated, through the step', async () => {
+      signsIn({ ...fresh });
+
+      const response = await GET(
+        request({
+          code: 'abc',
+          flow: 'oauth',
+          next: '/user-123/settings?tab=2',
+        }),
+      );
+
+      expect(location(response)).toBe(welcome('/user-123/settings?tab=2'));
+    });
+
+    it('never carries an unsafe destination, and never leaves the origin', async () => {
+      signsIn({ ...fresh });
+
+      const response = await GET(
+        request({ code: 'abc', flow: 'oauth', next: '//evil.test/steal' }),
+      );
+
+      expect(location(response)).toBe(welcome(HOME));
+      expect(new URL(location(response)).origin).toBe(ORIGIN);
+    });
+
+    it('is not sent there after a password reset', async () => {
+      signsIn({ ...fresh });
+
+      const response = await GET(request({ code: 'abc', flow: 'reset' }));
+
+      expect(location(response)).toBe(`${ORIGIN}${HOME}`);
+    });
+
+    it.each([
+      ['no flow', {}],
+      ['an unknown flow', { flow: 'sso' }],
+    ])('is not sent there with %s', async (_label, extra) => {
+      signsIn({ ...fresh });
+
+      const response = await GET(request({ code: 'abc', ...extra }));
+
+      expect(location(response)).toBe(`${ORIGIN}${HOME}`);
+    });
+
+    it('is not asked again once it finished or skipped the step', async () => {
+      signsIn({ ...fresh, user_metadata: { profile_confirmed: true } });
+
+      const response = await GET(request({ code: 'abc', flow: 'oauth' }));
+
+      expect(location(response)).toBe(`${ORIGIN}${HOME}`);
+    });
+
+    it('is left alone when the account is older than a new one', async () => {
+      signsIn({ created_at: new Date(NOW - 90 * DAY).toISOString() });
+
+      const response = await GET(request({ code: 'abc', flow: 'oauth' }));
+
+      expect(location(response)).toBe(`${ORIGIN}${HOME}`);
+    });
+
+    it.each([
+      ['no creation date', {}],
+      ['an unreadable creation date', { created_at: 'yesterday-ish' }],
+    ])(
+      'is left alone with %s, so doubt never adds a step',
+      async (_l, user) => {
+        signsIn(user);
+
+        const response = await GET(request({ code: 'abc', flow: 'oauth' }));
+
+        expect(location(response)).toBe(`${ORIGIN}${HOME}`);
+      },
+    );
+
+    it('does not reach the step when the sign-in fails', async () => {
+      mocks.exchangeCodeForSession.mockResolvedValue({
+        data: { user: null },
+        error: { code: 'x', message: 'y' },
+      });
+
+      const response = await GET(request({ code: 'abc', flow: 'oauth' }));
+
+      expect(location(response)).toBe(`${ORIGIN}/auth/error?reason=oauth`);
     });
   });
 });
