@@ -5,6 +5,7 @@ import { RootContent } from '@synapcity/frontend-ui/blocks/root-shell/root-conte
 import { SidebarShell } from '@synapcity/frontend-ui/blocks/sidebar-shell';
 import React from 'react';
 import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';
+import { Toaster } from '@/components/ui/toast/toast';
 
 type ShellProps = {
   children: React.ReactNode;
@@ -100,11 +101,22 @@ export default function RootShell({
   /** Present when someone is signed in; the app supplies where they lead. */
   account?: AccountLinks | null;
 }) {
-  return account ? (
-    <AuthenticatedShell account={account} headerActions={headerActions}>
-      {children}
-    </AuthenticatedShell>
-  ) : (
-    <PublicShell headerActions={headerActions}>{children}</PublicShell>
-  );
+  return (
+    <div data-slot="root-shell" className="flex min-h-svh flex-1">
+      <SkipLinkButton />
+      {account ? (
+        <SidebarShell
+          header={<RootHeader account={account} actions={headerActions} />}
+          account={account}
+        >
+          <ShellContent>{children}</ShellContent>
+                </SidebarShell>
+      ) : (
+        <div className="flex flex-1 flex-col">
+          <RootHeader actions={headerActions} />
+          <ShellContent>{children}</ShellContent>
+        </div>
+      )}
+    </div>  
+  )
 }
