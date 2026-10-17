@@ -17,13 +17,15 @@ import {
 } from '@synapcity/frontend-ui/components/ui/scroll-area';
 
 export const SettingsTabs = () => {
-  const [tab, setTab] = useState('theme');
+  // null until the URL hash is read. Starting on 'theme' drew and loaded the
+  // Theme tab, then swapped to the tab a link named (#regional), so the
+  // content flashed and the page height jumped twice. The hash never reaches
+  // the server, so server and first client render both show no panel.
+  const [tab, setTab] = useState<string | null>(null);
   // A tab stays mounted once opened, so a draft in it (the Theme tab's unsaved
   // choices) survives a visit to another tab. Tabs never opened still never load.
-  const [visited, setVisited] = useState<ReadonlySet<string>>(
-    () => new Set([tab]),
-  );
-  if (!visited.has(tab)) setVisited(new Set(visited).add(tab));
+  const [visited, setVisited] = useState<ReadonlySet<string>>(() => new Set());
+  if (tab !== null && !visited.has(tab)) setVisited(new Set(visited).add(tab));
 
   useEffect(() => {
     const sync = () => {
