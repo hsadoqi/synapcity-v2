@@ -38,3 +38,8 @@ export function hasRecentLinkSignIn(
     );
   });
 }
+
+/** `hasRecentLinkSignIn` against the clock, for callers that are not components. */
+export function hasRecentLinkSignInNow(amr: unknown): boolean {
+  return hasRecentLinkSignIn(amr, Math.floor(Date.now() / 1000));
+}

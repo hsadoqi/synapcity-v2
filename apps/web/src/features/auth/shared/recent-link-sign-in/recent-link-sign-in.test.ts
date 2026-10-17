@@ -1,7 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
   hasRecentLinkSignIn,
+  hasRecentLinkSignInNow,
   LINK_SIGN_IN_WINDOW_MINUTES,
 } from './recent-link-sign-in';
 
@@ -71,5 +72,18 @@ describe('hasRecentLinkSignIn', () => {
     ['an empty list', []],
   ])('refuses %s', (_label, amr) => {
     expect(hasRecentLinkSignIn(amr, NOW)).toBe(false);
+  });
+});
+
+describe('hasRecentLinkSignInNow', () => {
+  it('reads the clock', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(NOW * 1000);
+
+    expect(
+      hasRecentLinkSignInNow([{ method: 'otp', timestamp: NOW - 10 }]),
+    ).toBe(true);
+    expect(
+      hasRecentLinkSignInNow([{ method: 'otp', timestamp: NOW - 5000 }]),
+    ).toBe(false);
   });
 });

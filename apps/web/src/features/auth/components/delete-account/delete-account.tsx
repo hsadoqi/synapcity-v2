@@ -84,6 +84,8 @@ export function DeleteAccount({ email }: { email: string | null }) {
                 >
                   <FormField
                     id="delete-account-email"
+                    // The action reads `email`; the id stays unique on the page.
+                    name="email"
                     {...fieldErrorProps(state, 'email', messageId)}
                     label="Type your email address to continue"
                     hint={`We will send a link to ${email}. Open it within ${LINK_SIGN_IN_WINDOW_MINUTES} minutes to finish.`}
