@@ -30,12 +30,16 @@ describe('callbackUrl', () => {
 });
 
 describe('parseAuthFlow', () => {
-  it.each(['oauth', 'confirm', 'reset', 'email-change', 'link'] as const)(
-    'accepts %s',
-    (flow) => {
-      expect(parseAuthFlow(flow)).toBe(flow);
-    },
-  );
+  it.each([
+    'oauth',
+    'confirm',
+    'reset',
+    'email-change',
+    'link',
+    'delete-account',
+  ] as const)('accepts %s', (flow) => {
+    expect(parseAuthFlow(flow)).toBe(flow);
+  });
 
   it.each([null, undefined, '', 'OAUTH', 'reset ', '<script>', 'constructor'])(
     'rejects %j',
@@ -89,5 +93,18 @@ describe('the link flow', () => {
       'https://app.test/auth/callback?next=%2Fu%2Fsettings&flow=link',
     );
     expect(authErrorPath('link')).toBe('/auth/error?reason=link');
+  });
+});
+
+describe('the delete-account flow', () => {
+  it('tags the emailed link so a failure can be explained', () => {
+    expect(
+      callbackUrl('https://app.test', '/auth/delete-account', 'delete-account'),
+    ).toBe(
+      'https://app.test/auth/callback?next=%2Fauth%2Fdelete-account&flow=delete-account',
+    );
+    expect(authErrorPath('delete-account')).toBe(
+      '/auth/error?reason=delete-account',
+    );
   });
 });

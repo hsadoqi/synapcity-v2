@@ -9,6 +9,7 @@ export const AUTH_FLOWS = [
   'reset',
   'email-change',
   'link',
+  'delete-account',
 ] as const;
 export type AuthFlow = (typeof AUTH_FLOWS)[number];
 

@@ -11,6 +11,7 @@ export const NOTICES = {
   'password-updated': 'Password updated.',
   'email-updated': 'Email address updated.',
   'account-connected': 'Account connected.',
+  'account-deleted': 'Your account has been deleted.',
   // The first of two confirmations (see "Secure email change").
   'email-change-step':
     'Link confirmed. Confirm the message sent to your other address to finish the change.',

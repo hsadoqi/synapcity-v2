@@ -73,3 +73,10 @@ describe('the account-connected notice', () => {
     expect(NOTICES['account-connected']).toBe('Account connected.');
   });
 });
+
+describe('the account-deleted notice', () => {
+  it('is a listed key with plain wording', () => {
+    expect(isNoticeKey('account-deleted')).toBe(true);
+    expect(NOTICES['account-deleted']).toBe('Your account has been deleted.');
+  });
+});

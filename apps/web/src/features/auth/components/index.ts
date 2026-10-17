@@ -12,3 +12,4 @@ export * from './connected-accounts';
 // reads the session, so a client component importing this barrel would pull the
 // server's cookie and Supabase code into the browser bundle. Import it from
 // './auth-status' directly, from server code only.
+export * from './delete-account';
