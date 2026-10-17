@@ -1,12 +1,12 @@
 # Task scope
 
-## Active task: auth review follow-ups AHF-06, callback route tests (2026-10-17)
+## Active task: auth review follow-ups AHF-04, sign-out failure handling (2026-10-17)
 
-- Goal and mode: implement AHF-06 of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`; authorized by the owner's instruction to continue the plan.
-- Exact change: create `apps/web/src/app/auth/callback/route.test.ts`, which calls the real `GET` with `NextRequest` and replaces only the Supabase code exchange.
-- Mutation budgets: creates 1 test file plus this entry; source files, dependencies, config, schema and provider state 0. `route.ts` changes only if a test shows a defect, under a separate manifest.
-- Verification: `pnpm format:check`, `lint`, `typecheck`, `deps`, `test` and `build`. The mocked exchange does not prove a real PKCE link or OAuth session; the end-to-end suite and live auth are not run here.
-- Recovery: delete the test file; nothing else changes.
+- Goal and mode: implement AHF-04 of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`; the owner approved the recommended contract on 2026-10-17: when the provider returns or throws an error, still revalidate the layout and redirect to `/`, and log only the operation and a code.
+- Exact change: update `apps/web/src/features/auth/server/actions.ts` (`signOut` only) and `actions.test.ts`.
+- Mutation budgets: updates 2 source files plus this entry; creates 0; dependencies, config, schema, routes and provider state 0. No manual cookie deletion, session store or global revocation is added.
+- Verification: the two new failure tests fail before the change and pass after; then `pnpm format:check`, `lint`, `typecheck`, `deps`, `test` and `build`. A mock does not prove local or global session revocation; the end-to-end suite and live auth are not run here.
+- Recovery: revert the two source files; nothing else changes.
 
 ## Active task: bring refactor/auth-features into main (2026-10-17)
 
