@@ -5,7 +5,6 @@ import { RootContent } from '@synapcity/frontend-ui/blocks/root-shell/root-conte
 import { SidebarShell } from '@synapcity/frontend-ui/blocks/sidebar-shell';
 import React from 'react';
 import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';
-import { Toaster } from '@/components/ui/toast/toast';
 
 type ShellProps = {
   children: React.ReactNode;
