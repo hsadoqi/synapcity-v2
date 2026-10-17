@@ -8,71 +8,59 @@ type RowProps<Key extends keyof AppearanceSettings> = {
   onChange: (value: AppearanceSettings[Key]) => void;
 };
 
-export const ShowBordersRow = ({
-  value,
-  onChange,
-}: {
+type SwitchRowProps = {
+  id: string;
+  label: string;
+  description: string;
   value: boolean;
   onChange: (value: boolean) => void;
-}) => {
-  return (
-    <SettingRow
-      id="borders"
-      label="Show component borders"
-      description="Give panels and controls a little more definition."
-    >
-      <Switch
-        id="borders"
-        aria-describedby="borders-description"
-        checked={value}
-        onCheckedChange={onChange}
-      />
-    </SettingRow>
-  );
 };
 
-export const EnableAnimationsRow = ({
+function SwitchRow({
+  id,
+  label,
+  description,
   value,
   onChange,
-}: {
-  value: boolean;
-  onChange: (value: boolean) => void;
-}) => {
+}: SwitchRowProps) {
   return (
-    <SettingRow
-      id="animations"
-      label="Enable animations"
-      description="Use gentle transitions as you move around."
-    >
+    <SettingRow id={id} label={label} description={description}>
       <Switch
-        id="animations"
-        aria-describedby="animations-description"
+        id={id}
+        aria-describedby={`${id}-description`}
         checked={value}
         onCheckedChange={onChange}
       />
     </SettingRow>
   );
-};
+}
 
-export const ReducedMotionRow = ({
-  value,
-  onChange,
-}: RowProps<'reducedMotion'>) => {
-  return (
-    <SettingRow
-      id="reduced-motion"
-      label="Reduce motion"
-      description="Skip sliding and zooming. Fades and colour changes stay."
-    >
-      <Switch
-        id="reduced-motion"
-        aria-describedby="reduced-motion-description"
-        checked={value}
-        onCheckedChange={onChange}
-      />
-    </SettingRow>
-  );
-};
+export const ShowBordersRow = (props: RowProps<'showBorders'>) => (
+  <SwitchRow
+    id="borders"
+    label="Show component borders"
+    description="Give panels and controls a little more definition."
+    {...props}
+  />
+);
+
+export const EnableAnimationsRow = (props: RowProps<'animationsEnabled'>) => (
+  <SwitchRow
+    id="animations"
+    label="Enable animations"
+    description="Use gentle transitions as you move around."
+    {...props}
+  />
+);
+
+export const ReducedMotionRow = (props: RowProps<'reducedMotion'>) => (
+  <SwitchRow
+    id="reduced-motion"
+    label="Reduce motion"
+    description="Skip sliding and zooming. Fades and colour changes stay. Your device's own reduce-motion setting always applies as well."
+    {...props}
+  />
+);
 
 export const FontSizeRow = ({ value, onChange }: RowProps<'fontSize'>) => {
   return (

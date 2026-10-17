@@ -18,8 +18,12 @@ import {
 import { settingsDefaults } from '../types/settings';
 import type { Settings, SettingsPatch } from '../types';
 import { themeSchema } from '../types/theme';
+import {
+  applyAppearance,
+  PREFERENCES_STORAGE_KEY,
+} from '../shared/appearance-attributes';
 
-const STORAGE_KEY = 'synapcity-preferences';
+const STORAGE_KEY = PREFERENCES_STORAGE_KEY;
 
 type SettingsContextType = {
   settings: Settings;
@@ -113,15 +117,24 @@ export function SettingsProvider({
     };
   }, []);
 
+  const {
+    animationsEnabled,
+    showBorders,
+    reducedMotion,
+    contrastMode,
+    fontSize,
+  } = appearance;
   useEffect(() => {
-    // Styled by tokens/preferences.css in the tailwind-config package.
-    const root = document.documentElement.dataset;
-    root.animations = String(appearance.animationsEnabled);
-    root.borders = String(appearance.showBorders);
-    root.reducedMotion = String(appearance.reducedMotion);
-    root.contrast = appearance.contrastMode;
-    root.fontSize = appearance.fontSize;
-  }, [appearance]);
+    // Styled by tokens/preferences.css; the boot script in the root layout
+    // sets the same attributes before first paint.
+    applyAppearance(document.documentElement, {
+      animationsEnabled,
+      showBorders,
+      reducedMotion,
+      contrastMode,
+      fontSize,
+    });
+  }, [animationsEnabled, showBorders, reducedMotion, contrastMode, fontSize]);
 
   useEffect(() => {
     if (status !== 'Saved') return;

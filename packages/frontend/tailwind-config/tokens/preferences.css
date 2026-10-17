@@ -14,21 +14,21 @@
   --text-base-size: 1.0625rem;
 }
 
-/* Borders: a visible line between panels and around controls, in both themes. */
+/* Contrast and borders. The order is the precedence: low contrast softens the lines,
+ * an explicit "show borders" brings them back, and high contrast beats both. Low only
+ * softens lines; text keeps its contrast so it stays readable. */
+:root[data-contrast='low'] {
+  --border: color-mix(in oklch, var(--muted) 55%, var(--base-background));
+}
+
 :root[data-borders='true'] {
   --border: var(--muted-background);
 }
 
-/* Contrast. High draws lines and secondary text in the full ink colour. Low only softens
- * the lines; text keeps its contrast so it stays readable. */
 :root[data-contrast='high'] {
   --border: var(--base-foreground);
   --input: var(--base-foreground);
   --muted-foreground: var(--base-foreground);
-}
-
-:root[data-contrast='low'] {
-  --border: color-mix(in oklch, var(--muted) 55%, var(--base-background));
 }
 
 /* Animations off, or reduced motion on, stops travel and scale (see accessibility.css for
