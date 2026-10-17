@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { ProfileForm } from '@/features/account/components/profile-form';
+import { FIXTURE_MESSAGE } from '@/lib/access/dev-fixture';
 import { profileFromClaims } from '@/features/auth/shared/current-user';
 import { requireOwner } from '@/lib/access/require-owner';
 
@@ -11,7 +12,7 @@ export default async function SettingsPage({
 }: {
   params: Promise<{ userId: string }>;
 }) {
-  const claims = await requireOwner((await params).userId);
+  const { kind, claims } = await requireOwner((await params).userId);
   const { name } = profileFromClaims(claims);
 
   return (
@@ -24,7 +25,11 @@ export default async function SettingsPage({
           require you to re-verify your account.
         </p>
       </div>
-      <ProfileForm defaultName={name ?? ''} />
+      {kind === 'fixture' ? (
+        <p className="text-sm text-muted-foreground">{FIXTURE_MESSAGE}</p>
+      ) : (
+        <ProfileForm defaultName={name ?? ''} />
+      )}
     </div>
   );
 }

@@ -22,6 +22,7 @@ import { checkName } from '@/features/account/shared/name';
 import { getOrigin } from '@/features/auth/server/site-origin';
 import { safeNextPath } from '@/lib/routing/safe-next';
 import { createClient } from '@/lib/supabase/server';
+import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 
 import { registerWithPassword, requestRecoveryEmail } from './operations';
 
@@ -38,6 +39,8 @@ export async function signInWithPassword(
   _previous: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  if (fixtureModeEnabled())
+    return authFailure(FIXTURE_MESSAGE, { email: '', name: '' });
   const email = field(formData, 'email').trim();
   const password = field(formData, 'password');
   if (!email || !password) {
@@ -70,6 +73,8 @@ export async function signUp(
   _previous: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  if (fixtureModeEnabled())
+    return authFailure(FIXTURE_MESSAGE, { email: '', name: '' });
   const email = field(formData, 'email').trim();
   const password = field(formData, 'password');
   // Empty when the visitor gave no destination: the callback then falls back
@@ -116,6 +121,8 @@ export async function resendConfirmation(
   _previous: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  if (fixtureModeEnabled())
+    return authFailure(FIXTURE_MESSAGE, { email: '', name: '' });
   const email = field(formData, 'email').trim();
   const next = safeNextPath(field(formData, 'next'), '');
   if (!email) return authFailure(ENTER_EMAIL, { email }, ['email']);
@@ -141,6 +148,8 @@ export async function requestPasswordReset(
   _previous: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  if (fixtureModeEnabled())
+    return authFailure(FIXTURE_MESSAGE, { email: '', name: '' });
   const email = field(formData, 'email').trim();
   const user = { email, name: '' };
   if (!email) return authFailure(ENTER_EMAIL, user, ['email']);
@@ -169,6 +178,8 @@ export async function updatePassword(
   _previous: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  if (fixtureModeEnabled())
+    return authFailure(FIXTURE_MESSAGE, { email: '', name: '' });
   const password = field(formData, 'password');
   const confirm = field(formData, 'confirm');
   const user = { email: '', name: '' };
@@ -200,6 +211,7 @@ export async function updatePassword(
 }
 
 export async function signInWithOAuth(formData: FormData): Promise<void> {
+  if (fixtureModeEnabled()) redirect(authErrorPath('oauth'));
   const provider = field(formData, 'provider');
   if (!isOAuthProvider(provider)) redirect(authErrorPath('oauth'));
 
@@ -220,6 +232,7 @@ export async function signInWithOAuth(formData: FormData): Promise<void> {
 }
 
 export async function signOut(): Promise<void> {
+  if (fixtureModeEnabled()) redirect('/');
   const supabase = await createClient();
   // Redirect either way: the person asked to leave and has no recovery step to
   // take. Log only the operation and the code, never the error object, so a

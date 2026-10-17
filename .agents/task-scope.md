@@ -1,5 +1,14 @@
 # Task scope
 
+## Active task: auth review follow-ups AHF-02, development identity (2026-10-17)
+
+- Goal and mode: implement AHF-02 (and the D1 part of AHF-01) of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`; the owner approved recommendation D1 on 2026-10-17: real auth by default in development, fixture browsing only as an explicit server-side opt-in named `SYNAPCITY_DEV_AUTH` (value `fixture`, development only).
+- Exact change: creates `apps/web/src/lib/access/dev-fixture.ts` and its test, and `apps/web/src/features/auth/server/session.test.ts`. Updates `session.ts`, `lib/access/require-owner.ts` (now returns `{ kind, claims }`), `lib/supabase/middleware.ts`, `features/auth/server/actions.ts`, `features/account/server/actions.ts`, `features/auth/client/user-provider.tsx`, `features/auth/components/auth-status.tsx`, `features/auth/shared/current-user.ts`, `app/[userId]/home/page.tsx`, `app/[userId]/settings/page.tsx`, `app/auth/update-password/page.tsx`, their existing tests, `turbo.json` (flag declaration), `apps/web/README.md` and ADR-0006 (dated amendment).
+- Not carried over: the original `development-auth.ts` bypass on `v0/supabase-environment-error-df72e1eb` (kept there as evidence).
+- Mutation budgets: creates 3 source or test files; dependencies, schema, routes, public API 0; one new environment variable name (approved).
+- Verification: mode-matrix tests (development with and without the flag, test, production with the flag) for the helper, `requireOwner`, session, middleware, every auth action and the profile action; disabling the helper makes 16 of them fail. Not covered: a browser run of fixture mode, live Supabase, the e2e suite.
+- Recovery: revert the PR.
+
 ## Active task: auth review follow-ups AHF-07 part 1, status text reconciliation (2026-10-17)
 
 - Goal and mode: implement the status-text items of AHF-07 of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`: dated reconciliation notes where the spec and ADR-0007 contradict the accepted decisions, and the web README's test paragraph.

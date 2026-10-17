@@ -2,6 +2,7 @@ import { cache } from 'react';
 
 import { createClient } from '@/lib/supabase/server';
 
+import { fixtureModeEnabled, fixtureUser } from '@/lib/access/dev-fixture';
 import {
   currentUserFromClaims,
   type CurrentUser,
@@ -18,8 +19,12 @@ export const getVerifiedClaims = cache(async () => {
   return data?.claims ?? null;
 });
 
-/** Display-only view of the signed-in user. Never authorize with it. */
+/**
+ * Display-only view of the signed-in user. Never authorize with it. In
+ * development fixture mode it is the fixture user, which is not a session.
+ */
 export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
+  if (fixtureModeEnabled()) return fixtureUser();
   const claims = await getVerifiedClaims();
   return claims ? currentUserFromClaims(claims) : null;
 });

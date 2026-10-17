@@ -7,6 +7,7 @@ import { checkName } from '@/features/account/shared/name';
 import type { ProfileState } from '@/features/account/shared/form-state';
 import { withFullName } from './profile-metadata';
 import { createClient } from '@/lib/supabase/server';
+import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 
 /**
  * Updates the signed-in user's display name. It only ever acts on the caller's
@@ -17,6 +18,7 @@ export async function updateProfile(
   _previous: ProfileState,
   formData: FormData,
 ): Promise<ProfileState> {
+  if (fixtureModeEnabled()) return { error: FIXTURE_MESSAGE, name: '' };
   const raw = formData.get('name');
   const { name, error } = checkName(typeof raw === 'string' ? raw : '');
   if (error) return { error, fields: ['name'], name };

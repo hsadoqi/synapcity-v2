@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * The adapter between Next's proxy and `@supabase/ssr`. The SDK is stubbed at
@@ -28,6 +28,7 @@ const REFRESHED = {
 const sdk = vi.hoisted(() => ({
   claims: null as { sub: string } | null,
   refreshes: true,
+  clients: 0,
 }));
 
 vi.mock('./env', () => ({
@@ -41,14 +42,17 @@ vi.mock('@supabase/ssr', () => ({
     _url: string,
     _key: string,
     { cookies }: { cookies: { setAll: SetAll } },
-  ) => ({
-    auth: {
-      getClaims: async () => {
-        if (sdk.refreshes) cookies.setAll([REFRESHED], CACHE_HEADERS);
-        return { data: sdk.claims ? { claims: sdk.claims } : null };
+  ) => {
+    sdk.clients += 1;
+    return {
+      auth: {
+        getClaims: async () => {
+          if (sdk.refreshes) cookies.setAll([REFRESHED], CACHE_HEADERS);
+          return { data: sdk.claims ? { claims: sdk.claims } : null };
+        },
       },
-    },
-  }),
+    };
+  },
 }));
 
 import { updateSession } from './middleware';
@@ -68,7 +72,10 @@ function expectSessionCarried(response: Response) {
 beforeEach(() => {
   sdk.claims = null;
   sdk.refreshes = true;
+  sdk.clients = 0;
 });
+
+afterEach(() => vi.unstubAllEnvs());
 
 describe('updateSession', () => {
   it('passes the refreshed cookie and the cache headers on', async () => {
@@ -106,5 +113,28 @@ describe('updateSession', () => {
     const response = await updateSession(request('/'));
 
     expect(response.headers.get('cache-control')).toBeNull();
+  });
+});
+
+describe('updateSession in development fixture mode', () => {
+  it('passes every request through without building a Supabase client', async () => {
+    vi.stubEnv('NODE_ENV', 'development');
+    vi.stubEnv('SYNAPCITY_DEV_AUTH', 'fixture');
+
+    for (const path of ['/fixture-user/home', '/auth/login', '/']) {
+      const response = await updateSession(request(path));
+      expect(response.headers.get('location')).toBeNull();
+    }
+    expect(sdk.clients).toBe(0);
+  });
+
+  it('still protects routes in production even with the flag set', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('SYNAPCITY_DEV_AUTH', 'fixture');
+
+    const response = await updateSession(request('/user-1/home'));
+
+    expect(response.headers.get('location')).toContain('/auth/login');
+    expect(sdk.clients).toBe(1);
   });
 });
