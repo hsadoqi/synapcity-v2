@@ -326,9 +326,9 @@ describe('regional previews', () => {
   ] as const)('uses the selected number separators: %s', (value, preview) => {
     render(<NumberFormatRow value={value} onChange={() => {}} />);
     // Read the raw text: the default matcher folds the no-break space to " ".
-    expect(document.getElementById('number-format-description')?.textContent).toBe(
-      `An example number looks like: ${preview}`,
-    );
+    expect(
+      document.getElementById('number-format-description')?.textContent,
+    ).toBe(`An example number looks like: ${preview}`);
   });
 
   it('hydrates without timestamp mismatches when the server and client clocks differ', async () => {
