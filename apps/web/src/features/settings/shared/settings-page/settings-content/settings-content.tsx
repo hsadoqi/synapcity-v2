@@ -13,7 +13,7 @@ export function SettingsContent({
 }) {
   return (
     <SettingsProvider name={name} account={account}>
-      <div className="flex-1 flex w-full flex-col gap-8 px-5 py-10">
+      <div className="flex min-h-0 w-full flex-1 flex-col gap-8 px-5 py-10">
         <SettingsHeader />
         <SettingsTabs />
         <SettingsFooter />

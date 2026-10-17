@@ -79,6 +79,18 @@ describe('applyFontPreferences', () => {
     expect(link.media).toBe('all');
   });
 
+  it.each([
+    ['load', 'loaded'],
+    ['error', 'failed'],
+  ])('records a stylesheet that fires %s as %s', (event, status) => {
+    applyFontPreferences(root(), { ...none, headingFont: 'lora' });
+
+    const link = document.getElementById('font-preference-lora')!;
+    expect(link.dataset.status).toBeUndefined();
+    link.dispatchEvent(new Event(event));
+    expect(link.dataset.status).toBe(status);
+  });
+
   it('removes the override when a role returns to the default', () => {
     applyFontPreferences(root(), { ...none, headingFont: 'lora' });
     applyFontPreferences(root(), none);
@@ -133,6 +145,20 @@ describe('fontBootScript', () => {
     link.dispatchEvent(new Event('load'));
     expect(link.media).toBe('all');
   });
+
+  it.each([
+    ['load', 'loaded'],
+    ['error', 'failed'],
+  ])(
+    'records a stylesheet that fires %s as %s, as the provider does',
+    (event, status) => {
+      boot(JSON.stringify({ theme: { headingFont: 'lora' } }));
+
+      const link = document.getElementById('font-preference-lora')!;
+      link.dispatchEvent(new Event(event));
+      expect(link.dataset.status).toBe(status);
+    },
+  );
 
   it('shares link ids with the provider so a family is not fetched twice', () => {
     boot(JSON.stringify({ theme: { headingFont: 'lora' } }));

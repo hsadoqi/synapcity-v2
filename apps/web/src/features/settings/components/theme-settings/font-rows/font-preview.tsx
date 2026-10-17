@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { previewFontValue } from '../../../shared/font-preferences';
 import {
   fontPreferenceVariables,
+  googleFonts,
   type FontChoice,
   type FontRole,
 } from '../../../types/fonts';
@@ -36,7 +37,7 @@ export function FontPreview({
   font: FontChoice;
   children: string;
 }) {
-  usePreviewFont(font);
+  const { failed } = usePreviewFont(font);
   // Inline because it is data, not styling: the font picked in this row, set on
   // the sample alone (a class cannot carry a value chosen at runtime).
   const fontVariable = {
@@ -52,6 +53,11 @@ export function FontPreview({
         Preview
       </figcaption>
       <p className={cn('text-foreground', roleStyles[role])}>{children}</p>
+      {failed && font !== 'default' ? (
+        <p className="text-xs text-destructive">
+          {`${googleFonts[font].label} couldn’t be loaded from Google Fonts, so this sample uses a fallback font.`}
+        </p>
+      ) : null}
     </figure>
   );
 }

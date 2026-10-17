@@ -63,3 +63,4 @@ supabase/.temp
 .playwright-mcp
 
 .pnpm-store
+.archives

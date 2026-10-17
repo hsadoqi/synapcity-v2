@@ -16,6 +16,26 @@ describe('ThemeModeRow', () => {
     ).toContain('Dark');
   });
 
+  it.each([
+    [
+      'system',
+      'Follows your device, switching between light and dark with it.',
+    ],
+    ['light', 'Always light, whatever your device is set to.'],
+    ['dark', 'Always dark, whatever your device is set to.'],
+  ] as const)(
+    'describes what %s does, as the select’s description',
+    (mode, text) => {
+      render(<ThemeModeRow value={mode} onChange={() => {}} />);
+
+      const select = screen.getByRole('combobox', { name: 'Color theme' });
+      expect(
+        document.getElementById(select.getAttribute('aria-describedby')!)
+          ?.textContent,
+      ).toBe(text);
+    },
+  );
+
   it('offers light, dark and system default', async () => {
     render(<ThemeModeRow value="light" onChange={() => {}} />);
 

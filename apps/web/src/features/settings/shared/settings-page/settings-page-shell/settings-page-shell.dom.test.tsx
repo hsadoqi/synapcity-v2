@@ -4,15 +4,39 @@ import { describe, expect, it } from 'vitest';
 import { SettingsPageShell } from '../settings-page-shell';
 
 describe('SettingsPageShell', () => {
-  it('puts its children in the main landmark', () => {
+  it('renders its children', () => {
     render(
       <SettingsPageShell>
         <p>Content</p>
       </SettingsPageShell>,
     );
 
-    expect(screen.getByRole('main').contains(screen.getByText('Content'))).toBe(
-      true,
+    expect(screen.getByText('Content')).toBeTruthy();
+  });
+
+  // The app shell's RootContent renders the page's one <main>; a second one
+  // inside it is a nested landmark that screen readers announce twice.
+  it('adds no main landmark of its own', () => {
+    render(
+      <SettingsPageShell>
+        <p>Content</p>
+      </SettingsPageShell>,
     );
+
+    expect(screen.queryByRole('main')).toBeNull();
+  });
+
+  // RootContent shrinks to the screen only for a page marked this way, so the
+  // tab content scrolls instead of the page.
+  it('marks itself as filling the screen', () => {
+    const { container } = render(
+      <SettingsPageShell>
+        <p>Content</p>
+      </SettingsPageShell>,
+    );
+
+    expect(
+      container.firstElementChild?.hasAttribute('data-fill-viewport'),
+    ).toBe(true);
   });
 });

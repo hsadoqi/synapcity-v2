@@ -4,10 +4,10 @@ import { useState } from 'react';
 import { Button } from '@synapcity/frontend-ui/core/button';
 import { FieldGroup } from '@synapcity/frontend-ui/components/ui/field';
 import { Separator } from '@synapcity/frontend-ui/components/ui/separator';
+import { cn } from '@/lib/utils';
 import { useThemeDraft } from '../../hooks/use-theme-draft';
 import { SettingsTabShell } from '../../shared/settings-tabs/settings-tab-shell/settings-tab-shell';
 import { ThemeLivePreview } from './theme-live-preview/theme-live-preview';
-import { ThemeDisclaimer } from './theme-disclaimer/theme-disclaimer';
 import { ThemeModeRow } from './theme-rows/theme-rows';
 import { BodyFontRow, CodeFontRow, HeadingFontRow } from './font-rows';
 
@@ -56,33 +56,54 @@ export function ThemeSettings() {
       </section>
       <Separator />
       <ThemeLivePreview theme={draft} />
-      <ThemeDisclaimer theme={{ mode: draft.mode }} />
-      <div className="flex items-center justify-end gap-3">
-        <p role="status" className="text-xs text-muted-foreground">
-          {hasChanges ? 'You have unsaved changes.' : saved ? 'Saved.' : ''}
-        </p>
-        {/* Each button disables itself when used. Focusable while disabled, so
-            keyboard focus stays on it instead of falling back to the page. */}
-        <Button
-          type="button"
-          variant="outline"
-          disabled={!hasChanges}
-          focusableWhenDisabled
-          onClick={discard}
+      {/* The actions sit at the end of a long tab. Once there is something to
+          save they lift into a bar fixed to the bottom of the viewport, so the
+          prompt to save stays in view wherever the change was made. Fixed, not
+          sticky: the settings page nests several scroll containers, and fixed
+          does not depend on which of them scrolls. The outer box keeps the bar's
+          place, tall enough while it floats that the end of the tab is never
+          hidden under it. */}
+      <div
+        className={cn(
+          'flex min-h-7 justify-end pointer-coarse:min-h-11',
+          hasChanges && 'min-h-16 pointer-coarse:min-h-20',
+        )}
+      >
+        <div
+          className={cn(
+            'flex items-center justify-end gap-3',
+            hasChanges &&
+              'fixed inset-x-4 bottom-safe-4 z-10 mx-auto max-w-md justify-between rounded-lg border border-border bg-popover p-2 ps-4 text-popover-foreground shadow-md animate-in fade-in-0 slide-in-from-bottom-2',
+          )}
         >
-          Discard
-        </Button>
-        <Button
-          type="button"
-          disabled={!hasChanges}
-          focusableWhenDisabled
-          onClick={() => {
-            save();
-            setSaved(true);
-          }}
-        >
-          Save changes
-        </Button>
+          <p role="status" className="text-xs text-muted-foreground">
+            {hasChanges ? 'You have unsaved changes.' : saved ? 'Saved.' : ''}
+          </p>
+          <div className="flex items-center gap-3">
+            {/* Each button disables itself when used. Focusable while disabled,
+                so keyboard focus stays on it instead of falling back to the page. */}
+            <Button
+              type="button"
+              variant="outline"
+              disabled={!hasChanges}
+              focusableWhenDisabled
+              onClick={discard}
+            >
+              Discard
+            </Button>
+            <Button
+              type="button"
+              disabled={!hasChanges}
+              focusableWhenDisabled
+              onClick={() => {
+                save();
+                setSaved(true);
+              }}
+            >
+              Save changes
+            </Button>
+          </div>
+        </div>
       </div>
     </SettingsTabShell>
   );

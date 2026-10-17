@@ -64,7 +64,10 @@ const ShellContent = ({ children }: { children: React.ReactNode }) => (
 
 export function PublicShell({ children, headerActions }: ShellProps) {
   return (
-    <div data-slot="public-shell" className="flex min-h-svh flex-1 flex-col">
+    <div
+      data-slot="public-shell"
+      className="flex min-h-svh flex-1 flex-col z-0"
+    >
       <SkipLinkButton />
       <RootHeader actions={headerActions} />
       <div className="flex flex-1 flex-col">
@@ -80,7 +83,10 @@ export function AuthenticatedShell({
   account,
 }: ShellProps & { account: AccountLinks }) {
   return (
-    <div data-slot="authenticated-shell" className="flex min-h-svh flex-1">
+    <div
+      data-slot="authenticated-shell"
+      className="flex min-h-svh flex-1 flex-col z-0"
+    >
       <SkipLinkButton />
       <SidebarShell
         header={<RootHeader account={account} actions={headerActions} />}

@@ -9,6 +9,12 @@ import {
 export const PREFERENCES_STORAGE_KEY = 'synapcity-preferences';
 
 /**
+ * Fired on `window` after the preferences are saved. The browser's `storage`
+ * event only reaches other tabs; this tells readers in the same one.
+ */
+export const PREFERENCES_SAVED_EVENT = 'synapcity-preferences-saved';
+
+/**
  * Appearance preferences reach the page as data attributes on <html>, which
  * tokens/preferences.css in the tailwind-config package styles. Two writers
  * share this one mapping: the settings provider (live changes) and the boot

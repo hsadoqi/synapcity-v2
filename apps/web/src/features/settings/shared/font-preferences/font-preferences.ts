@@ -32,12 +32,20 @@ function addLink(doc: Document, attributes: Record<string, string>) {
   // A stylesheet that starts as `media=print` is fetched without blocking
   // rendering, then switched on when it arrives. A slow or blocked Google Fonts
   // request therefore leaves the fallback font showing; it never holds the page.
+  //
+  // `data-status` records how the request ended, so a preview mounted after it
+  // settled can still tell a loaded family from one that never arrived.
   if (attributes.rel === 'stylesheet') {
     link.onload = () => {
       link.media = 'all';
+      link.setAttribute('data-status', 'loaded');
+    };
+    link.onerror = () => {
+      link.setAttribute('data-status', 'failed');
     };
   }
   doc.head.append(link);
+  return link;
 }
 
 function connectToGoogle(doc: Document) {
@@ -50,11 +58,16 @@ function connectToGoogle(doc: Document) {
   addLink(doc, { rel: 'preconnect', href: GOOGLE_FILES, crossorigin: '' });
 }
 
-/** Adds the family's stylesheet the first time it is needed, and never again. */
-export function loadFont(doc: Document, id: GoogleFontId) {
-  if (doc.getElementById(fontLinkId(id))) return;
+/**
+ * Adds the family's stylesheet the first time it is needed, and never again.
+ * Returns that stylesheet's <link>, new or already present, so a caller can
+ * watch whether it loads.
+ */
+export function loadFont(doc: Document, id: GoogleFontId): HTMLLinkElement {
+  const existing = doc.getElementById(fontLinkId(id));
+  if (existing instanceof HTMLLinkElement) return existing;
   connectToGoogle(doc);
-  addLink(doc, {
+  return addLink(doc, {
     id: fontLinkId(id),
     rel: 'stylesheet',
     media: 'print',
@@ -129,7 +142,7 @@ export const fontBootScript = `(function(){try{var s=JSON.parse(localStorage.get
   bootCatalog,
 )};var R=${JSON.stringify(
   bootRoles,
-)};var d=document,r=d.documentElement;function l(a){var k=d.createElement('link');for(var n in a)k.setAttribute(n,a[n]);if(a.rel==='stylesheet')k.onload=function(){k.media='all'};d.head.appendChild(k)}for(var i=0;i<R.length;i++){var id=t[R[i][0]];if(typeof id!=='string'||!Object.prototype.hasOwnProperty.call(C,id))continue;if(!d.getElementById('font-preference-preconnect')){l({id:'font-preference-preconnect',rel:'preconnect',href:${JSON.stringify(
+)};var d=document,r=d.documentElement;function l(a){var k=d.createElement('link');for(var n in a)k.setAttribute(n,a[n]);if(a.rel==='stylesheet'){k.onload=function(){k.media='all';k.setAttribute('data-status','loaded')};k.onerror=function(){k.setAttribute('data-status','failed')}}d.head.appendChild(k)}for(var i=0;i<R.length;i++){var id=t[R[i][0]];if(typeof id!=='string'||!Object.prototype.hasOwnProperty.call(C,id))continue;if(!d.getElementById('font-preference-preconnect')){l({id:'font-preference-preconnect',rel:'preconnect',href:${JSON.stringify(
   GOOGLE_STYLES,
 )}});l({rel:'preconnect',href:${JSON.stringify(
   GOOGLE_FILES,

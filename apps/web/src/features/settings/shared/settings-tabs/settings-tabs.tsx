@@ -57,16 +57,16 @@ export const SettingsTabs = () => {
         setTab(String(value));
         window.location.hash = String(value);
       }}
-      className="flex-1 flex w-full flex-col gap-6 overflow-y-auto"
+      className="flex min-h-0 w-full flex-1 flex-col gap-6"
     >
       <SettingsTabsHeader onTabChange={setTab} />
-      <ScrollArea className="w-full overflow-x-auto">
+      <ScrollArea className="min-h-0 w-full flex-1 overflow-x-auto">
         {lazyTabs.map(({ value, Component }) => (
           <TabsContent
             key={value}
             value={value}
             keepMounted={visited.has(value)}
-            className="mt-6"
+            className="flex h-full flex-col"
           >
             <Suspense fallback={null}>
               <Component />

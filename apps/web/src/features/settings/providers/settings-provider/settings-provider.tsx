@@ -35,10 +35,15 @@ import type { Settings, SettingsPatch } from '../../types';
 import { themeSchema } from '../../types/theme';
 import {
   applyAppearance,
+  PREFERENCES_SAVED_EVENT,
   PREFERENCES_STORAGE_KEY,
 } from '../../shared/appearance-attributes';
 
 const STORAGE_KEY = PREFERENCES_STORAGE_KEY;
+
+// Collectors outside the settings page follow consent through this event.
+const announceSaved = () =>
+  window.dispatchEvent(new Event(PREFERENCES_SAVED_EVENT));
 const NOT_SAVED_TO_ACCOUNT =
   'Changes apply on this device, but could not be saved to your account.';
 
@@ -189,6 +194,7 @@ export function SettingsProvider({
       try {
         // Cache it, so the boot scripts paint these values on the next load.
         localStorage.setItem(STORAGE_KEY, JSON.stringify(reconciled.settings));
+        announceSaved();
       } catch {
         // Still applied for this visit.
       }
@@ -273,6 +279,7 @@ export function SettingsProvider({
       if (next.theme.mode !== mode) setMode(next.theme.mode);
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        announceSaved();
         setStatus('Saved');
       } catch {
         setStatus('Changes applied. Browser storage is unavailable.');
@@ -309,6 +316,7 @@ export function SettingsProvider({
       setStoredSettings(next);
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        announceSaved();
         setStatus('Saved');
       } catch {
         setStatus('Changes applied. Browser storage is unavailable.');

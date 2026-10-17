@@ -6,9 +6,23 @@ import {
   renderWithSettings,
   stubBrowser,
 } from '../../test-harness';
+import { themeDraftStorageKey } from '../../hooks/use-theme-draft';
+
+const mocks = vi.hoisted(() => ({
+  params: null as { userId?: string } | null,
+}));
+vi.mock('next/navigation', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('next/navigation')>()),
+  useParams: () => mocks.params,
+}));
+
+const THEME_DRAFT_STORAGE_KEY = themeDraftStorageKey();
 import { ThemeSettings } from './index';
 
-beforeEach(stubBrowser);
+beforeEach(() => {
+  stubBrowser();
+  mocks.params = null;
+});
 afterEach(() => vi.unstubAllGlobals());
 
 /** Opens the named select and picks an option, the way Base UI expects. */
@@ -197,5 +211,94 @@ describe('ThemeSettings', () => {
     expect(
       document.head.querySelectorAll('link[rel="stylesheet"]'),
     ).toHaveLength(1);
+  });
+
+  it('restores an unsaved draft after leaving and coming back', async () => {
+    const first = await renderWithSettings(<ThemeSettings />);
+    await pick('Color theme', 'Dark');
+    await waitFor(() =>
+      expect(sessionStorage.getItem(THEME_DRAFT_STORAGE_KEY)).toBe(
+        JSON.stringify({ mode: 'dark' }),
+      ),
+    );
+    first.unmount();
+
+    await renderWithSettings(<ThemeSettings />);
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole('combobox', { name: 'Color theme' }).textContent,
+      ).toContain('Dark'),
+    );
+    expect(screen.getByRole('status').textContent).toBe(
+      'You have unsaved changes.',
+    );
+    expect(currentSettings().theme.mode).toBe('system');
+  });
+
+  it('clears the stored draft once it is saved', async () => {
+    await renderWithSettings(<ThemeSettings />);
+    await pick('Color theme', 'Dark');
+    await waitFor(() =>
+      expect(sessionStorage.getItem(THEME_DRAFT_STORAGE_KEY)).not.toBeNull(),
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    await waitFor(() =>
+      expect(sessionStorage.getItem(THEME_DRAFT_STORAGE_KEY)).toBeNull(),
+    );
+  });
+
+  it('ignores a stored draft it does not recognise', async () => {
+    sessionStorage.setItem(
+      THEME_DRAFT_STORAGE_KEY,
+      JSON.stringify({ mode: 'sepia', headingFont: 'comic-sans' }),
+    );
+
+    await renderWithSettings(<ThemeSettings />);
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole('combobox', { name: 'Color theme' }).textContent,
+      ).toContain('System default'),
+    );
+    expect(screen.getByRole('status').textContent).toBe('');
+  });
+
+  it('lifts the actions into a bar fixed in view only while there is something to save', async () => {
+    await renderWithSettings(<ThemeSettings />);
+    const bar = () => screen.getByRole('status').parentElement!;
+    expect(bar().className).not.toContain('fixed');
+
+    await pick('Color theme', 'Dark');
+
+    await waitFor(() => expect(bar().className).toContain('fixed'));
+    fireEvent.click(screen.getByRole('button', { name: 'Discard' }));
+    await waitFor(() => expect(bar().className).not.toContain('fixed'));
+  });
+
+  it('keeps each person’s draft to themselves on the /[userId]/settings route', async () => {
+    sessionStorage.setItem(
+      themeDraftStorageKey('someone-else'),
+      JSON.stringify({ mode: 'dark' }),
+    );
+    mocks.params = { userId: 'ada' };
+
+    await renderWithSettings(<ThemeSettings />);
+    // Someone else's unsaved choice is not offered.
+    await waitFor(() =>
+      expect(
+        screen.getByRole('combobox', { name: 'Color theme' }).textContent,
+      ).toContain('System default'),
+    );
+
+    await pick('Color theme', 'Light');
+    await waitFor(() =>
+      expect(sessionStorage.getItem(themeDraftStorageKey('ada'))).toBe(
+        JSON.stringify({ mode: 'light' }),
+      ),
+    );
+    expect(sessionStorage.getItem(THEME_DRAFT_STORAGE_KEY)).toBeNull();
   });
 });

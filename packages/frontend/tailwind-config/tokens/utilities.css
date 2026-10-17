@@ -4,6 +4,15 @@
   }
 }
 
+/* For something fixed to the bottom of the viewport: a --spacing(4) gap, plus the
+ * device's bottom safe area (the iPhone home indicator) when the page is drawn under
+ * it (viewport-fit=cover). The inset is 0 otherwise, so this is plain bottom-4. */
+@utility bottom-safe-4 {
+  /* The first line is for browsers without env(), which drop the second. */
+  bottom: --spacing(4);
+  bottom: calc(--spacing(4) + env(safe-area-inset-bottom));
+}
+
 @utility theme-light {
   color-scheme: light;
   --background: var(--base-background);

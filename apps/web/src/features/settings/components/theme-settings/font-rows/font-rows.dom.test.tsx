@@ -75,6 +75,20 @@ describe('font rows', () => {
     ).toBe('');
   });
 
+  it('says when the chosen family could not be loaded', async () => {
+    render(<HeadingFontRow value="lora" onChange={() => {}} />);
+    const link = document.getElementById('font-preference-lora')!;
+    expect(screen.queryByText(/couldn’t be loaded/)).toBeNull();
+
+    link.dispatchEvent(new Event('error'));
+
+    expect(
+      await screen.findByText(
+        'Lora couldn’t be loaded from Google Fonts, so this sample uses a fallback font.',
+      ),
+    ).toBeTruthy();
+  });
+
   it('shows the current choice and offers the default first', async () => {
     render(<CodeFontRow value="fira-code" onChange={() => {}} />);
 
