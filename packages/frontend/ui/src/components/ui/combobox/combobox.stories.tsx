@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { expect, screen, userEvent, within } from 'storybook/test';
+import { expect, screen, userEvent, waitFor, within } from 'storybook/test';
 
 import {
   Combobox,
@@ -68,5 +68,11 @@ export const Filtering: Story = {
       'Europe/London',
       'Europe/Paris',
     ]);
+    // Base UI marks everything outside the open popup aria-hidden, including
+    // the focusable trigger; close it so the a11y check sees the resting state.
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() =>
+      expect(screen.queryAllByRole('option')).toHaveLength(0),
+    );
   },
 };

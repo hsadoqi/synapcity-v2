@@ -5,6 +5,10 @@
  */
 export const sharedConfig = {
   test: {
+    // The 5 s default is a limit for a quiet machine. A cold `pnpm verify` runs
+    // every workspace's tests at once, with coverage on, and tests that pass
+    // alone then time out. A test that really hangs still fails, just later.
+    testTimeout: 15_000,
     coverage: {
       provider: 'v8' as const,
       include: ['src/**/*.{ts,tsx}'],
