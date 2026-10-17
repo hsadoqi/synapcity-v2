@@ -7,6 +7,7 @@ import { ProfileSummary } from '@/features/account/components/profile';
 import { useCurrentUser } from '@/features/auth/client';
 import {
   ConnectedAccounts,
+  DeleteAccount,
   EmailChange,
   PasswordReset,
 } from '@/features/auth/components';
@@ -38,6 +39,11 @@ export const AccountSettings = () => {
             <EmailChange email={user.email} />
             <PasswordReset />
             <ConnectedAccounts />
+          </FieldGroup>
+          <Separator />
+          {/* Last, and apart: it cannot be undone. */}
+          <FieldGroup>
+            <DeleteAccount email={user.email} />
           </FieldGroup>
         </>
       ) : (

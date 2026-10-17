@@ -22,6 +22,7 @@ vi.mock('@/features/auth/server/actions/actions', () => ({
   resendEmailChange: vi.fn(),
   requestOwnPasswordReset: vi.fn(),
   connectAccount: vi.fn(),
+  requestAccountDeletion: vi.fn(),
 }));
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ refresh: vi.fn() }),
@@ -135,5 +136,17 @@ describe('AccountSettings', () => {
     ).toBeTruthy();
     expect(screen.getByText('Connected as ada-l')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Connect Google' })).toBeTruthy();
+  });
+
+  it('puts account deletion last, and offers it only to an account with an address to confirm by', () => {
+    const { unmount } = render(<AccountSettings />);
+    const buttons = screen.getAllByRole('button').map((b) => b.textContent);
+    expect(buttons.at(-1)).toBe('Delete account');
+    unmount();
+
+    mocks.user = { id: 'user-1', name: 'Ada', email: null, imageUrl: null };
+    render(<AccountSettings />);
+    expect(screen.queryByRole('button', { name: 'Delete account' })).toBeNull();
+    expect(screen.getByText(/no email address/i)).toBeTruthy();
   });
 });
