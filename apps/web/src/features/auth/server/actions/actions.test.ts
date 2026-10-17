@@ -77,6 +77,8 @@ async function redirectOf(run: Promise<unknown>): Promise<string | null> {
 }
 
 const USER_ID = 'user-1';
+/** Meets the whole password rule: length, lowercase, uppercase, digit, symbol. */
+const STRONG = 'Str0ng-Passw0rd!';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -101,7 +103,7 @@ describe('signInWithPassword', () => {
 
     const state = await signInWithPassword(
       {},
-      form({ email: ' a@b.co ', password: 'hunter2hunter2' }),
+      form({ email: ' a@b.co ', password: STRONG }),
     );
 
     expect(state.error).toBe('Email or password is incorrect.');
@@ -119,7 +121,7 @@ describe('signInWithPassword', () => {
 
     const state = await signInWithPassword(
       {},
-      form({ email: 'a@b.co', password: 'x'.repeat(12) }),
+      form({ email: 'a@b.co', password: STRONG }),
     );
 
     expect(state.unconfirmed).toBe(true);
@@ -134,7 +136,7 @@ describe('signInWithPassword', () => {
     const url = await redirectOf(
       signInWithPassword(
         {},
-        form({ email: 'a@b.co', password: 'x'.repeat(12), next: '/a/b?c=1' }),
+        form({ email: 'a@b.co', password: STRONG, next: '/a/b?c=1' }),
       ),
     );
 
@@ -153,7 +155,7 @@ describe('signInWithPassword', () => {
       const url = await redirectOf(
         signInWithPassword(
           {},
-          form({ email: 'a@b.co', password: 'x'.repeat(12), next }),
+          form({ email: 'a@b.co', password: STRONG, next }),
         ),
       );
 
@@ -166,7 +168,7 @@ describe('signUp', () => {
   const valid = {
     email: 'a@b.co',
     name: 'Ada',
-    password: 'x'.repeat(12),
+    password: STRONG,
   };
 
   it('checks email, then name, then password, without calling Supabase', async () => {
@@ -294,7 +296,7 @@ describe('updatePassword', () => {
   it('rejects a mismatched confirmation', async () => {
     const state = await updatePassword(
       {},
-      form({ password: 'x'.repeat(12), confirm: 'y'.repeat(12) }),
+      form({ password: STRONG, confirm: `${STRONG}x` }),
     );
 
     expect(state.fields).toEqual(['confirm']);
@@ -308,10 +310,7 @@ describe('updatePassword', () => {
     });
 
     const url = await redirectOf(
-      updatePassword(
-        {},
-        form({ password: 'x'.repeat(12), confirm: 'x'.repeat(12) }),
-      ),
+      updatePassword({}, form({ password: STRONG, confirm: STRONG })),
     );
 
     expect(url).toBe(`/${USER_ID}/home?notice=password-updated`);
@@ -419,7 +418,7 @@ describe('signOut', () => {
 });
 
 describe('results never echo a password', () => {
-  const PASSWORD = 'sentinel-password-5c1d';
+  const PASSWORD = 'Sentinel-Passw0rd-5c1d!';
   const valid = { email: 'a@b.co', name: 'Ada', password: PASSWORD };
 
   it('after a refused sign-in', async () => {

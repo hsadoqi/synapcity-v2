@@ -1,7 +1,11 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { MIN_PASSWORD_LENGTH, type AuthState } from '@/features/auth/types';
+import {
+  MIN_PASSWORD_LENGTH,
+  PASSWORD_REQUIREMENTS,
+  type AuthState,
+} from '@/features/auth/types';
 
 const mocks = vi.hoisted(() => ({ updatePassword: vi.fn() }));
 vi.mock('@/features/auth/server/actions/actions', () => ({
@@ -29,9 +33,7 @@ describe('UpdatePasswordForm', () => {
       expect(field(label).autocomplete).toBe('new-password');
       expect(field(label).minLength).toBe(MIN_PASSWORD_LENGTH);
     }
-    expect(
-      screen.getByText(`Use at least ${MIN_PASSWORD_LENGTH} characters.`),
-    ).toBeTruthy();
+    expect(screen.getByText(PASSWORD_REQUIREMENTS)).toBeTruthy();
     expect(field('New password').form!.noValidate).toBe(true);
   });
 

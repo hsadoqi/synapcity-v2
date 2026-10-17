@@ -1,4 +1,4 @@
-import { MIN_PASSWORD_LENGTH, type AuthFieldName } from '../../types';
+import { PASSWORD_REQUIREMENTS, type AuthFieldName } from '../../types';
 
 /**
  * Whether a Supabase Auth error code means "slow down". These say nothing about
@@ -28,7 +28,8 @@ export function authErrorMessage(code: string | undefined): string {
     case 'email_not_confirmed':
       return 'Confirm your email first. Check your inbox for the link.';
     case 'weak_password':
-      return `That password is too weak. Use at least ${MIN_PASSWORD_LENGTH} characters with a mix of letters, numbers and symbols.`;
+      // Also what the provider says when it rejects a common or leaked password.
+      return `That password is not allowed. ${PASSWORD_REQUIREMENTS} Avoid passwords that are common or have appeared in a data breach.`;
     case 'same_password':
       return 'Choose a password different from your current one.';
     case 'email_address_invalid':

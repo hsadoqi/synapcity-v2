@@ -3,14 +3,22 @@ import { z } from 'zod';
 
 import {
   MIN_PASSWORD_LENGTH,
+  PASSWORD_REQUIREMENTS,
   PASSWORD_TOO_SHORT_MESSAGE,
   emailRequestSchema,
+  missingCharactersMessage,
+  newPasswordSchema,
   everyRefusal,
   firstRefusal,
   signInSchema,
   signUpSchema,
   updatePasswordSchema,
 } from './schema';
+
+/** Meets the whole rule. */
+const STRONG = 'Str0ng-Passw0rd!';
+/** Exactly the minimum length, with every kind of character. */
+const EXACTLY_MINIMUM = 'Aa1!aaaa';
 
 const refusal = <T>(
   schema: z.ZodType<T>,
@@ -57,7 +65,7 @@ describe('signInSchema', () => {
 });
 
 describe('signUpSchema', () => {
-  const valid = { email: 'a@b.co', name: 'Ada', password: 'long-enough' };
+  const valid = { email: 'a@b.co', name: 'Ada', password: STRONG };
 
   it('reports one problem at a time, in the order email, name, password', () => {
     expect(
@@ -83,12 +91,12 @@ describe('signUpSchema', () => {
       signUpSchema.parse({
         email: ' a@b.co ',
         name: ' Ada ',
-        password: 'x'.repeat(MIN_PASSWORD_LENGTH),
+        password: EXACTLY_MINIMUM,
       }),
     ).toEqual({
       email: 'a@b.co',
       name: 'Ada',
-      password: 'x'.repeat(MIN_PASSWORD_LENGTH),
+      password: EXACTLY_MINIMUM,
     });
   });
 
@@ -121,7 +129,7 @@ describe('updatePasswordSchema', () => {
   it('points a mismatch at the confirm field', () => {
     expect(
       refusal(updatePasswordSchema, {
-        password: 'long-enough',
+        password: STRONG,
         confirm: 'different-one',
       }),
     ).toEqual({ message: 'The passwords do not match.', fields: ['confirm'] });
@@ -137,10 +145,10 @@ describe('updatePasswordSchema', () => {
   it('accepts matching passwords of enough length', () => {
     expect(
       updatePasswordSchema.parse({
-        password: 'long-enough',
-        confirm: 'long-enough',
+        password: STRONG,
+        confirm: STRONG,
       }).password,
-    ).toBe('long-enough');
+    ).toBe(STRONG);
   });
 });
 
@@ -159,5 +167,80 @@ describe('the refusal helpers', () => {
       { code: 'custom', message: 'c', path: ['other'], input: '' },
     ]);
     expect(everyRefusal(error)).toEqual({ message: 'a', fields: ['email'] });
+  });
+});
+
+describe('the new-password rule', () => {
+  const message = (password: string) =>
+    newPasswordSchema.safeParse(password).error?.issues[0]?.message;
+
+  it('accepts a password with every kind of character, at the minimum length', () => {
+    expect(newPasswordSchema.safeParse(EXACTLY_MINIMUM).success).toBe(true);
+    expect(EXACTLY_MINIMUM).toHaveLength(MIN_PASSWORD_LENGTH);
+    expect(newPasswordSchema.safeParse(STRONG).success).toBe(true);
+  });
+
+  it('reports length first, even when other kinds of character are missing too', () => {
+    expect(message('Aa1!')).toBe(PASSWORD_TOO_SHORT_MESSAGE);
+    expect(message('')).toBe(PASSWORD_TOO_SHORT_MESSAGE);
+  });
+
+  it.each([
+    ['no lowercase letter', 'AAAA1111!', 'Add a lowercase letter.'],
+    ['no uppercase letter', 'aaaa1111!', 'Add an uppercase letter.'],
+    ['no number', 'Aaaaaaaa!', 'Add a number.'],
+    ['no symbol', 'Aaaaaaa1', 'Add a symbol such as ! # or ?.'],
+    [
+      'no uppercase letter or symbol',
+      'aaaaaaa1',
+      'Add an uppercase letter and a symbol such as ! # or ?.',
+    ],
+    [
+      'only lowercase letters',
+      'aaaaaaaa',
+      'Add an uppercase letter, a number and a symbol such as ! # or ?.',
+    ],
+    [
+      'only digits',
+      '12345678',
+      'Add a lowercase letter, an uppercase letter and a symbol such as ! # or ?.',
+    ],
+  ])('names only what is missing: %s', (_label, password, expected) => {
+    expect(message(password)).toBe(expected);
+  });
+
+  it('counts each symbol Supabase documents, and only those', () => {
+    const documented = '!@#$%^&*()_+-=[]{};\'\\:"|<>?,./`~'.split('');
+    expect(documented).toHaveLength(32);
+    for (const symbol of documented) {
+      expect(missingCharactersMessage(`Aa1${symbol}aaaa`)).toBeNull();
+    }
+  });
+
+  it.each([
+    ['a space', 'Aa1 aaaa'],
+    ['an accented letter', 'Aa1éaaaa'],
+    ['a currency sign', 'Aa1€aaaa'],
+    ['an emoji', 'Aa1😀aaaa'],
+    ['a non-Latin letter', 'Aa1ыaaaa'],
+  ])(
+    'does not count %s as a symbol, as Supabase would not',
+    (_label, password) => {
+      expect(missingCharactersMessage(password)).toBe(
+        'Add a symbol such as ! # or ?.',
+      );
+    },
+  );
+
+  it('states the rule in words for the form to show', () => {
+    expect(PASSWORD_REQUIREMENTS).toBe(
+      'At least 8 characters, with a lowercase letter, an uppercase letter, a number and a symbol.',
+    );
+  });
+
+  it('is not applied to signing in, where an older password may predate it', () => {
+    expect(
+      signInSchema.safeParse({ email: 'a@b.co', password: 'weak' }).success,
+    ).toBe(true);
   });
 });

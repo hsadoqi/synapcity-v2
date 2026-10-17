@@ -4,7 +4,11 @@ import { useActionState, useId } from 'react';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
 import { updatePassword } from '@/features/auth/server/actions/actions';
-import { MIN_PASSWORD_LENGTH, type AuthState } from '@/features/auth/types';
+import {
+  MIN_PASSWORD_LENGTH,
+  PASSWORD_REQUIREMENTS,
+  type AuthState,
+} from '@/features/auth/types';
 import { FormField } from '@/components/forms/form-field';
 import { useFocusFirstError } from '@/hooks/use-focus-first-error';
 import { FormMessage } from '@/components/forms/form-message';
@@ -34,7 +38,7 @@ export function UpdatePasswordForm() {
         label="New password"
         type="password"
         autoComplete="new-password"
-        hint={`Use at least ${MIN_PASSWORD_LENGTH} characters.`}
+        hint={PASSWORD_REQUIREMENTS}
         minLength={MIN_PASSWORD_LENGTH}
         required
       />

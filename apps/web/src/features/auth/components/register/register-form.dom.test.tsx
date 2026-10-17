@@ -1,7 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MIN_PASSWORD_LENGTH, type AuthState } from '@/features/auth/types';
+import {
+  MIN_PASSWORD_LENGTH,
+  PASSWORD_REQUIREMENTS,
+  type AuthState,
+} from '@/features/auth/types';
 import { MAX_NAME_LENGTH } from '@/features/account/types';
 import { RegisterForm } from './register-form';
 
@@ -30,9 +34,7 @@ describe('RegisterForm', () => {
     expect(
       screen.getByText(`Up to ${MAX_NAME_LENGTH} characters.`),
     ).toBeTruthy();
-    expect(
-      screen.getByText(`Use at least ${MIN_PASSWORD_LENGTH} characters.`),
-    ).toBeTruthy();
+    expect(screen.getByText(PASSWORD_REQUIREMENTS)).toBeTruthy();
   });
 
   it('describes each field by its rule until an error replaces it', () => {

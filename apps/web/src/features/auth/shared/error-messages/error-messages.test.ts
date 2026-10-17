@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { MIN_PASSWORD_LENGTH, PASSWORD_TOO_SHORT_MESSAGE } from '../../types';
+import {
+  MIN_PASSWORD_LENGTH,
+  PASSWORD_REQUIREMENTS,
+  PASSWORD_TOO_SHORT_MESSAGE,
+} from '../../types';
 import {
   authErrorFields,
   authErrorMessage,
@@ -77,11 +81,13 @@ describe('authErrorMessage', () => {
     expect(message).not.toBe(GENERIC);
     expect(message).not.toMatch(/current password/i);
   });
-  it('gives weak passwords a hint without quoting a server message', () => {
-    expect(authErrorMessage('weak_password')).toMatch(/too weak/i);
-    expect(authErrorMessage('weak_password')).toContain(
-      `${MIN_PASSWORD_LENGTH} characters`,
-    );
+  it('states the whole password rule for a weak password, without quoting a server message', () => {
+    const message = authErrorMessage('weak_password');
+
+    expect(message).toMatch(/not allowed/i);
+    expect(message).toContain(PASSWORD_REQUIREMENTS);
+    // The provider also refuses common and leaked passwords.
+    expect(message).toMatch(/common|data breach/i);
   });
 
   it('answers wrong password and unknown email identically', () => {
