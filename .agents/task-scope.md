@@ -1,11 +1,11 @@
 # Task scope
 
-## Active task: auth review follow-ups AHF-05 part 3, AuthConfirmation and error-focus tests (2026-10-17)
+## Active task: auth review follow-ups AHF-05 part 2, UserProvider tests (2026-10-17)
 
-- Goal and mode: implement the `AuthConfirmation` heading-focus and shared error-focus items of AHF-05 of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`, on the DOM test setup from #34.
-- Exact change: create `apps/web/src/features/auth/shared/auth-confirmation.dom.test.tsx` and `apps/web/src/hooks/use-focus-first-error.dom.test.tsx`; update this entry. Nothing is mocked; both components render for real.
-- Mutation budgets: creates 2 test files; updates 1 (this entry); dependencies, config, production code, schema and provider state 0.
-- Verification: `pnpm format:check`, `lint`, `typecheck`, `deps`, `test`; removing the heading focus, or the empty-field preference, makes tests fail. Not covered: the real-submit profile form and distinct form message IDs (next part), the browser suite.
+- Goal and mode: implement the `UserProvider` item of AHF-05 of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`, on the DOM test setup merged in #34 (dependencies approved as D3).
+- Exact change: create `apps/web/src/features/auth/client/user-provider.dom.test.tsx` and update this entry. It mounts the real `UserProvider` with only `next/navigation` and the browser Supabase client stubbed, and drives the captured auth-event listener.
+- Mutation budgets: creates 1 test file; updates 1 (this entry); dependencies, config, production code, schema and provider state 0.
+- Verification: `pnpm format:check`, `lint`, `typecheck`, `deps`, `test`; removing the unsubscribe or the known-user tracking makes a test fail. Not covered: fixture-mode non-subscription (waits for D1), real cross-tab behavior, the other AHF-05 items.
 - Recovery: revert the PR; nothing else changes.
 
 ## Active task: auth review follow-ups AHF-05 part 1, DOM test setup (2026-10-17)
