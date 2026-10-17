@@ -1,5 +1,13 @@
 # Task scope
 
+## Active task: auth review follow-ups AHF-03, import-boundary scanner (2026-10-17)
+
+- Goal and mode: implement AHF-03 of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`; the owner approved recommendation D2 on 2026-10-17: keep the test-based check, repair it with a small comment-aware lexical scanner, add no dependency.
+- Exact change: update `apps/web/src/architecture.test.ts` only. Comments are stripped before scanning; a module under a feature's `server` folder is server-only unless it starts with `'use server'`; every client-marked module under `src` is scanned; `shared` may not import provider clients, the environment reader or `@supabase/*`; an unresolvable dynamic import is rejected in `shared` and client modules; failures name importer, target and rule; a throwaway-tree fixture proves a real forbidden source file fails the check.
+- Mutation budgets: updates 1 test file plus this entry; creates 0; dependencies, config, ESLint, production code, schema and provider state 0.
+- Verification: the new cases catch the review's four misses and pass the legal imports; a deliberate commented import in a shared file fails the real-tree scan; then `pnpm format:check`, `lint`, `typecheck`, `deps`, `test` and `build`. This checks direct imports only and is not proof of client-bundle isolation.
+- Recovery: revert the test file; nothing else changes.
+
 ## Active task: bring refactor/auth-features into main (2026-10-17)
 
 - Goal and mode: implement the owner's request to merge `refactor/auth-features` with `main` (PR #28). `main` holds the older auth UI as one squashed commit, so the merge conflicted in 66 files, mostly old-layout copies of files the branch had already moved.
