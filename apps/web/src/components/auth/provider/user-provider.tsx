@@ -53,7 +53,7 @@ export function UserProvider({
 }
 
 /** The signed-in user, or null when signed out. Display only. */
-export function useCurrentUser(): CurrentUser | null {
+function useCurrentUser(): CurrentUser | null {
   const user = useContext(UserContext);
   if (user === undefined) {
     throw new Error('useCurrentUser must be used inside <UserProvider>.');
