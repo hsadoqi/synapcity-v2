@@ -100,22 +100,11 @@ export default function RootShell({
   /** Present when someone is signed in; the app supplies where they lead. */
   account?: AccountLinks | null;
 }) {
-  return (
-    <div data-slot="root-shell" className="flex min-h-svh flex-1">
-      <SkipLinkButton />
-      {account ? (
-        <SidebarShell
-          header={<RootHeader account={account} actions={headerActions} />}
-          account={account}
-        >
-          <ShellContent>{children}</ShellContent>
-        </SidebarShell>
-      ) : (
-        <div className="flex flex-1 flex-col">
-          <RootHeader actions={headerActions} />
-          <ShellContent>{children}</ShellContent>
-        </div>
-      )}
-    </div>
+  return account ? (
+    <AuthenticatedShell account={account ?? {}} headerActions={headerActions}>
+      {children}
+    </AuthenticatedShell>
+  ) : (
+    <PublicShell headerActions={headerActions}>{children}</PublicShell>
   );
 }
