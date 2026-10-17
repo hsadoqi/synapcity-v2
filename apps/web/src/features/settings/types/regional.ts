@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-export const languages = ['en', 'es', 'fr', 'de', 'zh', 'ja'] as const;
+const languages = ['en', 'es', 'fr', 'de', 'zh', 'ja'] as const;
 
-export const numberFormats = [
+const numberFormats = [
   '1,000.00',
   '1.000,00',
   '1 000,00',
@@ -10,7 +10,7 @@ export const numberFormats = [
   '1,00,000.00',
 ] as const;
 
-export const firstDaysOfWeek = ['sunday', 'monday', 'saturday'] as const;
+const firstDaysOfWeek = ['sunday', 'monday', 'saturday'] as const;
 
 /** Follow the device's timezone instead of a fixed one. */
 export const SYSTEM_TIMEZONE = 'system';
