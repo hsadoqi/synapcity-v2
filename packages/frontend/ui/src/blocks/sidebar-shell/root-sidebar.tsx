@@ -26,7 +26,7 @@ export function RootSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar> & { userId: string }) {
   return (
-    <Sidebar {...props}>
+    <Sidebar {...props} key={userId}>
       <SidebarHeader>
         <ContextSwitcher
           versions={data.versions}
@@ -47,7 +47,11 @@ export function RootSidebar({
                       isActive={item.isActive}
                       render={(props) => {
                         return (
-                          <Link href={item.url} {...props}>
+                          <Link
+                            href={item.url}
+                            {...props}
+                            ref={props.ref as React.Ref<HTMLAnchorElement>}
+                          >
                             {item.title}
                           </Link>
                         );
@@ -69,7 +73,11 @@ export function RootSidebar({
               className="flex-1"
               render={(props) => {
                 return (
-                  <Link href={`/${userId}/settings`} {...props}>
+                  <Link
+                    href={`/${userId}/settings`}
+                    {...props}
+                    ref={props.ref as React.Ref<HTMLAnchorElement>}
+                  >
                     <Cog />
                     Settings
                   </Link>

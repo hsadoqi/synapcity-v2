@@ -1,5 +1,26 @@
 # Task scope
 
+## Active task: exclude local pnpm database from latest commit (2026-10-17)
+
+- Goal and authority: the owner requested correcting the recent commit to exclude index.db; amend only local commit 3de596fcb6b8d4d8142d5666a67917c613b8451f, preserving every other committed change.
+- Exact scope and budgets: update `.gitignore` and this scope record (2 files); untrack `.pnpm-store/v11/index.db` (1 index removal, no filesystem deletion); amend HEAD once, retaining its message and parent. New files, branch changes, pushes, external mutations and other source/dependency changes: 0.
+- Preconditions: clean worktree/index; latest commit introduces the database; current remote fix/auth-ui tip does not contain HEAD. System of record: Git history and root ignore rules; this entry records bounds only.
+- Verification: confirm amended tree differs only at these three paths, the database still exists locally and is ignored, and the worktree/index are clean. No runtime changes; runtime checks not required.
+- Recovery: original commit 3de596fcb6b8d4d8142d5666a67917c613b8451f remains in the reflog; original documents and hash captured in /private/tmp/synapcity-exclude-index-db-20261017. Any restoration requires separately scoped authority.
+- Stop: concurrent changes, a published latest commit, or a required mutation outside these destinations.
+
+## Active task: repair React and TypeScript peer dependencies (2026-10-17)
+
+- Goal and mode: implement the owner's request to fix the supplied peer-dependency errors. Dependency compatibility repair only.
+- Authority and readiness: direct owner fix request; current versions and consumers inspected, npm metadata verified, pnpm 11.25.0 package extensions tested in an isolated strict-peer fixture. Preserve existing staged UI manifest and lockfile work. Branch: `fix/auth-ui`.
+- Exact updates (8 maximum): this scope record; `apps/docs/package.json`; `apps/storybook/package.json`; `apps/web/package.json`; `packages/frontend/site/package.json`; `packages/dev/vitest-config/package.json`; `pnpm-workspace.yaml`; `pnpm-lock.yaml`.
+- Manifest: align remaining React consumers to the owner's already-staged React 19.3.0 and @types/react 19.3.0 pins, preserving existing React DOM 19.3.0; supply TypeScript 5.9.3 as a dependency of eslint-plugin-storybook 10.6.1 and vite-tsconfig-paths 5.1.4 through packageExtensions. TypeScript 5.9.3 satisfies both tooling chains, including tsconfck's ^5 peer constraint; retain TypeScript 7.0.2 as the compiler. Regenerate the lockfile without unrelated upgrades. No peer-range relaxation.
+- Systems of record: package manifests own direct dependencies; pnpm-workspace.yaml owns transitive compatibility configuration; pnpm-lock.yaml owns resolution; this entry records execution bounds only.
+- Budgets: existing repository files 8; creates/deletes/moves/renames 0; new package identities 0; source/test/API/schema changes 0; Git staging/commits/branches/PRs 0; external issues/projects/planning surfaces 0. Local operational changes: pnpm install and generated verification outputs only; disposable evidence/baselines under /private/tmp.
+- Verification: strict-peer install and frozen-lockfile replay; resolve actual installed compiler/tooling versions; root pnpm verify, reporting the first failure and every unreached gate. Additional focused checks if the full gate stops on unrelated failures.
+- Recovery: restore only this task's hunks from /private/tmp/synapcity-peer-baseline-20261017, preserving staged and concurrent work. No reset, stash, clean or history operations.
+- Stop conditions: concurrent content changes to a destination, incompatible upstream requirement that needs compiler/runtime or architecture changes, or repair requiring additional files. Existing product, topology, auth and testing-strategy decisions remain untouched.
+
 ## Active task: correct auth package constraints (2026-10-13)
 
 - Goal and mode: correct the auth decision/spec/task-plan set so auth packages and further splitting are evaluated on their merits. Mode: documentation correction only.
