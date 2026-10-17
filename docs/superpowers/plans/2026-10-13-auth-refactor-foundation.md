@@ -37,11 +37,11 @@ ARF-00 is a documentation/investigation task requiring its own approved scope, n
 **Depends on:** ARF-00; owner-selected topology, required governance amendments and exact execution scope approved.  
 **Code scope:** read-only inventory of the parent migration/consumer lists; no product source edits.
 
-- [ ] Reconcile every source, destination and consumer against the live tree; record collisions and new consumers.
-- [ ] Establish an exact task-scope manifest with one numeric budget per mutation class; approve recovery storage and preserve both tracked and untracked originals.
-- [ ] Read relevant installed-version docs and confirm existing scripts/environment prerequisites without changing tooling.
-- [ ] Run baseline web unit/type checks and existing auth/home browser tests where the approved environment supports them; record failures and not-run cases.
-- [ ] Confirm no source file changed since the captured baseline.
+- [x] Reconcile every source, destination and consumer against the live tree; record collisions and new consumers. Done 2026-10-17: 47 sources present, 0 collisions, consumers unchanged at 14 (`.agents/task-scope.md`).
+- [x] Establish an exact task-scope manifest with one numeric budget per mutation class; approve recovery storage and preserve both tracked and untracked originals. Done 2026-10-17: budgets in `.agents/task-scope.md`; all originals are committed, so Git history is the recovery store.
+- [x] Read relevant installed-version docs and confirm existing scripts/environment prerequisites without changing tooling. Done 2026-10-17: scripts confirmed; no move-specific framework API is involved.
+- [x] Run baseline web unit/type checks and existing auth/home browser tests where the approved environment supports them; record failures and not-run cases. Done 2026-10-17 except e2e: unit 143/143 and types pass; e2e not run in the container (no Chromium), left to CI.
+- [x] Confirm no source file changed since the captured baseline. Done 2026-10-17 at `6c511d7`.
 
 **Acceptance:** every intended file operation is bounded and recoverable; evidence distinguishes pre-existing failures and unavailable live-provider behavior. No earlier Draft task scope grants source mutation authority.  
 **Verification:** inventory/diff read-back; `pnpm --filter web test`, `pnpm --filter web check-types`, `pnpm --filter web test:e2e`. These baseline commands do not constitute final refactor verification.  

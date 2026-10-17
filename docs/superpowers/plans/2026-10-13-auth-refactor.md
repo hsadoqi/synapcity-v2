@@ -23,63 +23,63 @@ The current authoring scope creates three Proposed ADRs and three child task pla
 
 Paths in this table are relative to `apps/web/src/`. Source paths existed in the live snapshot unless a row explicitly says new. Target paths are the selected app-local destinations. The ARF-01 manifest turns these rows into exact file operations and budgets; the rows alone are not mutation authority. Keep function/component names initially; changing file ownership should not silently rename behavior.
 
-| Current source                                             | Proposed destination                                | Treatment                                                                     |
-| ---------------------------------------------------------- | --------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `app/auth/actions.ts`                                      | `features/auth/server/actions.ts`                   | Move existing actions; separate shared types; preserve behavior               |
-| `lib/auth/session.ts`                                      | `features/auth/server/session.ts`                   | Move request-scoped readers                                                   |
-| `lib/auth/origin/origin.ts`                                | `features/auth/server/site-origin.ts`               | Move configured-origin reader                                                 |
-| `lib/auth/origin/origin.test.ts`                           | `features/auth/server/site-origin.test.ts`          | Move existing tests                                                           |
-| `lib/auth/error-messages/error-messages.ts`                | `features/auth/shared/error-messages.ts`            | Move mapping; move field type to form contract                                |
-| `lib/auth/error-messages/error-messages.test.ts`           | `features/auth/shared/error-messages.test.ts`       | Move existing tests                                                           |
-| Types in `app/auth/actions.ts` and error mapping           | `features/auth/shared/form-state.ts`                | Extract `AuthState`, `AuthFieldName` and associated safe types                |
-| `lib/auth/profile/profile.ts`                              | `features/auth/shared/current-user.ts`              | Move display mapping/types; split metadata-write helper below                 |
-| `lib/auth/profile/profile.test.ts`                         | `features/auth/shared/current-user.test.ts`         | Retain mapping assertions; split metadata assertions below                    |
-| `withFullName` in `lib/auth/profile/profile.ts`            | `features/account/server/profile-metadata.ts`       | Extract existing metadata-preserving helper                                   |
-| Metadata assertions in `lib/auth/profile/profile.test.ts`  | `features/account/server/profile-metadata.test.ts`  | Preserve existing assertions                                                  |
-| `lib/auth/name/name.ts`                                    | `features/account/shared/name.ts`                   | Move pure validator; registration imports it                                  |
-| `lib/auth/name/name.test.ts`                               | `features/account/shared/name.test.ts`              | Move existing tests                                                           |
-| `lib/auth/auth-events/auth-events.ts`                      | `features/auth/client/auth-events.ts`               | Move event predicate; preserve semantics                                      |
-| `lib/auth/auth-events/auth-events.test.ts`                 | `features/auth/client/auth-events.test.ts`          | Move existing tests                                                           |
-| `components/auth/provider/user-provider.tsx`               | `features/auth/client/user-provider.tsx`            | Move provider/hook; preserve refresh coordination                             |
-| `lib/auth/home-path/home-path.ts`                          | `lib/routing/user-paths.ts`                         | Move current destination functions                                            |
-| `lib/auth/home-path/home-path.test.ts`                     | `lib/routing/user-paths.test.ts`                    | Move encoding/destination tests                                               |
-| `lib/auth/safe-next/safe-next.ts`                          | `lib/routing/safe-next.ts`                          | Move unchanged redirect validation                                            |
-| `lib/auth/safe-next/safe-next.test.ts`                     | `lib/routing/safe-next.test.ts`                     | Move existing tests                                                           |
-| `lib/auth/auth-flow/auth-flow.ts`                          | `lib/routing/auth-flow.ts`                          | Move current flow parser and error destination helper                         |
-| `lib/auth/auth-flow/auth-flow.test.ts`                     | `lib/routing/auth-flow.test.ts`                     | Move current flow/recovery tests                                              |
-| `lib/supabase/route-access.ts`                             | `lib/routing/route-access.ts`                       | Move unchanged route classification                                           |
-| `lib/supabase/route-access.test.ts`                        | `lib/routing/route-access.test.ts`                  | Move existing tests                                                           |
-| `lib/auth/require-owner/require-owner.ts`                  | `lib/access/require-owner.ts`                       | Move app-specific guard                                                       |
-| `lib/auth/require-owner/require-owner.test.ts`             | `lib/access/require-owner.test.ts`                  | Move existing tests                                                           |
-| `components/auth/form/auth-field.tsx`                      | `components/forms/form-field.tsx`                   | Move presentation; keep exported component name initially                     |
-| `components/auth/form/form-message.tsx`                    | `components/forms/form-message.tsx`                 | Move message/id presentation with minimal error/message prop contract         |
-| `components/auth/form/use-focus-first-error.ts`            | `components/forms/use-focus-first-error.ts`         | Move current focus hook; use minimal presentation contract                    |
-| `components/auth/form/resend-button.tsx`                   | `features/auth/components/resend-button.tsx`        | Move shared resend button used by both resend controls (added at ARF-00)      |
-| `components/auth/form/use-confirmation.ts`                 | `features/auth/client/use-confirmation.ts`          | Candidate move of existing auth-specific confirmation/edit hook               |
-| `components/auth/form/use-cooldown.ts`                     | `features/auth/client/use-cooldown.ts`              | Candidate move preserving current auth-resend cooldown behavior               |
-| `fieldErrorProps` in previous row                          | `features/auth/shared/form-feedback.ts`             | Extract auth-specific field association; reuse message ID                     |
-| `components/auth/login/login-form.tsx`                     | `features/auth/components/login-form.tsx`           | Move                                                                          |
-| `components/auth/register/register-card.tsx`               | `features/auth/components/register-card.tsx`        | Move                                                                          |
-| `components/auth/register/resend-confirmation.tsx`         | `features/auth/components/resend-confirmation.tsx`  | Move current resend control and preserve its existing action                  |
-| `components/auth/register/register-form.tsx`               | `features/auth/components/register-form.tsx`        | Move                                                                          |
-| `components/auth/forgot-password/forgot-password-card.tsx` | `features/auth/components/forgot-password-card.tsx` | Move                                                                          |
-| `components/auth/forgot-password/resend-reset-link.tsx`    | `features/auth/components/resend-reset-link.tsx`    | Candidate move preserving existing reset-resend control                       |
-| `components/auth/forgot-password/forgot-password-form.tsx` | `features/auth/components/forgot-password-form.tsx` | Move                                                                          |
-| `components/auth/update-password/update-password-card.tsx` | `features/auth/components/update-password-card.tsx` | Move                                                                          |
-| `components/auth/update-password/update-password-form.tsx` | `features/auth/components/update-password-form.tsx` | Move                                                                          |
-| `components/auth/buttons/oauth-buttons.tsx`                | `features/auth/components/oauth-buttons.tsx`        | Move                                                                          |
-| `components/auth/buttons/sign-out-button.tsx`              | `features/auth/components/sign-out-button.tsx`      | Move                                                                          |
-| `components/auth/buttons/auth-link-button.tsx`             | `features/auth/components/auth-link-button.tsx`     | Move                                                                          |
-| `components/auth/display/auth-status.tsx`                  | `features/auth/components/auth-status.tsx`          | Move; remains a server component                                              |
-| `components/auth/display/current-user-avatar.tsx`          | `features/auth/components/current-user-avatar.tsx`  | Move; remains a client component                                              |
-| `components/auth/shell/auth-shell.tsx`                     | `features/auth/components/auth-shell.tsx`           | Move                                                                          |
-| `components/auth/shell/auth-confirmation.tsx`              | `features/auth/components/auth-confirmation.tsx`    | Move current focus/confirmation behavior                                      |
-| `components/auth/profile/profile-form.tsx`                 | `features/account/components/profile-form.tsx`      | Move; use common form presentation                                            |
-| `app/[userId]/settings/actions.ts`                         | `features/account/server/actions.ts`                | Move existing profile action; extract state type                              |
-| `ProfileState` in previous row                             | `features/account/shared/form-state.ts`             | Extract safe account form contract                                            |
-| New, after move verification                               | `features/auth/server/operations.ts`                | Extract approved registration/recovery workflows only                         |
-| New, paired with operation extraction                      | `features/auth/server/operations.test.ts`           | Verify workflow input/outcome invariants                                      |
-| New, action integration coverage                           | `features/auth/server/actions.test.ts`              | Invoke real actions and assert validation, safe results and framework effects |
+| Current source                                               | Proposed destination                                | Treatment                                                                     |
+| ------------------------------------------------------------ | --------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `app/auth/actions.ts`                                        | `features/auth/server/actions.ts`                   | Move existing actions; separate shared types; preserve behavior               |
+| `lib/auth/session.ts`                                        | `features/auth/server/session.ts`                   | Move request-scoped readers                                                   |
+| `lib/auth/origin/origin.ts`                                  | `features/auth/server/site-origin.ts`               | Move configured-origin reader                                                 |
+| `lib/auth/origin/origin.test.ts`                             | `features/auth/server/site-origin.test.ts`          | Move existing tests                                                           |
+| `lib/auth/error-messages/error-messages.ts`                  | `features/auth/shared/error-messages.ts`            | Move mapping; move field type to form contract                                |
+| `lib/auth/error-messages/error-messages.test.ts`             | `features/auth/shared/error-messages.test.ts`       | Move existing tests                                                           |
+| Types in `app/auth/actions.ts` and error mapping             | `features/auth/shared/form-state.ts`                | Extract `AuthState`, `AuthFieldName` and associated safe types                |
+| `lib/auth/profile/profile.ts`                                | `features/auth/shared/current-user.ts`              | Move display mapping/types; split metadata-write helper below                 |
+| `lib/auth/profile/profile.test.ts`                           | `features/auth/shared/current-user.test.ts`         | Retain mapping assertions; split metadata assertions below                    |
+| `withFullName` in `lib/auth/profile/profile.ts`              | `features/account/server/profile-metadata.ts`       | Extract existing metadata-preserving helper                                   |
+| Metadata assertions in `lib/auth/profile/profile.test.ts`    | `features/account/server/profile-metadata.test.ts`  | Preserve existing assertions                                                  |
+| `lib/auth/name/name.ts`                                      | `features/account/shared/name.ts`                   | Move pure validator; registration imports it                                  |
+| `lib/auth/name/name.test.ts`                                 | `features/account/shared/name.test.ts`              | Move existing tests                                                           |
+| `lib/auth/auth-events/auth-events.ts`                        | `features/auth/client/auth-events.ts`               | Move event predicate; preserve semantics                                      |
+| `lib/auth/auth-events/auth-events.test.ts`                   | `features/auth/client/auth-events.test.ts`          | Move existing tests                                                           |
+| `components/auth/provider/user-provider.tsx`                 | `features/auth/client/user-provider.tsx`            | Move provider/hook; preserve refresh coordination                             |
+| `lib/auth/home-path/home-path.ts`                            | `lib/routing/user-paths.ts`                         | Move current destination functions                                            |
+| `lib/auth/home-path/home-path.test.ts`                       | `lib/routing/user-paths.test.ts`                    | Move encoding/destination tests                                               |
+| `lib/auth/safe-next/safe-next.ts`                            | `lib/routing/safe-next.ts`                          | Move unchanged redirect validation                                            |
+| `lib/auth/safe-next/safe-next.test.ts`                       | `lib/routing/safe-next.test.ts`                     | Move existing tests                                                           |
+| `lib/auth/auth-flow/auth-flow.ts`                            | `lib/routing/auth-flow.ts`                          | Move current flow parser and error destination helper                         |
+| `lib/auth/auth-flow/auth-flow.test.ts`                       | `lib/routing/auth-flow.test.ts`                     | Move current flow/recovery tests                                              |
+| `lib/supabase/route-access.ts`                               | `lib/routing/route-access.ts`                       | Move unchanged route classification                                           |
+| `lib/supabase/route-access.test.ts`                          | `lib/routing/route-access.test.ts`                  | Move existing tests                                                           |
+| `lib/auth/require-owner/require-owner.ts`                    | `lib/access/require-owner.ts`                       | Move app-specific guard                                                       |
+| `lib/auth/require-owner/require-owner.test.ts`               | `lib/access/require-owner.test.ts`                  | Move existing tests                                                           |
+| `components/auth/form/auth-field.tsx`                        | `components/forms/form-field.tsx`                   | Move presentation; keep exported component name initially                     |
+| `components/auth/form/form-message.tsx`                      | `components/forms/form-message.tsx`                 | Move message/id presentation with minimal error/message prop contract         |
+| `components/auth/form/use-focus-first-error.ts`              | `components/forms/use-focus-first-error.ts`         | Move current focus hook; use minimal presentation contract                    |
+| `components/auth/form/resend-button.tsx`                     | `features/auth/components/resend-button.tsx`        | Move shared resend button used by both resend controls (added at ARF-00)      |
+| `components/auth/form/use-confirmation.ts`                   | `features/auth/client/use-confirmation.ts`          | Candidate move of existing auth-specific confirmation/edit hook               |
+| `components/auth/form/use-cooldown.ts`                       | `features/auth/client/use-cooldown.ts`              | Candidate move preserving current auth-resend cooldown behavior               |
+| `fieldErrorProps` in `components/auth/form/form-message.tsx` | `features/auth/shared/form-feedback.ts`             | Extract auth-specific field association; reuse message ID                     |
+| `components/auth/login/login-form.tsx`                       | `features/auth/components/login-form.tsx`           | Move                                                                          |
+| `components/auth/register/register-card.tsx`                 | `features/auth/components/register-card.tsx`        | Move                                                                          |
+| `components/auth/register/resend-confirmation.tsx`           | `features/auth/components/resend-confirmation.tsx`  | Move current resend control and preserve its existing action                  |
+| `components/auth/register/register-form.tsx`                 | `features/auth/components/register-form.tsx`        | Move                                                                          |
+| `components/auth/forgot-password/forgot-password-card.tsx`   | `features/auth/components/forgot-password-card.tsx` | Move                                                                          |
+| `components/auth/forgot-password/resend-reset-link.tsx`      | `features/auth/components/resend-reset-link.tsx`    | Candidate move preserving existing reset-resend control                       |
+| `components/auth/forgot-password/forgot-password-form.tsx`   | `features/auth/components/forgot-password-form.tsx` | Move                                                                          |
+| `components/auth/update-password/update-password-card.tsx`   | `features/auth/components/update-password-card.tsx` | Move                                                                          |
+| `components/auth/update-password/update-password-form.tsx`   | `features/auth/components/update-password-form.tsx` | Move                                                                          |
+| `components/auth/buttons/oauth-buttons.tsx`                  | `features/auth/components/oauth-buttons.tsx`        | Move                                                                          |
+| `components/auth/buttons/sign-out-button.tsx`                | `features/auth/components/sign-out-button.tsx`      | Move                                                                          |
+| `components/auth/buttons/auth-link-button.tsx`               | `features/auth/components/auth-link-button.tsx`     | Move                                                                          |
+| `components/auth/display/auth-status.tsx`                    | `features/auth/components/auth-status.tsx`          | Move; remains a server component                                              |
+| `components/auth/display/current-user-avatar.tsx`            | `features/auth/components/current-user-avatar.tsx`  | Move; remains a client component                                              |
+| `components/auth/shell/auth-shell.tsx`                       | `features/auth/components/auth-shell.tsx`           | Move                                                                          |
+| `components/auth/shell/auth-confirmation.tsx`                | `features/auth/components/auth-confirmation.tsx`    | Move current focus/confirmation behavior                                      |
+| `components/auth/profile/profile-form.tsx`                   | `features/account/components/profile-form.tsx`      | Move; use common form presentation                                            |
+| `app/[userId]/settings/actions.ts`                           | `features/account/server/actions.ts`                | Move existing profile action; extract state type                              |
+| `ProfileState` in previous row                               | `features/account/shared/form-state.ts`             | Extract safe account form contract                                            |
+| New, after move verification                                 | `features/auth/server/operations.ts`                | Extract approved registration/recovery workflows only                         |
+| New, paired with operation extraction                        | `features/auth/server/operations.test.ts`           | Verify workflow input/outcome invariants                                      |
+| New, action integration coverage                             | `features/auth/server/actions.test.ts`              | Invoke real actions and assert validation, safe results and framework effects |
 
 Do not count split rows as independent moves from the same source. The execution manifest must enumerate each actual file operation once, distinguish moving files from extracting symbols, and approve removal of superseded source copies only after all consumers are updated. No compatibility copy or forwarding file is proposed by default.
 
