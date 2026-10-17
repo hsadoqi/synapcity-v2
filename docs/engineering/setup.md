@@ -49,6 +49,27 @@ A passing `pnpm verify` proves the repository's formatting, lint, types, unused-
 - When another variable is added, add it to the committed `.env.example` with a placeholder value in the same change.
 - Real values go in an untracked `.env` or `.env*.local` file, both git-ignored. Never commit secrets. The `security` CI job scans history for them.
 
+## Deployments
+
+Three Vercel projects deploy from this repository. These are the Vercel-generated addresses (no custom domain yet), as given by the owner on 2026-10-13.
+
+| App              | Live address                                   | Deploys                                                 |
+| ---------------- | ---------------------------------------------- | ------------------------------------------------------- |
+| `apps/web`       | `https://web-iota-three-69.vercel.app`         | `main`, and every feature branch except `dependabot/**` |
+| `apps/storybook` | `https://synapcity-storybook-sigma.vercel.app` | `main` only                                             |
+| `apps/docs`      | `https://synapcity-v2.vercel.app`              | `main` only                                             |
+
+The branch rules and why they exist are in `quality-gates.md` ("Vercel deployments").
+
+When the address of `apps/web` changes (for example a custom domain), change these together. The first two are dashboard settings; nothing in the repository holds them:
+
+1. **Vercel, `web` project, Production environment variables:** set `SITE_URL` to the new address including `https://`. A value without the scheme fails the build on purpose. `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` must be set before the build, because they are inlined into the browser bundle.
+2. **Supabase, Authentication, URL Configuration:** set Site URL to the same address, and list exactly `<address>/auth/callback` as a Redirect URL (plus `http://localhost:8080/auth/callback` for local work). Avoid wildcards: with a wildcard such as `*.vercel.app`, anyone can host a page that the redirect list would accept.
+3. **Google and GitHub consoles:** nothing to change. They hold only Supabase's own callback address.
+4. **Email:** a custom SMTP provider needs SPF and DKIM records on the sending domain.
+
+`SITE_URL` also sets `metadataBase`, so share images resolve against the real address. If it is unset, Next falls back to `http://localhost:3000` and warns at build.
+
 ## Generated files and caches
 
 - Committed: source, `pnpm-lock.yaml`, and configuration. Generated output is never committed.
