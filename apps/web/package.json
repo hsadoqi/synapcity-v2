@@ -23,7 +23,7 @@
     "@tailwindcss/postcss": "^4.3.3",
     "next": "16.4.0",
     "react": "19.2.8",
-    "react-dom": "19.2.8",
+    "react-dom": "19.3.0",
     "shadcn": "^4.21.4",
     "tailwindcss": "^4.3.3"
   },
@@ -36,7 +36,7 @@
     "@synapcity/frontend-tailwind-config": "workspace:*",
     "@types/node": "26.6.5",
     "@types/react": "19.2.18",
-    "@types/react-dom": "19.2.5",
+    "@types/react-dom": "19.3.0",
     "@vitest/coverage-v8": "4.1.11",
     "eslint": "10.9.1",
     "typescript": "7.0.2",
