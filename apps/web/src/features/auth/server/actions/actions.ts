@@ -22,6 +22,7 @@ import {
   emailChangeErrorFields,
   emailChangeErrorMessage,
   isRateLimited,
+  LAST_SIGN_IN,
   linkErrorMessage,
 } from '@/features/auth/shared/error-messages';
 import { isOAuthProvider } from '@/features/auth/shared/oauth-providers';
@@ -35,6 +36,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '../session';
 import {
   changeEmail,
+  disconnectAccount as disconnectAccountOperation,
   registerWithPassword,
   requestRecoveryEmail,
   resendEmailChange as resendEmailChangeOperation,
@@ -508,5 +510,42 @@ export async function requestAccountDeletion(
         `We sent a link to ${outcome.email}. Open it within 10 minutes to finish. Nothing is deleted until you confirm there.`,
         { email: outcome.email },
       );
+  }
+}
+
+/**
+ * Disconnects a Google or GitHub account from the signed-in person's account.
+ * Only the provider name comes from the form, and it must be a known one.
+ */
+export async function disconnectAccount(
+  _previous: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const provider = field(formData, 'provider');
+  if (!isOAuthProvider(provider)) return authFailure(TRY_AGAIN, { email: '' });
+
+  const user = await getCurrentUser();
+  if (!user) return signedOutFailure('');
+
+  const outcome = await disconnectAccountOperation({ provider });
+
+  switch (outcome.kind) {
+    case 'signed-out':
+      return signedOutFailure('');
+    case 'unavailable':
+      return authFailure(TRY_AGAIN, { email: '' });
+    case 'last-sign-in':
+      return authFailure(LAST_SIGN_IN, { email: '' });
+    case 'provider-error':
+      console.warn('disconnectAccount failed', {
+        provider,
+        code: outcome.code,
+      });
+      return authFailure(linkErrorMessage(outcome.code), { email: '' });
+    case 'not-connected':
+    case 'disconnected':
+      // Either way the account is not connected now: refresh what is shown.
+      revalidatePath('/', 'layout');
+      return authSuccess('Account disconnected.', { email: '' });
   }
 }

@@ -4,9 +4,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AuthState } from '@/features/auth/types';
 import { ConnectedAccountsProvider } from '@/features/auth/client';
 
-const mocks = vi.hoisted(() => ({ connectAccount: vi.fn() }));
+const mocks = vi.hoisted(() => ({
+  connectAccount: vi.fn(),
+  disconnectAccount: vi.fn(),
+}));
 vi.mock('@/features/auth/server/actions/actions', () => ({
   connectAccount: mocks.connectAccount,
+  disconnectAccount: mocks.disconnectAccount,
 }));
 vi.mock('next/navigation', () => ({ usePathname: () => '/u1/settings' }));
 
@@ -60,7 +64,11 @@ describe('ConnectedAccounts', () => {
       within(row('Google')).getByText('Connected as ada@gmail.com'),
     ).toBeTruthy();
     expect(within(row('GitHub')).getByText('Connected as ada-l')).toBeTruthy();
-    expect(screen.queryByRole('button')).toBeNull();
+    // Connected means it can be disconnected, not connected again.
+    expect(screen.queryByRole('button', { name: /^Connect / })).toBeNull();
+    expect(screen.getAllByRole('button', { name: /^Disconnect/ })).toHaveLength(
+      2,
+    );
   });
 
   it('says just "Connected" when the account gave nothing to show', () => {
@@ -73,8 +81,15 @@ describe('ConnectedAccounts', () => {
     show([{ provider: 'github', detail: 'ada-l' }]);
 
     expect(within(row('Google')).getByText('Not connected')).toBeTruthy();
-    expect(within(row('GitHub')).queryByRole('button')).toBeNull();
-    expect(screen.getAllByRole('button')).toHaveLength(1);
+    expect(
+      within(row('GitHub')).queryByRole('button', { name: /^Connect / }),
+    ).toBeNull();
+    expect(
+      within(row('GitHub')).getByRole('button', { name: /Disconnect/ }),
+    ).toBeTruthy();
+    expect(
+      within(row('Google')).queryByRole('button', { name: /^Disconnect/ }),
+    ).toBeNull();
   });
 
   it('hides the status icon from screen readers', () => {
@@ -166,5 +181,81 @@ describe('ConnectedAccounts', () => {
     expect(button.getAttribute('aria-busy')).toBe('true');
 
     await act(async () => finish({}));
+  });
+
+  describe('disconnecting', () => {
+    const open = (name: string) =>
+      fireEvent.click(
+        within(row(name)).getByRole('button', {
+          name: new RegExp(`Disconnect`),
+        }),
+      );
+    const confirm = async () =>
+      act(async () => {
+        fireEvent.submit(
+          within(screen.getByRole('alertdialog'))
+            .getByRole('button', { name: 'Disconnect' })
+            .closest('form')!,
+        );
+      });
+
+    beforeEach(() => {
+      mocks.disconnectAccount.mockResolvedValue({});
+    });
+
+    it('asks first, saying what changes, and sends nothing by opening the dialog', () => {
+      show([{ provider: 'github', detail: 'ada-l' }]);
+
+      open('GitHub');
+
+      expect(screen.getByRole('alertdialog').textContent).toMatch(
+        /no longer be able to sign in with GitHub.*connect it again/i,
+      );
+      expect(mocks.disconnectAccount).not.toHaveBeenCalled();
+    });
+
+    it('sends the provider, and only that', async () => {
+      show([{ provider: 'github', detail: 'ada-l' }]);
+      open('GitHub');
+
+      await confirm();
+
+      const formData = mocks.disconnectAccount.mock.calls[0]![1] as FormData;
+      expect(formData.get('provider')).toBe('github');
+      expect([...formData.keys()]).toEqual(['provider']);
+    });
+
+    it('shows the refusal inside the dialog, such as the last way to sign in', async () => {
+      mocks.disconnectAccount.mockResolvedValue({
+        error:
+          'That is your only way to sign in. Add a password or connect another account first.',
+      } satisfies AuthState);
+      show([{ provider: 'google', detail: 'ada@gmail.com' }]);
+      open('Google');
+
+      await confirm();
+
+      expect(
+        within(screen.getByRole('alertdialog')).getByRole('alert').textContent,
+      ).toContain('only way to sign in');
+    });
+
+    it('offers a way back in when the session has gone', async () => {
+      mocks.disconnectAccount.mockResolvedValue({
+        error:
+          'For your security, sign out, sign in again, then try once more.',
+        signedOut: true,
+      } satisfies AuthState);
+      show([{ provider: 'google', detail: null }]);
+      open('Google');
+
+      await confirm();
+
+      expect(
+        within(screen.getByRole('alertdialog')).getByRole('link', {
+          name: 'Sign in again',
+        }),
+      ).toBeTruthy();
+    });
   });
 });

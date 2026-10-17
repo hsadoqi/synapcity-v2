@@ -17,6 +17,8 @@ const mocks = vi.hoisted(() => ({
   getUser: vi.fn(),
   linkIdentity: vi.fn(),
   signInWithOtp: vi.fn(),
+  getUserIdentities: vi.fn(),
+  unlinkIdentity: vi.fn(),
 }));
 
 /** Stands in for Next's `redirect`, which never returns. */
@@ -49,12 +51,15 @@ vi.mock('@/lib/supabase/server', () => ({
       getUser: mocks.getUser,
       linkIdentity: mocks.linkIdentity,
       signInWithOtp: mocks.signInWithOtp,
+      getUserIdentities: mocks.getUserIdentities,
+      unlinkIdentity: mocks.unlinkIdentity,
     },
   }),
 }));
 
 import {
   connectAccount,
+  disconnectAccount,
   requestAccountDeletion,
   requestEmailChange,
   requestOwnPasswordReset,
@@ -1174,5 +1179,83 @@ describe('requestAccountDeletion', () => {
 
     expect(state.error).toBe('Something went wrong. Try again.');
     expect(JSON.stringify(warn.mock.calls)).not.toContain(OWN);
+  });
+});
+
+describe('disconnectAccount', () => {
+  const github = { identity_id: 'i-2', provider: 'github' };
+  const email = { identity_id: 'i-1', provider: 'email' };
+
+  beforeEach(() => {
+    mocks.getClaims.mockResolvedValue({
+      data: { claims: { sub: USER_ID, email: 'ada@example.com' } },
+      error: null,
+    });
+    mocks.getUserIdentities.mockResolvedValue({
+      data: { identities: [email, github] },
+      error: null,
+    });
+    mocks.unlinkIdentity.mockResolvedValue({ data: {}, error: null });
+  });
+
+  it('disconnects, refreshes what is shown, and says so', async () => {
+    mocks.revalidatePath.mockClear();
+
+    const state = await disconnectAccount({}, form({ provider: 'github' }));
+
+    expect(mocks.unlinkIdentity).toHaveBeenCalledExactlyOnceWith(github);
+    expect(state.success).toBe(true);
+    expect(state.message).toBe('Account disconnected.');
+    expect(mocks.revalidatePath).toHaveBeenCalledWith('/', 'layout');
+  });
+
+  it.each(['', 'facebook', 'email', '__proto__'])(
+    'refuses %j as a provider, before any call',
+    async (provider) => {
+      mocks.getUserIdentities.mockClear();
+
+      const state = await disconnectAccount({}, form({ provider }));
+
+      expect(state.error).toBe('Something went wrong. Try again.');
+      expect(mocks.getUserIdentities).not.toHaveBeenCalled();
+    },
+  );
+
+  it('needs a session, and offers sign-in', async () => {
+    mocks.getClaims.mockResolvedValue({ data: null, error: { code: 'x' } });
+
+    const state = await disconnectAccount({}, form({ provider: 'github' }));
+
+    expect(state.signedOut).toBe(true);
+    expect(mocks.unlinkIdentity).not.toHaveBeenCalled();
+  });
+
+  it('explains the only way to sign in, and changes nothing', async () => {
+    mocks.getUserIdentities.mockResolvedValue({
+      data: { identities: [github] },
+      error: null,
+    });
+
+    const state = await disconnectAccount({}, form({ provider: 'github' }));
+
+    expect(state.error).toBe(
+      'That is your only way to sign in. Add a password or connect another account first.',
+    );
+    expect(mocks.unlinkIdentity).not.toHaveBeenCalled();
+  });
+
+  it('words a project with linking switched off, logging only the code', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    mocks.unlinkIdentity.mockResolvedValue({
+      data: null,
+      error: { code: 'manual_linking_disabled', message: 'ada@example.com' },
+    });
+
+    const state = await disconnectAccount({}, form({ provider: 'github' }));
+
+    expect(state.error).toBe(
+      'Connecting accounts is not turned on for this app yet.',
+    );
+    expect(JSON.stringify(warn.mock.calls)).not.toContain('ada@example.com');
   });
 });

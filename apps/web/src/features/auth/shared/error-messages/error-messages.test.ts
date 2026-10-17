@@ -215,6 +215,15 @@ describe('connecting an account', () => {
       'That sign-in method is not available right now.',
     ],
     ['identity_already_exists', 'That account is already connected.'],
+    ['identity_not_found', 'That account is no longer connected.'],
+    [
+      'single_identity_not_deletable',
+      'That is your only way to sign in. Add a password or connect another account first.',
+    ],
+    [
+      'email_conflict_identity_not_deletable',
+      'That account supplies your email address, so it cannot be disconnected.',
+    ],
   ])('words %s for the person', (code, message) => {
     expect(linkErrorMessage(code)).toBe(message);
   });

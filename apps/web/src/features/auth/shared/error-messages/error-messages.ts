@@ -109,6 +109,10 @@ export function emailChangeErrorFields(
 }
 
 /** The wording for connecting a Google or GitHub account to the signed-in one. */
+/** Said when disconnecting would leave no way to sign in. */
+export const LAST_SIGN_IN =
+  'That is your only way to sign in. Add a password or connect another account first.';
+
 export function linkErrorMessage(code: string | undefined): string {
   switch (code) {
     case 'manual_linking_disabled':
@@ -119,6 +123,13 @@ export function linkErrorMessage(code: string | undefined): string {
       return 'That sign-in method is not available right now.';
     case 'identity_already_exists':
       return 'That account is already connected.';
+    case 'identity_not_found':
+      return 'That account is no longer connected.';
+    case 'single_identity_not_deletable':
+      return LAST_SIGN_IN;
+    case 'email_conflict_identity_not_deletable':
+      // Removing it would leave the account's address attached to nothing.
+      return 'That account supplies your email address, so it cannot be disconnected.';
     default:
       return authErrorMessage(code);
   }

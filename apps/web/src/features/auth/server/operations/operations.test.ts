@@ -12,6 +12,8 @@ const mocks = vi.hoisted(() => ({
   getClaims: vi.fn(),
   rpc: vi.fn(),
   signOut: vi.fn(),
+  getUserIdentities: vi.fn(),
+  unlinkIdentity: vi.fn(),
 }));
 
 vi.mock('@/lib/supabase/server', () => ({ createClient: mocks.createClient }));
@@ -24,6 +26,7 @@ import {
 import {
   changeEmail,
   deleteOwnAccount,
+  disconnectAccount,
   registerWithPassword,
   requestRecoveryEmail,
   resendEmailChange,
@@ -69,6 +72,8 @@ beforeEach(() => {
       signInWithOtp: mocks.signInWithOtp,
       getClaims: mocks.getClaims,
       signOut: mocks.signOut,
+      getUserIdentities: mocks.getUserIdentities,
+      unlinkIdentity: mocks.unlinkIdentity,
     },
     rpc: mocks.rpc,
   }));
@@ -784,5 +789,111 @@ describe('deleteOwnAccount', () => {
       kind: 'unavailable',
     });
     expect(mocks.rpc).not.toHaveBeenCalled();
+  });
+});
+
+describe('disconnectAccount', () => {
+  const email = { identity_id: 'i-1', provider: 'email', identity_data: {} };
+  const github = {
+    identity_id: 'i-2',
+    provider: 'github',
+    identity_data: { user_name: 'ada-l' },
+  };
+  const google = { identity_id: 'i-3', provider: 'google', identity_data: {} };
+  const has = (...identities: object[]) =>
+    mocks.getUserIdentities.mockResolvedValue({
+      data: { identities },
+      error: null,
+    });
+
+  beforeEach(() => {
+    mocks.unlinkIdentity.mockResolvedValue({ data: {}, error: null });
+  });
+
+  it("unlinks the person's own identity record for that provider, found here and not sent by the caller", async () => {
+    has(email, github);
+
+    const outcome = await disconnectAccount({ provider: 'github' });
+
+    expect(mocks.unlinkIdentity).toHaveBeenCalledExactlyOnceWith(github);
+    expect(outcome).toEqual({ kind: 'disconnected' });
+  });
+
+  it('can disconnect one of two connected accounts with no password', async () => {
+    has(google, github);
+
+    expect(await disconnectAccount({ provider: 'google' })).toEqual({
+      kind: 'disconnected',
+    });
+    expect(mocks.unlinkIdentity).toHaveBeenCalledExactlyOnceWith(google);
+  });
+
+  it('refuses to remove the only way to sign in, and changes nothing', async () => {
+    has(github);
+
+    expect(await disconnectAccount({ provider: 'github' })).toEqual({
+      kind: 'last-sign-in',
+    });
+    expect(mocks.unlinkIdentity).not.toHaveBeenCalled();
+  });
+
+  it('says so when it is not connected, and changes nothing', async () => {
+    has(email, github);
+
+    expect(await disconnectAccount({ provider: 'google' })).toEqual({
+      kind: 'not-connected',
+    });
+    expect(mocks.unlinkIdentity).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['single_identity_not_deletable', { kind: 'last-sign-in' }],
+    ['identity_not_found', { kind: 'not-connected' }],
+    [
+      'manual_linking_disabled',
+      { kind: 'provider-error', code: 'manual_linking_disabled' },
+    ],
+  ])('maps the provider refusing with %s', async (code, expected) => {
+    has(email, github);
+    mocks.unlinkIdentity.mockResolvedValue({
+      data: null,
+      error: { code, message: 'sentinel' },
+    });
+
+    const outcome = await disconnectAccount({ provider: 'github' });
+
+    expect(outcome).toEqual(expected);
+    expect(JSON.stringify(outcome)).not.toContain('sentinel');
+  });
+
+  it('tells a missing session from an outage when listing', async () => {
+    mocks.getUserIdentities.mockResolvedValue({
+      data: null,
+      error: new AuthSessionMissingError(),
+    });
+    expect(await disconnectAccount({ provider: 'github' })).toEqual({
+      kind: 'signed-out',
+    });
+
+    mocks.getUserIdentities.mockResolvedValue({
+      data: null,
+      error: new AuthRetryableFetchError('fetch failed', 0),
+    });
+    expect(await disconnectAccount({ provider: 'github' })).toEqual({
+      kind: 'unavailable',
+    });
+    expect(mocks.unlinkIdentity).not.toHaveBeenCalled();
+  });
+
+  it('reports an outage while unlinking as unavailable', async () => {
+    has(email, github);
+    mocks.unlinkIdentity.mockResolvedValue({
+      data: null,
+      error: new AuthRetryableFetchError('fetch failed', 0),
+    });
+
+    expect(await disconnectAccount({ provider: 'github' })).toEqual({
+      kind: 'unavailable',
+    });
   });
 });

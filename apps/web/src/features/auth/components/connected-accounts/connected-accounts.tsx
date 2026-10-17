@@ -3,8 +3,21 @@
 import { useActionState, useId } from 'react';
 import { CircleCheck } from 'lucide-react';
 import { Button } from '@synapcity/frontend-ui/core/button';
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@synapcity/frontend-ui/core/alert-dialog';
 
-import { connectAccount } from '@/features/auth/server/actions/actions';
+import {
+  connectAccount,
+  disconnectAccount,
+} from '@/features/auth/server/actions/actions';
 import { useConnectedAccounts } from '@/features/auth/client';
 import {
   OAUTH_PROVIDERS,
@@ -17,6 +30,63 @@ import { FormMessage } from '@/components/forms/form-message';
 import { SignInAgain } from '../sign-in-again';
 
 const initialState: AuthState = {};
+
+/**
+ * Disconnecting, behind a confirmation. It can be undone by connecting again,
+ * but it changes how the person can sign in, so it is not one click. The
+ * server refuses to remove the last way to sign in and says so here; when it
+ * works, the row stops being connected and this goes away with it.
+ */
+function DisconnectButton({ provider }: { provider: OAuthProvider }) {
+  const [state, formAction, pending] = useActionState(
+    disconnectAccount,
+    initialState,
+  );
+  const messageId = useId();
+  const label = providerLabel(provider);
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger
+        render={
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            aria-label={`Disconnect ${label}`}
+          />
+        }
+      >
+        Disconnect
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Disconnect {label}?</AlertDialogTitle>
+          <AlertDialogDescription>
+            You will no longer be able to sign in with {label}. You can connect
+            it again later.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <form action={formAction} className="flex flex-col gap-4">
+          <input type="hidden" name="provider" value={provider} />
+          <FormMessage id={messageId} state={{ error: state.error }} />
+          {state.signedOut ? <SignInAgain /> : null}
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button
+              type="submit"
+              variant="destructive"
+              disabled={pending}
+              aria-busy={pending}
+            >
+              {pending ? 'Disconnecting…' : 'Disconnect'}
+            </Button>
+          </AlertDialogFooter>
+        </form>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
 
 function ProviderRow({
   provider,
@@ -46,7 +116,9 @@ function ProviderRow({
             <span className="text-sm text-muted-foreground">Not connected</span>
           )}
         </div>
-        {account ? null : (
+        {account ? (
+          <DisconnectButton provider={provider} />
+        ) : (
           <form action={formAction}>
             <input type="hidden" name="provider" value={provider} />
             <Button

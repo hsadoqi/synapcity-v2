@@ -365,3 +365,48 @@ export async function deleteOwnAccount(input: {
   }
   return { kind: 'deleted' };
 }
+
+export type DisconnectOutcome =
+  | { kind: 'disconnected' }
+  /** It is not linked (any more), so there is nothing to remove. */
+  | { kind: 'not-connected' }
+  /** Removing it would leave no way to sign in. Nothing was changed. */
+  | { kind: 'last-sign-in' }
+  | { kind: 'signed-out' }
+  | { kind: 'unavailable' }
+  | { kind: 'provider-error'; code: string | undefined };
+
+/**
+ * Unlinks a Google or GitHub account from the signed-in person's account. The
+ * caller names only the provider; the identity record the SDK needs is looked
+ * up here, from the person's own identities, so nothing the browser sends can
+ * point at another account. The last remaining way to sign in is never removed.
+ */
+export async function disconnectAccount(input: {
+  provider: OAuthProvider;
+}): Promise<DisconnectOutcome> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.getUserIdentities();
+  if (error) {
+    if (isAuthSessionMissingError(error)) return { kind: 'signed-out' };
+    if (isAuthRetryableFetchError(error)) return { kind: 'unavailable' };
+    return { kind: 'provider-error', code: error.code };
+  }
+  const identities = data?.identities ?? [];
+  const identity = identities.find((item) => item.provider === input.provider);
+  if (!identity) return { kind: 'not-connected' };
+  if (identities.length < 2) return { kind: 'last-sign-in' };
+
+  const { error: unlinkError } = await supabase.auth.unlinkIdentity(identity);
+  if (unlinkError) {
+    if (unlinkError.code === 'single_identity_not_deletable') {
+      return { kind: 'last-sign-in' };
+    }
+    if (unlinkError.code === 'identity_not_found') {
+      return { kind: 'not-connected' };
+    }
+    if (isAuthRetryableFetchError(unlinkError)) return { kind: 'unavailable' };
+    return { kind: 'provider-error', code: unlinkError.code };
+  }
+  return { kind: 'disconnected' };
+}
