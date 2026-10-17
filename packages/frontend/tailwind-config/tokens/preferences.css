@@ -1,0 +1,64 @@
+/* What the Appearance settings do to the page. The settings provider writes these
+ * attributes on <html> (data-font-size, data-contrast, data-borders, data-animations,
+ * data-reduced-motion); nothing else sets them.
+ *
+ * Like accessibility.css this sits outside every @layer, so it beats the layered theme
+ * variables and utilities without touching a component's own classes. */
+
+/* Text size: the whole type scale is derived from --text-base-size. */
+:root[data-font-size='small'] {
+  --text-base-size: 0.875rem;
+}
+
+:root[data-font-size='large'] {
+  --text-base-size: 1.0625rem;
+}
+
+/* Borders: a visible line between panels and around controls, in both themes. */
+:root[data-borders='true'] {
+  --border: var(--muted-background);
+}
+
+/* Contrast. High draws lines and secondary text in the full ink colour. Low only softens
+ * the lines; text keeps its contrast so it stays readable. */
+:root[data-contrast='high'] {
+  --border: var(--base-foreground);
+  --input: var(--base-foreground);
+  --muted-foreground: var(--base-foreground);
+}
+
+:root[data-contrast='low'] {
+  --border: color-mix(in oklch, var(--muted) 55%, var(--base-background));
+}
+
+/* Animations off, or reduced motion on, stops travel and scale (see accessibility.css for
+ * why fades and colour changes stay). Turning animations off also ends the fades. */
+:root[data-reduced-motion='true'] {
+  scroll-behavior: auto;
+}
+
+:root[data-reduced-motion='true'] *,
+:root[data-reduced-motion='true'] *::before,
+:root[data-reduced-motion='true'] *::after,
+:root[data-animations='false'] *,
+:root[data-animations='false'] *::before,
+:root[data-animations='false'] *::after {
+  --tw-enter-translate-x: 0;
+  --tw-enter-translate-y: 0;
+  --tw-enter-scale: 1;
+  --tw-enter-rotate: 0;
+  --tw-enter-blur: 0;
+  --tw-exit-translate-x: 0;
+  --tw-exit-translate-y: 0;
+  --tw-exit-scale: 1;
+  --tw-exit-rotate: 0;
+  --tw-exit-blur: 0;
+}
+
+:root[data-animations='false'] *,
+:root[data-animations='false'] *::before,
+:root[data-animations='false'] *::after {
+  transition-duration: 0s;
+  animation-duration: 0.01ms;
+  animation-delay: 0s;
+}
