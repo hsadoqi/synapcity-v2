@@ -1,4 +1,4 @@
-export { RootShell, RootHeader, RootFooter, RootContent } from './root-shell';
-export { SidebarShell } from './sidebar-shell/sidebar-shell';
-export { SearchForm } from './search-form';
-export { ContextSwitcher } from './context-switcher';
+export * from '@synapcity/frontend-ui/blocks/context-switcher';
+export * from '@synapcity/frontend-ui/blocks/root-shell';
+export * from '@synapcity/frontend-ui/blocks/search-form';
+export * from '@synapcity/frontend-ui/blocks/sidebar-shell';

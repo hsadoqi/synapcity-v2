@@ -3,6 +3,6 @@ export {
   AuthenticatedShell,
   PublicShell,
 } from './root-shell';
-export { RootHeader } from './root-header';
-export { RootFooter } from './root-footer';
-export { RootContent } from './root-content';
+export { RootHeader } from '@synapcity/frontend-ui/blocks/root-shell/root-header';
+export { RootFooter } from '@synapcity/frontend-ui/blocks/root-shell/root-footer';
+export { RootContent } from '@synapcity/frontend-ui/blocks/root-shell/root-content';

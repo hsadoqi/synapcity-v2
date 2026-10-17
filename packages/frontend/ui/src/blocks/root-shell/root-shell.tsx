@@ -1,10 +1,10 @@
-import { SkipLinkButton } from '../../components/skip-link';
-import { RootHeader } from './root-header';
-import { RootFooter } from './root-footer';
-import { RootContent } from './root-content';
-import { SidebarShell } from '../sidebar-shell/sidebar-shell';
+import { SkipLinkButton } from '@synapcity/frontend-ui/components/skip-link';
+import { RootHeader } from '@synapcity/frontend-ui/blocks/root-shell/root-header';
+import { RootFooter } from '@synapcity/frontend-ui/blocks/root-shell/root-footer';
+import { RootContent } from '@synapcity/frontend-ui/blocks/root-shell/root-content';
+import { SidebarShell } from '@synapcity/frontend-ui/blocks/sidebar-shell';
 import React from 'react';
-import type { AccountLinks } from '../../lib/account-links';
+import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';
 
 type ShellProps = {
   children: React.ReactNode;
