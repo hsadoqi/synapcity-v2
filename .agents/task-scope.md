@@ -1,5 +1,14 @@
 # Task scope
 
+## Active task: auth review follow-ups AHF-07 part 1, status text reconciliation (2026-10-17)
+
+- Goal and mode: implement the status-text items of AHF-07 of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`: dated reconciliation notes where the spec and ADR-0007 contradict the accepted decisions, and the web README's test paragraph.
+- Exact change: update `docs/superpowers/specs/2026-10-13-auth-refactor-design.md` (status line only, body kept as the original proposal), `docs/architecture/decisions/0007-app-local-auth-and-account-ownership.md` (one Unresolved bullet, kept as history with a dated note), `apps/web/README.md` (test paragraph) and this entry. No decision is changed or newly accepted.
+- Mutation budgets: updates 4; creates 0; dependencies, source, config, schema 0.
+- Not done in this part: ticking the 67 unchecked items in the four original ARF plans (each needs its own acceptance evidence), the original ARF-01 baseline note, and the D1 development contract in the README (waits for D1).
+- Verification: `pnpm format:check`; README claims checked against the named test files. No runtime checks apply.
+- Recovery: revert the PR.
+
 ## Active task: auth review follow-ups AHF-05 part 1, DOM test setup (2026-10-17)
 
 - Goal and mode: implement the first part of AHF-05 of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`; the owner approved recommendation D3 on 2026-10-17: add `@testing-library/react` 16.3.3, `@testing-library/dom` 10.4.2 and `jsdom` 30.1.2 to `apps/web` as dev dependencies (the pins `frontend/ui` and the shared preset already use; no other package changes).
