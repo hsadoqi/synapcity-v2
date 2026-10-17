@@ -13,7 +13,7 @@ export function ThemeSettings() {
   const { theme, updateTheme } = useThemeSettings();
   return (
     <SettingsTabShell
-      title="Appearance"
+      title="Theme"
       description="A familiar space, in the light that suits you."
     >
       <FieldGroup>

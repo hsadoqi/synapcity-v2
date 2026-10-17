@@ -29,7 +29,7 @@ export default [
   },
   {
     value: 'appearance',
-    label: 'Appearance',
+    label: 'Display',
     icon: Eye,
     component: () =>
       import('../../components/appearance-settings').then(
