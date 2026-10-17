@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Button } from '@synapcity/frontend-ui/core/button';
 import { FieldGroup } from '@synapcity/frontend-ui/components/ui/field';
 import { Separator } from '@synapcity/frontend-ui/components/ui/separator';
@@ -16,16 +17,19 @@ import { BodyFontRow, CodeFontRow, HeadingFontRow } from './font-rows';
  */
 export function ThemeSettings() {
   const { draft, change, save, discard, hasChanges } = useThemeDraft();
+  // "Saved." confirms the last save until the next choice is made.
+  const [saved, setSaved] = useState(false);
+  const edit: typeof change = (patch) => {
+    setSaved(false);
+    change(patch);
+  };
   return (
     <SettingsTabShell
       title="Theme"
       description="Choose the light and the type you work best in."
     >
       <FieldGroup>
-        <ThemeModeRow
-          value={draft.mode}
-          onChange={(mode) => change({ mode })}
-        />
+        <ThemeModeRow value={draft.mode} onChange={(mode) => edit({ mode })} />
       </FieldGroup>
       <Separator />
       <section className="flex flex-col gap-4">
@@ -35,15 +39,15 @@ export function ThemeSettings() {
         <FieldGroup className="gap-8">
           <HeadingFontRow
             value={draft.headingFont}
-            onChange={(headingFont) => change({ headingFont })}
+            onChange={(headingFont) => edit({ headingFont })}
           />
           <BodyFontRow
             value={draft.bodyFont}
-            onChange={(bodyFont) => change({ bodyFont })}
+            onChange={(bodyFont) => edit({ bodyFont })}
           />
           <CodeFontRow
             value={draft.codeFont}
-            onChange={(codeFont) => change({ codeFont })}
+            onChange={(codeFont) => edit({ codeFont })}
           />
         </FieldGroup>
         <p className="text-xs text-muted-foreground">
@@ -55,17 +59,28 @@ export function ThemeSettings() {
       <ThemeDisclaimer theme={{ mode: draft.mode }} />
       <div className="flex items-center justify-end gap-3">
         <p role="status" className="text-xs text-muted-foreground">
-          {hasChanges ? 'You have unsaved changes.' : ''}
+          {hasChanges ? 'You have unsaved changes.' : saved ? 'Saved.' : ''}
         </p>
+        {/* Each button disables itself when used. Focusable while disabled, so
+            keyboard focus stays on it instead of falling back to the page. */}
         <Button
           type="button"
           variant="outline"
           disabled={!hasChanges}
+          focusableWhenDisabled
           onClick={discard}
         >
           Discard
         </Button>
-        <Button type="button" disabled={!hasChanges} onClick={save}>
+        <Button
+          type="button"
+          disabled={!hasChanges}
+          focusableWhenDisabled
+          onClick={() => {
+            save();
+            setSaved(true);
+          }}
+        >
           Save changes
         </Button>
       </div>

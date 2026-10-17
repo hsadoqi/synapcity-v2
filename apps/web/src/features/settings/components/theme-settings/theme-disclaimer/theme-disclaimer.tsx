@@ -1,5 +1,5 @@
 import type { Mode } from '@synapcity/frontend-ui/providers/mode-provider';
-import { Monitor } from 'lucide-react';
+import { Monitor, Moon, Sun, type LucideIcon } from 'lucide-react';
 
 // Whole sentences, not "always in ${mode} mode": a translation can then reorder
 // or inflect the mode name instead of inheriting the English word order. Each
@@ -11,10 +11,18 @@ const messages: Record<Mode, string> = {
   dark: 'Always dark, whatever your device is set to.',
 };
 
+// The same icons the Color theme select shows for each option.
+const icons: Record<Mode, LucideIcon> = {
+  system: Monitor,
+  light: Sun,
+  dark: Moon,
+};
+
 export const ThemeDisclaimer = ({ theme }: { theme: { mode: Mode } }) => {
+  const Icon = icons[theme.mode];
   return (
     <p className="flex items-center gap-2 text-xs text-muted-foreground">
-      <Monitor className="size-3.5" />
+      <Icon className="size-3.5" />
       {messages[theme.mode]}
     </p>
   );

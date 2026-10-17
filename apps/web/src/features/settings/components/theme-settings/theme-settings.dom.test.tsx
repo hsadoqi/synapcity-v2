@@ -49,7 +49,7 @@ describe('ThemeSettings', () => {
   it('previews a chosen mode, and switches the workspace only on save', async () => {
     await renderWithSettings(<ThemeSettings />);
     const saveButton = screen.getByRole('button', { name: 'Save changes' });
-    expect(saveButton.hasAttribute('disabled')).toBe(true);
+    expect(saveButton.getAttribute('aria-disabled') === 'true').toBe(true);
 
     await pick('Color theme', 'Dark');
 
@@ -64,14 +64,17 @@ describe('ThemeSettings', () => {
     expect(currentSettings().theme.mode).toBe('system');
     expect(document.documentElement.classList.contains('dark')).toBe(false);
 
+    saveButton.focus();
     fireEvent.click(saveButton);
 
     await waitFor(() => expect(currentSettings().theme.mode).toBe('dark'));
     await waitFor(() =>
       expect(document.documentElement.classList.contains('dark')).toBe(true),
     );
-    expect(saveButton.hasAttribute('disabled')).toBe(true);
-    expect(screen.getByRole('status').textContent).toBe('');
+    expect(saveButton.getAttribute('aria-disabled') === 'true').toBe(true);
+    expect(screen.getByRole('status').textContent).toBe('Saved.');
+    // Disabled by its own click, yet still focused: keyboard users keep their place.
+    expect(document.activeElement).toBe(saveButton);
   });
 
   it('has nothing to save after a choice is changed back', async () => {
@@ -82,7 +85,7 @@ describe('ThemeSettings', () => {
       expect(
         screen
           .getByRole('button', { name: 'Save changes' })
-          .hasAttribute('disabled'),
+          .getAttribute('aria-disabled') === 'true',
       ).toBe(false),
     );
     await pick('Color theme', 'System default');
@@ -91,7 +94,7 @@ describe('ThemeSettings', () => {
       expect(
         screen
           .getByRole('button', { name: 'Save changes' })
-          .hasAttribute('disabled'),
+          .getAttribute('aria-disabled') === 'true',
       ).toBe(true),
     );
   });
@@ -114,7 +117,9 @@ describe('ThemeSettings', () => {
     );
     expect(currentSettings().theme.mode).toBe('system');
     expect(
-      screen.getByRole('button', { name: 'Discard' }).hasAttribute('disabled'),
+      screen
+        .getByRole('button', { name: 'Discard' })
+        .getAttribute('aria-disabled') === 'true',
     ).toBe(true);
   });
 

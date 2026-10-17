@@ -12,12 +12,12 @@ export const ThemeModeRow = ({
 }) => {
   return (
     <SettingRow
-      id="appearance"
+      id="color-theme"
       label="Color theme"
       description="Choose a theme, or follow your device’s settings."
     >
       <SettingsSelect
-        id="appearance"
+        id="color-theme"
         value={value}
         onChange={(mode) => onChange(mode)}
         options={[

@@ -16,16 +16,24 @@
 
 /* Contrast and borders. The order is the precedence: low contrast softens the lines,
  * an explicit "show borders" brings them back, and high contrast beats both. Low only
- * softens lines; text keeps its contrast so it stays readable. */
-:root[data-contrast='low'] {
+ * softens lines; text keeps its contrast so it stays readable.
+ *
+ * Each rule also matches a nested .light or .dark (a theme preview scoped to one mode).
+ * Those classes redefine --border and --muted-foreground from their own palette, which
+ * would otherwise drop the preference inside them; restating it there resolves it
+ * against that palette instead. */
+:root[data-contrast='low'],
+:root[data-contrast='low'] :is(.light, .dark) {
   --border: color-mix(in oklch, var(--muted) 55%, var(--base-background));
 }
 
-:root[data-borders='true'] {
+:root[data-borders='true'],
+:root[data-borders='true'] :is(.light, .dark) {
   --border: var(--muted-background);
 }
 
-:root[data-contrast='high'] {
+:root[data-contrast='high'],
+:root[data-contrast='high'] :is(.light, .dark) {
   --border: var(--base-foreground);
   --input: var(--base-foreground);
   --muted-foreground: var(--base-foreground);
