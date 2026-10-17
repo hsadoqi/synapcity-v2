@@ -35,7 +35,6 @@ export const settingScope: {
     analytics: 'account',
     errorReports: 'account',
     sharing: 'account',
-    policyVersion: 'account',
   },
   theme: {
     mode: 'device',
@@ -180,10 +179,13 @@ export function withAccount(
   });
 }
 
+/** The export file format this build writes. Imports reject anything newer. */
+export const TRANSFER_FILE_VERSION = 2;
+
 /** The export file: what follows the person, and what stays on this device. */
 export function toTransferFile(settings: Settings) {
   return {
-    version: 2,
+    version: TRANSFER_FILE_VERSION,
     account: accountPart(settings),
     device: devicePart(settings),
   };
@@ -194,7 +196,7 @@ export function toTransferFile(settings: Settings) {
  * other input (the flat files exported before version 2) passes through.
  */
 export function fromTransferFile(input: unknown): unknown {
-  if (!isRecord(input) || input.version !== 2) return input;
+  if (!isRecord(input) || input.version !== TRANSFER_FILE_VERSION) return input;
   const account = isRecord(input.account) ? input.account : {};
   const device = isRecord(input.device) ? input.device : {};
   const flat: Record<string, unknown> = {};

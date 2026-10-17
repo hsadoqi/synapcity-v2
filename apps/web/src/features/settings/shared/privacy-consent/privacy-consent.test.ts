@@ -1,18 +1,22 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  PRIVACY_POLICY_VERSION,
+  PRIVACY_POLICY_VERSIONS,
   dataPrivacySchema,
 } from '../../types/data-privacy';
 import { canCollect, isBlockedBySignals } from './privacy-consent';
 
 const none = { globalPrivacyControl: false };
 const gpc = { globalPrivacyControl: true };
+const grant = (version: number) => ({
+  granted: true,
+  updatedAt: null,
+  version,
+});
 const allGranted = dataPrivacySchema.parse({
-  analytics: true,
-  errorReports: true,
-  sharing: true,
-  policyVersion: PRIVACY_POLICY_VERSION,
+  analytics: grant(PRIVACY_POLICY_VERSIONS.analytics),
+  errorReports: grant(PRIVACY_POLICY_VERSIONS.errorReports),
+  sharing: grant(PRIVACY_POLICY_VERSIONS.sharing),
 });
 
 describe('canCollect', () => {
@@ -23,18 +27,20 @@ describe('canCollect', () => {
     }
   });
 
-  it('allows a purpose granted under the current wording', () => {
+  it('allows a purpose granted under its current wording', () => {
     expect(canCollect(allGranted, 'analytics', none)).toBe(true);
   });
 
-  it('refuses a grant made under other wording', () => {
-    expect(
-      canCollect(
-        { ...allGranted, policyVersion: PRIVACY_POLICY_VERSION + 1 },
-        'analytics',
-        none,
-      ),
-    ).toBe(false);
+  it('refuses a grant made under other wording, or none', () => {
+    for (const version of [PRIVACY_POLICY_VERSIONS.analytics + 1, null]) {
+      expect(
+        canCollect(
+          { ...allGranted, analytics: { ...allGranted.analytics, version } },
+          'analytics',
+          none,
+        ),
+      ).toBe(false);
+    }
   });
 
   it('lets Global Privacy Control block sharing only', () => {

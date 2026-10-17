@@ -3,7 +3,7 @@
 import { useCallback } from 'react';
 import { useGlobalPrivacyControl } from './use-global-privacy-control';
 import {
-  PRIVACY_POLICY_VERSION,
+  choose,
   type DataPrivacySettingsPatch,
   type PrivacyPurpose,
 } from '../types/data-privacy';
@@ -15,10 +15,8 @@ export function useDataPrivacySettings() {
   // Every choice records when it was made and which wording it was made under.
   const setConsent = useCallback(
     (purpose: PrivacyPurpose, granted: boolean) => {
-      const patch: DataPrivacySettingsPatch = {
-        policyVersion: PRIVACY_POLICY_VERSION,
-      };
-      patch[purpose] = { granted, updatedAt: new Date().toISOString() };
+      const patch: DataPrivacySettingsPatch = {};
+      patch[purpose] = choose(purpose, granted);
       updateSettings({ privacy: patch });
     },
     [updateSettings],

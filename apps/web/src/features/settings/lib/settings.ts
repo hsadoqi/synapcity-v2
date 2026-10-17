@@ -9,10 +9,7 @@ import {
   transferSchema,
   type TransferSettingsPatch,
 } from '../types/import-export';
-import {
-  LEGACY_PRIVACY_POLICY_VERSION,
-  withCurrentPolicy,
-} from '../types/data-privacy';
+import { withCurrentPolicy } from '../types/data-privacy';
 
 export function mergeSettings(value: Settings, patch: SettingsPatch): Settings {
   const mode =
@@ -129,11 +126,8 @@ export function parseImportPatch(input: unknown) {
             ignored.push(`${key}.${field}`);
             continue;
           }
+          // Their bare boolean reads as a choice under the first wording.
           accept('privacy', renamed, item, `${key}.${field}`);
-          // An old choice was made under the first wording; keep it.
-          if (patch.privacy && !Object.hasOwn(value, 'policyVersion')) {
-            patch.privacy.policyVersion = LEGACY_PRIVACY_POLICY_VERSION;
-          }
         } else {
           accept(
             key as keyof TransferSettingsPatch,

@@ -1,5 +1,5 @@
 import {
-  PRIVACY_POLICY_VERSION,
+  PRIVACY_POLICY_VERSIONS,
   type DataPrivacySettings,
   type PrivacyPurpose,
 } from '../../types/data-privacy';
@@ -26,17 +26,18 @@ export function isBlockedBySignals(
 
 /**
  * The one check every collector makes before it loads or sends anything.
- * Collection needs a grant made under the current wording and no browser
- * signal against it.
+ * Collection needs a grant made under the purpose's current wording and no
+ * browser signal against it.
  */
 export function canCollect(
   privacy: DataPrivacySettings,
   purpose: PrivacyPurpose,
   signals: PrivacySignals,
 ) {
+  const entry = privacy[purpose];
   return (
-    privacy.policyVersion === PRIVACY_POLICY_VERSION &&
-    privacy[purpose].granted &&
+    entry.granted &&
+    entry.version === PRIVACY_POLICY_VERSIONS[purpose] &&
     !isBlockedBySignals(purpose, signals)
   );
 }

@@ -57,7 +57,10 @@ describe('setting scope (ADR-0010)', () => {
   it.each([
     [{ regional: { language: 'fr' } }, true],
     [{ theme: { bodyFont: 'lora' } }, true],
-    [{ privacy: { policyVersion: 1 } }, true],
+    [{ privacy: { sharing: { granted: false, updatedAt: null } } }, true],
+    [{ notifications: { email: false } }, true],
+    [{ notifications: { push: true } }, true],
+    [{ notifications: { sound: false } }, true],
     [{ theme: { mode: 'dark' } }, false],
     [{ appearance: { fontSize: 'large' } }, false],
     [{ unknown: { language: 'fr' } }, false],
@@ -111,6 +114,19 @@ describe('readAccountPreferences', () => {
       codeFont: 'default',
     });
     expect(read).not.toHaveProperty('unknown');
+  });
+
+  it('round-trips notifications and drops invalid values', () => {
+    const notifications = { email: false, push: true, sound: false };
+    expect(
+      readAccountPreferences(
+        accountPart({ ...settingsDefaults, notifications }),
+      ).notifications,
+    ).toEqual(notifications);
+    expect(
+      readAccountPreferences({ notifications: { push: 'yes', email: false } })
+        .notifications,
+    ).toEqual({ ...settingsDefaults.notifications, email: false });
   });
 
   it.each([null, 'text', [], {}])('reads %j as the defaults', (raw) => {

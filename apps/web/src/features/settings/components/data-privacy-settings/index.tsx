@@ -6,6 +6,7 @@ import { SettingsTabShell } from '../../shared/settings-tabs/settings-tab-shell/
 import { canCollect, isBlockedBySignals } from '../../shared/privacy-consent';
 import { privacyPurposes } from '../../types/data-privacy';
 import { PrivacyConsentRow } from './data-privacy-rows';
+import { DataPrivacyAskAgain } from './data-privacy-ask-again';
 import { DataPrivacyDisclaimer } from './data-privacy-disclaimer';
 import { useDataPrivacySettings } from '../../hooks/use-data-privacy-settings';
 
@@ -16,6 +17,7 @@ export function DataPrivacySettings() {
       title="Data privacy"
       description="Your space. Your data. Your choice."
     >
+      <DataPrivacyAskAgain privacy={privacy} />
       <FieldGroup>
         {privacyPurposes.map((purpose) => (
           <PrivacyConsentRow

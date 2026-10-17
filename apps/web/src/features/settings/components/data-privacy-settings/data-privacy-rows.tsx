@@ -3,9 +3,9 @@ import type { PrivacyPurpose } from '../../types/data-privacy';
 import { SettingRow } from '../../shared/setting-row/setting-row';
 
 // Say what each purpose collects and who receives it, matching the privacy
-// notice at /privacy. Changing what either says means raising
-// PRIVACY_POLICY_VERSION, so people are asked again.
-const purposeCopy: Record<
+// notice at /privacy. Changing what either says means raising that purpose's
+// number in PRIVACY_POLICY_VERSIONS, so people are asked again.
+export const purposeCopy: Record<
   PrivacyPurpose,
   { label: string; description: string }
 > = {
@@ -35,7 +35,7 @@ export const PrivacyConsentRow = ({
   purpose: PrivacyPurpose;
   /** Whether collection is allowed: the saved choice, unless `blocked`. */
   checked: boolean;
-  /** A browser signal overrides the saved choice. */
+  /** A browser signal overrides the saved choice: shown, not changeable. */
   blocked: boolean;
   onChange: (granted: boolean) => void;
 }) => {
@@ -55,7 +55,9 @@ export const PrivacyConsentRow = ({
         id={id}
         aria-describedby={`${id}-description`}
         checked={checked}
-        disabled={blocked}
+        // Read-only rather than disabled, so it can still be focused and its
+        // description (which says why) is announced.
+        readOnly={blocked}
         onCheckedChange={(granted) => onChange(granted)}
       />
     </SettingRow>

@@ -6,7 +6,7 @@ export const DataPrivacyDisclaimer = () => {
     <div className="flex flex-col gap-2">
       <p className="flex items-start gap-2 text-sm text-muted-foreground">
         <ShieldCheck className="size-4 shrink-0" />
-        Nothing is collected or sent unless you turn it on above.
+        No usage data or error reports are sent unless you turn them on above.
       </p>
       <LinkButton
         href="/privacy"

@@ -1,8 +1,20 @@
 import type { ErrorEvent } from '@sentry/browser';
 
-// Supabase user ids, which appear in routes such as /<userId>/settings.
-const ID_SEGMENT =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+// Supabase user ids, which appear in routes such as /<userId>/settings. A
+// route that puts any other identifier in the path (a username, a slug, an
+// email) must be added here, or reports will carry it.
+const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
+const ID_SEGMENT = new RegExp(`^${UUID}$`, 'i');
+const ID_IN_TEXT = new RegExp(UUID, 'gi');
+const EMAIL_IN_TEXT = /[^\s@<>()"',;]+@[^\s@<>()"',;]+\.[^\s@<>()"',;]+/g;
+
+/**
+ * Text with ids and email addresses replaced. Error messages can quote what
+ * failed, and that can include either.
+ */
+export function scrubText(text: string): string {
+  return text.replace(ID_IN_TEXT, ':id').replace(EMAIL_IN_TEXT, '[email]');
+}
 
 /**
  * A URL with nothing that identifies the person: no query (it can carry sign-in
@@ -25,13 +37,16 @@ export function scrubUrl(url: string): string | undefined {
 
 /**
  * Removes what an error report must not carry before it leaves the browser:
- * who the person is, request headers, cookies and query, breadcrumbs, and ids
- * in any URL. The error and its stack stay; they are what the report is for.
+ * who the person is, request headers, cookies and query, breadcrumbs, ids in
+ * any URL, and ids and email addresses in messages. The error and its stack
+ * stay; they are what the report is for. Other text in a message (something
+ * typed, quoted back by an error) cannot be recognised and is not removed.
  */
 export function scrubEvent(event: ErrorEvent): ErrorEvent {
   const scrubbed: ErrorEvent = { ...event };
   delete scrubbed.user;
   delete scrubbed.breadcrumbs;
+  if (event.message) scrubbed.message = scrubText(event.message);
   if (event.request) {
     const url = event.request.url && scrubUrl(event.request.url);
     scrubbed.request = url ? { url } : {};
@@ -39,7 +54,10 @@ export function scrubEvent(event: ErrorEvent): ErrorEvent {
   if (event.exception?.values) {
     scrubbed.exception = {
       ...event.exception,
-      values: event.exception.values.map((value) => {
+      values: event.exception.values.map((original) => {
+        const value = original.value
+          ? { ...original, value: scrubText(original.value) }
+          : original;
         if (!value.stacktrace?.frames) return value;
         return {
           ...value,

@@ -39,6 +39,10 @@ export function startErrorReports() {
     if (!allowed || Sentry.getClient()) return;
     Sentry.init({
       dsn,
+      // Without these Sentry files every report under "production", local
+      // development included. Vercel sets both on its builds.
+      environment: process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.NODE_ENV,
+      release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
       defaultIntegrations: false,
       integrations: [
         Sentry.globalHandlersIntegration(),

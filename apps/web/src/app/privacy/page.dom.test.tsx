@@ -16,6 +16,7 @@ describe('the privacy notice', () => {
       'Error reports',
       'Activity tracking and data sharing',
       'Your browser’s privacy signal',
+      'Where your choices are kept',
       'When this notice changes',
     ]);
   });
@@ -24,6 +25,9 @@ describe('the privacy notice', () => {
     render(<PrivacyPage />);
 
     expect(screen.getByText(/sends a report to Sentry/)).toBeTruthy();
+    expect(
+      screen.getByText(/stores reports in the United States/),
+    ).toBeTruthy();
     expect(
       screen.getByText(/nothing is collected for activity\s+tracking/),
     ).toBeTruthy();

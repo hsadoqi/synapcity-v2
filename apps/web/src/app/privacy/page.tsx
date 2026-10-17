@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = { title: 'Privacy' };
 
 // Keep in step with the Data privacy settings (features/settings): what each
-// switch collects and who receives it. A change to either means raising
-// PRIVACY_POLICY_VERSION, which asks everyone again.
+// switch collects and who receives it. A change to either for a purpose means
+// raising its number in PRIVACY_POLICY_VERSIONS, which asks everyone again.
 export default function PrivacyPage() {
   return (
     <section
@@ -36,14 +36,20 @@ export default function PrivacyPage() {
             With error reports on, when something breaks in your browser,
             Synapcity sends a report to Sentry, an error-monitoring service, so
             the problem can be found and fixed. A report holds the error
-            message, where in the code it happened, and the address of the page
-            with anything that identifies you removed.
+            message, where in the code it happened, and the address of the page,
+            with ids and email addresses removed from both.
           </p>
           <p>
-            It does not hold your name, email address or account id, what you
-            typed, or what you did before the error. An error message can
-            sometimes quote text from the page; reports are used only to fix
+            Reports are built not to include your name, email address or account
+            id, or what you did before the error. An error message can still
+            quote other text from the page, such as something you typed, which
+            cannot be recognised and removed. Reports are used only to fix
             problems.
+          </p>
+          <p>
+            Sentry stores reports in the United States and deletes them after at
+            most 90 days. Synapcity asks Sentry not to store the network address
+            a report came from.
           </p>
         </section>
 
@@ -70,13 +76,26 @@ export default function PrivacyPage() {
           </p>
         </section>
 
+        <section aria-labelledby="where" className="flex flex-col gap-3">
+          <h2 id="where" className="font-heading text-2xl font-medium">
+            Where your choices are kept
+          </h2>
+          <p>
+            Your choices are saved in this browser and, when you are signed in,
+            with your account, so they follow you to your other devices. Each
+            records when you made it. Global Privacy Control is read from each
+            browser separately.
+          </p>
+        </section>
+
         <section aria-labelledby="changes" className="flex flex-col gap-3">
           <h2 id="changes" className="font-heading text-2xl font-medium">
             When this notice changes
           </h2>
           <p>
-            If what a choice covers changes, that choice is turned off and you
-            are asked again.
+            If what a choice covers changes, that choice is turned off and the
+            Data privacy settings ask you again. Only the choices that changed
+            are affected.
           </p>
         </section>
       </div>

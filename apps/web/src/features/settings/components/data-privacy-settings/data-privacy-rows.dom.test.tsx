@@ -58,12 +58,22 @@ describe.each([
     expect(onChange).toHaveBeenCalledWith(true);
   });
 
-  it('is disabled and says why when a browser signal blocks it', () => {
-    render(row({ blocked: true }));
-
-    expect(screen.getByRole('switch').getAttribute('aria-disabled')).toBe(
-      'true',
+  it('is read-only but still focusable, and says why, when a browser signal blocks it', () => {
+    const onChange = vi.fn();
+    render(
+      <PrivacyConsentRow
+        purpose={purpose}
+        checked={false}
+        blocked
+        onChange={onChange}
+      />,
     );
+    const toggle = screen.getByRole('switch');
+
+    expect(toggle.getAttribute('aria-readonly')).toBe('true');
+    expect(toggle.getAttribute('tabindex')).toBe('0');
+    fireEvent.click(toggle);
+    expect(onChange).not.toHaveBeenCalled();
     expect(document.getElementById(`${id}-description`)?.textContent).toContain(
       'Global Privacy Control',
     );

@@ -3,15 +3,18 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { DataPrivacySettings } from '../components/data-privacy-settings';
 import { renderWithSettings, stubBrowser } from '../test-harness';
-import { PRIVACY_POLICY_VERSION } from '../types/data-privacy';
+import { PRIVACY_POLICY_VERSIONS } from '../types/data-privacy';
 import { useCanCollect } from './use-can-collect';
 
 const KEY = 'synapcity-preferences';
 const granted = (errorReports: boolean) =>
   JSON.stringify({
     privacy: {
-      errorReports: { granted: errorReports, updatedAt: null },
-      policyVersion: PRIVACY_POLICY_VERSION,
+      errorReports: {
+        granted: errorReports,
+        updatedAt: null,
+        version: PRIVACY_POLICY_VERSIONS.errorReports,
+      },
     },
   });
 
@@ -60,7 +63,13 @@ describe('useCanCollect', () => {
     localStorage.setItem(
       KEY,
       JSON.stringify({
-        privacy: { sharing: true, policyVersion: PRIVACY_POLICY_VERSION },
+        privacy: {
+          sharing: {
+            granted: true,
+            updatedAt: null,
+            version: PRIVACY_POLICY_VERSIONS.sharing,
+          },
+        },
       }),
     );
     expect(renderHook(() => useCanCollect('sharing')).result.current).toBe(

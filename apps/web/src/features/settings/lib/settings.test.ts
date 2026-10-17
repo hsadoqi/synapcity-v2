@@ -1,10 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { mergeSettings, parseImport, parseImportPatch } from './settings';
 import { settingsDefaults, settingsSchema } from '../types/settings';
-import {
-  LEGACY_PRIVACY_POLICY_VERSION,
-  PRIVACY_POLICY_VERSION,
-} from '../types/data-privacy';
+import { PRIVACY_POLICY_VERSIONS } from '../types/data-privacy';
 
 describe('settings merge and import', () => {
   it('fills appearance fields missing from an older saved object', () => {
@@ -32,8 +29,12 @@ describe('settings merge and import', () => {
       patch: {
         regional: { language: 'fr' },
         privacy: {
-          analytics: { granted: false, updatedAt: null },
-          policyVersion: LEGACY_PRIVACY_POLICY_VERSION,
+          analytics: {
+            granted: false,
+            updatedAt: null,
+            version: 1,
+            askAgain: false,
+          },
         },
       },
       ignored: ['regional.timezone', 'account'],
@@ -81,13 +82,16 @@ describe('settings merge and import', () => {
   });
 
   it('merges partial appearance, notification and privacy patches', () => {
+    const grant = {
+      granted: true,
+      updatedAt: null,
+      version: PRIVACY_POLICY_VERSIONS.analytics,
+      askAgain: false,
+    };
     const next = mergeSettings(settingsDefaults, {
       appearance: { showBorders: true },
       notifications: { push: true },
-      privacy: {
-        analytics: { granted: true, updatedAt: null },
-        policyVersion: PRIVACY_POLICY_VERSION,
-      },
+      privacy: { analytics: grant },
     });
     expect(next.appearance).toEqual({
       ...settingsDefaults.appearance,
@@ -100,8 +104,7 @@ describe('settings merge and import', () => {
     });
     expect(next.privacy).toEqual({
       ...settingsDefaults.privacy,
-      analytics: { granted: true, updatedAt: null },
-      policyVersion: PRIVACY_POLICY_VERSION,
+      analytics: grant,
     });
   });
 
@@ -284,9 +287,13 @@ describe('settings merge and import', () => {
       privacy: { dataSharing: true, tracking: false },
     });
     expect(patch.privacy).toEqual({
-      sharing: { granted: true, updatedAt: null },
-      analytics: { granted: false, updatedAt: null },
-      policyVersion: LEGACY_PRIVACY_POLICY_VERSION,
+      sharing: { granted: true, updatedAt: null, version: 1, askAgain: false },
+      analytics: {
+        granted: false,
+        updatedAt: null,
+        version: 1,
+        askAgain: false,
+      },
     });
     expect(ignored).toEqual([]);
     expect(
@@ -295,7 +302,12 @@ describe('settings merge and import', () => {
   });
 
   it('prefers the current privacy name over the old one regardless of order', () => {
-    const current = { granted: false, updatedAt: null };
+    const current = {
+      granted: false,
+      updatedAt: null,
+      version: null,
+      askAgain: false,
+    };
     for (const privacy of [
       { dataSharing: true, sharing: current },
       { sharing: current, dataSharing: true },
@@ -306,16 +318,51 @@ describe('settings merge and import', () => {
     }
   });
 
-  it('turns off imported grants made under other wording', () => {
+  it('turns off imported grants made under other wording, or none', () => {
     const at = '2026-10-17T12:00:00.000Z';
-    for (const policyVersion of [undefined, PRIVACY_POLICY_VERSION + 1]) {
+    for (const version of [undefined, PRIVACY_POLICY_VERSIONS.analytics + 1]) {
       const result = parseImport({
-        privacy: { analytics: { granted: true, updatedAt: at }, policyVersion },
+        privacy: { analytics: { granted: true, updatedAt: at, version } },
       });
-      expect(result.settings.privacy.analytics).toEqual({
+      expect(result.settings.privacy.analytics).toMatchObject({
         granted: false,
         updatedAt: at,
+        askAgain: true,
       });
     }
+  });
+
+  it('does not let an imported grant borrow the current state’s wording', () => {
+    const current = mergeSettings(settingsDefaults, {
+      privacy: {
+        analytics: {
+          granted: true,
+          updatedAt: null,
+          version: PRIVACY_POLICY_VERSIONS.analytics,
+          askAgain: false,
+        },
+      },
+    });
+    const { patch } = parseImportPatch({
+      privacy: { sharing: { granted: true, updatedAt: null } },
+    });
+    const next = mergeSettings(current, patch);
+    expect(next.privacy.sharing.granted).toBe(false);
+    expect(next.privacy.analytics.granted).toBe(true);
+  });
+
+  it('keeps an imported grant made under the current wording', () => {
+    const { patch } = parseImportPatch({
+      privacy: {
+        sharing: {
+          granted: true,
+          updatedAt: null,
+          version: PRIVACY_POLICY_VERSIONS.sharing,
+        },
+      },
+    });
+    expect(mergeSettings(settingsDefaults, patch).privacy.sharing.granted).toBe(
+      true,
+    );
   });
 });
