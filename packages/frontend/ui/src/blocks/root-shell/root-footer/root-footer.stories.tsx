@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { RootFooter } from '@synapcity/frontend-ui/blocks/root-shell';
+import { RootFooter } from '@synapcity/frontend-ui/blocks/root-shell/root-footer';
 
 const meta: Meta<typeof RootFooter> = {
   title: 'Blocks/RootFooter',
