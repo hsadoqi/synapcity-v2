@@ -1,5 +1,27 @@
 # Task scope
 
+## Active task: repair pnpm verify fixture failures (2026-10-16)
+
+- Goal and mode: implement the owner's request to fix `pnpm verify`; preserve existing uncommitted work and the four seed files, which exactly match seed 42.
+- Direct authority: the owner's current verification-repair request. No product, terminology, schema, ownership, dependency or verification-chain decision is changed.
+- Exact destinations: update `packages/dev/fixtures/src/seed.ts`, `packages/dev/fixtures/src/seed.test.ts`, `packages/dev/fixtures/README.md`, and this entry (4 updates). The fixture package owns deterministic generation and its drift tests; this entry records execution bounds only.
+- Mutation manifest: default seed-file generation to the existing files' seed 42 independently of the generic fixture default; compare parsed JSON so Prettier whitespace does not cause drift failures; document that contract.
+- Budgets: repository updates 4; creates/deletes/moves/renames 0; dependencies 0; Git history/branches/commits/PRs 0; external systems and other planning artifacts 0. Disposable verification logs may live under `/private/tmp`.
+- Verification: reproduce the four drift failures, run the fixture suite and scoped formatting, then rerun `pnpm verify`; report any remaining failures and stages not reached.
+- Recovery: restore only this task's hunks, preserving pre-existing changes; no reset, stash or clean.
+- Stop conditions: concurrent edits to these destinations, an unresolved decision, or another failure needing a broader mutation scope.
+
+## Active task: auth review follow-ups, batches A–E (2026-10-14)
+
+- Goal and mode: close the code and test gaps from the 2026-10-14 review of `refactor/auth-features` (`0cc15d7`). Mode: implementing, test-first.
+- Direct authority: the owner approved batches A–E, a hardened-regex boundary check (no new dependency), and deferred F (sign-out: redirect anyway, log the error) and G (documentation reconciliation) to a follow-up.
+- Update: `apps/web/src/lib/supabase/middleware.ts` (A); `apps/web/src/architecture.test.ts` (B); `apps/web/src/features/account/{shared/form-state.ts,server/actions.ts,components/profile-form.tsx}` (C); `apps/web/src/components/forms/*`, `apps/web/src/features/auth/shared/form-feedback.ts` and the auth forms that render `FormMessage` (D); `apps/storybook/vitest.config.ts` (E); `apps/web/e2e/auth.e2e.ts` (two assertions that hard-coded the old shared `form-message` id, added during D once the gate showed them); this entry.
+- Create: `apps/web/src/lib/supabase/middleware.test.ts`, `apps/web/src/features/account/server/actions.test.ts`, one pure form-message contract module under `apps/web/src/components/forms/`.
+- Budget: dependencies 0; deletes/renames 0; ADR/spec/plan edits 0; Supabase or provider configuration 0; commits/branches/PRs 0.
+- Verification: each batch's tests seen failing first, then `pnpm verify`.
+- Recovery: revert only these hunks with `git checkout -- <path>` per file on request; no reset, stash or clean.
+- Stop conditions: a fix that needs a new dependency, a provider or routing behaviour change beyond the review's findings, or concurrent edits to a listed file.
+
 ## Active task: correct auth package constraints (2026-10-13)
 
 - Goal and mode: correct the auth decision/spec/task-plan set so auth packages and further splitting are evaluated on their merits. Mode: documentation correction only.
