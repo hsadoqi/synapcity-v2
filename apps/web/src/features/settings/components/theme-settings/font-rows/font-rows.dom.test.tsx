@@ -60,6 +60,21 @@ describe('font rows', () => {
     expect(sentence('Code font preview').className).toContain('font-code');
   });
 
+  it('sets the sample in the row’s chosen font, on the sample alone', () => {
+    render(<HeadingFontRow value="lora" onChange={() => {}} />);
+
+    expect(
+      screen
+        .getByRole('figure')
+        .style.getPropertyValue('--font-preference-heading'),
+    ).toBe("'Lora', serif");
+    expect(
+      document.documentElement.style.getPropertyValue(
+        '--font-preference-heading',
+      ),
+    ).toBe('');
+  });
+
   it('shows the current choice and offers the default first', async () => {
     render(<CodeFontRow value="fira-code" onChange={() => {}} />);
 

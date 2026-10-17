@@ -1,45 +1,76 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { stubBrowser } from '../../../test-harness';
+import { themeDefaults, type ThemeSettings } from '../../../types/theme';
 import { ThemeLivePreview } from '../theme-live-preview';
 
-const preview = () =>
-  screen.getByRole('figure', { name: 'Live workspace preview' });
+beforeEach(stubBrowser);
+afterEach(() => vi.unstubAllGlobals());
+
+const show = (theme: Partial<ThemeSettings> = {}) =>
+  render(<ThemeLivePreview theme={{ ...themeDefaults, ...theme }} />);
+
+const preview = () => screen.getByRole('figure', { name: 'Live preview' });
+/** The sample workspace inside the figure, which carries the draft theme. */
+const frame = () => preview().querySelector('[aria-hidden]') as HTMLElement;
 
 describe('ThemeLivePreview', () => {
-  it('is one named figure with a visible caption', () => {
-    render(<ThemeLivePreview theme={{ mode: 'light' }} />);
+  it('is one figure, named by its visible caption', () => {
+    show();
 
     expect(preview()).toBeTruthy();
-    expect(screen.getByText('Live preview')).toBeTruthy();
+    expect(screen.getByText('Live preview').tagName).toBe('FIGCAPTION');
   });
 
   it.each(['light', 'dark'] as const)(
-    'forces the %s theme onto the preview only',
+    'shows the %s mode on the sample only, before it is saved',
     (mode) => {
-      render(<ThemeLivePreview theme={{ mode }} />);
+      show({ mode });
 
-      expect(preview().classList.contains(mode)).toBe(true);
+      expect(frame().classList.contains(mode)).toBe(true);
+      expect(document.documentElement.classList.contains(mode)).toBe(false);
     },
   );
 
-  it('inherits the page theme in system mode', () => {
-    render(<ThemeLivePreview theme={{ mode: 'system' }} />);
+  it('resolves system mode against the device', () => {
+    // stubBrowser's matchMedia matches nothing: a device that asks for light.
+    show({ mode: 'system' });
 
-    expect(preview().classList.contains('light')).toBe(false);
-    expect(preview().classList.contains('dark')).toBe(false);
-    expect(preview().classList.contains('system')).toBe(false);
+    expect(frame().classList.contains('light')).toBe(true);
+    expect(frame().classList.contains('system')).toBe(false);
   });
 
-  it('shows sample workspace content', () => {
-    render(<ThemeLivePreview theme={{ mode: 'light' }} />);
+  it('sets the chosen fonts on the sample, and resets the defaults', () => {
+    show({ headingFont: 'lora', codeFont: 'fira-code' });
 
-    expect(screen.getByText('A little room to think.')).toBeTruthy();
-    expect(screen.getByText('All notes')).toBeTruthy();
+    expect(frame().style.getPropertyValue('--font-preference-heading')).toBe(
+      "'Lora', serif",
+    );
+    expect(frame().style.getPropertyValue('--font-preference-code')).toBe(
+      "'Fira Code', monospace",
+    );
+    // `initial` overrides a saved font on <html>, so the shipped one shows.
+    expect(frame().style.getPropertyValue('--font-preference-body')).toBe(
+      'initial',
+    );
+    expect(
+      document.documentElement.style.getPropertyValue(
+        '--font-preference-heading',
+      ),
+    ).toBe('');
+  });
+
+  it('fetches a chosen family so the preview can show it', () => {
+    show({ headingFont: 'lora' });
+
+    const links = document.head.querySelectorAll('link[rel="stylesheet"]');
+    expect(links).toHaveLength(1);
+    expect(links[0]?.getAttribute('href')).toContain('family=Lora');
   });
 
   it('keeps the sample content out of the accessibility tree and the outline', () => {
-    render(<ThemeLivePreview theme={{ mode: 'light' }} />);
+    show();
 
     expect(screen.queryByRole('heading')).toBeNull();
     expect(

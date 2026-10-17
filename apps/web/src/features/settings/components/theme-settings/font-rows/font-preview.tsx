@@ -1,5 +1,13 @@
 import { cn } from '@/lib/utils';
-import type { FontRole } from '../../../types/fonts';
+import {
+  previewFontValue,
+  usePreviewFont,
+} from '../../../shared/font-preferences';
+import {
+  fontPreferenceVariables,
+  type FontChoice,
+  type FontRole,
+} from '../../../types/fonts';
 
 const roleStyles: Record<FontRole, string> = {
   heading: 'font-heading text-xl font-semibold tracking-tight',
@@ -14,22 +22,31 @@ const roleNames: Record<FontRole, string> = {
 };
 
 /**
- * One sentence set in the font the role currently uses. It reads the same
- * `--font-*` role tokens the rest of the app does, so it shows exactly what a
- * choice will look like. The dashed, indented frame and the "Preview" label
- * mark it as a sample, not content.
+ * One sentence set in `font`, the role's chosen but not yet saved font. It sets
+ * the role's `--font-preference-*` on itself only, so it shows the choice while
+ * the rest of the page keeps the saved font. The dashed, indented frame and the
+ * "Preview" label mark it as a sample, not content.
  */
 export function FontPreview({
   role,
+  font,
   children,
 }: {
   role: FontRole;
+  font: FontChoice;
   children: string;
 }) {
+  usePreviewFont(font);
+  // Inline because it is data, not styling: the font picked in this row, set on
+  // the sample alone (a class cannot carry a value chosen at runtime).
+  const fontVariable = {
+    [fontPreferenceVariables[role]]: previewFontValue(font),
+  };
   return (
     <figure
       aria-label={`${roleNames[role]} font preview`}
       className="ms-4 flex flex-col gap-1.5 rounded-md border border-dashed border-border bg-muted/30 px-4 py-3"
+      style={fontVariable}
     >
       <figcaption className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
         Preview

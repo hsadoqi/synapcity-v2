@@ -47,7 +47,9 @@ function FontPreferenceRow<T extends FontChoice>({
           }))}
         />
       </SettingRow>
-      <FontPreview role={role}>{sample}</FontPreview>
+      <FontPreview role={role} font={value}>
+        {sample}
+      </FontPreview>
     </div>
   );
 }

@@ -1,37 +1,48 @@
-import type { Mode } from '@synapcity/frontend-ui/providers/mode-provider';
-import { cn } from '@/lib/utils';
+import { useId } from 'react';
 import { PanelLeft, FileText, Plus, ArrowUpRight, Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { usePrefersDark } from '../../../hooks/use-prefers-dark';
+import {
+  previewFontStyle,
+  usePreviewFont,
+} from '../../../shared/font-preferences';
+import type { ThemeSettings } from '../../../types/theme';
 
-export const ThemeLivePreview = ({
-  theme,
-}: {
-  theme: {
-    mode: Mode;
-  };
-}) => {
-  // System mode inherits the root ModeProvider, including system changes.
-  const resolvedMode = theme.mode === 'system' ? undefined : theme.mode;
-  // A figure, so the mockup is announced once, by its name, as an illustration.
-  // Its sample sidebar, heading and text are hidden from assistive tech: read
-  // aloud they would pass for real page content, and the heading would join the
-  // settings outline.
+/**
+ * A sample workspace in the theme being chosen, before it is saved. The page
+ * keeps its saved theme until then, so the mode and fonts are scoped to the
+ * sample: a `light`/`dark` class (System resolves against the device, and follows
+ * it as it changes) and `--font-preference-*` on the frame, which the `@theme
+ * inline` role tokens read right there.
+ *
+ * A figure, named by its visible caption, so the mockup is announced once as an
+ * illustration. Its sample sidebar, heading and text are hidden from assistive
+ * tech: read aloud they would pass for real page content, and the heading would
+ * join the settings outline.
+ */
+export const ThemeLivePreview = ({ theme }: { theme: ThemeSettings }) => {
+  const prefersDark = usePrefersDark();
+  const mode =
+    theme.mode === 'system' ? (prefersDark ? 'dark' : 'light') : theme.mode;
+  usePreviewFont(theme.headingFont);
+  usePreviewFont(theme.bodyFont);
+  usePreviewFont(theme.codeFont);
+  // Browsers name a figure from its figcaption on their own; the explicit link
+  // makes that hold for every assistive-tech stack, jsdom's included.
+  const captionId = useId();
   return (
-    <figure
-      aria-label="Live workspace preview"
-      className={cn('flex flex-col gap-3', resolvedMode)}
-    >
-      <figcaption className="flex items-center justify-between">
-        <span className="text-xs font-medium uppercase text-muted-foreground">
-          Preview
-        </span>
-        <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <span className="size-1.5 rounded-sm bg-primary" />
-          Live preview
-        </span>
+    <figure aria-labelledby={captionId} className="flex flex-col gap-3">
+      <figcaption id={captionId} className="text-xs text-muted-foreground">
+        Live preview
       </figcaption>
+      {/* Dynamic, so inline: the chosen fonts are data, not a static style. */}
       <div
         aria-hidden
-        className="overflow-hidden rounded-lg border border-border bg-background"
+        className={cn(
+          'overflow-hidden rounded-lg border border-border bg-background font-body text-foreground',
+          mode,
+        )}
+        style={previewFontStyle(theme)}
       >
         <div className="flex h-9 items-center justify-between border-b border-border bg-muted/40 px-3">
           <div className="flex gap-1.5">

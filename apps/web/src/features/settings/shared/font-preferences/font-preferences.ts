@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import {
   fontPreferenceVariables,
   fontStack,
@@ -81,6 +83,34 @@ export function applyFontPreferences(root: HTMLElement, theme: FontFields) {
       root.style.setProperty(variable, fontStack(choice));
     }
   }
+}
+
+/**
+ * The value that previews `choice` on one element without touching <html>. The
+ * role tokens are `@theme inline`, so `font-heading` and friends read
+ * `--font-preference-*` on the element that uses them: setting it on a preview
+ * re-fonts only that preview. `initial` makes the variable invalid there, so the
+ * role falls back to the shipped font even when <html> carries a saved override.
+ */
+export function previewFontValue(choice: FontChoice): string {
+  return choice === 'default' ? 'initial' : fontStack(choice);
+}
+
+/** Inline style that previews every role of `fonts` on one element. */
+export function previewFontStyle(fonts: FontFields): Record<string, string> {
+  return Object.fromEntries(
+    (Object.keys(roleFields) as FontRole[]).map((role) => [
+      fontPreferenceVariables[role],
+      previewFontValue(fonts[roleFields[role]]),
+    ]),
+  );
+}
+
+/** Fetches the family a preview shows, once, without applying it to the page. */
+export function usePreviewFont(choice: FontChoice) {
+  useEffect(() => {
+    if (choice !== 'default') loadFont(document, choice);
+  }, [choice]);
 }
 
 const bootCatalog = Object.fromEntries(
