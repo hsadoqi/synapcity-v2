@@ -165,6 +165,9 @@ describe('regional controls', () => {
       await mount();
       expect(values().regional).toEqual(expected);
     },
+    // Two mounts plus a pick from the long timezone list: on a loaded machine
+    // this outlasts the 5 s default (as in settings-tabs.dom.test.tsx).
+    15_000,
   );
 
   it('keeps valid saved timezone aliases selectable', async () => {

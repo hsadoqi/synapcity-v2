@@ -155,7 +155,10 @@ describe('shared SettingsProvider', () => {
     await ready();
     expect(values().regional.language).toBe('fr');
     expect(values().notifications.sound).toBe(false);
-    expect(document.documentElement.dataset.borders).toBe('true');
+    // Applied by a passive effect, which can run after `isReady` renders.
+    await waitFor(() =>
+      expect(document.documentElement.dataset.borders).toBe('true'),
+    );
     expect(localStorage.getItem(KEY)).toBe(saved);
     expect(screen.getByRole('status').textContent).toBe('');
   });
