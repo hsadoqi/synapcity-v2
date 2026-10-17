@@ -1,9 +1,9 @@
 'use client';
 
-import { FieldGroup } from '@synapcity/frontend-ui/components/ui/field';
-import { Separator } from '@synapcity/frontend-ui/components/ui/separator';
+import { FieldGroup } from '@synapcity/frontend-ui/core/field';
+import { Separator } from '@synapcity/frontend-ui/core/separator';
 import { useAppearanceSettings } from '../../hooks/use-appearance-settings';
-import { SettingsTabShell } from '../../shared/settings-tabs/settings-tab-shell/settings-tab-shell';
+import { SettingsTabShell } from '../../shared';
 import {
   ContrastModeRow,
   EnableAnimationsRow,

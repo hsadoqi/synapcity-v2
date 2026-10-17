@@ -1,14 +1,14 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { stubBrowser } from '../../test-harness';
+import { stubBrowser } from '../../../test-harness';
 import {
   ContrastModeRow,
   EnableAnimationsRow,
   FontSizeRow,
   ReducedMotionRow,
   ShowBordersRow,
-} from './appearance-rows';
+} from '../appearance-rows';
 
 beforeEach(stubBrowser);
 afterEach(() => vi.unstubAllGlobals());

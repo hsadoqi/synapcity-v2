@@ -1,7 +1,7 @@
 import { Switch } from '@synapcity/frontend-ui/core/switch';
-import { SettingRow } from '../../shared';
-import { SettingsSelect } from '../../shared/settings-select/settings-select';
-import type { AppearanceSettings } from '../../types/appearance';
+import { SettingRow } from '../../../shared';
+import { SettingsSelect } from '../../../shared/settings-select/settings-select';
+import type { AppearanceSettings } from '../../../types/appearance';
 
 type RowProps<Key extends keyof AppearanceSettings> = {
   value: AppearanceSettings[Key];
