@@ -86,9 +86,15 @@ function UserMenu({
       </TooltipProvider>
       <DropdownMenuContent align="end" className="w-64">
         <DropdownMenuGroup>
-          <DropdownMenuLabel className="flex flex-col justify-start gap-0.5">
-            {name && <span className="text-xs text-foreground">{name}</span>}
-            {email && <span className="text-xs text-foreground">{email}</span>}
+          <DropdownMenuLabel className="flex flex-col items-start gap-1">
+            {name && (
+              <span className="font-ui text-sm text-foreground">{name}</span>
+            )}
+            {email && (
+              <span className="max-w-full truncate font-ui text-xs text-muted-foreground">
+                {email}
+              </span>
+            )}
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         {children ? <DropdownMenuSeparator /> : null}
