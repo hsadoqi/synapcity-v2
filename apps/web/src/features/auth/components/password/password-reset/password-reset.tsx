@@ -7,6 +7,7 @@ import { useCooldown } from '@/features/auth/client';
 import type { AuthState } from '@/features/auth/types';
 import { FormMessage } from '@/components/forms/form-message';
 import { ResendButton } from '../../../shared/resend-button';
+import { SignInAgain } from '../../sign-in-again';
 
 const initialState: AuthState = {};
 
@@ -40,6 +41,7 @@ export function PasswordReset() {
         </p>
       ) : null}
       <FormMessage id={messageId} state={{ error: state.error }} />
+      {state.signedOut ? <SignInAgain /> : null}
       <ResendButton
         label={state.success ? 'Send again' : 'Send reset link'}
         pending={pending}

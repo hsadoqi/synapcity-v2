@@ -13,6 +13,7 @@ import { FormMessage } from '@/components/forms/form-message';
 import { fieldErrorProps } from '@/components/forms/form-feedback';
 import { useFocusFirstError } from '@/hooks/use-focus-first-error';
 import { createClient } from '@/lib/supabase/client';
+import { SignInAgain } from '../sign-in-again';
 import { ResendEmailChange } from './resend-email-change';
 
 const initialState: AuthState = {};
@@ -111,6 +112,7 @@ export function EmailChange({ email }: { email: string | null }) {
           required
         />
         <FormMessage id={messageId} state={{ error: shown.error }} />
+        {shown.signedOut ? <SignInAgain /> : null}
         <div className="flex flex-wrap gap-2">
           <Button
             type="submit"

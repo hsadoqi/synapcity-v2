@@ -7,6 +7,7 @@ import type { AuthState } from '@/features/auth/types';
 import { FormMessage } from '@/components/forms/form-message';
 import { useCooldown } from '@/features/auth/client';
 import { ResendButton } from '../../shared/resend-button';
+import { SignInAgain } from '../sign-in-again';
 
 const initialState: AuthState = {};
 
@@ -31,6 +32,7 @@ export function ResendEmailChange({
   return (
     <form action={formAction} className="flex flex-col gap-2">
       <FormMessage id={messageId} state={state} />
+      {state.signedOut ? <SignInAgain /> : null}
       <ResendButton
         label="Resend link"
         pending={pending}

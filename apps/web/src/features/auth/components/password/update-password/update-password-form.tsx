@@ -16,7 +16,7 @@ import { fieldErrorProps } from '@/components/forms/form-feedback';
 
 const initialState: AuthState = {};
 
-export function UpdatePasswordForm() {
+export function UpdatePasswordForm({ next }: { next: string }) {
   const [state, formAction, pending] = useActionState(
     updatePassword,
     initialState,
@@ -32,6 +32,7 @@ export function UpdatePasswordForm() {
       noValidate
       className="flex flex-col gap-4"
     >
+      <input type="hidden" name="next" value={next} />
       <FormField
         id="password"
         {...fieldErrorProps(state, 'password', messageId)}

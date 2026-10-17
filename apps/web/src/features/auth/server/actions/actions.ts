@@ -217,6 +217,8 @@ export async function updatePassword(
   formData: FormData,
 ): Promise<AuthState> {
   const user = { email: '', name: '' };
+  // Where a reset started from settings goes back to. Untrusted, so checked.
+  const next = safeNextPath(field(formData, 'next'), '');
   const parsed = updatePasswordSchema.safeParse({
     password: field(formData, 'password'),
     confirm: field(formData, 'confirm'),
@@ -245,7 +247,7 @@ export async function updatePassword(
 
   revalidatePath('/', 'layout');
   // The page they land on shows this once (see NoticeToast).
-  redirect(withNotice(homePathFor(data.user.id), 'password-updated'));
+  redirect(withNotice(next || homePathFor(data.user.id), 'password-updated'));
 }
 
 export async function signInWithOAuth(formData: FormData): Promise<void> {
@@ -290,6 +292,11 @@ export async function signOut(): Promise<void> {
 }
 
 const SIGNED_OUT = authErrorMessage('session_not_found');
+
+/** The session has gone: say so, and flag it so the form can link to sign-in. */
+function signedOutFailure(email: string): AuthState {
+  return { ...authFailure(SIGNED_OUT, { email }), signedOut: true };
+}
 const TRY_AGAIN = authErrorMessage(undefined);
 
 /** Where the confirmation link brings someone back to: their settings. */
@@ -317,12 +324,12 @@ export async function requestEmailChange(
   const { email } = parsed.data;
 
   const redirectTo = await emailChangeRedirect();
-  if (!redirectTo) return authFailure(SIGNED_OUT, { email });
+  if (!redirectTo) return signedOutFailure(email);
 
   const outcome = await changeEmail({ newEmail: email, redirectTo });
   switch (outcome.kind) {
     case 'signed-out':
-      return authFailure(SIGNED_OUT, { email });
+      return signedOutFailure(email);
     case 'unavailable':
       return authFailure(TRY_AGAIN, { email });
     case 'same-email':
@@ -353,12 +360,12 @@ export async function resendEmailChange(
   _formData: FormData,
 ): Promise<AuthState> {
   const redirectTo = await emailChangeRedirect();
-  if (!redirectTo) return authFailure(SIGNED_OUT, { email: '' });
+  if (!redirectTo) return signedOutFailure('');
 
   const outcome = await resendEmailChangeOperation({ redirectTo });
   switch (outcome.kind) {
     case 'signed-out':
-      return authFailure(SIGNED_OUT, { email: '' });
+      return signedOutFailure('');
     case 'unavailable':
       return authFailure(TRY_AGAIN, { email: '' });
     case 'nothing-pending':
@@ -385,13 +392,18 @@ export async function requestOwnPasswordReset(
   _previous: AuthState,
   _formData: FormData,
 ): Promise<AuthState> {
+  const user = await getCurrentUser();
+  if (!user) return signedOutFailure('');
+
+  // Where to come back to once the new password is chosen: here, not home.
+  const back = `/auth/update-password?${new URLSearchParams({ next: settingsPathFor(user.id) })}`;
   const outcome = await sendOwnPasswordReset({
-    resetRedirect: callbackUrl(getOrigin(), '/auth/update-password', 'reset'),
+    resetRedirect: callbackUrl(getOrigin(), back, 'reset'),
   });
 
   switch (outcome.kind) {
     case 'signed-out':
-      return authFailure(SIGNED_OUT, { email: '' });
+      return signedOutFailure('');
     case 'unavailable':
       return authFailure(TRY_AGAIN, { email: '' });
     case 'no-email':

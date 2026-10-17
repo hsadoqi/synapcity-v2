@@ -12,6 +12,11 @@ export type AuthState = {
   success?: boolean;
   /** The address is valid but unconfirmed, so the form can offer a new link. */
   unconfirmed?: boolean;
+  /**
+   * True when the error is that there is no session any more, so the form can
+   * offer a way to sign in. A dropped connection is not this.
+   */
+  signedOut?: boolean;
   data?: {
     user?: UserData;
   };

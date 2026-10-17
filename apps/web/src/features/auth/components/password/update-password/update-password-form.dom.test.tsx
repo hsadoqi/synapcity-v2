@@ -27,7 +27,7 @@ describe('UpdatePasswordForm', () => {
   });
 
   it('labels both password fields as new passwords and states the minimum', () => {
-    render(<UpdatePasswordForm />);
+    render(<UpdatePasswordForm next="" />);
 
     for (const label of ['New password', 'Confirm new password']) {
       expect(field(label).autocomplete).toBe('new-password');
@@ -42,7 +42,7 @@ describe('UpdatePasswordForm', () => {
       error: 'The passwords do not match.',
       fields: ['confirm'],
     } satisfies AuthState);
-    render(<UpdatePasswordForm />);
+    render(<UpdatePasswordForm next="" />);
 
     await submit();
 
@@ -61,7 +61,7 @@ describe('UpdatePasswordForm', () => {
       error: 'Use a password of at least 8 characters.',
       fields: ['password'],
     } satisfies AuthState);
-    render(<UpdatePasswordForm />);
+    render(<UpdatePasswordForm next="" />);
     fireEvent.change(field('New password'), { target: { value: 'short' } });
 
     await submit();

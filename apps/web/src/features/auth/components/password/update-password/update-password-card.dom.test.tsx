@@ -9,7 +9,7 @@ import { UpdatePasswordCard } from './update-password-card';
 
 describe('UpdatePasswordCard', () => {
   it('is the new-password page with one h1 and the form', () => {
-    render(<UpdatePasswordCard />);
+    render(<UpdatePasswordCard next="" />);
 
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe(
       'Choose a new password',
