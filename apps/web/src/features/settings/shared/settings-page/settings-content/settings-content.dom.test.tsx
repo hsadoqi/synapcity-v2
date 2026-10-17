@@ -16,6 +16,10 @@ import { SettingsContent } from '../settings-content';
 // mock; this layout test opens a stand-in in its place.
 const account = tabs.find((tab) => tab.value === 'account')!;
 
+// Each tab loads lazily, and these tests wait up to 5 s for it. The test's own
+// limit must be longer, or a slow machine cuts it off before that wait ends.
+const LOADING_TIMEOUT = 15_000;
+
 beforeEach(() => {
   stubBrowser();
   window.location.hash = '';
@@ -75,43 +79,51 @@ describe('SettingsContent', () => {
     expect(otherLabels).not.toContain(title);
   });
 
-  it('keeps unsaved Theme choices through a visit to another tab', async () => {
-    window.location.hash = 'theme';
-    show();
-    const colorTheme = () =>
-      screen.getByRole('combobox', { name: 'Color theme' });
-    await waitFor(() => colorTheme(), { timeout: 5000 });
+  it(
+    'keeps unsaved Theme choices through a visit to another tab',
+    async () => {
+      window.location.hash = 'theme';
+      show();
+      const colorTheme = () =>
+        screen.getByRole('combobox', { name: 'Color theme' });
+      await waitFor(() => colorTheme(), { timeout: 5000 });
 
-    fireEvent.click(colorTheme());
-    const dark = await screen.findByRole('option', { name: 'Dark' });
-    fireEvent.pointerDown(dark, { pointerType: 'mouse', button: 0 });
-    fireEvent.click(dark, { detail: 1 });
-    await waitFor(() => expect(colorTheme().textContent).toContain('Dark'));
+      fireEvent.click(colorTheme());
+      const dark = await screen.findByRole('option', { name: 'Dark' });
+      fireEvent.pointerDown(dark, { pointerType: 'mouse', button: 0 });
+      fireEvent.click(dark, { detail: 1 });
+      await waitFor(() => expect(colorTheme().textContent).toContain('Dark'));
 
-    fireEvent.click(screen.getByRole('tab', { name: 'Display' }));
-    await screen.findByRole(
-      'combobox',
-      { name: 'Contrast' },
-      { timeout: 5000 },
-    );
-    fireEvent.click(screen.getByRole('tab', { name: 'Theme' }));
+      fireEvent.click(screen.getByRole('tab', { name: 'Display' }));
+      await screen.findByRole(
+        'combobox',
+        { name: 'Contrast' },
+        { timeout: 5000 },
+      );
+      fireEvent.click(screen.getByRole('tab', { name: 'Theme' }));
 
-    await waitFor(() => expect(colorTheme().textContent).toContain('Dark'));
-    expect(
-      within(screen.getByRole('tabpanel')).getByRole('status').textContent,
-    ).toBe('You have unsaved changes.');
-  });
+      await waitFor(() => expect(colorTheme().textContent).toContain('Dark'));
+      expect(
+        within(screen.getByRole('tabpanel')).getByRole('status').textContent,
+      ).toBe('You have unsaved changes.');
+    },
+    LOADING_TIMEOUT,
+  );
 
-  it('opens on the Account tab and loads its content', async () => {
-    show();
+  it(
+    'opens on the Account tab and loads its content',
+    async () => {
+      show();
 
-    expect(
-      await screen.findByText('Account panel', {}, { timeout: 5000 }),
-    ).toBeTruthy();
-    expect(
-      screen
-        .getByRole('tab', { name: 'Account' })
-        .getAttribute('aria-selected'),
-    ).toBe('true');
-  });
+      expect(
+        await screen.findByText('Account panel', {}, { timeout: 5000 }),
+      ).toBeTruthy();
+      expect(
+        screen
+          .getByRole('tab', { name: 'Account' })
+          .getAttribute('aria-selected'),
+      ).toBe('true');
+    },
+    LOADING_TIMEOUT,
+  );
 });

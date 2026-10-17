@@ -102,10 +102,7 @@ async function choose(label: string, option: string) {
   } else {
     fireEvent.click(control);
   }
-  // A timezone option also names its UTC offset ("America/New York UTC−04:00").
-  const item = await screen.findByRole('option', {
-    name: (name) => name === option || name.startsWith(`${option} UTC`),
-  });
+  const item = await screen.findByRole('option', { name: option });
   fireEvent.pointerDown(item, { pointerType: 'mouse', button: 0 });
   fireEvent.click(item, { detail: 1 });
   await waitFor(() => expect(screen.queryByRole('listbox')).toBeNull());
@@ -237,16 +234,6 @@ describe('regional controls', () => {
     expect(option.querySelector('[lang="ja"]')?.textContent).toBe('日本語');
   });
 
-  it('finds a timezone by its common name or offset', async () => {
-    await mount();
-    const input = screen.getByRole('combobox', { name: 'Timezone' });
-    fireEvent.keyDown(input, { key: 'ArrowDown' });
-    fireEvent.change(input, { target: { value: 'Japan Standard Time' } });
-    expect(
-      await screen.findByRole('option', { name: 'Asia/Tokyo UTC+09:00' }),
-    ).toBeTruthy();
-  });
-
   it('keeps display controls working independently of regional settings', async () => {
     localStorage.setItem(
       'synapcity-preferences',
@@ -338,9 +325,10 @@ describe('regional previews', () => {
     ['1,00,000.00', '12,34,567.89'],
   ] as const)('uses the selected number separators: %s', (value, preview) => {
     render(<NumberFormatRow value={value} onChange={() => {}} />);
-    expect(
-      screen.getByText(`An example number looks like: ${preview}`),
-    ).toBeTruthy();
+    // Read the raw text: the default matcher folds the no-break space to " ".
+    expect(document.getElementById('number-format-description')?.textContent).toBe(
+      `An example number looks like: ${preview}`,
+    );
   });
 
   it('hydrates without timestamp mismatches when the server and client clocks differ', async () => {

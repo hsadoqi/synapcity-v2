@@ -60,32 +60,6 @@ export function LanguageRow({ value, onChange }: RowProps<'language'>) {
   );
 }
 
-/**
- * The zone's current UTC offset to show beside it, and the names people search
- * by instead of the IANA city: "Pacific Daylight Time", "PDT", "GMT-7".
- */
-function describeTimezone(timezone: string, date: Date) {
-  const name = (timeZoneName: Intl.DateTimeFormatOptions['timeZoneName']) =>
-    new Intl.DateTimeFormat('en-US', { timeZone: timezone, timeZoneName })
-      .formatToParts(date)
-      .find((part) => part.type === 'timeZoneName')?.value ?? '';
-  // "GMT-07:00" reads as "UTC−07:00"; the bare "GMT" of UTC itself as "UTC±00:00".
-  const offset = name('longOffset');
-  const detail =
-    offset === 'GMT'
-      ? 'UTC±00:00'
-      : offset.replace('GMT', 'UTC').replace('-', '−');
-  return {
-    detail,
-    keywords: [
-      offset,
-      offset.replace('GMT', 'UTC'),
-      name('short'),
-      name('long'),
-    ].join(' '),
-  };
-}
-
 export function TimezoneRow({
   value,
   onChange,
@@ -98,13 +72,11 @@ export function TimezoneRow({
 }) {
   // Built once per list, not on every clock tick: there are over 400 zones.
   const options = useMemo(() => {
-    const now = new Date();
     const device = {
       value: SYSTEM_TIMEZONE,
       label: deviceTimezone
         ? `Device (${deviceTimezone.replaceAll('_', ' ')})`
         : 'Device timezone',
-      ...(deviceTimezone && describeTimezone(deviceTimezone, now)),
     };
     // Preserve valid saved aliases or offsets absent from the canonical zone list.
     const zones = [...new Set(['UTC', value, ...timezones])]
@@ -112,7 +84,6 @@ export function TimezoneRow({
       .map((timezone) => ({
         value: timezone,
         label: timezone.replaceAll('_', ' '),
-        ...describeTimezone(timezone, now),
       }));
     return [device, ...zones];
   }, [value, timezones, deviceTimezone]);
