@@ -1,7 +1,7 @@
-import type { AccountLinks } from '../../lib/account-links';
-import { SidebarInset } from '../../components/ui/sidebar';
-import { RootSidebar } from './root-sidebar';
-import { SidebarProviders } from './sidebar-providers';
+import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';
+import { SidebarInset } from '@synapcity/frontend-ui/core/sidebar';
+import { RootSidebar } from '@synapcity/frontend-ui/blocks/sidebar-shell/root-sidebar';
+import { SidebarProviders } from '@synapcity/frontend-ui/blocks/sidebar-shell/sidebar-providers';
 
 export const SidebarShell = ({
   header,

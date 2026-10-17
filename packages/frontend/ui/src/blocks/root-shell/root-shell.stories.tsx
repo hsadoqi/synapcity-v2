@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import RootShell from '@synapcity/frontend-ui/blocks/root-shell/root-shell';
+import { RootShell } from '@synapcity/frontend-ui/blocks/root-shell';
 
 // No `nextjs.appDirectory`: the app-router mock in @storybook/nextjs-vite 10.6 does not
 // provide the layout cache node that next 16.4's useRouter reads, so every story crashed.
