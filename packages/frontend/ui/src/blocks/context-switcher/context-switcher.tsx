@@ -55,7 +55,7 @@ export function ContextSwitcher({
             {versions.map((version) => (
               <DropdownMenuItem
                 key={version}
-                onSelect={() => setSelectedVersion(version)}
+                onClick={() => setSelectedVersion(version)}
               >
                 v{version}{' '}
                 {version === selectedVersion && <Check className="ml-auto" />}
