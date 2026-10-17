@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import type { LinkProps } from 'next/link';
 import { buttonVariants } from './ui/button';
 import type { ButtonProps } from './ui/button';
 import { cn } from 'cn';
@@ -10,7 +11,7 @@ type NativeLinkProps = Omit<
   React.AnchorHTMLAttributes<HTMLAnchorElement>,
   'href'
 >;
-type NextLinkProps = Omit<React.ComponentProps<typeof Link>, 'href'>;
+type NextLinkProps = Omit<LinkProps, 'href'>;
 type LinkButtonProps = NativeLinkProps &
   NextLinkProps &
   Pick<ButtonProps, 'variant' | 'size'> & { href: string; disabled?: boolean };
@@ -20,6 +21,7 @@ const LinkButton = React.forwardRef<HTMLAnchorElement, LinkButtonProps>(
   ({ variant, size, className, href, disabled, onClick, ...props }, ref) => {
     return (
       <Link
+        {...props}
         ref={ref}
         data-slot="link-button"
         aria-disabled={disabled}
@@ -33,7 +35,6 @@ const LinkButton = React.forwardRef<HTMLAnchorElement, LinkButtonProps>(
           }
           onClick?.(event);
         }}
-        {...props}
       />
     );
   },

@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { UpdatePasswordCard } from '@/features/auth/components/update-password-card';
 
-export const metadata: Metadata = { title: 'Choose a new password' };
+export const metadata: Metadata = { title: 'Choose a password' };
 
 export default async function UpdatePasswordPage() {
   // The reset link signs the user in through /auth/callback. Without that

@@ -215,7 +215,7 @@ This is the authoritative list of the highest-impact open product and terminolog
 
 Among the highest-impact open decisions are:
 
-- the primary wedge and first vertical slice;
+- the primary wedge (the first vertical slice, quick capture, is accepted in `docs/product/first-slice.md`);
 - final product positioning and initial-user framing;
 - the name and internal organization of contextual working environments;
 - Global Home and its relationship to Dashboards;
