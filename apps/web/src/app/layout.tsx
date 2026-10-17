@@ -9,6 +9,8 @@ import { RootShell } from '@synapcity/frontend-ui/blocks/root-shell';
 import { createMetadata } from '@synapcity/frontend-site/metadata';
 import { UserProvider } from '@/components/auth/provider/user-provider';
 import { getCurrentUser } from '@/lib/auth/session';
+import { UserProvider } from '@/components/auth/provider/user-provider';
+import { AuthStatus } from '@/components/auth/display/auth-status';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 const geistSans = localFont({
