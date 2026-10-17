@@ -13,6 +13,7 @@ describe('the sign-in problem page', () => {
     ['reset', 'That reset link did not work'],
     ['email-change', 'That email confirmation link did not work'],
     ['link', 'That account could not be connected'],
+    ['delete-account', 'That deletion link did not work'],
     [undefined, 'That link did not work'],
     ['something-else', 'That link did not work'],
   ])('explains the %s failure', async (reason, title) => {

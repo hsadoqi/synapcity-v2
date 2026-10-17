@@ -49,6 +49,12 @@ const RECOVERY: Record<AuthFlow | 'unknown', Recovery> = {
       'The sign-in may have been cancelled, or that Google or GitHub account may already be connected to another account. Sign in and try again from your settings.',
     primary: { type: 'login', label: 'Sign in' },
   },
+  'delete-account': {
+    title: 'That deletion link did not work',
+    description:
+      'It may have expired, been used already, or been opened in a different browser from the one you asked in. Nothing was deleted. Sign in and ask again from your settings.',
+    primary: { type: 'login', label: 'Sign in' },
+  },
   unknown: {
     title: 'That link did not work',
     description:

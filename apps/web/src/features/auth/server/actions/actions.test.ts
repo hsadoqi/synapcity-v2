@@ -16,6 +16,7 @@ const mocks = vi.hoisted(() => ({
   getClaims: vi.fn(),
   getUser: vi.fn(),
   linkIdentity: vi.fn(),
+  signInWithOtp: vi.fn(),
 }));
 
 /** Stands in for Next's `redirect`, which never returns. */
@@ -47,12 +48,14 @@ vi.mock('@/lib/supabase/server', () => ({
       getClaims: mocks.getClaims,
       getUser: mocks.getUser,
       linkIdentity: mocks.linkIdentity,
+      signInWithOtp: mocks.signInWithOtp,
     },
   }),
 }));
 
 import {
   connectAccount,
+  requestAccountDeletion,
   requestEmailChange,
   requestOwnPasswordReset,
   requestPasswordReset,
@@ -1092,5 +1095,84 @@ describe('connectAccount', () => {
     expect(state.error).toBe(
       'Too many attempts. Wait a few minutes and try again.',
     );
+  });
+});
+
+describe('requestAccountDeletion', () => {
+  const OWN = 'ada@example.com';
+  beforeEach(() => {
+    mocks.getUser.mockResolvedValue({
+      data: { user: { id: USER_ID, email: OWN } },
+      error: null,
+    });
+    mocks.signInWithOtp.mockResolvedValue({ data: {}, error: null });
+  });
+
+  it('emails the link when the typed address is the right one, and says nothing is deleted yet', async () => {
+    const state = await requestAccountDeletion({}, form({ email: OWN }));
+
+    expect(mocks.signInWithOtp).toHaveBeenCalledExactlyOnceWith({
+      email: OWN,
+      options: {
+        shouldCreateUser: false,
+        emailRedirectTo:
+          'https://app.test/auth/callback?next=%2Fauth%2Fdelete-account&flow=delete-account',
+      },
+    });
+    expect(state.success).toBe(true);
+    expect(state.message).toContain('Nothing is deleted until you confirm');
+  });
+
+  it('refuses a wrong address on the field, and sends nothing', async () => {
+    const state = await requestAccountDeletion(
+      {},
+      form({ email: 'someone@else.test' }),
+    );
+
+    expect(state.error).toBe('That is not the email address on this account.');
+    expect(state.fields).toEqual(['email']);
+    expect(mocks.signInWithOtp).not.toHaveBeenCalled();
+  });
+
+  it('refuses an empty address before asking the provider', async () => {
+    mocks.getUser.mockClear();
+
+    const state = await requestAccountDeletion({}, form({ email: '' }));
+
+    expect(state.error).toBeTruthy();
+    expect(state.fields).toEqual(['email']);
+    expect(mocks.getUser).not.toHaveBeenCalled();
+    expect(mocks.signInWithOtp).not.toHaveBeenCalled();
+  });
+
+  it('offers sign-in when the session has gone', async () => {
+    mocks.getUser.mockResolvedValue({
+      data: { user: null },
+      error: { code: 'session_not_found' },
+    });
+
+    const state = await requestAccountDeletion({}, form({ email: OWN }));
+
+    expect(state.signedOut).toBe(true);
+  });
+
+  it('shows a rate limit, and is honest about other failures while logging only the code', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    mocks.signInWithOtp.mockResolvedValueOnce({
+      data: {},
+      error: { code: 'over_email_send_rate_limit' },
+    });
+    expect((await requestAccountDeletion({}, form({ email: OWN }))).error).toBe(
+      'Too many attempts. Wait a few minutes and try again.',
+    );
+
+    mocks.signInWithOtp.mockResolvedValueOnce({
+      data: {},
+      error: { code: 'unexpected_failure', message: `failed for ${OWN}` },
+    });
+    const state = await requestAccountDeletion({}, form({ email: OWN }));
+
+    expect(state.error).toBe('Something went wrong. Try again.');
+    expect(JSON.stringify(warn.mock.calls)).not.toContain(OWN);
   });
 });

@@ -38,6 +38,7 @@ import {
   registerWithPassword,
   requestRecoveryEmail,
   resendEmailChange as resendEmailChangeOperation,
+  sendAccountDeletionLink,
   sendOwnPasswordReset,
   startAccountLink,
 } from '../operations';
@@ -454,5 +455,58 @@ export async function connectAccount(
         code: outcome.code,
       });
       return authFailure(linkErrorMessage(outcome.code), { email: '' });
+  }
+}
+
+/**
+ * First step of deleting the account: checks the address typed and emails the
+ * link that continues. Nothing is deleted here or by opening the link.
+ */
+export async function requestAccountDeletion(
+  _previous: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const typed = field(formData, 'email').trim();
+  const parsed = emailRequestSchema.safeParse({ email: typed });
+  if (!parsed.success) {
+    const { message, fields } = firstRefusal(parsed.error);
+    return authFailure(message, { email: typed }, fields);
+  }
+
+  const outcome = await sendAccountDeletionLink({
+    typedEmail: parsed.data.email,
+    redirectTo: callbackUrl(
+      getOrigin(),
+      '/auth/delete-account',
+      'delete-account',
+    ),
+  });
+
+  switch (outcome.kind) {
+    case 'signed-out':
+      return signedOutFailure(typed);
+    case 'unavailable':
+      return authFailure(TRY_AGAIN, { email: typed });
+    case 'no-email':
+      return authFailure(
+        'This account has no email address to send a link to.',
+        { email: typed },
+      );
+    case 'wrong-email':
+      return authFailure(
+        'That is not the email address on this account.',
+        { email: typed },
+        ['email'],
+      );
+    case 'rate-limited':
+      return authFailure(authErrorMessage(outcome.code), { email: typed });
+    case 'provider-error':
+      console.warn('requestAccountDeletion failed', { code: outcome.code });
+      return authFailure(authErrorMessage(outcome.code), { email: typed });
+    case 'sent':
+      return authSuccess(
+        `We sent a link to ${outcome.email}. Open it within 10 minutes to finish. Nothing is deleted until you confirm there.`,
+        { email: outcome.email },
+      );
   }
 }

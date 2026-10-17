@@ -25,7 +25,7 @@ export type AvatarSaved =
   | { ok: false; error: string; fields?: ['avatar'] };
 
 /** Deletes every file in the user's avatar folder except `keep`. Best effort. */
-async function removeOldAvatars(
+export async function removeOldAvatars(
   supabase: Supabase,
   userId: string,
   keep?: string,
