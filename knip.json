@@ -1,5 +1,10 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "ignore": ["apps/web/src/lib/**/*", "tsconfig.json", "packages/dev/**/*"],
+  "ignore": [
+    "apps/web/src/lib/**/*",
+    "tsconfig.json",
+    "packages/dev/**/*",
+    ".agents/.archives/**"
+  ],
   "ignoreDependencies": []
 }
