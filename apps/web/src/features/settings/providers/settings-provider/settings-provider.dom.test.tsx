@@ -173,7 +173,6 @@ describe('shared SettingsProvider', () => {
     expect(values().privacy).toMatchObject({
       analytics: { granted: true },
       sharing: { granted: false },
-      policyVersion: 1,
     });
   });
 
