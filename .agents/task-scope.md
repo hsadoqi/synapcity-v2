@@ -1,5 +1,17 @@
 # Task scope
 
+## Active task: author auth review follow-up implementation plan (2026-10-16)
+
+- Goal and mode: turn the owner's completed auth review into a detailed implementation plan. Mode: planning/documentation authoring only; no application implementation or acceptance of proposed behavior.
+- Direct authority: the owner's current request, "create a detailed implementation plan pls", following the read-only review of `refactor/auth-features` at `773060f` and its five existing WIP paths.
+- Exact destinations and budget: create `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md` (1 create); update `.agents/task-scope.md` (1 update). Other repository changes, source changes, dependency changes, moves/renames/deletes, commits/branches/PRs, GitHub objects, provider configuration, live accounts and external planning surfaces: 0. Disposable authoring backups/check output may live under `/private/tmp/synapcity-auth-plan-authoring-20261016`.
+- Systems of record: accepted ADRs retain decision authority; original ARF plans retain ARF task completion; the new Proposed plan owns only AHF-00 through AHF-09 follow-up definitions, dependencies and eventual completion. Its historical baseline is evidence, not a second ARF status ledger. This entry bounds authoring only.
+- Content scope: preserve current topology/package options; specify the development-auth decision and identity invariant, boundary-check repairs, sign-out failure handling, meaningful test gaps, evidence-based documentation reconciliation and separate live-provider verification. Record unresolved choices and implementation approval gates without resolving them through plan wording.
+- Preconditions: re-read live source/status, accepted decisions and planning workflow; preserve four modified source files and untracked `features/auth/shared/development-auth.ts`; do not silently adopt stale spec statuses or infer historical baseline proof from current tests.
+- Verification: scoped Prettier write/check, relative Markdown link and named-path read-back, unique AHF task IDs/dependency order, diff/whitespace inspection and unchanged source/WIP comparison. Runtime checks are not rerun for this authoring-only change; prior review results are explicitly dated evidence.
+- Recovery: remove only the newly authored plan and reverse only this entry if separately requested; the original scope is captured at `/private/tmp/synapcity-auth-plan-authoring-20261016/task-scope.before.md`. Preserve every pre-existing scope and source change; no reset/stash/clean.
+- Stop conditions: concurrent changes to either authoring destination; an additional mutation class; a requested architectural decision being mistaken for approval; or an exact implementation destination needing a fresh scope. Execution of the plan requires its stated approvals and per-batch manifests.
+
 ## Active task: repair pnpm verify fixture failures (2026-10-16)
 
 - Goal and mode: implement the owner's request to fix `pnpm verify`; preserve existing uncommitted work and the four seed files, which exactly match seed 42.
