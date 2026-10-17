@@ -36,28 +36,31 @@ describe('SettingsContent', () => {
 
   // A page titled with another tab's name sends people looking in the wrong
   // place (the Theme page was once titled "Appearance" beside an Appearance tab).
-  it.each(tabs.map((tab) => [tab.label, tab.value]))(
-    'titles the %s page without naming another tab',
-    async (label, value) => {
-      window.location.hash = value;
-      const { container } = show();
-      await screen.findByRole('tabpanel', {}, { timeout: 5000 });
-      const title = await waitFor(
-        () => {
-          const node = container.querySelector(
-            '[role="tabpanel"] [data-slot="card-title"]',
-          );
-          if (!node?.textContent) throw new Error('title not loaded');
-          return node.textContent;
-        },
-        { timeout: 5000 },
-      );
-      const otherLabels = tabs
-        .map((tab) => tab.label)
-        .filter((other) => other !== label);
-      expect(otherLabels).not.toContain(title);
-    },
-  );
+  // Account is left out: it reads the signed-in user and server actions, which
+  // its own tests mock, and this layout test does not.
+  it.each(
+    tabs
+      .filter((tab) => tab.value !== 'account')
+      .map((tab) => [tab.label, tab.value]),
+  )('titles the %s page without naming another tab', async (label, value) => {
+    window.location.hash = value;
+    const { container } = show();
+    await screen.findByRole('tabpanel', {}, { timeout: 5000 });
+    const title = await waitFor(
+      () => {
+        const node = container.querySelector(
+          '[role="tabpanel"] [data-slot="card-title"]',
+        );
+        if (!node?.textContent) throw new Error('title not loaded');
+        return node.textContent;
+      },
+      { timeout: 5000 },
+    );
+    const otherLabels = tabs
+      .map((tab) => tab.label)
+      .filter((other) => other !== label);
+    expect(otherLabels).not.toContain(title);
+  });
 
   it('opens on the theme tab and loads its content', async () => {
     show();
