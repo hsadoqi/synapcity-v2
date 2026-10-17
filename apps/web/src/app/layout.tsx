@@ -4,9 +4,11 @@ import '../styles/globals.css';
 import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import RootProviders from './providers';
+import { AuthStatus } from '@/components/auth/display/auth-status';
 import { RootShell } from '@synapcity/frontend-ui/blocks/root-shell';
 import { createMetadata } from '@synapcity/frontend-site/metadata';
-
+import { UserProvider } from '@/components/auth/provider/user-provider';
+import { getCurrentUser } from '@/lib/auth/session';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 const geistSans = localFont({
@@ -24,11 +26,12 @@ export const metadata: Metadata = createMetadata({
   siteUrl: process.env.SITE_URL,
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getCurrentUser();
   return (
     <html
       lang="en"
@@ -37,7 +40,14 @@ export default function RootLayout({
     >
       <body>
         <RootProviders>
-          <RootShell>{children}</RootShell>
+          <UserProvider user={user}>
+            <RootShell
+              userId={user?.id ?? null}
+              headerActions={<AuthStatus variant="header" />}
+            >
+              {children}
+            </RootShell>
+          </UserProvider>
         </RootProviders>
       </body>
     </html>

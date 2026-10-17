@@ -8,9 +8,10 @@
   color-scheme: light;
   --background: var(--base-background);
   --foreground: var(--base-foreground);
-  --card: var(--base-background)/90;
+  /* Literals, like theme-dark: surfaces stay fixed if a ramp is rethemed. */
+  --card: oklch(100% 0 0);
   --card-foreground: var(--base-foreground);
-  --popover: var(--base-background)/20;
+  --popover: oklch(100% 0 0);
   --popover-foreground: var(--base-foreground);
   --destructive: oklch(45% 0.245 27.325);
   --destructive-foreground: var(--base-50);
@@ -97,6 +98,44 @@
     in oklch,
     var(--background),
     var(--foreground) 14%
+  );
+}
+
+/* Menu item states. bg-hover mixes into --background, which in dark sits below the popover
+   (14.5% against 20.5%), so on a menu it lands at 1.02:1 and disappears. These mix into the
+   popover itself: the highlight is about 1.36:1 against the menu in light and 1.31:1 in dark,
+   with text on it at 12:1 or better. Solid mixes, never alpha (the Solid Mix Rule). 12% matches
+   bg-destructive-hover so the two highlights stay in step; the fill is also the keyboard cue. */
+@utility bg-popover-hover {
+  background-color: color-mix(
+    in oklch,
+    var(--popover),
+    var(--popover-foreground) 12%
+  );
+}
+
+/* A destructive item's highlight: the popover tinted with --destructive. The label keeps its
+   own destructive colour (about 5.7:1 on it in both themes), and because --destructive is
+   remapped per theme no hand-written dark: colour is needed. */
+@utility bg-destructive-hover {
+  background-color: color-mix(in oklch, var(--popover), var(--destructive) 12%);
+}
+
+/* Filled-button states: the fill mixed toward the page, so hover and pressed stay
+   solid colours (never an alpha that reads as disabled) and the label keeps its contrast. */
+@utility bg-fill-hover {
+  background-color: color-mix(
+    in oklch,
+    var(--primary-foreground),
+    var(--background) 18%
+  );
+}
+
+@utility bg-fill-pressed {
+  background-color: color-mix(
+    in oklch,
+    var(--primary-foreground),
+    var(--background) 32%
   );
 }
 

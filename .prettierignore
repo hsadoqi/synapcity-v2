@@ -13,3 +13,4 @@ docs/archive
 .pnpm-store
 **/coverage/**
 storybook-static
+.impeccable

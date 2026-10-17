@@ -47,8 +47,7 @@
   --base: var(--base-500);
   --primary: var(--primary-500);
   --accent: var(--accent-500);
-  --scondary: var(--secondary-500);
-  --muted: var(--base-100);
+  --secondary: var(--secondary-500);
 }
 
 .light {
@@ -57,11 +56,22 @@
   --primary-foreground: var(--primary-950);
   --primary-background: var(--primary-50);
   --accent-foreground: var(--accent-950);
-  --accent-background: var(--accent-50);
+  --accent-background: var(--accent-100);
   --secondary-foreground: var(--secondary-950);
   --secondary-background: var(--secondary-50);
-  --muted-foreground: var(--base-foreground)/20;
-  --muted-background: var(--base-foreground)/80;
+  --muted: var(--base-200);
+  /* Mixed from this theme's own ink and page, so they hold if a ramp is
+     rethemed. Muted text lands near 52% (5.5:1); field borders near 60%. */
+  --muted-foreground: color-mix(
+    in oklch,
+    var(--base-foreground) 55%,
+    var(--base-background)
+  );
+  --muted-background: color-mix(
+    in oklch,
+    var(--base-foreground) 45%,
+    var(--base-background)
+  );
 }
 
 .dark {
@@ -73,6 +83,16 @@
   --accent-background: var(--accent-950);
   --secondary-foreground: var(--secondary-50);
   --secondary-background: var(--secondary-950);
-  --muted-foreground: var(--base-foreground)/80;
-  --muted-background: var(--base-foreground)/20;
+  --muted: var(--base-800);
+  /* Muted text near 71% (about 7.6:1); field borders near 52%. */
+  --muted-foreground: color-mix(
+    in oklch,
+    var(--base-foreground) 67%,
+    var(--base-background)
+  );
+  --muted-background: color-mix(
+    in oklch,
+    var(--base-foreground) 45%,
+    var(--base-background)
+  );
 }

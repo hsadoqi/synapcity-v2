@@ -1,0 +1,33 @@
+'use client';
+
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '@synapcity/frontend-ui/core/avatar';
+
+import { useCurrentUser } from '../provider/user-provider';
+
+function initialsOf(name: string | null): string {
+  if (!name) return '?';
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join('')
+    .toUpperCase();
+}
+
+export function CurrentUserAvatar() {
+  const user = useCurrentUser();
+  const name = user?.name ?? null;
+  const imageUrl = user?.imageUrl ?? null;
+
+  return (
+    <Avatar>
+      {imageUrl && <AvatarImage src={imageUrl} alt={name ?? 'Your avatar'} />}
+      <AvatarFallback>{initialsOf(name)}</AvatarFallback>
+    </Avatar>
+  );
+}

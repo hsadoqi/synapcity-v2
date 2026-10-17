@@ -1,6 +1,12 @@
-export const RootContent = ({ children }: { children: React.ReactNode }) => {
+'use client';
+
+import type { ReactNode } from 'react';
+
+export const RootContent = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="flex size-full justify-center relative">
+    // flex-1, not size-full: the footer shares this column, and 100% height
+    // would push it below the fold on every page.
+    <div className="relative flex w-full flex-1 justify-center">
       <main
         id="main-content"
         tabIndex={-1}

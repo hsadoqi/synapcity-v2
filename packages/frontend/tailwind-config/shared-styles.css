@@ -108,6 +108,10 @@
   --text-4xl--line-height: 1.111111;
   --text-5xl: calc(var(--text-base-size) * 45 / 15);
   --text-5xl--line-height: 1;
+  /* The Real-16 Rule: a literal 16px for fields on touch screens. iOS Safari
+     zooms into any focused field under 16px, and text-base here is 15px. */
+  --text-touch-field: 1rem;
+  --text-touch-field--line-height: 1.5;
   --radius-xs: calc(var(--radius-base) * 0.5);
   --radius-sm: calc(var(--radius-base) * 0.6);
   --radius-md: calc(var(--radius-base) * 0.8);

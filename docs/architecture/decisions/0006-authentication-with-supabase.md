@@ -20,7 +20,7 @@ Upstream evidence, read 2026-10-13:
 - Supabase Auth is the authentication provider for `apps/web`.
 - Sign-in methods: email and password (sign up, sign in, sign out, email confirmation, password reset) and OAuth with Google and GitHub.
 - Sessions are cookie-based through `@supabase/ssr`, using the PKCE flow. Session refresh happens in `apps/web/src/proxy.ts`.
-- Code lives in `apps/web` only. No new workspace package is created.
+- The initial implementation was placed in `apps/web`. The owner clarified on 2026-10-13 that this placement was not intended to restrict auth packages or further code splitting. This ADR chooses the auth provider and session behavior; app-local modules, an auth package, or a feature/service split may be selected through a subsequent owner-approved ownership/topology decision.
 - Only the publishable key reaches the browser. The service-role or secret key is never exposed, never prefixed `NEXT_PUBLIC_`, and not used by this feature.
 - Redirect URLs sent to Supabase (confirmation, reset, OAuth) are built from the server-side `SITE_URL` setting, never from request headers, so a forged `Origin` or `Host` cannot aim an email link at another site. The Supabase redirect allow-list should list exact URLs; a wildcard such as `*.vercel.app` weakens this and needs the owner's approval.
 - Authorization checks on the server use `getClaims()` (or `getUser()` where fresh user data is required), never `getSession()`.
@@ -59,7 +59,7 @@ The repository owner approves changes to the provider, the session model, any pe
 ## Integration expectations
 
 - Auth UI uses installed `@synapcity/frontend-ui` components and semantic tokens; no hardcoded colours or font stacks.
-- Supabase clients are created in `apps/web/src/lib/supabase/` and nowhere else; client components never import the server client.
+- The initial Supabase client setup lives in `apps/web/src/lib/supabase/`. Its owning adapter/module may move under an approved ownership/topology decision while preserving request-bound server clients and browser/server separation; client components never import the server client.
 - Environment variable names and where they are set (local `.env.local`, Vercel) are documented; `.env*` stays git-ignored.
 - Auth responses are not cached across users.
 

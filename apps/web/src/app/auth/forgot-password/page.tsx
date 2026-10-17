@@ -1,17 +1,16 @@
 import type { Metadata } from 'next';
 
-import { ForgotPasswordCard } from '@/components/auth/forgot-password-card';
-import { AuthLinkButton } from '@/components/auth/auth-link-button';
+import { ForgotPasswordCard } from '@/components/auth/forgot-password/forgot-password-card';
 
 export const metadata: Metadata = { title: 'Reset your password' };
 
-export default function ForgotPasswordPage() {
-  return (
-    <div className="flex flex-col size-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm">
-        <ForgotPasswordCard />
-      </div>
-      <AuthLinkButton type="login" className="mt-4" />
-    </div>
-  );
+export default async function ForgotPasswordPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ expired?: string }>;
+}) {
+  // Set by /auth/update-password when someone arrives without a valid reset link.
+  const expired = (await searchParams).expired === '1';
+
+  return <ForgotPasswordCard expired={expired} />;
 }
