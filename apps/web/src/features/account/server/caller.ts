@@ -18,7 +18,7 @@ export type MetadataPatch = (
   existing: Record<string, unknown> | null | undefined,
 ) => Record<string, unknown>;
 
-export const SIGN_IN_AGAIN = 'Sign in again to update your profile.';
+const SIGN_IN_AGAIN = 'Sign in again to update your profile.';
 export const SAVE_FAILED = 'Could not save your changes. Try again.';
 export const SHOWS_LATER = 'It may take a little while to show everywhere.';
 

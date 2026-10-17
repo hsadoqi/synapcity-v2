@@ -2,7 +2,7 @@
 
 import { Button } from '@synapcity/frontend-ui/core/button';
 
-import { updateAvatar } from '@/features/account/server/actions';
+import { updateAvatar } from '@/features/account/server/actions/avatar-actions';
 import type { ProfileState } from '@/features/account/types';
 import { AvatarField } from './avatar-field';
 import { ProfileFormShell } from '../profile/profile-form-shell';

@@ -9,7 +9,7 @@ vi.mock('@synapcity/frontend-ui/core/toast', () => ({
 
 const mocks = vi.hoisted(() => ({ completeProfile: vi.fn() }));
 
-vi.mock('@/features/account/server/actions', () => ({
+vi.mock('@/features/account/server/actions/setup-actions', () => ({
   completeProfile: mocks.completeProfile,
 }));
 

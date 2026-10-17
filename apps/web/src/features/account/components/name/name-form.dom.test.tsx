@@ -12,7 +12,7 @@ import type { ProfileState } from '@/features/account/types';
 /** Only the Server Action boundary is replaced; React runs the real form. */
 const mocks = vi.hoisted(() => ({ updateName: vi.fn() }));
 
-vi.mock('@/features/account/server/actions', () => ({
+vi.mock('@/features/account/server/actions/name-actions', () => ({
   updateName: mocks.updateName,
 }));
 

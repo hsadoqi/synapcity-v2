@@ -1,6 +1,6 @@
 'use client';
 
-import { completeProfile } from '@/features/account/server';
+import { completeProfile } from '@/features/account/server/actions/setup-actions';
 import { AvatarField } from '../../avatar';
 import { NameField } from '../../name';
 import { ProfileFormShell } from '../profile-form-shell';
