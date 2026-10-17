@@ -2,10 +2,12 @@ import { screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AppearanceSettings } from './components/appearance-settings';
+import { DataPrivacySettings } from './components/data-privacy-settings';
 import { RegionalSettings } from './components/regional-settings';
 import { ThemeSettings } from './components/theme-settings';
 import { renderWithSettings, stubBrowser } from './test-harness';
 import { appearanceSchema } from './types/appearance';
+import { dataPrivacySchema } from './types/data-privacy';
 import { regionalSchema } from './types/regional';
 import { themeSchema } from './types/theme';
 
@@ -14,7 +16,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 type Control = { role: 'combobox' | 'switch'; name: string };
 
-// Every setting the Theme, Appearance and Regional tabs own has a control named here. A
+// Every setting the Theme, Appearance, Regional and Data privacy tabs own has a control named here. A
 // field added to either schema fails this test until it gets one, so a setting
 // cannot be saved, exported and imported without anyone being able to change it.
 // `colorScheme` is the one exception: it mirrors `theme.mode`, which the Theme
@@ -46,6 +48,11 @@ const regionalControls: Record<keyof typeof regionalSchema.shape, Control> = {
   numberFormat: { role: 'combobox', name: 'Number format' },
 };
 
+const privacyControls: Record<keyof typeof dataPrivacySchema.shape, Control> = {
+  dataSharing: { role: 'switch', name: 'Data sharing with third parties' },
+  tracking: { role: 'switch', name: 'Activity tracking' },
+};
+
 describe('settings with a control', () => {
   it('names a control for every theme setting', () => {
     expect(Object.keys(themeControls).sort()).toEqual(
@@ -64,6 +71,12 @@ describe('settings with a control', () => {
   it('names a control for every regional setting', () => {
     expect(Object.keys(regionalControls).sort()).toEqual(
       Object.keys(regionalSchema.shape).sort(),
+    );
+  });
+
+  it('names a control for every data privacy setting', () => {
+    expect(Object.keys(privacyControls).sort()).toEqual(
+      Object.keys(dataPrivacySchema.shape).sort(),
     );
   });
 
@@ -87,6 +100,14 @@ describe('settings with a control', () => {
     'the Regional tab renders %s',
     async (_key, { role, name }) => {
       await renderWithSettings(<RegionalSettings />);
+      expect(screen.getByRole(role, { name })).toBeTruthy();
+    },
+  );
+
+  it.each(Object.entries(privacyControls))(
+    'the Data privacy tab renders %s',
+    async (_key, { role, name }) => {
+      await renderWithSettings(<DataPrivacySettings />);
       expect(screen.getByRole(role, { name })).toBeTruthy();
     },
   );
