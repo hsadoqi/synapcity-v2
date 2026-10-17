@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => ({
   updateUser: vi.fn(),
   signInWithOAuth: vi.fn(),
   signOut: vi.fn(),
+  createClient: vi.fn(),
 }));
 
 /** Stands in for Next's `redirect`, which never returns. */
@@ -28,17 +29,20 @@ vi.mock('@/features/auth/server/site-origin', () => ({
   getOrigin: () => 'https://app.test',
 }));
 vi.mock('@/lib/supabase/server', () => ({
-  createClient: async () => ({
-    auth: {
-      signInWithPassword: mocks.signInWithPassword,
-      signUp: mocks.signUp,
-      resend: mocks.resend,
-      resetPasswordForEmail: mocks.resetPasswordForEmail,
-      updateUser: mocks.updateUser,
-      signInWithOAuth: mocks.signInWithOAuth,
-      signOut: mocks.signOut,
-    },
-  }),
+  createClient: async () => {
+    mocks.createClient();
+    return {
+      auth: {
+        signInWithPassword: mocks.signInWithPassword,
+        signUp: mocks.signUp,
+        resend: mocks.resend,
+        resetPasswordForEmail: mocks.resetPasswordForEmail,
+        updateUser: mocks.updateUser,
+        signInWithOAuth: mocks.signInWithOAuth,
+        signOut: mocks.signOut,
+      },
+    };
+  },
 }));
 
 import {
@@ -485,5 +489,55 @@ describe('invalid submissions never reach the provider', () => {
     expect(state.fields).toEqual(['email']);
     expect(mocks.resend).not.toHaveBeenCalled();
     expect(mocks.resetPasswordForEmail).not.toHaveBeenCalled();
+  });
+});
+
+describe('development fixture mode', () => {
+  beforeEach(() => {
+    vi.stubEnv('NODE_ENV', 'development');
+    vi.stubEnv('SYNAPCITY_DEV_AUTH', 'fixture');
+    mocks.createClient.mockClear();
+  });
+  afterEach(() => vi.unstubAllEnvs());
+
+  const valid = form({
+    email: 'a@b.test',
+    password: 'long-enough-password',
+    confirm: 'long-enough-password',
+    name: 'Ada',
+    provider: 'google',
+  });
+
+  it('rejects every form action before a Supabase client is built', async () => {
+    const results = await Promise.all([
+      signInWithPassword({}, valid),
+      signUp({}, valid),
+      resendConfirmation({}, valid),
+      requestPasswordReset({}, valid),
+      updatePassword({}, valid),
+    ]);
+
+    for (const result of results) {
+      expect(result.error).toContain('Fixture mode');
+    }
+    expect(mocks.createClient).not.toHaveBeenCalled();
+  });
+
+  it('sends OAuth to the error page and sign-out home without a client', async () => {
+    expect(await redirectOf(signInWithOAuth(valid))).toContain('/auth/error');
+    expect(await redirectOf(signOut())).toBe('/');
+    expect(mocks.createClient).not.toHaveBeenCalled();
+  });
+
+  it('does not apply in production even with the flag set', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    mocks.signInWithPassword.mockResolvedValue({
+      data: null,
+      error: { code: 'invalid_credentials' },
+    });
+
+    await signInWithPassword({}, valid);
+
+    expect(mocks.createClient).toHaveBeenCalled();
   });
 });

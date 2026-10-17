@@ -148,4 +148,15 @@ describe('UserProvider', () => {
     expect(() => render(<Who />)).toThrow(/inside <UserProvider>/);
     quiet.mockRestore();
   });
+
+  it('does not subscribe to auth events for a fixture user', () => {
+    render(
+      <UserProvider user={{ ...ada, fixture: true }}>
+        <Who />
+      </UserProvider>,
+    );
+
+    expect(screen.getByText('ada@b.co')).toBeTruthy();
+    expect(mocks.onAuthStateChange).not.toHaveBeenCalled();
+  });
 });

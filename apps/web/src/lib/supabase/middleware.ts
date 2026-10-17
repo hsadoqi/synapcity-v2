@@ -3,10 +3,15 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 import { homePathFor } from '@/lib/routing/user-paths';
 import { safeNextPath } from '@/lib/routing/safe-next';
+import { fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import { getSupabaseEnv } from './env';
 import { isGuestOnlyPath, isProtectedPath } from '../routing/route-access';
 
 export async function updateSession(request: NextRequest) {
+  // Development fixture mode has no session to refresh and must not reach
+  // Supabase. Production and test never take this branch.
+  if (fixtureModeEnabled()) return NextResponse.next({ request });
+
   let supabaseResponse = NextResponse.next({
     request,
   });

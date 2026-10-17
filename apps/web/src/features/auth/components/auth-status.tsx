@@ -5,6 +5,7 @@ import { UserMenu } from '@synapcity/frontend-ui/components/user-menu';
 import { signOut } from '@/features/auth/server/actions';
 import { accountLinksFor, homePathFor } from '@/lib/routing/user-paths';
 import { getCurrentUser } from '@/features/auth/server/session';
+import { FIXTURE_MESSAGE } from '@/lib/access/dev-fixture';
 
 /**
  * Reads the verified session claims on the server (ADR-0006) so the first paint
@@ -33,6 +34,17 @@ export async function AuthStatus({
       <LinkButton href={homePathFor(user.id)} variant="default" size="lg">
         Go to your workspace
       </LinkButton>
+    );
+  }
+
+  if (user.fixture) {
+    return (
+      <span
+        title={FIXTURE_MESSAGE}
+        className="rounded-md border border-border px-2 py-1 text-xs text-muted-foreground"
+      >
+        Fixture mode
+      </span>
     );
   }
 

@@ -31,6 +31,10 @@ Set these in `apps/web/.env.local` (git-ignored) and, for deployments, in the ho
 
 The app throws on the first sign-up, reset or OAuth call if `SITE_URL` is missing.
 
+### Development fixture mode
+
+By default, development uses real Supabase auth like every other environment. To browse the signed-in pages without a Supabase project, set `SYNAPCITY_DEV_AUTH=fixture` in `apps/web/.env.local` and restart the dev server. You are then a fixed fixture user at `/fixture-user/home`; the header shows "Fixture mode", and sign-in, sign-up, recovery, OAuth, sign-out and profile changes are rejected before any Supabase call. It only works when `NODE_ENV` is `development`; test and production ignore it. See the amendment in [ADR-0006](../../docs/architecture/decisions/0006-authentication-with-supabase.md).
+
 ### `SITE_URL` per environment
 
 Each environment has its own `SITE_URL`, and the emailed link only works if Supabase accepts it. In the Supabase dashboard (Authentication, URL Configuration), add one **Redirect URLs** entry per environment, written as `<SITE_URL>/auth/callback**`. The app appends `?next=…&flow=…` to the callback, and Supabase documents `**` as "any sequence of characters", so that entry covers it. Supabase's guide says the `redirectTo` must match the list, and it says nothing about whether an entry without the `**` also matches a URL carrying a query string, so confirm with a real sign-up before relying on that form.

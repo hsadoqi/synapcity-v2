@@ -83,6 +83,20 @@ Security advisors, first run on 2026-10-13: three warnings, none about objects t
 
 Not verified: profile isolation between two real accounts through the application, setting a password on a GitHub account and then signing in with it (the Google case was checked by hand on 2026-10-17), and automated tests of the server actions and the session proxy (the pure helpers are unit-tested).
 
+## Amendment 2026-10-17: development fixture mode
+
+Approved by the repository owner (decision D1 of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`, recommended option). Real Supabase verification is the default in every environment, including development. Fixture browsing of the owner-area pages is kept only as an explicit server-side opt-in.
+
+| Mode             | When                                                    | Identity                          | Owner-area pages                | Mutations                                    |
+| ---------------- | ------------------------------------------------------- | --------------------------------- | ------------------------------- | -------------------------------------------- |
+| Real (default)   | Always, unless the flag below is set; all of production | Supabase verified claims          | Verified owner (`requireOwner`) | Normal                                       |
+| Fixture (opt-in) | `NODE_ENV=development` and `SYNAPCITY_DEV_AUTH=fixture` | Fixed display user, not a session | Fixture user's id only, marked  | Rejected before a Supabase client is created |
+
+- `getVerifiedClaims()` keeps meaning provider-verified claims; a fixture is never returned from it. `requireOwner` returns a tagged result (`verified` or `fixture`).
+- The flag is read on every call by `apps/web/src/lib/access/dev-fixture.ts`; `test` and `production` ignore it. It is declared in `turbo.json` (`globalPassThroughEnv`). This is a new durable configuration name, approved with the amendment.
+- Fixture mode skips the session proxy and the browser auth subscription, shows a visible "Fixture mode" label, and the settings page and every auth and profile action explain that account actions are unavailable.
+- The previous unconditional development bypass (`development-auth.ts`, on `v0/supabase-environment-error-df72e1eb`) is not carried over; it is retained there as evidence only.
+
 ## Reconsideration conditions
 
 A requirement the cookie-session model cannot meet (for example native clients), a Supabase pricing or availability change, a security incident, or a decision to adopt a different persistence or identity stack.

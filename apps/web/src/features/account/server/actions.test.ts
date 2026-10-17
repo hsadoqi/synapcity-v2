@@ -1,21 +1,25 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   revalidatePath: vi.fn(),
   getUser: vi.fn(),
   updateUser: vi.fn(),
   refreshSession: vi.fn(),
+  createClient: vi.fn(),
 }));
 
 vi.mock('next/cache', () => ({ revalidatePath: mocks.revalidatePath }));
 vi.mock('@/lib/supabase/server', () => ({
-  createClient: async () => ({
-    auth: {
-      getUser: mocks.getUser,
-      updateUser: mocks.updateUser,
-      refreshSession: mocks.refreshSession,
-    },
-  }),
+  createClient: async () => {
+    mocks.createClient();
+    return {
+      auth: {
+        getUser: mocks.getUser,
+        updateUser: mocks.updateUser,
+        refreshSession: mocks.refreshSession,
+      },
+    };
+  },
 }));
 
 import { updateProfile } from './actions';
@@ -113,5 +117,21 @@ describe('updateProfile', () => {
       name: 'Ada',
     });
     expect(mocks.revalidatePath).toHaveBeenCalledWith('/', 'layout');
+  });
+});
+
+describe('updateProfile in development fixture mode', () => {
+  beforeEach(() => {
+    vi.stubEnv('NODE_ENV', 'development');
+    vi.stubEnv('SYNAPCITY_DEV_AUTH', 'fixture');
+  });
+  afterEach(() => vi.unstubAllEnvs());
+
+  it('is rejected before a Supabase client is built', async () => {
+    const result = await updateProfile({}, form('Ada'));
+
+    expect(result.error).toContain('Fixture mode');
+    expect(mocks.createClient).not.toHaveBeenCalled();
+    expect(mocks.updateUser).not.toHaveBeenCalled();
   });
 });
