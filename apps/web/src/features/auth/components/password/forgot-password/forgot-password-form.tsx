@@ -1,0 +1,46 @@
+'use client';
+
+import { useId } from 'react';
+import { Button } from '@synapcity/frontend-ui/core/button';
+
+import type { AuthState } from '@/features/auth/types';
+import { FormField } from '@/components/forms/form-field';
+import { useFocusFirstError } from '@/hooks/use-focus-first-error/use-focus-first-error';
+import { FormMessage } from '@/components/forms/form-message';
+import { fieldErrorProps } from '@/components/forms/form-feedback';
+
+export function ForgotPasswordForm({
+  state,
+  formAction,
+  pending,
+}: {
+  state: AuthState;
+  formAction: (formData: FormData) => void;
+  pending: boolean;
+}) {
+  const formRef = useFocusFirstError(state);
+  const messageId = useId();
+
+  return (
+    <form
+      ref={formRef}
+      action={formAction}
+      noValidate
+      className="flex flex-col gap-4"
+    >
+      <FormField
+        id="email"
+        {...fieldErrorProps(state, 'email', messageId)}
+        label="Email"
+        type="email"
+        autoComplete="email"
+        defaultValue={state.data?.user?.email}
+        required
+      />
+      <FormMessage id={messageId} state={state} />
+      <Button type="submit" size="lg" disabled={pending} aria-busy={pending}>
+        {pending ? 'Sending…' : 'Send reset link'}
+      </Button>
+    </form>
+  );
+}
