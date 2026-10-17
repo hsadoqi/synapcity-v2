@@ -60,3 +60,5 @@ next-env.d.ts
 debug-storybook.log
 supabase/.temp
 .playwright-mcp
+
+.pnpm-store
