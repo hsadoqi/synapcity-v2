@@ -9,6 +9,7 @@ import { OAuthButtons } from './oauth-buttons';
 import { AuthConfirmation } from './auth-confirmation';
 import { AuthShell } from './auth-shell';
 import { useConfirmation } from '@/features/auth/client/use-confirmation';
+import { AuthDivider } from './auth-divider';
 import { RegisterForm } from './register-form';
 import { ResendConfirmation } from './resend-confirmation';
 
@@ -48,7 +49,7 @@ export function RegisterCard({ next }: { next: string }) {
       ) : (
         <>
           <OAuthButtons next={next} />
-          <p className="text-center text-xs text-muted-foreground">or</p>
+          <AuthDivider label="or continue with email" />
           <RegisterForm
             next={next}
             state={formState}

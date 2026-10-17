@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { SynapcityLogo } from '../../components/logo-mark';
+import { SynapcityLogo, SynapcityMark } from '../../components/logo-mark';
 import { ModeToggle } from '../../components/mode-toggle';
 import Link from 'next/link';
 import { LinkButton } from '../../components/link-button';
@@ -22,7 +22,7 @@ type RootHeaderProps = {
  */
 export const RootHeaderContent = ({ actions, account }: RootHeaderProps) => {
   return (
-    <div className="flex flex-1 items-center justify-between">
+    <div className="flex min-w-0 flex-1 items-center justify-between gap-4">
       <RootLogoLink homeHref={account?.homeHref} />
       <RootIconActions settingsHref={account?.settingsHref}>
         {actions}
@@ -35,14 +35,21 @@ export const RootHeader = ({ account, ...props }: RootHeaderProps) => {
   // Same gutters as RootContent and RootFooter so the logo lines up with the
   // page below it.
   return (
-    <div className="flex items-center">
+    <div className="sticky top-0 flex h-16 shrink-0 items-stretch border-b border-divider bg-background/95 supports-backdrop-filter:backdrop-blur-sm">
       {account && (
         <>
-          <SidebarTrigger className="shrink-0 mx-2" size="icon-lg" />
-          <Separator orientation="vertical" className="h-full" />
+          <div className="flex shrink-0 items-center px-2 sm:px-3">
+            <SidebarTrigger size="icon-lg" />
+          </div>
+          <Separator orientation="vertical" />
         </>
       )}
-      <header className="flex items-center gap-2 px-2 lg:px-6 py-2  flex-1">
+      <header
+        className={cn(
+          'flex min-w-0 flex-1 items-center',
+          account ? 'px-3 sm:px-4 lg:px-6' : 'px-4 sm:px-10 lg:px-16',
+        )}
+      >
         <RootHeaderContent account={account} {...props} />
       </header>
     </div>
@@ -60,12 +67,22 @@ const RootLogoLink = ({
   return (
     <Link
       href={homeHref}
+      aria-label="Synapcity home"
       className={cn(
-        'inline-flex min-h-6 items-center pointer-coarse:min-h-11',
+        'inline-flex min-h-10 shrink-0 items-center rounded-sm outline-none transition-opacity hover:opacity-70 focus-visible:ring-2 focus-visible:ring-ring/50 pointer-coarse:min-h-11',
         className,
       )}
     >
-      <SynapcityLogo size="sm" className="text-foreground" />
+      <SynapcityMark
+        size="md"
+        title={null}
+        className="text-foreground sm:hidden"
+      />
+      <SynapcityLogo
+        size="sm"
+        title={null}
+        className="hidden text-foreground sm:block"
+      />
     </Link>
   );
 };
@@ -91,10 +108,14 @@ const RootIconActions = ({
   children?: ReactNode;
 }) => {
   return (
-    <div className="flex items-center gap-2">
+    <nav
+      aria-label="Account and appearance"
+      className="flex items-center gap-1"
+    >
+      {' '}
       <ModeToggle variant="ghost" size="lg" />
       {settingsHref && <SettingsLinkIcon href={settingsHref} />}
       {children}
-    </div>
+    </nav>
   );
 };
