@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   revalidatePath: vi.fn(),
@@ -352,10 +352,61 @@ describe('signInWithOAuth', () => {
 describe('signOut', () => {
   it('signs out, refreshes the layout and goes to the landing page', async () => {
     mocks.signOut.mockResolvedValue({});
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     expect(await redirectOf(signOut())).toBe('/');
-    expect(mocks.signOut).toHaveBeenCalled();
+    expect(mocks.signOut).toHaveBeenCalledOnce();
     expect(mocks.revalidatePath).toHaveBeenCalledWith('/', 'layout');
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  describe('when the provider fails', () => {
+    const LEAK_MARKER = 'sentinel-marker-9f3a';
+    let warn: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      warn.mockRestore();
+    });
+
+    /** Everything the action logged, as one string. */
+    function logged(): string {
+      return JSON.stringify(warn.mock.calls);
+    }
+
+    it('still revalidates and redirects, and logs only the code', async () => {
+      mocks.signOut.mockResolvedValue({
+        error: {
+          code: 'session_not_found',
+          status: 403,
+          message: LEAK_MARKER,
+          email: `${LEAK_MARKER}@b.co`,
+        },
+      });
+
+      expect(await redirectOf(signOut())).toBe('/');
+      expect(mocks.signOut).toHaveBeenCalledOnce();
+      expect(mocks.revalidatePath).toHaveBeenCalledWith('/', 'layout');
+      expect(warn).toHaveBeenCalledExactlyOnceWith('signOut failed', {
+        code: 'session_not_found',
+        status: 403,
+      });
+      expect(logged()).not.toContain(LEAK_MARKER);
+    });
+
+    it('still revalidates and redirects when the SDK throws', async () => {
+      mocks.signOut.mockRejectedValue(new Error(LEAK_MARKER));
+
+      expect(await redirectOf(signOut())).toBe('/');
+      expect(mocks.revalidatePath).toHaveBeenCalledWith('/', 'layout');
+      expect(warn).toHaveBeenCalledExactlyOnceWith('signOut failed', {
+        thrown: true,
+      });
+      expect(logged()).not.toContain(LEAK_MARKER);
+    });
   });
 });
 

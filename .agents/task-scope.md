@@ -1,5 +1,13 @@
 # Task scope
 
+## Active task: auth review follow-ups AHF-04, sign-out failure handling (2026-10-17)
+
+- Goal and mode: implement AHF-04 of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`; the owner approved the recommended contract on 2026-10-17: when the provider returns or throws an error, still revalidate the layout and redirect to `/`, and log only the operation and a code.
+- Exact change: update `apps/web/src/features/auth/server/actions.ts` (`signOut` only) and `actions.test.ts`.
+- Mutation budgets: updates 2 source files plus this entry; creates 0; dependencies, config, schema, routes and provider state 0. No manual cookie deletion, session store or global revocation is added.
+- Verification: the two new failure tests fail before the change and pass after; then `pnpm format:check`, `lint`, `typecheck`, `deps`, `test` and `build`. A mock does not prove local or global session revocation; the end-to-end suite and live auth are not run here.
+- Recovery: revert the two source files; nothing else changes.
+
 ## Active task: bring refactor/auth-features into main (2026-10-17)
 
 - Goal and mode: implement the owner's request to merge `refactor/auth-features` with `main` (PR #28). `main` holds the older auth UI as one squashed commit, so the merge conflicted in 66 files, mostly old-layout copies of files the branch had already moved.
