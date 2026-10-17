@@ -154,6 +154,21 @@ describe('Select', () => {
     expect(trigger().getAttribute('data-size')).toBe('sm');
   });
 
+  // Like Button and Input: compact for a mouse, 44px for a finger. The trigger
+  // needs the size-qualified form, because a bare `pointer-coarse:h-11` is less
+  // specific than `data-[size=default]:h-7` and would lose to it.
+  it('grows the trigger and options to a 44px touch target on coarse pointers', async () => {
+    renderSelect({ rootProps: { defaultOpen: true } });
+
+    expect(trigger().className).toContain(
+      'pointer-coarse:data-[size=default]:h-11',
+    );
+    expect(trigger().className).toContain('pointer-coarse:data-[size=sm]:h-11');
+    expect(
+      (await screen.findByRole('option', { name: 'Light' })).className,
+    ).toContain('pointer-coarse:min-h-11');
+  });
+
   it('exposes the invalid state on the trigger', () => {
     renderSelect({ triggerProps: { 'aria-invalid': true } });
 

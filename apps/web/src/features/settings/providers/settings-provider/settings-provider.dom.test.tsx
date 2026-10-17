@@ -237,7 +237,7 @@ describe('shared SettingsProvider', () => {
     expect(screen.getByText(/Welcome, Grace/)).toBeTruthy();
     expect(localStorage.getItem(KEY)).toBeNull();
     fireEvent.click(screen.getByText('Invalid update'));
-    expect(values().regional.timezone).toBe('UTC');
+    expect(values().regional.timezone).toBe('system');
     expect(screen.getByRole('status').textContent).toContain(
       'could not be updated',
     );
