@@ -12,11 +12,19 @@ import { stubBrowser } from '../../../test-harness';
 import tabs from '../../../lib/data/tabs';
 import { SettingsContent } from '../settings-content';
 
+// Account reads the signed-in user and server actions, which its own tests
+// mock; this layout test opens a stand-in in its place.
+const account = tabs.find((tab) => tab.value === 'account')!;
+
 beforeEach(() => {
   stubBrowser();
   window.location.hash = '';
+  vi.spyOn(account, 'component').mockResolvedValue(() => <p>Account panel</p>);
 });
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
 
 const show = (name?: string | null) =>
   render(
@@ -68,6 +76,7 @@ describe('SettingsContent', () => {
   });
 
   it('keeps unsaved Theme choices through a visit to another tab', async () => {
+    window.location.hash = 'theme';
     show();
     const colorTheme = () =>
       screen.getByRole('combobox', { name: 'Color theme' });
@@ -93,18 +102,16 @@ describe('SettingsContent', () => {
     ).toBe('You have unsaved changes.');
   });
 
-  it('opens on the theme tab and loads its content', async () => {
+  it('opens on the Account tab and loads its content', async () => {
     show();
 
     expect(
-      screen.getByRole('tab', { name: 'Theme' }).getAttribute('aria-selected'),
-    ).toBe('true');
-    expect(
-      await screen.findByRole(
-        'combobox',
-        { name: 'Color theme' },
-        { timeout: 5000 },
-      ),
+      await screen.findByText('Account panel', {}, { timeout: 5000 }),
     ).toBeTruthy();
+    expect(
+      screen
+        .getByRole('tab', { name: 'Account' })
+        .getAttribute('aria-selected'),
+    ).toBe('true');
   });
 });

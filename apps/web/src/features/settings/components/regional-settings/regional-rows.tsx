@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { SettingRow } from '../../shared/setting-row/setting-row';
 import { SettingsCombobox } from '../../shared/settings-combobox/settings-combobox';
 import { SettingsSelect } from '../../shared/settings-select/settings-select';
@@ -15,25 +16,39 @@ type RowProps<Key extends keyof RegionalSettings> = {
 };
 
 // Each language in its own name, then in English for anyone who cannot read it.
-// No flags: a language is not a country.
-const languageOptions: {
+// No flags: a language is not a country. The own name carries its `lang` so a
+// screen reader says it in that language's voice (WCAG 3.1.2).
+const languageNames: {
   value: RegionalSettings['language'];
-  label: string;
+  native: string;
+  english: string;
 }[] = [
-  { value: 'en', label: 'English' },
-  { value: 'es', label: 'Español — Spanish' },
-  { value: 'fr', label: 'Français — French' },
-  { value: 'de', label: 'Deutsch — German' },
-  { value: 'zh', label: '中文 — Chinese' },
-  { value: 'ja', label: '日本語 — Japanese' },
+  { value: 'en', native: 'English', english: 'English' },
+  { value: 'es', native: 'Español', english: 'Spanish' },
+  { value: 'fr', native: 'Français', english: 'French' },
+  { value: 'de', native: 'Deutsch', english: 'German' },
+  { value: 'zh', native: '中文', english: 'Chinese' },
+  { value: 'ja', native: '日本語', english: 'Japanese' },
 ];
+
+const languageOptions = languageNames.map(({ value, native, english }) => ({
+  value,
+  label:
+    native === english ? (
+      english
+    ) : (
+      <>
+        <span lang={value}>{native}</span> — {english}
+      </>
+    ),
+}));
 
 export function LanguageRow({ value, onChange }: RowProps<'language'>) {
   return (
     <SettingRow
       id="language"
       label="Preferred language"
-      description="Your preferred language for your workspace."
+      description="Used to write out times. Menus and labels are in English."
     >
       <SettingsSelect<RegionalSettings['language']>
         id="language"
@@ -43,6 +58,32 @@ export function LanguageRow({ value, onChange }: RowProps<'language'>) {
       />
     </SettingRow>
   );
+}
+
+/**
+ * The zone's current UTC offset to show beside it, and the names people search
+ * by instead of the IANA city: "Pacific Daylight Time", "PDT", "GMT-7".
+ */
+function describeTimezone(timezone: string, date: Date) {
+  const name = (timeZoneName: Intl.DateTimeFormatOptions['timeZoneName']) =>
+    new Intl.DateTimeFormat('en-US', { timeZone: timezone, timeZoneName })
+      .formatToParts(date)
+      .find((part) => part.type === 'timeZoneName')?.value ?? '';
+  // "GMT-07:00" reads as "UTC−07:00"; the bare "GMT" of UTC itself as "UTC±00:00".
+  const offset = name('longOffset');
+  const detail =
+    offset === 'GMT'
+      ? 'UTC±00:00'
+      : offset.replace('GMT', 'UTC').replace('-', '−');
+  return {
+    detail,
+    keywords: [
+      offset,
+      offset.replace('GMT', 'UTC'),
+      name('short'),
+      name('long'),
+    ].join(' '),
+  };
 }
 
 export function TimezoneRow({
@@ -55,19 +96,26 @@ export function TimezoneRow({
   /** Known only in the browser; null during the server render. */
   deviceTimezone: string | null;
 }) {
-  const device = {
-    value: SYSTEM_TIMEZONE,
-    label: deviceTimezone
-      ? `Device (${deviceTimezone.replaceAll('_', ' ')})`
-      : 'Device timezone',
-  };
-  // Preserve valid saved aliases or offsets absent from the canonical zone list.
-  const zones = [...new Set(['UTC', value, ...timezones])]
-    .filter((timezone) => timezone !== SYSTEM_TIMEZONE)
-    .map((timezone) => ({
-      value: timezone,
-      label: timezone.replaceAll('_', ' '),
-    }));
+  // Built once per list, not on every clock tick: there are over 400 zones.
+  const options = useMemo(() => {
+    const now = new Date();
+    const device = {
+      value: SYSTEM_TIMEZONE,
+      label: deviceTimezone
+        ? `Device (${deviceTimezone.replaceAll('_', ' ')})`
+        : 'Device timezone',
+      ...(deviceTimezone && describeTimezone(deviceTimezone, now)),
+    };
+    // Preserve valid saved aliases or offsets absent from the canonical zone list.
+    const zones = [...new Set(['UTC', value, ...timezones])]
+      .filter((timezone) => timezone !== SYSTEM_TIMEZONE)
+      .map((timezone) => ({
+        value: timezone,
+        label: timezone.replaceAll('_', ' '),
+        ...describeTimezone(timezone, now),
+      }));
+    return [device, ...zones];
+  }, [value, timezones, deviceTimezone]);
   return (
     <SettingRow
       id="timezone"
@@ -78,7 +126,7 @@ export function TimezoneRow({
         id="timezone"
         value={value}
         onChange={onChange}
-        options={[device, ...zones]}
+        options={options}
         placeholder="Search timezones…"
         empty="No timezone matches."
       />
@@ -196,13 +244,15 @@ export function FirstDayOfWeekRow({
 }
 
 // `grouping` picks the digit grouping: en-IN groups by lakh and crore (12,34,567).
+// The space group is a narrow no-break space, as CLDR writes it, so a number
+// never wraps between its digit groups.
 const numberFormatParts: Record<
   RegionalSettings['numberFormat'],
   { group: string; decimal: string; grouping: 'en-US' | 'en-IN' }
 > = {
   '1,000.00': { group: ',', decimal: '.', grouping: 'en-US' },
   '1.000,00': { group: '.', decimal: ',', grouping: 'en-US' },
-  '1 000,00': { group: ' ', decimal: ',', grouping: 'en-US' },
+  '1 000,00': { group: ' ', decimal: ',', grouping: 'en-US' },
   "1'000.00": { group: "'", decimal: '.', grouping: 'en-US' },
   '1,00,000.00': { group: ',', decimal: '.', grouping: 'en-IN' },
 };

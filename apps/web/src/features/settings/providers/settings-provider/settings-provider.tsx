@@ -33,6 +33,7 @@ import { applyFontPreferences } from '../../shared/font-preferences';
 import { settingsDefaults } from '../../types/settings';
 import type { Settings, SettingsPatch } from '../../types';
 import { themeSchema } from '../../types/theme';
+import { pageLanguage } from '../../types/regional';
 import {
   applyAppearance,
   PREFERENCES_SAVED_EVENT,
@@ -248,9 +249,9 @@ export function SettingsProvider({
   const { language } = settings.regional;
   useEffect(() => {
     // Same wait as above. The root layout renders `lang="en"`; this follows
-    // the saved choice so assistive tech and font fallback use the right one.
+    // the saved choice once the interface is written in it (see pageLanguage).
     if (!isReady) return;
-    document.documentElement.lang = language;
+    document.documentElement.lang = pageLanguage(language);
   }, [isReady, language]);
 
   useEffect(() => {

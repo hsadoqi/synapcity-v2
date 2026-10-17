@@ -18,11 +18,11 @@ afterEach(() => {
 const tab = (value: string) => tabs.find((entry) => entry.value === value)!;
 
 describe('SettingsTabs', () => {
-  // Opening a link such as /settings#regional once drew the Theme tab first,
+  // Opening a link such as /settings#regional once drew the default tab first,
   // then swapped to Regional: the content flashed and the page height jumped
-  // twice while each tab loaded.
-  it('opens the tab named in the URL without loading the Theme tab first', async () => {
-    const loadTheme = vi.spyOn(tab('theme'), 'component');
+  // twice while each tab loaded. The default is Account.
+  it('opens the tab named in the URL without loading the Account tab first', async () => {
+    const loadAccount = vi.spyOn(tab('account'), 'component');
     window.location.hash = 'regional';
 
     await renderWithSettings(<SettingsTabs />);
@@ -39,21 +39,30 @@ describe('SettingsTabs', () => {
         .getByRole('tab', { name: 'Regional' })
         .getAttribute('aria-selected'),
     ).toBe('true');
-    expect(loadTheme).not.toHaveBeenCalled();
+    expect(loadAccount).not.toHaveBeenCalled();
     expect(
-      screen.queryByRole('combobox', { name: 'Color theme', hidden: true }),
-    ).toBeNull();
+      screen
+        .getByRole('tab', { name: 'Account' })
+        .getAttribute('aria-selected'),
+    ).toBe('false');
   });
 
-  it('opens on the Theme tab when the URL names none', async () => {
+  // Account reads the signed-in user and server actions, which its own tests
+  // mock; here a stand-in shows which tab opened.
+  it('opens on the Account tab when the URL names none', async () => {
+    vi.spyOn(tab('account'), 'component').mockResolvedValue(() => (
+      <p>Account panel</p>
+    ));
+
     await renderWithSettings(<SettingsTabs />);
 
     expect(
-      await screen.findByRole(
-        'combobox',
-        { name: 'Color theme' },
-        { timeout: 5000 },
-      ),
+      await screen.findByText('Account panel', {}, { timeout: 5000 }),
     ).toBeTruthy();
+    expect(
+      screen
+        .getByRole('tab', { name: 'Account' })
+        .getAttribute('aria-selected'),
+    ).toBe('true');
   });
 });

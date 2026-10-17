@@ -28,10 +28,22 @@ export function RegionalSettings() {
       setTimezones(Intl.supportedValuesOf('timeZone'));
       setDeviceTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone);
     }, 0);
-    const timer = setInterval(() => setPreviewDate(new Date()), 60000);
+    // Tick on the minute, not a minute after opening, so the time preview
+    // never shows the minute that has already passed.
+    let timer: ReturnType<typeof setTimeout>;
+    const tick = () => {
+      timer = setTimeout(
+        () => {
+          setPreviewDate(new Date());
+          tick();
+        },
+        60000 - (Date.now() % 60000),
+      );
+    };
+    tick();
     return () => {
       clearTimeout(initial);
-      clearInterval(timer);
+      clearTimeout(timer);
     };
   }, []);
 

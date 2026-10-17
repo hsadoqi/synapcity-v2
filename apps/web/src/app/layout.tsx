@@ -11,6 +11,7 @@ import { appearanceBootScript } from '@/features/settings/shared/appearance-attr
 import { fontBootScript } from '@/features/settings/shared/font-preferences';
 import { AccountPreferencesSync } from '@/features/settings/components/account-preferences-sync';
 import { getAccountPreferences } from '@/features/settings/server/account-preferences';
+import { pageLanguage } from '@/features/settings/types/regional';
 import { accountLinksFor } from '@/lib/routing/user-paths';
 export const metadata: Metadata = createMetadata({
   siteUrl: process.env.SITE_URL,
@@ -28,7 +29,7 @@ export default async function RootLayout({
   const account = stored?.preferences ?? null;
   return (
     <html
-      lang={account?.regional.language ?? 'en'}
+      lang={pageLanguage(account?.regional.language ?? 'en')}
       className={fontVariables}
       suppressHydrationWarning
     >

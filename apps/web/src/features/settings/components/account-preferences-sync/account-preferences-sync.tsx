@@ -15,6 +15,7 @@ import {
   PREFERENCES_STORAGE_KEY,
 } from '../../shared/appearance-attributes';
 import { applyFontPreferences } from '../../shared/font-preferences';
+import { pageLanguage } from '../../types/regional';
 import { settingsDefaults, type Settings } from '../../types/settings';
 
 function readLocal(): Settings {
@@ -61,7 +62,7 @@ export function AccountPreferencesSync({
       applyAppearance(root, settings.appearance);
       applyFontPreferences(root, settings.theme);
     }
-    root.lang = settings.regional.language;
+    root.lang = pageLanguage(settings.regional.language);
   }, [preferences]);
 
   return null;

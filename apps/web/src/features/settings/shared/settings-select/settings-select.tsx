@@ -8,13 +8,13 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-} from '@synapcity/frontend-ui/components/ui/select';
+} from '@synapcity/frontend-ui/core/select';
 
 type SettingsSelectProps<T extends string> = {
   id: string;
   value: T;
   onChange: (value: T) => void;
-  options: { value: T; label: string; icon?: ReactNode }[];
+  options: { value: T; label: ReactNode; icon?: ReactNode }[];
 };
 
 export function SettingsSelect<T extends string>({

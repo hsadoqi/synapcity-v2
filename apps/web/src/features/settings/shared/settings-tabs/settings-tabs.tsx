@@ -8,13 +8,10 @@ import {
   useState,
   type ComponentType,
 } from 'react';
-import { Tabs, TabsContent } from '@synapcity/frontend-ui/components/ui/tabs';
+import { Tabs, TabsContent } from '@synapcity/frontend-ui/core/tabs';
 import tabs from '../../lib/data/tabs';
 import { SettingsTabsHeader } from './settings-tab-header';
-import {
-  ScrollArea,
-  ScrollBar,
-} from '@synapcity/frontend-ui/components/ui/scroll-area';
+import { ScrollArea, ScrollBar } from '@synapcity/frontend-ui/core/scroll-area';
 
 export const SettingsTabs = () => {
   // null until the URL hash is read. Starting on 'theme' drew and loaded the

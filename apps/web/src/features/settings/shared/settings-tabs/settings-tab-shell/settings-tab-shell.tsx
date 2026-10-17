@@ -4,7 +4,7 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-} from '@synapcity/frontend-ui/components/ui/card';
+} from '@synapcity/frontend-ui/core/card';
 import { ReactNode } from 'react';
 
 export const SettingsTabShell = ({

@@ -54,6 +54,16 @@ export type RegionalSettingsPatch = Partial<RegionalSettings>;
 
 export const regionalDefaults: RegionalSettings = regionalSchema.parse({});
 
+// The languages the interface text is written in. Only these may become the
+// page's `lang`: marking English text as Japanese makes screen readers read it
+// in a Japanese voice (WCAG 3.1.1). Add a language here once it is translated.
+const interfaceLanguages: readonly RegionalSettings['language'][] = ['en'];
+
+/** The `lang` for the page: the saved language once the interface speaks it. */
+export function pageLanguage(language: RegionalSettings['language']) {
+  return interfaceLanguages.includes(language) ? language : 'en';
+}
+
 /** The IANA timezone to format with: the device's when the setting is `system`. */
 export function resolveTimezone(timezone: RegionalSettings['timezone']) {
   return timezone === SYSTEM_TIMEZONE

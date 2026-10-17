@@ -1,6 +1,6 @@
 'use client';
 
-import { FieldGroup } from '@synapcity/frontend-ui/components/ui/field';
+import { FieldGroup } from '@synapcity/frontend-ui/core/field';
 import { useNotificationSettings } from '../../hooks/use-notification-settings';
 import { notificationKinds } from '../../types/notifications';
 import { SettingsTabShell } from '../../shared/settings-tabs/settings-tab-shell/settings-tab-shell';

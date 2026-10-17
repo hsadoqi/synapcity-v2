@@ -4,7 +4,7 @@ import {
   FieldContent,
   FieldDescription,
   FieldLabel,
-} from '@synapcity/frontend-ui/components/ui/field';
+} from '@synapcity/frontend-ui/core/field';
 
 type SettingRowProps = {
   id: string;

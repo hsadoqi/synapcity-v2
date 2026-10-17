@@ -102,7 +102,10 @@ async function choose(label: string, option: string) {
   } else {
     fireEvent.click(control);
   }
-  const item = await screen.findByRole('option', { name: option });
+  // A timezone option also names its UTC offset ("America/New York UTC−04:00").
+  const item = await screen.findByRole('option', {
+    name: (name) => name === option || name.startsWith(`${option} UTC`),
+  });
   fireEvent.pointerDown(item, { pointerType: 'mouse', button: 0 });
   fireEvent.click(item, { detail: 1 });
   await waitFor(() => expect(screen.queryByRole('listbox')).toBeNull());
@@ -209,15 +212,39 @@ describe('regional controls', () => {
     ).toContain('Monday');
   });
 
-  it('sets the page language from the saved language', async () => {
+  it('keeps the page language English while the interface is only in English', async () => {
     localStorage.setItem(
       'synapcity-preferences',
       JSON.stringify({ regional: initialRegional }),
     );
     await mount();
-    expect(document.documentElement.lang).toBe('de');
+    // German saved, but every label is English: lang="de" would make a
+    // screen reader read English in a German voice (WCAG 3.1.1).
+    expect(document.documentElement.lang).toBe('en');
     await choose('Preferred language', '日本語 — Japanese');
-    expect(document.documentElement.lang).toBe('ja');
+    expect(values().regional.language).toBe('ja');
+    expect(document.documentElement.lang).toBe('en');
+  });
+
+  it('marks each language name with its own language', async () => {
+    await mount();
+    fireEvent.click(
+      screen.getByRole('combobox', { name: 'Preferred language' }),
+    );
+    const option = await screen.findByRole('option', {
+      name: '日本語 — Japanese',
+    });
+    expect(option.querySelector('[lang="ja"]')?.textContent).toBe('日本語');
+  });
+
+  it('finds a timezone by its common name or offset', async () => {
+    await mount();
+    const input = screen.getByRole('combobox', { name: 'Timezone' });
+    fireEvent.keyDown(input, { key: 'ArrowDown' });
+    fireEvent.change(input, { target: { value: 'Japan Standard Time' } });
+    expect(
+      await screen.findByRole('option', { name: 'Asia/Tokyo UTC+09:00' }),
+    ).toBeTruthy();
   });
 
   it('keeps display controls working independently of regional settings', async () => {
@@ -305,7 +332,8 @@ describe('regional previews', () => {
   it.each([
     ['1,000.00', '1,234,567.89'],
     ['1.000,00', '1.234.567,89'],
-    ['1 000,00', '1 234 567,89'],
+    // A narrow no-break space, so the number never wraps between groups.
+    ['1 000,00', '1\u202f234\u202f567,89'],
     ["1'000.00", "1'234'567.89"],
     ['1,00,000.00', '12,34,567.89'],
   ] as const)('uses the selected number separators: %s', (value, preview) => {

@@ -32,7 +32,8 @@ describe('AccountPreferencesSync (ADR-0010, every page)', () => {
     );
     render(<AccountPreferencesSync preferences={accountPart(account)} />);
 
-    expect(html.lang).toBe('de');
+    // The interface is English only, so the page stays lang="en" (pageLanguage).
+    expect(html.lang).toBe('en');
     expect(html.style.getPropertyValue('--font-preference-heading')).toContain(
       'Fraunces',
     );
@@ -89,7 +90,7 @@ describe('AccountPreferencesSync (ADR-0010, every page)', () => {
     );
     render(<AccountPreferencesSync preferences={null} />);
 
-    expect(html.lang).toBe('fr');
+    expect(html.lang).toBe('en');
     // Nothing to apply, so nothing is rewritten.
     expect(cached().regional.language).toBe('fr');
     expect(localStorage.getItem(SET_ASIDE_KEY)).toBeNull();

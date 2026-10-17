@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { Button } from '@synapcity/frontend-ui/core/button';
-import { FieldGroup } from '@synapcity/frontend-ui/components/ui/field';
-import { Separator } from '@synapcity/frontend-ui/components/ui/separator';
+import { FieldGroup } from '@synapcity/frontend-ui/core/field';
+import { Separator } from '@synapcity/frontend-ui/core/separator';
 import { cn } from '@/lib/utils';
 import { useThemeDraft } from '../../hooks/use-theme-draft';
 import { SettingsTabShell } from '../../shared/settings-tabs/settings-tab-shell/settings-tab-shell';
