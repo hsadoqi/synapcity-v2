@@ -48,6 +48,7 @@ vi.mock('@/lib/supabase/server', () => ({
 
 import {
   requestEmailChange,
+  requestOwnPasswordReset,
   requestPasswordReset,
   resendConfirmation,
   resendEmailChange,
@@ -589,6 +590,20 @@ describe('changing the email', () => {
       expect(state.error).toBeUndefined();
     });
 
+    it('says the address was updated, and sent no link, when the project applies it at once', async () => {
+      mocks.updateUser.mockResolvedValue({
+        data: { user: { id: USER_ID, email: NEW } },
+        error: null,
+      });
+
+      const state = await requestEmailChange({}, form({ email: NEW }));
+
+      expect(state.success).toBe(true);
+      expect(state.message).toBe('Email address updated.');
+      expect(state.message).not.toMatch(/link/i);
+      expect(mocks.revalidatePath).toHaveBeenCalledWith('/', 'layout');
+    });
+
     it('words the success so it is true whether or not the current address must confirm too', async () => {
       const state = await requestEmailChange({}, form({ email: NEW }));
 
@@ -738,5 +753,108 @@ describe('changing the email', () => {
       expect(JSON.stringify(warn.mock.calls)).not.toContain(NEW);
       warn.mockRestore();
     });
+  });
+});
+
+describe('requestOwnPasswordReset', () => {
+  const OWN = 'ada@example.com';
+  const SIGNED_OUT =
+    'For your security, sign out, sign in again, then try once more.';
+  const signedIn = (email: string | null = OWN) =>
+    mocks.getUser.mockResolvedValue({
+      data: { user: { id: USER_ID, email: email ?? undefined } },
+      error: null,
+    });
+
+  beforeEach(() => {
+    signedIn();
+    mocks.resetPasswordForEmail.mockResolvedValue({ data: {}, error: null });
+  });
+
+  it('sends the link to their own address, through the same reset flow as the public form', async () => {
+    const state = await requestOwnPasswordReset({}, form({}));
+
+    expect(mocks.resetPasswordForEmail).toHaveBeenCalledExactlyOnceWith(OWN, {
+      redirectTo:
+        'https://app.test/auth/callback?next=%2Fauth%2Fupdate-password&flow=reset',
+    });
+    expect(state.success).toBe(true);
+    expect(state.message).toBe(
+      `We sent a link to ${OWN}. Open it to choose a new password.`,
+    );
+  });
+
+  it('ignores any address in the form', async () => {
+    await requestOwnPasswordReset({}, form({ email: 'attacker@evil.test' }));
+
+    expect(
+      JSON.stringify(mocks.resetPasswordForEmail.mock.calls),
+    ).not.toContain('attacker');
+  });
+
+  it('needs a session', async () => {
+    mocks.getUser.mockResolvedValue({
+      data: { user: null },
+      error: { code: 'session_not_found' },
+    });
+
+    const state = await requestOwnPasswordReset({}, form({}));
+
+    expect(state.error).toBe(SIGNED_OUT);
+    expect(mocks.resetPasswordForEmail).not.toHaveBeenCalled();
+  });
+
+  it('does not call an outage a signed-out session', async () => {
+    mocks.getUser.mockResolvedValue({
+      data: { user: null },
+      error: new AuthRetryableFetchError('fetch failed', 0),
+    });
+
+    const state = await requestOwnPasswordReset({}, form({}));
+
+    expect(state.error).toBe('Something went wrong. Try again.');
+  });
+
+  it('says so when the account has no email', async () => {
+    signedIn(null);
+
+    const state = await requestOwnPasswordReset({}, form({}));
+
+    expect(state.error).toBe(
+      'This account has no email address to send a link to.',
+    );
+    expect(mocks.resetPasswordForEmail).not.toHaveBeenCalled();
+  });
+
+  it('shows a rate limit', async () => {
+    mocks.resetPasswordForEmail.mockResolvedValue({
+      data: {},
+      error: { code: 'over_email_send_rate_limit' },
+    });
+
+    const state = await requestOwnPasswordReset({}, form({}));
+
+    expect(state.error).toBe(
+      'Too many attempts. Wait a few minutes and try again.',
+    );
+    expect(state.success).toBeUndefined();
+  });
+
+  it('is honest about any other failure, and logs only its code', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    mocks.resetPasswordForEmail.mockResolvedValue({
+      data: {},
+      error: { code: 'unexpected_failure', message: `failed for ${OWN}` },
+    });
+
+    const state = await requestOwnPasswordReset({}, form({}));
+
+    expect(state.error).toBe('Something went wrong. Try again.');
+    expect(state.success).toBeUndefined();
+    expect(warn).toHaveBeenCalledWith('requestOwnPasswordReset failed', {
+      code: 'unexpected_failure',
+    });
+    expect(JSON.stringify(warn.mock.calls)).not.toContain(OWN);
+    warn.mockRestore();
   });
 });

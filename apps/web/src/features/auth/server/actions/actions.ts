@@ -36,6 +36,7 @@ import {
   registerWithPassword,
   requestRecoveryEmail,
   resendEmailChange as resendEmailChangeOperation,
+  sendOwnPasswordReset,
 } from '../operations';
 
 const OAUTH_PROVIDERS = ['google', 'github'] as const;
@@ -334,6 +335,9 @@ export async function requestEmailChange(
         { email },
         emailChangeErrorFields(outcome.code),
       );
+    case 'changed':
+      revalidatePath('/', 'layout');
+      return authSuccess('Email address updated.', { email });
     case 'requested':
       revalidatePath('/', 'layout');
       return authSuccess(
@@ -369,5 +373,41 @@ export async function resendEmailChange(
       return authSuccess('Requested again. It can take a minute to arrive.', {
         email: outcome.email,
       });
+  }
+}
+
+/**
+ * Sends the signed-in person a link to choose a new password. It takes no
+ * input: the address is their own, read from the provider, and the link goes
+ * through the same reset flow as the public form.
+ */
+export async function requestOwnPasswordReset(
+  _previous: AuthState,
+  _formData: FormData,
+): Promise<AuthState> {
+  const outcome = await sendOwnPasswordReset({
+    resetRedirect: callbackUrl(getOrigin(), '/auth/update-password', 'reset'),
+  });
+
+  switch (outcome.kind) {
+    case 'signed-out':
+      return authFailure(SIGNED_OUT, { email: '' });
+    case 'unavailable':
+      return authFailure(TRY_AGAIN, { email: '' });
+    case 'no-email':
+      return authFailure(
+        'This account has no email address to send a link to.',
+        { email: '' },
+      );
+    case 'rate-limited':
+      return authFailure(authErrorMessage(outcome.code), { email: '' });
+    case 'provider-error':
+      console.warn('requestOwnPasswordReset failed', { code: outcome.code });
+      return authFailure(authErrorMessage(outcome.code), { email: '' });
+    case 'sent':
+      return authSuccess(
+        `We sent a link to ${outcome.email}. Open it to choose a new password.`,
+        { email: outcome.email },
+      );
   }
 }

@@ -18,6 +18,7 @@ import {
   registerWithPassword,
   requestRecoveryEmail,
   resendEmailChange,
+  sendOwnPasswordReset,
 } from './operations';
 
 const PASSWORD = 'sentinel-password-9f3a';
@@ -248,6 +249,42 @@ describe('changeEmail', () => {
     expect(outcome).toEqual({ kind: 'requested' });
   });
 
+  it('reports a link was requested when the provider is holding the change as pending', async () => {
+    mocks.getUser.mockResolvedValue(user());
+    mocks.updateUser.mockResolvedValue({
+      data: {
+        user: {
+          id: 'user-1',
+          email: 'ada@example.com',
+          new_email: 'grace@example.com',
+        },
+      },
+      error: null,
+    });
+
+    expect(await changeEmail(input)).toEqual({ kind: 'requested' });
+  });
+
+  it('reports the address as changed when the project applies it at once, with nothing pending', async () => {
+    mocks.getUser.mockResolvedValue(user());
+    mocks.updateUser.mockResolvedValue({
+      data: { user: { id: 'user-1', email: 'Grace@Example.com' } },
+      error: null,
+    });
+
+    expect(await changeEmail(input)).toEqual({ kind: 'changed' });
+  });
+
+  it('does not call it changed when the address on the account is still the old one', async () => {
+    mocks.getUser.mockResolvedValue(user());
+    mocks.updateUser.mockResolvedValue({
+      data: { user: { id: 'user-1', email: 'ada@example.com' } },
+      error: null,
+    });
+
+    expect(await changeEmail(input)).toEqual({ kind: 'requested' });
+  });
+
   it("compares with the provider's current address, ignoring case", async () => {
     mocks.getUser.mockResolvedValue(user());
 
@@ -361,5 +398,95 @@ describe('resendEmailChange', () => {
       code: 'over_email_send_rate_limit',
     });
     expect(JSON.stringify(outcome)).not.toContain('sentinel');
+  });
+});
+
+describe('sendOwnPasswordReset', () => {
+  const resetRedirect =
+    'https://app.test/auth/callback?next=%2Fauth%2Fupdate-password&flow=reset';
+  const signedIn = (email: string | null = 'ada@example.com') =>
+    mocks.getUser.mockResolvedValue({
+      data: { user: { id: 'user-1', email: email ?? undefined } },
+      error: null,
+    });
+
+  it("sends the link to the account's own address, read from the provider", async () => {
+    signedIn();
+    mocks.resetPasswordForEmail.mockResolvedValue({ data: {}, error: null });
+
+    const outcome = await sendOwnPasswordReset({ resetRedirect });
+
+    expect(mocks.resetPasswordForEmail).toHaveBeenCalledExactlyOnceWith(
+      'ada@example.com',
+      { redirectTo: resetRedirect },
+    );
+    expect(outcome).toEqual({ kind: 'sent', email: 'ada@example.com' });
+  });
+
+  it('takes no address from the caller, so it cannot be aimed elsewhere', async () => {
+    signedIn();
+    mocks.resetPasswordForEmail.mockResolvedValue({ data: {}, error: null });
+
+    await sendOwnPasswordReset({
+      resetRedirect,
+      // @ts-expect-error: there is deliberately no such input
+      email: 'attacker@evil.test',
+    });
+
+    expect(
+      JSON.stringify(mocks.resetPasswordForEmail.mock.calls),
+    ).not.toContain('attacker');
+  });
+
+  it('has nothing to send to when the account has no email', async () => {
+    signedIn(null);
+
+    expect(await sendOwnPasswordReset({ resetRedirect })).toEqual({
+      kind: 'no-email',
+    });
+    expect(mocks.resetPasswordForEmail).not.toHaveBeenCalled();
+  });
+
+  it('tells a missing session from an unreachable service', async () => {
+    mocks.getUser.mockResolvedValue({
+      data: { user: null },
+      error: { code: 'session_not_found' },
+    });
+    expect(await sendOwnPasswordReset({ resetRedirect })).toEqual({
+      kind: 'signed-out',
+    });
+
+    mocks.getUser.mockResolvedValue({
+      data: { user: null },
+      error: new AuthRetryableFetchError('fetch failed', 0),
+    });
+    expect(await sendOwnPasswordReset({ resetRedirect })).toEqual({
+      kind: 'unavailable',
+    });
+    expect(mocks.resetPasswordForEmail).not.toHaveBeenCalled();
+  });
+
+  it('separates a rate limit from any other failure, and keeps SDK objects out of the outcome', async () => {
+    signedIn();
+    mocks.resetPasswordForEmail.mockResolvedValue({
+      data: {},
+      error: { code: 'over_email_send_rate_limit', message: 'sentinel' },
+    });
+    const limited = await sendOwnPasswordReset({ resetRedirect });
+    expect(limited).toEqual({
+      kind: 'rate-limited',
+      code: 'over_email_send_rate_limit',
+    });
+
+    mocks.resetPasswordForEmail.mockResolvedValue({
+      data: {},
+      error: { code: 'unexpected_failure', message: 'sentinel' },
+    });
+    const failed = await sendOwnPasswordReset({ resetRedirect });
+    expect(failed).toEqual({
+      kind: 'provider-error',
+      code: 'unexpected_failure',
+    });
+    expect(JSON.stringify([limited, failed])).not.toContain('sentinel');
   });
 });

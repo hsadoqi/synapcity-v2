@@ -94,6 +94,8 @@ export type EmailChangeInput = {
 export type EmailChangeOutcome =
   /** A confirmation link is on its way; the address changes only once it is used. */
   | { kind: 'requested' }
+  /** The project confirms without email, so the address is already the new one. */
+  | { kind: 'changed' }
   /** Nothing to do: it is already the address on the account. */
   | { kind: 'same-email' }
   /** There is no session, so there is no account to change. */
@@ -122,11 +124,22 @@ export async function changeEmail(
     return { kind: 'same-email' };
   }
 
-  const { error } = await supabase.auth.updateUser(
+  const { data: updated, error } = await supabase.auth.updateUser(
     { email: input.newEmail },
     { emailRedirectTo: input.redirectTo },
   );
   if (error) return { kind: 'provider-error', code: error.code };
+
+  // Without email confirmation the provider applies the change at once, and
+  // nothing is left pending. Saying a link was sent would then be untrue.
+  const user = updated?.user;
+  if (
+    user &&
+    !user.new_email &&
+    user.email?.toLowerCase() === input.newEmail.toLowerCase()
+  ) {
+    return { kind: 'changed' };
+  }
   return { kind: 'requested' };
 }
 
@@ -163,4 +176,43 @@ export async function resendEmailChange(input: {
   });
   if (error) return { kind: 'provider-error', code: error.code };
   return { kind: 'sent', email: pending };
+}
+
+export type OwnPasswordResetOutcome =
+  | { kind: 'sent'; email: string }
+  /** The account has no email address to send a link to. */
+  | { kind: 'no-email' }
+  | { kind: 'signed-out' }
+  | { kind: 'unavailable' }
+  | { kind: 'rate-limited'; code: string }
+  | { kind: 'provider-error'; code: string | undefined };
+
+/**
+ * Sends the password-reset link to the signed-in person's own address. The
+ * address is read from the provider, never taken from the caller, so this
+ * cannot be pointed at anyone else's inbox. Unlike the public reset form it
+ * can say when something failed: the address is the person's own, so there is
+ * no account to hide.
+ */
+export async function sendOwnPasswordReset(input: {
+  resetRedirect: string;
+}): Promise<OwnPasswordResetOutcome> {
+  const supabase = await createClient();
+  const { data, error: userError } = await supabase.auth.getUser();
+  if (userError || !data.user) {
+    return isAuthRetryableFetchError(userError)
+      ? { kind: 'unavailable' }
+      : { kind: 'signed-out' };
+  }
+  const email = data.user.email;
+  if (!email) return { kind: 'no-email' };
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: input.resetRedirect,
+  });
+  if (error?.code && isRateLimited(error.code)) {
+    return { kind: 'rate-limited', code: error.code };
+  }
+  if (error) return { kind: 'provider-error', code: error.code };
+  return { kind: 'sent', email };
 }
