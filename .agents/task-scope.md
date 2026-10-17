@@ -1,5 +1,13 @@
 # Task scope
 
+## Active task: auth review follow-ups AHF-05 part 1, DOM test setup (2026-10-17)
+
+- Goal and mode: implement the first part of AHF-05 of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`; the owner approved recommendation D3 on 2026-10-17: add `@testing-library/react` 16.3.3, `@testing-library/dom` 10.4.2 and `jsdom` 30.1.2 to `apps/web` as dev dependencies (the pins `frontend/ui` and the shared preset already use; no other package changes).
+- Exact change: `apps/web/vitest.config.ts` becomes two Vitest projects, `node` (everything except `*.dom.test.*`) and `dom` (`src/**/*.dom.test.{ts,tsx}` with the shared React preset); creates `use-cooldown.dom.test.tsx` and `use-confirmation.dom.test.tsx` beside the hooks. Updates `apps/web/package.json`, `pnpm-lock.yaml` and this entry. Pnpm also collapsed the duplicate `next@16.4.0` lockfile variant to the one built against `@babel/core` 8.0.1; no version changed.
+- Mutation budgets: dependencies 3 (dev, exact); creates 2 test files; updates 4 (config, manifest, lockfile, this entry); production code, schema, provider state 0.
+- Verification: `pnpm format:check`, `lint`, `typecheck`, `deps`, `test`; removing the cooldown restart or the email focus makes the matching test fail. Not covered: `UserProvider`, profile form, `AuthConfirmation`, error focus and the browser suite (later AHF-05 parts); no live provider or browser-layout proof.
+- Recovery: revert the PR; nothing else changes.
+
 ## Active task: auth review follow-ups AHF-03, import-boundary scanner (2026-10-17)
 
 - Goal and mode: implement AHF-03 of `docs/superpowers/plans/2026-10-16-auth-review-follow-ups.md`; the owner approved recommendation D2 on 2026-10-17: keep the test-based check, repair it with a small comment-aware lexical scanner, add no dependency.
