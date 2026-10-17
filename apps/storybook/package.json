@@ -15,7 +15,7 @@
     "@synapcity/frontend-ui": "workspace:*",
     "next": "16.3.8",
     "react": "19.2.8",
-    "react-dom": "19.2.8",
+    "react-dom": "19.3.0",
     "shadcn": "^4.21.4"
   },
   "devDependencies": {
@@ -32,7 +32,7 @@
     "@tailwindcss/vite": "^4",
     "@types/node": "26.6.5",
     "@types/react": "19.2.18",
-    "@types/react-dom": "19.2.5",
+    "@types/react-dom": "19.3.0",
     "@vitest/browser-playwright": "^4",
     "@vitest/coverage-v8": "^4",
     "eslint": "10.9.1",
