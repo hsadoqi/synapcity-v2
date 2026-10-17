@@ -48,9 +48,14 @@ const regionalControls: Record<keyof typeof regionalSchema.shape, Control> = {
   numberFormat: { role: 'combobox', name: 'Number format' },
 };
 
-const privacyControls: Record<keyof typeof dataPrivacySchema.shape, Control> = {
-  dataSharing: { role: 'switch', name: 'Data sharing with third parties' },
-  tracking: { role: 'switch', name: 'Activity tracking' },
+// `policyVersion` is recorded with each choice, not chosen.
+const privacyControls: Record<
+  Exclude<keyof typeof dataPrivacySchema.shape, 'policyVersion'>,
+  Control
+> = {
+  analytics: { role: 'switch', name: 'Activity tracking' },
+  errorReports: { role: 'switch', name: 'Error reports' },
+  sharing: { role: 'switch', name: 'Data sharing with third parties' },
 };
 
 describe('settings with a control', () => {
@@ -76,7 +81,9 @@ describe('settings with a control', () => {
 
   it('names a control for every data privacy setting', () => {
     expect(Object.keys(privacyControls).sort()).toEqual(
-      Object.keys(dataPrivacySchema.shape).sort(),
+      Object.keys(dataPrivacySchema.shape)
+        .filter((key) => key !== 'policyVersion')
+        .sort(),
     );
   });
 

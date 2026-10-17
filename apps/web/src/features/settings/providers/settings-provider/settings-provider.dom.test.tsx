@@ -27,7 +27,7 @@ function Controls() {
   const { updateRegional } = useRegionalSettings();
   const { updateAppearance } = useAppearanceSettings();
   const { updateNotifications } = useNotificationSettings();
-  const { updatePrivacy } = useDataPrivacySettings();
+  const { setConsent } = useDataPrivacySettings();
   const { updateTheme } = useThemeSettings();
   const { setMode } = useMode();
   return (
@@ -62,7 +62,7 @@ function Controls() {
       >
         Change appearance
       </button>
-      <button onClick={() => updatePrivacy({ tracking: true })}>
+      <button onClick={() => setConsent('analytics', true)}>
         Change privacy
       </button>
       <button onClick={() => updateTheme({ mode: 'dark' })}>Dark mode</button>
@@ -170,7 +170,11 @@ describe('shared SettingsProvider', () => {
     expect(document.documentElement.dataset.reducedMotion).toBe('true');
     expect(document.documentElement.dataset.contrast).toBe('high');
     expect(document.documentElement.dataset.fontSize).toBe('large');
-    expect(values().privacy).toEqual({ dataSharing: false, tracking: true });
+    expect(values().privacy).toMatchObject({
+      analytics: { granted: true },
+      sharing: { granted: false },
+      policyVersion: 1,
+    });
   });
 
   it('uses the root mode provider and observes changes made by other mode controls', async () => {

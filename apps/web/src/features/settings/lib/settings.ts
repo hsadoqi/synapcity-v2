@@ -9,17 +9,23 @@ import {
   transferSchema,
   type TransferSettingsPatch,
 } from '../types/import-export';
+import {
+  LEGACY_PRIVACY_POLICY_VERSION,
+  withCurrentPolicy,
+} from '../types/data-privacy';
 
 export function mergeSettings(value: Settings, patch: SettingsPatch): Settings {
   const mode =
     patch.theme?.mode ?? patch.appearance?.colorScheme ?? value.theme.mode;
-  return settingsSchema.parse({
+  const next = settingsSchema.parse({
     regional: { ...value.regional, ...patch.regional },
     appearance: { ...value.appearance, ...patch.appearance, colorScheme: mode },
     notifications: { ...value.notifications, ...patch.notifications },
     privacy: { ...value.privacy, ...patch.privacy },
     theme: { ...value.theme, ...patch.theme, mode },
   });
+  // Saved, imported or merged, a grant counts only under the current wording.
+  return { ...next, privacy: withCurrentPolicy(next.privacy) };
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -52,6 +58,12 @@ const legacyFields = {
   dateFormat: ['regional', 'dateFormat'],
   showBorders: ['appearance', 'showBorders'],
   animationsEnabled: ['appearance', 'animationsEnabled'],
+} as const;
+
+// Earlier versions named the two privacy choices by what they switched on.
+const legacyPrivacyFields = {
+  dataSharing: 'sharing',
+  tracking: 'analytics',
 } as const;
 
 // Import and storage restoration share validation, including the old flat shape.
@@ -109,12 +121,27 @@ export function parseImportPatch(input: unknown) {
       }
     } else if (Object.hasOwn(transferSchema.shape, key) && isRecord(value)) {
       for (const [field, item] of Object.entries(value)) {
-        accept(
-          key as keyof TransferSettingsPatch,
-          field,
-          item,
-          `${key}.${field}`,
-        );
+        if (key === 'privacy' && Object.hasOwn(legacyPrivacyFields, field)) {
+          const renamed =
+            legacyPrivacyFields[field as keyof typeof legacyPrivacyFields];
+          // As above, the current name takes precedence over the old one.
+          if (Object.hasOwn(value, renamed)) {
+            ignored.push(`${key}.${field}`);
+            continue;
+          }
+          accept('privacy', renamed, item, `${key}.${field}`);
+          // An old choice was made under the first wording; keep it.
+          if (patch.privacy && !Object.hasOwn(value, 'policyVersion')) {
+            patch.privacy.policyVersion = LEGACY_PRIVACY_POLICY_VERSION;
+          }
+        } else {
+          accept(
+            key as keyof TransferSettingsPatch,
+            field,
+            item,
+            `${key}.${field}`,
+          );
+        }
       }
     } else {
       ignored.push(key);

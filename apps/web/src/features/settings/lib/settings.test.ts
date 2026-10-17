@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { mergeSettings, parseImport, parseImportPatch } from './settings';
 import { settingsDefaults, settingsSchema } from '../types/settings';
+import {
+  LEGACY_PRIVACY_POLICY_VERSION,
+  PRIVACY_POLICY_VERSION,
+} from '../types/data-privacy';
 
 describe('settings merge and import', () => {
   it('fills appearance fields missing from an older saved object', () => {
@@ -25,7 +29,13 @@ describe('settings merge and import', () => {
         account: { password: 'never-import-this' },
       }),
     ).toEqual({
-      patch: { regional: { language: 'fr' }, privacy: { tracking: false } },
+      patch: {
+        regional: { language: 'fr' },
+        privacy: {
+          analytics: { granted: false, updatedAt: null },
+          policyVersion: LEGACY_PRIVACY_POLICY_VERSION,
+        },
+      },
       ignored: ['regional.timezone', 'account'],
     });
   });
@@ -74,7 +84,10 @@ describe('settings merge and import', () => {
     const next = mergeSettings(settingsDefaults, {
       appearance: { showBorders: true },
       notifications: { push: true },
-      privacy: { tracking: true },
+      privacy: {
+        analytics: { granted: true, updatedAt: null },
+        policyVersion: PRIVACY_POLICY_VERSION,
+      },
     });
     expect(next.appearance).toEqual({
       ...settingsDefaults.appearance,
@@ -85,7 +98,11 @@ describe('settings merge and import', () => {
       push: true,
       sound: true,
     });
-    expect(next.privacy).toEqual({ dataSharing: false, tracking: true });
+    expect(next.privacy).toEqual({
+      ...settingsDefaults.privacy,
+      analytics: { granted: true, updatedAt: null },
+      policyVersion: PRIVACY_POLICY_VERSION,
+    });
   });
 
   it('keeps the two existing mode fields aligned, with explicit theme mode taking precedence', () => {
@@ -160,7 +177,7 @@ describe('settings merge and import', () => {
     });
     expect(result.settings.theme.mode).toBe('dark');
     expect(result.settings.notifications.email).toBe(false);
-    expect(result.settings.privacy.tracking).toBe(true);
+    expect(result.settings.privacy.analytics.granted).toBe(true);
     expect(result.ignored).toContain('name');
   });
 
@@ -195,7 +212,7 @@ describe('settings merge and import', () => {
       showBorders: true,
       fontSize: 'large',
     });
-    expect(result.settings.privacy.tracking).toBe(false);
+    expect(result.settings.privacy.analytics.granted).toBe(false);
     expect(result.ignored).toEqual(['regional', 'notifications']);
   });
 
@@ -260,5 +277,45 @@ describe('settings merge and import', () => {
       changed,
     );
     expect(mergeSettings(changed, settingsDefaults)).toEqual(settingsDefaults);
+  });
+
+  it('reads the old privacy names, keeping those choices', () => {
+    const { patch, ignored } = parseImportPatch({
+      privacy: { dataSharing: true, tracking: false },
+    });
+    expect(patch.privacy).toEqual({
+      sharing: { granted: true, updatedAt: null },
+      analytics: { granted: false, updatedAt: null },
+      policyVersion: LEGACY_PRIVACY_POLICY_VERSION,
+    });
+    expect(ignored).toEqual([]);
+    expect(
+      parseImport({ privacy: { dataSharing: true } }).settings.privacy,
+    ).toMatchObject({ sharing: { granted: true } });
+  });
+
+  it('prefers the current privacy name over the old one regardless of order', () => {
+    const current = { granted: false, updatedAt: null };
+    for (const privacy of [
+      { dataSharing: true, sharing: current },
+      { sharing: current, dataSharing: true },
+    ]) {
+      const result = parseImportPatch({ privacy });
+      expect(result.patch.privacy?.sharing).toEqual(current);
+      expect(result.ignored).toEqual(['privacy.dataSharing']);
+    }
+  });
+
+  it('turns off imported grants made under other wording', () => {
+    const at = '2026-10-17T12:00:00.000Z';
+    for (const policyVersion of [undefined, PRIVACY_POLICY_VERSION + 1]) {
+      const result = parseImport({
+        privacy: { analytics: { granted: true, updatedAt: at }, policyVersion },
+      });
+      expect(result.settings.privacy.analytics).toEqual({
+        granted: false,
+        updatedAt: at,
+      });
+    }
   });
 });
