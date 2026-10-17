@@ -48,7 +48,7 @@ The final package count, names, categories, exported APIs or framework coupling;
 - Current [workspace conventions](../workspace-conventions.md) put server/application-runtime code in apps and permit `dev`/`frontend` categories. A server-capable or framework-specific auth package may require a separately reviewed category/runtime amendment. Record the needed change rather than excluding the candidate or silently overriding the convention.
 - The [package checklist](../package-creation-checklist.md) requires a real use case and responsibility; it does not require two consumers.
 - Auth metadata and the approved `profiles` table remain distinct sources; future profile storage/ownership is a separate decision.
-- Automated import-boundary enforcement remains open; no enforcement tool is selected.
+- Automated import-boundary enforcement was open when this section was written. The Selection below (2026-10-14) chose a Vitest test; this line is kept as history. Reconciliation note, 2026-10-17: the layout choice (Candidate A) is selected and executed; what stays open here is the package/category question for a future auth package, profile storage, and a transitive import-graph check (the test checks direct imports only).
 
 ## Governance boundary
 

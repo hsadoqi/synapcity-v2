@@ -1,6 +1,6 @@
 # Auth organization refactor: proposed specification
 
-**Status:** Draft requirements; linked ADRs are Proposed; not approved for implementation.  
+**Status:** Draft requirements as written on 2026-10-13. Reconciliation note, 2026-10-17: ADR-0007, ADR-0008 and ADR-0009 are now Accepted, and the layout is selected and implemented; the body below is kept as the original proposal and still calls them Proposed. Requirements are not thereby declared verified; see the follow-up plan for what is tested.  
 **Date:** 2026-10-13.  
 **Source snapshot:** Live working tree on `fix/auth-ui`, including concurrent uncommitted changes. Re-inventory before execution.  
 **Companion plan:** [Auth refactor plan](../plans/2026-10-13-auth-refactor.md).
