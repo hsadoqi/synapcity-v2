@@ -96,7 +96,8 @@ const values = () => JSON.parse(screen.getByTestId('settings').textContent!);
 async function choose(label: string, option: string) {
   const control = screen.getByRole('combobox', { name: label });
   if (control instanceof HTMLInputElement) {
-    // The timezone list is searchable: type to narrow it, then pick.
+    // The timezone list is searchable: open it, type to narrow it, then pick.
+    fireEvent.keyDown(control, { key: 'ArrowDown' });
     fireEvent.change(control, { target: { value: option } });
   } else {
     fireEvent.click(control);

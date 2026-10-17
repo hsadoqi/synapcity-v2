@@ -20,6 +20,7 @@ export function stubBrowser() {
   }
   // Chosen fonts live on <html>'s style and as <link>s in <head>, also shared.
   document.documentElement.removeAttribute('style');
+  document.documentElement.removeAttribute('lang');
   document.head.innerHTML = '';
   vi.stubGlobal(
     'matchMedia',

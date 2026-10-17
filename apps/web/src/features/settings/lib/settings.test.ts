@@ -67,7 +67,7 @@ describe('settings merge and import', () => {
     expect(next.regional).toEqual({ ...current.regional, language: 'fr' });
     expect(next.notifications).toEqual(current.notifications);
     expect(current.regional.language).toBe('en');
-    expect(settingsDefaults.regional.timezone).toBe('UTC');
+    expect(settingsDefaults.regional.timezone).toBe('system');
   });
 
   it('merges partial appearance, notification and privacy patches', () => {
@@ -107,7 +107,7 @@ describe('settings merge and import', () => {
         regional: { timezone: 'Invalid/Zone' },
       }),
     ).toThrow();
-    expect(settingsDefaults.regional.timezone).toBe('UTC');
+    expect(settingsDefaults.regional.timezone).toBe('system');
   });
 
   it('imports valid leaves while reporting invalid and unknown leaves', () => {
