@@ -34,6 +34,17 @@ export function authErrorMessage(code: string | undefined): string {
       return 'Too many attempts. Wait a few minutes and try again.';
     case 'signup_disabled':
       return 'Sign-ups are closed right now.';
+    case 'reauthentication_needed':
+    case 'session_expired':
+    case 'session_not_found':
+      // Changing a password needs a recent sign-in. The app does not run
+      // Supabase's reauthentication (nonce) step, so signing in again is the fix.
+      return 'For your security, sign out, sign in again, then try once more.';
+    case 'current_password_required':
+      // Supabase's "Require current password" setting. This form has no
+      // current-password field, and a Google or GitHub account has no password
+      // to give, so the setting must stay off for this page to work (ADR-0006).
+      return 'Password changes are unavailable right now. Try again later.';
     default:
       return 'Something went wrong. Try again.';
   }

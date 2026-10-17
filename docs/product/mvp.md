@@ -1,7 +1,7 @@
 # MVP decision boundary
 
 **Status:** Open product decision
-**Current decision:** No first slice has been selected
+**Current decision:** Quick capture, accepted 2026-10-17 in [`first-slice.md`](first-slice.md)
 
 ## Why this document does not contain a feature list
 
