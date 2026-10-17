@@ -7,6 +7,7 @@ import { Separator } from '@synapcity/frontend-ui/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { useThemeDraft } from '../../hooks/use-theme-draft';
 import { SettingsTabShell } from '../../shared/settings-tabs/settings-tab-shell/settings-tab-shell';
+import { SettingsSection } from '../../shared/settings-section';
 import { ThemeLivePreview } from './theme-live-preview/theme-live-preview';
 import { ThemeModeRow } from './theme-rows/theme-rows';
 import { BodyFontRow, CodeFontRow, HeadingFontRow } from './font-rows';
@@ -32,8 +33,7 @@ export function ThemeSettings() {
         <ThemeModeRow value={draft.mode} onChange={(mode) => edit({ mode })} />
       </FieldGroup>
       <Separator />
-      <section className="flex flex-col gap-4">
-        <h3 className="text-sm font-medium">Fonts</h3>
+      <SettingsSection title="Fonts">
         {/* Wider than the gap inside a row, so each sample reads as part of the
             choice above it rather than the next one. */}
         <FieldGroup className="gap-8">
@@ -53,7 +53,7 @@ export function ThemeSettings() {
         <p className="text-xs text-muted-foreground">
           Fonts load from Google Fonts, and only once you choose them.
         </p>
-      </section>
+      </SettingsSection>
       <Separator />
       <ThemeLivePreview theme={draft} />
       {/* The actions sit at the end of a long tab. Once there is something to

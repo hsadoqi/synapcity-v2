@@ -63,10 +63,26 @@
   --tw-exit-blur: 0;
 }
 
+/* Transitions travel too (a sidebar sliding on left and width), so reduced motion keeps only
+ * the ones that change how something looks. Keep this list in step with accessibility.css. */
+:root[data-reduced-motion='true'] *,
+:root[data-reduced-motion='true'] *::before,
+:root[data-reduced-motion='true'] *::after {
+  transition-property:
+    color, background-color, border-color, text-decoration-color, fill, stroke,
+    opacity, box-shadow, outline-color;
+}
+
 :root[data-animations='false'] *,
 :root[data-animations='false'] *::before,
 :root[data-animations='false'] *::after {
   transition-duration: 0s;
+}
+
+/* A spinner keeps turning: it is the only sign that work is in progress. */
+:root[data-animations='false'] :not(.animate-spin),
+:root[data-animations='false'] *::before,
+:root[data-animations='false'] *::after {
   animation-duration: 0.01ms;
   animation-delay: 0s;
 }

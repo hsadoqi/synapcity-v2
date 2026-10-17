@@ -13,6 +13,7 @@ import {
   NumberFormatRow,
 } from './regional-rows';
 import { SettingsTabShell } from '../../shared/settings-tabs';
+import { SettingsSection } from '../../shared/settings-section';
 
 export function RegionalSettings() {
   const { regional, updateRegional } = useRegionalSettings();
@@ -39,18 +40,16 @@ export function RegionalSettings() {
       title="Regional"
       description="How you see dates, times, and numbers."
     >
-      <section className="flex flex-col gap-4">
-        <h3 className="text-sm font-medium">Language</h3>
+      <SettingsSection title="Language">
         <FieldGroup>
           <LanguageRow
             value={regional.language}
             onChange={(language) => updateRegional({ language })}
           />
         </FieldGroup>
-      </section>
+      </SettingsSection>
       <Separator />
-      <section className="flex flex-col gap-4">
-        <h3 className="text-sm font-medium">Date &amp; time</h3>
+      <SettingsSection title="Date & time">
         <FieldGroup>
           <TimezoneRow
             value={regional.timezone}
@@ -76,17 +75,16 @@ export function RegionalSettings() {
             onChange={(firstDayOfWeek) => updateRegional({ firstDayOfWeek })}
           />
         </FieldGroup>
-      </section>
+      </SettingsSection>
       <Separator />
-      <section className="flex flex-col gap-4">
-        <h3 className="text-sm font-medium">Numbers</h3>
+      <SettingsSection title="Numbers">
         <FieldGroup>
           <NumberFormatRow
             value={regional.numberFormat}
             onChange={(numberFormat) => updateRegional({ numberFormat })}
           />
         </FieldGroup>
-      </section>
+      </SettingsSection>
     </SettingsTabShell>
   );
 }
