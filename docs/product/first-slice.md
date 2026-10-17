@@ -1,10 +1,10 @@
 # First-slice decision
 
-Status: Proposed
+Status: Accepted
 Owner: Hanaa (product owner)
 Date: 2026-10-17
 
-The product owner chose **quick capture** as the first slice on 2026-10-17, from three candidates (shared documents across contexts, quick capture, a dashboard of live documents). This record turns that choice into the bounded proof that `docs/product/mvp.md` requires. It is not governing until the owner accepts it. Items marked **Owner decision** are the places where this draft picks a default that the owner must confirm or change.
+The product owner chose **quick capture** as the first slice on 2026-10-17, from three candidates (shared documents across contexts, quick capture, a dashboard of live documents). This record turns that choice into the bounded proof that `docs/product/mvp.md` requires. The owner accepted this record as written on 2026-10-17, including every default marked **Owner decision**. Those markers stay so a later change to one of them is easy to find.
 
 ## Problem and user workflow
 
