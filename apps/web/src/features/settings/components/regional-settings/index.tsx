@@ -18,12 +18,14 @@ export function RegionalSettings() {
   const { regional, updateRegional } = useRegionalSettings();
   const [previewDate, setPreviewDate] = useState<Date | null>(null);
   const [timezones, setTimezones] = useState<string[]>([]);
+  const [deviceTimezone, setDeviceTimezone] = useState<string | null>(null);
 
   useEffect(() => {
     // Keep the initial server/client render identical; populate browser data later.
     const initial = setTimeout(() => {
       setPreviewDate(new Date());
       setTimezones(Intl.supportedValuesOf('timeZone'));
+      setDeviceTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone);
     }, 0);
     const timer = setInterval(() => setPreviewDate(new Date()), 60000);
     return () => {
@@ -54,6 +56,7 @@ export function RegionalSettings() {
             value={regional.timezone}
             onChange={(timezone) => updateRegional({ timezone })}
             timezones={timezones}
+            deviceTimezone={deviceTimezone}
           />
           <TimeFormatRow
             value={regional.timeFormat}

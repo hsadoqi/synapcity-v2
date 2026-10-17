@@ -159,6 +159,14 @@ export function SettingsProvider({
     });
   }, [isReady, headingFont, bodyFont, codeFont]);
 
+  const { language } = settings.regional;
+  useEffect(() => {
+    // Same wait as above. The root layout renders `lang="en"`; this follows
+    // the saved choice so assistive tech and font fallback use the right one.
+    if (!isReady) return;
+    document.documentElement.lang = language;
+  }, [isReady, language]);
+
   useEffect(() => {
     if (status !== 'Saved') return;
     const timer = setTimeout(() => setStatus(''), 3000);

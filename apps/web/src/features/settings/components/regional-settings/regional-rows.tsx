@@ -1,13 +1,32 @@
 'use client';
 
 import { SettingRow } from '../../shared/setting-row/setting-row';
+import { SettingsCombobox } from '../../shared/settings-combobox/settings-combobox';
 import { SettingsSelect } from '../../shared/settings-select/settings-select';
-import type { RegionalSettings } from '../../types/regional';
+import {
+  resolveTimezone,
+  SYSTEM_TIMEZONE,
+  type RegionalSettings,
+} from '../../types/regional';
 
 type RowProps<Key extends keyof RegionalSettings> = {
   value: RegionalSettings[Key];
   onChange: (value: RegionalSettings[Key]) => void;
 };
+
+// Each language in its own name, then in English for anyone who cannot read it.
+// No flags: a language is not a country.
+const languageOptions: {
+  value: RegionalSettings['language'];
+  label: string;
+}[] = [
+  { value: 'en', label: 'English' },
+  { value: 'es', label: 'Español — Spanish' },
+  { value: 'fr', label: 'Français — French' },
+  { value: 'de', label: 'Deutsch — German' },
+  { value: 'zh', label: '中文 — Chinese' },
+  { value: 'ja', label: '日本語 — Japanese' },
+];
 
 export function LanguageRow({ value, onChange }: RowProps<'language'>) {
   return (
@@ -20,14 +39,7 @@ export function LanguageRow({ value, onChange }: RowProps<'language'>) {
         id="language"
         value={value}
         onChange={onChange}
-        options={[
-          { value: 'en', label: '🇺🇸 English' },
-          { value: 'es', label: '🇪🇸 Español' },
-          { value: 'fr', label: '🇫🇷 Français' },
-          { value: 'de', label: '🇩🇪 Deutsch' },
-          { value: 'zh', label: '🇨🇳 中文' },
-          { value: 'ja', label: '🇯🇵 日本語' },
-        ]}
+        options={languageOptions}
       />
     </SettingRow>
   );
@@ -37,25 +49,38 @@ export function TimezoneRow({
   value,
   onChange,
   timezones,
-}: RowProps<'timezone'> & { timezones: readonly string[] }) {
+  deviceTimezone,
+}: RowProps<'timezone'> & {
+  timezones: readonly string[];
+  /** Known only in the browser; null during the server render. */
+  deviceTimezone: string | null;
+}) {
+  const device = {
+    value: SYSTEM_TIMEZONE,
+    label: deviceTimezone
+      ? `Device (${deviceTimezone.replaceAll('_', ' ')})`
+      : 'Device timezone',
+  };
   // Preserve valid saved aliases or offsets absent from the canonical zone list.
-  const options = [...new Set(['UTC', value, ...timezones])].map(
-    (timezone) => ({
+  const zones = [...new Set(['UTC', value, ...timezones])]
+    .filter((timezone) => timezone !== SYSTEM_TIMEZONE)
+    .map((timezone) => ({
       value: timezone,
       label: timezone.replaceAll('_', ' '),
-    }),
-  );
+    }));
   return (
     <SettingRow
       id="timezone"
       label="Timezone"
       description="Use this timezone when displaying dates and times."
     >
-      <SettingsSelect
+      <SettingsCombobox
         id="timezone"
         value={value}
         onChange={onChange}
-        options={options}
+        options={[device, ...zones]}
+        placeholder="Search timezones…"
+        empty="No timezone matches."
       />
     </SettingRow>
   );
@@ -74,7 +99,7 @@ export function TimeFormatRow({
 }) {
   const preview = previewDate
     ? new Intl.DateTimeFormat(language, {
-        timeZone: timezone,
+        timeZone: resolveTimezone(timezone),
         hour: 'numeric',
         minute: '2-digit',
         hourCycle: value === '12-hour' ? 'h12' : 'h23',
@@ -110,7 +135,7 @@ export function DateFormatRow({
 }) {
   const parts = previewDate
     ? new Intl.DateTimeFormat('en-US', {
-        timeZone: timezone,
+        timeZone: resolveTimezone(timezone),
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
@@ -161,29 +186,37 @@ export function FirstDayOfWeekRow({
         value={value}
         onChange={onChange}
         options={[
-          { value: 'Sunday', label: 'Sunday' },
-          { value: 'Monday', label: 'Monday' },
-          { value: 'Saturday', label: 'Saturday' },
+          { value: 'sunday', label: 'Sunday' },
+          { value: 'monday', label: 'Monday' },
+          { value: 'saturday', label: 'Saturday' },
         ]}
       />
     </SettingRow>
   );
 }
 
+// `grouping` picks the digit grouping: en-IN groups by lakh and crore (12,34,567).
+const numberFormatParts: Record<
+  RegionalSettings['numberFormat'],
+  { group: string; decimal: string; grouping: 'en-US' | 'en-IN' }
+> = {
+  '1,000.00': { group: ',', decimal: '.', grouping: 'en-US' },
+  '1.000,00': { group: '.', decimal: ',', grouping: 'en-US' },
+  '1 000,00': { group: ' ', decimal: ',', grouping: 'en-US' },
+  "1'000.00": { group: "'", decimal: '.', grouping: 'en-US' },
+  '1,00,000.00': { group: ',', decimal: '.', grouping: 'en-IN' },
+};
+
 export function NumberFormatRow({ value, onChange }: RowProps<'numberFormat'>) {
-  const separators = {
-    '1,000.00': { group: ',', decimal: '.' },
-    '1.000,00': { group: '.', decimal: ',' },
-    '1 000,00': { group: ' ', decimal: ',' },
-  }[value];
-  const preview = new Intl.NumberFormat('en-US', {
+  const { group, decimal, grouping } = numberFormatParts[value];
+  const preview = new Intl.NumberFormat(grouping, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })
     .formatToParts(1234567.89)
     .map((part) => {
-      if (part.type === 'group') return separators.group;
-      if (part.type === 'decimal') return separators.decimal;
+      if (part.type === 'group') return group;
+      if (part.type === 'decimal') return decimal;
       return part.value;
     })
     .join('');
@@ -197,11 +230,10 @@ export function NumberFormatRow({ value, onChange }: RowProps<'numberFormat'>) {
         id="number-format"
         value={value}
         onChange={onChange}
-        options={[
-          { value: '1,000.00', label: '1,000.00' },
-          { value: '1.000,00', label: '1.000,00' },
-          { value: '1 000,00', label: '1 000,00' },
-        ]}
+        options={Object.keys(numberFormatParts).map((format) => ({
+          value: format as RegionalSettings['numberFormat'],
+          label: format,
+        }))}
       />
     </SettingRow>
   );

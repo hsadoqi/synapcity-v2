@@ -28,11 +28,12 @@ const initialRegional: RegionalSettingsType = {
   dateFormat: 'DD/MM/YYYY',
   timeFormat: '24-hour',
   numberFormat: '1.000,00',
-  firstDayOfWeek: 'Monday',
+  firstDayOfWeek: 'monday',
 };
 
 beforeEach(() => {
   localStorage.clear();
+  document.documentElement.removeAttribute('lang');
   vi.stubGlobal(
     'matchMedia',
     vi.fn(() => ({
@@ -94,7 +95,12 @@ const values = () => JSON.parse(screen.getByTestId('settings').textContent!);
 
 async function choose(label: string, option: string) {
   const control = screen.getByRole('combobox', { name: label });
-  fireEvent.click(control);
+  if (control instanceof HTMLInputElement) {
+    // The timezone list is searchable: type to narrow it, then pick.
+    fireEvent.change(control, { target: { value: option } });
+  } else {
+    fireEvent.click(control);
+  }
   const item = await screen.findByRole('option', { name: option });
   fireEvent.pointerDown(item, { pointerType: 'mouse', button: 0 });
   fireEvent.click(item, { detail: 1 });
@@ -106,7 +112,7 @@ describe('regional controls', () => {
     {
       label: 'Preferred language',
       field: 'language',
-      option: '🇫🇷 Français',
+      option: 'Français — French',
       value: 'fr',
     },
     {
@@ -137,7 +143,7 @@ describe('regional controls', () => {
       label: 'First day of the week',
       field: 'firstDayOfWeek',
       option: 'Saturday',
-      value: 'Saturday',
+      value: 'saturday',
     },
   ])(
     'updates and restores $field without resetting siblings',
@@ -167,10 +173,50 @@ describe('regional controls', () => {
     );
     await mount();
     expect(
-      screen.getByRole('combobox', { name: 'Timezone' }).textContent,
-    ).toContain('US/Eastern');
+      (screen.getByRole('combobox', { name: 'Timezone' }) as HTMLInputElement)
+        .value,
+    ).toBe('US/Eastern');
     await choose('Timezone', 'UTC');
     expect(values().regional.timezone).toBe('UTC');
+  });
+
+  it('follows the device timezone when "Device" is chosen', async () => {
+    localStorage.setItem(
+      'synapcity-preferences',
+      JSON.stringify({ regional: initialRegional }),
+    );
+    await mount();
+    const device = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    await choose('Timezone', `Device (${device.replaceAll('_', ' ')})`);
+    expect(values().regional.timezone).toBe('system');
+    expect(
+      JSON.parse(localStorage.getItem('synapcity-preferences')!).regional
+        .timezone,
+    ).toBe('system');
+  });
+
+  it('reads a first day of the week saved with a capital letter', async () => {
+    localStorage.setItem(
+      'synapcity-preferences',
+      JSON.stringify({ regional: { firstDayOfWeek: 'Monday' } }),
+    );
+    await mount();
+    expect(values().regional.firstDayOfWeek).toBe('monday');
+    expect(
+      screen.getByRole('combobox', { name: 'First day of the week' })
+        .textContent,
+    ).toContain('Monday');
+  });
+
+  it('sets the page language from the saved language', async () => {
+    localStorage.setItem(
+      'synapcity-preferences',
+      JSON.stringify({ regional: initialRegional }),
+    );
+    await mount();
+    expect(document.documentElement.lang).toBe('de');
+    await choose('Preferred language', '日本語 — Japanese');
+    expect(document.documentElement.lang).toBe('ja');
   });
 
   it('keeps display controls working independently of regional settings', async () => {
@@ -211,6 +257,24 @@ describe('regional previews', () => {
     expect(screen.getByText('Today looks like: 2026-01-01')).toBeTruthy();
   });
 
+  it('formats with the device timezone when the setting is "system"', () => {
+    const previewDate = new Date('2026-01-01T00:30:00Z');
+    vi.spyOn(Intl.DateTimeFormat.prototype, 'resolvedOptions').mockReturnValue({
+      ...new Intl.DateTimeFormat('en').resolvedOptions(),
+      timeZone: 'Asia/Tokyo',
+    });
+    render(
+      <TimeFormatRow
+        value="24-hour"
+        onChange={() => {}}
+        timezone="system"
+        language="en"
+        previewDate={previewDate}
+      />,
+    );
+    expect(screen.getByText('Current time looks like: 09:30')).toBeTruthy();
+  });
+
   it('formats midnight correctly in 24-hour and 12-hour modes', () => {
     const previewDate = new Date('2026-01-01T05:30:00Z');
     const component = render(
@@ -241,6 +305,8 @@ describe('regional previews', () => {
     ['1,000.00', '1,234,567.89'],
     ['1.000,00', '1.234.567,89'],
     ['1 000,00', '1 234 567,89'],
+    ["1'000.00", "1'234'567.89"],
+    ['1,00,000.00', '12,34,567.89'],
   ] as const)('uses the selected number separators: %s', (value, preview) => {
     render(<NumberFormatRow value={value} onChange={() => {}} />);
     expect(
