@@ -8,6 +8,7 @@ export const AUTH_FLOWS = [
   'confirm',
   'reset',
   'email-change',
+  'link',
 ] as const;
 export type AuthFlow = (typeof AUTH_FLOWS)[number];
 

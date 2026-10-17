@@ -442,7 +442,8 @@ export async function connectAccount(
 
   switch (outcome.kind) {
     case 'redirect':
-      redirect(outcome.url);
+      // Never returns: the browser is sent to the provider.
+      return redirect(outcome.url);
     case 'signed-out':
       return signedOutFailure('');
     case 'unavailable':
