@@ -62,6 +62,18 @@ export const ReducedMotionRow = (props: RowProps<'reducedMotion'>) => (
   />
 );
 
+export const AllDevicesRow = (props: {
+  value: boolean;
+  onChange: (value: boolean) => void;
+}) => (
+  <SwitchRow
+    id="all-devices"
+    label="Use on all my devices"
+    description="Apply these display settings wherever you sign in. Turn off to give each device its own again."
+    {...props}
+  />
+);
+
 export const FontSizeRow = ({ value, onChange }: RowProps<'fontSize'>) => {
   return (
     <SettingRow

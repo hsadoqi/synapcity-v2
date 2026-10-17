@@ -1,15 +1,6 @@
 import { logFailure, type Supabase } from '@/features/account/server/caller';
-import {
-  readAccountPreferences,
-  type AccountPreferences,
-} from '../lib/scope';
-
-/** What the settings page loads from `user_preferences` (ADR-0010). */
-export type StoredAccountPreferences = {
-  /** null: signed in, but nothing saved to the account yet. */
-  preferences: AccountPreferences | null;
-  deviceTimezone: string | null;
-};
+import type { StoredAccountPreferences } from '../lib/account-sync';
+import { readAccountPreferences } from '../lib/scope';
 
 /**
  * Reads the caller's own preferences row. Returns undefined when the read

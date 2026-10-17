@@ -15,6 +15,20 @@ import {
   parseImport,
   withoutStoredAccount,
 } from '../../lib/settings';
+import {
+  deviceTimezone,
+  readDeviceDisplay,
+  reconcile,
+  writeDeviceDisplay,
+  type AccountSync,
+} from '../../lib/account-sync';
+import {
+  accountPart,
+  displayOf,
+  isDefaultAccount,
+  touchesAccount,
+  type DisplaySettings,
+} from '../../lib/scope';
 import { applyFontPreferences } from '../../shared/font-preferences';
 import { settingsDefaults } from '../../types/settings';
 import type { Settings, SettingsPatch } from '../../types';
@@ -25,6 +39,8 @@ import {
 } from '../../shared/appearance-attributes';
 
 const STORAGE_KEY = PREFERENCES_STORAGE_KEY;
+const NOT_SAVED_TO_ACCOUNT =
+  'Changes apply on this device, but could not be saved to your account.';
 
 type SettingsContextType = {
   settings: Settings;
@@ -33,6 +49,11 @@ type SettingsContextType = {
   name: string | null;
   updateName: (name: string) => void;
   isReady: boolean;
+  /** Whether account preferences are saved to the account (signed in). */
+  syncsToAccount: boolean;
+  /** Whether display settings apply on all the person's devices. */
+  displayOnAllDevices: boolean;
+  setDisplayOnAllDevices: (on: boolean) => void;
 };
 
 export const SettingsContext = createContext<SettingsContextType | null>(null);
@@ -40,9 +61,12 @@ export const SettingsContext = createContext<SettingsContextType | null>(null);
 export function SettingsProvider({
   children,
   name: initialName = null,
+  account,
 }: {
   children: ReactNode;
   name?: string | null;
+  /** Signed in: the saved account preferences and how to save them (ADR-0010). */
+  account?: AccountSync;
 }) {
   const [storedSettings, setStoredSettings] = useState(settingsDefaults);
   const current = useRef(settingsDefaults);
@@ -58,6 +82,12 @@ export function SettingsProvider({
     updateName(initialName);
   }
   const [status, setStatus] = useState('');
+  // Read once, at load, like browser storage; later saves go through `persist`.
+  const accountSync = useRef(account);
+  const override = useRef<DisplaySettings | null>(null);
+  const [displayOverride, setDisplayOverride] =
+    useState<DisplaySettings | null>(null);
+  const saveCount = useRef(0);
   const { nativeMode, setMode } = useMode();
   const parsedMode = themeSchema.shape.mode.safeParse(nativeMode);
   // The existing root ModeProvider owns color mode, including changes elsewhere.
@@ -76,6 +106,27 @@ export function SettingsProvider({
   useEffect(() => {
     current.current = settings;
   }, [settings]);
+
+  /** Saves the account part of `next`. The newest save's outcome is reported. */
+  const persist = useCallback((next: Settings) => {
+    const sync = accountSync.current;
+    if (!sync) return;
+    const count = ++saveCount.current;
+    const report = (error: string | null) => {
+      if (count === saveCount.current && error) setStatus(error);
+    };
+    sync.save(accountPart(next, override.current), deviceTimezone()).then(
+      (result) =>
+        report(
+          result.ok
+            ? null
+            : result.signedOut
+              ? result.error
+              : NOT_SAVED_TO_ACCOUNT,
+        ),
+      () => report(NOT_SAVED_TO_ACCOUNT),
+    );
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -110,13 +161,42 @@ export function SettingsProvider({
       } catch {
         setStatus('Storage unavailable. Changes apply for this visit.');
       }
+      loadAccount();
       ready.current = true;
       setIsReady(true);
     });
     return () => {
       cancelled = true;
     };
-  }, []);
+
+    // The account's own part wins over this browser's copy (ADR-0010).
+    function loadAccount() {
+      const sync = accountSync.current;
+      if (!sync) return;
+      const local = current.current;
+      const stored = sync.stored.preferences;
+      if (!stored) {
+        // First load since signing in: keep choices made before, if any.
+        if (!isDefaultAccount(accountPart(local))) persist(local);
+        return;
+      }
+      const reconciled = reconcile(local, stored, readDeviceDisplay());
+      writeDeviceDisplay(reconciled.setAside);
+      override.current = stored.appearanceOverride ?? null;
+      setDisplayOverride(override.current);
+      current.current = reconciled.settings;
+      setStoredSettings(reconciled.settings);
+      try {
+        // Cache it, so the boot scripts paint these values on the next load.
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(reconciled.settings));
+      } catch {
+        // Still applied for this visit.
+      }
+      if (sync.stored.deviceTimezone !== deviceTimezone()) {
+        persist(reconciled.settings);
+      }
+    }
+  }, [persist]);
 
   const {
     animationsEnabled,
@@ -197,13 +277,71 @@ export function SettingsProvider({
       } catch {
         setStatus('Changes applied. Browser storage is unavailable.');
       }
+      // While display settings apply everywhere, a display change is an
+      // account change too.
+      const displayChanged = Boolean(override.current && patch.appearance);
+      if (displayChanged) {
+        override.current = displayOf(next);
+        setDisplayOverride(override.current);
+      }
+      if (displayChanged || touchesAccount(patch)) persist(next);
     },
-    [mode, setMode],
+    [mode, setMode, persist],
   );
 
+  const setDisplayOnAllDevices = useCallback(
+    (on: boolean) => {
+      if (!ready.current || !accountSync.current) return;
+      const now = current.current;
+      let next = now;
+      if (on) {
+        // Keep this device's own values, to restore when this is turned off.
+        writeDeviceDisplay(displayOf(now));
+        override.current = displayOf(now);
+      } else {
+        const own = readDeviceDisplay();
+        writeDeviceDisplay(null);
+        override.current = null;
+        if (own) next = mergeSettings(now, { appearance: own });
+      }
+      setDisplayOverride(override.current);
+      current.current = next;
+      setStoredSettings(next);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        setStatus('Saved');
+      } catch {
+        setStatus('Changes applied. Browser storage is unavailable.');
+      }
+      persist(next);
+    },
+    [persist],
+  );
+
+  const syncsToAccount = account !== undefined;
+  const displayOnAllDevices = displayOverride !== null;
   const value = useMemo(
-    () => ({ settings, updateSettings, status, name, updateName, isReady }),
-    [settings, updateSettings, status, name, isReady],
+    () => ({
+      settings,
+      updateSettings,
+      status,
+      name,
+      updateName,
+      isReady,
+      syncsToAccount,
+      displayOnAllDevices,
+      setDisplayOnAllDevices,
+    }),
+    [
+      settings,
+      updateSettings,
+      status,
+      name,
+      isReady,
+      syncsToAccount,
+      displayOnAllDevices,
+      setDisplayOnAllDevices,
+    ],
   );
 
   return (

@@ -3,8 +3,10 @@
 import { FieldGroup } from '@synapcity/frontend-ui/core/field';
 import { Separator } from '@synapcity/frontend-ui/core/separator';
 import { useAppearanceSettings } from '../../hooks/use-appearance-settings';
+import { useSettings } from '../../hooks/use-settings';
 import { SettingsTabShell } from '../../shared';
 import {
+  AllDevicesRow,
   ContrastModeRow,
   EnableAnimationsRow,
   FontSizeRow,
@@ -16,6 +18,8 @@ import {
 // the Theme tab, which owns it.
 export function AppearanceSettings() {
   const { appearance, updateAppearance } = useAppearanceSettings();
+  const { syncsToAccount, displayOnAllDevices, setDisplayOnAllDevices } =
+    useSettings();
 
   return (
     <SettingsTabShell
@@ -55,6 +59,20 @@ export function AppearanceSettings() {
           />
         </FieldGroup>
       </section>
+      {syncsToAccount && (
+        <>
+          <Separator />
+          <section className="flex flex-col gap-4">
+            <h3 className="text-sm font-medium">Devices</h3>
+            <FieldGroup>
+              <AllDevicesRow
+                value={displayOnAllDevices}
+                onChange={setDisplayOnAllDevices}
+              />
+            </FieldGroup>
+          </section>
+        </>
+      )}
     </SettingsTabShell>
   );
 }

@@ -6,12 +6,9 @@ import {
   SAVE_FAILED,
 } from '@/features/account/server/caller';
 import { createClient } from '@/lib/supabase/server';
+import type { SavePreferencesResult } from '../../lib/account-sync';
 import { accountPreferencesSchema } from '../../lib/scope';
 import { isSupportedTimezone } from '../../types/regional';
-
-export type SavePreferencesResult =
-  | { ok: true }
-  | { ok: false; error: string; signedOut?: true };
 
 const INVALID = 'Preferences could not be saved. Check the selected values.';
 

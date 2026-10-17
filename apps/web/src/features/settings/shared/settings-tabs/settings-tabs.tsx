@@ -18,6 +18,12 @@ import {
 
 export const SettingsTabs = () => {
   const [tab, setTab] = useState('theme');
+  // A tab stays mounted once opened, so a draft in it (the Theme tab's unsaved
+  // choices) survives a visit to another tab. Tabs never opened still never load.
+  const [visited, setVisited] = useState<ReadonlySet<string>>(
+    () => new Set([tab]),
+  );
+  if (!visited.has(tab)) setVisited(new Set(visited).add(tab));
 
   useEffect(() => {
     const sync = () => {
@@ -54,7 +60,12 @@ export const SettingsTabs = () => {
       <SettingsTabsHeader onTabChange={setTab} />
       <ScrollArea className="w-full overflow-x-auto">
         {lazyTabs.map(({ value, Component }) => (
-          <TabsContent key={value} value={value} className="mt-6">
+          <TabsContent
+            key={value}
+            value={value}
+            keepMounted={visited.has(value)}
+            className="mt-6"
+          >
             <Suspense fallback={null}>
               <Component />
             </Suspense>

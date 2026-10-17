@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ModeProvider } from '@synapcity/frontend-ui/providers/mode-provider';
 
@@ -60,6 +60,32 @@ describe('SettingsContent', () => {
       .map((tab) => tab.label)
       .filter((other) => other !== label);
     expect(otherLabels).not.toContain(title);
+  });
+
+  it('keeps unsaved Theme choices through a visit to another tab', async () => {
+    show();
+    const colorTheme = () =>
+      screen.getByRole('combobox', { name: 'Color theme' });
+    await waitFor(() => colorTheme(), { timeout: 5000 });
+
+    fireEvent.click(colorTheme());
+    const dark = await screen.findByRole('option', { name: 'Dark' });
+    fireEvent.pointerDown(dark, { pointerType: 'mouse', button: 0 });
+    fireEvent.click(dark, { detail: 1 });
+    await waitFor(() => expect(colorTheme().textContent).toContain('Dark'));
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Display' }));
+    await screen.findByRole(
+      'combobox',
+      { name: 'Contrast' },
+      { timeout: 5000 },
+    );
+    fireEvent.click(screen.getByRole('tab', { name: 'Theme' }));
+
+    await waitFor(() => expect(colorTheme().textContent).toContain('Dark'));
+    expect(screen.getByRole('status', { name: '' }).textContent).toBe(
+      'You have unsaved changes.',
+    );
   });
 
   it('opens on the theme tab and loads its content', async () => {
