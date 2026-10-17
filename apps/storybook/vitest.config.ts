@@ -5,10 +5,7 @@ import { defineConfig, mergeConfig } from 'vitest/config';
 
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 
-import {
-  chromiumBrowser,
-  browserConfig,
-} from '@synapcity/dev-vitest-config/browser';
+import { browserConfig } from '@synapcity/dev-vitest-config/browser';
 
 const dirname =
   typeof import.meta.dirname !== 'undefined'
@@ -26,9 +23,11 @@ const config = defineConfig({
           // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
           storybookTest({ configDir: path.join(dirname, '.storybook') }),
         ],
+        // `browser` (headless Chromium) comes from `browserConfig` through
+        // `extends: true`. Declaring it here as well merges the two
+        // `instances` arrays, and every story then runs twice.
         test: {
           name: 'storybook',
-          browser: chromiumBrowser(),
         },
       },
     ],

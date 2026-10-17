@@ -1,0 +1,40 @@
+'use client';
+
+import { useActionState, useId } from 'react';
+import { Button } from '@synapcity/frontend-ui/core/button';
+
+import { updateProfile } from '@/features/account/server/actions';
+import type { ProfileState } from '@/features/account/shared/form-state';
+import { MAX_NAME_LENGTH } from '@/features/account/shared/name';
+import { AuthField } from '@/features/auth/shared/auth-field';
+import { useFocusFirstError } from '@/hooks/use-focus-first-error';
+import { FormMessage } from '@/components/forms/form-message';
+import { fieldErrorProps } from '@/components/forms/form-feedback';
+
+export function ProfileForm({ defaultName }: { defaultName: string }) {
+  const [state, formAction, pending] = useActionState(updateProfile, {
+    name: defaultName,
+  } satisfies ProfileState);
+
+  const formRef = useFocusFirstError(state);
+  const messageId = useId();
+
+  return (
+    <form ref={formRef} action={formAction} className="flex flex-col gap-4">
+      <AuthField
+        id="name"
+        {...fieldErrorProps(state, 'name', messageId)}
+        label="Name"
+        type="text"
+        autoComplete="name"
+        maxLength={MAX_NAME_LENGTH}
+        defaultValue={state.name ?? defaultName}
+        required
+      />
+      <FormMessage id={messageId} state={state} />
+      <Button type="submit" size="lg" disabled={pending} aria-busy={pending}>
+        {pending ? 'Saving…' : 'Save changes'}
+      </Button>
+    </form>
+  );
+}

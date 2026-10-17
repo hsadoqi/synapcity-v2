@@ -1,19 +1,20 @@
-import { SidebarInset } from '../../components/ui/sidebar';
-import { RootSidebar } from './root-sidebar';
-import { SidebarProviders } from './sidebar-providers';
+import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';
+import { SidebarInset } from '@synapcity/frontend-ui/core/sidebar';
+import { RootSidebar } from '@synapcity/frontend-ui/blocks/sidebar-shell/root-sidebar';
+import { SidebarProviders } from '@synapcity/frontend-ui/blocks/sidebar-shell/sidebar-providers';
 
 export const SidebarShell = ({
   header,
-  userId,
+  account,
   children,
 }: {
   header: React.ReactNode | null;
-  userId: string;
+  account: AccountLinks;
   children: React.ReactNode;
 }) => {
   return (
     <SidebarProviders>
-      {userId && <RootSidebar userId={userId} />}
+      <RootSidebar settingsHref={account.settingsHref} />
       {/* The provider is viewport-height, so the header stays put and only the
           work surface below it scrolls. min-w-0 lets wide content shrink
           instead of pushing the inset past the viewport. */}

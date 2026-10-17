@@ -1,8 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-import { authErrorPath, parseAuthFlow } from '@/lib/auth/auth-flow/auth-flow';
-import { homePathFor } from '@/lib/auth/home-path/home-path';
-import { safeNextPath } from '@/lib/auth/safe-next/safe-next';
+import { authErrorPath, parseAuthFlow } from '@/lib/routing/auth-flow';
+import { homePathFor } from '@/lib/routing/user-paths';
+import { safeNextPath } from '@/lib/routing/safe-next';
 import { createClient } from '@/lib/supabase/server';
 
 /**

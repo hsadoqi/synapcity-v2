@@ -1,5 +1,8 @@
 import { fileURLToPath } from 'node:url';
-import { DEFAULT_SEED, createFixtures, type Fixtures } from './index.ts';
+import { createFixtures, type Fixtures } from './index.ts';
+
+// The checked-in seed files use 42; generic fixture consumers keep their default.
+const SEED_FILE_SEED = 42;
 
 /*
  * One entry per seed file: the key is the file name (`seed/<name>.json`) and
@@ -9,6 +12,9 @@ import { DEFAULT_SEED, createFixtures, type Fixtures } from './index.ts';
  */
 export const seedDefinitions = {
   users: (fx: Fixtures) => fx.list(10, fx.person),
+  workspaces: (fx: Fixtures) => fx.list(20, fx.workspace),
+  documents: (fx: Fixtures) => fx.list(20, fx.document),
+  dashboards: (fx: Fixtures) => fx.list(20, fx.dashboard),
 } satisfies Record<string, (fx: Fixtures) => unknown[]>;
 
 export type SeedName = keyof typeof seedDefinitions;
@@ -21,7 +27,7 @@ export function isSeedName(name: string): name is SeedName {
 
 export function buildSeed<N extends SeedName>(
   name: N,
-  seed: number = DEFAULT_SEED,
+  seed: number = SEED_FILE_SEED,
 ): ReturnType<(typeof seedDefinitions)[N]> {
   return seedDefinitions[name](createFixtures(seed)) as ReturnType<
     (typeof seedDefinitions)[N]

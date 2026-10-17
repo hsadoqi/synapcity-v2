@@ -1,15 +1,19 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-import { homePathFor } from '@/lib/auth/home-path/home-path';
-import { safeNextPath } from '@/lib/auth/safe-next/safe-next';
+import { homePathFor } from '@/lib/routing/user-paths';
+import { safeNextPath } from '@/lib/routing/safe-next';
 import { getSupabaseEnv } from './env';
-import { isGuestOnlyPath, isProtectedPath } from './route-access';
+import { isGuestOnlyPath, isProtectedPath } from '../routing/route-access';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   });
+  // The SDK sends cache headers with the first cookie write only, so a page
+  // that sets session cookies is never stored by a shared cache. Every
+  // response this proxy returns, redirects included, has to carry them.
+  let cacheHeaders: Record<string, string> = {};
 
   // With Fluid compute, don't put this client in a global environment
   // variable. Always create a new one on each request.
@@ -19,7 +23,7 @@ export async function updateSession(request: NextRequest) {
       getAll() {
         return request.cookies.getAll();
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet, headers) {
         cookiesToSet.forEach(({ name, value }) =>
           request.cookies.set(name, value),
         );
@@ -29,9 +33,29 @@ export async function updateSession(request: NextRequest) {
         cookiesToSet.forEach(({ name, value, options }) =>
           supabaseResponse.cookies.set(name, value, options),
         );
+        cacheHeaders = { ...cacheHeaders, ...headers };
+        Object.entries(cacheHeaders).forEach(([key, value]) =>
+          supabaseResponse.headers.set(key, value),
+        );
       },
     },
   });
+
+  /**
+   * A redirect replaces `supabaseResponse`, so it must take over the session
+   * cookies getClaims() just refreshed (or the user is signed out) and the
+   * cache headers that came with them.
+   */
+  function redirectWithSession(destination: URL) {
+    const redirect = NextResponse.redirect(destination);
+    supabaseResponse.cookies
+      .getAll()
+      .forEach((cookie) => redirect.cookies.set(cookie));
+    Object.entries(cacheHeaders).forEach(([key, value]) =>
+      redirect.headers.set(key, value),
+    );
+    return redirect;
+  }
 
   // Do not run code between createServerClient and
   // supabase.auth.getClaims(). A simple mistake could make it very hard to debug
@@ -46,8 +70,14 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = '/auth/login';
     url.search = '';
-    url.searchParams.set('next', request.nextUrl.pathname);
-    return NextResponse.redirect(url);
+    // Keep the query so the visitor lands on the same view after signing in.
+    // `request.nextUrl` is untouched by the clone above; the value is still
+    // validated by `safeNextPath` where it is used.
+    url.searchParams.set(
+      'next',
+      `${request.nextUrl.pathname}${request.nextUrl.search}`,
+    );
+    return redirectWithSession(url);
   }
 
   if (user && isGuestOnlyPath(request.nextUrl.pathname)) {
@@ -61,13 +91,7 @@ export async function updateSession(request: NextRequest) {
     // safeNextPath only returns same-origin paths. Assert it anyway, so a later
     // change to that helper cannot turn this into an open redirect.
     if (destination.origin !== request.nextUrl.origin) return supabaseResponse;
-    const redirect = NextResponse.redirect(destination);
-    // Carry over any session cookies getClaims() just refreshed, or this
-    // redirect would drop them and sign the user out.
-    supabaseResponse.cookies
-      .getAll()
-      .forEach((cookie) => redirect.cookies.set(cookie));
-    return redirect;
+    return redirectWithSession(destination);
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.

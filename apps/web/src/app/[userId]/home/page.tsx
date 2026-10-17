@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
 
-import { CurrentUserAvatar } from '@/components/auth/display/current-user-avatar';
-import { SignOutButton } from '@/components/auth/buttons/sign-out-button';
-import { requireOwner } from '@/lib/auth/require-owner/require-owner';
+import { CurrentUserAvatar } from '@/features/auth/components/current-user-avatar';
+import { SignOutButton } from '@/features/auth/components/sign-out-button';
+import { requireOwner } from '@/lib/access/require-owner';
 
 export const metadata: Metadata = { title: 'Home' };
 

@@ -7,7 +7,7 @@ const LOGO_HEIGHT = 150;
 
 /*
  * Monochrome logo as an SVG string: an export of `SynapcityLogo`
- * (packages/frontend/ui/src/components/logo-mark.tsx, the source of truth) and
+ * (packages/frontend/ui/src/components/logo-mark/logo-mark.tsx, the source of truth) and
  * identical to apps/web/public/brand-assets/logo-monochrome.svg. When the
  * geometry changes, re-export both.
  *
@@ -39,7 +39,7 @@ export function OpenGraphCard() {
         background: '#fafafa',
       }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element -- rendered by ImageResponse, not the DOM */}
+      {/* An <img> on purpose: ImageResponse renders this tree, not the DOM. */}
       <img
         src={LOGO_SRC}
         width={LOGO_WIDTH}

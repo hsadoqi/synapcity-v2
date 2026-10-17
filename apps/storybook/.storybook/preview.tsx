@@ -44,7 +44,7 @@ export default definePreview({
       },
       defaultTheme: 'dark',
     }),
-    (Story, { context }) => (
+    (Story) => (
       <div className={`${fontVariables} size-full`}>
         {/* next-themes injects an inline script to avoid a first-paint flash. Nothing server-renders
             here and addon-themes already sets the class, so mark it as a data block: React stops

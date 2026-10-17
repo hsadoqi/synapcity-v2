@@ -1,6 +1,6 @@
 # Auth organization refactor: proposed implementation plan
 
-**Status:** Proposed parent plan; execution not authorized.  
+**Status:** Proposed parent plan. Layout selected, the file moves of section 2 and the operations extraction (ADR-0008) executed 2026-10-14 (see section 5).  
 **Date:** 2026-10-13.  
 **Specification:** [Auth organization refactor](../specs/2026-10-13-auth-refactor-design.md).
 
@@ -183,3 +183,16 @@ Each checkpoint should be recoverable from the captured live baseline. Restore o
 Report final ownership and why each piece belongs there; preserved observable behavior; decisions left open (packages, profile storage, broader authorization and routing architecture); exact checks and results; unrun stages; pre-existing failures; live-provider cases verified/not verified; remaining uncommitted artifacts; and any unresolved risk or next safe action.
 
 **Authoring result:** Proposed ADRs and task plans are prepared; this documentation correction has performed no source implementation or runtime verification. Assess existing overlapping work at ARF-00 rather than treating unchecked tasks as proof that no other implementation exists. Checkboxes in the owning plans remain unchecked. Authoring these files does not accept the ADRs or approve code execution.
+
+## 5. Execution record (2026-10-14)
+
+[ADR-0007](../../architecture/decisions/0007-app-local-auth-and-account-ownership.md) selected the app-local candidate and the table in section 2 was executed on `refactor/auth-features` as written, with these differences:
+
+- `components/auth/form/resend-button.tsx` moved to `features/auth/components/resend-button.tsx` (not in the table; it is auth-specific).
+- `field()` lives at `features/auth/server/form-data.ts`; `AuthState`, `authFailure` and `authSuccess` at `features/auth/shared/form-state.ts` with `AuthFieldName` moved into that contract; `accountLinksFor()` in `lib/routing/user-paths.ts`.
+- `fieldErrorProps` is at `features/auth/shared/form-feedback.ts`; `FormMessage` and `useFocusFirstError` take a minimal `{ error?, message? }` shape and no longer import auth types.
+- `components/index.ts` (an unused barrel) was removed.
+- `features/auth/server/actions.test.ts` already existed from the earlier slice and moved with `actions.ts`.
+- `apps/web/src/architecture.test.ts` enforces the layer boundaries.
+
+`features/auth/server/operations.ts` and `operations.test.ts` were then added per ADR-0008 (registration and recovery only; `resendConfirmation` stays in its action). ADR-0008 and ADR-0007 are Accepted.

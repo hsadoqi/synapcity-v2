@@ -22,7 +22,7 @@ const people = fx.list(5, fx.person);
 ```sh
 pnpm --filter @synapcity/dev-fixtures generate            # every seed
 pnpm --filter @synapcity/dev-fixtures generate users      # one seed
-pnpm --filter @synapcity/dev-fixtures generate users 42   # one seed, another RNG seed
+pnpm --filter @synapcity/dev-fixtures generate users 7    # one seed, another RNG seed
 ```
 
-To add a kind of seed, add a `seedDefinitions` entry and run `generate`. A test per entry fails when a committed file drifts from its definition (it checks the default seed, so commit files generated without a seed argument). Files are exported as `@synapcity/dev-fixtures/data/<name>`. The shapes are placeholders until the data model is decided; nothing consumes them yet.
+To add a kind of seed, add a `seedDefinitions` entry and run `generate`. Seed-file generation defaults to **42**, matching the checked-in files; `createFixtures()` keeps its independent default of **1**. A test per entry fails when a committed file's parsed JSON data drifts from its definition (using seed 42, so commit files generated without a seed argument). JSON whitespace is checked by Prettier. Files are exported as `@synapcity/dev-fixtures/data/<name>`. The shapes are placeholders until the data model is decided; nothing consumes them yet.
