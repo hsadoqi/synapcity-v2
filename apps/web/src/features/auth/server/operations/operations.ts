@@ -1,6 +1,10 @@
-import { isAuthRetryableFetchError } from '@supabase/supabase-js';
+import {
+  isAuthRetryableFetchError,
+  isAuthSessionMissingError,
+} from '@supabase/supabase-js';
 
 import { isRateLimited } from '@/features/auth/shared/error-messages';
+import type { OAuthProvider } from '@/features/auth/shared/oauth-providers';
 import { createClient } from '@/lib/supabase/server';
 
 /*
@@ -215,4 +219,35 @@ export async function sendOwnPasswordReset(input: {
   }
   if (error) return { kind: 'provider-error', code: error.code };
   return { kind: 'sent', email };
+}
+
+export type AccountLinkOutcome =
+  /** Send the browser to the provider; it brings the person back to `redirectTo`. */
+  | { kind: 'redirect'; url: string }
+  | { kind: 'signed-out' }
+  | { kind: 'unavailable' }
+  | { kind: 'provider-error'; code: string | undefined };
+
+/**
+ * Starts linking a Google or GitHub account to the signed-in person's account.
+ * The provider only links an account the person signs in to, and refuses one
+ * that already belongs to this or another account. Linking has to be switched
+ * on in the project's settings; when it is not, the code says so.
+ */
+export async function startAccountLink(input: {
+  provider: OAuthProvider;
+  redirectTo: string;
+}): Promise<AccountLinkOutcome> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.linkIdentity({
+    provider: input.provider,
+    options: { redirectTo: input.redirectTo },
+  });
+  if (error) {
+    if (isAuthSessionMissingError(error)) return { kind: 'signed-out' };
+    if (isAuthRetryableFetchError(error)) return { kind: 'unavailable' };
+    return { kind: 'provider-error', code: error.code };
+  }
+  if (!data?.url) return { kind: 'provider-error', code: undefined };
+  return { kind: 'redirect', url: data.url };
 }

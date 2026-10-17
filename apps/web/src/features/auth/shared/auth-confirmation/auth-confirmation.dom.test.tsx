@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { AuthConfirmation } from './auth-confirmation';
@@ -53,5 +53,41 @@ describe('AuthConfirmation', () => {
       screen.getByRole('button', { name: 'Use a different email' }).click(),
     );
     expect(onEdit).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows no "requested for" line when there is no address to name', () => {
+    render(<AuthConfirmation message="Link sent" email="" />);
+
+    expect(screen.getByRole('status').textContent).toBe('Link sent');
+    expect(screen.queryByText(/Requested for/)).toBeNull();
+  });
+
+  it('offers "use a different email" only when it can go back, and runs it', () => {
+    const onEdit = vi.fn();
+    const { rerender } = render(
+      <AuthConfirmation message="Sent" email="a@b.co" />,
+    );
+    expect(
+      screen.queryByRole('button', { name: 'Use a different email' }),
+    ).toBeNull();
+
+    rerender(
+      <AuthConfirmation message="Sent" email="a@b.co" onEdit={onEdit} />,
+    );
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Use a different email' }),
+    );
+
+    expect(onEdit).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows its follow-up actions, such as resending', () => {
+    render(
+      <AuthConfirmation message="Sent" email="a@b.co">
+        <button type="button">Resend link</button>
+      </AuthConfirmation>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Resend link' })).toBeTruthy();
   });
 });

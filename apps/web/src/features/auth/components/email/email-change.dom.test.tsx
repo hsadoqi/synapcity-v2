@@ -17,6 +17,7 @@ vi.mock('@/features/auth/server/actions/actions', () => ({
 }));
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ refresh: mocks.refresh }),
+  usePathname: () => '/u1/settings',
 }));
 vi.mock('@/lib/supabase/client', () => ({
   createClient: () => ({ auth: { refreshSession: mocks.refreshSession } }),
@@ -144,6 +145,37 @@ describe('EmailChange', () => {
       expect(screen.getByRole('status').textContent).toContain(
         `We sent a confirmation link to ${NEW}.`,
       );
+    });
+
+    it('offers a way back in when the session has gone', async () => {
+      mocks.requestEmailChange.mockResolvedValue({
+        error:
+          'For your security, sign out, sign in again, then try once more.',
+        signedOut: true,
+        data: { user: { email: NEW } },
+      } satisfies AuthState);
+      show();
+      open();
+
+      await send();
+
+      expect(
+        screen
+          .getByRole('link', { name: 'Sign in again' })
+          .getAttribute('href'),
+      ).toBe('/auth/login?next=%2Fu1%2Fsettings');
+    });
+
+    it('offers no link for an error that signing in would not fix', async () => {
+      mocks.requestEmailChange.mockResolvedValue({
+        error: 'Too many attempts. Wait a few minutes and try again.',
+      } satisfies AuthState);
+      show();
+      open();
+
+      await send();
+
+      expect(screen.queryByRole('link', { name: 'Sign in again' })).toBeNull();
     });
 
     it("does not show the last attempt's error again when the form is reopened", async () => {

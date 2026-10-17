@@ -1,6 +1,10 @@
 import { cache } from 'react';
 
 import { createClient } from '@/lib/supabase/server';
+import {
+  connectedAccountsFrom,
+  type ConnectedAccount,
+} from '@/features/auth/shared/connected-accounts';
 
 import {
   currentUserFromClaims,
@@ -25,12 +29,27 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
 });
 
 /**
- * The address a pending email change is waiting on, or null. The token's
- * claims do not carry it, so this asks the provider (a network call): use it
- * only where it is shown, not on every page.
+ * The provider's own record of the signed-in user (a network call), shared by
+ * everything that needs more than the token's claims carry. Memoized per
+ * request, so the settings page asks once however many readers it has.
  */
-export const getPendingEmail = cache(async (): Promise<string | null> => {
+const getProviderUser = cache(async () => {
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
-  return data.user?.new_email ?? null;
+  return data.user ?? null;
 });
+
+/**
+ * The address a pending email change is waiting on, or null. The token's
+ * claims do not carry it, so this asks the provider: use it only where it is
+ * shown, not on every page.
+ */
+export const getPendingEmail = cache(async (): Promise<string | null> => {
+  return (await getProviderUser())?.new_email ?? null;
+});
+
+/** The Google and GitHub accounts linked to this one, as display rows. */
+export const getConnectedAccounts = cache(
+  async (): Promise<ConnectedAccount[]> =>
+    connectedAccountsFrom((await getProviderUser())?.identities),
+);

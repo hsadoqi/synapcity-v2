@@ -303,6 +303,43 @@ describe('updatePassword', () => {
     expect(mocks.updateUser).not.toHaveBeenCalled();
   });
 
+  it('goes back to where the reset was started from, carrying the notice', async () => {
+    mocks.updateUser.mockResolvedValue({
+      data: { user: { id: USER_ID } },
+      error: null,
+    });
+
+    const url = await redirectOf(
+      updatePassword(
+        {},
+        form({
+          password: STRONG,
+          confirm: STRONG,
+          next: `/${USER_ID}/settings`,
+        }),
+      ),
+    );
+
+    expect(url).toBe(`/${USER_ID}/settings?notice=password-updated`);
+  });
+
+  it.each([
+    ['an external URL', 'https://evil.test/steal'],
+    ['a protocol-relative URL', '//evil.test/steal'],
+    ['a script URL', 'javascript:alert(1)'],
+  ])('ignores %s as the place to go back to', async (_label, next) => {
+    mocks.updateUser.mockResolvedValue({
+      data: { user: { id: USER_ID } },
+      error: null,
+    });
+
+    const url = await redirectOf(
+      updatePassword({}, form({ password: STRONG, confirm: STRONG, next })),
+    );
+
+    expect(url).toBe(`/${USER_ID}/home?notice=password-updated`);
+  });
+
   it('goes to the user home after changing it, carrying the notice', async () => {
     mocks.updateUser.mockResolvedValue({
       data: { user: { id: USER_ID } },
@@ -759,11 +796,16 @@ describe('requestOwnPasswordReset', () => {
   const OWN = 'ada@example.com';
   const SIGNED_OUT =
     'For your security, sign out, sign in again, then try once more.';
-  const signedIn = (email: string | null = OWN) =>
+  const signedIn = (email: string | null = OWN) => {
+    mocks.getClaims.mockResolvedValue({
+      data: { claims: { sub: USER_ID, email: OWN } },
+      error: null,
+    });
     mocks.getUser.mockResolvedValue({
       data: { user: { id: USER_ID, email: email ?? undefined } },
       error: null,
     });
+  };
 
   beforeEach(() => {
     signedIn();
@@ -774,8 +816,9 @@ describe('requestOwnPasswordReset', () => {
     const state = await requestOwnPasswordReset({}, form({}));
 
     expect(mocks.resetPasswordForEmail).toHaveBeenCalledExactlyOnceWith(OWN, {
+      // Back to settings once the new password is chosen, not to home.
       redirectTo:
-        'https://app.test/auth/callback?next=%2Fauth%2Fupdate-password&flow=reset',
+        'https://app.test/auth/callback?next=%2Fauth%2Fupdate-password%3Fnext%3D%252Fuser-1%252Fsettings&flow=reset',
     });
     expect(state.success).toBe(true);
     expect(state.message).toBe(
@@ -856,4 +899,81 @@ describe('requestOwnPasswordReset', () => {
     expect(JSON.stringify(warn.mock.calls)).not.toContain(OWN);
     warn.mockRestore();
   });
+});
+
+describe('when the session has gone, the form is told so it can link to sign-in', () => {
+  const claimsGone = () => {
+    mocks.getClaims.mockResolvedValue({ data: null, error: null });
+    mocks.getUser.mockResolvedValue({
+      data: { user: null },
+      error: { code: 'session_not_found' },
+    });
+  };
+  /** Claims still say signed in, but the provider no longer knows the session. */
+  const sessionGoneAtProvider = () => {
+    mocks.getClaims.mockResolvedValue({
+      data: { claims: { sub: USER_ID, email: 'ada@example.com' } },
+      error: null,
+    });
+    mocks.getUser.mockResolvedValue({
+      data: { user: null },
+      error: { code: 'session_not_found' },
+    });
+  };
+  const outage = () => {
+    mocks.getClaims.mockResolvedValue({
+      data: { claims: { sub: USER_ID, email: 'ada@example.com' } },
+      error: null,
+    });
+    mocks.getUser.mockResolvedValue({
+      data: { user: null },
+      error: new AuthRetryableFetchError('fetch failed', 0),
+    });
+  };
+
+  const actions = [
+    [
+      'requestEmailChange',
+      () => requestEmailChange({}, form({ email: 'grace@example.com' })),
+    ],
+    ['resendEmailChange', () => resendEmailChange({}, form({}))],
+    ['requestOwnPasswordReset', () => requestOwnPasswordReset({}, form({}))],
+  ] as const;
+
+  it.each(actions)(
+    '%s flags it when the token has no claims',
+    async (_name, run) => {
+      claimsGone();
+
+      const state = await run();
+
+      expect(state.signedOut).toBe(true);
+      expect(state.error).toBe(
+        'For your security, sign out, sign in again, then try once more.',
+      );
+    },
+  );
+
+  it.each(actions)(
+    '%s flags it when only the provider knows the session is gone',
+    async (_name, run) => {
+      sessionGoneAtProvider();
+
+      const state = await run();
+
+      expect(state.signedOut).toBe(true);
+    },
+  );
+
+  it.each(actions)(
+    '%s does not flag an outage, where signing in again would not help',
+    async (_name, run) => {
+      outage();
+
+      const state = await run();
+
+      expect(state.error).toBe('Something went wrong. Try again.');
+      expect(state.signedOut).toBeUndefined();
+    },
+  );
 });

@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => ({ resendEmailChange: vi.fn() }));
 vi.mock('@/features/auth/server/actions/actions', () => ({
   resendEmailChange: mocks.resendEmailChange,
 }));
+vi.mock('next/navigation', () => ({ usePathname: () => '/u1/settings' }));
 
 import { ResendEmailChange } from './resend-email-change';
 
@@ -76,5 +77,19 @@ describe('ResendEmailChange', () => {
     expect(screen.getByRole('alert').textContent).toBe(
       'Too many attempts. Wait a few minutes and try again.',
     );
+  });
+
+  it('offers a way back in when the session has gone', async () => {
+    mocks.resendEmailChange.mockResolvedValue({
+      error: 'For your security, sign out, sign in again, then try once more.',
+      signedOut: true,
+    } satisfies AuthState);
+    render(<ResendEmailChange justRequested={false} />);
+
+    await submit();
+
+    expect(
+      screen.getByRole('link', { name: 'Sign in again' }).getAttribute('href'),
+    ).toBe('/auth/login?next=%2Fu1%2Fsettings');
   });
 });

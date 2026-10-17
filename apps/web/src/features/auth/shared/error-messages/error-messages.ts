@@ -107,3 +107,19 @@ export function emailChangeErrorFields(
   }
   return authErrorFields(code);
 }
+
+/** The wording for connecting a Google or GitHub account to the signed-in one. */
+export function linkErrorMessage(code: string | undefined): string {
+  switch (code) {
+    case 'manual_linking_disabled':
+      // A project setting, not something the person did.
+      return 'Connecting accounts is not turned on for this app yet.';
+    case 'provider_disabled':
+    case 'oauth_provider_not_supported':
+      return 'That sign-in method is not available right now.';
+    case 'identity_already_exists':
+      return 'That account is already connected.';
+    default:
+      return authErrorMessage(code);
+  }
+}

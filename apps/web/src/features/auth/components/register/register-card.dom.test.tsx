@@ -100,4 +100,19 @@ describe('RegisterCard', () => {
       'Sign up',
     );
   });
+
+  it('still confirms when the accepted sign-up came back without an address to name', async () => {
+    mocks.signUp.mockResolvedValue({
+      success: true,
+      message: 'We sent a confirmation link.',
+    });
+    render(<RegisterCard next="" />);
+
+    await submit();
+
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe(
+      'Check your email',
+    );
+    expect(screen.queryByText(/Requested for/)).toBeNull();
+  });
 });

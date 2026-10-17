@@ -22,7 +22,9 @@ import {
   emailChangeErrorFields,
   emailChangeErrorMessage,
   isRateLimited,
+  linkErrorMessage,
 } from '@/features/auth/shared/error-messages';
+import { isOAuthProvider } from '@/features/auth/shared/oauth-providers';
 import { field } from '@/features/auth/server/form-data';
 import { homePathFor, settingsPathFor } from '@/lib/routing/user-paths';
 import { withNotice } from '@/lib/routing/notices';
@@ -37,14 +39,8 @@ import {
   requestRecoveryEmail,
   resendEmailChange as resendEmailChangeOperation,
   sendOwnPasswordReset,
+  startAccountLink,
 } from '../operations';
-
-const OAUTH_PROVIDERS = ['google', 'github'] as const;
-type OAuthProvider = (typeof OAUTH_PROVIDERS)[number];
-
-function isOAuthProvider(value: string): value is OAuthProvider {
-  return (OAUTH_PROVIDERS as readonly string[]).includes(value);
-}
 
 export async function signInWithPassword(
   _previous: AuthState,
@@ -421,5 +417,41 @@ export async function requestOwnPasswordReset(
         `We sent a link to ${outcome.email}. Open it to choose a new password.`,
         { email: outcome.email },
       );
+  }
+}
+
+/**
+ * Starts connecting a Google or GitHub account to the signed-in person's
+ * account. On success it does not return: it sends the browser to the
+ * provider, which brings the person back through the callback to settings.
+ */
+export async function connectAccount(
+  _previous: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const provider = field(formData, 'provider');
+  if (!isOAuthProvider(provider)) return authFailure(TRY_AGAIN, { email: '' });
+
+  const user = await getCurrentUser();
+  if (!user) return signedOutFailure('');
+
+  const outcome = await startAccountLink({
+    provider,
+    redirectTo: callbackUrl(getOrigin(), settingsPathFor(user.id), 'link'),
+  });
+
+  switch (outcome.kind) {
+    case 'redirect':
+      redirect(outcome.url);
+    case 'signed-out':
+      return signedOutFailure('');
+    case 'unavailable':
+      return authFailure(TRY_AGAIN, { email: '' });
+    case 'provider-error':
+      console.warn('connectAccount failed', {
+        provider,
+        code: outcome.code,
+      });
+      return authFailure(linkErrorMessage(outcome.code), { email: '' });
   }
 }

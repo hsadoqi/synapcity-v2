@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => ({ requestOwnPasswordReset: vi.fn() }));
 vi.mock('@/features/auth/server/actions/actions', () => ({
   requestOwnPasswordReset: mocks.requestOwnPasswordReset,
 }));
+vi.mock('next/navigation', () => ({ usePathname: () => '/u1/settings' }));
 
 import { PasswordReset } from './password-reset';
 
@@ -99,5 +100,30 @@ describe('PasswordReset', () => {
         .getByRole('button', { name: 'Send reset link' })
         .getAttribute('aria-disabled'),
     ).toBeNull();
+  });
+
+  it('offers a way back in when the session has gone, and not for other errors', async () => {
+    mocks.requestOwnPasswordReset.mockResolvedValue({
+      error: 'For your security, sign out, sign in again, then try once more.',
+      signedOut: true,
+    } satisfies AuthState);
+    render(<PasswordReset />);
+
+    await send();
+
+    expect(
+      screen.getByRole('link', { name: 'Sign in again' }).getAttribute('href'),
+    ).toBe('/auth/login?next=%2Fu1%2Fsettings');
+  });
+
+  it('shows no sign-in link for an ordinary refusal', async () => {
+    mocks.requestOwnPasswordReset.mockResolvedValue({
+      error: 'Too many attempts. Wait a few minutes and try again.',
+    } satisfies AuthState);
+    render(<PasswordReset />);
+
+    await send();
+
+    expect(screen.queryByRole('link', { name: 'Sign in again' })).toBeNull();
   });
 });
