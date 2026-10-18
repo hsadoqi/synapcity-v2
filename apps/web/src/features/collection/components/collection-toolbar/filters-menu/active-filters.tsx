@@ -1,0 +1,86 @@
+'use client';
+
+import { X } from 'lucide-react';
+
+import { Badge } from '@synapcity/frontend-ui/core/badge';
+import { Button } from '@synapcity/frontend-ui/core/button';
+
+import {
+  EMPTY_FILTERS,
+  hasActiveFilters,
+  type CollectionFilters,
+} from '../../../shared';
+
+type ActiveFiltersProps = {
+  filters: CollectionFilters;
+  onFiltersChange: (filters: CollectionFilters) => void;
+};
+
+export function ActiveFilters({
+  filters,
+  onFiltersChange,
+}: ActiveFiltersProps) {
+  if (!hasActiveFilters(filters)) return null;
+
+  const chips: { key: string; label: string; remove: () => void }[] = [
+    ...(filters.pinned
+      ? [
+          {
+            key: 'pinned',
+            label: 'Pinned',
+            remove: () => onFiltersChange({ ...filters, pinned: false }),
+          },
+        ]
+      : []),
+    ...(filters.recent
+      ? [
+          {
+            key: 'recent',
+            label: 'Recently updated',
+            remove: () => onFiltersChange({ ...filters, recent: false }),
+          },
+        ]
+      : []),
+    ...filters.groups.map((group) => ({
+      key: `group-${group}`,
+      label: group,
+      remove: () =>
+        onFiltersChange({
+          ...filters,
+          groups: filters.groups.filter((value) => value !== group),
+        }),
+    })),
+  ];
+
+  return (
+    <div
+      className="flex flex-wrap items-center gap-2"
+      aria-label="Active filters"
+      role="group"
+    >
+      {chips.map((chip) => (
+        <Badge
+          key={chip.key}
+          variant="outline"
+          render={
+            <button
+              type="button"
+              onClick={chip.remove}
+              aria-label={`Remove filter: ${chip.label}`}
+            />
+          }
+        >
+          {chip.label}
+          <X data-icon="inline-end" aria-hidden="true" />
+        </Badge>
+      ))}
+      <Button
+        variant="ghost"
+        size="xs"
+        onClick={() => onFiltersChange(EMPTY_FILTERS)}
+      >
+        Clear
+      </Button>
+    </div>
+  );
+}

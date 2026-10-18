@@ -31,14 +31,19 @@ describe('SettingsTabs', () => {
     'opens the tab named in the URL without loading the Account tab first',
     async () => {
       const loadAccount = vi.spyOn(tab('account'), 'component');
+      // Regional's own tests cover its fields; loading the real tab here
+      // pulls in the language and timezone data and times out under coverage.
+      vi.spyOn(tab('regional'), 'component').mockResolvedValue(() => (
+        <p>Regional panel</p>
+      ));
       window.location.hash = 'regional';
 
       await renderWithSettings(<SettingsTabs />);
 
       expect(
-        await screen.findByRole(
-          'combobox',
-          { name: 'Preferred language' },
+        await screen.findByText(
+          'Regional panel',
+          {},
           { timeout: FIND_TIMEOUT },
         ),
       ).toBeTruthy();
