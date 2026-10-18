@@ -38,26 +38,16 @@ export function EntityHeader({
       label: 'New document',
       onNew: onNewDocument || (() => {}),
       icon: FileText,
+      variant: 'default' as const,
     },
     {
       label: 'New dashboard',
       onNew: onNewDashboard || (() => {}),
       icon: LayoutDashboard,
+      variant: 'outline' as const,
     },
   ];
 
-  const moreActions = [
-    {
-      label: 'Rename',
-      onClick: onRename || (() => {}),
-      icon: Pencil,
-    },
-    {
-      label: 'Archive',
-      onClick: onArchive || (() => {}),
-      icon: Archive,
-    },
-  ];
   return (
     <header className="flex min-w-0 flex-1 flex-col gap-6">
       <div className="flex flex-col gap-2">
@@ -71,11 +61,42 @@ export function EntityHeader({
 
       <div className="flex flex-wrap items-center gap-2">
         {quickActions.map((action) => (
-          <Button key={action.label} onClick={action.onNew}>
+          <Button
+            key={action.label}
+            variant={action.variant}
+            onClick={action.onNew}
+          >
             <action.icon data-icon="inline-start" aria-hidden="true" />
             {action.label}
           </Button>
         ))}
+        <EntityMoreActions onRename={onRename} onArchive={onArchive} />
+      </div>
+    </header>
+  );
+}
+
+export function EntityMoreActions({
+  onRename,
+  onArchive,
+}: {
+  onRename?: () => void;
+  onArchive?: () => void;
+}) {
+  const moreActions = [
+    {
+      label: 'Rename',
+      onClick: onRename || (() => {}),
+      icon: Pencil,
+    },
+    {
+      label: 'Archive',
+      onClick: onArchive || (() => {}),
+      icon: Archive,
+    },
+  ];
+
+  return (
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
@@ -83,6 +104,10 @@ export function EntityHeader({
                 variant="ghost"
                 size="icon"
                 aria-label="More space actions"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                }}
               />
             }
           >
@@ -97,7 +122,5 @@ export function EntityHeader({
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>
-    </header>
-  );
+  )
 }

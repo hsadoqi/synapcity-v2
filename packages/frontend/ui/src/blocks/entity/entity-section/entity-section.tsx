@@ -107,7 +107,7 @@ function EntitySectionEmpty({
   createLabel,
 }: EntitySectionEmptyProps) {
   return (
-    <div className="flex flex-col items-start gap-4 rounded-md border border-dashed border-border px-5 py-6 sm:flex-row sm:items-center">
+    <div className="flex flex-col items-start gap-4 rounded-lg border border-dashed border-border px-5 py-6 sm:flex-row sm:items-center">
       <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted">
         <EntityIcon
           name={icon}
