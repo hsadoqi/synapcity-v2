@@ -1,4 +1,4 @@
-import { EntitySection } from '@synapcity/frontend-ui/blocks/entity/entity-section';
+import { EntitySection } from '@synapcity/frontend-ui/blocks/entity';
 
 import type { Space, SpaceEntity } from '../../shared/types';
 import { SpacesHeader } from './spaces-header';

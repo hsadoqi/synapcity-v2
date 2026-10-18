@@ -3,10 +3,11 @@ import Link from 'next/link';
 
 import { Button } from '@synapcity/frontend-ui/core/button';
 import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
-import { EntityItemCard } from '@synapcity/frontend-ui/blocks/entity/entity-item-card';
-import { EntityItem } from '@synapcity/frontend-ui/types/entity';
-import { EntityIcon } from '@synapcity/frontend-ui/blocks/entity/entity-icon';
-
+import {
+  EntityIcon,
+  EntityItemCard,
+} from '@synapcity/frontend-ui/blocks/entity';
+import type { EntityItem } from '@synapcity/frontend-ui/types/entity';
 interface EntitySectionProps {
   id: string;
   title: string;
