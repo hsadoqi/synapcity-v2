@@ -12,6 +12,7 @@ export const sharedConfig = {
     // `test:coverage` run, so the margin is 30 s.
     testTimeout: 30_000,
     coverage: {
+      clean: false,
       provider: 'v8' as const,
       include: ['src/**/*.{ts,tsx}'],
       exclude: ['src/**/*.test.{ts,tsx}', 'src/**/*.stories.{ts,tsx}'],

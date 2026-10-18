@@ -62,7 +62,16 @@
       "dependsOn": ["transit", "@synapcity/dev-vitest-config#build"],
       "outputs": ["**/coverage/report/**"]
     },
+    "web#test:coverage": {
+      "dependsOn": ["transit", "@synapcity/dev-vitest-config#build"],
+      "outputs": ["**/coverage/report/**"]
+    },
     "test:e2e": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "outputs": ["playwright-report/**", "test-results/**"]
+    },
+    "web#test:e2e": {
       "dependsOn": ["build"],
       "cache": false,
       "outputs": ["playwright-report/**", "test-results/**"]

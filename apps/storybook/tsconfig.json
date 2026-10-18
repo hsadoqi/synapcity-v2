@@ -1,6 +1,7 @@
 {
   "extends": "@synapcity/dev-typescript-config/nextjs.json",
   "compilerOptions": {
+    "lib": ["esnext", "dom"],
     "paths": {
       "@/*": ["./src/*"]
     },

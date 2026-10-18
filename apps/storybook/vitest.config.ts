@@ -1,3 +1,4 @@
+import { globSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -11,6 +12,33 @@ const dirname =
   typeof import.meta.dirname !== 'undefined'
     ? import.meta.dirname
     : path.dirname(fileURLToPath(import.meta.url));
+
+// Every JS subpath `@synapcity/frontend-ui` exports, as explicit ids for `optimizeDeps.include`.
+// A glob there (`@synapcity/frontend-ui/**`) cannot work: Vite's `expandGlobIds` always adds the
+// bare package name, and this package has no `.` export, so resolving it throws.
+const frontendUiIds = (() => {
+  const name = '@synapcity/frontend-ui';
+  const dir = path.join(dirname, 'node_modules', name);
+  const { exports } = JSON.parse(
+    readFileSync(path.join(dir, 'package.json'), 'utf8'),
+  ) as {
+    exports: Record<string, string>;
+  };
+  return Object.entries(exports)
+    .filter(([key]) => !key.endsWith('.css'))
+    .flatMap(([key, target]) => {
+      if (!key.includes('*')) return [path.posix.join(name, key)];
+      // './src/components/ui/*/index.ts' -> captures 'button' from 'src/components/ui/button/index.ts'
+      const escaped = target.slice(2).replace(/[.+?^${}()|[\]\\]/g, '\\$&');
+      const pattern = new RegExp(`^${escaped.replace('*', '(.+)')}$`);
+      return globSync(target.slice(2), { cwd: dir }).flatMap((file: string) => {
+        const match = pattern.exec(file);
+        return match?.[1]
+          ? [path.posix.join(name, key.replace('*', match[1]))]
+          : [];
+      });
+    });
+})();
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 const config = defineConfig({
@@ -35,7 +63,12 @@ const config = defineConfig({
           name: 'storybook',
         },
         optimizeDeps: {
-          include: ['storybook/theming', 'react-dom', 'react/jsx-runtime'],
+          include: [
+            'storybook/theming',
+            'react-dom',
+            'react/jsx-runtime',
+            ...frontendUiIds,
+          ],
         },
       },
     ],
