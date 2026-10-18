@@ -16,12 +16,13 @@ Spaces, documents and dashboards are expected to become features of their own. E
 
 Browse mechanics live in `apps/web/src/features/collection`, a feature that knows nothing about the resources it lists.
 
-1. **Scope of the feature:** search, filters, sort, layout (grid, list), active-filter chips, per-item actions (open, rename, pin, duplicate, delete with confirmation), and the loading, empty and no-results states. It does not own spaces, documents or dashboards.
+1. **Scope of the feature:** search, filters, sort, layout (grid, list), active-filter chips, per-item actions (open, rename, pin, duplicate, delete with confirmation), and the loading, empty and no-results states. It also owns the other ways of showing items, so every page can reuse them: `CollectionTabs` (collections as tabs, with an optional overview), the item displays `FeaturedItems`, `ItemChips` and `CompactItemList` with their skeletons, and `CreateActions` (a row of "New …" buttons). It does not own spaces, documents or dashboards.
 2. **Layers** follow ADR-0007. `shared/` holds framework-free types and pure functions (`applyCollectionQuery`, `applyItemAction`, `formatUpdated`, filter helpers). `components/` holds the React views. `client/` and `server/` are added when there is code for them, not before.
 3. **Consumers supply everything resource-specific** as props on `CollectionView`: `labels` (singular, plural), `icon`, `context` (where the collection lives, shown above the title and in the search placeholder), `grouping` (`{ label, options }`, which turns on the group filter and shows each item's group) and `emptyState` copy.
-4. **Items are resource-neutral.** `CollectionItem` has an optional `group` (a space, for example) instead of `spaceName`, and `CollectionFilters` has `groups` instead of `spaces`.
-5. **Dependency direction:** other features may import `collection`; `collection` imports no other feature. `architecture.test.ts` enforces this with the rule "collection depends on no other feature".
-6. **`collection` is the internal module name only.** It is not a user-facing or product term.
+4. **Items are resource-neutral, and there is one item model.** `CollectionItem` has an optional `group` (a space, for example) instead of `spaceName`, and `CollectionFilters` has `groups` instead of `spaces`. An optional `kind` (e.g. `'document'`) serves lists that mix kinds; the consumer maps kinds to an icon and a label (`CollectionKinds`). The home page's separate `HomeItem` was folded into `CollectionItem` (owner's decision, 2026-10-17); its hand-written "2h ago" labels are now computed by `formatAgo`, which counts days by the calendar in the viewer's time zone.
+5. **Generic presentation goes to `@synapcity/frontend-ui`.** `SectionHeading`, `EmptyNote`, `LoadingRegion` and `ConfirmDialog` carry no collection or app knowledge, so they live in the package (`components/*`), each with a story and tests, rather than in `collection`.
+6. **Dependency direction:** other features may import `collection`; `collection` imports no other feature. `architecture.test.ts` enforces this with the rule "collection depends on no other feature".
+7. **`collection` is the internal module name only.** It is not a user-facing or product term.
 
 ## Scope
 
@@ -68,4 +69,4 @@ The owner approves changes to the dependency rule, the props contract's shape, a
 
 ## Implementation
 
-Implemented 2026-10-17 on `feat/build-home-rooute`. `features/home` keeps the resource configuration (`lib/collection/resources.ts`), the fixtures and `CollectionTabs`, a tabbed surface with an optional Overview tab that renders its children. Verified: type-check, ESLint with no warnings, Prettier, the architecture test, and the Vitest suite including the new tests. Not run: Storybook, Playwright, build, and a browser check of the home page.
+Implemented 2026-10-17 on `feat/build-home-rooute`, then extended the same day: `CollectionTabs` became generic (callers pass `CollectionTabDefinition`s; home builds them with `resourceTabs`), the overview sections became the shared displays, and `HomeItem` was removed. `features/home` now holds only home's page composition, copy and configuration (`lib/overview.ts`, `lib/collection/resources.ts`) and fixtures. `features/home` keeps the resource configuration (`lib/collection/resources.ts`), the fixtures and `CollectionTabs`, a tabbed surface with an optional Overview tab that renders its children. Verified: type-check, ESLint with no warnings, Prettier, the architecture test, and the Vitest suite including the new tests. Not run: Storybook, Playwright, build, and a browser check of the home page.
