@@ -10,6 +10,8 @@ interface EntityDateProps {
   /** Read by screen readers before the date, such as "Updated". */
   srPrefix?: string;
   className?: string;
+  /** `span` lets the date sit inside a sentence; the default is a paragraph. */
+  as?: 'p' | 'span';
 }
 
 const subscribe = () => () => {};
@@ -20,7 +22,12 @@ const subscribe = () => () => {};
  * Rendering the relative words on the server would use the server's clock and
  * zone, and hydration would keep them.
  */
-export function EntityDate({ at, srPrefix, className }: EntityDateProps) {
+export function EntityDate({
+  at,
+  srPrefix,
+  className,
+  as: Tag = 'p',
+}: EntityDateProps) {
   const inBrowser = useSyncExternalStore(
     subscribe,
     () => true,
@@ -29,10 +36,10 @@ export function EntityDate({ at, srPrefix, className }: EntityDateProps) {
   const label = inBrowser ? formatEntityDate(at) : formatUtcDate(at);
 
   return (
-    <p className={className}>
+    <Tag className={className}>
       {srPrefix && <span className="sr-only">{srPrefix} </span>}
       <time dateTime={at}>{label}</time>
-    </p>
+    </Tag>
   );
 }
 

@@ -21,6 +21,14 @@ describe('EntityDate', () => {
     expect(screen.getByText('Today')).toBeTruthy();
   });
 
+  it('renders a paragraph by default and a span when asked', () => {
+    const paragraph = render(<EntityDate at={at} />);
+    expect(paragraph.container.firstElementChild?.tagName).toBe('P');
+
+    const span = render(<EntityDate at={at} as="span" />);
+    expect(span.container.firstElementChild?.tagName).toBe('SPAN');
+  });
+
   it('prefixes the date for screen readers when asked', () => {
     const { container } = render(<EntityDate at={at} srPrefix="Updated" />);
 
