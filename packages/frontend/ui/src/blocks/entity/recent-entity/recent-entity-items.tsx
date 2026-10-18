@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { EntityItem } from '@synapcity/frontend-ui/types/entity';
 import { EntityIcon } from '@synapcity/frontend-ui/blocks/entity/entity-icon';
+import { formatEntityDate } from '@synapcity/frontend-ui/blocks/entity/format-entity-date';
 
 interface RecentEntityItemsProps {
   items?: EntityItem[];
@@ -9,24 +10,16 @@ interface RecentEntityItemsProps {
 }
 
 export function RecentEntityItems({
-  label = 'Recent Items',
+  label = 'Recently touched',
   items = [],
   prefix,
 }: RecentEntityItemsProps) {
   if (items.length === 0) return null;
 
-  const updatedLabel = new Date(
-    items[0]?.updatedAt ?? new Date(),
-  ).toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-
   return (
     <aside
       aria-labelledby="recently-touched-heading"
-      className="flex w-full flex-col gap-2 rounded-md bg-muted p-3 lg:w-72"
+      className="flex w-full flex-col gap-2 rounded-lg bg-muted p-3 lg:w-72"
     >
       <h2
         id="recently-touched-heading"
@@ -36,7 +29,6 @@ export function RecentEntityItems({
       </h2>
       <ul className="flex flex-col">
         {items.map((item) => {
-          //   const Icon = kindIcon[item.kind]
           return (
             <li key={item.id}>
               <Link
@@ -52,8 +44,9 @@ export function RecentEntityItems({
                 <time
                   dateTime={item.updatedAt}
                   className="shrink-0 text-xs text-muted-foreground"
+                  suppressHydrationWarning
                 >
-                  {updatedLabel}
+                  {formatEntityDate(item.updatedAt)}
                 </time>
               </Link>
             </li>

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import type { EntityItem } from '@synapcity/frontend-ui/types/entity';
 import { EntityIcon } from '@synapcity/frontend-ui/blocks/entity/entity-icon';
+import { formatEntityDate } from '@synapcity/frontend-ui/blocks/entity/format-entity-date';
 
 export const RecentEntityRow = ({
   entity,
@@ -11,14 +12,7 @@ export const RecentEntityRow = ({
   entity: EntityItem;
   slug: string;
 }) => {
-  const updatedLabel = new Date(entity.updatedAt).toLocaleDateString(
-    undefined,
-    {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    },
-  );
+  const updatedLabel = formatEntityDate(entity.updatedAt);
   return (
     <li key={entity.id}>
       <Link
