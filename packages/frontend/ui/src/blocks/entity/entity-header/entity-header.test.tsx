@@ -37,8 +37,14 @@ describe('EntityHeader', () => {
   });
 
   it('offers a labelled menu trigger for the other actions', () => {
-    render(<EntityHeader name="Research" />);
+    render(<EntityHeader name="Research" onRename={() => {}} />);
 
     expect(screen.getByRole('button', { name: 'More actions' })).toBeTruthy();
+  });
+
+  it('has no actions menu when no action is given', () => {
+    render(<EntityHeader name="Research" />);
+
+    expect(screen.queryByRole('button', { name: 'More actions' })).toBeNull();
   });
 });

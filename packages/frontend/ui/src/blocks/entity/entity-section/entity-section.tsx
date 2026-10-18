@@ -1,12 +1,11 @@
-'use client';
-
 import { ArrowRight, Plus } from 'lucide-react';
+import Link from 'next/link';
 
 import { Button } from '@synapcity/frontend-ui/core/button';
+import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
 import { EntityItemCard } from '@synapcity/frontend-ui/blocks/entity/entity-item-card';
 import { EntityItem } from '@synapcity/frontend-ui/types/entity';
 import { EntityIcon } from '@synapcity/frontend-ui/blocks/entity/entity-icon';
-import Link from 'next/link';
 
 interface EntitySectionProps {
   id: string;
@@ -18,11 +17,18 @@ interface EntitySectionProps {
   emptyTitle: string;
   emptyBody: string;
   emptyIcon: string;
+  /** Labels the create link; shown only with `createHref`. */
   createLabel: string;
+  /** Where creating one happens. Without it the empty state offers no button. */
+  createHref?: string;
   prefix: string;
   /** How many items to show; defaults to 4. */
   limit?: number;
+  /** What the count counts, for screen readers; defaults to item/items. */
+  noun?: { one: string; other: string };
 }
+
+const pluralRules = new Intl.PluralRules('en-US');
 
 export function EntitySection({
   id,
@@ -34,12 +40,15 @@ export function EntitySection({
   emptyBody,
   emptyIcon,
   createLabel,
+  createHref,
   prefix,
   limit = 4,
+  noun = { one: 'item', other: 'items' },
 }: EntitySectionProps) {
   const headingId = `${id}-heading`;
   const visible = items.slice(0, limit);
   const slug = `${prefix}/${id}`;
+  const countNoun = pluralRules.select(total) === 'one' ? noun.one : noun.other;
 
   return (
     <section aria-labelledby={headingId} className="flex flex-col gap-4">
@@ -50,9 +59,9 @@ export function EntitySection({
         >
           {title}
           <span className="text-sm font-normal text-muted-foreground tabular-nums">
-            <span className="sr-only">(</span>
+            <span className="sr-only">, </span>
             {total}
-            <span className="sr-only"> items)</span>
+            <span className="sr-only"> {countNoun}</span>
           </span>
         </h2>
         {total > 0 && viewAllHref && (
@@ -78,25 +87,23 @@ export function EntitySection({
           ))}
         </ul>
       ) : (
-        <div className="flex items-center justify-center">
-          <EntitySectionEmpty
-            slug={slug}
-            title={emptyTitle}
-            body={emptyBody}
-            createLabel={createLabel}
-            icon={emptyIcon}
-          />
-        </div>
+        <EntitySectionEmpty
+          title={emptyTitle}
+          body={emptyBody}
+          createLabel={createLabel}
+          createHref={createHref}
+          icon={emptyIcon}
+        />
       )}
     </section>
   );
 }
 
 interface EntitySectionEmptyProps {
-  slug: string;
   title: string;
   body: string;
   createLabel: string;
+  createHref?: string;
   icon: string;
 }
 
@@ -105,6 +112,7 @@ function EntitySectionEmpty({
   title,
   body,
   createLabel,
+  createHref,
 }: EntitySectionEmptyProps) {
   return (
     <div className="flex flex-col items-start gap-4 rounded-lg border border-dashed border-border px-5 py-6 sm:flex-row sm:items-center">
@@ -119,10 +127,12 @@ function EntitySectionEmpty({
         <p className="text-sm font-medium text-foreground">{title}</p>
         <p className="text-sm text-muted-foreground text-pretty">{body}</p>
       </div>
-      <Button variant="outline" size="sm">
-        <Plus data-icon="inline-start" aria-hidden="true" />
-        {createLabel}
-      </Button>
+      {createHref && (
+        <LinkButton href={createHref} variant="outline" size="sm">
+          <Plus data-icon="inline-start" aria-hidden="true" />
+          {createLabel}
+        </LinkButton>
+      )}
     </div>
   );
 }

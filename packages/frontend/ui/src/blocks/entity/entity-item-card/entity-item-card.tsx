@@ -1,22 +1,30 @@
-'use client';
-
 import Link from 'next/link';
 import type { EntityItem } from '@synapcity/frontend-ui/types/entity';
+import { EntityDate } from '@synapcity/frontend-ui/blocks/entity/entity-date';
 import { EntityIcon } from '@synapcity/frontend-ui/blocks/entity/entity-icon';
-import { formatEntityDate } from '@synapcity/frontend-ui/blocks/entity/format-entity-date';
 import { EntityMoreActions } from '@synapcity/frontend-ui/blocks/entity/entity-header';
 
 interface EntityItemCardProps {
   entity: EntityItem;
   slug: string;
+  /** Without either action the card has no actions menu. */
+  onRename?: () => void;
+  onArchive?: () => void;
 }
 
 /**
  * The whole card opens the item: the title link stretches over it, and the
  * actions menu comes last in the DOM so it sits above that stretched area.
+ *
+ * Renders on the server; only the date and the actions menu run in the browser.
  */
-export function EntityItemCard({ entity, slug }: EntityItemCardProps) {
-  const updatedLabel = formatEntityDate(entity.updatedAt);
+export function EntityItemCard({
+  entity,
+  slug,
+  onRename,
+  onArchive,
+}: EntityItemCardProps) {
+  const hasActions = Boolean(onRename || onArchive);
 
   return (
     <div className="group relative flex h-full flex-col gap-6 rounded-lg border border-border bg-card p-3 text-foreground transition-colors hover:bg-muted">
@@ -42,16 +50,17 @@ export function EntityItemCard({ entity, slug }: EntityItemCardProps) {
         )}
       </div>
 
-      <p className="text-xs text-muted-foreground">
-        <span className="sr-only">Updated </span>
-        <time dateTime={entity.updatedAt} suppressHydrationWarning>
-          {updatedLabel}
-        </time>
-      </p>
+      <EntityDate
+        at={entity.updatedAt}
+        srPrefix="Updated"
+        className="text-xs text-muted-foreground"
+      />
 
-      <div className="absolute top-2 right-2">
-        <EntityMoreActions onRename={() => {}} onArchive={() => {}} />
-      </div>
+      {hasActions && (
+        <div className="absolute top-2 right-2">
+          <EntityMoreActions onRename={onRename} onArchive={onArchive} />
+        </div>
+      )}
     </div>
   );
 }

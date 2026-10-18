@@ -55,11 +55,53 @@ describe('EntitySection', () => {
   });
 
   it('shows the empty state and no view-all link without items', () => {
-    render(<EntitySection {...props} items={[]} total={0} />);
+    render(
+      <EntitySection
+        {...props}
+        createHref="/u1/documents/new"
+        items={[]}
+        total={0}
+      />,
+    );
 
     expect(screen.getByText('No documents yet')).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'New document' })).toBeTruthy();
+    expect(
+      screen.getByRole('link', { name: 'New document' }).getAttribute('href'),
+    ).toBe('/u1/documents/new');
     expect(screen.queryByRole('button', { name: /View all/ })).toBeNull();
+  });
+
+  it('offers no create control when there is nowhere to create one', () => {
+    render(<EntitySection {...props} items={[]} total={0} />);
+
+    expect(screen.queryByRole('link', { name: 'New document' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'New document' })).toBeNull();
+  });
+
+  it('names the count with the right plural for screen readers', () => {
+    const { rerender } = render(
+      <EntitySection
+        {...props}
+        noun={{ one: 'document', other: 'documents' }}
+        items={[item(1)]}
+        total={1}
+      />,
+    );
+    expect(screen.getByRole('heading', { level: 2 }).textContent).toBe(
+      'Documents, 1 document',
+    );
+
+    rerender(
+      <EntitySection
+        {...props}
+        noun={{ one: 'document', other: 'documents' }}
+        items={[item(1), item(2)]}
+        total={2}
+      />,
+    );
+    expect(screen.getByRole('heading', { level: 2 }).textContent).toBe(
+      'Documents, 2 documents',
+    );
   });
 
   it('shows every item when given a larger limit and no view-all link', () => {

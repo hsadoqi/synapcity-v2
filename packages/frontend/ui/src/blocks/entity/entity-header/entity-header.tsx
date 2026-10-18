@@ -83,18 +83,16 @@ export function EntityMoreActions({
   onRename?: () => void;
   onArchive?: () => void;
 }) {
+  // Only actions the caller can carry out; a menu item that does nothing is worse than none.
   const moreActions = [
-    {
-      label: 'Rename',
-      onClick: onRename || (() => {}),
-      icon: Pencil,
-    },
-    {
-      label: 'Archive',
-      onClick: onArchive || (() => {}),
-      icon: Archive,
-    },
-  ];
+    { label: 'Rename', onClick: onRename, icon: Pencil },
+    { label: 'Archive', onClick: onArchive, icon: Archive },
+  ].filter(
+    (action): action is typeof action & { onClick: () => void } =>
+      action.onClick !== undefined,
+  );
+
+  if (moreActions.length === 0) return null;
 
   return (
     <DropdownMenu>

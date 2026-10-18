@@ -39,3 +39,7 @@ export const Default: Story = {};
 export const Empty: Story = {
   args: { items: [], total: 0 },
 };
+
+export const EmptyWithCreate: Story = {
+  args: { items: [], total: 0, createHref: '/u1/home/spaces/s1/documents/new' },
+};

@@ -35,6 +35,22 @@ describe('EntityItemCard', () => {
     );
   });
 
+  it('has no actions menu unless an action is given', () => {
+    const { rerender } = render(
+      <EntityItemCard entity={document} slug="/u1/documents" />,
+    );
+    expect(screen.queryByRole('button', { name: 'More actions' })).toBeNull();
+
+    rerender(
+      <EntityItemCard
+        entity={document}
+        slug="/u1/documents"
+        onArchive={() => {}}
+      />,
+    );
+    expect(screen.getByRole('button', { name: 'More actions' })).toBeTruthy();
+  });
+
   it('omits the description when there is none', () => {
     render(
       <EntityItemCard
