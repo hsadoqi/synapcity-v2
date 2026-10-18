@@ -56,12 +56,12 @@ const radii: Record<Radius, { label: string; description: string }> = {
     label: 'Default',
     description: 'The standard, lightly softened corners.',
   },
-  rounded: {
-    label: 'Rounded',
+  soft: {
+    label: 'Soft',
     description: 'Softer corners on buttons, panels and fields.',
   },
-  round: {
-    label: 'Round',
+  rounded: {
+    label: 'Rounded',
     description: 'Generously rounded corners throughout.',
   },
 };
@@ -70,7 +70,7 @@ const densities: Record<Density, { label: string; description: string }> = {
   compact: {
     label: 'Compact',
     description:
-      'Tighter spacing to fit more on screen. On touch screens it stays comfortable so controls remain easy to tap.',
+      'Tighter spacing, except on touch screens where controls stay easy to tap.',
   },
   comfortable: {
     label: 'Comfortable',

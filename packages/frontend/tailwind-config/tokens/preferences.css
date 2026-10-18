@@ -34,11 +34,11 @@
   --radius-factor: 1;
 }
 
-[data-radius='rounded'] {
+[data-radius='soft'] {
   --radius-factor: 2;
 }
 
-[data-radius='round'] {
+[data-radius='rounded'] {
   --radius-factor: 3;
 }
 

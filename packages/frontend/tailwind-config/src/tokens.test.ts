@@ -254,8 +254,8 @@ describe('radius and density', () => {
     expect([
       factor('sharp'),
       factor('default'),
+      factor('soft'),
       factor('rounded'),
-      factor('round'),
     ]).toEqual(['0', '1', '2', '3']);
   });
 

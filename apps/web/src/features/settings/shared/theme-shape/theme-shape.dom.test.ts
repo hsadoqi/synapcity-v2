@@ -25,10 +25,10 @@ function boot(saved?: string) {
 describe('applyThemeShape', () => {
   it('writes the corner radius and density as attributes on the element', () => {
     applyThemeShape(document.documentElement, {
-      radius: 'rounded',
+      radius: 'soft',
       density: 'compact',
     });
-    expect(dataset()).toEqual({ radius: 'rounded', density: 'compact' });
+    expect(dataset()).toEqual({ radius: 'soft', density: 'compact' });
   });
 
   it('writes to any element, so a preview can carry its own', () => {
@@ -44,7 +44,7 @@ describe('applyThemeShape', () => {
 
 describe('previewShapeAttributes', () => {
   it('names the attributes applyThemeShape writes, so a preview matches the page', () => {
-    const theme = { radius: 'rounded', density: 'compact' } as const;
+    const theme = { radius: 'soft', density: 'compact' } as const;
     const element = document.createElement('div');
     applyThemeShape(element, theme);
     const preview = previewShapeAttributes(theme);
@@ -62,13 +62,13 @@ describe('themeShapeBootScript', () => {
   });
 
   it('writes the same attributes the provider would for saved choices', () => {
-    boot(JSON.stringify({ theme: { radius: 'round', density: 'compact' } }));
+    boot(JSON.stringify({ theme: { radius: 'rounded', density: 'compact' } }));
     const fromBoot = dataset();
     for (const key of Object.keys(document.documentElement.dataset)) {
       delete document.documentElement.dataset[key];
     }
     applyThemeShape(document.documentElement, {
-      radius: 'round',
+      radius: 'rounded',
       density: 'compact',
     });
     expect(dataset()).toEqual(fromBoot);

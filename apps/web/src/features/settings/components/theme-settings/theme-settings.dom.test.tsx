@@ -355,7 +355,7 @@ describe('ThemeSettings corner radius and density', () => {
     await waitFor(() =>
       expect(
         screen.getByText(
-          'Tighter spacing to fit more on screen. On touch screens it stays comfortable so controls remain easy to tap.',
+          'Tighter spacing, except on touch screens where controls stay easy to tap.',
         ),
       ).toBeTruthy(),
     );
@@ -368,10 +368,10 @@ describe('ThemeSettings corner radius and density', () => {
     expect(frame()?.dataset.radius).toBe('default');
     expect(frame()?.dataset.density).toBe('comfortable');
 
-    await pick('Corner radius', 'Round');
+    await pick('Corner radius', 'Rounded');
     await pick('Density', 'Spacious');
 
-    await waitFor(() => expect(frame()?.dataset.radius).toBe('round'));
+    await waitFor(() => expect(frame()?.dataset.radius).toBe('rounded'));
     expect(frame()?.dataset.density).toBe('spacious');
     // The page keeps its saved look until the choice is saved.
     expect(document.documentElement.dataset.radius).toBe('default');
@@ -380,10 +380,10 @@ describe('ThemeSettings corner radius and density', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Save changes' }));
 
-    await waitFor(() => expect(currentSettings().theme.radius).toBe('round'));
+    await waitFor(() => expect(currentSettings().theme.radius).toBe('rounded'));
     expect(currentSettings().theme.density).toBe('spacious');
     await waitFor(() =>
-      expect(document.documentElement.dataset.radius).toBe('round'),
+      expect(document.documentElement.dataset.radius).toBe('rounded'),
     );
     expect(document.documentElement.dataset.density).toBe('spacious');
   });
@@ -408,14 +408,14 @@ describe('ThemeSettings corner radius and density', () => {
   it('restores an unsaved radius and density kept in session storage', async () => {
     sessionStorage.setItem(
       THEME_DRAFT_STORAGE_KEY,
-      JSON.stringify({ radius: 'rounded', density: 'compact' }),
+      JSON.stringify({ radius: 'soft', density: 'compact' }),
     );
     await renderWithSettings(<ThemeSettings />);
 
     await waitFor(() =>
       expect(
         screen.getByRole('combobox', { name: 'Corner radius' }).textContent,
-      ).toContain('Rounded'),
+      ).toContain('Soft'),
     );
     expect(
       screen.getByRole('combobox', { name: 'Density' }).textContent,

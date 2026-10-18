@@ -68,15 +68,15 @@ describe('setting scope (ADR-0010)', () => {
     expect(
       accountPart({
         ...settingsDefaults,
-        theme: { ...settingsDefaults.theme, radius: 'round' },
+        theme: { ...settingsDefaults.theme, radius: 'rounded' },
       }).theme.radius,
-    ).toBe('round');
+    ).toBe('rounded');
   });
 
   it.each([
     [{ regional: { language: 'fr' } }, true],
     [{ theme: { bodyFont: 'lora' } }, true],
-    [{ theme: { radius: 'round' } }, true],
+    [{ theme: { radius: 'rounded' } }, true],
     [{ theme: { density: 'compact' } }, false],
     [{ privacy: { sharing: { granted: false, updatedAt: null } } }, true],
     [{ notifications: { email: false } }, true],
@@ -142,8 +142,8 @@ describe('readAccountPreferences', () => {
     // readAccountPreferences lists the theme fields by hand: a field missing from that list is
     // dropped on every reload without any error, which is what this guards.
     expect(
-      readAccountPreferences({ theme: { radius: 'round' } }).theme.radius,
-    ).toBe('round');
+      readAccountPreferences({ theme: { radius: 'rounded' } }).theme.radius,
+    ).toBe('rounded');
     expect(
       readAccountPreferences({ theme: { radius: 'pill' } }).theme.radius,
     ).toBe('default');
@@ -213,11 +213,11 @@ describe('toTransferFile', () => {
       ...settingsDefaults,
       theme: {
         ...settingsDefaults.theme,
-        radius: 'rounded',
+        radius: 'soft',
         density: 'spacious',
       },
     });
-    expect(file.account.theme.radius).toBe('rounded');
+    expect(file.account.theme.radius).toBe('soft');
     expect(file.account.theme).not.toHaveProperty('density');
     expect(file.device.theme).toEqual({ mode: 'system', density: 'spacious' });
   });

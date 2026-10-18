@@ -39,7 +39,7 @@ describe('theme settings', () => {
 
   it('names the presets the CSS defines, and no others', () => {
     // preferences.css has one [data-radius] / [data-density] rule per preset.
-    expect([...radii]).toEqual(['sharp', 'default', 'rounded', 'round']);
+    expect([...radii]).toEqual(['sharp', 'default', 'soft', 'rounded']);
     expect([...densities]).toEqual(['compact', 'comfortable', 'spacious']);
   });
 });

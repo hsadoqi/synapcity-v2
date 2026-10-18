@@ -57,8 +57,8 @@ test.describe('with a mouse', () => {
 
     for (const [radius, factor] of [
       ['sharp', 0],
-      ['rounded', 2],
-      ['round', 3],
+      ['soft', 2],
+      ['rounded', 3],
     ] as const) {
       const fresh = await page.context().newPage();
       expect(await load(fresh, { radius })).toMatchObject({ radius });
@@ -83,7 +83,10 @@ test.describe('with a mouse', () => {
   test("keeps Compact at or above WCAG 2.5.8's 24px minimum target", async ({
     page,
   }) => {
-    await load(page, { density: 'compact' });
+    // Applied first: 28px is also the default, so this would pass with nothing applied.
+    expect(await load(page, { density: 'compact' })).toMatchObject({
+      density: 'compact',
+    });
     expect((await measure(page)).fieldHeight).toBeGreaterThanOrEqual(24);
   });
 
@@ -100,7 +103,10 @@ test.describe('on a touch screen', () => {
 
   test('keeps fields at 44px even when Compact is saved', async ({ page }) => {
     // The coarse-pointer field is h-11 (44px); shrinking the spacing would take it below that.
-    await load(page, { density: 'compact' });
+    // Applied first: 44px is also the default on touch, so this would pass with nothing applied.
+    expect(await load(page, { density: 'compact' })).toMatchObject({
+      density: 'compact',
+    });
     expect((await measure(page)).fieldHeight).toBe(44);
   });
 

@@ -8,7 +8,7 @@ import { bodyFonts, codeFonts, headingFonts } from './fonts';
  * preview cannot disagree about what "rounded" or "compact" means. The default of each is the
  * look the app had before these settings existed.
  */
-export const radii = ['sharp', 'default', 'rounded', 'round'] as const;
+export const radii = ['sharp', 'default', 'soft', 'rounded'] as const;
 export const densities = ['compact', 'comfortable', 'spacious'] as const;
 
 // The font, radius and density fields carry their own default, as the appearance schema does,
