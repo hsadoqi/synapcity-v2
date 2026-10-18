@@ -29,6 +29,8 @@ const themeControls: Record<keyof typeof themeSchema.shape, Control> = {
   headingFont: { role: 'combobox', name: 'Heading font' },
   bodyFont: { role: 'combobox', name: 'Body font' },
   codeFont: { role: 'combobox', name: 'Monospace font' },
+  radius: { role: 'combobox', name: 'Corner radius' },
+  density: { role: 'combobox', name: 'Density' },
 };
 
 const appearanceControls: Record<

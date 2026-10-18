@@ -73,7 +73,7 @@ describe('ThemeSettings', () => {
     ).toBeTruthy();
   });
 
-  it('outlines the tab as its title, then the Fonts section, and nothing else', async () => {
+  it('outlines the tab as its title, then the Fonts and Shape and spacing sections, and nothing else', async () => {
     await renderWithSettings(<ThemeSettings />);
 
     expect(
@@ -84,6 +84,7 @@ describe('ThemeSettings', () => {
     ).toEqual([
       { level: 2, text: 'Theme' },
       { level: 3, text: 'Fonts' },
+      { level: 3, text: 'Shape and spacing' },
     ]);
   });
 
@@ -327,5 +328,97 @@ describe('ThemeSettings', () => {
       ),
     );
     expect(sessionStorage.getItem(THEME_DRAFT_STORAGE_KEY)).toBeNull();
+  });
+});
+
+describe('ThemeSettings corner radius and density', () => {
+  const frame = () =>
+    screen
+      .getByRole('figure', { name: 'Live preview' })
+      .querySelector<HTMLElement>('[aria-hidden]');
+
+  it('offers both, each describing the option chosen', async () => {
+    await renderWithSettings(<ThemeSettings />);
+
+    expect(
+      screen.getByRole('combobox', { name: 'Corner radius' }).textContent,
+    ).toContain('Default');
+    expect(
+      screen.getByRole('combobox', { name: 'Density' }).textContent,
+    ).toContain('Comfortable');
+    expect(
+      screen.getByText('The standard, lightly softened corners.'),
+    ).toBeTruthy();
+    expect(screen.getByText('The standard spacing.')).toBeTruthy();
+
+    await pick('Density', 'Compact');
+    await waitFor(() =>
+      expect(
+        screen.getByText(
+          'Tighter spacing to fit more on screen. On touch screens it stays comfortable so controls remain easy to tap.',
+        ),
+      ).toBeTruthy(),
+    );
+  });
+
+  it('previews a choice on the sample only, and changes the page only on save', async () => {
+    await renderWithSettings(<ThemeSettings />);
+    fireEvent.click(screen.getByRole('button', { name: 'Preview' }));
+    await screen.findByRole('figure', { name: 'Live preview' });
+    expect(frame()?.dataset.radius).toBe('default');
+    expect(frame()?.dataset.density).toBe('comfortable');
+
+    await pick('Corner radius', 'Round');
+    await pick('Density', 'Spacious');
+
+    await waitFor(() => expect(frame()?.dataset.radius).toBe('round'));
+    expect(frame()?.dataset.density).toBe('spacious');
+    // The page keeps its saved look until the choice is saved.
+    expect(document.documentElement.dataset.radius).toBe('default');
+    expect(document.documentElement.dataset.density).toBe('comfortable');
+    expect(currentSettings().theme.radius).toBe('default');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    await waitFor(() => expect(currentSettings().theme.radius).toBe('round'));
+    expect(currentSettings().theme.density).toBe('spacious');
+    await waitFor(() =>
+      expect(document.documentElement.dataset.radius).toBe('round'),
+    );
+    expect(document.documentElement.dataset.density).toBe('spacious');
+  });
+
+  it('discards an unsaved radius', async () => {
+    await renderWithSettings(<ThemeSettings />);
+
+    await pick('Corner radius', 'Sharp');
+    await waitFor(() =>
+      expect(screen.getByText('Square corners everywhere.')).toBeTruthy(),
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Discard' }));
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole('combobox', { name: 'Corner radius' }).textContent,
+      ).toContain('Default'),
+    );
+    expect(document.documentElement.dataset.radius).toBe('default');
+  });
+
+  it('restores an unsaved radius and density kept in session storage', async () => {
+    sessionStorage.setItem(
+      THEME_DRAFT_STORAGE_KEY,
+      JSON.stringify({ radius: 'rounded', density: 'compact' }),
+    );
+    await renderWithSettings(<ThemeSettings />);
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole('combobox', { name: 'Corner radius' }).textContent,
+      ).toContain('Rounded'),
+    );
+    expect(
+      screen.getByRole('combobox', { name: 'Density' }).textContent,
+    ).toContain('Compact');
   });
 });

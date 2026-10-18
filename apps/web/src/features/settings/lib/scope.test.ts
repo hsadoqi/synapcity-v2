@@ -6,6 +6,7 @@ import {
   isDefaultAccount,
   readAccountPreferences,
   settingScope,
+  toTransferFile,
   touchesAccount,
   withAccount,
 } from './scope';
@@ -43,20 +44,40 @@ describe('setting scope (ADR-0010)', () => {
   it('keeps colour mode and display settings on the device', () => {
     const account = accountPart({
       ...settingsDefaults,
-      theme: { ...settingsDefaults.theme, mode: 'dark', bodyFont: 'lora' },
+      theme: {
+        ...settingsDefaults.theme,
+        mode: 'dark',
+        bodyFont: 'lora',
+        density: 'compact',
+      },
     });
+    // Corner radius follows the person with the fonts; density and mode stay on the device.
     expect(account.theme).toEqual({
       headingFont: 'default',
       bodyFont: 'lora',
       codeFont: 'default',
+      radius: 'default',
     });
     expect(account).not.toHaveProperty('appearance');
     expect(account).not.toHaveProperty('appearanceOverride');
   });
 
+  it('puts corner radius on the account and density on the device (ADR-0010)', () => {
+    expect(settingScope.theme.radius).toBe('account');
+    expect(settingScope.theme.density).toBe('device');
+    expect(
+      accountPart({
+        ...settingsDefaults,
+        theme: { ...settingsDefaults.theme, radius: 'round' },
+      }).theme.radius,
+    ).toBe('round');
+  });
+
   it.each([
     [{ regional: { language: 'fr' } }, true],
     [{ theme: { bodyFont: 'lora' } }, true],
+    [{ theme: { radius: 'round' } }, true],
+    [{ theme: { density: 'compact' } }, false],
     [{ privacy: { sharing: { granted: false, updatedAt: null } } }, true],
     [{ notifications: { email: false } }, true],
     [{ notifications: { push: true } }, true],
@@ -112,8 +133,23 @@ describe('readAccountPreferences', () => {
       headingFont: 'default',
       bodyFont: 'lora',
       codeFont: 'default',
+      radius: 'default',
     });
     expect(read).not.toHaveProperty('unknown');
+  });
+
+  it('keeps a saved corner radius, drops an invalid one, and ignores a stored density', () => {
+    // readAccountPreferences lists the theme fields by hand: a field missing from that list is
+    // dropped on every reload without any error, which is what this guards.
+    expect(
+      readAccountPreferences({ theme: { radius: 'round' } }).theme.radius,
+    ).toBe('round');
+    expect(
+      readAccountPreferences({ theme: { radius: 'pill' } }).theme.radius,
+    ).toBe('default');
+    expect(
+      readAccountPreferences({ theme: { density: 'compact' } }).theme,
+    ).not.toHaveProperty('density');
   });
 
   it('round-trips notifications and drops invalid values', () => {
@@ -168,6 +204,29 @@ describe('withAccount', () => {
     const merged = withAccount(local, account);
     expect(merged.regional.language).toBe('de');
     expect(merged.appearance.fontSize).toBe('small');
+  });
+});
+
+describe('toTransferFile', () => {
+  it('writes corner radius with the account and density with the device', () => {
+    const file = toTransferFile({
+      ...settingsDefaults,
+      theme: { ...settingsDefaults.theme, radius: 'rounded', density: 'spacious' },
+    });
+    expect(file.account.theme.radius).toBe('rounded');
+    expect(file.account.theme).not.toHaveProperty('density');
+    expect(file.device.theme).toEqual({ mode: 'system', density: 'spacious' });
+  });
+
+  it('reads its own export back to the same theme', () => {
+    const theme = {
+      ...settingsDefaults.theme,
+      radius: 'sharp' as const,
+      density: 'compact' as const,
+    };
+    expect(fromTransferFile(toTransferFile({ ...settingsDefaults, theme }))).toMatchObject(
+      { theme: { radius: 'sharp', density: 'compact' } },
+    );
   });
 });
 

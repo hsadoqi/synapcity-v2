@@ -5,6 +5,8 @@ import { useParams } from 'next/navigation';
 import z from 'zod';
 import { bodyFonts, codeFonts, headingFonts } from '../types/fonts';
 import {
+  densities,
+  radii,
   themeSchema,
   type ThemeSettings,
   type ThemeSettingsPatch,
@@ -28,6 +30,8 @@ const draftSchema = z.object({
   headingFont: z.enum(headingFonts).optional(),
   bodyFont: z.enum(bodyFonts).optional(),
   codeFont: z.enum(codeFonts).optional(),
+  radius: z.enum(radii).optional(),
+  density: z.enum(densities).optional(),
 });
 
 function readDraft(key: string): ThemeSettingsPatch {
