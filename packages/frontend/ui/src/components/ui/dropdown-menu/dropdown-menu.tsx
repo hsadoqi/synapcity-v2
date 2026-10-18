@@ -279,7 +279,7 @@ function DropdownMenuShortcut({
     <span
       data-slot="dropdown-menu-shortcut"
       className={cn(
-        'ml-auto pl-4 font-ui text-[0.625rem] tracking-widest text-muted-foreground tabular-nums group-data-highlighted/dropdown-menu-item:text-inherit',
+        'ml-auto pl-4 font-ui text-2xs tracking-widest text-muted-foreground tabular-nums group-data-highlighted/dropdown-menu-item:text-inherit',
         className,
       )}
       {...props}

@@ -45,7 +45,9 @@
   --color-secondary-800: var(--secondary-800);
   --color-secondary-900: var(--secondary-900);
   --color-secondary-950: var(--secondary-950);
-  --color-base: var(--base);
+  /* No bare --color-base: a colour named "base" makes Tailwind read text-base as a text colour,
+     not the font size, so body and every text-base lost the scalable size (the type scale is
+     keyed off --text-base-size). The ramp steps and the two roles below are unaffected. */
   --color-base-foreground: var(--base-foreground);
   --color-base-background: var(--base-background);
   --color-primary: var(--primary);
@@ -100,6 +102,9 @@
     --font-preference-code,
     var(--font-geist-mono, ui-monospace)
   );
+  /* Exactly 0.625rem at the default size. No line-height on purpose: text-2xs leaves the
+     surrounding one alone, as the text-[0.625rem] it replaces did. */
+  --text-2xs: calc(var(--text-base-size) * 10 / 15);
   --text-xs: calc(var(--text-base-size) * 13 / 15);
   --text-xs--line-height: 1.333333;
   --text-sm: calc(var(--text-base-size) * 14 / 15);
