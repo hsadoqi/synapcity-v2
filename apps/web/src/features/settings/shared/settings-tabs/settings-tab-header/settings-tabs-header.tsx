@@ -7,7 +7,7 @@ export const SettingsTabsHeader = ({
   onTabChange: (value: string) => void;
 }) => {
   return (
-    <div className="settings-tab-bar overflow-hidden border-b border-border">
+    <div className="settings-tab-bar overflow-hidden border-b border-border shrink-0">
       <TabsList
         variant="line"
         className="w-full"
