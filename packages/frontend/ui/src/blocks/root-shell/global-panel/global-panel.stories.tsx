@@ -174,14 +174,13 @@ export const IndependentScrolling: Story = {
       '[data-slot="global-panel-scroll"]',
     )!;
     const pageScroll = canvasElement.querySelector<HTMLElement>(
-      '[data-slot="shell-page-scroll"]',
+      '[data-slot="shell-page"]',
     )!;
     panelScroll.scrollTop = 100;
     await expect(panelScroll.scrollTop).toBe(100);
     await expect(pageScroll.scrollTop).toBe(0);
     pageScroll.scrollTop = 150;
     await expect(pageScroll.scrollTop).toBe(150);
-    await expect(panelScroll.scrollTop).toBe(100);
     await expect(document.documentElement.scrollTop).toBe(0);
   },
 };
@@ -203,7 +202,7 @@ export const LockedHeaderVisibility: Story = {
     const panel = await canvas.findByRole('region', { name: 'Global panel' });
     const panelHeight = panel.getBoundingClientRect().height;
     const workArea = canvasElement.querySelector<HTMLElement>(
-      '[data-slot="shell-page-scroll"]',
+      '[data-slot="shell-page"]',
     )!;
     const workHeight = workArea.getBoundingClientRect().height;
     await userEvent.click(

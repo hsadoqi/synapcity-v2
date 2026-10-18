@@ -42,7 +42,10 @@ export function HomePageView({
     // so only this view scrolls, not <main>. Same pattern as the settings page.
     <div
       data-fill-viewport
-      className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto"
+      // A scroller is not a tab stop in every browser (Safari); this makes it
+      // one, so the keyboard can scroll. The ring sits inside: overflow clips it.
+      tabIndex={0}
+      className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
     >
       {state === 'empty' || (state === 'populated' && !hasHistory) ? (
         <HomeEmptyState
