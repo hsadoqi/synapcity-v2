@@ -1,4 +1,5 @@
-:root {
+:root,
+.dark {
   --base-50: oklch(98.5% 0 0);
   --base-100: oklch(97% 0 0);
   --base-200: oklch(92.2% 0 0);
@@ -43,7 +44,6 @@
   --secondary-800: var(--base-800);
   --secondary-900: var(--base-900);
   --secondary-950: var(--base-950);
-
   --base: var(--base-500);
   --primary: var(--primary-500);
   --accent: var(--accent-500);
@@ -65,12 +65,12 @@
   --muted-foreground: color-mix(
     in oklch,
     var(--base-foreground) 55%,
-    var(--base-background)
+    var(--muted)
   );
   --muted-background: color-mix(
     in oklch,
-    var(--base-foreground) 45%,
-    var(--base-background)
+    var(--base-background) 45%,
+    var(--muted)
   );
 }
 
@@ -88,11 +88,11 @@
   --muted-foreground: color-mix(
     in oklch,
     var(--base-foreground) 67%,
-    var(--base-background)
+    var(--muted)
   );
   --muted-background: color-mix(
     in oklch,
-    var(--base-foreground) 45%,
-    var(--base-background)
+    var(--base-background) 45%,
+    var(--muted)
   );
 }

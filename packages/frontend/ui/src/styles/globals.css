@@ -1,4 +1,7 @@
 @import 'shadcn/tailwind.css';
 @import '@synapcity/frontend-tailwind-config';
 
-@source '../components/**/*';
+@source '../';
+@source '../../../../../apps/web/src';
+@source '../../../../../apps/docs/src';
+@source '../../../../../apps/storybook/src';
