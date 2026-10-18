@@ -97,30 +97,30 @@ export function EntityMoreActions({
   ];
 
   return (
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="More space actions"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                }}
-              />
-            }
-          >
-            <MoreHorizontal aria-hidden="true" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-40">
-            {moreActions.map((action) => (
-              <DropdownMenuItem key={action.label} onClick={action.onClick}>
-                <action.icon aria-hidden="true" />
-                {action.label}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-  )
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        render={
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="More actions"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+          />
+        }
+      >
+        <MoreHorizontal aria-hidden="true" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-40">
+        {moreActions.map((action) => (
+          <DropdownMenuItem key={action.label} onClick={action.onClick}>
+            <action.icon aria-hidden="true" />
+            {action.label}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }

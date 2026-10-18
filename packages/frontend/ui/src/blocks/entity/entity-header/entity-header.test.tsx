@@ -39,8 +39,6 @@ describe('EntityHeader', () => {
   it('offers a labelled menu trigger for the other actions', () => {
     render(<EntityHeader name="Research" />);
 
-    expect(
-      screen.getByRole('button', { name: 'More space actions' }),
-    ).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'More actions' })).toBeTruthy();
   });
 });
