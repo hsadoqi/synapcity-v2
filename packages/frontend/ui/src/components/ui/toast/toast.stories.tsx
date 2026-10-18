@@ -97,11 +97,8 @@ export const Dismisses: Story = {
     await waitFor(() => expect(title).toBeVisible());
 
     await userEvent.click(screen.getByLabelText('Close toast'));
-    // The toast stays mounted through its 500ms exit transition, which can
-    // overrun waitFor's 1s default when many story files run in parallel.
-    await waitFor(
-      () => expect(screen.queryByText('Saved')).not.toBeInTheDocument(),
-      { timeout: 4000 },
+    await waitFor(() =>
+      expect(screen.queryByText('Saved')).not.toBeInTheDocument(),
     );
   },
 };

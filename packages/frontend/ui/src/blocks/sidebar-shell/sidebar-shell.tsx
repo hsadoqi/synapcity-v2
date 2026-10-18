@@ -2,15 +2,18 @@ import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';
 import { SidebarInset } from '@synapcity/frontend-ui/core/sidebar';
 import { RootSidebar } from '@synapcity/frontend-ui/blocks/sidebar-shell/root-sidebar';
 import { SidebarProviders } from '@synapcity/frontend-ui/blocks/sidebar-shell/sidebar-providers';
+import { GlobalPanelShell } from '@synapcity/frontend-ui/blocks/root-shell/global-panel';
 
 export const SidebarShell = ({
   header,
   account,
   children,
+  globalPanel,
 }: {
   header: React.ReactNode | null;
   account: AccountLinks;
   children: React.ReactNode;
+  globalPanel?: React.ReactNode;
 }) => {
   return (
     <SidebarProviders>
@@ -21,10 +24,9 @@ export const SidebarShell = ({
           min-w-0 lets wide content shrink instead of pushing the inset past
           the viewport. */}
       <SidebarInset className="min-h-0 min-w-0 overflow-hidden">
-        {header}
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <GlobalPanelShell header={header} panel={globalPanel}>
           {children}
-        </div>
+        </GlobalPanelShell>
       </SidebarInset>
     </SidebarProviders>
   );

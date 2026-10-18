@@ -41,9 +41,9 @@ describe('SettingsTabs', () => {
       await renderWithSettings(<SettingsTabs />);
 
       expect(
-        await screen.findByText(
-          'Regional panel',
-          {},
+        await screen.findByRole(
+          'combobox',
+          { name: 'Preferred language' },
           { timeout: FIND_TIMEOUT },
         ),
       ).toBeTruthy();

@@ -1,3 +1,39 @@
+## Active task: app header visibility while the global panel is locked (2026-10-17)
+
+- Goal and mode: implement the owner's approved recommendation ("sounds good"): locking an open global panel hides the app header; a panel-toolbar button explicitly reveals/hides it; unlocking or closing restores it. No hover reveal.
+- Exact updates (6): `.agents/task-scope.md`; `global-panel.tsx`, `global-panel.test.tsx`, `global-panel.stories.tsx` under `packages/frontend/ui/src/blocks/root-shell/global-panel/`; `apps/web/e2e/global-panel.e2e.ts`; `docs/architecture/decisions/0011-resizable-global-panel-shell.md`. Create/delete/move/rename 0; dependencies/config/public APIs/persistence/routes/Git/external systems/other planning artifacts 0.
+- Authority and ownership: direct owner selection of the proposed behavior; shared UI already owns session-local shell state. Amend ADR-0011 narrowly for this approved header behavior; hover and unrelated shell mechanisms stay undecided. Preserve all prior uncommitted work and main-padding adjustments.
+- Behavior: header visible when closed/unlocked; locked defaults hidden; explicit reveal persists until hidden again or lock session ends. Hidden header stays mounted but inert and removed from layout/tab order. Keep panel pixel height stable; remaining space goes to main. Show/hide, lock and close controls remain reachable in panel toolbar. Restore visible header before returning focus to its panel toggle on close, including drag collapse. No persisted preference, animation or hover behavior.
+- Verification: focused real-library component tests, browser interactions/axe and computed geometry at desktop/mobile, affected E2E, formatting/lint/types/Knip/brand/coverage/build. Run pnpm verify with CI server reuse disabled so it cannot consume the owner's existing port-8080 server; report the resulting port blocker and run browser checks on isolated ports.
+- Recovery: restore only this task's hunks from `/private/tmp/synapcity-locked-panel-header-baseline`; preserve other work and servers. Stop on overlapping edits or required scope expansion.
+
+Earlier scopes below are retained as history and grant no additional mutation authority.
+
+## Active task: main spacing while the global panel is open (2026-10-17)
+
+- Goal and mode: implement the owner's request to reduce the main area's vertical padding while the global panel is open; implementing.
+- Exact updates (3): `.agents/task-scope.md`; `packages/frontend/ui/src/blocks/root-shell/global-panel/global-panel.tsx`; `packages/frontend/ui/src/blocks/root-shell/root-content/root-content.tsx`. Creates/deletes/moves/renames 0; dependencies/config/public APIs/persistence/routes/Git/external systems/other planning artifacts 0.
+- Approval: direct owner request for this visual behavior. Expose existing open state as an ephemeral DOM attribute on the work-area container; use a named Tailwind group to reduce main padding to py-4 / sm:py-6 / lg:py-8. Closed and public spacing remains py-10 / sm:py-14 / lg:py-16. Horizontal gutters, panel controls and scrolling behavior remain intact.
+- Ownership: shared UI already owns the shell and main spacing. This scope bounds execution only; no product or architecture decision.
+- Verification: focused existing component tests, format/lint/types, browser computed spacing at mobile/tablet/desktop with panel open and closed, and pnpm verify. No implementation-mirroring test for this low-impact visual adjustment. Report unrun or blocked checks precisely.
+- Recovery: restore only these changes from `/private/tmp/synapcity-panel-main-spacing-baseline`, preserving the prior panel implementation and concurrent work. Stop on overlapping edits or required scope expansion.
+
+Earlier scopes below are retained as history and grant no additional mutation authority.
+
+## Active task: resizable global panel (2026-10-17)
+
+- Goal and mode: implement the owner-approved resizable global panel in feat-core-ui-routes, using the archived feat-theming-system implementation as evaluated evidence; implementing.
+- Approval: owner approved the concrete 21-file manifest, dependency and ADR on 2026-10-17 ("yes"). Global panel remains a provisional label. Preserve existing shell ownership and signed-out behavior.
+- Exact updates (11): `.agents/task-scope.md`; `packages/frontend/ui/package.json`; `pnpm-lock.yaml`; `packages/frontend/ui/src/blocks/root-shell/root-shell.tsx`, `root-shell.test.tsx`, `root-shell.stories.tsx`; that folder's `root-header/root-header.tsx` and `root-header.test.tsx`; `packages/frontend/ui/src/blocks/sidebar-shell/sidebar-shell.tsx` and `sidebar-shell.test.tsx`; `docs/architecture/decisions/README.md`.
+- Exact creates (10): `resizable.tsx`, `resizable.test.tsx`, `resizable.stories.tsx`, `index.ts` under `packages/frontend/ui/src/components/ui/resizable/`; `global-panel.tsx`, `global-panel.test.tsx`, `global-panel.stories.tsx`, `index.ts` under `packages/frontend/ui/src/blocks/root-shell/global-panel/`; `apps/web/e2e/global-panel.e2e.ts`; `docs/architecture/decisions/0011-resizable-global-panel-shell.md`.
+- Systems of record: accepted ADR owns this bounded adoption; shared UI owns shell presentation and mounted-session state; apps/web owns browser acceptance checks; this record bounds execution only. Budgets: updates 11; creates 10; new dependencies 1 (`react-resizable-panels@4.14.5`); delete/move/rename 0; persistence/schema/route changes 0; Git history/PR/issues/projects 0; external-service changes 0; archive changes 0; other planning surfaces 0.
+- Behavior: authenticated-only, initially collapsed, first open 30 percent, vertical reflow beneath existing header, independent scrolling, pointer/touch/keyboard resize, remember completed resize in memory, lock blocks outside/Escape dismissal only, explicit close works, reset lock on close, protect portaled overlays and restore focus before collapse. Caller-owned content slot with neutral empty state. Preserve skip link, landmarks, sidebar and account links.
+- Preconditions: clean worktree confirmed; actual branch `feat/build-home-rooute`; no dependencies installed initially. Registry confirmed 4.14.5 and React 19 peer compatibility; use matching upstream/package docs. Lifecycle scripts disabled during install. No utility modules, registry, capture lifecycle or persistence adoption.
+- Verification: focused component/interaction tests, mutation check for meaningful regressions, browser resize/dismissal/focus/scroll/desktop/mobile checks, formatting/lint/typecheck/Knip/brand/coverage/build and pnpm verify; report failures and gates not reached. Browser checks use production build or clearly labelled Storybook/harness proof.
+- Recovery: restore only this task's hunks from `/private/tmp/synapcity-global-panel-20261017-baseline`, remove only its added files and dependency entries, preserve concurrent changes; no reset/stash/clean/history mutation. Stop on concurrent edits to scoped files, unresolved decisions, or a required destination outside this manifest.
+
+Earlier scopes below are retained as history and grant no additional mutation authority.
+
 # Task scope
 
 ## Active task: merge `main` into `feat/settings-page` (2026-10-17)
