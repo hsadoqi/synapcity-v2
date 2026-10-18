@@ -34,6 +34,7 @@ export const LoggedIn: Story = {
       homeHref: '/user-123/home',
       settingsHref: '/user-123/settings',
     },
+    globalPanel: <p>Caller-owned utility content</p>,
   },
 };
 

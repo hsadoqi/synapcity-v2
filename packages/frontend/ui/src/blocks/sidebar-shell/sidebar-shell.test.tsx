@@ -1,10 +1,21 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SidebarShell } from '@synapcity/frontend-ui/blocks/sidebar-shell';
 import { ModeProvider } from '@synapcity/frontend-ui/providers/mode-provider';
 
 const account = { homeHref: '/u/home', settingsHref: '/u/settings' };
+
+beforeEach(() => {
+  vi.stubGlobal(
+    'ResizeObserver',
+    class {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    },
+  );
+});
 
 const renderShell = (header: React.ReactNode = <div>Header</div>) =>
   render(
@@ -54,5 +65,17 @@ describe('SidebarShell', () => {
     expect(
       document.querySelector('[data-slot="sidebar-inset"]')!.className,
     ).toContain('min-w-0');
+  });
+
+  it('gives the panel and page separate scroll containers below the header', () => {
+    renderShell();
+    expect(
+      document
+        .querySelector('[data-slot="global-panel-scroll"]')
+        ?.contains(document.querySelector('[data-slot="shell-page-scroll"]')),
+    ).toBe(false);
+    expect(
+      document.querySelector('[data-slot="shell-page-scroll"]')?.textContent,
+    ).toBe('Page');
   });
 });

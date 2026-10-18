@@ -11,6 +11,7 @@ import { cn } from '@synapcity/frontend-ui/lib/utils';
 import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';
 import { SidebarTrigger } from '@synapcity/frontend-ui/core/sidebar';
 import { Separator } from '@synapcity/frontend-ui/core/separator';
+import { GlobalPanelToggle } from '@synapcity/frontend-ui/blocks/root-shell/global-panel';
 
 type RootHeaderProps = {
   actions?: ReactNode;
@@ -28,6 +29,7 @@ export const RootHeaderContent = ({ actions, account }: RootHeaderProps) => {
     <div className="flex min-w-0 flex-1 items-center justify-between gap-4">
       <RootLogoLink homeHref={account?.homeHref} />
       <RootIconActions settingsHref={account?.settingsHref}>
+        {account && <GlobalPanelToggle />}
         {actions}
       </RootIconActions>
     </div>
