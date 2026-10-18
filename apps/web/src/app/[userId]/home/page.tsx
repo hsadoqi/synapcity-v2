@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
 
 import { requireOwner } from '@/lib/access/require-owner';
-import { HomePageLayout } from '@/features/home/components/home-page';
-import { fixtureItems, fixturePinned } from '@/features/home/lib/fixtures';
+import { HomePageView } from '@/features/home/components/home-page';
+import {
+  fixtureItems,
+  fixturePinned,
+} from '@/features/home/lib/overview.fixtures';
 
 export const metadata: Metadata = { title: 'Home' };
 
@@ -12,8 +15,7 @@ export default async function HomePage({
   params: Promise<{ userId: string }>;
 }) {
   // The proxy only knows someone is signed in; this checks it is this user.
-  const { claims } = await requireOwner((await params).userId);
-  console.log('claims', claims);
+  await requireOwner((await params).userId);
   //   return (
   //     <div className="flex flex-1 flex-col items-center justify-center gap-4 p-4 text-center">
   //       <CurrentUserAvatar />
@@ -26,7 +28,7 @@ export default async function HomePage({
   //     </div>
   //   );
   return (
-    <HomePageLayout
+    <HomePageView
       state="populated"
       items={fixtureItems}
       pinned={fixturePinned}

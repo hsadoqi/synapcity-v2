@@ -1,5 +1,5 @@
-import { HomePageShell } from '@/features/home/components/home-page';
-import HomeProviders from '@/features/home/providers/home-providers';
+import { HomeShell } from '@/features/home/components/home-shell';
+import { HomeProviders } from '@/features/home/providers/home-providers';
 
 export default function HomeLayout({
   children,
@@ -8,7 +8,7 @@ export default function HomeLayout({
 }) {
   return (
     <HomeProviders>
-      <HomePageShell>{children}</HomePageShell>
+      <HomeShell>{children}</HomeShell>
     </HomeProviders>
   );
 }
