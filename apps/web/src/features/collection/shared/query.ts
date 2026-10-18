@@ -132,6 +132,12 @@ export function applyCollectionQuery(
     ) {
       return false;
     }
+    if (
+      filters.tags.length > 0 &&
+      !item.tags.some((tag) => filters.tags.includes(tag))
+    ) {
+      return false;
+    }
     if (!needle) return true;
     return [item.title, item.subtitle, item.group, ...item.tags]
       .filter(Boolean)
@@ -149,4 +155,33 @@ export function applyCollectionQuery(
     const bTime = new Date(b[key] ?? b.updatedAt).getTime();
     return (aTime - bTime) * direction;
   });
+}
+
+/** When an item was last in use: when it was opened, else when it changed. */
+function lastActive(item: CollectionItem) {
+  return new Date(item.lastViewedAt ?? item.updatedAt).getTime();
+}
+
+/**
+ * Most recently in use first. An item never opened counts from its last
+ * change, so a new or untouched item still finds a place. Returns a new list.
+ */
+export function byRecency(items: CollectionItem[]) {
+  return [...items].sort((a, b) => lastActive(b) - lastActive(a));
+}
+
+/**
+ * The tags used across `items`, most used first (ties alphabetical), so a
+ * short row of tag chips can show the ones that matter.
+ */
+export function tagsByUse(items: CollectionItem[]) {
+  const counts = new Map<string, number>();
+  for (const item of items) {
+    for (const tag of new Set(item.tags)) {
+      counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    }
+  }
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([tag]) => tag);
 }
