@@ -19,7 +19,7 @@ export const SettingsHeader = () => {
           {status}
         </span>
       </div>
-      <p className="text-sm text-muted-foreground">
+      <p className="max-w-prose text-sm text-muted-foreground">
         {name ? `Welcome, ${name}.` : 'Welcome.'} This is your personal space. A
         workspace that feels like you. Make yourself at home.
       </p>

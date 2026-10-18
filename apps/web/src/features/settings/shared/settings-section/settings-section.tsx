@@ -13,7 +13,7 @@ type SettingsSectionProps = {
 export function SettingsSection({ title, children }: SettingsSectionProps) {
   const headingId = useId();
   return (
-    <section aria-labelledby={headingId} className="flex flex-col gap-4">
+    <section aria-labelledby={headingId} className="flex flex-col gap-3">
       <h3 id={headingId} className="font-heading text-base font-semibold">
         {title}
       </h3>

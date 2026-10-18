@@ -16,7 +16,10 @@ export function SettingsContent({
 }) {
   return (
     <SettingsProvider name={name} account={account}>
-      <div className="flex min-h-0 w-full flex-1 flex-col gap-8 px-5 py-10">
+      {/* One reading column. The page shell already pads the sides and caps at
+          max-w-7xl; at that width a row's label and its control sat ~1000px
+          apart. Header, tabs, card and footer share this column so they align. */}
+      <div className="mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col gap-6 py-6 sm:gap-8 sm:py-10">
         <SettingsHeader />
         {notice && <p className="text-sm text-muted-foreground">{notice}</p>}
         <SettingsTabs />
