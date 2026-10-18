@@ -3,6 +3,16 @@ import { describe, expect, it } from 'vitest';
 
 import { SPACE_FIXTURES } from '../../lib/fixtures';
 import { SpacesCollection } from './spaces-collection';
+import { SpacesCollectionSkeleton } from './spaces-collection-skeleton';
+
+describe('SpacesCollectionSkeleton', () => {
+  it('keeps the page heading and announces that spaces are loading', () => {
+    render(<SpacesCollectionSkeleton />);
+
+    expect(screen.getByRole('heading', { name: 'Spaces' })).toBeTruthy();
+    expect(screen.getByRole('status').textContent).toBe('Loading spaces');
+  });
+});
 
 describe('SpacesCollection', () => {
   it('names the page and lists every space, not just the first few', () => {
@@ -59,6 +69,16 @@ describe('SpacesCollection', () => {
     render(<SpacesCollection spaces={[]} userId="u1" />);
 
     expect(screen.getByText('No spaces yet')).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Create a space' })).toBeTruthy();
+    // Creating a space does not exist yet, so nothing pretends to offer it.
+    expect(screen.queryByRole('button', { name: 'Create a space' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Create a space' })).toBeNull();
+  });
+
+  it('counts spaces in words for screen readers', () => {
+    render(<SpacesCollection spaces={[SPACE_FIXTURES[0]!]} userId="u1" />);
+
+    expect(screen.getByRole('heading', { level: 2 }).textContent).toBe(
+      'All spaces, 1 space',
+    );
   });
 });

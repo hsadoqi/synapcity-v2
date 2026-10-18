@@ -32,17 +32,20 @@ export function SpacesCollection({ spaces, userId }: SpacesCollectionProps) {
           Spaces
         </h1>
         <p className="max-w-prose text-sm text-muted-foreground text-pretty">
-          Each space keeps related documents and dashboards in one place.
+          Each space keeps related documents and dashboards in one place. The
+          one you changed last comes first.
         </p>
       </header>
+      {/* No createHref until creating a space exists; a button that does nothing is worse than none. */}
       <EntitySection
         id="spaces"
-        title="Recently updated"
+        title="All spaces"
+        noun={{ one: 'space', other: 'spaces' }}
         items={[...spaces].sort(byRecentlyUpdated).map(toListedSpace)}
         total={spaces.length}
         limit={spaces.length}
         emptyTitle="No spaces yet"
-        emptyBody="A space keeps related documents and dashboards together."
+        emptyBody="Spaces you make will show up here."
         emptyIcon="folder"
         createLabel="Create a space"
         prefix={`/${userId}/home`}
