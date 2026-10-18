@@ -1,9 +1,8 @@
 @import './typeset.css';
 
+/* Only what differs from .typeset: the heading and code fonts already default to the app's. */
 .typeset-docs {
   --typeset-font-body: var(--font-body);
-  --typeset-font-heading: var(--font-heading);
-  --typeset-font-mono: var(--font-code);
   --typeset-size: 14px;
   --typeset-leading: 1.6;
   --typeset-flow: 1em;
