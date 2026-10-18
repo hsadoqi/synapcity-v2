@@ -22,7 +22,7 @@ Phases 5 and 6 are intentionally thin. They cannot be enhanced until G1 selects 
 
 ## Boundaries
 
-- **Component layer:** already decided in ADR-0011. shadcn CLI is the source-acquisition mechanism and Base UI (`@base-ui/react`) is the primitive base; both land in `@synapcity/frontend-uiontend-uiontend-ui-core`. Phase 3 and 4 work follows this and does not reopen it.
+- **Component layer:** already decided in ADR-0011. shadcn CLI is the source-acquisition mechanism and Base UI (`@base-ui/react`) is the primitive base; both land in `@synapcity/frontend-ui/core`. Phase 3 and 4 work follows this and does not reopen it.
 - **Application frame:** placeholder regions plus provisional navigation, as described in the [Home and sidebar IA brief](phase-03-home-sidebar-ia-brief.md). Owner decision, 2026-10-05: this amends the earlier "neutral, no product navigation" boundary. The context switcher and the Home, Documents and Dashboards entries are provisional display copy and stay disabled until each has a model. Global Home's relationship to Dashboards, resumption and recency semantics, and the final name of contextual environments remain open decisions. Route segments in `apps/web` are placeholder scaffolds, not naming decisions; `docs/glossary.md` governs the labels.
 - **"Protected" routes:** out of scope. Authentication is a non-goal and needs an identity model. At most a documented placeholder seam.
 - **Lexical and React Grid Layout UI:** not before G1.

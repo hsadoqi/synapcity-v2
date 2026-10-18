@@ -30,6 +30,21 @@ describe('RootShell', () => {
     expect(screen.getByRole('contentinfo')).toBeTruthy();
   });
 
+  // A sticky bar without a z-index is painted in page order with the other
+  // positioned boxes, so the page content (RootContent is \`relative\`) was
+  // drawn over the header as it scrolled. jsdom cannot paint; this guards the
+  // stacking order the fix depends on.
+  it.each([
+    ['public', {}],
+    ['authenticated', { account }],
+  ])('keeps the %s sticky header above the page content', (_name, props) => {
+    renderShell(props);
+    const bar = screen.getByRole('banner').closest('.sticky');
+
+    expect(bar).not.toBeNull();
+    expect(bar!.className).toMatch(/(^|\s)z-\d+(\s|$)/);
+  });
+
   it('puts the skip link first in the tab order', () => {
     renderShell();
     const skip = screen.getByRole('link', { name: 'Skip to main content' });

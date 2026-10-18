@@ -28,12 +28,25 @@ Set these in `apps/web/.env.local` (git-ignored) and, for deployments, in the ho
 | `NEXT_PUBLIC_SUPABASE_URL`             | yes                    | Supabase project URL                                                                                                             |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | yes                    | Supabase publishable key. Never put the secret or service-role key in this app                                                   |
 | `SITE_URL`                             | no                     | Public origin of this app. Used to build email and OAuth redirect URLs; it must be on Supabase's redirect allow-list (see below) |
+| `NEXT_PUBLIC_SENTRY_DSN`               | yes                    | Optional. Sentry DSN for error reports, sent only after someone turns them on (see below)                                        |
 
 The app throws on the first sign-up, reset or OAuth call if `SITE_URL` is missing.
 
 ### Development fixture mode
 
-By default, development uses real Supabase auth like every other environment. To browse the signed-in pages without a Supabase project, set `SYNAPCITY_DEV_AUTH=fixture` in `apps/web/.env.local` and restart the dev server. You are then a fixed fixture user at `/fixture-user/home`; the header shows "Fixture mode", and sign-in, sign-up, recovery, OAuth, sign-out and profile changes are rejected before any Supabase call. It only works when `NODE_ENV` is `development`; test and production ignore it. See the amendment in [ADR-0006](../../docs/architecture/decisions/0006-authentication-with-supabase.md).
+By default, development uses real Supabase auth like every other environment. To browse the signed-in pages without a Supabase project, set `SYNAPCITY_DEV_AUTH=fixture` in `apps/web/.env.local` and restart the dev server. You are then a fixed fixture user at `/fixture-user/home`; the header shows "Fixture mode", and sign-in, sign-up, recovery, OAuth, sign-out and every account change (name, photo, email, password, connected accounts, account deletion and synced preferences) are rejected before any Supabase call. Settings still work, from browser storage only. It only works when `NODE_ENV` is `development`; test and production ignore it. See the amendment in [ADR-0006](../../docs/architecture/decisions/0006-authentication-with-supabase.md).
+
+### Error reports (Sentry)
+
+Error reports are off for everyone until a person turns them on in Settings, under Data privacy; until then the Sentry SDK is not even downloaded. With `NEXT_PUBLIC_SENTRY_DSN` unset, nothing is sent at all. The app sends browser errors only, without breadcrumbs, user data, cookies, headers or query strings, and replaces ids in URLs. In the Sentry project settings, also turn on **Prevent Storing of IP Addresses** (Security & Privacy), because Sentry can see the address a report was sent from, and the privacy notice at `/privacy` says reports carry nothing that identifies the person.
+
+Reports are labelled with `NEXT_PUBLIC_VERCEL_ENV` and `NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA`, which Vercel sets on its builds; elsewhere the environment is `NODE_ENV`, so local errors show as `development`, not `production`.
+
+Not set up yet, each a separate change:
+
+- **Source maps.** Production stack traces are minified until source maps are uploaded at build time (for example `sentry-cli sourcemaps inject` and `upload` in CI, then deleting the maps from the deployment). That needs a Sentry auth token as a CI secret. Do not bring back `withSentryConfig` for this: it also instruments the server.
+- **Ad blockers.** Many block `*.sentry.io`, so some reports never arrive. Sentry's `tunnel` option fixes this through an app route that forwards reports; that route must accept only this project's DSN, or it becomes an open relay.
+- **Server errors.** Only browser errors are reported. Server reporting needs the person's consent on the server, which waits on ADR-0010.
 
 ### `SITE_URL` per environment
 
@@ -50,6 +63,23 @@ Also set Supabase's own **Site URL** (the same page) to the production origin: i
 Previews are the sharp edge: a deployment URL that is not on the list does not get its auth links honoured, so auth email from an unlisted preview will not come back to that preview. Turborepo filters task environments to declared variables, so `SITE_URL` is listed under `globalPassThroughEnv` in `turbo.json`: tasks receive it, and changing it does not invalidate the build cache because it is read at request time, not compiled in.
 
 If `NEXT_PUBLIC_SUPABASE_URL` or `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` is missing, every request fails (the session proxy runs on all pages) with an error that names the variable. They are read at build time for the browser bundle, so CI and deployments must set them before `next build`; CI uses placeholders.
+
+## Supabase settings and migrations the account flows depend on
+
+Set in the Supabase dashboard, or run by hand in its SQL editor (the repository does not apply migrations). Each item says what breaks without it.
+
+| Where                               | Setting                                                                                                                                                                           | Without it                                                                                                       |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Authentication, Sign In / Providers | **Enable Manual Linking** (beta, off by default)                                                                                                                                  | Connecting or disconnecting Google or GitHub from settings fails; the page says linking is switched off.         |
+| Authentication, Sign In / Providers | Password strength: 8 characters, lowercase, uppercase, digits and symbols (already set by the owner)                                                                              | The form's rule and the project's would differ; the form never asks for less than the project.                   |
+| Authentication, Sign In / Providers | **Secure email change** either way                                                                                                                                                | The wording is true for both settings. On, an email change needs a link from each address.                       |
+| Authentication, URL Configuration   | Redirect URLs entry `<SITE_URL>/auth/callback**` (above)                                                                                                                          | No emailed link or provider sign-in returns, including email change, connecting an account and account deletion. |
+| Authentication, Email Templates     | The **Magic Link** template is what account deletion sends, so it reads as a sign-in link. Its wording is the owner's to edit; the link itself must stay `{{ .ConfirmationURL }}` | The deletion email is the stock sign-in email.                                                                   |
+| Storage                             | Bucket `avatars` with owner-folder policies: `supabase/migrations/20261017113500_create_avatars_bucket.sql`                                                                       | Photo upload fails.                                                                                              |
+| SQL editor                          | `supabase/migrations/20261017122000_profiles_signup_read_google_picture.sql`                                                                                                      | A new Google account starts with no stored photo (the header still shows it).                                    |
+| SQL editor                          | `supabase/migrations/20261017140000_delete_own_account.sql`. **Irreversible once called.** Read it first                                                                          | Account deletion reaches its last button and then fails with "Could not delete your account".                    |
+
+Not verified against a real project at the time of writing: the avatars and Google-picture migrations were run by the owner (the first confirmed, the second unconfirmed), and the deletion migration has not been run. The first of two email-change links is assumed to return with a message and no code. An emailed link is assumed to record `otp` or `magiclink` in the token; if it records another name, deletion refuses and does nothing (it fails closed).
 
 ## Structure
 

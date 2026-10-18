@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 import { safeNextPath } from '@/lib/routing/safe-next';
-import { RegisterCard } from '@/features/auth/components/register-card';
+import { RegisterCard } from '@/features/auth/components/register/register-card';
 
 export const metadata: Metadata = { title: 'Sign up' };
 

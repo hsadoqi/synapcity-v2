@@ -31,12 +31,16 @@ The following are outside the initial committed slice unless the MVP decision ex
 - generalized file ingestion, extraction, and indexing pipelines;
 - comprehensive Tasks, Goals, and Habits;
 - a plugin marketplace or public extension platform;
-- comprehensive automation, notifications, and scheduling infrastructure;
+- comprehensive automation and scheduling infrastructure, beyond what the notifications track below needs;
 - mobile/native/PWA product surfaces;
 - offline-first synchronization or CRDT architecture;
 - arbitrary user-defined schemas, types, or no-code application building;
 - a universal entity table, graph database, or generic relationship framework selected in advance of concrete relationship requirements;
 - full implementation of every foundational capability before one vertical slice has been evaluated.
+
+## Notifications track (owner decision, 2026-10-17)
+
+The product owner moved notifications into scope on 2026-10-17, as a track separate from the first slice in `first-slice.md` (which still excludes them from its hypothesis). Included: account and security alerts, product announcements, and reminders on user content; delivered in-app with an optional sound, by browser push, and by email. The design, the phases and the decisions still open are in [`docs/superpowers/specs/2026-10-17-notifications-design.md`](../superpowers/specs/2026-10-17-notifications-design.md). Each architecture choice it lists still needs its own approval.
 
 ## Deferred product directions
 

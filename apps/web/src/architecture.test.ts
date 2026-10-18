@@ -480,7 +480,7 @@ describe('import checks on a fixture tree', () => {
           'features/auth/shared/view.tsx': `import type { S } from './form-state';\nimport { useId } from 'react';\n`,
           'features/auth/server/uses-shared.ts': `import type { S } from '../shared/form-state';\nimport { h } from './helper';\n`,
           // A client module may call a Server Action entry point.
-          'features/auth/components/form.tsx': `'use client';\nimport { signOut } from '@/features/auth/server/actions';\nimport type { S } from '../shared/form-state';\nconst load = () => import('../shared/form-state');\n`,
+          'features/auth/components/form.tsx': `'use client';\nimport { signOut } from '@/features/auth/server/actions/actions';\nimport type { S } from '../shared/form-state';\nconst load = () => import('../shared/form-state');\n`,
           'features/auth/client/hook.ts': `'use client';\nimport type { S } from '../shared/form-state';\n`,
         }),
       ).toEqual([]);

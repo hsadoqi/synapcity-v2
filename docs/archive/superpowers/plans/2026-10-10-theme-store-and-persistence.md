@@ -53,10 +53,12 @@
 ### Task 1: Persisted payload, validation, rebuild (pure)
 
 **Files:**
+
 - Create: `apps/web/components/theme/lib/persisted-theme.ts`
 - Test: `apps/web/components/theme/lib/persisted-theme.test.tsx`
 
 **Interfaces:**
+
 - Consumes: from `./apply`: `appliedCss`, `AppliedTheme`, `ThemeInitial`; from `./color-math`: `accentSourceFor`, `COLOR_RANGES`, `HARMONIES`, `PRESETS`, `resolveTokens`, `tokenVariables`, `HarmonyId`, `Oklch`; from `./appearance`: `DENSITY`, `RADIUS`, `SCALE`; from `./fonts`: `DEFAULT_FONTS`, `fonts`, `FontId`, `FontRole`.
 - Produces:
   - `THEME_PREFS_COOKIE = 'theme-prefs'`
@@ -652,6 +654,7 @@ git add -- "${F[@]}" && git commit -m "feat: add validated persistence for the a
 Behavior-preserving. Nothing is saved yet; the sheet just reads the store with `useSyncExternalStore`.
 
 **Files:**
+
 - Create: `apps/web/components/theme/lib/applied-store.ts`
 - Create: `apps/web/components/theme/lib/applied-store.test.tsx`
 - Modify: `apps/web/components/theme/lib/apply.ts` (remove the record block at the end)
@@ -660,6 +663,7 @@ Behavior-preserving. Nothing is saved yet; the sheet just reads the store with `
 - Modify: `apps/web/components/theme/components/containers/theme-sheet.test.tsx` (one import)
 
 **Interfaces:**
+
 - Consumes: from `./apply`: `applyToDocument`, `hasChanges`, `mergeApplied`, `removeFromDocument`, `seedAfter`, `AppliedTheme`, `ThemeDraft`, `ThemeInitial`; from `./color-math`: `Mode`.
 - Produces:
   - `type AppliedRecord = { applied: AppliedTheme; seed: ThemeInitial; modeBefore: Mode | null; modeApplied: Mode | null }`
@@ -894,13 +898,13 @@ with
   changesBetween,
 ```
 
-2. After `import { DEFAULT_FONTS } from './fonts';` add:
+1. After `import { DEFAULT_FONTS } from './fonts';` add:
 
 ```ts
 import { clearApplied } from './applied-store';
 ```
 
-3. Delete the whole `describe('the applied record', …)` block (the three tests now live in `applied-store.test.tsx`), from `describe('the applied record', () => {` through its closing `});` just before `describe('transitions while a theme is applied'`.
+1. Delete the whole `describe('the applied record', …)` block (the three tests now live in `applied-store.test.tsx`), from `describe('the applied record', () => {` through its closing `});` just before `describe('transitions while a theme is applied'`.
 
 Update the sheet test import in `theme-sheet.test.tsx`:
 
@@ -986,6 +990,7 @@ git add -- "${F[@]}" && git commit -m "refactor: move the applied record into a 
 ### Task 3: Save and restore the applied theme in the store
 
 **Files:**
+
 - Modify: `apps/web/components/theme/lib/applied-store.ts`
 - Modify: `apps/web/components/theme/lib/applied-store.test.tsx`
 - Modify: `apps/web/components/theme/lib/apply.ts` (one comment)
@@ -993,6 +998,7 @@ git add -- "${F[@]}" && git commit -m "refactor: move the applied record into a 
 - Modify: `apps/web/components/theme/components/containers/theme-sheet.test.tsx` (copy test, new reload test)
 
 **Interfaces:**
+
 - Consumes: `THEME_PREFS_COOKIE`, `appliedFromPersisted`, `expiredPrefsCookie`, `parsePersistedTheme`, `persistedFromSnapshot`, `prefsCookieString`, `serializePersistedTheme` from `./persisted-theme` (Task 1).
 - Produces: `hydrateApplied(raw?: string): void` — replaces the record with the saved theme (or empty) and notifies subscribers; with no argument it reads `document.cookie`. `getAppliedRecord`, `recordApply` and `clearApplied` also load the cookie once, lazily, on the first call in a browser.
 
@@ -1167,7 +1173,7 @@ import {
 } from '../../lib/persisted-theme';
 ```
 
-2. Rename and update the existing copy test (it currently expects `Applied until reload.`):
+1. Rename and update the existing copy test (it currently expects `Applied until reload.`):
 
 ```tsx
     it('applies the mode to the app and says it was applied', () => {
@@ -1182,7 +1188,7 @@ import {
     });
 ```
 
-3. Add inside the top-level `describe('ThemeSheet', …)` (a sibling of the existing `describe` blocks):
+1. Add inside the top-level `describe('ThemeSheet', …)` (a sibling of the existing `describe` blocks):
 
 ```tsx
   it('offers to revert a theme saved by an earlier visit, and reverting forgets it', async () => {
@@ -1356,10 +1362,12 @@ git add -- "${F[@]}" && git commit -m "feat: save the applied theme and restore 
 ### Task 4: The server renders the saved theme into the first HTML
 
 **Files:**
+
 - Modify: `apps/web/app/layout.tsx`
 - Create: `apps/web/tests/theme-prefs.spec.ts`
 
 **Interfaces:**
+
 - Consumes: `APPLIED_STYLE_ID` from `../components/theme/lib/apply`; `THEME_PREFS_COOKIE`, `persistedCss` from `../components/theme/lib/persisted-theme`.
 
 - [ ] **Step 1: Write the failing test**
@@ -1482,7 +1490,7 @@ Expected: FAIL: the style element does not exist yet, so the first-HTML, empty-e
 
 - [ ] **Step 3: Write minimal implementation**
 
-In `apps/web/app/layout.tsx`, add imports below the existing `@synapcity/frontend-uiontend-uiontend-ui-core` import:
+In `apps/web/app/layout.tsx`, add imports below the existing `@synapcity/frontend-ui/core` import:
 
 ```tsx
 import { APPLIED_STYLE_ID } from '../components/theme/lib/apply';
@@ -1535,6 +1543,7 @@ git add -- "${F[@]}" && git commit -m "feat: render the saved theme into the fir
 ### Task 5: Record the decision and verify the repository
 
 **Files:**
+
 - Modify: `docs/architecture/decisions/0016-theme-shape-and-functionality.md`
 
 - [ ] **Step 1: Amend ADR-0016**
@@ -1543,7 +1552,7 @@ Read the file first (`Read` the "Structure" and "What this does NOT decide" sect
 
 In "Structure", replace the whole bullet that begins `- Interim behavior, until persistence is decided:` with:
 
-```
+```txt
 - Apply is global only. It writes only the controls the user changed, because the
   editor's defaults are not the app's. Colors are written per mode (`:root.light`
   and `:root.dark`), fonts as `--font-preference-*`, radius as `--radius-base`,
@@ -1559,7 +1568,7 @@ In "Structure", replace the whole bullet that begins `- Interim behavior, until 
 
 In "What this does NOT decide", replace the bullet that begins `- Persistence: where each value is stored` with:
 
-```
+```txt
 - Persistence beyond the global applied theme. The applied theme is saved in the
   `theme-prefs` cookie only: local storage cannot reach the first HTML, so it is
   not used. Named themes and their assignments in a per-user database are not
@@ -1589,6 +1598,7 @@ for c in format:check lint typecheck test test:storybook test:smoke deps deps:bo
 ```
 
 Expected:
+
 - pass: `format:check`, `lint`, `typecheck`, `test`, `docs:check`, `build`.
 - fail exactly as before this plan: `test:storybook` (the 3 text-scale stories), `test:smoke` (the 4 listed in Global Constraints; every `theme-prefs` and `theme-mode` test passes), `deps`, `deps:boundaries` (13 `no-circular` + 1 `not-to-unresolved`).
 

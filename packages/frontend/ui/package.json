@@ -16,7 +16,7 @@
   },
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
-    "lint": "eslint . --cache --max-warnings 0",
+    "lint": "eslint . --cache --cache-strategy content --max-warnings 0",
     "generate:component": "turbo gen react-component",
     "check-types": "tsc --noEmit",
     "verify": "pnpm lint && pnpm check-types && pnpm build",

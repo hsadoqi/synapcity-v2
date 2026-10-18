@@ -20,12 +20,12 @@ export const FIXTURE_MESSAGE =
  * whatever the flag says.
  */
 export function fixtureModeEnabled(): boolean {
-  /* eslint-disable turbo/no-undeclared-env-vars -- NODE_ENV is defined by Next.js for every runtime. */
+  // Both are declared in turbo.json: NODE_ENV in `build.env`,
+  // SYNAPCITY_DEV_AUTH in `globalPassThroughEnv`.
   return (
     process.env.NODE_ENV === 'development' &&
     process.env.SYNAPCITY_DEV_AUTH === 'fixture'
   );
-  /* eslint-enable turbo/no-undeclared-env-vars */
 }
 
 export const fixtureClaims = {

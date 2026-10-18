@@ -97,6 +97,23 @@ Approved by the repository owner (decision D1 of `docs/superpowers/plans/2026-10
 - Fixture mode skips the session proxy and the browser auth subscription, shows a visible "Fixture mode" label, and the settings page and every auth and profile action explain that account actions are unavailable.
 - The previous unconditional development bypass (`development-auth.ts`, on `v0/supabase-environment-error-df72e1eb`) is not carried over; it is retained there as evidence only.
 
+## Amendment, 2026-10-17: account and credential flows added on this branch
+
+Additions made at the repository owner's request. They keep the decision above (Supabase Auth, `@supabase/ssr` cookie sessions, `getClaims` on the server, PKCE through `/auth/callback`); none changes it.
+
+- **Change of email** from settings: `updateUser({ email }, { emailRedirectTo })`. Nothing changes until a link is used; the waiting address is read back from the provider (`user.new_email`) and shown until confirmed. Flow tag `email-change`.
+- **Password reset from settings**: the existing reset link, sent to the signed-in person's own address, returning to settings. No password is handled in settings.
+- **Password rule** for choosing a password: at least 8 characters with a lowercase letter, an uppercase letter, a digit and a symbol. It mirrors the project's Supabase password settings (the owner set them in the dashboard) and uses Supabase's documented symbol set, so the form never rejects what the provider accepts. Sign-in does not apply it, since an older account may predate it.
+- **Linked accounts**: Google and GitHub rows in settings, connecting with `linkIdentity` (flow tag `link`). Needs "Enable Manual Linking" in the project's Auth settings. Disconnecting is not built.
+- **Account deletion**: a confirm dialog, the address typed, then an emailed link (`signInWithOtp` with `shouldCreateUser: false`, flow tag `delete-account`) that opens a page with a final button. Deleting needs an emailed-link sign-in in the last 10 minutes, read from the verified `amr` claim. The app holds no service-role key, so the deletion is the Postgres function `public.delete_own_account()` (a `SECURITY DEFINER` function that checks the same rule and deletes only `auth.uid()`), shipped as a migration the owner runs by hand. Avatar files are removed first through the Storage API, best effort. Irreversible.
+- **Welcome step** after a sign-up or a first provider sign-in (`/auth/welcome`), driven by the `profile_confirmed` user-metadata key. The key is metadata, not a column; where profile data should live stays open (see Unresolved).
+- **Notices across a redirect**: `?notice=<key>` from a fixed list in `lib/routing/notices.ts`; an unknown key is ignored and nothing is authorized by it.
+- **Error boundaries**: `app/error.tsx`, `app/not-found.tsx` and a styled `app/global-error.tsx`, which needed the font loaders moved to `app/fonts.ts` (see the dated note in ADR-0003).
+- **Validation**: zod schemas in each feature's `types/` are the standard for form input.
+- **Development fixture mode** (amendment above) covers these flows too: every server action they add refuses before a Supabase client is created, and the settings page and root layout read no provider record or preferences row, so settings work from browser storage only.
+
+Verified by automated tests only (mocked provider and framework boundaries): the operations, actions, callback branches, pages and components above. **Not verified live**: that the first of two email-change links returns with a `message` and no `code` (assumed); that an emailed link yields `otp` or `magiclink` in `amr` (both accepted; any other name makes deletion refuse, so it fails closed); the wording of the Magic Link email the deletion link arrives in; cross-device behavior of PKCE links; and `next build`, Playwright and Storybook, which were not run for this work.
+
 ## Reconsideration conditions
 
 A requirement the cookie-session model cannot meet (for example native clients), a Supabase pricing or availability change, a security incident, or a decision to adopt a different persistence or identity stack.
