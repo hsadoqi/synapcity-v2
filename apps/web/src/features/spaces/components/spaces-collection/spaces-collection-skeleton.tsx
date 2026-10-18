@@ -2,11 +2,12 @@ import { Skeleton } from '@synapcity/frontend-ui/core/skeleton';
 
 import { SpacesHeader } from './spaces-header';
 
-const PLACEHOLDER_CARDS = 8;
+const PLACEHOLDER_ROWS = 5;
 
 /**
  * The spaces page while its spaces load: the real heading and intro, which do
- * not depend on the data, over placeholders laid out as the grid lays out.
+ * not depend on the data, over placeholders laid out as the page lays out
+ * (carousel beside the pinned panel, a toolbar, then the list).
  */
 export function SpacesCollectionSkeleton() {
   return (
@@ -18,32 +19,34 @@ export function SpacesCollectionSkeleton() {
         Loading spaces
       </span>
       <SpacesHeader />
-      <div className="flex flex-col gap-4">
-        <Skeleton className="h-6 w-32" />
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {Array.from({ length: PLACEHOLDER_CARDS }, (_, index) => (
-            <SpaceCardSkeleton key={index} />
+
+      <div aria-hidden="true" className="grid grid-cols-1 gap-4 lg:grid-cols-4">
+        <div className="flex min-w-0 flex-col gap-3 lg:col-span-3">
+          <Skeleton className="h-6 w-40" />
+          <div className="flex gap-3 overflow-hidden">
+            <Skeleton className="h-48 basis-11/12 shrink-0" />
+            <Skeleton className="h-48 basis-56 shrink-0" />
+          </div>
+        </div>
+        <div className="flex flex-col gap-3 rounded-md border border-border p-4">
+          <Skeleton className="h-6 w-24" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+        </div>
+      </div>
+
+      <div aria-hidden="true" className="flex flex-col gap-3">
+        <div className="flex gap-2">
+          <Skeleton className="h-7 flex-1 sm:max-w-sm" />
+          <Skeleton className="h-7 w-20" />
+          <Skeleton className="h-7 w-20" />
+        </div>
+        <div className="flex flex-col gap-1">
+          {Array.from({ length: PLACEHOLDER_ROWS }, (_, index) => (
+            <Skeleton key={index} className="h-12 w-full" />
           ))}
         </div>
       </div>
-    </div>
-  );
-}
-
-/**
- * EntityItemCard's frame and line heights (icon, name, two-line description,
- * date), so the cards land where the placeholders were.
- */
-function SpaceCardSkeleton() {
-  return (
-    <div className="flex flex-col gap-6 rounded-lg border border-border bg-card p-3">
-      <Skeleton className="size-4" />
-      <div className="flex flex-col gap-1">
-        <Skeleton className="h-5 w-2/3" />
-        <Skeleton className="h-5 w-full" />
-        <Skeleton className="h-5 w-4/5" />
-      </div>
-      <Skeleton className="h-4 w-16" />
     </div>
   );
 }
