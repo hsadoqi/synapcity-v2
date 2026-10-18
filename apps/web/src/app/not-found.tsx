@@ -1,4 +1,4 @@
-import { LinkButton } from '@synapcity/frontend-ui/components';
+import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
 
 import { MessagePage } from '@/components/shells/message-page';
 

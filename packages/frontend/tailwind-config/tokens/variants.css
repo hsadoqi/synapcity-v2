@@ -8,3 +8,9 @@
     }
   }
 }
+
+@custom-variant open-overlay {
+  &:is(.open-overlay *) {
+    @slot;
+  }
+}

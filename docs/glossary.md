@@ -98,6 +98,7 @@ The following terms may be valid in implementation contexts but carry no automat
 - fixture shapes such as `*Summary` and `*ViewFixture`;
 - current package-layer labels such as domain, runtime, UI, adapter, service, and app;
 - experimental identifiers such as `EntityRef`, `synapcity://`, `regionCount`, and `dataSourceId`.
+- `collection`, the internal name of `apps/web/src/features/collection` (search, filter, sort and display mechanics for any list of items, per [ADR-0011](architecture/decisions/0011-collection-browse-feature.md)), and its item field `group`. Neither is a product term: do not derive user-facing copy, routes or schemas from them.
 
 ## Naming decision process
 
