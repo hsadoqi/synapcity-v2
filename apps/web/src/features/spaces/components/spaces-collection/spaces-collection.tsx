@@ -19,16 +19,26 @@ function toListedSpace(space: SpaceEntity): Space {
   };
 }
 
+/** Most recently touched first, so the space you were last in is first. */
+function byRecentlyUpdated(a: SpaceEntity, b: SpaceEntity): number {
+  return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+}
+
 export function SpacesCollection({ spaces, userId }: SpacesCollectionProps) {
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-10 lg:py-14">
-      <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">
-        Spaces
-      </h1>
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-8 lg:py-12">
+      <header className="flex flex-col gap-1">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
+          Spaces
+        </h1>
+        <p className="max-w-prose text-sm text-muted-foreground text-pretty">
+          Each space keeps related documents and dashboards in one place.
+        </p>
+      </header>
       <EntitySection
         id="spaces"
-        title="All spaces"
-        items={spaces.map(toListedSpace)}
+        title="Recently updated"
+        items={[...spaces].sort(byRecentlyUpdated).map(toListedSpace)}
         total={spaces.length}
         limit={spaces.length}
         emptyTitle="No spaces yet"

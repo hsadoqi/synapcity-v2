@@ -24,6 +24,31 @@ describe('SpacesCollection', () => {
     ).toBe(`/u1/home/spaces/${first!.id}`);
   });
 
+  it('lists the most recently updated space first', () => {
+    const [older, newer] = [
+      {
+        ...SPACE_FIXTURES[0]!,
+        id: 'older',
+        name: 'Older',
+        updatedAt: '2026-01-01T00:00:00.000Z',
+      },
+      {
+        ...SPACE_FIXTURES[0]!,
+        id: 'newer',
+        name: 'Newer',
+        updatedAt: '2026-06-01T00:00:00.000Z',
+      },
+    ];
+    render(<SpacesCollection spaces={[older!, newer!]} userId="u1" />);
+
+    const links = screen
+      .getAllByRole('link')
+      .map((l) => l.getAttribute('href'));
+    expect(links.indexOf('/u1/home/spaces/newer')).toBeLessThan(
+      links.indexOf('/u1/home/spaces/older'),
+    );
+  });
+
   it('offers no view-all link', () => {
     render(<SpacesCollection spaces={[...SPACE_FIXTURES]} userId="u1" />);
 
