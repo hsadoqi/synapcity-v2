@@ -181,6 +181,33 @@ describe('the compiled token CSS', () => {
   });
 });
 
+describe('the appearance preferences', () => {
+  const border = (selector: string) =>
+    declsFor(selector).find((d) => d.prop === '--border')?.value;
+
+  it('makes "show borders" change the border at normal contrast', () => {
+    // The default border is --muted. Setting --border to --muted again left the setting doing
+    // nothing unless contrast was low, so it must resolve to something else.
+    const normal = border(':root');
+    const shown = border(":root[data-borders='true']");
+    expect(shown).toBeDefined();
+    expect(shown).not.toBe(normal);
+  });
+
+  it('lets high contrast beat both, and low contrast soften the border', () => {
+    expect(border(":root[data-contrast='high']")).toBe(
+      'var(--base-foreground)',
+    );
+    // The optimizer writes a plain fallback first and the colour-mix inside an @supports block,
+    // so read the whole rule, not its first declaration.
+    let low = '';
+    tree.walkRules(/^:root\[data-contrast='low'\]/, (rule) => {
+      low += rule.toString();
+    });
+    expect(low).toContain('color-mix');
+  });
+});
+
 describe('the token source', () => {
   const tokens = join(root, 'tokens');
   const source = readdirSync(tokens)
