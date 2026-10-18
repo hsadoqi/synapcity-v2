@@ -34,6 +34,7 @@ function SwitchRow({
   return (
     <SettingRow
       id={id}
+      toggle
       label={label}
       description={supersededBy ?? description}
       disabled={superseded}

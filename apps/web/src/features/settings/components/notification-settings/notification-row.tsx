@@ -41,6 +41,7 @@ export const NotificationRow = ({
   return (
     <SettingRow
       id={id}
+      toggle
       label={label}
       description={
         blockedReason ? `${description} ${blockedReason}` : description
