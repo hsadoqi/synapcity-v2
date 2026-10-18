@@ -18,7 +18,7 @@ export function CollectionGridCard({
   onItemAction,
 }: CollectionItemCardProps) {
   return (
-    <li className="relative flex flex-col gap-3 rounded-md border border-border bg-card p-4 text-card-foreground transition-colors hover:bg-muted motion-reduce:transition-none">
+    <li className="relative flex flex-col gap-3 rounded-md border border-border bg-card p-4 text-card-foreground transition-colors hover:bg-muted/50 motion-reduce:transition-none">
       <div className="flex items-start gap-3">
         <ItemIcon icon={icon} />
         <div className="flex min-w-0 flex-1 flex-col gap-1">
