@@ -29,7 +29,7 @@
 
 :root[data-borders='true'],
 :root[data-borders='true'] :is(.light, .dark) {
-  --border: var(--muted-background);
+  --border: var(--muted);
 }
 
 :root[data-contrast='high'],
