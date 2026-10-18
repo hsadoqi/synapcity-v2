@@ -1,6 +1,7 @@
 import { Skeleton } from '@synapcity/frontend-ui/core/skeleton';
 
 import type { CollectionLabels } from '../../shared';
+import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
 
 type CollectionHeaderProps = {
   labels: CollectionLabels;
@@ -8,6 +9,7 @@ type CollectionHeaderProps = {
   context?: string;
   count: number;
   loading: boolean;
+  userId?: string;
 };
 
 export function CollectionHeader({
@@ -15,16 +17,18 @@ export function CollectionHeader({
   context,
   count,
   loading,
+  userId
 }: CollectionHeaderProps) {
   const countLabel = `${count} ${count === 1 ? singular : `${singular}s`}`;
-
+  
+const slug = `/${userId}/home/${plural.toLowerCase()}`;
   return (
-    <header className="flex flex-col gap-1">
+    <header className="flex gap-1 justify-between items-center">
       {context && <p className="text-sm text-muted-foreground">{context}</p>}
       <div className="flex items-baseline gap-3">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
           {plural}
-        </h1>
+        </h2>
         {loading ? (
           <Skeleton className="h-4 w-16" />
         ) : (
@@ -33,6 +37,14 @@ export function CollectionHeader({
           </span>
         )}
       </div>
+          <LinkButton
+            href={slug}
+            variant="link"
+            size="sm"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground"
+          >
+            View all {plural.toLowerCase()}
+          </LinkButton>
     </header>
   );
 }

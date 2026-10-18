@@ -24,6 +24,7 @@ import { ActiveFilters, CollectionToolbar } from '../collection-toolbar';
 import { CollectionGrid } from './collection-grid';
 import { CollectionHeader } from './collection-header';
 import { CollectionList } from './collection-list';
+import { useCurrentUser } from '@/features/auth/client/user-provider';
 
 export type CollectionViewProps = {
   /** How to name the items: "document" / "Documents". */
@@ -87,10 +88,12 @@ export function CollectionView({
     now,
     onItemAction,
   };
+  const user = useCurrentUser();
 
   return (
     <section className="flex flex-col gap-6">
       <CollectionHeader
+        userId={user?.id ?? ''}
         labels={labels}
         context={context}
         count={state === 'populated' ? items.length : 0}
