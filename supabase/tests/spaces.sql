@@ -1,4 +1,4 @@
--- Behavioral regression checks for ADR-0012. Run only on a disposable local
+-- Behavioral regression checks for ADR-0012 (as amended by ADR-0013). Run only on a disposable local
 -- database after applying the migrations, as the database administrator:
 -- psql -X -v ON_ERROR_STOP=1 -f supabase/tests/spaces.sql <local-connection>
 -- All synthetic users and records below are rolled back. No pgTAP dependency.
@@ -79,11 +79,13 @@ begin
   exception when insufficient_privilege then null;
   end;
 
-  begin
-    delete from public.spaces where id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
-    raise exception 'Standalone Space deletion must be refused';
-  exception when insufficient_privilege then null;
-  end;
+  -- ADR-0013 allows owners to delete their own Spaces; see
+  -- space-participation.sql for the owner delete and its effect on content.
+  delete from public.spaces where id = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+  get diagnostics changed = row_count;
+  if changed <> 0 then
+    raise exception 'RLS must prevent deleting another owner''s Space';
+  end if;
 
   begin
     insert into public.spaces (name) values (E' \t\n');
