@@ -166,8 +166,8 @@ describe('regional controls', () => {
       expect(values().regional).toEqual(expected);
     },
     // Two mounts plus a pick from the long timezone list: on a loaded machine
-    // this outlasts the 5 s default (as in settings-tabs.dom.test.tsx).
-    15_000,
+    // this outlasts the 5 s vitest default, so it gets the shared margin.
+    30_000,
   );
 
   it('keeps valid saved timezone aliases selectable', async () => {
