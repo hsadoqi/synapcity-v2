@@ -61,6 +61,8 @@ describe('font preferences in the settings schema', () => {
       headingFont: 'default',
       bodyFont: 'default',
       codeFont: 'default',
+      radius: 'default',
+      density: 'comfortable',
     });
     expect(settingsDefaults.theme.headingFont).toBe('default');
   });
