@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 import { Separator } from '@synapcity/frontend-ui/core/separator';
+import { Tabs, TabsContent } from '@synapcity/frontend-ui/core/tabs';
 
 import {
   applyCollectionQuery,
@@ -38,8 +39,14 @@ type CollectionTabsProps = {
    */
   children?: React.ReactNode;
   overviewLabel?: string;
+  /** Whose home each collection's "View all" link goes to. */
+  userId?: string;
   /** The time relative dates are measured from. Defaults to now. */
   now?: Date;
+  /** Shown beside the tabs, e.g. the caller's create actions. */
+  barActions?: React.ReactNode;
+  /** The "New …" button in a collection's toolbar; receives that tab's id. */
+  onCreate?: (tabId: string) => void;
 };
 
 /**
@@ -52,6 +59,9 @@ export function CollectionTabs({
   children,
   overviewLabel = 'Overview',
   now,
+  userId,
+  barActions,
+  onCreate,
 }: CollectionTabsProps) {
   const hasOverview = children != null;
   const [showingOverview, setShowingOverview] = useState(hasOverview);
@@ -113,40 +123,49 @@ export function CollectionTabs({
     });
   }
 
-  return (
-    <div className="flex flex-1 flex-col gap-6">
-      {tab && tabCount > 1 && (
-        <>
-          <CollectionTabsBar
-            tab={tab}
-            onTabChange={handleTabChange}
-            overviewLabel={hasOverview ? overviewLabel : undefined}
-            tabs={tabs}
+  const content =
+    tab === OVERVIEW_TAB
+      ? children
+      : active && (
+          <CollectionView
+            {...active.view}
+            items={visibleItems}
+            state={viewState}
+            query={query}
+            onQueryChange={setQuery}
+            filters={filters}
+            onFiltersChange={setFilters}
+            sort={sort}
+            onSortChange={setSort}
+            layout={layout}
+            onLayoutChange={setLayout}
+            onCreate={() => onCreate?.(active.id)}
+            onItemAction={handleItemAction}
+            now={now}
+            userId={userId}
           />
-          <Separator />
-        </>
-      )}
+        );
 
-      {tab === OVERVIEW_TAB
-        ? children
-        : active && (
-            <CollectionView
-              {...active.view}
-              items={visibleItems}
-              state={viewState}
-              query={query}
-              onQueryChange={setQuery}
-              filters={filters}
-              onFiltersChange={setFilters}
-              sort={sort}
-              onSortChange={setSort}
-              layout={layout}
-              onLayoutChange={setLayout}
-              onCreate={() => {}}
-              onItemAction={handleItemAction}
-              now={now}
-            />
-          )}
-    </div>
+  // One tab: nothing to switch between, so no tab bar and no tab panel.
+  if (!tab || tabCount <= 1) {
+    return <div className="flex flex-1 flex-col gap-6">{content}</div>;
+  }
+
+  return (
+    <Tabs
+      value={tab}
+      onValueChange={(value) => handleTabChange(String(value))}
+      className="flex-1 gap-6"
+    >
+      <CollectionTabsBar
+        overviewLabel={hasOverview ? overviewLabel : undefined}
+        tabs={tabs}
+        actions={barActions}
+      />
+      <Separator />
+      <TabsContent value={tab} className="flex flex-1 flex-col gap-6 text-base">
+        {content}
+      </TabsContent>
+    </Tabs>
   );
 }

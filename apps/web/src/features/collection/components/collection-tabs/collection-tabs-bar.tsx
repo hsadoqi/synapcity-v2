@@ -1,44 +1,40 @@
 'use client';
 
-import { Tabs, TabsList, TabsTrigger } from '@synapcity/frontend-ui/core/tabs';
+import { TabsList, TabsTrigger } from '@synapcity/frontend-ui/core/tabs';
 
 /** The value of the optional overview tab; no collection tab may use it as its id. */
 export const OVERVIEW_TAB = 'overview';
 
 type CollectionTabsBarProps = {
-  tab: string;
-  onTabChange: (tab: string) => void;
   /** Adds an overview tab, with this label, before the collection tabs. */
   overviewLabel?: string;
   tabs: { id: string; label: string }[];
+  /** Whatever the caller wants beside the tabs, e.g. its create actions. */
+  actions?: React.ReactNode;
 };
 
-/** The tab bar above the collections. Which tabs it shows is up to the caller. */
+/**
+ * The tab bar above the collections. Which tabs it shows, and what sits
+ * beside them, is up to the caller. It must be rendered inside `Tabs`.
+ */
 export function CollectionTabsBar({
-  tab,
-  onTabChange,
   overviewLabel,
   tabs,
+  actions,
 }: CollectionTabsBarProps) {
   return (
-    <div
-      role="group"
-      aria-label="Collections"
-      className="flex flex-wrap items-center gap-3 rounded-md border border-dashed border-border bg-muted/40 p-2"
-    >
-      <Tabs value={tab} onValueChange={(value) => onTabChange(String(value))}>
-        <TabsList>
-          {overviewLabel && (
-            <TabsTrigger value={OVERVIEW_TAB}>{overviewLabel}</TabsTrigger>
-          )}
-          {tabs.map(({ id, label }) => (
-            <TabsTrigger key={id} value={id}>
-              {label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
-      {/* TODO: Add dynamic toggle items here for each filter applied, e.g. "In Space" or "Pinned" */}
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <TabsList>
+        {overviewLabel && (
+          <TabsTrigger value={OVERVIEW_TAB}>{overviewLabel}</TabsTrigger>
+        )}
+        {tabs.map(({ id, label }) => (
+          <TabsTrigger key={id} value={id}>
+            {label}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+      {actions}
     </div>
   );
 }

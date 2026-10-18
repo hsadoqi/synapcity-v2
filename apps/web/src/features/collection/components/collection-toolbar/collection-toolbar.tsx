@@ -31,7 +31,7 @@ type CollectionToolbarProps = {
 };
 
 export function CollectionToolbar({
-  labels: { singular },
+  labels: { singular, plural },
   context,
   grouping,
   query,
@@ -45,8 +45,8 @@ export function CollectionToolbar({
   onCreate,
 }: CollectionToolbarProps) {
   const placeholder = context
-    ? `Search ${singular}s in ${context}…`
-    : `Search ${singular}s…`;
+    ? `Search ${plural.toLowerCase()} in ${context}…`
+    : `Search ${plural.toLowerCase()}…`;
 
   // Mobile: search + create share row one, controls wrap to row two.
   // sm and up: search, controls, create on a single row.
@@ -56,7 +56,7 @@ export function CollectionToolbar({
         query={query}
         onQueryChange={onQueryChange}
         placeholder={placeholder}
-        label={`Search ${singular}s`}
+        label={`Search ${plural.toLowerCase()}`}
         className="order-1 min-w-0 flex-1 sm:max-w-sm"
       />
 

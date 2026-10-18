@@ -91,7 +91,7 @@ export function ItemActionsMenu({
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
         title={`Delete “${item.title}”?`}
-        description={`This ${singular} will be gone for good. There’s no undo, so take a breath first.`}
+        description={`This ${singular} will be deleted permanently. This can’t be undone.`}
         confirmText={`Delete ${singular}`}
         cancelText="Keep it"
         onConfirm={() => onAction('delete', item)}

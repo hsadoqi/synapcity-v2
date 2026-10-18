@@ -56,7 +56,7 @@ describe('CollectionView', () => {
     renderView();
 
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Recipes' }),
+      screen.getByRole('heading', { level: 2, name: 'Recipes' }),
     ).toBeTruthy();
     expect(screen.getByText('2 recipes')).toBeTruthy();
     expect(

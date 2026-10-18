@@ -47,7 +47,7 @@ describe('CollectionTabs', () => {
 
     expect(screen.queryByText('Overview content')).toBeNull();
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Recipes' }),
+      screen.getByRole('heading', { level: 2, name: 'Recipes' }),
     ).toBeTruthy();
     expect(screen.getByText('Title stew')).toBeTruthy();
   });

@@ -37,7 +37,7 @@ export function CompactItemList({
       isEmpty={visible.length === 0}
       tight
     >
-      <ul className="-mx-2 flex flex-col">
+      <ul className="-mx-2 flex flex-col flex-1">
         {visible.map((item) => (
           <li key={item.id}>
             <CompactItemRow item={item} {...itemProps} />
@@ -64,9 +64,11 @@ function CompactItemRow({
       <ItemKindTile kind={kindOf(item, kinds)} />
       <span className="flex min-w-0 flex-1 flex-col">
         <span className="truncate text-sm font-medium">{item.title}</span>
-        <span className="truncate text-xs text-muted-foreground">
-          {item.group}
-        </span>
+        {item.group && (
+          <span className="truncate text-xs text-muted-foreground">
+            {item.group}
+          </span>
+        )}
       </span>
       <span className="sr-only">, edited </span>
       <time

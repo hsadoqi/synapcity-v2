@@ -2,7 +2,6 @@
 
 import { X } from 'lucide-react';
 
-import { Badge } from '@synapcity/frontend-ui/core/badge';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
 import {
@@ -59,20 +58,16 @@ export function ActiveFilters({
       role="group"
     >
       {chips.map((chip) => (
-        <Badge
+        <Button
           key={chip.key}
           variant="outline"
-          render={
-            <button
-              type="button"
-              onClick={chip.remove}
-              aria-label={`Remove filter: ${chip.label}`}
-            />
-          }
+          size="xs"
+          onClick={chip.remove}
+          aria-label={`Remove filter: ${chip.label}`}
         >
           {chip.label}
           <X data-icon="inline-end" aria-hidden="true" />
-        </Badge>
+        </Button>
       ))}
       <Button
         variant="ghost"

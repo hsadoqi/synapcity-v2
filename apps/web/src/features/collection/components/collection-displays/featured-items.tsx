@@ -1,5 +1,7 @@
 import { ArrowRight } from 'lucide-react';
 
+import { cn } from '@/lib/utils';
+
 import { Button } from '@synapcity/frontend-ui/core/button';
 import { Skeleton } from '@synapcity/frontend-ui/core/skeleton';
 
@@ -34,16 +36,29 @@ export function FeaturedItems({
       emptyMessage={emptyMessage}
       isEmpty={!lead}
     >
-      {lead && <FeaturedItemCard item={lead} {...itemProps} />}
-      {siblings.length > 0 && (
-        <ul className="grid gap-3 sm:grid-cols-2">
-          {siblings.map((item) => (
-            <li key={item.id}>
-              <FeaturedItemSibling item={item} {...itemProps} />
-            </li>
-          ))}
-        </ul>
-      )}
+      <div
+        className={cn(
+          'grid grid-cols-1 gap-3',
+          siblings.length > 0 && 'lg:grid-cols-3',
+        )}
+      >
+        {lead && (
+          <FeaturedItemCard
+            item={lead}
+            className={cn(siblings.length > 0 && 'lg:col-span-2')}
+            {...itemProps}
+          />
+        )}
+        {siblings.length > 0 && (
+          <ul className="flex flex-col gap-3">
+            {siblings.map((item) => (
+              <li key={item.id}>
+                <FeaturedItemSibling item={item} {...itemProps} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </CollectionSection>
   );
 }
@@ -55,10 +70,16 @@ function FeaturedItemCard({
   now,
   timeZone,
   onOpen,
-}: CollectionDisplayItemProps) {
+  className,
+}: CollectionDisplayItemProps & { className?: string }) {
   const kind = kindOf(item, kinds);
   return (
-    <article className="flex flex-col gap-5 rounded-md border border-border bg-card p-5 sm:p-6">
+    <article
+      className={cn(
+        'flex flex-col gap-5 rounded-md border border-border bg-card p-5',
+        className,
+      )}
+    >
       <div className="flex min-w-0 items-center gap-3">
         <ItemKindTile kind={kind} size="md" />
         <p className="min-w-0 truncate text-sm text-muted-foreground">
@@ -124,30 +145,32 @@ export function FeaturedItemsSkeleton({
 }: Pick<CollectionDisplayProps, 'heading' | 'headingIcon'>) {
   return (
     <CollectionSectionSkeleton heading={heading} icon={headingIcon}>
-      <div className="flex flex-col gap-5 rounded-md border border-border bg-card p-5 sm:p-6">
-        <div className="flex items-center gap-3">
-          <Skeleton className="size-10 rounded-sm" />
-          <Skeleton className="h-4 w-32" />
-        </div>
-        <Skeleton className="h-6 w-2/3" />
-        <div className="flex items-center justify-between gap-4">
-          <Skeleton className="h-4 w-28" />
-          <Skeleton className="h-8 w-20" />
-        </div>
-      </div>
-      <div className="grid gap-3 sm:grid-cols-2">
-        {[0, 1].map((key) => (
-          <div
-            key={key}
-            className="flex items-center gap-3 rounded-md border border-border bg-card p-4"
-          >
-            <Skeleton className="size-8 rounded-sm" />
-            <div className="flex flex-1 flex-col gap-2">
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-3 w-1/2" />
-            </div>
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+        <div className="flex flex-col gap-5 rounded-md border border-border bg-card p-5 lg:col-span-2">
+          <div className="flex items-center gap-3">
+            <Skeleton className="size-10 rounded-sm" />
+            <Skeleton className="h-4 w-32" />
           </div>
-        ))}
+          <Skeleton className="h-6 w-2/3" />
+          <div className="flex items-center justify-between gap-4">
+            <Skeleton className="h-4 w-28" />
+            <Skeleton className="h-8 w-20" />
+          </div>
+        </div>
+        <div className="flex flex-col gap-3">
+          {[0, 1].map((key) => (
+            <div
+              key={key}
+              className="flex items-center gap-3 rounded-md border border-border bg-card p-4"
+            >
+              <Skeleton className="size-8 rounded-sm" />
+              <div className="flex flex-1 flex-col gap-2">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3 w-1/2" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </CollectionSectionSkeleton>
   );

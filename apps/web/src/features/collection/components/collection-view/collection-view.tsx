@@ -24,7 +24,6 @@ import { ActiveFilters, CollectionToolbar } from '../collection-toolbar';
 import { CollectionGrid } from './collection-grid';
 import { CollectionHeader } from './collection-header';
 import { CollectionList } from './collection-list';
-import { useCurrentUser } from '@/features/auth/client/user-provider';
 
 export type CollectionViewProps = {
   /** How to name the items: "document" / "Documents". */
@@ -48,6 +47,8 @@ export type CollectionViewProps = {
   onLayoutChange: (layout: CollectionLayout) => void;
   onCreate: () => void;
   onItemAction?: (action: CollectionItemAction, item: CollectionItem) => void;
+  /** Whose home the "View all" link goes to. Omit to hide the link. */
+  userId?: string;
   now?: Date;
 };
 
@@ -78,6 +79,7 @@ export function CollectionView({
   onLayoutChange,
   onCreate,
   onItemAction = () => {},
+  userId,
   now = new Date(),
 }: CollectionViewProps) {
   const itemProps = {
@@ -88,12 +90,11 @@ export function CollectionView({
     now,
     onItemAction,
   };
-  const user = useCurrentUser();
 
   return (
     <section className="flex flex-col gap-6">
       <CollectionHeader
-        userId={user?.id ?? ''}
+        userId={userId}
         labels={labels}
         context={context}
         count={state === 'populated' ? items.length : 0}
@@ -131,7 +132,7 @@ export function CollectionView({
 
       {state === 'no-results' && (
         <CollectionNoResults
-          singular={labels.singular}
+          plural={labels.plural}
           query={query}
           hasFilters={hasActiveFilters(filters)}
           onClearQuery={() => onQueryChange('')}
