@@ -313,12 +313,12 @@ export function GlobalPanelShell({
         />
         <ResizablePanel defaultSize="100%" minSize="4rem">
           <div
-            data-slot="shell-page-scroll"
+            data-slot="shell-page"
             data-global-panel={open ? 'open' : 'closed'}
             role="group"
             aria-label="Work area"
             tabIndex={0}
-            className="group/work-area flex h-full min-h-0 flex-col overflow-y-auto outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
+            className="group/work-area flex h-full min-h-0 flex-col overflow-hidden outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
           >
             {children}
           </div>

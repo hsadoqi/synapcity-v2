@@ -15,7 +15,10 @@ export function SectionHeading({
   return (
     <h2
       id={id}
-      className={cn("flex items-center gap-2 text-sm font-medium text-muted-foreground", className)}
+      className={cn(
+        'flex items-center gap-2 text-sm font-medium text-muted-foreground',
+        className,
+      )}
     >
       {Icon && <Icon aria-hidden="true" className="size-3.5" />}
       {children}
