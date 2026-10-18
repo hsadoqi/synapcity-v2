@@ -1,3 +1,63 @@
+## Active task: render stored icon names in ItemCard (2026-10-17)
+
+- Goal/mode: implement the owner's request to render `item.icon` (a stored string) as a Lucide icon; implementing.
+- Exact updates (2): this scope; `apps/web/src/features/spaces/components/item-card.tsx` (icon imports/rendering and formatting only; preserve current card content, links and date work).
+- Exact creates (3): `space-icon.tsx`, `index.ts`, `space-icon.dom.test.tsx` under `apps/web/src/features/spaces/components/space-icon/`.
+- Authority: direct owner request for icon rendering. Existing Lucide 1.55.0 provides DynamicIcon, iconNames and IconName; package source and current first-party dynamic-icon docs verified. Isolate the dynamic loader in a client component, validate names against the installed catalog without a cast, and render a static Folder fallback for unavailable names or while loading. Keep SVG decorative where the caller already marks it so. Do not add a picker, change persisted icon schema or load raw SVG/URLs.
+- Budgets/systems: updates 2; creates 3; delete/move/rename 0; dependencies/config/schema/migrations/routes/Git/external systems/other planning artifacts 0. apps/web owns this feature renderer; this scope only bounds execution. Preserve other ongoing ItemCard edits and report independent card contract errors rather than modifying adjacent fields.
+- Verification: actual dynamic-loader DOM tests for available names and static/loading fallback; architecture tests, scoped format/lint/types/Knip and root pnpm verify. Report existing WIP errors and gates not reached; no claim of production-browser proof from jsdom. A small client boundary avoids sending the whole card to the browser; Lucide's documented dynamic loader still builds catalog modules.
+- Recovery: restore only this task's hunks using `/private/tmp/synapcity-space-icon-baseline`; preserve all prior WIP. Stop if a scoped edit overlaps this icon change or needs scope expansion.
+
+Earlier scopes below are retained as history and grant no additional mutation authority.
+
+## Active task: owned Space storage draft and Lucide icon identifiers (2026-10-17)
+
+- Goal/mode: implement owner's approval to draft a Spaces migration and ownerId, plus their confirmed Lucide-name icon choice. Migration stays unapplied to Supabase. Existing feature foundation remains preserved.
+- Exact updates (8): this scope; `shared/schema/schema.ts`, `shared/schema/schema.test.ts`, `lib/fixtures/spaces/spaces.ts`, `lib/fixtures/spaces/spaces.test.ts`, `server/get-space/get-space.test.ts` under `apps/web/src/features/spaces/`; `docs/architecture/decisions/README.md`; `docs/glossary.md` (bounded owner-approved implementation exception, final noun still unresolved).
+- Exact creates (3): `supabase/migrations/20261018013000_create_spaces.sql`; `supabase/tests/spaces.sql`; `docs/architecture/decisions/0012-owned-space-records.md`. Timestamp is UTC for 2026-10-17 21:30 EDT; no existing migration or ADR occupies those paths.
+- Authority and gates: owner approved drafting storage/ownerId and selected Lucide names. Owner explicitly selected permanent deletion of owned Spaces when the account is deleted (2026-10-17 21:32 EDT), matching profiles/preferences; implement ON DELETE CASCADE. Never apply to a hosted or existing local database, invoke db push/reset, or write remote state.
+- Behavior: required icon as a kebab-case Lucide identifier (format validation; no full-catalog runtime import), saved ownerId mapped from owner_id, UUID owner reference to auth.users, owner-only select/insert/update with least-privilege column grants, database UUID ID/default timestamps and existing updated_at trigger; icon text default folder, plain text-array tags, optional description. Account-delete handling must match the owner's answer. No standalone delete access, ownership transfer, content relationship, icon picker/renderer or endpoint adoption. No route data-source replacement.
+- Budgets/systems: updates 8, creates 3; delete/move/rename 0; dependencies/config/new packages/Git history/PR/issues/projects/hosted systems/other planning surfaces 0. ADR owns the narrow approved storage decision; SQL owns its implementation; app feature owns its runtime contract. Disposable local PostgreSQL cluster, synthetic auth schema/roles and verification artifacts may live under /private/tmp; they provide local PostgreSQL evidence only.
+- Verification: focused schema/fixture/fetch/architecture tests, known fixture icon names against installed Lucide 1.55.0, actual migration and permissions/RLS/timestamp/constraints/deletion tests on disposable PostgreSQL if available; scoped format/lint/types/Knip and root pnpm verify. SQL tests must fail on meaningful policy/grant mutations. Report environment blockers, browser checks not reached, generated database types not produced and hosted behavior not verified.
+- Recovery: restore only this task's hunks from `/private/tmp/synapcity-spaces-storage-icon-baseline`; preserve prior WIP. Disposable cluster stopped after checks. No reset/stash/clean or live rollback. Stop on concurrent scoped edits, unapproved lifecycle choice or scope expansion.
+
+Earlier scopes below are retained as history and grant no additional mutation authority.
+
+## Active task: Space timestamps and tags (2026-10-17)
+
+- Goal and mode: implement the owner's approved saved-record timestamps/input separation plus `tags: string[]`; implementing.
+- Exact updates (9): this scope and, under `apps/web/src/features/spaces/`, `shared/schema/schema.ts`, `shared/schema/index.ts`, `shared/schema/schema.test.ts`, `shared/types/types.ts`, `shared/types/index.ts`, `lib/fixtures/spaces/spaces.ts`, `lib/fixtures/spaces/spaces.test.ts`, `server/get-space/get-space.test.ts`.
+- Approval and behavior: owner approved adding createdAt/updatedAt and tags after the proposal to separate input and saved-record schemas. Saved records require ISO datetime strings with Z or an explicit offset and a plain string array; empty tags allowed. Create inputs contain editable name/description/tags; update inputs make those editable fields optional. Inputs exclude IDs/timestamps. Existing getSpace validation consumes the extended schema. Fixed timestamps in fixtures, with tagged and untagged examples; retain the owner's lib/fixtures location. No tag taxonomy, normalization, limits, new ownership/lifecycle fields or persistence adoption.
+- Budgets/systems: updates 9, creates/deletes/moves/renames 0. Dependencies/config/database/migrations/public API endpoints/routes/Git history/PR/issues/projects/external systems/other planning artifacts 0. apps/web owns the feature contract; this scope owns execution bounds only. Current Zod 4.6.7; ISO datetime/offset, object extension, pick and partial verified against first-party Zod documentation in the preceding proposal.
+- Verification: schema/input/fixture/fetch and architecture tests; scoped format/lint/types/Knip; root pnpm verify. Preserve and report prior untouched-settings failures and Turbopack worker-port restriction; do not broaden into their repair. No live Supabase/API or browser behavior claim.
+- Recovery: restore only this task's hunks from `/private/tmp/synapcity-spaces-metadata-baseline`, preserving all prior uncommitted work. Stop on overlapping edits or scope expansion.
+
+Earlier scopes below are retained as history and grant no additional mutation authority.
+
+## Active task: spaces schema, types and fixtures (2026-10-17)
+
+- Goal and mode: implement the owner's request to establish spaces schema, types and fixtures before further feature work. Treat schema as runtime validation of the existing UI contract, not a persisted schema or finalized domain model.
+- Exact updates (5): this scope; `apps/web/src/features/spaces/shared/types/types.ts`; `apps/web/src/features/spaces/server/get-space/get-space.ts`; its `get-space.test.ts`; the owner-added `apps/web/src/features/spaces/lib/fixtures/index.ts` (formatting only). The owner's approval to finish imports and verification in `lib/fixtures` covers consuming that existing entry point in the fixture tests.
+- Exact creates (6) under `apps/web/src/features/spaces/`: `shared/schema/schema.ts`, `shared/schema/index.ts`, `shared/schema/schema.test.ts`; `lib/fixtures/spaces/spaces.ts`, `lib/fixtures/spaces/index.ts`, `lib/fixtures/spaces/spaces.test.ts`. Owner moved the fixtures into `lib/fixtures` and explicitly authorized finishing at that location on 2026-10-17; preserve the move and updated relative imports. The fixture test may be updated to consume its public folder entry point.
+- Authority and behavior: direct owner request. Retain `id`, `name`, optional `description`; require a nonempty opaque ID and a nonblank trimmed name; infer Space from the Zod schema. Parse fetched records, rejecting malformed responses. Supply deterministic, clearly marked sample data and an override factory for local tests/preview use; do not wire fixtures into live routes. Product terminology, owner/relationship/lifecycle models and persistence remain undecided.
+- Budgets and systems: apps/web owns this feature contract and fixtures; this record owns execution bounds only. Updates 5; creates 6; delete/move/rename 0; dependencies/config/database/migrations/public API additions/routes/Git/external systems/other planning artifacts 0. Zod 4.6.7 is already declared; verify installed version and first-party guidance. Prior extraction remains uncommitted and preserved.
+- Verification: focused schema/fixture/fetch/architecture tests; scoped formatting/lint/types and Knip; production build; root pnpm verify, with existing unrelated failures reported separately. No database or real API behavior is verified by these checks.
+- Recovery: restore only this task's hunks using the preceding extraction as the baseline; new files can be removed only as part of an authorized recovery. Preserve all prior WIP. Stop on overlapping edits or scope expansion.
+
+Earlier scopes below are retained as history and grant no additional mutation authority.
+
+## Active task: extract existing spaces route functionality (2026-10-17)
+
+- Goal and mode: implement the owner's request for an app-local `features/spaces` folder; behavior-preserving refactor.
+- Exact updates (3): this scope; `apps/web/src/app/[userId]/home/spaces/page.tsx`; `apps/web/src/app/[userId]/home/spaces/[spaceId]/page.tsx`.
+- Exact creates (9) under `apps/web/src/features/spaces/`: `shared/types/types.ts`, `shared/types/index.ts`; `server/get-space/get-space.ts`, `server/get-space/index.ts`, `server/get-space/get-space.test.ts`; `components/spaces-content/spaces-content.tsx`, `components/spaces-content/index.ts`; `components/space-details/space-details.tsx`, `components/space-details/index.ts`.
+- Authority: direct owner request authorizes this extraction using the current app-local feature convention. Existing Space naming/type and API call remain provisional implementation evidence, not a terminology, API or persistence decision. Routes retain parameter handling and requireOwner before fetching. Preserve content, styling, fetch encoding/no-store, 404 and error behavior.
+- Systems of record and budgets: apps/web owns feature code and route composition; this scope owns execution bounds only. Updates 3, creates 9; deletes/moves/renames 0; dependencies/config/schema/public API/route additions/Git history/PR/issues/projects/external systems/other planning artifacts 0. Disposable verification logs and baseline copies may live in /private/tmp.
+- Verification: focused fetch behavior and architecture tests; scoped format/lint/types; root pnpm verify, then proportional checks where blocked by unrelated existing failures. Report exact failures and gates not reached. No API handler exists here; live data behavior is not established by mocked fetch tests.
+- Recovery: original untracked routes and scope copied to `/private/tmp/synapcity-spaces-refactor-baseline`; restore only this task's hunks and remove only its added files if recovery is authorized. Preserve concurrent work; stop on overlapping edits or required scope expansion.
+
+Earlier scopes below are retained as history and grant no additional mutation authority.
+
 ## Active task: app header visibility while the global panel is locked (2026-10-17)
 
 - Goal and mode: implement the owner's approved recommendation ("sounds good"): locking an open global panel hides the app header; a panel-toolbar button explicitly reveals/hides it; unlocking or closing restores it. No hover reveal.
