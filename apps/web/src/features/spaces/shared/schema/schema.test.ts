@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 
-import type { CreateSpaceInput, Space, UpdateSpaceInput } from '../types';
+import type { CreateSpaceInput, SpaceEntity, UpdateSpaceInput } from '../types';
 import { createSpaceSchema, spaceSchema, updateSpaceSchema } from './index';
 
 const savedSpace = {
@@ -18,7 +18,7 @@ describe('spaceSchema', () => {
     const space = spaceSchema.parse(savedSpace);
 
     expect(space).toEqual(savedSpace);
-    expectTypeOf(space).toEqualTypeOf<Space>();
+    expectTypeOf(space).toEqualTypeOf<SpaceEntity>();
   });
 
   it('trims the name while preserving the ID and description', () => {

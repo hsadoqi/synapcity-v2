@@ -1,0 +1,46 @@
+import { EntityContent } from '@synapcity/frontend-ui/blocks/entity/entity-content';
+import { EntityItem, Space } from '../shared/types';
+import { SpaceCollections } from './space-collections';
+import { createSpaceFixture } from '../lib/fixtures';
+import { EntityItemCard } from '@synapcity/frontend-ui/blocks';
+
+function getRecentSpaceItems(entity: Space, limit = 3): EntityItem[] {
+  const space = entity as Partial<Space>;
+  return [...(space.documents ?? []), ...(space.dashboards ?? [])]
+    .sort(
+      (a: EntityItem, b: EntityItem) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    )
+    .slice(0, limit);
+}
+
+export function SpaceContent({
+  userId,
+  spaceItem,
+}: {
+  userId: string;
+  spaceItem?: Space;
+}) {
+  const entityItem = createSpaceFixture({ ownerId: userId });
+  return (
+    <EntityContent
+      userId={userId}
+      getRecentItems={getRecentSpaceItems}
+      createFixture={createSpaceFixture}
+    >
+      <>
+        {spaceItem ? (
+          <SpaceCollections entity={spaceItem} userId={userId} />
+        ) : (
+          <div className="flex flex-col gap-12">
+            <EntityItemCard
+              key={entityItem.id}
+              entity={entityItem}
+              slug={`/${userId}/home/spaces`}
+            />
+          </div>
+        )}
+      </>
+    </EntityContent>
+  );
+}

@@ -1,21 +1,26 @@
 import { notFound } from 'next/navigation';
 
-import { spaceSchema } from '../../shared/schema';
+import { spaceItem as sampleSpace } from '../../lib/fixtures';
 import type { Space } from '../../shared/types';
+import { findSpace } from '../space-repository';
 
 export async function getSpace(spaceId: string): Promise<Space> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? '';
-  const res = await fetch(
-    `${baseUrl}/api/spaces/${encodeURIComponent(spaceId)}`,
-    { cache: 'no-store' },
-  );
+  const spaceEntity = await findSpace(spaceId);
+  if (!spaceEntity) notFound();
 
-  if (res.status === 404) {
-    notFound();
-  }
-  if (!res.ok) {
-    throw new Error(`Failed to fetch space ${spaceId}: ${res.status}`);
-  }
+  // Placeholder until documents and dashboards are persisted (ADR-0013).
+  const documents = sampleSpace.documents;
+  const dashboards = sampleSpace.dashboards;
 
-  return spaceSchema.parse(await res.json());
+  return {
+    ...spaceEntity,
+    kind: 'space',
+    documents: documents.map((doc) => ({ ...doc, kind: 'document' as const })),
+    dashboards: dashboards.map((dash) => ({
+      ...dash,
+      kind: 'dashboard' as const,
+    })),
+    documentsTotal: documents.length,
+    dashboardsTotal: dashboards.length,
+  };
 }

@@ -1,1 +1,6 @@
-export { SPACE_FIXTURES, createSpaceFixture } from './spaces';
+export {
+  SPACE_FIXTURES,
+  createSpaceEntityFixture,
+  createSpaceFixture,
+  spaceItem,
+} from './spaces';

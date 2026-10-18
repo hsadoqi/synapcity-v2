@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest';
 import dynamicIconImports from 'lucide-react/dynamicIconImports';
 
 import { spaceSchema } from '../../../shared/schema';
-import { SPACE_FIXTURES, createSpaceFixture } from '../index';
+import {
+  SPACE_FIXTURES,
+  createSpaceEntityFixture,
+  createSpaceFixture,
+} from '../index';
 
 describe('space fixtures', () => {
   it('provides valid sample records with distinct IDs', () => {
@@ -33,16 +37,18 @@ describe('space fixtures', () => {
   it('covers tagged and untagged spaces with fixed timestamps', () => {
     expect(SPACE_FIXTURES.some((space) => space.tags.length > 0)).toBe(true);
     expect(SPACE_FIXTURES.some((space) => space.tags.length === 0)).toBe(true);
-    expect(createSpaceFixture()).toMatchObject({
+    expect(createSpaceEntityFixture()).toMatchObject({
       createdAt: '2026-10-01T09:00:00Z',
       updatedAt: '2026-10-03T14:30:00Z',
     });
-    expect(() => createSpaceFixture({ createdAt: 'yesterday' })).toThrow();
+    expect(() =>
+      createSpaceEntityFixture({ createdAt: 'yesterday' }),
+    ).toThrow();
   });
 
   it('creates independent deterministic records', () => {
-    const first = createSpaceFixture();
-    const second = createSpaceFixture();
+    const first = createSpaceEntityFixture();
+    const second = createSpaceEntityFixture();
 
     expect(first).toEqual(second);
     expect(first).not.toBe(second);
@@ -56,7 +62,7 @@ describe('space fixtures', () => {
 
   it('applies and validates overrides', () => {
     expect(
-      createSpaceFixture({
+      createSpaceEntityFixture({
         id: 'fixture-custom',
         name: '  Custom  ',
         description: undefined,
@@ -73,7 +79,24 @@ describe('space fixtures', () => {
       createdAt: '2026-10-01T09:00:00Z',
       updatedAt: '2026-10-06T12:00:00+00:00',
     });
-    expect(() => createSpaceFixture({ name: '   ' })).toThrow();
-    expect(() => createSpaceFixture({ id: '' })).toThrow();
+    expect(() => createSpaceEntityFixture({ name: '   ' })).toThrow();
+    expect(() => createSpaceEntityFixture({ id: '' })).toThrow();
+  });
+
+  it('builds a display-ready space owned by the given user', () => {
+    const space = createSpaceFixture({ ownerId: 'user-1' });
+
+    expect(space).toMatchObject({
+      kind: 'space',
+      ownerId: 'user-1',
+      documentsTotal: space.documents.length,
+      dashboardsTotal: space.dashboards.length,
+    });
+    expect(space.documents.every((item) => item.kind === 'document')).toBe(
+      true,
+    );
+    expect(space.dashboards.every((item) => item.kind === 'dashboard')).toBe(
+      true,
+    );
   });
 });

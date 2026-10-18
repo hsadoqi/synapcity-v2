@@ -1,1 +1,1 @@
-export * from './types';
+export * from '@synapcity/frontend-ui/types/entity';
