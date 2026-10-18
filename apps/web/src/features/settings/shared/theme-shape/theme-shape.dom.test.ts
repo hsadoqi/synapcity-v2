@@ -1,7 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { PREFERENCES_STORAGE_KEY } from '../appearance-attributes';
-import { applyThemeShape, themeShapeBootScript } from './theme-shape';
+import {
+  applyThemeShape,
+  previewShapeAttributes,
+  themeShapeBootScript,
+} from './theme-shape';
 
 const dataset = () => ({ ...document.documentElement.dataset });
 
@@ -35,6 +39,19 @@ describe('applyThemeShape', () => {
       density: 'spacious',
     });
     expect(dataset()).toEqual({});
+  });
+});
+
+describe('previewShapeAttributes', () => {
+  it('names the attributes applyThemeShape writes, so a preview matches the page', () => {
+    const theme = { radius: 'rounded', density: 'compact' } as const;
+    const element = document.createElement('div');
+    applyThemeShape(element, theme);
+    const preview = previewShapeAttributes(theme);
+    expect(Object.fromEntries(Object.entries(preview))).toEqual({
+      'data-radius': element.getAttribute('data-radius'),
+      'data-density': element.getAttribute('data-density'),
+    });
   });
 });
 

@@ -30,6 +30,7 @@ import {
   type DisplaySettings,
 } from '../../lib/scope';
 import { applyFontPreferences } from '../../shared/font-preferences';
+import { applyThemeShape } from '../../shared/theme-shape';
 import { settingsDefaults } from '../../types/settings';
 import type { Settings, SettingsPatch } from '../../types';
 import { themeSchema } from '../../types/theme';
@@ -245,6 +246,15 @@ export function SettingsProvider({
       codeFont,
     });
   }, [isReady, headingFont, bodyFont, codeFont]);
+
+  const { radius, density } = settings.theme;
+  useEffect(() => {
+    // Same wait as above: the default shape must not undo the saved one.
+    if (!isReady) return;
+    // Styled by tokens/preferences.css; the boot script in the root layout sets
+    // the same attributes before first paint.
+    applyThemeShape(document.documentElement, { radius, density });
+  }, [isReady, radius, density]);
 
   const { language } = settings.regional;
   useEffect(() => {

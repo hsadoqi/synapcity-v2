@@ -24,6 +24,16 @@ export function applyThemeShape(
 }
 
 /**
+ * The same two attributes as props, for previewing a choice on one element in JSX
+ * (the Theme tab's live preview), the way `previewFontStyle` previews fonts.
+ */
+export function previewShapeAttributes(
+  theme: Pick<ThemeSettings, 'radius' | 'density'>,
+) {
+  return { 'data-radius': theme.radius, 'data-density': theme.density };
+}
+
+/**
  * Runs before the first paint, from the root layout. The settings provider only
  * mounts on the settings page and only after hydration, so without this the saved
  * shape would be missing on every other page and snap in late on this one. It

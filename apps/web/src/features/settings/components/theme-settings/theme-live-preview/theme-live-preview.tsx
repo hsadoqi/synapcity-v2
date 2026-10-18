@@ -5,6 +5,7 @@ import { PanelLeft, FileText, Plus, ArrowUpRight, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePrefersDark } from '../../../hooks/use-prefers-dark';
 import { previewFontStyle } from '../../../shared/font-preferences';
+import { previewShapeAttributes } from '../../../shared/theme-shape';
 import { usePreviewFont } from '../../../hooks/use-preview-font';
 import type { ThemeSettings } from '../../../types/theme';
 
@@ -43,6 +44,7 @@ export const ThemeLivePreview = ({ theme }: { theme: ThemeSettings }) => {
           mode,
         )}
         style={previewFontStyle(theme)}
+        {...previewShapeAttributes(theme)}
       >
         <div className="flex h-9 items-center justify-between border-b border-border bg-muted/40 px-3">
           <div className="flex gap-1.5">

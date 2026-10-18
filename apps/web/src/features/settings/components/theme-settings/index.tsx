@@ -9,7 +9,7 @@ import { useThemeDraft } from '../../hooks/use-theme-draft';
 import { SettingsTabShell } from '../../shared/settings-tabs/settings-tab-shell/settings-tab-shell';
 import { SettingsSection } from '../../shared/settings-section';
 import { ThemePreviewPopover } from './theme-preview-popover';
-import { ThemeModeRow } from './theme-rows/theme-rows';
+import { DensityRow, RadiusRow, ThemeModeRow } from './theme-rows/theme-rows';
 import { BodyFontRow, CodeFontRow, HeadingFontRow } from './font-rows';
 
 /**
@@ -54,6 +54,19 @@ export function ThemeSettings() {
         <p className="text-xs text-muted-foreground">
           Fonts load from Google Fonts, and only once you choose them.
         </p>
+      </SettingsSection>
+      <Separator />
+      <SettingsSection title="Shape and spacing">
+        <FieldGroup>
+          <RadiusRow
+            value={draft.radius}
+            onChange={(radius) => edit({ radius })}
+          />
+          <DensityRow
+            value={draft.density}
+            onChange={(density) => edit({ density })}
+          />
+        </FieldGroup>
       </SettingsSection>
       {/* The actions sit at the end of a long tab. Once there is something to
           save they lift into a bar fixed to the bottom of the viewport, so the

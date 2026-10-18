@@ -211,7 +211,11 @@ describe('toTransferFile', () => {
   it('writes corner radius with the account and density with the device', () => {
     const file = toTransferFile({
       ...settingsDefaults,
-      theme: { ...settingsDefaults.theme, radius: 'rounded', density: 'spacious' },
+      theme: {
+        ...settingsDefaults.theme,
+        radius: 'rounded',
+        density: 'spacious',
+      },
     });
     expect(file.account.theme.radius).toBe('rounded');
     expect(file.account.theme).not.toHaveProperty('density');
@@ -224,9 +228,9 @@ describe('toTransferFile', () => {
       radius: 'sharp' as const,
       density: 'compact' as const,
     };
-    expect(fromTransferFile(toTransferFile({ ...settingsDefaults, theme }))).toMatchObject(
-      { theme: { radius: 'sharp', density: 'compact' } },
-    );
+    expect(
+      fromTransferFile(toTransferFile({ ...settingsDefaults, theme })),
+    ).toMatchObject({ theme: { radius: 'sharp', density: 'compact' } });
   });
 });
 

@@ -11,7 +11,12 @@ describe('theme settings', () => {
   it('still parses a theme saved before corner radius and density existed', () => {
     // Saved JSON, imports and the account row from earlier builds lack both fields.
     expect(themeSchema.parse({ mode: 'dark', bodyFont: 'lora' })).toMatchObject(
-      { mode: 'dark', bodyFont: 'lora', radius: 'default', density: 'comfortable' },
+      {
+        mode: 'dark',
+        bodyFont: 'lora',
+        radius: 'default',
+        density: 'comfortable',
+      },
     );
   });
 
@@ -24,9 +29,9 @@ describe('theme settings', () => {
   });
 
   it('rejects values that are not presets', () => {
-    expect(themeSchema.safeParse({ mode: 'light', radius: 'pill' }).success).toBe(
-      false,
-    );
+    expect(
+      themeSchema.safeParse({ mode: 'light', radius: 'pill' }).success,
+    ).toBe(false);
     expect(
       themeSchema.safeParse({ mode: 'light', density: 'tight' }).success,
     ).toBe(false);
