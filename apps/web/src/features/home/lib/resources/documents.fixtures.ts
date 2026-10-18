@@ -1,6 +1,6 @@
 import type { CollectionItem } from '@/features/collection/shared';
 
-import { daysAgo } from './fixture-clock';
+import { daysAgo } from '../fixture-clock';
 
 export const documentFixtures: CollectionItem[] = [
   {

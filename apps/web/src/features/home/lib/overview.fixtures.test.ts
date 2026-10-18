@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatAgo } from '@/features/collection/shared';
+import { formatAgo } from '@/features/collection/shared/query';
 
-import { fixtureItems, fixturePinned, OVERVIEW_NOW } from './fixtures';
+import { FIXTURE_NOW } from './fixture-clock';
+import { fixtureItems, fixturePinned } from './overview.fixtures';
 
 // The labels the overview showed when they were hand-written strings. Computed
 // labels must read the same, so moving to the shared displays changed no text.
@@ -24,7 +25,7 @@ describe('overview fixtures', () => {
       const labels = Object.fromEntries(
         fixtureItems.map((item) => [
           item.id,
-          formatAgo(item.updatedAt, OVERVIEW_NOW, timeZone),
+          formatAgo(item.updatedAt, FIXTURE_NOW, timeZone),
         ]),
       );
       expect(labels).toEqual(PREVIOUS_LABELS);

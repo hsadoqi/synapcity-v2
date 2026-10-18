@@ -1,8 +1,6 @@
 import type { CollectionItem } from '@/features/collection/shared';
 
-/** The fixture clock: the overview's "2h ago" labels are measured from it. */
-export const OVERVIEW_NOW = new Date('2026-10-10T10:45:00Z');
-
+/** The date the header shows; it matches `FIXTURE_NOW`. */
 export const fixtureDate = {
   label: 'Saturday, October 10',
   dateTime: '2026-10-10',
