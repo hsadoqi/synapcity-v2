@@ -9,6 +9,7 @@ import { UserProvider } from '@/features/auth/client';
 import { getCurrentUser } from '@/features/auth/server';
 import { appearanceBootScript } from '@/features/settings/shared/appearance-attributes';
 import { fontBootScript } from '@/features/settings/shared/font-preferences';
+import { themeShapeBootScript } from '@/features/settings/shared/theme-shape';
 import { AccountPreferencesSync } from '@/features/settings/components/account-preferences-sync';
 import { getAccountPreferences } from '@/features/settings/server/account-preferences';
 import { pageLanguage } from '@/features/settings/types/regional';
@@ -38,6 +39,8 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: appearanceBootScript }} />
         {/* Applies saved font choices, and fetches only those, before first paint. */}
         <script dangerouslySetInnerHTML={{ __html: fontBootScript }} />
+        {/* Applies the saved corner radius and density before first paint. */}
+        <script dangerouslySetInnerHTML={{ __html: themeShapeBootScript }} />
       </head>
       <body>
         <AccountPreferencesSync preferences={account} />
