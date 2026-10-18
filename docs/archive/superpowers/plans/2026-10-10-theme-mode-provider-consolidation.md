@@ -37,12 +37,14 @@ Failure modes the spec implies, most likely first. Each has a test in the task t
 ### Task 1: Cookie constant and pre-paint script
 
 **Files:**
+
 - Create: `packages/ui/core/src/providers/theme-init-script.ts`
 - Create: `packages/ui/core/src/providers/theme-init-script.test.ts`
 - Modify: `packages/ui/core/src/providers/index.ts`
 
 **Interfaces:**
-- Produces: `THEME_COOKIE: 'theme'` and `THEME_INIT_SCRIPT: string` (an immediately-invoked function expression), both exported from `@synapcity/frontend-uiontend-uiontend-ui-core` through `providers/index.ts`.
+
+- Produces: `THEME_COOKIE: 'theme'` and `THEME_INIT_SCRIPT: string` (an immediately-invoked function expression), both exported from `@synapcity/frontend-ui/core` through `providers/index.ts`.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -210,10 +212,12 @@ git commit -m "feat: add the pre-paint theme mode script and cookie constant"
 ### Task 2: ThemeProvider uses the shared cookie name
 
 **Files:**
+
 - Modify: `packages/ui/core/src/providers/theme-provider.tsx:51-55` (the `setMode` cookie write)
 - Create: `packages/ui/core/src/providers/theme-provider.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `THEME_COOKIE`, `THEME_INIT_SCRIPT` from `./theme-init-script`.
 - Produces: unchanged `ThemeProvider`, `useThemeMode` (`{ mode, system, resolvedMode, setMode }`); the cookie it writes is now `theme`.
 
@@ -399,11 +403,13 @@ git commit -m "fix: write the mode cookie under the shared theme name"
 ### Task 3: Move the dark-mode block onto ThemeProvider
 
 **Files:**
+
 - Modify: `packages/ui/core/src/components/blocks/dark-mode/dark-mode-preference-toggle.tsx` (the `mode` prop and the `aria-label`)
 - Modify: `packages/ui/core/src/components/blocks/dark-mode/dark-mode-preference-control.tsx`
 - Modify: `packages/ui/core/src/components/blocks/dark-mode/dark-mode.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `useThemeMode`, `ThemeProvider` from `../../../providers/theme-provider`.
 - Produces: `DarkModePreferenceToggle` with `mode?: DarkMode | null` (still optional for existing callers); `DarkModePreferenceControl` unchanged in name and props.
 
@@ -629,11 +635,13 @@ git commit -m "refactor: wire the dark-mode block to ThemeProvider"
 ### Task 4: Root layout reads the shared name and runs the script
 
 **Files:**
+
 - Modify: `apps/web/app/layout.tsx`
 - Create: `apps/web/tests/theme-mode.spec.ts`
 
 **Interfaces:**
-- Consumes: `InlineScript`, `THEME_COOKIE`, `THEME_INIT_SCRIPT` from `@synapcity/frontend-uiontend-uiontend-ui-core`.
+
+- Consumes: `InlineScript`, `THEME_COOKIE`, `THEME_INIT_SCRIPT` from `@synapcity/frontend-ui/core`.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -703,16 +711,16 @@ import {
   InlineScript,
   THEME_COOKIE,
   THEME_INIT_SCRIPT,
-} from '@synapcity/frontend-uiontend-uiontend-ui-core';
+} from '@synapcity/frontend-ui/core';
 ```
 
-2. Change the cookie read to use the constant:
+1. Change the cookie read to use the constant:
 
 ```tsx
   const cookieDarkMode = cookieStore.get(THEME_COOKIE)?.value;
 ```
 
-3. Add `suppressHydrationWarning` to `<html>` and a `<head>` carrying the script, so the opening of the returned tree reads:
+1. Add `suppressHydrationWarning` to `<html>` and a `<head>` carrying the script, so the opening of the returned tree reads:
 
 ```tsx
     <html
@@ -751,6 +759,7 @@ git commit -m "fix: set the theme mode before first paint and read the shared co
 ### Task 5: Archive DarkModeProvider
 
 **Files:**
+
 - Create: docs/archive/2026-10-10-dark-mode-provider.md (plain text here: `pnpm docs:check` rejects backticked doc paths that do not exist yet)
 - Delete (after archiving): `packages/ui/core/src/providers/dark-mode-provider.tsx`
 - Modify: `packages/ui/core/src/providers/index.ts`
@@ -759,6 +768,7 @@ git commit -m "fix: set the theme mode before first paint and read the shared co
 - Modify: `apps/web/components/root/root-command-palette/root-command-palette.tsx` (the commented-out line)
 
 **Interfaces:**
+
 - Consumes: nothing new. After this task nothing may import `dark-mode-provider`.
 
 - [ ] **Step 1: Prove nothing but the planned files still uses it**
@@ -810,7 +820,7 @@ git rm packages/ui/core/src/providers/dark-mode-provider.tsx
 - `providers/index.ts`: delete the `export * from './dark-mode-provider';` line.
 - `components/base/index.ts`: delete the `export { DarkModeProvider } from '../../providers/dark-mode-provider';` line.
 - `dark-mode-preference-toggle.tsx`: delete the two-line comment above the `toggle-group` import that begins `// Import the sibling module directly` (the cycle no longer exists; keep the imports as they are).
-- `root-command-palette.tsx`: delete the line `  // const { setPreference } = useDarkModePreference();`.
+- `root-command-palette.tsx`: delete the line `// const { setPreference } = useDarkModePreference();`.
 
 - [ ] **Step 4: Verify nothing broke**
 
@@ -830,20 +840,21 @@ git commit -m "refactor: archive DarkModeProvider in favor of ThemeProvider"
 ### Task 6: Record the decisions and verify the whole repository
 
 **Files:**
+
 - Modify: `docs/architecture/decisions/0016-theme-shape-and-functionality.md` (two paragraphs)
 
 - [ ] **Step 1: Amend ADR-0016**
 
 In "What this does NOT decide", replace the last bullet:
 
-```
+```txt
 - The existing duplicate dark-mode providers in `ui-core`; consolidating them is
   separate work.
 ```
 
 with:
 
-```
+```txt
 - Any theme state beyond mode. The duplicate dark-mode providers in `ui-core`
   were consolidated onto `ThemeProvider`; `DarkModeProvider` is archived in
   `docs/archive/2026-10-10-dark-mode-provider.md`.
@@ -851,7 +862,7 @@ with:
 
 In "Unresolved", replace the "Mode cookie name" bullet with:
 
-```
+```txt
 - **Mode cookie name.** Interim: the theme provider, the pre-paint script, and
   the root layout all use `theme` (one constant, `THEME_COOKIE`). The final
   persistence key scheme is still undecided and may rename it.

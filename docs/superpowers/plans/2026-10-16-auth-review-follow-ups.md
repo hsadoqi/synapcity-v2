@@ -87,6 +87,17 @@ Keep pure/server tests in Node; scope DOM configuration/setup to the component t
 | AHF-08 | Final local gate and reviewable evidence                           | All approved local source/config changes finished          |
 | AHF-09 | Separately authorized live acceptance and bounded handoff          | AHF-08; explicit live-test scope                           |
 
+> **Status note, 2026-10-17 (evidence, not a sign-off).** Checkboxes below are deliberately left for the owner's review; this lists what exists, so the review can be quick.
+>
+> - AHF-00 and AHF-01 were not backdated: no baseline snapshot or approved contracts were recorded at the time.
+> - AHF-02: resolved by removal, not by the planned repair. The development identity bypass is not on this branch (it sits in `stash@{0}`), so there is no fixture mode to test.
+> - AHF-03: `apps/web/src/architecture.test.ts` has negative cases (comment before a specifier, an unlisted server helper, a client module outside features, unresolvable dynamic imports, commented-out imports), legal-import cases and an integrated temporary-file case. Not checked against each bullet: the failure message wording, and whether the stale comment about TypeScript linting was corrected.
+> - AHF-04: `features/auth/server/actions/actions.test.ts` covers `signOut` success and a returned error (still revalidates, still redirects, logs only the code). A thrown SDK error is not separately tested.
+> - AHF-05: DOM tests exist for `user-provider`, `use-confirmation`, `use-cooldown` and the auth forms. The browser-suite extension was not done, because running it builds into `.next` and may collide with a running dev server.
+> - AHF-06: `app/auth/callback/route.test.ts` calls the real `GET` with only the Supabase exchange stubbed: safe and unsafe `next`, missing code, exchange error, absent user, and no provider text in redirects. It now also covers the welcome step and the `email-change`, `link` and `delete-account` flows.
+> - AHF-07 to AHF-09 are not done. The README gained a section on the Supabase settings the flows depend on.
+> - Live acceptance (AHF-09) has not been run for any of the flows added since 2026-10-13.
+
 Execution batches are sequential by default. Independent tasks do not require concurrent agents, and builds/browser suites sharing `.next` must not overlap. A pending D1 or D3 does not block AHF-03, AHF-04 or AHF-06.
 
 ### AHF-00 — capture the live baseline and preservation evidence

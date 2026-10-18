@@ -7,7 +7,7 @@
     "dev": "next dev --port 4000",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --cache --max-warnings 0",
+    "lint": "eslint . --cache --cache-strategy content --max-warnings 0",
     "check-types": "next typegen && tsc --noEmit"
   },
   "dependencies": {

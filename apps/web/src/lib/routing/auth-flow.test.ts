@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { authErrorPath, callbackUrl, parseAuthFlow } from './auth-flow';
+import {
+  authErrorPath,
+  callbackUrl,
+  parseAuthFlow,
+  welcomePath,
+} from './auth-flow';
 
 describe('callbackUrl', () => {
   it('tags the callback with the destination and the flow', () => {
@@ -25,7 +30,14 @@ describe('callbackUrl', () => {
 });
 
 describe('parseAuthFlow', () => {
-  it.each(['oauth', 'confirm', 'reset'] as const)('accepts %s', (flow) => {
+  it.each([
+    'oauth',
+    'confirm',
+    'reset',
+    'email-change',
+    'link',
+    'delete-account',
+  ] as const)('accepts %s', (flow) => {
     expect(parseAuthFlow(flow)).toBe(flow);
   });
 
@@ -44,5 +56,55 @@ describe('authErrorPath', () => {
 
   it('falls back to the plain error page', () => {
     expect(authErrorPath(null)).toBe('/auth/error');
+  });
+});
+
+describe('welcomePath', () => {
+  it('goes to the welcome step carrying the destination', () => {
+    expect(welcomePath('/u1/home')).toBe('/auth/welcome?next=%2Fu1%2Fhome');
+  });
+
+  it('encodes a destination that could otherwise inject parameters', () => {
+    const path = welcomePath('/x?next=//evil.test&y=1');
+    const params = new URL(path, 'https://app.test').searchParams;
+
+    expect(params.get('next')).toBe('/x?next=//evil.test&y=1');
+    expect([...params.keys()]).toEqual(['next']);
+  });
+});
+
+describe('the email-change flow', () => {
+  it('tags a callback so a failure can be explained', () => {
+    expect(callbackUrl('https://app.test', '/u/settings', 'email-change')).toBe(
+      'https://app.test/auth/callback?next=%2Fu%2Fsettings&flow=email-change',
+    );
+  });
+
+  it('has its own error path', () => {
+    expect(authErrorPath('email-change')).toBe(
+      '/auth/error?reason=email-change',
+    );
+  });
+});
+
+describe('the link flow', () => {
+  it('tags a callback so a failed connection can be explained', () => {
+    expect(callbackUrl('https://app.test', '/u/settings', 'link')).toBe(
+      'https://app.test/auth/callback?next=%2Fu%2Fsettings&flow=link',
+    );
+    expect(authErrorPath('link')).toBe('/auth/error?reason=link');
+  });
+});
+
+describe('the delete-account flow', () => {
+  it('tags the emailed link so a failure can be explained', () => {
+    expect(
+      callbackUrl('https://app.test', '/auth/delete-account', 'delete-account'),
+    ).toBe(
+      'https://app.test/auth/callback?next=%2Fauth%2Fdelete-account&flow=delete-account',
+    );
+    expect(authErrorPath('delete-account')).toBe(
+      '/auth/error?reason=delete-account',
+    );
   });
 });

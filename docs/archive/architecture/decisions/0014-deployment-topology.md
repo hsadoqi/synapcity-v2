@@ -30,7 +30,7 @@ accepting the decision itself.
    workspace package directly via `workspace:` resolution.
 4. Deployment dependency behavior must follow the workspace graph: a
    web-only change affects only the web project; a Storybook-only change
-   affects only the Storybook project; a shared `@synapcity/frontend-uiontend-uiontend-ui-core` change
+   affects only the Storybook project; a shared `@synapcity/frontend-ui/core` change
    affects both. Vercel's native dependency-aware build skipping is used
    first; custom ignored-build-step logic is added only if that proves
    insufficient.
@@ -94,7 +94,7 @@ correctness workflow runs green on hosted CI for `main` @ `fbc4db3`; the
 `synapcity-web` (root `apps/web`) and `synapcity-design` (root `apps/storybook`)
 Vercel projects both serve production from `main`; native monorepo skipping
 behaved as intended (web-only change deploys web and skips Storybook,
-Storybook-only change the reverse, a shared `@synapcity/frontend-uiontend-uiontend-ui-core` change deploys
+Storybook-only change the reverse, a shared `@synapcity/frontend-ui/core` change deploys
 both). No `vercel.json`, custom ignored-build script or path filter is used.
 This ADR left the project names open; `synapcity-web` and `synapcity-design`
 are the names that were created.

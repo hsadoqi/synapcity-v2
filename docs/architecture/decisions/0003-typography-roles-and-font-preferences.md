@@ -59,3 +59,7 @@ The compiled stylesheet shows `body` in Inter, `h1`–`h3` in Geist, and `code`/
 ## Reconsideration conditions
 
 A brand typeface, a licensing change to Inter or Geist, a requirement for scripts these fonts do not cover, or a measured loading cost that a system font stack would remove.
+
+## Amendment, 2026-10-17: where the loaders live
+
+Decision items 4 and 5 name `apps/web/src/app/layout.tsx` as the place fonts are loaded and added. The loaders now live in `apps/web/src/app/fonts.ts`, which exports one `fontVariables` class string. Both `layout.tsx` and `global-error.tsx` put it on `<html>`: `global-error` replaces the root layout when that fails, so it must bring the font variables itself, and a Next.js layout may not export them for it to import. Read "in `layout.tsx`" in items 4 and 5 as "in `fonts.ts`, used by the layout". Nothing else changes: the families, the four roles, the override variables and "a component never imports a font" stand. Recorded at the owner's direction while styling `global-error` like the rest of the app; it does not reopen the decision.

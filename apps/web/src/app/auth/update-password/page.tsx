@@ -3,11 +3,16 @@ import { redirect } from 'next/navigation';
 
 import { fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import { createClient } from '@/lib/supabase/server';
-import { UpdatePasswordCard } from '@/features/auth/components/update-password-card';
+import { safeNextPath } from '@/lib/routing/safe-next';
+import { UpdatePasswordCard } from '@/features/auth/components/password/update-password/update-password-card';
 
 export const metadata: Metadata = { title: 'Choose a password' };
 
-export default async function UpdatePasswordPage() {
+export default async function UpdatePasswordPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
   // Fixture mode has no session, so there is nothing to update.
   if (fixtureModeEnabled()) redirect('/');
 
@@ -17,5 +22,8 @@ export default async function UpdatePasswordPage() {
   const { data } = await supabase.auth.getClaims();
   if (!data?.claims) redirect('/auth/forgot-password?expired=1');
 
-  return <UpdatePasswordCard />;
+  // Empty when absent: the action then picks the user's own home.
+  const next = safeNextPath((await searchParams).next, '');
+
+  return <UpdatePasswordCard next={next} />;
 }

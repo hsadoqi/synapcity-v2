@@ -1,8 +1,14 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-import { authErrorPath, parseAuthFlow } from '@/lib/routing/auth-flow';
+import {
+  authErrorPath,
+  parseAuthFlow,
+  welcomePath,
+} from '@/lib/routing/auth-flow';
+import { needsProfileSetup } from '@/features/account/shared/profile-confirmed';
 import { homePathFor } from '@/lib/routing/user-paths';
 import { safeNextPath } from '@/lib/routing/safe-next';
+import { withNotice } from '@/lib/routing/notices';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -23,8 +29,44 @@ export async function GET(request: NextRequest) {
     if (!error && data.user) {
       // No (or an unsafe) `next`: send them to their own home.
       const destination = safeNextPath(next, homePathFor(data.user.id));
-      return NextResponse.redirect(`${origin}${destination}`);
+      // A new account is asked once to confirm its name and photo. Only when
+      // the link was a sign-up or a provider sign-in: a password reset is
+      // someone who already has an account. If anything about the account is
+      // unknown, the answer is no, so doubt never adds a step.
+      const welcome =
+        (flow === 'oauth' || flow === 'confirm') &&
+        needsProfileSetup(data.user);
+      // A confirmed email change, or a newly connected account, lands back
+      // where it was asked for, saying so.
+      const arrival =
+        flow === 'email-change'
+          ? withNotice(destination, 'email-updated')
+          : flow === 'link'
+            ? withNotice(destination, 'account-connected')
+            : welcome
+              ? welcomePath(destination)
+              : destination;
+      return NextResponse.redirect(`${origin}${arrival}`);
     }
+  }
+
+  // With "Secure email change" on, the first of the two links is accepted but
+  // does not finish the change, so it comes back with a `message` and no code.
+  // That is not a failure. A failed link carries `error` instead, and the
+  // message text itself is never shown (the notice wording is ours).
+  // ASSUMPTION about the provider: this is how the link comes back; it needs
+  // checking against a real email change.
+  if (
+    !code &&
+    flow === 'email-change' &&
+    searchParams.has('message') &&
+    !searchParams.has('error') &&
+    !searchParams.has('error_code')
+  ) {
+    const back = safeNextPath(next, '/');
+    return NextResponse.redirect(
+      `${origin}${withNotice(back, 'email-change-step')}`,
+    );
   }
 
   return NextResponse.redirect(`${origin}${authErrorPath(flow)}`);

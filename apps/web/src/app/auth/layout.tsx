@@ -1,4 +1,4 @@
-import { AuthPageShell } from '@/components/shells/auth-page-shell';
+import { AuthPageShell } from '@/components/shells';
 
 export default function AuthLayout({
   children,

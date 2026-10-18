@@ -13,7 +13,7 @@ export const SidebarProviders = ({
     <TooltipProvider>
       <SidebarProvider
         defaultOpen={false}
-        className="min-h-svh max-w-screen size-full"
+        className="h-svh w-full max-w-screen"
       >
         {children}
       </SidebarProvider>

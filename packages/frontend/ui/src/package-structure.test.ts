@@ -29,8 +29,11 @@ const COMPONENT_ROOTS = [
 ] as const;
 
 const list = (dir: string) => readdirSync(dir).sort();
+// Hidden folders (editor or tool state such as `.claude/`) are never components.
 const dirs = (dir: string) =>
-  list(dir).filter((name) => statSync(join(dir, name)).isDirectory());
+  list(dir).filter(
+    (name) => !name.startsWith('.') && statSync(join(dir, name)).isDirectory(),
+  );
 
 /** Every folder that holds `<folder>/<folder>.tsx`, at any depth under a root. */
 function componentFolders(): string[] {

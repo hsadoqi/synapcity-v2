@@ -17,10 +17,17 @@ export default defineConfig({
         resolve: { alias },
         test: { name: 'node', exclude: ['src/**/*.dom.test.{ts,tsx}'] },
       }),
-      mergeConfig(reactConfig, {
-        resolve: { alias },
-        test: { name: 'dom', include: ['src/**/*.dom.test.{ts,tsx}'] },
-      }),
+      // `mergeConfig` concatenates arrays, so merging `include` onto the base
+      // preset would also pull every plain test into jsdom and run it twice.
+      // Replace it instead.
+      {
+        ...mergeConfig(reactConfig, { resolve: { alias } }),
+        test: {
+          ...reactConfig.test,
+          name: 'dom',
+          include: ['src/**/*.dom.test.{ts,tsx}'],
+        },
+      },
     ],
   },
 });
