@@ -1,5 +1,4 @@
 @import 'tailwindcss';
-@import 'shadcn/tailwind.css';
 @import '@synapcity/frontend-ui/styles.css';
 
 @source '../../';
@@ -12,5 +11,5 @@
 .light,
 .dark,
 .docs-story {
-  @apply bg-(--background) text-(--foreground);
+  @apply bg-background text-foreground;
 }

@@ -16,20 +16,20 @@ describe('Badge', () => {
   });
 
   it.each([
-    ['default', 'bg-primary', 'text-primary-foreground'],
-    ['secondary', 'bg-secondary', 'text-secondary-foreground'],
-    ['destructive', 'bg-destructive/10', 'text-destructive'],
+    ['default', 'bg-primary-foreground', 'text-primary-background'],
+    ['secondary', 'bg-secondary-foreground', 'text-secondary-background'],
+    ['destructive', 'bg-destructive-foreground', 'text-destructive-background'],
     ['outline', 'border-border', 'text-foreground'],
-    ['ghost', 'hover:bg-muted', 'hover:text-muted-foreground'],
-    ['link', 'text-primary-foreground', 'hover:underline'],
+    ['ghost', 'hover:bg-muted-foreground', 'hover:text-muted-background'],
+    ['link', 'text-base-foreground', 'hover:underline'],
   ] as const)(
     'renders the %s variant with its semantic styles',
     (variant, background, foreground) => {
       render(<Badge variant={variant}>Status</Badge>);
       const badge = screen.getByText('Status');
       expect(badge.getAttribute('data-variant')).toBe(variant);
-      expect(badge.classList.contains(background)).toBe(true);
       expect(badge.classList.contains(foreground)).toBe(true);
+      expect(badge.classList.contains(background)).toBe(true);
       expect(badge.hasAttribute('variant')).toBe(false);
     },
   );

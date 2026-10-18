@@ -32,7 +32,14 @@
   --info-foreground: var(--base-50);
   --border: var(--muted);
   --divider: var(--muted-foreground);
-  --input: var(--muted-background);
+  /* Field borders need 3:1 against the card (WCAG 1.4.11), so they mix their own mid grey
+     rather than borrow --muted-background, which is near the page colour. Near L 61% here,
+     52% in dark; e2e/theme-tokens.e2e.ts measures it. */
+  --input: color-mix(
+    in oklch,
+    var(--base-foreground) 45%,
+    var(--base-background)
+  );
   --ring: var(--base);
   --link: var(--base-600);
   --sidebar: var(--base-50);
@@ -64,7 +71,14 @@
   --info-foreground: var(--base-950);
   --border: var(--muted);
   --divider: var(--muted-foreground);
-  --input: var(--muted-background);
+  /* Field borders need 3:1 against the card (WCAG 1.4.11), so they mix their own mid grey
+     rather than borrow --muted-background, which is near the page colour. Near L 61% here,
+     52% in dark; e2e/theme-tokens.e2e.ts measures it. */
+  --input: color-mix(
+    in oklch,
+    var(--base-foreground) 45%,
+    var(--base-background)
+  );
   --ring: var(--base);
   --link: var(--base-400);
   --sidebar: var(--base-900);
