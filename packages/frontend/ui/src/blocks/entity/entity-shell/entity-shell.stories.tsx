@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { EntityShell } from '@synapcity/frontend-ui/blocks/entity/entity-shell';
+import { EntityShell } from '@synapcity/frontend-ui/blocks/entity';
 import type { Space } from '@synapcity/frontend-ui/types/entity';
 
 const space: Space = {
@@ -19,7 +19,7 @@ const space: Space = {
   updatedAt: '2026-10-16T09:30:00.000Z',
 };
 
-const meta: Meta<typeof EntityShell<Space>> = {
+const meta: Meta<typeof EntityShell> = {
   title: 'Blocks/Entity/EntityShell',
   component: EntityShell,
   tags: ['autodocs'],
@@ -30,13 +30,13 @@ const meta: Meta<typeof EntityShell<Space>> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof EntityShell<Space>>;
+type Story = StoryObj<typeof EntityShell>;
 
 export const Default: Story = {};
 
 export const WithRecentItems: Story = {
   args: {
-    getRecentItems: () => [
+    recentItems: [
       {
         id: 'doc-1',
         name: 'Launch plan',

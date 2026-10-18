@@ -44,20 +44,14 @@ describe('EntityShell', () => {
   });
 
   it('lists recent items when asked for them', () => {
-    render(<EntityShell entity={space} getRecentItems={() => recent} />);
+    render(<EntityShell entity={space} recentItems={recent} />);
 
     expect(screen.getByText('Launch plan')).toBeTruthy();
   });
 
-  it('hides recent items when showRecentItems is false', () => {
-    render(
-      <EntityShell
-        entity={space}
-        showRecentItems={false}
-        getRecentItems={() => recent}
-      />,
-    );
+  it('shows no recent items by default', () => {
+    render(<EntityShell entity={space} />);
 
-    expect(screen.queryByText('Launch plan')).toBeNull();
+    expect(screen.queryByText('Recent Items')).toBeNull();
   });
 });

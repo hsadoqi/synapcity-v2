@@ -46,12 +46,10 @@ export function EntitySection({
       <div className="flex items-center justify-between gap-4">
         <h2
           id={headingId}
-          className="flex items-baseline gap-2 text-base font-medium"
+          className="flex items-baseline gap-2 text-base font-medium text-foreground"
         >
           {title}
-          {/* text-foreground, not text-muted-foreground: axe measured 4.17:1 on
-              this count in Storybook (dark). Revisit once the cause is found. */}
-          <span className="text-sm font-normal text-foreground tabular-nums">
+          <span className="text-sm font-normal text-muted-foreground tabular-nums">
             <span className="sr-only">(</span>
             {total}
             <span className="sr-only"> items)</span>

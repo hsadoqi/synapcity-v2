@@ -13,14 +13,12 @@ export function EntityContent({
   children?: React.ReactNode;
 }) {
   const entityItem = createFixture?.({ ownerId: userId });
+  // Chosen here, on the server, so only plain data reaches the client shell.
+  const recentItems = entityItem ? getRecentItems(entityItem) : [];
   return (
     <div className="flex flex-col flex-1 gap-6">
       {entityItem && (
-        <EntityShell
-          entity={{ ...entityItem }}
-          showRecentItems
-          getRecentItems={getRecentItems}
-        >
+        <EntityShell entity={{ ...entityItem }} recentItems={recentItems}>
           {children}
         </EntityShell>
       )}

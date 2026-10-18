@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/ui/button';
 import {
   Sheet,
   SheetContent,
@@ -9,7 +9,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from '@synapcity/frontend-ui/core/sheet';
+} from '@synapcity/frontend-ui/components/ui/sheet';
 
 const meta: Meta<typeof Sheet> = {
   title: 'Components/Sheet',

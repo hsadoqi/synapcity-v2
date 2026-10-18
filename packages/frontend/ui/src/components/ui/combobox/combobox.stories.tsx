@@ -8,7 +8,7 @@ import {
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
-} from '@synapcity/frontend-ui/core/combobox';
+} from '@synapcity/frontend-ui/components/ui/combobox';
 
 const meta: Meta<typeof Combobox> = {
   title: 'Components/Combobox',

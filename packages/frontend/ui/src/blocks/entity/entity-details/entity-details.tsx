@@ -9,7 +9,7 @@ export function EntityDetails({
 }) {
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+      <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
         {entity.name}
       </h1>
       {entity.description && (
