@@ -38,7 +38,12 @@ export function HomePageView({
   const hasHistory = items.length > 0 || pinned.length > 0;
 
   return (
-    <div className="flex flex-1 flex-col">
+    // data-fill-viewport lets RootContent shrink to the space below the header,
+    // so only this view scrolls, not <main>. Same pattern as the settings page.
+    <div
+      data-fill-viewport
+      className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto"
+    >
       {state === 'empty' || (state === 'populated' && !hasHistory) ? (
         <HomeEmptyState
           singular="space"
