@@ -15,7 +15,8 @@ export default async function HomePage({
   params: Promise<{ userId: string }>;
 }) {
   // The proxy only knows someone is signed in; this checks it is this user.
-  await requireOwner((await params).userId);
+  const { userId } = await params;
+  await requireOwner(userId);
   //   return (
   //     <div className="flex flex-1 flex-col items-center justify-center gap-4 p-4 text-center">
   //       <CurrentUserAvatar />
@@ -34,6 +35,7 @@ export default async function HomePage({
       pinned={fixturePinned}
       dateLabel="Today"
       dateTime={new Date().toISOString()}
+      userId={userId}
     />
   );
 }

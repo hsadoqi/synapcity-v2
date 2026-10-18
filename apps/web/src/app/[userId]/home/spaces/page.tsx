@@ -1,6 +1,10 @@
+import type { Metadata } from 'next';
+
 import { SpacesCollection } from '@/features/spaces/components/spaces-collection';
 import { getSpaces } from '@/features/spaces/server/get-spaces';
 import { requireOwner } from '@/lib/access/require-owner';
+
+export const metadata: Metadata = { title: 'Spaces' };
 
 export default async function SpacesPage({
   params,
