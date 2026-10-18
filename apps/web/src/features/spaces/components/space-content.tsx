@@ -26,7 +26,7 @@ export function SpaceContent({
     <EntityContent
       userId={userId}
       getRecentItems={getRecentSpaceItems}
-      createFixture={createSpaceFixture}
+      createFixture={spaceItem ? () => spaceItem : createSpaceFixture}
     >
       <>
         {spaceItem ? (
