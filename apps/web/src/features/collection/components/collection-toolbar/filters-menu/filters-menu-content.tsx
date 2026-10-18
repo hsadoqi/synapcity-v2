@@ -16,13 +16,25 @@ type FiltersMenuContentProps = {
   onFiltersChange: (filters: CollectionFilters) => void;
   /** Adds a submenu to filter by group. Omit, or pass no options, to hide it. */
   grouping?: CollectionGrouping;
+  /** Adds a submenu to filter by tag. Omit, or pass none, to hide it. */
+  tags?: string[];
 };
 
 export function FiltersMenuContent({
   filters,
   onFiltersChange,
   grouping,
+  tags,
 }: FiltersMenuContentProps) {
+  function toggleTag(tag: string, checked: boolean) {
+    onFiltersChange({
+      ...filters,
+      tags: checked
+        ? [...filters.tags, tag]
+        : filters.tags.filter((value) => value !== tag),
+    });
+  }
+
   function toggleGroup(group: string, checked: boolean) {
     onFiltersChange({
       ...filters,
@@ -62,6 +74,18 @@ export function FiltersMenuContent({
             items={grouping.options}
             selected={filters.groups}
             onToggle={toggleGroup}
+          />
+        </>
+      )}
+
+      {tags && tags.length > 0 && (
+        <>
+          <DropdownMenuSeparator />
+          <CollectionFilterMenu
+            label="Tags"
+            items={tags}
+            selected={filters.tags}
+            onToggle={toggleTag}
           />
         </>
       )}

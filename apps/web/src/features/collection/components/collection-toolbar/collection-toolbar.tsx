@@ -20,6 +20,8 @@ type CollectionToolbarProps = {
   context?: string;
   /** Turns on the group submenu in the filter menu. */
   grouping?: CollectionGrouping;
+  /** Every tag in use, for the tag submenu of the filter menu. */
+  tagOptions?: string[];
   query: string;
   onQueryChange: (query: string) => void;
   filters: CollectionFilters;
@@ -36,6 +38,7 @@ export function CollectionToolbar({
   labels: { plural },
   context,
   grouping,
+  tagOptions,
   query,
   onQueryChange,
   filters,
@@ -67,6 +70,7 @@ export function CollectionToolbar({
           filters={filters}
           onFiltersChange={onFiltersChange}
           grouping={grouping}
+          tags={tagOptions}
         />
         <SortOptionsMenu sort={sort} onSortChange={onSortChange} />
         <LayoutToggleGroup layout={layout} onLayoutChange={onLayoutChange} />

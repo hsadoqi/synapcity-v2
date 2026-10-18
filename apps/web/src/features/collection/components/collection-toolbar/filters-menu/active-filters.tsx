@@ -49,6 +49,15 @@ export function ActiveFilters({
           groups: filters.groups.filter((value) => value !== group),
         }),
     })),
+    ...filters.tags.map((tag) => ({
+      key: `tag-${tag}`,
+      label: `Tag: ${tag}`,
+      remove: () =>
+        onFiltersChange({
+          ...filters,
+          tags: filters.tags.filter((value) => value !== tag),
+        }),
+    })),
   ];
 
   return (

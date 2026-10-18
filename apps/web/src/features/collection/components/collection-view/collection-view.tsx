@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
 
 import {
@@ -20,7 +21,11 @@ import {
   CollectionLoading,
   CollectionNoResults,
 } from '../collection-states';
-import { ActiveFilters, CollectionToolbar } from '../collection-toolbar';
+import {
+  ActiveFilters,
+  CollectionTagChips,
+  CollectionToolbar,
+} from '../collection-toolbar';
 import { CollectionGrid } from './collection-grid';
 import { CollectionHeader } from './collection-header';
 import { CollectionList } from './collection-list';
@@ -34,6 +39,15 @@ export type CollectionViewProps = {
   context?: string;
   /** Turns on the group filter and shows each item's group. Omit to hide both. */
   grouping?: CollectionGrouping;
+  /**
+   * Every tag in use, most used first. Turns on the tag filter: a short row of
+   * chips under the toolbar and a Tags submenu in the filter menu.
+   */
+  tagOptions?: string[];
+  /** Which actions the item menu offers. Omit for all of them. */
+  actions?: CollectionItemAction[];
+  /** Content for the card shown when an item's icon is hovered. Omit for none. */
+  renderPreview?: (item: CollectionItem) => ReactNode;
   emptyState: CollectionEmptyCopy;
   items: CollectionItem[];
   state: CollectionState;
@@ -45,7 +59,10 @@ export type CollectionViewProps = {
   onSortChange: (sort: CollectionSort) => void;
   layout: CollectionLayout;
   onLayoutChange: (layout: CollectionLayout) => void;
-  onCreate: () => void;
+  /** Without it the view offers no create button, since one that does nothing is worse than none. */
+  onCreate?: () => void;
+  /** The page has its own heading: keep the title for assistive tech and show only the count. */
+  hideTitle?: boolean;
   onItemAction?: (action: CollectionItemAction, item: CollectionItem) => void;
   /** Whose home the toolbar's "View all" link goes to. Omit to hide the link. */
   userId?: string;
@@ -58,7 +75,7 @@ export type CollectionViewProps = {
  */
 export type CollectionViewConfig = Pick<
   CollectionViewProps,
-  'labels' | 'icon' | 'context' | 'grouping' | 'emptyState'
+  'labels' | 'icon' | 'context' | 'grouping' | 'tagOptions' | 'emptyState'
 >;
 
 export function CollectionView({
@@ -66,6 +83,9 @@ export function CollectionView({
   icon,
   context,
   grouping,
+  tagOptions,
+  actions,
+  renderPreview,
   emptyState,
   items,
   state,
@@ -78,6 +98,7 @@ export function CollectionView({
   layout,
   onLayoutChange,
   onCreate,
+  hideTitle,
   onItemAction = () => {},
   userId,
   now = new Date(),
@@ -94,6 +115,8 @@ export function CollectionView({
     showGroup: grouping !== undefined,
     now,
     onItemAction,
+    actions,
+    renderPreview,
   };
 
   return (
@@ -103,6 +126,7 @@ export function CollectionView({
         context={context}
         count={state === 'populated' ? items.length : 0}
         loading={state === 'loading'}
+        hideTitle={hideTitle}
       />
 
       <div className="flex flex-col gap-3">
@@ -110,6 +134,7 @@ export function CollectionView({
           labels={labels}
           context={context}
           grouping={grouping}
+          tagOptions={tagOptions}
           query={query}
           onQueryChange={onQueryChange}
           filters={filters}
@@ -120,6 +145,13 @@ export function CollectionView({
           onLayoutChange={onLayoutChange}
           viewAllHref={viewAllHref}
         />
+        {tagOptions && (
+          <CollectionTagChips
+            tags={tagOptions}
+            filters={filters}
+            onFiltersChange={onFiltersChange}
+          />
+        )}
         <ActiveFilters filters={filters} onFiltersChange={onFiltersChange} />
       </div>
 

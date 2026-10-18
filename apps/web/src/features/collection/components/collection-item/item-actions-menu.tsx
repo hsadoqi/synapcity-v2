@@ -23,18 +23,38 @@ import {
 import type { CollectionItem, CollectionItemAction } from '../../shared';
 import { ConfirmDialog } from '@synapcity/frontend-ui/components/confirm-dialog';
 
+const ALL_ACTIONS: CollectionItemAction[] = [
+  'open',
+  'rename',
+  'toggle-pin',
+  'duplicate',
+  'delete',
+];
+
 type ItemActionsMenuProps = {
   item: CollectionItem;
   singular: string;
   onAction: (action: CollectionItemAction, item: CollectionItem) => void;
+  /** Which actions to offer. Omit for all of them; an empty list hides the menu. */
+  actions?: CollectionItemAction[];
 };
 
 export function ItemActionsMenu({
   item,
   singular,
   onAction,
+  actions = ALL_ACTIONS,
 }: ItemActionsMenuProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const offers = (action: CollectionItemAction) => actions.includes(action);
+  const offersEdits =
+    offers('open') ||
+    offers('rename') ||
+    offers('toggle-pin') ||
+    offers('duplicate');
+
+  if (actions.length === 0) return null;
+
   return (
     <>
       <DropdownMenu>
@@ -51,51 +71,67 @@ export function ItemActionsMenu({
           <MoreHorizontal aria-hidden="true" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-40">
-          <DropdownMenuGroup>
-            <DropdownMenuItem onClick={() => onAction('open', item)}>
-              <ExternalLink aria-hidden="true" />
-              Open
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onAction('rename', item)}>
-              <Pencil aria-hidden="true" />
-              Rename
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onAction('toggle-pin', item)}>
-              {item.pinned ? (
-                <PinOff aria-hidden="true" />
-              ) : (
-                <Pin aria-hidden="true" />
+          {offersEdits && (
+            <DropdownMenuGroup>
+              {offers('open') && (
+                <DropdownMenuItem onClick={() => onAction('open', item)}>
+                  <ExternalLink aria-hidden="true" />
+                  Open
+                </DropdownMenuItem>
               )}
-              {item.pinned ? 'Unpin' : 'Pin'}
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onAction('duplicate', item)}>
-              <Copy aria-hidden="true" />
-              Duplicate
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem
-              variant="destructive"
-              onClick={() => setConfirmOpen(true)}
-            >
-              <Trash2 aria-hidden="true" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
+              {offers('rename') && (
+                <DropdownMenuItem onClick={() => onAction('rename', item)}>
+                  <Pencil aria-hidden="true" />
+                  Rename
+                </DropdownMenuItem>
+              )}
+              {offers('toggle-pin') && (
+                <DropdownMenuItem
+                  onClick={() => onAction('toggle-pin', item)}
+                >
+                  {item.pinned ? (
+                    <PinOff aria-hidden="true" />
+                  ) : (
+                    <Pin aria-hidden="true" />
+                  )}
+                  {item.pinned ? 'Unpin' : 'Pin'}
+                </DropdownMenuItem>
+              )}
+              {offers('duplicate') && (
+                <DropdownMenuItem onClick={() => onAction('duplicate', item)}>
+                  <Copy aria-hidden="true" />
+                  Duplicate
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuGroup>
+          )}
+          {offersEdits && offers('delete') && <DropdownMenuSeparator />}
+          {offers('delete') && (
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => setConfirmOpen(true)}
+              >
+                <Trash2 aria-hidden="true" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <ConfirmDialog
-        variant="destructive"
-        open={confirmOpen}
-        onOpenChange={setConfirmOpen}
-        title={`Delete “${item.title}”?`}
-        description={`This ${singular} will be deleted permanently. This can’t be undone.`}
-        confirmText={`Delete ${singular}`}
-        cancelText="Keep it"
-        onConfirm={() => onAction('delete', item)}
-      />
+      {offers('delete') && (
+        <ConfirmDialog
+          variant="destructive"
+          open={confirmOpen}
+          onOpenChange={setConfirmOpen}
+          title={`Delete “${item.title}”?`}
+          description={`This ${singular} will be deleted permanently. This can’t be undone.`}
+          confirmText={`Delete ${singular}`}
+          cancelText="Keep it"
+          onConfirm={() => onAction('delete', item)}
+        />
+      )}
     </>
   );
 }

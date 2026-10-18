@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
 
 import type { CollectionItem, CollectionItemAction } from '../../shared';
@@ -11,6 +12,10 @@ export type CollectionItemsProps = {
   showGroup: boolean;
   now: Date;
   onItemAction: (action: CollectionItemAction, item: CollectionItem) => void;
+  /** Which actions the item menu offers. Omit for all of them. */
+  actions?: CollectionItemAction[];
+  /** Content for the card shown when an item's icon is hovered. Omit for none. */
+  renderPreview?: (item: CollectionItem) => ReactNode;
 };
 
 /** Props for one grid card or list row. */

@@ -4,7 +4,7 @@ import { Badge } from '@synapcity/frontend-ui/core/badge';
 
 import { formatUpdated } from '../../shared';
 import { ItemActionsMenu } from './item-actions-menu';
-import { ItemIcon } from './item-icon';
+import { ItemIconPreview } from './item-icon-preview';
 import { ItemOpenButton } from './item-open-button';
 import type { CollectionItemCardProps } from './item-props';
 import { PinnedMark } from './pinned-mark';
@@ -16,13 +16,20 @@ export function CollectionListRow({
   showGroup,
   now,
   onItemAction,
+  actions,
+  renderPreview,
 }: CollectionItemCardProps) {
   return (
     <li className="relative flex items-center gap-3 px-3 py-2 transition-colors first:rounded-t-md last:rounded-b-md hover:bg-muted/50">
-      <ItemIcon icon={icon} />
+      <ItemIconPreview
+        item={item}
+        icon={icon}
+        renderPreview={renderPreview}
+      />
       <div className="flex min-w-0 flex-1 items-baseline gap-3">
         <ItemOpenButton
           title={item.title}
+          href={item.href}
           onOpen={() => onItemAction('open', item)}
         />
         {item.subtitle && (
@@ -34,6 +41,11 @@ export function CollectionListRow({
       {showGroup && item.group && (
         <span className="hidden w-32 truncate text-xs text-muted-foreground lg:block">
           {item.group}
+        </span>
+      )}
+      {item.detail && (
+        <span className="hidden w-40 shrink-0 truncate text-xs text-muted-foreground lg:block">
+          {item.detail}
         </span>
       )}
       <div className="hidden w-40 items-center gap-1 overflow-hidden xl:flex">
@@ -53,6 +65,7 @@ export function CollectionListRow({
         item={item}
         singular={singular}
         onAction={onItemAction}
+        actions={actions}
       />
     </li>
   );
