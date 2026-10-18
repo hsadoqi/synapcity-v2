@@ -7,12 +7,12 @@ import {
   ItemChipsSkeleton,
 } from '@/features/collection/components';
 
-import { OVERVIEW_NOW } from '../../lib/fixtures';
+import { FIXTURE_NOW } from '../../lib/fixture-clock';
 import { ITEM_KINDS, OVERVIEW_SECTIONS } from '../../lib/overview';
 import type { HomePageProps } from '../../lib/types';
 
 /** Home's overview: the shared collection displays, with home's words and items. */
-export function HomePageSections({
+export function HomeOverview({
   items = [],
   pinned = [],
 }: Pick<HomePageProps, 'items' | 'pinned'>) {
@@ -22,7 +22,7 @@ export function HomePageSections({
         {...OVERVIEW_SECTIONS.continue}
         items={items.slice(0, 3)}
         kinds={ITEM_KINDS}
-        now={OVERVIEW_NOW}
+        now={FIXTURE_NOW}
       />
       <ItemChips
         {...OVERVIEW_SECTIONS.pinned}
@@ -34,14 +34,14 @@ export function HomePageSections({
         items={items}
         limit={6}
         kinds={ITEM_KINDS}
-        now={OVERVIEW_NOW}
+        now={FIXTURE_NOW}
       />
     </div>
   );
 }
 
 /** The overview while it loads: each section's skeleton under its real heading. */
-export function HomePageSectionsSkeleton() {
+export function HomeOverviewSkeleton() {
   return (
     <>
       <FeaturedItemsSkeleton heading={OVERVIEW_SECTIONS.continue.heading} />

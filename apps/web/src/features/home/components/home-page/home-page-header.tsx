@@ -5,8 +5,9 @@ import { toast } from '@synapcity/frontend-ui/core/toast';
 import { useCurrentUser } from '@/features/auth/client/user-provider/user-provider';
 import { CreateActions } from '@/features/collection/components';
 
-import { CREATE_ACTIONS, OVERVIEW_SECTIONS } from '../../../lib/overview';
+import { CREATE_ACTIONS, OVERVIEW_SECTIONS } from '../../lib/overview';
 
+/** Today's date, a greeting and the quick ways to create something. */
 export function HomePageHeader({
   dateLabel,
   dateTime,
@@ -21,7 +22,7 @@ export function HomePageHeader({
         <time dateTime={dateTime}>{dateLabel}</time>
       </p>
       <h1 className="text-2xl font-semibold tracking-tight">
-        Welcome back, {user?.name || 'User'}{' '}
+        Welcome back, {user?.name || 'User'}
       </h1>
       <div className="text-sm text-muted-foreground">
         <CreateActions

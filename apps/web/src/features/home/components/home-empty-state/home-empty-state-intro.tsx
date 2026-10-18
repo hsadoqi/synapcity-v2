@@ -1,22 +1,26 @@
 'use client';
 
-import { House } from 'lucide-react';
+import { House, type LucideIcon } from 'lucide-react';
 
 import { CreateButton } from '@/features/collection/components';
 
-export function EmptyPageContent({
+type HomeEmptyStateIntroProps = {
+  title?: string;
+  description?: string;
+  icon?: LucideIcon;
+  /** What the button creates, e.g. "space" for "New space". */
+  singular?: string;
+  onCreate: () => void;
+};
+
+/** The page heading, a line of welcome and one button to create something. */
+export function HomeEmptyStateIntro({
   title = 'Home',
   description = "A calm place to begin. Pick a thread back up, or start something new when you're ready.",
   icon: Icon = House,
+  singular = 'document',
   onCreate,
-  singular = 'dcument',
-}: {
-  title?: string;
-  description?: string;
-  icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-  onCreate: () => void;
-  singular?: string;
-}) {
+}: HomeEmptyStateIntroProps) {
   return (
     <section
       aria-labelledby="home-title"

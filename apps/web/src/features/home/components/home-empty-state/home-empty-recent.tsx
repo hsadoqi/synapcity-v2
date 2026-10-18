@@ -1,35 +1,25 @@
-import { CollectionItem } from '@/features/collection/shared/types';
+import { Clock } from 'lucide-react';
+
 import { Button } from '@synapcity/frontend-ui/core/button';
 
-interface EmptyRecentLineProps {
+import type { CollectionItem } from '@/features/collection/shared';
+
+type HomeEmptyRecentProps = {
   items: CollectionItem[];
   limit?: number;
   onOpen?: (item: CollectionItem) => void;
-}
+};
 
-export function EmptyRecentLine({
-  items = [],
+/** A single quiet line of recent items, or a note that they will appear here. */
+export function HomeEmptyRecent({
+  items,
   limit = 3,
   onOpen,
-}: EmptyRecentLineProps) {
+}: HomeEmptyRecentProps) {
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center gap-2">
-        <div className="shrink-0">
-          <svg
-            className="h-6 w-6 text-muted-foreground"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        </div>
+        <Clock aria-hidden="true" className="size-6 text-muted-foreground" />
         <p className="text-center text-sm text-pretty text-muted-foreground">
           The things you return to will settle in here over time.
         </p>

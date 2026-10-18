@@ -1,6 +1,6 @@
 import { Skeleton } from '@synapcity/frontend-ui/core/skeleton';
 
-export function EmptyRecentLineSkeleton() {
+export function HomeEmptyRecentSkeleton() {
   return (
     <div aria-busy="true" className="flex flex-col items-center gap-2">
       <span className="sr-only" role="status">
