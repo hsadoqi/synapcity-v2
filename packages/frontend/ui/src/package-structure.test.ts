@@ -8,8 +8,8 @@ import { describe, expect, it } from 'vitest';
  *
  * - every component is a folder named after it, holding the component, its
  *   stories, its tests and an index that is the folder's public surface;
- * - code reaches other modules through `@synapcity/frontend-ui/*`, never a
- *   relative path (an index may re-export its own sibling);
+ * - code reaches other folders through `@synapcity/frontend-ui/*`; a relative
+ *   path may only name a file in the same folder (`./sibling`);
  * - every such specifier, and every `exports` entry, resolves to a real file.
  */
 
@@ -146,14 +146,15 @@ describe('imports', () => {
       (match) => match[1]!,
     );
 
-  it('uses package paths, not relative paths', () => {
+  it('uses package paths across folders; relative paths only to siblings', () => {
     const offenders: string[] = [];
     for (const file of files) {
-      const isIndex = file.endsWith('/index.ts');
       for (const specifier of importsOf(file)) {
         if (!specifier.startsWith('.')) continue;
-        // An index may re-export the module it fronts: `./button`.
-        if (isIndex && /^\.\/[\w-]+$/.test(specifier)) continue;
+        // A file in the same folder, such as `./button` or `./entity-icons`.
+        // Anything that climbs (`../`) or descends (`./parts/x`) crosses a
+        // module boundary and goes through the package path instead.
+        if (/^\.\/[\w.-]+$/.test(specifier)) continue;
         offenders.push(`${rel(file)} -> ${specifier}`);
       }
     }

@@ -33,8 +33,8 @@ src/components/link-button/
 
 - `components/ui/<name>/` holds shadcn components (`core/<name>`), `components/<name>/` the Synapcity ones, `blocks/<name>/` compositions and `providers/<name>/` providers. A block's sub-components are nested folders (`blocks/root-shell/root-header/`).
 - The `exports` map in `package.json` resolves each wildcard entry to `<folder>/index.ts`, so an import names the folder, never a file.
-- Code reaches any other module through `@synapcity/frontend-ui/*`, including in stories and tests. The one relative import allowed is an `index.ts` re-exporting its own sibling file.
-- `src/package-structure.test.ts` enforces all of this: each folder has its component, index, stories and tests; no relative imports; every specifier and `exports` entry resolves.
+- Code reaches any other folder through `@synapcity/frontend-ui/*`, including in stories and tests. A relative import may only name a file in the same folder (`./entity-icons`), such as an `index.ts` re-exporting its component or a component using a private helper beside it; never `../` or a path into a subfolder.
+- `src/package-structure.test.ts` enforces all of this: each folder has its component, index, stories and tests; relative imports only to same-folder files; every specifier and `exports` entry resolves.
 
 ## Adding a component
 
