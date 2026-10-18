@@ -1,4 +1,4 @@
-import { SpaceDetails } from '@/features/spaces/components/space-details';
+import { SpaceContent } from '@/features/spaces/components/space-content';
 import { getSpace } from '@/features/spaces/server/get-space';
 import { requireOwner } from '@/lib/access/require-owner';
 
@@ -9,7 +9,7 @@ export default async function SpaceShowPage({
 }) {
   const { userId, spaceId } = await params;
   await requireOwner(userId);
-  const space = await getSpace(spaceId);
+  const awaitedSpace = await getSpace(spaceId);
 
-  return <SpaceDetails space={space} />;
+  return <SpaceContent userId={userId} spaceItem={awaitedSpace} />;
 }
