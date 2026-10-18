@@ -17,6 +17,8 @@ export const SPACE_FIXTURES: readonly SpaceEntity[] = [
     tags: ['writing', 'ideas'],
     createdAt: '2026-10-01T09:00:00Z',
     updatedAt: '2026-10-03T14:30:00Z',
+    pinnedAt: '2026-10-04T09:00:00Z',
+    lastViewedAt: '2026-10-03T14:30:00Z',
   },
   {
     id: 'fixture-space-learning',
@@ -27,6 +29,8 @@ export const SPACE_FIXTURES: readonly SpaceEntity[] = [
     tags: ['learning'],
     createdAt: '2026-10-02T10:00:00Z',
     updatedAt: '2026-10-04T11:00:00Z',
+    pinnedAt: null,
+    lastViewedAt: '2026-10-05T18:00:00Z',
   },
   {
     id: 'fixture-space-personal',
@@ -36,6 +40,8 @@ export const SPACE_FIXTURES: readonly SpaceEntity[] = [
     tags: [],
     createdAt: '2026-10-05T08:00:00Z',
     updatedAt: '2026-10-05T08:00:00Z',
+    pinnedAt: null,
+    lastViewedAt: null,
   },
 ];
 
@@ -65,6 +71,8 @@ export const spaceItem = {
   icon: SPACE_FIXTURES[0]?.icon ?? 'folder',
   description: SPACE_FIXTURES[0]?.description ?? 'No description provided.',
   tags: SPACE_FIXTURES[0]?.tags ?? [],
+  pinnedAt: SPACE_FIXTURES[0]?.pinnedAt ?? null,
+  lastViewedAt: SPACE_FIXTURES[0]?.lastViewedAt ?? null,
   documents: [
     {
       id: 'doc1',

@@ -9,7 +9,11 @@ vi.mock('@/lib/supabase/server', () => ({ createClient }));
 vi.mock('@/lib/access/dev-fixture', () => ({ fixtureModeEnabled }));
 
 import { SPACE_FIXTURES } from '../../lib/fixtures';
-import { findSpace, listSpaces } from './space-repository';
+import {
+  findSpace,
+  listSpaces,
+  listSpaceSummaries,
+} from './space-repository';
 
 const row = {
   id: '9ab8c032-8759-44e9-808d-0573d13f290e',
@@ -20,6 +24,8 @@ const row = {
   tags: ['writing'],
   created_at: '2026-10-18T05:12:33.123456+00:00',
   updated_at: '2026-10-18T05:12:33.123456+00:00',
+  pinned_at: null,
+  last_viewed_at: null,
 };
 
 /** A stand-in for the PostgREST query builder that resolves to `result`. */
@@ -64,9 +70,29 @@ describe('space repository', () => {
           tags: ['writing'],
           createdAt: row.created_at,
           updatedAt: row.updated_at,
+          pinnedAt: null,
+          lastViewedAt: null,
         },
       ]);
       expect(spaces[0]).not.toHaveProperty('description', null);
+    });
+
+    it('maps the pinned and last-viewed times when they are set', async () => {
+      queryReturning({
+        data: [
+          {
+            ...row,
+            pinned_at: '2026-10-18T06:00:00+00:00',
+            last_viewed_at: '2026-10-18T07:00:00+00:00',
+          },
+        ],
+        error: null,
+      });
+
+      const [space] = await listSpaces();
+
+      expect(space?.pinnedAt).toBe('2026-10-18T06:00:00+00:00');
+      expect(space?.lastViewedAt).toBe('2026-10-18T07:00:00+00:00');
     });
 
     it('keeps a description when there is one', async () => {
@@ -94,6 +120,65 @@ describe('space repository', () => {
       fixtureModeEnabled.mockReturnValue(true);
 
       await expect(listSpaces()).resolves.toEqual([...SPACE_FIXTURES]);
+      expect(createClient).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('listSpaceSummaries', () => {
+    it('adds the document and dashboard counts to each space', async () => {
+      const { builder } = queryReturning({
+        data: [
+          {
+            ...row,
+            space_documents: [{ count: 8 }],
+            space_dashboards: [{ count: 1 }],
+          },
+        ],
+        error: null,
+      });
+
+      const [space] = await listSpaceSummaries();
+
+      expect(builder.select).toHaveBeenCalledWith(
+        expect.stringContaining('space_documents(count), space_dashboards(count)'),
+      );
+      expect(space).toMatchObject({
+        id: row.id,
+        documentsTotal: 8,
+        dashboardsTotal: 1,
+      });
+    });
+
+    it('counts zero when nothing takes part in the space', async () => {
+      queryReturning({
+        data: [{ ...row, space_documents: [], space_dashboards: [] }],
+        error: null,
+      });
+
+      const [space] = await listSpaceSummaries();
+
+      expect(space).toMatchObject({ documentsTotal: 0, dashboardsTotal: 0 });
+    });
+
+    it('reports a database error', async () => {
+      queryReturning({ data: null, error: { message: 'boom' } });
+
+      await expect(listSpaceSummaries()).rejects.toThrow(
+        'Failed to load spaces: boom',
+      );
+    });
+
+    it('uses the sample records with zero counts in fixture mode', async () => {
+      fixtureModeEnabled.mockReturnValue(true);
+
+      const spaces = await listSpaceSummaries();
+
+      expect(spaces).toHaveLength(SPACE_FIXTURES.length);
+      expect(spaces[0]).toMatchObject({
+        id: SPACE_FIXTURES[0]?.id,
+        documentsTotal: 0,
+        dashboardsTotal: 0,
+      });
       expect(createClient).not.toHaveBeenCalled();
     });
   });

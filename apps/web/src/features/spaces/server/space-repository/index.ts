@@ -1,1 +1,5 @@
-export { findSpace, listSpaces } from './space-repository';
+export {
+  findSpace,
+  listSpaces,
+  listSpaceSummaries,
+} from './space-repository';
