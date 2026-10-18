@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import dynamicIconImports from 'lucide-react/dynamicIconImports';
+import { findEntityIcon } from '@synapcity/frontend-ui/blocks/entity/entity-icon';
 
 import { spaceSchema } from '../../../shared/schema';
 import {
@@ -28,9 +28,9 @@ describe('space fixtures', () => {
     ).toBe(true);
   });
 
-  it('uses icon names available in the installed Lucide package', () => {
+  it('uses icons from the fixed entity icon set', () => {
     for (const space of SPACE_FIXTURES) {
-      expect(Object.hasOwn(dynamicIconImports, space.icon)).toBe(true);
+      expect(findEntityIcon(space.icon)?.name).toBe(space.icon);
     }
   });
 

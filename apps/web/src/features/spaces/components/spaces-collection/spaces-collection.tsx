@@ -1,6 +1,7 @@
 import { EntitySection } from '@synapcity/frontend-ui/blocks/entity/entity-section';
 
 import type { Space, SpaceEntity } from '../../shared/types';
+import { SpacesHeader } from './spaces-header';
 
 interface SpacesCollectionProps {
   spaces: SpaceEntity[];
@@ -27,15 +28,7 @@ function byRecentlyUpdated(a: SpaceEntity, b: SpaceEntity): number {
 export function SpacesCollection({ spaces, userId }: SpacesCollectionProps) {
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-8 lg:py-12">
-      <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
-          Spaces
-        </h1>
-        <p className="max-w-prose text-sm text-muted-foreground text-pretty">
-          Each space keeps related documents and dashboards in one place. The
-          one you changed last comes first.
-        </p>
-      </header>
+      <SpacesHeader />
       {/* No createHref until creating a space exists; a button that does nothing is worse than none. */}
       <EntitySection
         id="spaces"
