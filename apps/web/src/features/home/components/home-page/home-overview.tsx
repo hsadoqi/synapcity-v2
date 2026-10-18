@@ -1,7 +1,6 @@
 import {
   CompactItemList,
   CompactItemListSkeleton,
-  FeaturedItems,
   FeaturedItemsSkeleton,
   ItemChips,
   ItemChipsSkeleton,
@@ -17,13 +16,13 @@ export function HomeOverview({
   pinned = [],
 }: Pick<HomePageProps, 'items' | 'pinned'>) {
   return (
-    <div className="flex-1 flex flex-col gap-10 px-4 py-8 sm:px-6 sm:py-12">
-      <FeaturedItems
+    <div className="flex-1 flex flex-col gap-10">
+      {/* <FeaturedItems
         {...OVERVIEW_SECTIONS.continue}
         items={items.slice(0, 3)}
         kinds={ITEM_KINDS}
         now={FIXTURE_NOW}
-      />
+      /> */}
       <ItemChips
         {...OVERVIEW_SECTIONS.pinned}
         items={pinned}
