@@ -40,7 +40,7 @@ export const RootHeader = ({ account, ...props }: RootHeaderProps) => {
   // Same gutters as RootContent and RootFooter so the logo lines up with the
   // page below it.
   return (
-    <div className="sticky top-0 z-10 flex h-16 shrink-0 items-stretch border-b border-divider bg-background/95 supports-backdrop-filter:backdrop-blur-sm">
+    <div className="sticky top-0 z-10 flex h-16 shrink-0 items-stretch border-b border-border bg-background/95 supports-backdrop-filter:backdrop-blur-sm">
       {account && (
         <>
           <div className="flex shrink-0 items-center px-2 sm:px-3">

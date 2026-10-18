@@ -238,7 +238,7 @@ export function GlobalPanelShell({
             inert={!open}
             className="flex h-full min-h-0 flex-col bg-muted/50"
           >
-            <div className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-divider bg-background px-4">
+            <div className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-border bg-background px-4">
               <h2 id={`${id}-title`} className="truncate text-sm font-medium">
                 Global panel
               </h2>
