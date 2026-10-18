@@ -26,7 +26,7 @@ Browse mechanics live in `apps/web/src/features/collection`, a feature that know
 
 ## Scope
 
-The module boundary, its layers, the props contract between `collection` and its consumers, and the dependency direction. The current consumer is `features/home` (`components/collection-tabs`, `lib/collection/resources.ts`), which holds the resource-specific configuration until each resource has its own feature.
+The module boundary, its layers, the props contract between `collection` and its consumers, and the dependency direction. The current consumer is `features/home` (`lib/resources/`, `lib/overview.ts`), which holds the resource-specific configuration until each resource has its own feature.
 
 ## What this does NOT decide
 
@@ -69,4 +69,4 @@ The owner approves changes to the dependency rule, the props contract's shape, a
 
 ## Implementation
 
-Implemented 2026-10-17 on `feat/build-home-rooute`, then extended the same day: `CollectionTabs` became generic (callers pass `CollectionTabDefinition`s; home builds them with `resourceTabs`), the overview sections became the shared displays, and `HomeItem` was removed. `features/home` now holds only home's page composition, copy and configuration (`lib/overview.ts`, `lib/collection/resources.ts`) and fixtures. `features/home` keeps the resource configuration (`lib/collection/resources.ts`), the fixtures and `CollectionTabs`, a tabbed surface with an optional Overview tab that renders its children. Verified: type-check, ESLint with no warnings, Prettier, the architecture test, and the Vitest suite including the new tests. Not run: Storybook, Playwright, build, and a browser check of the home page.
+Implemented 2026-10-17 on `feat/build-home-rooute`, then extended the same day: `CollectionTabs` became generic (callers pass `CollectionTabDefinition`s; home builds them with `resourceTabs`), the overview sections became the shared displays, and `HomeItem` was removed. `features/home` now holds only home's page composition, copy and configuration (`lib/overview.ts`, `lib/resources/`) and fixtures. Verified: type-check, ESLint with no warnings, Prettier, the architecture test, and the Vitest suite including the new tests. Not run: Storybook, Playwright, build, and a browser check of the home page.
