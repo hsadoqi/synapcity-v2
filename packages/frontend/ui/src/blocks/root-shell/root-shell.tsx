@@ -9,6 +9,8 @@ import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';
 type ShellProps = {
   children: React.ReactNode;
   headerActions?: React.ReactNode;
+  /** Optional content for the authenticated shell's session-local utility panel. */
+  globalPanel?: React.ReactNode;
 };
 
 // export default function RootShell({
@@ -81,6 +83,7 @@ export function AuthenticatedShell({
   children,
   headerActions,
   account,
+  globalPanel,
 }: ShellProps & { account: AccountLinks }) {
   return (
     <div
@@ -91,6 +94,7 @@ export function AuthenticatedShell({
       <SidebarShell
         header={<RootHeader account={account} actions={headerActions} />}
         account={account}
+        globalPanel={globalPanel}
       >
         <ShellContent>{children}</ShellContent>
       </SidebarShell>
@@ -102,12 +106,17 @@ export default function RootShell({
   children,
   headerActions,
   account,
+  globalPanel,
 }: ShellProps & {
   /** Present when someone is signed in; the app supplies where they lead. */
   account?: AccountLinks | null;
 }) {
   return account ? (
-    <AuthenticatedShell account={account ?? {}} headerActions={headerActions}>
+    <AuthenticatedShell
+      account={account}
+      headerActions={headerActions}
+      globalPanel={globalPanel}
+    >
       {children}
     </AuthenticatedShell>
   ) : (

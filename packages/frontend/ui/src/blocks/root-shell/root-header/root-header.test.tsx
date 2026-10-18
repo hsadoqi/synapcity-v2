@@ -9,6 +9,7 @@ import {
 } from '@synapcity/frontend-ui/blocks/root-shell/root-header';
 import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
 import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
+import { GlobalPanelShell } from '@synapcity/frontend-ui/blocks/root-shell/global-panel';
 
 vi.mock('next/navigation', () => ({ usePathname: () => '/' }));
 
@@ -120,5 +121,35 @@ describe('RootHeader', () => {
     renderHeader(null);
 
     expect(screen.queryByRole('link', { name: 'Settings' })).toBeNull();
+  });
+
+  it('places the panel action in the account navigation when hosted by the panel shell', () => {
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      },
+    );
+    render(
+      <ModeProvider>
+        <TooltipProvider>
+          <SidebarProvider>
+            <GlobalPanelShell header={<RootHeader account={account} />}>
+              <p>Page</p>
+            </GlobalPanelShell>
+          </SidebarProvider>
+        </TooltipProvider>
+      </ModeProvider>,
+    );
+    const nav = screen.getByRole('navigation', {
+      name: 'Account and appearance',
+    });
+    expect(
+      within(nav)
+        .getByRole('button', { name: 'Toggle global panel' })
+        .getAttribute('aria-expanded'),
+    ).toBe('false');
   });
 });

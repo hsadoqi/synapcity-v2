@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   AuthenticatedShell,
@@ -9,6 +9,17 @@ import {
 import { ModeProvider } from '@synapcity/frontend-ui/providers/mode-provider';
 
 vi.mock('next/navigation', () => ({ usePathname: () => '/' }));
+
+beforeEach(() => {
+  vi.stubGlobal(
+    'ResizeObserver',
+    class {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    },
+  );
+});
 
 const account = { homeHref: '/u/home', settingsHref: '/u/settings' };
 
@@ -89,5 +100,23 @@ describe('RootShell', () => {
   it('exposes both shell variants', () => {
     expect(typeof PublicShell).toBe('function');
     expect(typeof AuthenticatedShell).toBe('function');
+  });
+
+  it('offers the panel only in the authenticated shell and passes caller-owned contents', () => {
+    const view = renderShell({ account, globalPanel: <p>Caller utility</p> });
+    expect(
+      screen
+        .getByRole('button', { name: 'Toggle global panel' })
+        .getAttribute('aria-expanded'),
+    ).toBe('false');
+    expect(
+      document.querySelector('[data-root-global-panel]')?.textContent,
+    ).toContain('Caller utility');
+    view.unmount();
+    renderShell();
+    expect(
+      screen.queryByRole('button', { name: 'Toggle global panel' }),
+    ).toBeNull();
+    expect(document.querySelector('[data-root-global-panel]')).toBeNull();
   });
 });
