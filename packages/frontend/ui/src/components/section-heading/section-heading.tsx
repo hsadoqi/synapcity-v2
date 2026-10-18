@@ -1,4 +1,4 @@
-import { cn } from '../../lib/utils';
+import { cn } from '@synapcity/frontend-ui/lib/utils';
 import type { LucideIcon } from 'lucide-react';
 
 export function SectionHeading({

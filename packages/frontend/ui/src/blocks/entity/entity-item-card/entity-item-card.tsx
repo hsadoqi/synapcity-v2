@@ -4,7 +4,7 @@ import Link from 'next/link';
 import type { EntityItem } from '@synapcity/frontend-ui/types/entity';
 import { EntityIcon } from '@synapcity/frontend-ui/blocks/entity/entity-icon';
 import { formatEntityDate } from '@synapcity/frontend-ui/blocks/entity/format-entity-date';
-import { EntityMoreActions } from '../entity-header';
+import { EntityMoreActions } from '@synapcity/frontend-ui/blocks/entity/entity-header';
 
 interface EntityItemCardProps {
   entity: EntityItem;
