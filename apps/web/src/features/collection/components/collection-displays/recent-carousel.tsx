@@ -55,7 +55,9 @@ export function RecentCarousel({
   function scrollBy(direction: -1 | 1) {
     const el = track.current;
     if (!el) return;
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reduced = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
     el.scrollBy({
       left: direction * el.clientWidth * 0.8,
       behavior: reduced ? 'auto' : 'smooth',
@@ -148,11 +150,7 @@ function CarouselCard({
         isLead ? 'min-h-48 gap-4 bg-muted p-6' : 'gap-3 bg-card p-4',
       )}
     >
-      <ItemIconPreview
-        item={item}
-        icon={icon}
-        renderPreview={renderPreview}
-      />
+      <ItemIconPreview item={item} icon={icon} renderPreview={renderPreview} />
 
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <h3

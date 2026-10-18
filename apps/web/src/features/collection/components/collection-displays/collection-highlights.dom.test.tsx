@@ -81,7 +81,9 @@ describe('CollectionHighlights', () => {
   });
 
   it('says so when nothing is pinned', () => {
-    renderHighlights({ items: ITEMS.map((entry) => ({ ...entry, pinned: false })) });
+    renderHighlights({
+      items: ITEMS.map((entry) => ({ ...entry, pinned: false })),
+    });
 
     expect(screen.getByText('Pin a recipe to keep it here.')).toBeTruthy();
   });
@@ -156,7 +158,9 @@ describe('CollectionHighlights', () => {
     expect(
       screen
         .getAllByRole('link', { name: 'Linked' })
-        .every((link) => link.getAttribute('href') === '/u1/home/recipes/linked'),
+        .every(
+          (link) => link.getAttribute('href') === '/u1/home/recipes/linked',
+        ),
     ).toBe(true);
   });
 

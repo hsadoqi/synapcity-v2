@@ -21,11 +21,7 @@ export function CollectionListRow({
 }: CollectionItemCardProps) {
   return (
     <li className="relative flex items-center gap-3 px-3 py-2 transition-colors first:rounded-t-md last:rounded-b-md hover:bg-muted/50">
-      <ItemIconPreview
-        item={item}
-        icon={icon}
-        renderPreview={renderPreview}
-      />
+      <ItemIconPreview item={item} icon={icon} renderPreview={renderPreview} />
       <div className="flex min-w-0 flex-1 items-baseline gap-3">
         <ItemOpenButton
           title={item.title}

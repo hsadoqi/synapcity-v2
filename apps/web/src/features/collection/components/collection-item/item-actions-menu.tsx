@@ -86,9 +86,7 @@ export function ItemActionsMenu({
                 </DropdownMenuItem>
               )}
               {offers('toggle-pin') && (
-                <DropdownMenuItem
-                  onClick={() => onAction('toggle-pin', item)}
-                >
+                <DropdownMenuItem onClick={() => onAction('toggle-pin', item)}>
                   {item.pinned ? (
                     <PinOff aria-hidden="true" />
                   ) : (

@@ -16,7 +16,11 @@ export function ItemIcon({ icon: Icon, name }: ItemIconProps) {
       aria-hidden="true"
       className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground"
     >
-      {name ? <EntityIcon name={name} className="size-4" /> : <Icon className="size-4" />}
+      {name ? (
+        <EntityIcon name={name} className="size-4" />
+      ) : (
+        <Icon className="size-4" />
+      )}
     </span>
   );
 }
