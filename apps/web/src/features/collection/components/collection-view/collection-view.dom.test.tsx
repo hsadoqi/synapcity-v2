@@ -222,10 +222,14 @@ describe('CollectionView', () => {
       renderView({ actions: ['open', 'toggle-pin'] });
 
       fireEvent.click(
-        screen.getAllByRole('button', { name: 'Actions for Weekly review' })[0]!,
+        screen.getAllByRole('button', {
+          name: 'Actions for Weekly review',
+        })[0]!,
       );
 
-      expect(await screen.findByRole('menuitem', { name: 'Open' })).toBeTruthy();
+      expect(
+        await screen.findByRole('menuitem', { name: 'Open' }),
+      ).toBeTruthy();
       expect(screen.getByRole('menuitem', { name: 'Pin' })).toBeTruthy();
       expect(screen.queryByRole('menuitem', { name: 'Rename' })).toBeNull();
       expect(screen.queryByRole('menuitem', { name: 'Delete' })).toBeNull();
@@ -234,9 +238,7 @@ describe('CollectionView', () => {
     it('hides the menu when no action is allowed', () => {
       renderView({ actions: [] });
 
-      expect(
-        screen.queryByRole('button', { name: /^Actions for/ }),
-      ).toBeNull();
+      expect(screen.queryByRole('button', { name: /^Actions for/ })).toBeNull();
     });
   });
 });

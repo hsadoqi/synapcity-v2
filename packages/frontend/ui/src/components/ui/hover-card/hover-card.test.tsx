@@ -37,9 +37,9 @@ describe('HoverCard', () => {
     );
 
     expect(content).toBeTruthy();
-    expect(
-      screen.getByText('Writing').getAttribute('data-slot'),
-    ).toBe('hover-card-trigger');
+    expect(screen.getByText('Writing').getAttribute('data-slot')).toBe(
+      'hover-card-trigger',
+    );
   });
 
   it('places the content on the requested side', async () => {

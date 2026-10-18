@@ -318,10 +318,7 @@ describe('tagsByUse', () => {
   });
 
   it('counts a tag once per item and handles items without tags', () => {
-    const items = [
-      item({ id: 'a', tags: ['x', 'x'] }),
-      item({ id: 'b' }),
-    ];
+    const items = [item({ id: 'a', tags: ['x', 'x'] }), item({ id: 'b' })];
 
     expect(tagsByUse(items)).toEqual(['x']);
     expect(tagsByUse([])).toEqual([]);

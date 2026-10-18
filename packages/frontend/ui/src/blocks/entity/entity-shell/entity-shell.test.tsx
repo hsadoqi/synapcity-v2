@@ -18,6 +18,8 @@ const space: Space = {
   dashboardsTotal: 0,
   createdAt: '2026-10-01T12:00:00.000Z',
   updatedAt: '2026-10-16T09:30:00.000Z',
+  pinnedAt: null,
+  lastViewedAt: null,
 };
 
 const recent = [

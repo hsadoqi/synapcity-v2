@@ -9,11 +9,7 @@ vi.mock('@/lib/supabase/server', () => ({ createClient }));
 vi.mock('@/lib/access/dev-fixture', () => ({ fixtureModeEnabled }));
 
 import { SPACE_FIXTURES } from '../../lib/fixtures';
-import {
-  findSpace,
-  listSpaces,
-  listSpaceSummaries,
-} from './space-repository';
+import { findSpace, listSpaces, listSpaceSummaries } from './space-repository';
 
 const row = {
   id: '9ab8c032-8759-44e9-808d-0573d13f290e',
@@ -140,7 +136,9 @@ describe('space repository', () => {
       const [space] = await listSpaceSummaries();
 
       expect(builder.select).toHaveBeenCalledWith(
-        expect.stringContaining('space_documents(count), space_dashboards(count)'),
+        expect.stringContaining(
+          'space_documents(count), space_dashboards(count)',
+        ),
       );
       expect(space).toMatchObject({
         id: row.id,
