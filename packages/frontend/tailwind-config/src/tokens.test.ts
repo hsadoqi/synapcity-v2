@@ -206,6 +206,21 @@ describe('the appearance preferences', () => {
     });
     expect(low).toContain('color-mix');
   });
+
+  it('softens the seams (--divider, behind --sidebar-border) with low contrast, and restores them', () => {
+    // Otherwise the sidebar's line stays at full strength beside panels that have softened.
+    const rule = (re: RegExp) => {
+      let text = '';
+      tree.walkRules(re, (r) => {
+        text += r.toString();
+      });
+      return text;
+    };
+    const low = rule(/^:root\[data-contrast='low'\]/);
+    expect(low).toMatch(/--divider:[^;]*color-mix/);
+    const shown = rule(/^:root\[data-borders='true'\]/);
+    expect(shown).toContain('--divider: var(--muted-foreground)');
+  });
 });
 
 describe('the token source', () => {

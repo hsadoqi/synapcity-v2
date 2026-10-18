@@ -25,6 +25,13 @@
 :root[data-contrast='low'],
 :root[data-contrast='low'] :is(.light, .dark) {
   --border: color-mix(in oklch, var(--muted) 55%, var(--base-background));
+  /* The seams between regions (--sidebar-border reads this) are lines too, so they soften
+     with the panels instead of staying at full strength beside them. */
+  --divider: color-mix(
+    in oklch,
+    var(--muted-foreground) 45%,
+    var(--base-background)
+  );
 }
 
 :root[data-borders='true'],
@@ -33,6 +40,8 @@
      contrast. --input is the field border, about 3.7:1 against the page (WCAG 1.4.11's 3:1),
      so panels and controls get the same definition a text field has. */
   --border: var(--input);
+  /* Undoes low contrast's softening of the seams; at normal contrast it is already this. */
+  --divider: var(--muted-foreground);
 }
 
 :root[data-contrast='high'],
