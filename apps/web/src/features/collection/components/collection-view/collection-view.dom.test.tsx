@@ -62,7 +62,22 @@ describe('CollectionView', () => {
     expect(
       screen.getByRole('searchbox', { name: 'Search recipes' }),
     ).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'New recipe' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'New recipe' })).toBeNull();
+  });
+
+  it('links to the full list in the toolbar when there is a user', () => {
+    renderView({ userId: 'u1' });
+
+    expect(
+      screen
+        .getByRole('link', { name: 'View all recipes' })
+        .getAttribute('href'),
+    ).toBe('/u1/home/recipes');
+  });
+
+  it('hides the link without a user', () => {
+    renderView();
+    expect(screen.queryByRole('link', { name: /View all/ })).toBeNull();
   });
 
   it('shows the context above the title and in the search placeholder', () => {

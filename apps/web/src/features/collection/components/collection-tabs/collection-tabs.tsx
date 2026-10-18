@@ -163,7 +163,10 @@ export function CollectionTabs({
         actions={barActions}
       />
       <Separator />
-      <TabsContent value={tab} className="flex flex-1 flex-col gap-6 text-base">
+      <TabsContent
+        value={tab}
+        className="flex flex-1 flex-col gap-6 text-base p-4"
+      >
         {content}
       </TabsContent>
     </Tabs>

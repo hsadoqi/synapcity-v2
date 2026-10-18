@@ -1,9 +1,9 @@
 import { ArrowRight } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
-
 import { Button } from '@synapcity/frontend-ui/core/button';
 import { Skeleton } from '@synapcity/frontend-ui/core/skeleton';
+
+import { cn } from '@/lib/utils';
 
 import { formatAgo } from '../../shared';
 import {

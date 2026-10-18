@@ -1,5 +1,4 @@
 import { Skeleton } from '@synapcity/frontend-ui/core/skeleton';
-import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
 
 import type { CollectionLabels } from '../../shared';
 
@@ -9,7 +8,6 @@ type CollectionHeaderProps = {
   context?: string;
   count: number;
   loading: boolean;
-  userId?: string;
 };
 
 export function CollectionHeader({
@@ -17,14 +15,8 @@ export function CollectionHeader({
   context,
   count,
   loading,
-  userId,
 }: CollectionHeaderProps) {
   const countLabel = `${count} ${count === 1 ? singular : plural.toLowerCase()}`;
-  // Without a signed-in user there is no route to link to.
-  const viewAllHref = userId
-    ? `/${userId}/home/${plural.toLowerCase()}`
-    : undefined;
-
   return (
     <header className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
       <div className="flex min-w-0 flex-col gap-1">
@@ -44,11 +36,6 @@ export function CollectionHeader({
           )}
         </div>
       </div>
-      {viewAllHref && (
-        <LinkButton href={viewAllHref} variant="link" size="sm">
-          View all {plural.toLowerCase()}
-        </LinkButton>
-      )}
     </header>
   );
 }

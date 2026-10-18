@@ -47,7 +47,7 @@ export type CollectionViewProps = {
   onLayoutChange: (layout: CollectionLayout) => void;
   onCreate: () => void;
   onItemAction?: (action: CollectionItemAction, item: CollectionItem) => void;
-  /** Whose home the "View all" link goes to. Omit to hide the link. */
+  /** Whose home the toolbar's "View all" link goes to. Omit to hide the link. */
   userId?: string;
   now?: Date;
 };
@@ -82,6 +82,11 @@ export function CollectionView({
   userId,
   now = new Date(),
 }: CollectionViewProps) {
+  // Without a signed-in user there is no route to link to.
+  const viewAllHref = userId
+    ? `/${userId}/home/${labels.plural.toLowerCase()}`
+    : undefined;
+
   const itemProps = {
     icon,
     singular: labels.singular,
@@ -94,7 +99,6 @@ export function CollectionView({
   return (
     <section className="flex flex-col gap-6">
       <CollectionHeader
-        userId={userId}
         labels={labels}
         context={context}
         count={state === 'populated' ? items.length : 0}
@@ -114,7 +118,7 @@ export function CollectionView({
           onSortChange={onSortChange}
           layout={layout}
           onLayoutChange={onLayoutChange}
-          onCreate={onCreate}
+          viewAllHref={viewAllHref}
         />
         <ActiveFilters filters={filters} onFiltersChange={onFiltersChange} />
       </div>

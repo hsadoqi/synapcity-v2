@@ -11,7 +11,6 @@ import {
 import { Tabs, TabsContent } from '@synapcity/frontend-ui/core/tabs';
 import tabs from '../../lib/data/tabs';
 import { SettingsTabsHeader } from './settings-tab-header';
-import { ScrollArea, ScrollBar } from '@synapcity/frontend-ui/core/scroll-area';
 
 export const SettingsTabs = () => {
   // null until the URL hash is read. Starting on 'theme' drew and loaded the
@@ -57,21 +56,18 @@ export const SettingsTabs = () => {
       className="flex min-h-0 w-full flex-1 flex-col gap-6"
     >
       <SettingsTabsHeader onTabChange={setTab} />
-      <ScrollArea className="min-h-0 w-full flex-1 overflow-x-auto">
-        {lazyTabs.map(({ value, Component }) => (
-          <TabsContent
-            key={value}
-            value={value}
-            keepMounted={visited.has(value)}
-            className="flex h-full flex-col"
-          >
-            <Suspense fallback={null}>
-              <Component />
-            </Suspense>
-          </TabsContent>
-        ))}
-        <ScrollBar orientation="horizontal" className="bg-transparent" />
-      </ScrollArea>
+      {lazyTabs.map(({ value, Component }) => (
+        <TabsContent
+          key={value}
+          value={value}
+          keepMounted={visited.has(value)}
+          className="flex h-full flex-col"
+        >
+          <Suspense fallback={null}>
+            <Component />
+          </Suspense>
+        </TabsContent>
+      ))}
     </Tabs>
   );
 };
