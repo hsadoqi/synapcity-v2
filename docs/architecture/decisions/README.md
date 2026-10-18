@@ -36,7 +36,7 @@ ADRs are numbered sequentially (`0001-*.md`, `0002-*.md`, ...) and never renumbe
 | [0011](0011-collection-browse-feature.md)             | Collection, an app-local feature for browse mechanics        | Accepted |
 | [0011](0011-resizable-global-panel-shell.md)          | Resizable global panel in the authenticated shell            | Accepted |
 | [0012](0012-owned-space-records.md)                   | Owned Space records and serializable icon identifiers        | Accepted |
-| [0013](0013-document-and-dashboard-persistence.md)    | Document and dashboard persistence boundary                  | Proposed |
+| [0013](0013-document-and-dashboard-persistence.md)    | Document and dashboard persistence boundary                  | Accepted |
 
 **Lineage.** The ADRs in `docs/archive/architecture/decisions/` (0001-0016) belong to the previous implementation. They are evidence under `docs/engineering/preservation-policy.md`, not authority, and several describe workspaces that do not exist here (`apps/storybook`, `packages/ui/core`). This index restarted at 0001 for the current repository. When a current ADR needs an archived decision, it restates the decision it adopts rather than citing the archived number.
 
