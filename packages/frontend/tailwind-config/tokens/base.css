@@ -9,7 +9,11 @@
 
 @layer base {
   :root {
-    --radius-base: 0.25rem;
+    /* The two units the Theme tab's Corner radius and Density scale (preferences.css). They are
+       what the app used before those settings existed, so the default presets change nothing. */
+    --radius-unit: 0.25rem;
+    --spacing-unit: 0.25rem;
+    --radius-base: var(--radius-unit);
     --radius: var(--radius-base);
   }
 

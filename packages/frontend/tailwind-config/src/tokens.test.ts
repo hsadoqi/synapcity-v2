@@ -223,6 +223,78 @@ describe('the appearance preferences', () => {
   });
 });
 
+describe('radius and density', () => {
+  const value = (selector: string, prop: string) =>
+    declsFor(selector).find((d) => d.prop === prop)?.value;
+  const inCoarsePointer = (parent: AtRule | Root) =>
+    parent.type === 'atrule' &&
+    (parent as AtRule).params.includes('pointer: coarse');
+
+  it("keeps today's radius and spacing as the base each preset scales", () => {
+    // The unit is the value in use before these settings existed, so the default presets
+    // change nothing for anyone who never chooses.
+    expect(value(':root', '--radius-unit')).toBe('0.25rem');
+    expect(value(':root', '--spacing-unit')).toBe('0.25rem');
+  });
+
+  it('scales the radius from its unit by a factor, on any element', () => {
+    // Selected by attribute alone, not :root, so the live preview can carry its own draft.
+    expect(value('[data-radius]', '--radius-base')).toContain(
+      'var(--radius-unit)',
+    );
+    expect(value('[data-radius]', '--radius-base')).toContain(
+      'var(--radius-factor)',
+    );
+    expect(value('[data-radius]', '--radius-factor')).toBe('1');
+  });
+
+  it('maps each radius preset to one factor, in CSS only', () => {
+    const factor = (preset: string) =>
+      value(`[data-radius='${preset}']`, '--radius-factor');
+    expect([
+      factor('sharp'),
+      factor('default'),
+      factor('rounded'),
+      factor('round'),
+    ]).toEqual(['0', '1', '2', '3']);
+  });
+
+  it('scales --spacing from its unit by a factor, on any element', () => {
+    expect(value('[data-density]', '--spacing')).toContain(
+      'var(--spacing-unit)',
+    );
+    expect(value('[data-density]', '--spacing')).toContain(
+      'var(--density-factor)',
+    );
+    expect(value('[data-density]', '--density-factor')).toBe('1');
+    const factor = (preset: string) =>
+      value(`[data-density='${preset}']`, '--density-factor');
+    expect([
+      factor('compact'),
+      factor('comfortable'),
+      factor('spacious'),
+    ]).toEqual(['0.875', '1', '1.125']);
+  });
+
+  it("keeps a default control at or above WCAG 2.5.8's 24px at Compact", () => {
+    // The default control is h-7: 7 steps of the 4px unit, 28px. Compact is the smallest factor
+    // that stays at or over the 24 CSS px minimum target size (a 24.5px control).
+    const compact = Number(
+      value("[data-density='compact']", '--density-factor'),
+    );
+    expect(7 * 4 * compact).toBeGreaterThanOrEqual(24);
+  });
+
+  it('ignores Compact on a touch screen, where controls are 44px', () => {
+    // Shrinking the spacing would take the coarse-pointer 44px controls (h-11) below 44.
+    expect(
+      declsFor("[data-density='compact']", inCoarsePointer).find(
+        (d) => d.prop === '--density-factor',
+      )?.value,
+    ).toBe('1');
+  });
+});
+
 describe('the token source', () => {
   const tokens = join(root, 'tokens');
   const source = readdirSync(tokens)

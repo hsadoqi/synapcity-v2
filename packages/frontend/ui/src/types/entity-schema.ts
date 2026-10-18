@@ -25,4 +25,8 @@ export const spaceSchema = createSpaceSchema.extend({
   ownerId: z.uuid(),
   createdAt: timestampSchema,
   updatedAt: timestampSchema,
+  /** When the owner pinned the space; null when it is not pinned. */
+  pinnedAt: timestampSchema.nullable().default(null),
+  /** When the owner last opened the space; null when never opened. */
+  lastViewedAt: timestampSchema.nullable().default(null),
 });

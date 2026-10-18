@@ -1,6 +1,7 @@
-/* What the Appearance settings do to the page. The settings provider writes these
+/* What the Appearance and Theme settings do to the page. The settings provider writes these
  * attributes on <html> (data-font-size, data-contrast, data-borders, data-animations,
- * data-reduced-motion); nothing else sets them.
+ * data-reduced-motion, data-radius, data-density); nothing else sets them, except the Theme
+ * tab's live preview, which sets data-radius and data-density on its own frame.
  *
  * Like accessibility.css this sits outside every @layer, so it beats the layered theme
  * variables and utilities without touching a component's own classes. */
@@ -12,6 +13,62 @@
 
 :root[data-font-size='large'] {
   --text-base-size: 1.0625rem;
+}
+
+/* Corner radius: one factor on the radius unit, so every component's corners follow together
+ * (the radius scale in shared-styles.css is derived from --radius-base). These select on the
+ * attribute alone, not :root, and redeclare the result on the element: a var() resolves where
+ * it is declared, so a preview frame carrying its own data-radius needs its own --radius-base.
+ * The preset names are the allowed values in types/theme.ts; the numbers live only here. */
+[data-radius] {
+  --radius-factor: 1;
+  --radius-base: calc(var(--radius-unit) * var(--radius-factor));
+  --radius: var(--radius-base);
+}
+
+[data-radius='sharp'] {
+  --radius-factor: 0;
+}
+
+[data-radius='default'] {
+  --radius-factor: 1;
+}
+
+[data-radius='rounded'] {
+  --radius-factor: 2;
+}
+
+[data-radius='round'] {
+  --radius-factor: 3;
+}
+
+/* Density: one factor on Tailwind's --spacing, which every gap, padding, margin, height, width
+ * and size utility multiplies, so controls and icons scale with the rhythm (as in Radix
+ * Themes' scaling). Compact is 0.875 because the default 28px control (h-7) then stays at 24.5px,
+ * over WCAG 2.5.8's 24px minimum target size. Same attribute-only selector as radius above. */
+[data-density] {
+  --density-factor: 1;
+  --spacing: calc(var(--spacing-unit) * var(--density-factor));
+}
+
+[data-density='comfortable'] {
+  --density-factor: 1;
+}
+
+[data-density='compact'] {
+  --density-factor: 0.875;
+}
+
+[data-density='spacious'] {
+  --density-factor: 1.125;
+}
+
+/* A touch screen sizes its controls at 44px (h-11); shrinking the spacing would take them
+ * below that, so Compact is ignored there and reads as Comfortable. Spacious applies. */
+@media (pointer: coarse) {
+  [data-density='compact'] {
+    --density-factor: 1;
+  }
 }
 
 /* Contrast and borders. The order is the precedence: low contrast softens the lines,
