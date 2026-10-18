@@ -69,7 +69,10 @@ export function SpacesIndex({ spaces, userId, now }: SpacesIndexProps) {
     );
   }
 
-  function handleItemAction(action: CollectionItemAction, item: CollectionItem) {
+  function handleItemAction(
+    action: CollectionItemAction,
+    item: CollectionItem,
+  ) {
     if (action === 'open' && item.href) {
       router.push(item.href);
     }

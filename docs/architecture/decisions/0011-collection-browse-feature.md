@@ -39,9 +39,9 @@ The module boundary, its layers, the props contract between `collection` and its
 
 ## Unresolved
 
-- **Query ownership.** Expected direction: `collection` owns the controls and their state shape; each resource feature runs its own query (server-side, paginated) and passes items and a state back. This needs a decision when the first resource feature loads real data.
+- **Query ownership.** Working answer for the spaces index (2026-10-18, owner's decision): the page loads every item once and the consumer filters and sorts them in memory with `applyCollectionQuery`. This stays the answer until a list is large enough to need server-side queries or pagination; revisit at a few hundred items. Whether the state lives in the URL remains open.
 - **Pluralisation.** Several strings build the plural as `${singular}s` ("Search documents"). That is correct for the current resources but not in general; a consumer with an irregular plural needs a label for it.
-- **Item actions.** The action set (open, rename, pin, duplicate, delete) is fixed in `collection`. A resource that cannot support one of them needs a way to say so.
+- **Item actions.** Resolved in part (2026-10-18): `CollectionView` takes an `actions` list, so a resource offers only the actions it supports (spaces: open and pin). The full action set is still defined in `collection`.
 
 ## Governance boundary
 
@@ -70,3 +70,14 @@ The owner approves changes to the dependency rule, the props contract's shape, a
 ## Implementation
 
 Implemented 2026-10-17 on `feat/build-home-rooute`, then extended the same day: `CollectionTabs` became generic (callers pass `CollectionTabDefinition`s; home builds them with `resourceTabs`), the overview sections became the shared displays, and `HomeItem` was removed. `features/home` now holds only home's page composition, copy and configuration (`lib/overview.ts`, `lib/resources/`) and fixtures. Verified: type-check, ESLint with no warnings, Prettier, the architecture test, and the Vitest suite including the new tests. Not run: Storybook, Playwright, build, and a browser check of the home page.
+
+## Amendment: spaces index (2026-10-18)
+
+Approved by the owner's direct instruction while building the spaces index as the first resource page on real data. The index reuses `collection`; it does not build a second set of browse mechanics. Contract changes, all optional so the home page is unaffected:
+
+- `CollectionItem` gains `icon` (a stored icon name), `href`, `lastViewedAt` and `detail` (a short line of facts).
+- `CollectionFilters` gains `tags`; `CollectionView` takes `tagOptions` (a row of the most used tags plus a Tags submenu), `actions` (which item actions to offer), `renderPreview` (the hover card on an item's icon) and `hideTitle` (for a page that has its own heading). `onCreate` is now optional: without it there is no create button.
+- New displays `RecentCarousel`, `PinnedPanel` and `CollectionHighlights`: items in the order they were last in use (`byRecency`: opened, else changed), the first card filling the row and later ones smaller, beside a pinned list.
+- `lastViewedAt` is stored per owner on the resource (`last_viewed_at`), as is `pinnedAt`; both are stamped by the database. "Recently viewed" here means the owner opened the item's page. That definition is a working one: the product meaning of recency and "Continue" is still an open product decision in `PRODUCT.md`.
+
+Not decided: remembering the layout choice (grid or list) across visits. It would be a new key in the account preferences (ADR-0010), so it needs its own approval. Not done yet: documents and dashboards index pages, which have no feature or repository yet.

@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
@@ -34,7 +40,10 @@ const carouselTitles = () =>
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mocks.setSpacePinned.mockResolvedValue({ ok: true, pinnedAt: '2026-10-18T12:00:00Z' });
+  mocks.setSpacePinned.mockResolvedValue({
+    ok: true,
+    pinnedAt: '2026-10-18T12:00:00Z',
+  });
 });
 
 describe('SpacesCollectionSkeleton', () => {
@@ -79,7 +88,9 @@ describe('SpacesCollection', () => {
   it('shows what each space holds', () => {
     render(<SpacesCollection spaces={[SPACES[0]!]} userId="u1" />);
 
-    expect(screen.getAllByText('8 documents · 1 dashboard').length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText('8 documents · 1 dashboard').length,
+    ).toBeGreaterThan(0);
   });
 
   it('lists the pinned space in the pinned panel', () => {
@@ -113,7 +124,9 @@ describe('SpacesCollection', () => {
 
     const panel = screen.getByRole('region', { name: /Pinned/ });
     await waitFor(() =>
-      expect(within(panel).getByRole('link', { name: 'Learning' })).toBeTruthy(),
+      expect(
+        within(panel).getByRole('link', { name: 'Learning' }),
+      ).toBeTruthy(),
     );
     expect(mocks.setSpacePinned).toHaveBeenCalledWith(SPACES[1]!.id, true);
   });
