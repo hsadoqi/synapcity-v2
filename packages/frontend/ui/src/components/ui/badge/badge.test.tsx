@@ -21,7 +21,7 @@ describe('Badge', () => {
     ['destructive', 'bg-destructive/10', 'text-destructive'],
     ['outline', 'border-border', 'text-foreground'],
     ['ghost', 'hover:bg-muted', 'hover:text-muted-foreground'],
-    ['link', 'text-link', 'hover:underline'],
+    ['link', 'text-primary-foreground', 'hover:underline'],
   ] as const)(
     'renders the %s variant with its semantic styles',
     (variant, background, foreground) => {
