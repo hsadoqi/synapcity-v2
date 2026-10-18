@@ -51,26 +51,15 @@
 :root[data-animations='false'] *,
 :root[data-animations='false'] *::before,
 :root[data-animations='false'] *::after {
-  --tw-enter-translate-x: 0;
-  --tw-enter-translate-y: 0;
-  --tw-enter-scale: 1;
-  --tw-enter-rotate: 0;
-  --tw-enter-blur: 0;
-  --tw-exit-translate-x: 0;
-  --tw-exit-translate-y: 0;
-  --tw-exit-scale: 1;
-  --tw-exit-rotate: 0;
-  --tw-exit-blur: 0;
+  @apply motion-no-travel;
 }
 
-/* Transitions travel too (a sidebar sliding on left and width), so reduced motion keeps only
- * the ones that change how something looks. Keep this list in step with accessibility.css. */
+/* Reduced motion keeps only the transitions that change how something looks (see
+ * accessibility.css). */
 :root[data-reduced-motion='true'] *,
 :root[data-reduced-motion='true'] *::before,
 :root[data-reduced-motion='true'] *::after {
-  transition-property:
-    color, background-color, border-color, text-decoration-color, fill, stroke,
-    opacity, box-shadow, outline-color;
+  @apply motion-visual-transitions-only;
 }
 
 :root[data-animations='false'] *,
