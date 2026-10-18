@@ -3,7 +3,7 @@
 /* Only what differs from .typeset: the heading and code fonts already default to the app's. */
 .typeset-docs {
   --typeset-font-body: var(--font-body);
-  --typeset-size: 14px;
+  --typeset-size: calc(var(--text-base-size) * 14 / 15);
   --typeset-leading: 1.6;
   --typeset-flow: 1em;
 }
