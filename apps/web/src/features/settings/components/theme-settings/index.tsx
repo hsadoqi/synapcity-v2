@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { useThemeDraft } from '../../hooks/use-theme-draft';
 import { SettingsTabShell } from '../../shared/settings-tabs/settings-tab-shell/settings-tab-shell';
 import { SettingsSection } from '../../shared/settings-section';
-import { ThemeLivePreview } from './theme-live-preview/theme-live-preview';
+import { ThemePreviewPopover } from './theme-preview-popover';
 import { ThemeModeRow } from './theme-rows/theme-rows';
 import { BodyFontRow, CodeFontRow, HeadingFontRow } from './font-rows';
 
@@ -28,6 +28,7 @@ export function ThemeSettings() {
     <SettingsTabShell
       title="Theme"
       description="Choose the light and the type you work best in."
+      action={<ThemePreviewPopover theme={draft} hasChanges={hasChanges} />}
     >
       <FieldGroup>
         <ThemeModeRow value={draft.mode} onChange={(mode) => edit({ mode })} />
@@ -54,8 +55,6 @@ export function ThemeSettings() {
           Fonts load from Google Fonts, and only once you choose them.
         </p>
       </SettingsSection>
-      <Separator />
-      <ThemeLivePreview theme={draft} />
       {/* The actions sit at the end of a long tab. Once there is something to
           save they lift into a bar fixed to the bottom of the viewport, so the
           prompt to save stays in view wherever the change was made. Fixed, not

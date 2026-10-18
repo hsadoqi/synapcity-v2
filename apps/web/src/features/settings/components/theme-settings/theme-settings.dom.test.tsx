@@ -34,11 +34,38 @@ async function pick(select: string, option: string) {
 }
 
 describe('ThemeSettings', () => {
-  it('shows the control, a live preview and the disclaimer', async () => {
+  it('opens the live preview from the header and keeps it open while a choice is made', async () => {
+    await renderWithSettings(<ThemeSettings />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Preview' }));
+    const figure = await screen.findByRole('figure', { name: 'Live preview' });
+    expect(
+      figure.querySelector('[aria-hidden]')?.classList.contains('light'),
+    ).toBe(true);
+
+    await pick('Color theme', 'Dark');
+
+    // The choice reaches the open preview, which an outside press did not close.
+    await waitFor(() =>
+      expect(
+        screen
+          .getByRole('figure', { name: 'Live preview' })
+          .querySelector('[aria-hidden]')
+          ?.classList.contains('dark'),
+      ).toBe(true),
+    );
+    expect(
+      screen.getByRole('button', { name: /^Preview.*unsaved changes$/ }),
+    ).toBeTruthy();
+  });
+
+  it('shows the control, a preview button and the disclaimer', async () => {
     await renderWithSettings(<ThemeSettings />);
 
     expect(screen.getByRole('combobox', { name: 'Color theme' })).toBeTruthy();
-    expect(screen.getByRole('figure', { name: 'Live preview' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Preview' })).toBeTruthy();
+    // Not drawn until asked for.
+    expect(screen.queryByRole('figure', { name: 'Live preview' })).toBeNull();
     expect(
       screen.getByText(
         'Follows your device, switching between light and dark with it.',
