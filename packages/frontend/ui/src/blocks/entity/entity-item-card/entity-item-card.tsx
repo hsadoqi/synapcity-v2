@@ -27,7 +27,7 @@ export function EntityItemCard({
   const hasActions = Boolean(onRename || onArchive);
 
   return (
-    <div className="group relative flex h-full flex-col gap-6 rounded-lg border border-border bg-card p-3 text-foreground transition-colors hover:bg-muted">
+    <div className="group relative flex h-full flex-col gap-6 rounded-lg border border-border bg-card p-3 text-foreground transition-colors hover:bg-muted/50">
       <EntityIcon
         name={entity.icon}
         className="size-4 text-muted-foreground transition-colors group-hover:text-foreground"
@@ -35,7 +35,8 @@ export function EntityItemCard({
       />
 
       <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <h3 className="truncate text-sm font-medium">
+        {/* Two lines, so spaces whose names start alike stay tellable apart. */}
+        <h3 className="line-clamp-2 text-sm font-medium wrap-break-word">
           <Link
             href={`${slug}/${entity.id}`}
             className="rounded-sm outline-none after:absolute after:inset-0 after:rounded-lg focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-ring"

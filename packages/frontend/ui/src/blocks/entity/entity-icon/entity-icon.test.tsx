@@ -1,56 +1,51 @@
-import { render, waitFor } from '@testing-library/react';
+import { render } from '@testing-library/react';
+import { renderToString } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 
 import { EntityIcon } from '@synapcity/frontend-ui/blocks/entity/entity-icon';
 
 describe('EntityIcon', () => {
   it.each(['pen-line', 'book-open', 'house', 'camera'])(
-    'loads the real Lucide icon for %s',
-    async (name) => {
+    'renders the Lucide icon for %s straight away',
+    (name) => {
       const { container } = render(
         <EntityIcon name={name} className="size-4" aria-hidden="true" />,
       );
 
-      await waitFor(() => {
-        const svg = container.querySelector(`svg.lucide-${name}`);
-        expect(svg).not.toBeNull();
-        expect(svg?.getAttribute('class')).toContain('size-4');
-        expect(svg?.getAttribute('aria-hidden')).toBe('true');
-      });
+      const svg = container.querySelector(`svg.lucide-${name}`);
+      expect(svg).not.toBeNull();
+      expect(svg?.getAttribute('class')).toContain('size-4');
+      expect(svg?.getAttribute('aria-hidden')).toBe('true');
     },
   );
 
-  it('shows the folder fallback while a named icon loads', async () => {
-    const { container } = render(
-      <EntityIcon name="book-open" aria-hidden="true" />,
+  it('renders its icon on the server, with nothing left to load', () => {
+    expect(renderToString(<EntityIcon name="book-open" />)).toContain(
+      'lucide-book-open',
     );
-
-    expect(container.querySelector('svg.lucide-folder')).not.toBeNull();
-    await waitFor(() => {
-      expect(container.querySelector('svg.lucide-book-open')).not.toBeNull();
-      expect(container.querySelector('svg.lucide-folder')).toBeNull();
-    });
   });
 
-  it.each(['unavailable-icon', '', '__proto__', '<svg />'])(
-    'renders the static fallback for an unavailable identifier: %s',
-    (name) => {
-      const reportError = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
-      try {
-        const { container } = render(
-          <EntityIcon name={name} className="size-4" aria-hidden="true" />,
-        );
+  it.each([
+    'unavailable-icon',
+    'alarm-clock', // a real Lucide icon, but outside the fixed set
+    '',
+    '__proto__',
+    'constructor',
+    '<svg />',
+  ])('renders the folder for an identifier outside the set: %s', (name) => {
+    const reportError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const { container } = render(
+        <EntityIcon name={name} className="size-4" aria-hidden="true" />,
+      );
 
-        const svg = container.querySelector('svg.lucide-folder');
-        expect(svg).not.toBeNull();
-        expect(svg?.getAttribute('class')).toContain('size-4');
-        expect(svg?.getAttribute('aria-hidden')).toBe('true');
-        expect(reportError).not.toHaveBeenCalled();
-      } finally {
-        reportError.mockRestore();
-      }
-    },
-  );
+      const svg = container.querySelector('svg.lucide-folder');
+      expect(svg).not.toBeNull();
+      expect(svg?.getAttribute('class')).toContain('size-4');
+      expect(svg?.getAttribute('aria-hidden')).toBe('true');
+      expect(reportError).not.toHaveBeenCalled();
+    } finally {
+      reportError.mockRestore();
+    }
+  });
 });

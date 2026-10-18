@@ -1,25 +1,16 @@
-'use client';
-
 import { Folder, type LucideProps } from 'lucide-react';
-import { DynamicIcon, iconNames, type IconName } from 'lucide-react/dynamic';
 
-const availableIconNames = new Set<string>(iconNames);
-
-function isIconName(name: string): name is IconName {
-  return availableIconNames.has(name);
-}
+import { findEntityIcon } from './entity-icons';
 
 type EntityIconProps = LucideProps & { name: string };
 
-/** Resolves the stored identifier without assuming it exists in this version. */
+/**
+ * The icon for a stored identifier, from the fixed set in `entity-icons`.
+ * Anything outside the set, including malformed input, shows the folder.
+ * Renders on the server; nothing loads after the page arrives.
+ */
 export function EntityIcon({ name, ...props }: EntityIconProps) {
-  if (!isIconName(name)) return <Folder {...props} />;
+  const Icon = findEntityIcon(name)?.Icon ?? Folder;
 
-  return (
-    <DynamicIcon
-      name={name}
-      {...props}
-      fallback={() => <Folder {...props} />}
-    />
-  );
+  return <Icon {...props} />;
 }
