@@ -1,6 +1,6 @@
 # Auth review follow-ups: implementation and verification plan
 
-> **Execution record 2026-10-17:** AHF-01 to AHF-07 were carried out as PRs #29 to #31, #34 to #38, #41 and #42, and are ticked below with the evidence for each. AHF-00 was not run as written, AHF-08 was run locally except the e2e and Storybook steps (CI ran the full chain), and AHF-09 (live acceptance) has not started and needs the owner's explicit scope.
+> **Execution record 2026-10-17:** AHF-01 to AHF-07 were carried out as PRs #29 to #31, #34 to #38, #41 and #42, and are ticked below with the evidence for each. AHF-00 was not run as written, AHF-08 was run locally except the e2e and Storybook steps (CI ran the full chain), and AHF-09 (live acceptance) was partly run on 2026-10-17 (see its results table) and stays open.
 
 **Status:** Proposed implementation plan; authoring authorized 2026-10-16. No source changes, dependency additions, new fixture-auth policy or live-provider operations are authorized by authoring this file.  
 **Owner / approval authority:** Hanaa Sadoqi.  
@@ -225,11 +225,11 @@ Execution batches are sequential by default. Independent tasks do not require co
 
 ### AHF-09 — run a bounded live acceptance pass and hand off
 
-- [ ] Obtain explicit authorization naming the Supabase project/environment, app origin, disposable account/mailbox ownership, second-account scope, permitted email/OAuth/profile/password mutations and cleanup. Availability of credentials alone is not this authorization.
-- [ ] Use real auth mode to exercise the matrix below; fixture mode must be disabled. Record a precondition, action and observable outcome for each case; redact account identifiers and secrets.
-- [ ] Inspect environment/callback allow-list and deployed caching behavior read-only where authorized. Provider settings, schema/migration changes, SMTP configuration and deployment remain outside this plan's execution scope.
-- [ ] Record test-account cleanup only within the approved recovery scope. Account deletion or provider-configuration cleanup needs its own exact authorization; never improvise it.
-- [ ] Produce a final handoff naming completed follow-ups, blocked/declined items, open decisions, current uncommitted artifacts, exact local/live evidence and the next safe action. Leave this task incomplete if live access is unavailable, even when AHF-08 passes.
+- [x] Obtain explicit authorization naming the Supabase project/environment, app origin, disposable account/mailbox ownership, second-account scope, permitted email/OAuth/profile/password mutations and cleanup. Availability of credentials alone is not this authorization. _(2026-10-17: evidence: owner named the dev Supabase project, `http://localhost:8080`, all flows, plus-addresses of the owner's own mailbox and owner-run user cleanup in the thread; recorded in `.agents/task-scope.md`.)_
+- [ ] Use real auth mode to exercise the matrix below; fixture mode must be disabled. Record a precondition, action and observable outcome for each case; redact account identifiers and secrets. _(2026-10-17: open: partly run in real auth mode with fixture off; see the results below. Reset, resend, second account and both OAuth providers are NOT VERIFIED.)_
+- [ ] Inspect environment/callback allow-list and deployed caching behavior read-only where authorized. Provider settings, schema/migration changes, SMTP configuration and deployment remain outside this plan's execution scope. _(2026-10-17: open: not done; no deployed environment was used.)_
+- [ ] Record test-account cleanup only within the approved recovery scope. Account deletion or provider-configuration cleanup needs its own exact authorization; never improvise it. _(2026-10-17: open: two test users (`+ahf1`, `+ahf2`) remain in the dev project; the owner deletes them in the Supabase dashboard.)_
+- [ ] Produce a final handoff naming completed follow-ups, blocked/declined items, open decisions, current uncommitted artifacts, exact local/live evidence and the next safe action. Leave this task incomplete if live access is unavailable, even when AHF-08 passes. _(2026-10-17: open: this note and the results below are the interim handoff; the task stays incomplete because required rows are unverified.)_
 
 | Live case                              | Required observable result                                                                                                                                                   |
 | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -242,6 +242,22 @@ Execution batches are sequential by default. Independent tasks do not require co
 | Two-account URL ownership              | A cannot read B's user-area route; URL changes do not change mutation identity; actual resource/RLS claims require separately available data evidence                        |
 | Cross-tab sign-out and session refresh | Other tab updates appropriately; expired/refreshed session survives navigation without stale identity or redirect loops                                                      |
 | Deployed response isolation            | Where an approved deployed environment exists, cookie-writing responses carry appropriate cache restrictions; no cross-account response reuse is observed in the scoped test |
+
+**Live results (2026-10-17, dev Supabase project, app on localhost via `next dev`, fixture off, headless Chromium 1194; account identifiers redacted):**
+
+| Live case                            | Result                                                                                                                                                                                                |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Password sign-in and sign-out        | Verified. Sign-in landed on the account's own home; sign-out returned to `/`; the protected URL then redirected to `/auth/login?next=...`.                                                            |
+| New-account signup and confirmation  | Partly verified. The signup response was neutral. The confirmation link was already used (probably by a mail scanner) and landed on `/auth/error?reason=confirm`; the success path was not exercised. |
+| Confirmation resend and address edit | NOT VERIFIED. A second signup was rejected by the project's email rate limit.                                                                                                                         |
+| Recovery and password update         | NOT VERIFIED. The reset request showed "Too many attempts. Wait a few minutes and try again." and sent nothing.                                                                                       |
+| Google and GitHub                    | NOT VERIFIED. Both are enabled in the project; neither was run.                                                                                                                                       |
+| Profile update and refresh           | Verified. "Name updated", the name survived a reload and the header avatar initials changed.                                                                                                          |
+| Two-account URL ownership            | Partly verified. A well-formed id that is not the caller's gave a 404. No second confirmed account existed; this is not an RLS audit.                                                                 |
+| Cross-tab sign-out and refresh       | Observed. After sign-out in one tab, a second tab still showed the signed-in page for the 3 seconds waited; it redirects on the next navigation. Not judged against a contract.                       |
+| Deployed response isolation          | NOT VERIFIED. No deployed environment was authorized.                                                                                                                                                 |
+
+Two environment notes: the container needed `NODE_USE_ENV_PROXY=1` on the dev server to reach Supabase through the proxy (not a repository change), and the project's built-in mailer allows only a few emails per hour. Running `next dev` also deleted the tracked file `apps/web/AGENTS.md` ("agentRules is disabled"); it was restored with `git checkout`.
 
 **Acceptance:** each applicable row has live evidence or an explicit NOT VERIFIED / unavailable result. A successful application-route check is not represented as a complete RLS audit. Outstanding required live rows remain open completion work.
 
