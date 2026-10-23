@@ -4,6 +4,9 @@ import type { Exception, Violation } from '../model/index.ts';
  * Existing violations, one file or edge each, with the milestone that removes it
  * (workspace conventions, Boundary checks). An entry that stops matching fails the run.
  */
+const NEXT_IN_SHARED_UI =
+  'Pre-existing Next.js import in shared UI (ownership map: framework-coupled presentation).';
+
 export const EXCEPTIONS: readonly Exception[] = [
   {
     rule: 'R11',
@@ -17,64 +20,56 @@ export const EXCEPTIONS: readonly Exception[] = [
     rule: 'R11',
     file: 'packages/frontend/ui/src/blocks/entity/entity-item-card/entity-item-card.tsx',
     specifier: 'next/link',
-    reason:
-      'Pre-existing Next.js import in shared UI (ownership map: framework-coupled presentation).',
+    reason: NEXT_IN_SHARED_UI,
     removal: 'M7 collection migration (entity blocks join frontend-collection)',
   },
   {
     rule: 'R11',
     file: 'packages/frontend/ui/src/blocks/entity/entity-section/entity-section.tsx',
     specifier: 'next/link',
-    reason:
-      'Pre-existing Next.js import in shared UI (ownership map: framework-coupled presentation).',
+    reason: NEXT_IN_SHARED_UI,
     removal: 'M7 collection migration (entity blocks join frontend-collection)',
   },
   {
     rule: 'R11',
     file: 'packages/frontend/ui/src/blocks/entity/recent-entity/recent-entity-items.tsx',
     specifier: 'next/link',
-    reason:
-      'Pre-existing Next.js import in shared UI (ownership map: framework-coupled presentation).',
+    reason: NEXT_IN_SHARED_UI,
     removal: 'M7 collection migration (entity blocks join frontend-collection)',
   },
   {
     rule: 'R11',
     file: 'packages/frontend/ui/src/blocks/entity/recent-entity/recent-entity-row.tsx',
     specifier: 'next/link',
-    reason:
-      'Pre-existing Next.js import in shared UI (ownership map: framework-coupled presentation).',
+    reason: NEXT_IN_SHARED_UI,
     removal: 'M7 collection migration (entity blocks join frontend-collection)',
   },
   {
     rule: 'R11',
     file: 'packages/frontend/ui/src/blocks/root-shell/root-header/root-header.tsx',
     specifier: 'next/link',
-    reason:
-      'Pre-existing Next.js import in shared UI (ownership map: framework-coupled presentation).',
+    reason: NEXT_IN_SHARED_UI,
     removal: 'M6 shells migration (frontend-shells, host-supplied links)',
   },
   {
     rule: 'R11',
     file: 'packages/frontend/ui/src/blocks/sidebar-shell/root-sidebar/root-sidebar.tsx',
     specifier: 'next/link',
-    reason:
-      'Pre-existing Next.js import in shared UI (ownership map: framework-coupled presentation).',
+    reason: NEXT_IN_SHARED_UI,
     removal: 'M6 shells migration (frontend-shells, host-supplied links)',
   },
   {
     rule: 'R11',
     file: 'packages/frontend/ui/src/components/auth-buttons/auth-buttons.tsx',
     specifier: 'next/navigation',
-    reason:
-      'Pre-existing Next.js import in shared UI (ownership map: framework-coupled presentation).',
+    reason: NEXT_IN_SHARED_UI,
     removal: 'M9 auth migration (frontend-auth, host-supplied navigation)',
   },
   {
     rule: 'R11',
     file: 'packages/frontend/ui/src/components/link-button/link-button.tsx',
     specifier: 'next/link',
-    reason:
-      'Pre-existing Next.js import in shared UI (ownership map: framework-coupled presentation).',
+    reason: NEXT_IN_SHARED_UI,
     removal:
       'M6 frontend foundations (link wrapper moves behind frontend-ui ./next)',
   },
@@ -82,8 +77,7 @@ export const EXCEPTIONS: readonly Exception[] = [
     rule: 'R11',
     file: 'packages/frontend/ui/src/components/user-menu/user-menu.tsx',
     specifier: 'next/link',
-    reason:
-      'Pre-existing Next.js import in shared UI (ownership map: framework-coupled presentation).',
+    reason: NEXT_IN_SHARED_UI,
     removal: 'M6 shells migration (frontend-shells, host-supplied links)',
   },
   {

@@ -21,6 +21,18 @@ describe('edgeRules', () => {
     expect(summary(run())).toEqual([]);
   });
 
+  describe('R5 (unmatched deep specifier)', () => {
+    it('reports a deep import no exports entry matches as R5, not R0', () => {
+      expect(
+        summary(
+          run({
+            'apps/web/src/x.ts': `import '@t/frontend-f/src/hidden';`,
+          }),
+        ),
+      ).toEqual(['R5 apps/web/src/x.ts']);
+    });
+  });
+
   describe('R0', () => {
     it('fails an unresolved production import', () => {
       expect(
@@ -253,6 +265,27 @@ describe('edgeRules', () => {
           }),
         ),
       ).toEqual(['R2 packages/features/feat/src/server/bad.ts']);
+    });
+
+    it('R8: fails a feature production file importing its own test', () => {
+      expect(
+        summary(
+          run({
+            'packages/features/feat/src/frontend/x.test.ts': 'export {};',
+            'packages/features/feat/src/frontend/bad.ts': `import './x.test.ts';`,
+          }),
+        ),
+      ).toEqual(['R8 packages/features/feat/src/frontend/bad.ts']);
+    });
+
+    it('R0: fails a require() of a missing file and sees a require() edge', () => {
+      expect(
+        summary(
+          run({
+            'apps/web/src/x.ts': `const m = require('./missing');\nexport default m;`,
+          }),
+        ),
+      ).toEqual(['R0 apps/web/src/x.ts']);
     });
 
     it('R8: fails a feature production file importing its own story', () => {

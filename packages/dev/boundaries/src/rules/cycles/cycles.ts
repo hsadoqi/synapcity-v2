@@ -1,7 +1,10 @@
 import type { Edge, Violation, Workspace } from '../../model/index.ts';
 import { repoPath } from '../../paths/index.ts';
 
-/** Strongly connected components with more than one node, or a node with an edge to itself (Tarjan). */
+/**
+ * Strongly connected components with more than one node, or a node with an edge to itself (Tarjan).
+ * Iterative, so a long import chain cannot overflow the call stack.
+ */
 function cycles(
   nodes: string[],
   neighbours: (node: string) => string[],
@@ -19,34 +22,56 @@ function cycles(
   const onStack = new Set<string>();
   const found: string[][] = [];
 
-  const visit = (node: string) => {
-    index.set(node, counter);
-    low.set(node, counter);
-    counter++;
-    stack.push(node);
-    onStack.add(node);
-    for (const neighbour of next(node)) {
-      if (!index.has(neighbour)) {
-        visit(neighbour);
-        low.set(node, Math.min(low.get(node)!, low.get(neighbour)!));
-      } else if (onStack.has(neighbour)) {
-        low.set(node, Math.min(low.get(node)!, index.get(neighbour)!));
+  for (const root of nodes) {
+    if (index.has(root)) continue;
+    const work: Array<{ node: string; child: number }> = [
+      { node: root, child: 0 },
+    ];
+    index.set(root, counter);
+    low.set(root, counter++);
+    stack.push(root);
+    onStack.add(root);
+
+    while (work.length > 0) {
+      const frame = work[work.length - 1]!;
+      const children = next(frame.node);
+      if (frame.child < children.length) {
+        const neighbour = children[frame.child++]!;
+        if (!index.has(neighbour)) {
+          index.set(neighbour, counter);
+          low.set(neighbour, counter++);
+          stack.push(neighbour);
+          onStack.add(neighbour);
+          work.push({ node: neighbour, child: 0 });
+        } else if (onStack.has(neighbour)) {
+          low.set(
+            frame.node,
+            Math.min(low.get(frame.node)!, index.get(neighbour)!),
+          );
+        }
+        continue;
+      }
+      work.pop();
+      const parent = work[work.length - 1];
+      if (parent) {
+        low.set(
+          parent.node,
+          Math.min(low.get(parent.node)!, low.get(frame.node)!),
+        );
+      }
+      if (low.get(frame.node) === index.get(frame.node)) {
+        const component: string[] = [];
+        let member: string;
+        do {
+          member = stack.pop()!;
+          onStack.delete(member);
+          component.push(member);
+        } while (member !== frame.node);
+        if (component.length > 1 || children.includes(frame.node))
+          found.push(component.sort());
       }
     }
-    if (low.get(node) === index.get(node)) {
-      const component: string[] = [];
-      let member: string;
-      do {
-        member = stack.pop()!;
-        onStack.delete(member);
-        component.push(member);
-      } while (member !== node);
-      if (component.length > 1 || next(node).includes(node))
-        found.push(component.sort());
-    }
-  };
-
-  for (const node of nodes) if (!index.has(node)) visit(node);
+  }
   return found;
 }
 

@@ -21,7 +21,7 @@ function serverEntries(workspace: Workspace): Set<string> {
   return entries;
 }
 
-/** R10: every server entry file starts with `import 'server-only'`, and no other package file imports it. */
+/** R10: every server entry file's first statement is `import 'server-only'`, and no other package file imports it. */
 export function serverGuardRule(
   files: Map<string, SourceFile>,
   workspace: Workspace,
@@ -32,14 +32,13 @@ export function serverGuardRule(
 
   for (const entry of entries) {
     const file = files.get(entry);
-    const first = file?.imports[0];
-    if (!file || first?.kind !== 'side-effect' || first.specifier !== GUARD) {
+    if (file?.leadingImport !== GUARD) {
       violations.push({
         rule: 'R10',
         file: rel(entry),
         specifier: GUARD,
         target: null,
-        message: `a server entry's first import must be import '${GUARD}'`,
+        message: `a server entry's first statement must be import '${GUARD}'`,
       });
     }
   }

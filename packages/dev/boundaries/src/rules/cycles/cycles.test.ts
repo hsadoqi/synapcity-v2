@@ -70,4 +70,17 @@ describe('cycleRule (R9)', () => {
       'packages/frontend/f/src/m2.ts',
     ]);
   });
+
+  it('finds a cycle at the end of a very long import chain without overflowing the stack', () => {
+    const length = 4000;
+    const files: Record<string, string> = {};
+    for (let i = 0; i < length; i++) {
+      const next = i === length - 1 ? 0 : i + 1;
+      files[`packages/frontend/f/src/chain/n${i}.ts`] =
+        `import './n${next}.ts';`;
+    }
+    const violations = run(files);
+    expect(violations).toHaveLength(1);
+    expect(violations[0]?.members).toHaveLength(length);
+  });
 });

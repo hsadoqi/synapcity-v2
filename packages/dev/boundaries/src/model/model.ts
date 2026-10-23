@@ -2,18 +2,21 @@
 export type Category =
   'domain' | 'frontend' | 'server' | 'features' | 'dev' | 'app';
 
+export const GRAPHS = [
+  'domain',
+  'frontend',
+  'server',
+  'feature-contracts',
+  'feature-frontend',
+  'feature-server',
+  'app-browser',
+  'app-backend',
+  'testing',
+  'dev',
+] as const;
+
 /** The dependency graph a file belongs to; the rows and columns of ADR-0014's matrix. */
-export type Graph =
-  | 'domain'
-  | 'frontend'
-  | 'server'
-  | 'feature-contracts'
-  | 'feature-frontend'
-  | 'feature-server'
-  | 'app-browser'
-  | 'app-backend'
-  | 'testing'
-  | 'dev';
+export type Graph = (typeof GRAPHS)[number];
 
 export type RuleId =
   | 'R0'
@@ -28,6 +31,8 @@ export type RuleId =
   | 'R9'
   | 'R10'
   | 'R11';
+
+export type Directive = 'use client' | 'use server' | null;
 
 export interface WorkspacePackage {
   name: string;
@@ -52,7 +57,8 @@ export interface Workspace {
 export interface ImportRecord {
   specifier: string;
   typeOnly: boolean;
-  kind: 'import' | 'export' | 'side-effect' | 'dynamic';
+  kind:
+    'import' | 'export' | 'side-effect' | 'dynamic' | 'require' | 'import-type';
   /** False for a dynamic import whose argument is not a single string literal. */
   literal: boolean;
   line: number;
@@ -64,7 +70,9 @@ export interface SourceFile {
   pkg: WorkspacePackage;
   graph: Graph;
   production: boolean;
-  directive: 'use client' | 'use server' | null;
+  directive: Directive;
+  /** Specifier of the first statement after the directives, when that statement is a bare `import 'x'`. */
+  leadingImport: string | null;
   imports: ImportRecord[];
   parseError: string | null;
 }

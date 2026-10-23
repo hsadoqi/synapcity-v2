@@ -9,6 +9,7 @@ import type {
   SourceFile,
   Violation,
   Workspace,
+  WorkspacePackage,
 } from '../../model/index.ts';
 import { repoPath, byFileThenRule } from '../../paths/index.ts';
 import { createResolver } from '../../resolve/index.ts';
@@ -71,6 +72,21 @@ export function buildEdges(workspace: Workspace): {
     }
   }
   return { files, edges };
+}
+
+/** The workspace package a bare specifier with a subpath names (`@scope/name/deep`), if any. */
+function workspaceOwner(
+  workspace: Workspace,
+  specifier: string,
+): WorkspacePackage | undefined {
+  if (specifier.startsWith('.') || specifier.startsWith('/')) return undefined;
+  const parts = specifier.split('/');
+  const name = specifier.startsWith('@')
+    ? parts.slice(0, 2).join('/')
+    : parts[0];
+  return name === specifier
+    ? undefined
+    : workspace.packages.find((pkg) => pkg.name === name);
 }
 
 /** R6: the feature path rule an edge between two files of one feature package breaks, if any. */
@@ -139,7 +155,18 @@ export function edgeRules(
       continue;
     }
     if (target.kind === 'unresolved') {
-      report('R0', from, specifier, null, 'import does not resolve');
+      const owner = workspaceOwner(workspace, specifier);
+      if (owner) {
+        report(
+          'R5',
+          from,
+          specifier,
+          owner.name,
+          `${owner.name} does not export this path; import a public entry listed in its exports`,
+        );
+      } else {
+        report('R0', from, specifier, null, 'import does not resolve');
+      }
       continue;
     }
     if (target.kind === 'unscanned') {

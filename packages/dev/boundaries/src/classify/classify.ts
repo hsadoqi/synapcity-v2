@@ -1,6 +1,4 @@
-import type { Graph, WorkspacePackage } from '../model/index.ts';
-
-type Directive = 'use client' | 'use server' | null;
+import type { Directive, Graph, WorkspacePackage } from '../model/index.ts';
 
 const FEATURE_GRAPHS: Record<string, Graph> = {
   contracts: 'feature-contracts',

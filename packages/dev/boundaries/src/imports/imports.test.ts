@@ -116,3 +116,54 @@ describe('readModule parsing', () => {
     expect(result.parseError).not.toBeNull();
   });
 });
+
+describe('readModule edges the module record omits', () => {
+  it('reads require() calls and import = require', () => {
+    expect(
+      imports(`const a = require('a');\nimport b = require('b');`).map((i) => [
+        i.specifier,
+        i.kind,
+        i.literal,
+      ]),
+    ).toEqual([
+      ['a', 'require', true],
+      ['b', 'require', true],
+    ]);
+  });
+
+  it('flags a require() with a computed argument as non-literal', () => {
+    const [record] = imports(`const m = require(name);`);
+    expect(record).toMatchObject({ kind: 'require', literal: false });
+  });
+
+  it('reads type-position import("x").T as a type-only edge', () => {
+    expect(imports(`type T = import('./t').T;`)).toEqual([
+      expect.objectContaining({
+        specifier: './t',
+        kind: 'import-type',
+        typeOnly: true,
+      }),
+    ]);
+  });
+
+  it('marks import type x = require as type-only', () => {
+    expect(imports(`import type x = require('x');`)[0]?.typeOnly).toBe(true);
+  });
+});
+
+describe('readModule leadingImport', () => {
+  const leading = (source: string) => readModule('f.ts', source).leadingImport;
+
+  it('is the specifier of a first bare import, after directives and comments', () => {
+    expect(leading(`'use server';\n// guard\nimport 'server-only';`)).toBe(
+      'server-only',
+    );
+  });
+
+  it('is null when code or another import comes first', () => {
+    expect(leading(`const a = 1;\nimport 'server-only';`)).toBeNull();
+    expect(
+      leading(`import { a } from './a';\nimport 'server-only';`),
+    ).toBeNull();
+  });
+});

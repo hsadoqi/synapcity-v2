@@ -150,7 +150,7 @@ Record the baseline before code migration. Milestone 1 baseline verification rem
 
 Accepted 2026-10-23 through the [Milestone 3.4 design](../superpowers/specs/2026-10-23-m3-boundary-enforcement-design.md); enforced by `pnpm boundaries` (`dev-boundaries`) inside `pnpm verify`. Pre-existing violations are named in `packages/dev/boundaries/src/exceptions/exceptions.ts`, each with its removal milestone.
 
-The checker classifies every file by path into package, category and entry graph (in apps, `'use client'` files and what they reach form the browser graph; `'use server'` files are action boundaries), resolves every import including `import type` with the importing workspace's tsconfig and `exports`, and enforces:
+The checker classifies every file by path into package, category and entry graph (in apps, `'use client'` files and what they reach form the browser graph; `'use server'` files are action boundaries), resolves every import, including `import type`, `require()`, `import x = require()` and type-position `import('x')`, with the importing workspace's tsconfig and `exports`, and enforces:
 
 | #   | Rule                                                                                                                                                                                         |
 | --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

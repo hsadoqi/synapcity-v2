@@ -60,7 +60,7 @@ describe('loadWorkspace', () => {
       '@synapcity/frontend-site': true,
       '@synapcity/frontend-tailwind-config': true,
       '@synapcity/dev-fixtures': true,
-      '@synapcity/dev-anything': true,
+      '@synapcity/dev-anything': false,
       '@synapcity/frontend-shells': false,
       web: false,
     });
@@ -129,6 +129,21 @@ describe('listSourceFiles', () => {
       .map((f) => f.slice(ui!.dir.length + 1))
       .sort();
     expect(listed).toEqual(['src/a.ts', 'src/b.tsx', 'vitest.config.ts']);
+  });
+
+  it('scans a source folder that shares a name with build output, below the package root', () => {
+    const root = workspace({
+      'packages/frontend/ui/package.json': manifest('@synapcity/frontend-ui'),
+      'packages/frontend/ui/src/dist/a.ts': '',
+      'packages/frontend/ui/src/coverage/b.ts': '',
+      'packages/frontend/ui/dist/generated.ts': '',
+    });
+    const [ui] = loadWorkspace(root).packages;
+    expect(
+      listSourceFiles(ui!)
+        .map((f) => f.slice(ui!.dir.length + 1))
+        .sort(),
+    ).toEqual(['src/coverage/b.ts', 'src/dist/a.ts']);
   });
 });
 

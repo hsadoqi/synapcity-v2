@@ -37,6 +37,16 @@ describe('serverGuardRule (R10)', () => {
     ).toEqual(['R10 packages/server/s/src/index.ts']);
   });
 
+  it('fails a guard that follows other code', () => {
+    expect(
+      summary(
+        run({
+          'packages/server/s/src/index.ts': `export const s = 1;\nimport 'server-only';`,
+        }),
+      ),
+    ).toEqual(['R10 packages/server/s/src/index.ts']);
+  });
+
   it('fails a feature server entry without the guard', () => {
     expect(
       summary(

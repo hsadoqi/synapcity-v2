@@ -1,17 +1,6 @@
-import type { Graph } from '../model/index.ts';
+import { GRAPHS, type Graph } from '../model/index.ts';
 
-const EVERY_GRAPH: readonly Graph[] = [
-  'domain',
-  'frontend',
-  'server',
-  'feature-contracts',
-  'feature-frontend',
-  'feature-server',
-  'app-browser',
-  'app-backend',
-  'testing',
-  'dev',
-];
+const EVERY_GRAPH: readonly Graph[] = GRAPHS;
 
 /**
  * ADR-0014 section 2, the dependency and runtime matrix: what each graph may import.

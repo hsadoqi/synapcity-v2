@@ -16,6 +16,11 @@ const LEGACY = new Set([
   '@synapcity/frontend-ui',
   '@synapcity/frontend-site',
   '@synapcity/frontend-tailwind-config',
+  '@synapcity/dev-eslint-config',
+  '@synapcity/dev-fixtures',
+  '@synapcity/dev-playwright-config',
+  '@synapcity/dev-typescript-config',
+  '@synapcity/dev-vitest-config',
 ]);
 
 const SOURCE_EXTENSIONS = [
@@ -28,12 +33,12 @@ const SOURCE_EXTENSIONS = [
   '.mjs',
   '.cjs',
 ];
-const SKIPPED_DIRECTORIES = new Set([
-  'node_modules',
-  '.next',
+/** Skipped at any depth. */
+const INSTALLED_OR_CACHED = new Set(['node_modules', '.next', '.turbo']);
+/** Build and report output, skipped only at the package root so a source folder named `dist` is still scanned. */
+const OUTPUT_AT_ROOT = new Set([
   'dist',
   'coverage',
-  '.turbo',
   'storybook-static',
   'playwright-report',
   'test-results',
@@ -88,7 +93,7 @@ function readPackage(dir: string, category: Category): WorkspacePackage | null {
     name,
     dir,
     category,
-    legacy: LEGACY.has(name) || name.startsWith('@synapcity/dev-'),
+    legacy: LEGACY.has(name),
     dependencies: Object.entries(declared)
       .filter(([, range]) => range.startsWith('workspace:'))
       .map(([dependency]) => dependency),
@@ -128,7 +133,10 @@ export function listSourceFiles(pkg: WorkspacePackage): string[] {
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
       const full = join(dir, entry.name);
       if (entry.isDirectory()) {
-        if (!SKIPPED_DIRECTORIES.has(entry.name)) walk(full);
+        const skipped =
+          INSTALLED_OR_CACHED.has(entry.name) ||
+          (dir === pkg.dir && OUTPUT_AT_ROOT.has(entry.name));
+        if (!skipped) walk(full);
       } else if (
         entry.isFile() &&
         SOURCE_EXTENSIONS.some((extension) => entry.name.endsWith(extension)) &&
