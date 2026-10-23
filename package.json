@@ -5,6 +5,7 @@
   "scripts": {
     "build": "turbo run build",
     "build:storybook": "turbo run build-storybook --filter=storybook",
+    "start": "turbo run start",
     "dev": "turbo run dev",
     "dev:web": "turbo run dev --filter=web",
     "dev:docs": "turbo run dev --filter=docs",
@@ -33,7 +34,7 @@
     "typescript": "7.0.2",
     "vitest": "4.1.11"
   },
-  "packageManager": "pnpm@11.25.0",
+  "packageManager": "pnpm@12.15.0",
   "engines": {
     "node": ">=24"
   }

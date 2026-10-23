@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev --port 4000",
     "build": "next build",
-    "start": "next start",
+    "start:docs": "next start",
     "lint": "eslint . --cache --cache-strategy content --max-warnings 0",
     "check-types": "next typegen && tsc --noEmit"
   },

@@ -86,6 +86,10 @@
     },
     "transit": {
       "dependsOn": ["^transit"]
+    },
+    "start": {
+      "cache": false,
+      "persistent": true
     }
   }
 }
