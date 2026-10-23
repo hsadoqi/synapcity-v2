@@ -2,22 +2,38 @@
 
 import { FieldGroup } from '@synapcity/frontend-ui/core/field';
 import { Separator } from '@synapcity/frontend-ui/core/separator';
-import { SettingsTabShell } from '../../shared/settings-tabs/settings-tab-shell/settings-tab-shell';
+import { SettingsTabShell } from '../../shared/settings-tabs';
 import { canCollect, isBlockedBySignals } from '../../shared/privacy-consent';
-import { privacyPurposes } from '../../types/data-privacy';
+import {
+  choose,
+  privacyPurposes,
+  type Consent,
+} from '../../types/data-privacy';
 import { PrivacyConsentRow } from './data-privacy-rows';
 import { DataPrivacyAskAgain } from './data-privacy-ask-again';
 import { DataPrivacyDisclaimer } from './data-privacy-disclaimer';
-import { useDataPrivacySettings } from '../../hooks/use-data-privacy-settings';
+import { useGlobalPrivacyControl } from '../../hooks/use-global-privacy-control';
+import { useSettingsDraft } from '../../hooks/use-settings-draft';
+
+// Each choice records when it was made, so two records mean the same choice
+// when both grant or both refuse.
+const sameChoice = (_field: unknown, a: unknown, b: unknown) =>
+  (a as Consent).granted === (b as Consent).granted;
 
 export function DataPrivacySettings() {
-  const { privacy, signals, setConsent } = useDataPrivacySettings();
+  const draft = useSettingsDraft('privacy', { same: sameChoice });
+  const saved = draft.saved;
+  const privacy = draft.draft;
+  const change = draft.change;
+  const signals = { globalPrivacyControl: useGlobalPrivacyControl() };
   return (
     <SettingsTabShell
       title="Data privacy"
       description="Your space. Your data. Your choice."
+      draft={draft}
     >
-      <DataPrivacyAskAgain privacy={privacy} />
+      {/* What was turned off, from the saved choices: a draft does not answer it. */}
+      <DataPrivacyAskAgain privacy={saved} />
       <FieldGroup>
         {privacyPurposes.map((purpose) => (
           <PrivacyConsentRow
@@ -26,7 +42,10 @@ export function DataPrivacySettings() {
             // The switch shows what collectors are allowed, through the same gate.
             checked={canCollect(privacy, purpose, signals)}
             blocked={isBlockedBySignals(purpose, signals)}
-            onChange={(granted) => setConsent(purpose, granted)}
+            // Every choice records when it was made and which wording it was made under.
+            onChange={(granted) =>
+              change({ [purpose]: choose(purpose, granted) })
+            }
           />
         ))}
       </FieldGroup>

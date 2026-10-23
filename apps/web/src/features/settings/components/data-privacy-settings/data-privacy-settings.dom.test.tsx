@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   currentSettings,
   renderWithSettings,
+  saveTab,
   stubBrowser,
 } from '../../test-harness';
 import { PRIVACY_POLICY_VERSIONS } from '../../types/data-privacy';
@@ -42,6 +43,7 @@ describe('DataPrivacySettings', () => {
       await renderWithSettings(<DataPrivacySettings />);
 
       fireEvent.click(screen.getByRole('switch', { name: label }));
+      saveTab();
 
       const { privacy } = currentSettings();
       expect(privacy[purpose].granted).toBe(true);
@@ -114,6 +116,7 @@ describe('DataPrivacySettings', () => {
     await renderWithSettings(<DataPrivacySettings />);
 
     fireEvent.click(screen.getByRole('switch', { name: 'Activity tracking' }));
+    saveTab();
 
     expect(screen.queryByText(/has changed/)).toBeNull();
     expect(currentSettings().privacy.analytics.askAgain).toBe(false);
@@ -144,6 +147,7 @@ describe('DataPrivacySettings', () => {
 
       expect(checked('Activity tracking')).toBe('true');
       fireEvent.click(screen.getByRole('switch', { name: 'Error reports' }));
+      saveTab();
       expect(currentSettings().privacy.errorReports.granted).toBe(true);
     });
   });
