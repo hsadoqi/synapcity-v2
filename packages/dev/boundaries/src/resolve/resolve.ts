@@ -1,3 +1,4 @@
+import { realpathSync } from 'node:fs';
 import { builtinModules } from 'node:module';
 import { dirname } from 'node:path';
 
@@ -68,20 +69,13 @@ export function createResolver(
   return (fromFile, specifier) => {
     if (specifier.startsWith('node:') || BUILTINS.has(specifier))
       return { kind: 'external', name: specifier };
-    const result = resolverFor(owner(fromFile)).sync(
-      dirname(fromFile),
-      specifier,
-    );
+    // A symlinked path would miss its owning package and that package's tsconfig.
+    const from = realpathSync(fromFile);
+    const result = resolverFor(owner(from)).sync(dirname(from), specifier);
     if (!result.path) return { kind: 'unresolved' };
-    const insideWorkspacePackage = workspace.packages.some((pkg) =>
-      isInside(result.path!, pkg.dir),
-    );
-    if (result.path.includes('/node_modules/') && !insideWorkspacePackage) {
-      return { kind: 'external', name: packageName(specifier) };
-    }
+    // Workspace packages resolve to their real directories, so an installed dependency is anything under node_modules.
     if (
-      !insideWorkspacePackage &&
-      result.path.includes('/node_modules/') === false &&
+      result.path.includes('/node_modules/') ||
       !isInside(result.path, workspace.root)
     ) {
       return { kind: 'external', name: packageName(specifier) };
