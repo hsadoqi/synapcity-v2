@@ -87,7 +87,24 @@ A package's `exports` defines its supported public interface. Consumers do not b
 - Tests, stories, development configuration, seeds, and explicit demo hosts may use dev support; shipped entry points may not.
 - Type-only and development dependencies still have owners and must not conceal graph cycles.
 
-Exact manifest/export syntax and enforcement implementation belong to Milestone 3. The existing [web architecture test](../../apps/web/src/architecture.test.ts) checks some direct imports within web; it is not a workspace-wide or transitive proof.
+### Entry points
+
+Accepted 2026-10-23 through the [Milestone 3.2 design](../superpowers/specs/2026-10-23-m3-public-entry-points-design.md), which records the evidence and the owner's decisions.
+
+1. A package's `exports` map is its whole public interface; consumers never import by file path. List each entry. A wildcard is allowed only where every match is a deliberate public unit, as in `frontend-ui/core/*`.
+2. Single-runtime packages (domain, server, and frontend other than framework adapters) expose a root `.` entry. Add a module subpath such as `@synapcity/domain-records/spaces` only when consumers need a narrower interface.
+3. Feature packages expose `./contracts` (portable types, validation, view models), `./frontend` (presentation, including Server Components) and `./server` (backend orchestration and loaders), and no root entry. A feature without server work omits `./server`. Do not use `./client`.
+4. A `./frontend` or `./contracts` entry never re-exports from `./server`. Inside a mixed package, files reached from `./frontend` or `./contracts` never import files reached from `./server`, even by relative path.
+5. The file behind every server entry (`server-*` roots and feature `./server`) starts with `import 'server-only'` (`server-only@0.0.1`, added when the package is created). The guard sits in the entry file only.
+6. `'use client'` goes at the start of a client subtree, not on every file.
+7. Framework-specific code has a named entry, such as `./next`; root entries stay framework-neutral.
+8. Test-only code (fakes, fake capabilities, story helpers) has a `./testing` entry that only tests, stories and dev hosts import.
+9. There are no types-only entries. A type needed on both sides lives in domain or a feature's `./contracts`, never in a server entry.
+10. Entries point to TypeScript source; packages have no build step.
+
+`frontend-ui`'s broad `./lib/*`, `./hooks/*`, `./utils/*` and `./types/*` wildcards predate these rules and are narrowed by the migrations that touch them.
+
+Enforcement is Milestone 3.4. The existing [web architecture test](../../apps/web/src/architecture.test.ts) checks some direct imports within web; it is not a workspace-wide or transitive proof.
 
 ## Runtime and platform integration
 

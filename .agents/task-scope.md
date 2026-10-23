@@ -1,3 +1,11 @@
+## Active task: Milestone 3.2 public entry points design (2026-10-23)
+
+- Goal and mode: design the public entry-point and runtime-separation conventions for the 3.1 inventory with the owner; write one Proposed design.
+- Owner decisions (2026-10-23): feature packages expose `./contracts`, `./frontend` and `./server` with no root entry ("sure"); `server-only@0.0.1` approved as a dependency of packages with a server entry, added when each package is created ("sure"). Registry and Next.js 16.4.3 bundled docs checked the same day.
+- Exact creates (1): `docs/superpowers/specs/2026-10-23-m3-public-entry-points-design.md`. Updates (1): this ledger. Manifests, dependencies installed, source, config, commits and pushes 0.
+- Verification: Prettier, link check, builder read-through. Not run: application gates (documentation only).
+- Recording (owner approved 2026-10-23, "sure"): rules added to `docs/architecture/workspace-conventions.md` under Entry points; spec marked Accepted. Additional updates: `docs/architecture/workspace-conventions.md`.
+
 ## Active task: Milestone 3.1 package grouping and naming design (2026-10-23)
 
 - Goal and mode: owner asked to start Milestone 3 with 3.1 (package grouping and naming). Brainstorming with the owner, then writing one Proposed design for owner review. No package, manifest, source, config or dependency change.
