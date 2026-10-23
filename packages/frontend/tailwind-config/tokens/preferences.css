@@ -1,18 +1,17 @@
 /* What the Appearance and Theme settings do to the page. The settings provider writes these
- * attributes on <html> (data-font-size, data-contrast, data-borders, data-animations,
+ * attributes on <html> (data-text-size, data-contrast, data-borders, data-animations,
  * data-reduced-motion, data-radius, data-density); nothing else sets them, except the Theme
- * tab's live preview, which sets data-radius and data-density on its own frame.
+ * tab's live preview, which sets data-text-size, data-radius and data-density on its own frame.
  *
  * Like accessibility.css this sits outside every @layer, so it beats the layered theme
  * variables and utilities without touching a component's own classes. */
 
-/* Text size: the whole type scale is derived from --text-base-size. */
-:root[data-font-size='small'] {
-  --text-base-size: 0.875rem;
-}
-
-:root[data-font-size='large'] {
-  --text-base-size: 1.0625rem;
+/* Text size: the whole type scale is derived from --text-base-size, so one factor on its unit
+ * resizes every text-* step together. The setting is a percentage, not a preset, so the factor
+ * arrives as --text-scale beside the attribute (100% writes 1). Same attribute-only selector as
+ * radius below, so a preview frame carrying its own data-text-size gets its own size. */
+[data-text-size] {
+  --text-base-size: calc(var(--text-base-unit) * var(--text-scale, 1));
 }
 
 /* Corner radius: one factor on the radius unit, so every component's corners follow together
@@ -60,7 +59,7 @@
 }
 
 [data-density='spacious'] {
-  --density-factor: 1.125;
+  --density-factor: 1.25;
 }
 
 /* A touch screen sizes its controls at 44px (h-11); shrinking the spacing would take them

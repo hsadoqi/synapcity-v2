@@ -248,6 +248,19 @@ describe('radius and density', () => {
     expect(value('[data-radius]', '--radius-factor')).toBe('1');
   });
 
+  it('scales the text size from its unit by --text-scale, on any element', () => {
+    // 15px at 100%, the size in use before the setting became a percentage.
+    expect(value(':root', '--text-base-unit')).toBe('0.9375rem');
+    const size = value('[data-text-size]', '--text-base-size');
+    expect(size).toContain('var(--text-base-unit)');
+    expect(size).toContain('var(--text-scale');
+    // The default must not tie with [data-text-size]: it is declared later, so it would win.
+    expect(value(':where(:root)', '--text-base-size')).toBe(
+      'var(--text-base-unit)',
+    );
+    expect(value(':root', '--text-base-size')).toBeUndefined();
+  });
+
   it('maps each radius preset to one factor, in CSS only', () => {
     const factor = (preset: string) =>
       value(`[data-radius='${preset}']`, '--radius-factor');
@@ -273,7 +286,7 @@ describe('radius and density', () => {
       factor('compact'),
       factor('comfortable'),
       factor('spacious'),
-    ]).toEqual(['0.875', '1', '1.125']);
+    ]).toEqual(['0.875', '1', '1.25']);
   });
 
   it("keeps a default control at or above WCAG 2.5.8's 24px at Compact", () => {
