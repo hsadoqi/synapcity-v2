@@ -1,3 +1,16 @@
+## Active task: umbrella boundary READMEs (2026-10-23)
+
+- Goal and mode: implement the owner's direct request to add boundary READMEs under the agreed domain, frontend, server, features, and dev umbrellas, with Mermaid interaction/dependency diagrams. Documentation only; detailed package design and implementation migration remain separate work.
+- Exact updates (6): packages/domain/README.md; packages/frontend/README.md; packages/server/README.md; packages/features/README.md; packages/dev/README.md; this task-scope entry. Preserve the concurrently added umbrella headings and existing introductory content, and all prior task entries.
+- Git scope: create and use docs/reorganization-m2-boundaries from the clean refactor/reorganization-m1-baseline commit 1390871eaca37c96713c5f7549d3ec6b4ae0764b in the named architecture-reorganization worktree. Existing baseline branch remains intact; no commit, push, PR, reset, worktree relocation, or deletion.
+- Authority: direct owner category/composition decisions and README request in this conversation on 2026-10-23. These READMEs record Current direction with explicit implementation/reconciliation gaps. They are the category-boundary notes; existing ADRs remain the decision register and need scoped reconciliation before migration. No second milestone/task/status ledger is created.
+- Budgets and systems: repository documentation updates 5; existing task-scope updates 1; documentation creates 0; local Git branch creates 1; production/package/config/dependency/schema/API/runtime changes 0; source moves/deletes/renames 0; commits/pushes/PRs 0; GitHub/issues/projects/external planning mutations 0. Disposable documentation-validation artifacts under /private/tmp are permitted.
+- Preconditions: the five pre-existing umbrella README stubs are the only working-tree changes, and their headings and existing introductory content are preserved, exact source commit verified, preserve existing package READMEs and historical task entries. Scope excludes wider canonical-doc reconciliation and Milestone 1 baseline execution.
+- Verification: read back all six changed files; check relative links, Markdown fences and diagram/text consistency; run pnpm format:check and focused formatting checks; parse/render each Mermaid diagram where available; git diff --check and exact-file manifest check. Report tool/environment blockers, unrendered diagrams and unrun application gates literally.
+- Recovery: restore only this task's newly prepended scope entry and additions to the five existing README stubs after checking for concurrent changes; retain the original historical ledger and both branches. No history rewrite or external state recovery is required.
+
+Earlier scopes below are retained as history and grant no additional mutation authority.
+
 ## Active task: repair main integration on feat/build-spaces-feature (2026-10-17)
 
 - Goal and mode: owner requested fixing the main integration, then explicitly approved saving recovery state, aborting the duplicate-history rebase, and merging fetched origin/main (c5f03cf) into feat/build-spaces-feature. Implementing integration only.
