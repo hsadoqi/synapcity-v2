@@ -74,6 +74,7 @@ Accepted 2026-10-23 through the [Milestone 3.1 design](../superpowers/specs/2026
 | `features-dashboards`                 | Dashboard browsing                                                                                                                                           | M10           |
 | `features-home`                       | Home, aggregating the resource features                                                                                                                      | M11           |
 | `dev-*` (five existing)               | Tooling, test configuration and fixtures; `dev-fixtures` grows scenarios and sample content                                                                  | exists        |
+| `dev-boundaries`                      | Workspace boundary checker (`pnpm boundaries`) and its violation probes                                                                                      | M3.4          |
 
 **Preferences and Settings** are different packages on purpose: preferences are the data, rules, persistence and browser runtime; Settings is the screen that edits them.
 
@@ -144,6 +145,28 @@ The [ownership map](reorganization-ownership-map.md) covers all current source f
 Temporary compatibility exports point to one canonical implementation. Record each bridge's source, target, consumers, owner, and removal condition in the migration task scope. No broad legacy exemption authorizes new violations. Keep explicit production/demo bindings and identify existing fixture/fake-operation gaps.
 
 Record the baseline before code migration. Milestone 1 baseline verification remains separate from documentation checks. Use focused checks during moves, then the repository gate at completed implementation checkpoints; report unrun checks and live-provider limits.
+
+## Boundary checks
+
+Accepted 2026-10-23 through the [Milestone 3.4 design](../superpowers/specs/2026-10-23-m3-boundary-enforcement-design.md); being implemented in `dev-boundaries`. Until `pnpm boundaries` exists and runs in `pnpm verify`, these rules are not enforced.
+
+The checker classifies every file by path into package, category and entry graph (in apps, `'use client'` files and what they reach form the browser graph; `'use server'` files are action boundaries), resolves every import including `import type` with the importing workspace's tsconfig and `exports`, and enforces:
+
+| #   | Rule                                                                                                                                                 |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1  | Packages never import app source.                                                                                                                    |
+| R2  | Every edge between categories and entry graphs is allowed by ADR-0014's matrix.                                                                      |
+| R3  | No server code is reachable, directly or transitively, from frontend packages, feature `frontend`/`contracts` graphs or the app browser graph.       |
+| R4  | Domain imports only domain packages and allowlisted portable libraries (initially `zod`).                                                            |
+| R5  | Imports into another package go through its `exports`.                                                                                               |
+| R6  | Feature path rules: `frontend/` and `contracts/` never import `server/`; `contracts/` never imports `frontend/`; only `testing/` imports `testing/`. |
+| R7  | In new packages, cross-folder imports target the folder's `index.ts`.                                                                                |
+| R8  | Production files never import `dev-*` packages, `./testing` entries, tests or stories.                                                               |
+| R9  | No package or module cycles.                                                                                                                         |
+| R10 | Every server entry file starts with `import 'server-only'`.                                                                                          |
+| R11 | `next` imports in frontend packages occur only behind `./next`.                                                                                      |
+
+**Exceptions.** Existing violations are listed one file or edge at a time, each with its rule, reason and removal milestone. An entry that no longer matches fails the run, so the list only shrinks. Category, package or folder-wide exemptions are not allowed. Every rule has a probe that plants a violation in a temporary workspace and proves the check fails.
 
 ## Tooling and verification
 

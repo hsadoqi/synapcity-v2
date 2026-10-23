@@ -129,6 +129,7 @@ Account helpers in `features/account/shared` are classified at M9: pure helpers 
 | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | `dev-fixtures` (existing)                                                                             | Extended with contract-based factories, scenarios and sample content as modules inside the package (M5). No new package. |
 | `dev-eslint-config`, `dev-typescript-config`, `dev-vitest-config`, `dev-playwright-config` (existing) | Unchanged by 3.1; 3.4 and 3.5 may extend them.                                                                           |
+| `dev-boundaries` (new, 3.4)                                                                           | Workspace boundary checker and probes; added by the 3.4 design (owner decision, 2026-10-23).                             |
 
 **Totals:** 21 new packages over the reorganization (domain 3, frontend 7, server 4, features 7), plus `frontend-editor` once approved, and 8 existing packages kept (frontend 3, dev 5).
 

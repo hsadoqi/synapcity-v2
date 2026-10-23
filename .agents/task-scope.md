@@ -4,6 +4,7 @@
 - Owner decisions (2026-10-23): custom checker on `oxc-parser` and `oxc-resolver` ("ok sounds good"); both approved as development dependencies of the checker. Pending in the design: checker location (H1), the `pnpm verify` gate change, and the rules.
 - Exact creates (1): `docs/superpowers/specs/2026-10-23-m3-boundary-enforcement-design.md`. Updates (1): this ledger. Dependencies installed, manifests, lockfile, source, config, commits, pushes 0.
 - Verification: Prettier, link check, builder read-through. Not run: application gates (documentation only).
+- Recording (owner approved 2026-10-23, "sure"): `dev-boundaries` placement (H1), the `pnpm verify` gate change and the rules accepted; recorded in `docs/architecture/workspace-conventions.md` (Boundary checks section, inventory row), `docs/architecture/decisions/README.md` (candidate entry), the 3.1 spec dev table and the 3.4 spec. Implementation is not started; it follows a written plan.
 
 ## Active task: Milestone 3.3 internal organization design (2026-10-23)
 

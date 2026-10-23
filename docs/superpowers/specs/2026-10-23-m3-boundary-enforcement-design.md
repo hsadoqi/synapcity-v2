@@ -1,6 +1,6 @@
 # Milestone 3.4: dependency enforcement
 
-**Status:** Proposed, awaiting owner approval.
+**Status:** Accepted by the owner on 2026-10-23 and recorded in the [workspace conventions](../../architecture/workspace-conventions.md#boundary-checks). Implementation follows its plan; the checker does not exist yet.
 **Date:** 2026-10-23
 **Branch:** `chore/reorganization-m3-boundary-enforcement`
 **Enforces:** [ADR-0014](../../architecture/decisions/0014-multi-app-package-boundaries.md) section 2 and the [workspace conventions](../../architecture/workspace-conventions.md) for the package inventory, entry points and internal organization.
@@ -33,10 +33,11 @@ The boundary rules fail the build instead of living only in documents. A forbidd
 | --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | G1  | Build a custom boundary checker on `oxc-parser` and `oxc-resolver`, not dependency-cruiser or eslint-plugin-boundaries.                                                                                                                                     |
 | G2  | Declare `oxc-parser` and `oxc-resolver` as development dependencies of the checker. Versions follow the repository default of latest stable: `oxc-parser@0.155.0` (adds a second copy beside Knip's 0.153.x) and `oxc-resolver@11.24.2` (shared with Knip). |
+| G3  | The checker lives in a new `dev-boundaries` package (H1), `pnpm boundaries` joins `pnpm verify` after `pnpm deps`, and the rules, exception policy and probes in section 6 are accepted.                                                                    |
 
-## 5. Open decision for the owner
+## 5. Resolved: where the checker lives
 
-**H1. Where the checker lives.** Options:
+**H1, resolved by the owner on 2026-10-23: a new `dev-boundaries` package.** The options were:
 
 - **A new `dev-boundaries` package (recommended).** The probes are Vitest tests, and tests run per workspace through Turbo, so a package gets `test` and `test:coverage` like every other workspace. It belongs in the `dev` category (tooling, never shipped) and adds one row to the inventory. `pnpm boundaries` runs its CLI.
 - **Root `scripts/boundaries/`.** No new package, matching `scripts/check-brand-assets.mjs`, but the probes would need a new root test setup outside Turbo's per-workspace tasks.
