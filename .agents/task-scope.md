@@ -4,7 +4,7 @@
 - Owner decisions (2026-10-23): keep the folder-per-unit look with `index.ts` ("i prefer the folder look"); feature entry naming delegated and kept as `./contracts`; features never re-export domain contracts (temporary migration bridges excepted).
 - Exact creates (1): `docs/superpowers/specs/2026-10-23-m3-internal-organization-design.md`. Updates (1): this ledger. Source, config, manifests, commits, pushes 0.
 - Verification: Prettier, link check, builder read-through. Not run: application gates (documentation only).
-- Inventory amendment (owner approved 2026-10-23, "okay"): no `services` umbrella; vendor SDKs wrapped by adapter packages; `server-supabase` and `frontend-supabase` added, `frontend-editor` noted as future. Additional updates: `docs/architecture/workspace-conventions.md`, `docs/architecture/reorganization-ownership-map.md`, `docs/superpowers/specs/2026-10-23-m3-package-grouping-design.md`, `packages/server/README.md`, `packages/frontend/README.md`.
+- Recording (owner approved 2026-10-23, "yup sounds good"): rules recorded in the Internal organization section of `docs/architecture/workspace-conventions.md`, replacing the earlier "no forwarding wrapper for every function" wording that contradicted F1; spec marked Accepted. Additional updates: `docs/architecture/workspace-conventions.md`.
 
 ## Active task: Milestone 3.2 public entry points design (2026-10-23)
 
@@ -23,6 +23,7 @@
 - Verification: Prettier on changed files, relative-link check, builder read-through of the spec. Not run: application gates (documentation only).
 - Recording (owner confirmed D4, D5 and C1 and approved recording, 2026-10-23): inventory and rules added to `docs/architecture/workspace-conventions.md`; ownership map error-reports and shells rows; ADR-0014 shells row and leaf-name pointer; glossary implementation-naming note (also removes the AI-introduced "universal Entity model" wording); domain and frontend README example lists; spec marked Accepted. Additional updates: `docs/glossary.md`, `docs/architecture/workspace-conventions.md`.
 - Follow-up (owner approved 2026-10-23, "ok"): widened ADR-0014's Frontend-to-Domain condition to contracts and pure rules; updated its diagram, the frontend and domain READMEs, and the spec (O1 resolved). Additional updates: `packages/frontend/README.md`.
+- Inventory amendment (owner approved 2026-10-23, "okay"): no `services` umbrella; vendor SDKs wrapped by adapter packages; `server-supabase` and `frontend-supabase` added, `frontend-editor` noted as future. Additional updates: `docs/architecture/workspace-conventions.md`, `docs/architecture/reorganization-ownership-map.md`, `docs/superpowers/specs/2026-10-23-m3-package-grouping-design.md`, `packages/server/README.md`, `packages/frontend/README.md`.
 
 ## Milestone 1 baseline record (2026-10-23)
 
