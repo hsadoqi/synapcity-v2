@@ -1,3 +1,11 @@
+## Active task: Milestone 3.3 internal organization design (2026-10-23)
+
+- Goal and mode: design internal file organization for packages with the owner; write one Proposed design.
+- Owner decisions (2026-10-23): keep the folder-per-unit look with `index.ts` ("i prefer the folder look"); feature entry naming delegated and kept as `./contracts`; features never re-export domain contracts (temporary migration bridges excepted).
+- Exact creates (1): `docs/superpowers/specs/2026-10-23-m3-internal-organization-design.md`. Updates (1): this ledger. Source, config, manifests, commits, pushes 0.
+- Verification: Prettier, link check, builder read-through. Not run: application gates (documentation only).
+- Inventory amendment (owner approved 2026-10-23, "okay"): no `services` umbrella; vendor SDKs wrapped by adapter packages; `server-supabase` and `frontend-supabase` added, `frontend-editor` noted as future. Additional updates: `docs/architecture/workspace-conventions.md`, `docs/architecture/reorganization-ownership-map.md`, `docs/superpowers/specs/2026-10-23-m3-package-grouping-design.md`, `packages/server/README.md`, `packages/frontend/README.md`.
+
 ## Active task: Milestone 3.2 public entry points design (2026-10-23)
 
 - Goal and mode: design the public entry-point and runtime-separation conventions for the 3.1 inventory with the owner; write one Proposed design.

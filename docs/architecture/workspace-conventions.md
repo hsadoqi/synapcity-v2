@@ -40,37 +40,40 @@ Do not infer a new product noun, schema, or durable identifier from a package na
 
 Prefer the name the code and durable identifiers already use. Name a package by responsibility, never by technique or vagueness: `containers`, `layouts`, `utils`, `common` and `shared` are not package names.
 
-A new package must earn its boundary through at least one of: a different runtime, different dependencies, a different consumer set (planned consumers count), independent testing, or a different rate of change. Folder size alone is not a reason. Grow a package through explicit modules before splitting it. Fields shared by several contracts go in a base contract inside the owning package, not in a separate cross-cutting package. Browser platform effects are frontend packages and backend provider integration is server; there is no separate platform category.
+A new package must earn its boundary through at least one of: a different runtime, different dependencies, a different consumer set (planned consumers count), independent testing, or a different rate of change. Folder size alone is not a reason. Grow a package through explicit modules before splitting it. Fields shared by several contracts go in a base contract inside the owning package, not in a separate cross-cutting package. Browser platform effects are frontend packages and backend provider integration is server; there is no separate platform or services category. Each outside vendor SDK is wrapped by an adapter package in the category where it runs, named after the vendor (`server-supabase`); other packages receive the vendor's client or capability from that adapter and never import the SDK. A responsibility-named package is a capability, a vendor-named package is an adapter. A separately deployed backend process would be an app, not a package category.
 
 ### Package inventory
 
 Accepted 2026-10-23 through the [Milestone 3.1 design](../superpowers/specs/2026-10-23-m3-package-grouping-design.md), which records each package's current source inputs and the owner's decisions. A package is created by the migration that first moves code into it, never as an empty skeleton.
 
-| Package                               | Owns                                                                                                    | First code |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------------- | ---------- |
-| `domain-records`                      | Base record contract; Space, Document and Dashboard contracts as separate modules extending it          | M4         |
-| `domain-preferences`                  | Preference schemas, defaults, account/device scope, merging, import/transfer validation, consent policy | M4         |
-| `domain-identity`                     | Credential, profile, name and avatar contracts; verified-identity contract                              | M4         |
-| `frontend-ui` (existing)              | Primitives, generic components and form pieces, generic hooks, low-level layout primitives              | exists     |
-| `frontend-shells`                     | Composable app shells and page frames                                                                   | M6         |
-| `frontend-collection`                 | Browse projections, query mechanics, generic controls and displays, local browse state                  | M7         |
-| `frontend-settings`                   | Settings presentation pieces                                                                            | M8         |
-| `frontend-preferences`                | Browser preference runtime: device store, apply functions, boot scripts, mode, consent state            | M8         |
-| `frontend-error-reports`              | Consent-gated browser error reporting and event scrubbing                                               | M8         |
-| `frontend-auth`                       | Auth presentation pieces                                                                                | M9         |
-| `frontend-site` (existing)            | Site metadata and brand presentation                                                                    | exists     |
-| `frontend-tailwind-config` (existing) | Tokens and styling foundation                                                                           | exists     |
-| `server-data`                         | Space, Document and Dashboard repositories, queries and row mapping                                     | M7         |
-| `server-account`                      | Profile, avatar and account-preference operations                                                       | M8         |
-| `server-auth`                         | Verified identity, auth operations, verified-caller helpers                                             | M9         |
-| `features-spaces`                     | Space browsing and detail                                                                               | M7         |
-| `features-settings`                   | The Settings experience: editors, drafts, guard, import/export, account sync                            | M8         |
-| `features-auth`                       | Sign-in, registration, password, email and session workflows                                            | M9         |
-| `features-account`                    | Name, avatar and profile workflows                                                                      | M9         |
-| `features-documents`                  | Document browsing                                                                                       | M10        |
-| `features-dashboards`                 | Dashboard browsing                                                                                      | M10        |
-| `features-home`                       | Home, aggregating the resource features                                                                 | M11        |
-| `dev-*` (five existing)               | Tooling, test configuration and fixtures; `dev-fixtures` grows scenarios and sample content             | exists     |
+| Package                               | Owns                                                                                                                                                         | First code    |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------- |
+| `domain-records`                      | Base record contract; Space, Document and Dashboard contracts as separate modules extending it                                                               | M4            |
+| `domain-preferences`                  | Preference schemas, defaults, account/device scope, merging, import/transfer validation, consent policy                                                      | M4            |
+| `domain-identity`                     | Credential, profile, name and avatar contracts; verified-identity contract                                                                                   | M4            |
+| `frontend-ui` (existing)              | Primitives, generic components and form pieces, generic hooks, low-level layout primitives                                                                   | exists        |
+| `frontend-shells`                     | Composable app shells and page frames                                                                                                                        | M6            |
+| `frontend-collection`                 | Browse projections, query mechanics, generic controls and displays, local browse state                                                                       | M7            |
+| `frontend-settings`                   | Settings presentation pieces                                                                                                                                 | M8            |
+| `frontend-preferences`                | Browser preference runtime: device store, apply functions, boot scripts, mode, consent state                                                                 | M8            |
+| `frontend-error-reports`              | Consent-gated browser error reporting and event scrubbing                                                                                                    | M8            |
+| `frontend-auth`                       | Auth presentation pieces                                                                                                                                     | M9            |
+| `frontend-supabase`                   | Browser Supabase client used by auth state listening; the only frontend package importing `@supabase/*`                                                      | M9            |
+| `frontend-editor` (future)            | Document editor runtime (Lexical), nodes and plugins; created only after the editor and document body are approved                                           | not scheduled |
+| `frontend-site` (existing)            | Site metadata and brand presentation                                                                                                                         | exists        |
+| `frontend-tailwind-config` (existing) | Tokens and styling foundation                                                                                                                                | exists        |
+| `server-data`                         | Space, Document and Dashboard repositories, queries and row mapping                                                                                          | M7            |
+| `server-account`                      | Profile, avatar and account-preference operations                                                                                                            | M8            |
+| `server-auth`                         | Verified identity, auth operations, verified-caller helpers                                                                                                  | M9            |
+| `server-supabase`                     | Request-bound server client from host-supplied cookies, session refresh helpers, provider-error translation; the only server package importing `@supabase/*` | M7            |
+| `features-spaces`                     | Space browsing and detail                                                                                                                                    | M7            |
+| `features-settings`                   | The Settings experience: editors, drafts, guard, import/export, account sync                                                                                 | M8            |
+| `features-auth`                       | Sign-in, registration, password, email and session workflows                                                                                                 | M9            |
+| `features-account`                    | Name, avatar and profile workflows                                                                                                                           | M9            |
+| `features-documents`                  | Document browsing                                                                                                                                            | M10           |
+| `features-dashboards`                 | Dashboard browsing                                                                                                                                           | M10           |
+| `features-home`                       | Home, aggregating the resource features                                                                                                                      | M11           |
+| `dev-*` (five existing)               | Tooling, test configuration and fixtures; `dev-fixtures` grows scenarios and sample content                                                                  | exists        |
 
 **Preferences and Settings** are different packages on purpose: preferences are the data, rules, persistence and browser runtime; Settings is the screen that edits them.
 

@@ -83,6 +83,8 @@ The host supplies where a link leads and how an action is invoked. A callback ex
 - `collection` ----> Browse behavior and DOM collection views
 - `settings` ----> Reusable settings presentation (rows, sections, editor controls); the editing workflow is `features/settings`
 - `auth` ----> Reusable authentication presentation (form pieces, status and confirmation views); auth workflows are `features/auth`
+- `supabase` ----> Browser Supabase client adapter
+- `editor` ----> Future document editor runtime (Lexical), once the editor is approved
 - `preferences` ----> Browser preference runtime: device store, applying theme/mode/fonts, consent state
 - `error-reports` ----> Consent-gated browser error reporting
 - `site` ----> Existing site metadata/brand concerns
