@@ -1,5 +1,3 @@
-import { relative, sep } from 'node:path';
-
 import type {
   Edge,
   Graph,
@@ -7,6 +5,7 @@ import type {
   Violation,
   Workspace,
 } from '../../model/index.ts';
+import { repoPath } from '../../paths/index.ts';
 
 /** App modules that only the server may load (prefix match on repository-relative paths). */
 export const APP_SERVER_ONLY = [
@@ -35,9 +34,9 @@ export function reachabilityRule(
   files: Map<string, SourceFile>,
   edges: Edge[],
   workspace: Workspace,
+  appServerOnly: readonly string[] = APP_SERVER_ONLY,
 ): Violation[] {
-  const rel = (path: string) =>
-    relative(workspace.root, path).split(sep).join('/');
+  const rel = (path: string) => repoPath(workspace.root, path);
   const outgoing = new Map<string, Edge[]>();
   for (const edge of edges) {
     if (edge.record.typeOnly) continue;
@@ -48,15 +47,51 @@ export function reachabilityRule(
 
   const forbiddenFile = (file: SourceFile) =>
     SERVER_GRAPHS.has(file.graph) ||
-    APP_SERVER_ONLY.some((prefix) => rel(file.path).startsWith(prefix));
+    appServerOnly.some((prefix) => rel(file.path).startsWith(prefix));
   const forbiddenModule = (specifier: string) =>
     SERVER_ONLY_MODULES.some(
       (module) => specifier === module || specifier.startsWith(`${module}/`),
     );
 
+  // Only files that can reach a forbidden target need the path walk below. Find them with one reverse pass
+  // instead of walking from every browser file.
+  const reaches = new Set<string>();
+  const incoming = new Map<string, string[]>();
+  const pending: string[] = [];
+  for (const [from, list] of outgoing) {
+    for (const { record, target } of list) {
+      if (target.kind === 'external' && forbiddenModule(record.specifier)) {
+        if (!reaches.has(from)) {
+          reaches.add(from);
+          pending.push(from);
+        }
+      } else if (target.kind === 'file') {
+        if (forbiddenFile(target.file)) {
+          if (!reaches.has(from)) {
+            reaches.add(from);
+            pending.push(from);
+          }
+        } else if (target.file.directive !== 'use server') {
+          const list = incoming.get(target.file.path) ?? [];
+          list.push(from);
+          incoming.set(target.file.path, list);
+        }
+      }
+    }
+  }
+  for (let path = pending.pop(); path; path = pending.pop()) {
+    for (const from of incoming.get(path) ?? []) {
+      if (!reaches.has(from)) {
+        reaches.add(from);
+        pending.push(from);
+      }
+    }
+  }
+
   const violations: Violation[] = [];
   for (const source of files.values()) {
     if (!source.production || !BROWSER_GRAPHS.has(source.graph)) continue;
+    if (!reaches.has(source.path)) continue;
     const via = new Map<string, string | null>([[source.path, null]]);
     const queue = [source.path];
     const reported = new Set<string>();

@@ -1,6 +1,7 @@
-import { join, relative, sep } from 'node:path';
+import { join } from 'node:path';
 
 import type { SourceFile, Violation, Workspace } from '../../model/index.ts';
+import { byFileThenRule, repoPath } from '../../paths/index.ts';
 
 const GUARD = 'server-only';
 
@@ -20,13 +21,12 @@ function serverEntries(workspace: Workspace): Set<string> {
   return entries;
 }
 
-/** R10: every server entry file starts with `import 'server-only'`, and no other file imports it. */
+/** R10: every server entry file starts with `import 'server-only'`, and no other package file imports it. */
 export function serverGuardRule(
   files: Map<string, SourceFile>,
   workspace: Workspace,
 ): Violation[] {
-  const rel = (path: string) =>
-    relative(workspace.root, path).split(sep).join('/');
+  const rel = (path: string) => repoPath(workspace.root, path);
   const entries = serverEntries(workspace);
   const violations: Violation[] = [];
 
@@ -44,7 +44,13 @@ export function serverGuardRule(
     }
   }
   for (const file of files.values()) {
-    if (entries.has(file.path) || !file.production) continue;
+    // App server modules may import the guard themselves (Next.js hardening).
+    if (
+      entries.has(file.path) ||
+      !file.production ||
+      file.pkg.category === 'app'
+    )
+      continue;
     if (file.imports.some((record) => record.specifier === GUARD)) {
       violations.push({
         rule: 'R10',
@@ -55,5 +61,5 @@ export function serverGuardRule(
       });
     }
   }
-  return violations.sort((a, b) => a.file.localeCompare(b.file));
+  return violations.sort(byFileThenRule);
 }

@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, readFileSync, realpathSync } from 'node:fs';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 
 import type { Category, Workspace, WorkspacePackage } from '../model/index.ts';
 
@@ -107,10 +107,12 @@ export function loadWorkspace(requestedRoot: string): Workspace {
     if (pkg) packages.push(pkg);
   }
   for (const categoryDir of subdirectories(join(root, 'packages'))) {
-    const category = categoryDir.slice(
-      categoryDir.lastIndexOf('/') + 1,
-    ) as Category;
-    if (!CATEGORIES.has(category)) continue;
+    const category = basename(categoryDir) as Category;
+    if (!CATEGORIES.has(category)) {
+      throw new Error(
+        `boundaries: packages/${category} is not one of the five categories (${[...CATEGORIES].join(', ')}); packages in it would go unchecked`,
+      );
+    }
     for (const dir of subdirectories(categoryDir)) {
       const pkg = readPackage(dir, category);
       if (pkg) packages.push(pkg);

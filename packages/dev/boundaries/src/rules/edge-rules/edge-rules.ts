@@ -73,6 +73,19 @@ export function buildEdges(workspace: Workspace): {
   return { files, edges };
 }
 
+/** R6: the feature path rule an edge between two files of one feature package breaks, if any. */
+function featurePathViolation(from: SourceFile, to: SourceFile): string | null {
+  if (
+    to.graph === 'feature-server' &&
+    (from.graph === 'feature-frontend' || from.graph === 'feature-contracts')
+  )
+    return `${from.graph} never imports feature server code`;
+  if (to.graph === 'feature-frontend' && from.graph === 'feature-contracts')
+    return 'feature contracts never import feature frontend code';
+  if (to.graph === 'testing') return 'only testing/ imports testing/';
+  return null;
+}
+
 /** R0, R1, R2, R4, R5, R6, R7, R8 and R11: rules judged one file or one import at a time. */
 export function edgeRules(
   files: Map<string, SourceFile>,
@@ -228,31 +241,21 @@ export function edgeRules(
 
     // Same package: the feature path rules (R6), test or story imports (R8), then the folder-import rule (R7).
     if (from.pkg.category === 'features' && from.production) {
-      if (
-        to.graph === 'feature-server' &&
-        (from.graph === 'feature-frontend' ||
-          from.graph === 'feature-contracts')
-      ) {
-        report(
-          'R6',
-          from,
-          specifier,
-          toPath,
-          `${from.graph} never imports feature server code`,
-        );
+      const r6 = featurePathViolation(from, to);
+      if (r6) {
+        report('R6', from, specifier, toPath, r6);
       } else if (
-        to.graph === 'feature-frontend' &&
-        from.graph === 'feature-contracts'
+        to.production &&
+        from.graph !== to.graph &&
+        !isAllowed(from.graph, to.graph)
       ) {
         report(
-          'R6',
+          'R2',
           from,
           specifier,
           toPath,
-          'feature contracts never import feature frontend code',
+          `${from.graph} may not import ${to.graph} (ADR-0014 matrix)`,
         );
-      } else if (to.graph === 'testing') {
-        report('R6', from, specifier, toPath, 'only testing/ imports testing/');
       }
     }
     // A feature file importing testing/ is already R6.

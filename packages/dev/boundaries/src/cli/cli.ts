@@ -1,9 +1,18 @@
 import { resolve } from 'node:path';
 
 import { check } from '../check/index.ts';
+import { EXCEPTIONS } from '../exceptions/index.ts';
+import { APP_SERVER_ONLY } from '../rules/reachability/index.ts';
 
 const root = resolve(import.meta.dirname, '../../../../..');
-const { violations, stale, fileCounts } = check(root);
+let result: ReturnType<typeof check>;
+try {
+  result = check(root, EXCEPTIONS, APP_SERVER_ONLY);
+} catch (error) {
+  console.error(error instanceof Error ? error.message : error);
+  process.exit(2);
+}
+const { violations, stale, fileCounts } = result;
 
 for (const v of violations) {
   console.log(

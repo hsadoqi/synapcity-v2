@@ -1,13 +1,18 @@
 import { resolve } from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 
-import { check } from './index.ts';
+import { EXCEPTIONS } from '../exceptions/index.ts';
+import { APP_SERVER_ONLY } from '../rules/reachability/index.ts';
+import { check, type CheckResult } from './index.ts';
 
 const REPOSITORY = resolve(import.meta.dirname, '../../../../..');
 
 describe('the repository', () => {
-  const result = check(REPOSITORY);
+  let result: CheckResult;
+  beforeAll(() => {
+    result = check(REPOSITORY, EXCEPTIONS, APP_SERVER_ONLY);
+  });
 
   it('has no boundary violations beyond the named exceptions', () => {
     expect(
