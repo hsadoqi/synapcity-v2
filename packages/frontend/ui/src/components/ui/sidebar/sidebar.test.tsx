@@ -115,7 +115,7 @@ describe('Sidebar', () => {
     expect(wrapper).not.toBeNull();
     expect(
       (wrapper as HTMLElement).style.getPropertyValue('--sidebar-width'),
-    ).toBe('16rem');
+    ).toBe('20svw');
   });
 
   it('renders the desktop sidebar with state, side and variant', () => {
