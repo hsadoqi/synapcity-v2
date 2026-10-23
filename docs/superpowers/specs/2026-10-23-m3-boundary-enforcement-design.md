@@ -1,6 +1,6 @@
 # Milestone 3.4: dependency enforcement
 
-**Status:** Accepted by the owner on 2026-10-23 and recorded in the [workspace conventions](../../architecture/workspace-conventions.md#boundary-checks). Implementation follows its plan; the checker does not exist yet.
+**Status:** Accepted by the owner on 2026-10-23 and recorded in the [workspace conventions](../../architecture/workspace-conventions.md#boundary-checks). Implemented by its plan as `pnpm boundaries` (`packages/dev/boundaries`); Milestone 3.5 integration items remain.
 **Date:** 2026-10-23
 **Branch:** `chore/reorganization-m3-boundary-enforcement`
 **Enforces:** [ADR-0014](../../architecture/decisions/0014-multi-app-package-boundaries.md) section 2 and the [workspace conventions](../../architecture/workspace-conventions.md) for the package inventory, entry points and internal organization.
