@@ -20,13 +20,20 @@ export const BASE: Record<string, string> = {
   'packages/server/s/package.json': manifest('@t/server-s', {
     exports: { '.': './src/index.ts', './testing': './src/testing/index.ts' },
   }),
-  'packages/server/s/src/index.ts': 'export const s = 1;',
+  'packages/server/s/src/index.ts': `import 'server-only';\nexport const s = 1;`,
   'packages/server/s/src/testing/index.ts': 'export const fake = 1;',
-  'packages/features/feat/package.json': manifest('@t/features-feat'),
+  'packages/features/feat/package.json': manifest('@t/features-feat', {
+    exports: {
+      './contracts': './src/contracts/index.ts',
+      './frontend': './src/frontend/index.ts',
+      './server': './src/server/index.ts',
+      './testing': './src/testing/index.ts',
+    },
+  }),
   'packages/features/feat/src/contracts/index.ts':
     'export type C = { id: string };',
   'packages/features/feat/src/frontend/index.ts': `import type { C } from '../contracts/index.ts';\nexport type F = C;`,
-  'packages/features/feat/src/server/index.ts': `import { s } from '@t/server-s';\nexport const load = () => s;`,
+  'packages/features/feat/src/server/index.ts': `import 'server-only';\nimport { s } from '@t/server-s';\nexport const load = () => s;`,
   'packages/features/feat/src/testing/index.ts':
     'export const fakeLoad = () => 1;',
   'packages/features/feat/src/frontend/a/a.ts': 'export const a = 1;',
@@ -49,6 +56,10 @@ export const BASE: Record<string, string> = {
   'node_modules/react/index.js': '',
   'node_modules/next/package.json': manifest('next'),
   'node_modules/next/link.js': '',
+  'node_modules/server-only/package.json': manifest('server-only', {
+    main: 'index.js',
+  }),
+  'node_modules/server-only/index.js': '',
 };
 
 export const LINKS = {
