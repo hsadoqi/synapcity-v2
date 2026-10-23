@@ -21,6 +21,59 @@ describe('edgeRules', () => {
     expect(summary(run())).toEqual([]);
   });
 
+  describe('R11 in features and the frontend-domain condition', () => {
+    it('R11: fails a next import in feature frontend code outside frontend/next/', () => {
+      expect(
+        summary(
+          run({
+            'packages/features/feat/src/frontend/link.tsx': `import Link from 'next/link';\nexport { Link };`,
+          }),
+        ),
+      ).toContain('R11 packages/features/feat/src/frontend/link.tsx');
+    });
+    it('R11: allows a next import under a feature frontend/next/ folder', () => {
+      expect(
+        summary(
+          run({
+            'packages/features/feat/src/frontend/next/index.ts': `import Link from 'next/link';\nexport { Link };`,
+          }),
+        ),
+      ).toEqual([]);
+    });
+    it('R2: fails frontend importing a domain subpath other than contracts or rules', () => {
+      expect(
+        summary(
+          run({
+            'packages/domain/d/package.json': manifest('@t/domain-d', {
+              exports: {
+                '.': './src/index.ts',
+                './contracts': './src/index.ts',
+                './persistence': './src/persistence.ts',
+              },
+            }),
+            'packages/domain/d/src/persistence.ts': 'export const p = 1;',
+            'packages/frontend/f/src/x.ts': `import { p } from '@t/domain-d/persistence';\nexport const q = p;`,
+          }),
+        ),
+      ).toEqual(['R2 packages/frontend/f/src/x.ts']);
+    });
+    it('R2: allows frontend importing a domain contracts entry', () => {
+      expect(
+        summary(
+          run({
+            'packages/domain/d/package.json': manifest('@t/domain-d', {
+              exports: {
+                '.': './src/index.ts',
+                './contracts': './src/index.ts',
+              },
+            }),
+            'packages/frontend/f/src/x.ts': `import { d } from '@t/domain-d/contracts';\nexport const q = d;`,
+          }),
+        ),
+      ).toEqual([]);
+    });
+  });
+
   describe('R5 (unmatched deep specifier)', () => {
     it('reports a deep import no exports entry matches as R5, not R0', () => {
       expect(

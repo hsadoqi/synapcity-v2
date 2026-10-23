@@ -21,6 +21,8 @@ export const DOMAIN_LIBRARIES = ['zod'];
 const SOURCE_FILE = /\.[cm]?[jt]sx?$/;
 const INDEX_FILE = /^index\.[cm]?[jt]sx?$/;
 const FEATURE_FOLDERS = new Set(['contracts', 'frontend', 'server', 'testing']);
+/** Domain entries frontend packages may import (ADR-0014: contracts and pure rules; owner decision 2026-10-23). */
+const FRONTEND_DOMAIN_ENTRIES = ['', '/contracts', '/rules'];
 const DECLARATION_FILE = /\.d\.[cm]?ts$/;
 const PRODUCTION_IMPORTS_NON_PRODUCTION =
   'production code never imports dev, testing, test or story code';
@@ -72,6 +74,13 @@ export function buildEdges(workspace: Workspace): {
     }
   }
   return { files, edges };
+}
+
+/** What follows the package name in a specifier (`@scope/name/rules` → `/rules`; the bare name → ''). */
+function subpath(specifier: string, packageName: string): string {
+  return specifier.startsWith(packageName)
+    ? specifier.slice(packageName.length)
+    : '';
 }
 
 /** The workspace package a bare specifier with a subpath names (`@scope/name/deep`), if any. */
@@ -219,11 +228,14 @@ function externalRules(
       message: `domain may import only ${DOMAIN_LIBRARIES.join(', ')}`,
     });
   }
+  // Frontend packages keep Next.js behind src/next/; a feature does so inside its frontend/ folder.
+  const nextFolder =
+    from.pkg.category === 'features' ? 'src/frontend/next/' : 'src/next/';
   const inNextFolder = rel(from.path).startsWith(
-    `${rel(from.pkg.dir)}/src/next/`,
+    `${rel(from.pkg.dir)}/${nextFolder}`,
   );
   if (
-    from.pkg.category === 'frontend' &&
+    (from.pkg.category === 'frontend' || from.graph === 'feature-frontend') &&
     from.production &&
     name === 'next' &&
     !inNextFolder
@@ -265,6 +277,18 @@ function crossPackageRules(
     );
   } else if (from.production && !to.production) {
     report(finding('R8', PRODUCTION_IMPORTS_NON_PRODUCTION));
+  } else if (
+    from.production &&
+    from.graph === 'frontend' &&
+    to.graph === 'domain' &&
+    !FRONTEND_DOMAIN_ENTRIES.includes(subpath(specifier, to.pkg.name))
+  ) {
+    report(
+      finding(
+        'R2',
+        `frontend may import domain contracts and pure rules only: use ${to.pkg.name}, /contracts or /rules (ADR-0014 matrix)`,
+      ),
+    );
   } else if (
     from.production &&
     to.production &&

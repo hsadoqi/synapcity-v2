@@ -156,7 +156,7 @@ The checker classifies every file by path into package, category and entry graph
 | --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | R0  | Every import resolves to scanned code or an asset, every file parses, and every package folder is one of the five categories, so a scan never passes silently (added by the implementation). |
 | R1  | Packages never import app source.                                                                                                                                                            |
-| R2  | Every edge between categories and entry graphs is allowed by ADR-0014's matrix.                                                                                                              |
+| R2  | Every edge between categories and entry graphs is allowed by ADR-0014's matrix, including frontend-to-domain only through the root, `./contracts` or `./rules`.                              |
 | R3  | No server code is reachable, directly or transitively, from frontend packages, feature `frontend`/`contracts` graphs or the app browser graph.                                               |
 | R4  | Domain imports only domain packages and allowlisted portable libraries (initially `zod`).                                                                                                    |
 | R5  | Imports into another package go through its `exports`.                                                                                                                                       |
@@ -165,7 +165,7 @@ The checker classifies every file by path into package, category and entry graph
 | R8  | Production files never import `dev-*` packages, `./testing` entries, tests or stories.                                                                                                       |
 | R9  | No package or module cycles. An exception pins the exact cycle members, so a cycle that grows fails again.                                                                                   |
 | R10 | Every server entry file starts with `import 'server-only'`.                                                                                                                                  |
-| R11 | `next` imports in frontend packages occur only behind `./next`.                                                                                                                              |
+| R11 | `next` imports in frontend packages occur only behind `./next` (`src/next/`); in a feature, only under `src/frontend/next/`.                                                                 |
 
 **Exceptions.** Existing violations are listed one file or edge at a time, each with its rule, reason and removal milestone. An entry that no longer matches fails the run, so the list only shrinks. Category, package or folder-wide exemptions are not allowed. Every rule has a probe that plants a violation in a temporary workspace and proves the check fails. R3's list of app server-only modules (`APP_SERVER_ONLY`) is checked too: an entry that matches no scanned file fails, so a rename cannot disarm the rule.
 
@@ -175,4 +175,4 @@ Root scripts in [package.json](../../package.json) define what actually runs. Pa
 
 Tokens remain owned by `frontend-tailwind-config` under ADR-0002; app CSS remains wiring. Product schemas and copied identity/state do not move into generic UI.
 
-Creating a package follows the [package checklist](package-creation-checklist.md). Testing breadth and thresholds remain governed by Proposed ADR-0005 and the existing Definition of Done. Boundary checks cover only the rules listed under [Boundary checks](#boundary-checks); the conditional cells of ADR-0014's matrix (for example frontend-to-domain "contracts and pure rules only") are not yet machine-checked.
+Creating a package follows the [package checklist](package-creation-checklist.md). Testing breadth and thresholds remain governed by Proposed ADR-0005 and the existing Definition of Done. Boundary checks cover only the rules listed under [Boundary checks](#boundary-checks) and the frontend-to-domain condition (frontend imports only the domain package root, `./contracts` or `./rules`). The sibling-feature public-interface condition is covered by R5 (exports only); its acyclic requirement by R9.
