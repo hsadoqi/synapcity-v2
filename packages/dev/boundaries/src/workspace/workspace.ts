@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, realpathSync } from 'node:fs';
 import { join } from 'node:path';
 
 import type { Category, Workspace, WorkspacePackage } from '../model/index.ts';
@@ -98,7 +98,9 @@ function readPackage(dir: string, category: Category): WorkspacePackage | null {
 }
 
 /** Workspaces at `apps/<name>` and `packages/<category>/<name>`. */
-export function loadWorkspace(root: string): Workspace {
+export function loadWorkspace(requestedRoot: string): Workspace {
+  // The resolver returns real paths; package directories must use the same form.
+  const root = realpathSync(requestedRoot);
   const packages: WorkspacePackage[] = [];
   for (const dir of subdirectories(join(root, 'apps'))) {
     const pkg = readPackage(dir, 'app');

@@ -1,3 +1,5 @@
+import { realpathSync } from 'node:fs';
+
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { createWorkspace } from '../testing/workspace/index.ts';
@@ -127,5 +129,14 @@ describe('listSourceFiles', () => {
       .map((f) => f.slice(ui!.dir.length + 1))
       .sort();
     expect(listed).toEqual(['src/a.ts', 'src/b.tsx', 'vitest.config.ts']);
+  });
+});
+
+describe('loadWorkspace paths', () => {
+  it('uses the real path of the root, so resolved paths and package directories agree', () => {
+    const root = workspace({ 'apps/web/package.json': manifest('web') });
+    const ws = loadWorkspace(root);
+    expect(ws.root).toBe(realpathSync(root));
+    expect(ws.packages[0]?.dir.startsWith(realpathSync(root))).toBe(true);
   });
 });
