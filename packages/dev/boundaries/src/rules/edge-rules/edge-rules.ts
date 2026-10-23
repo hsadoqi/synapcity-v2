@@ -45,17 +45,21 @@ export function buildEdges(workspace: Workspace): {
         edges.push({ from, record, target: { kind: 'unresolved' } });
         continue;
       }
-      const resolution = resolve(from.path, record.specifier);
+      const resolution = resolve(from.path, record.specifier, record.typeOnly);
       if (resolution.kind === 'path') {
-        const file = SOURCE_FILE.test(resolution.path)
-          ? files.get(resolution.path)
-          : undefined;
+        const isCode =
+          SOURCE_FILE.test(resolution.path) &&
+          !DECLARATION_FILE.test(resolution.path);
+        const file = isCode ? files.get(resolution.path) : undefined;
         edges.push({
           from,
           record,
+          // Code the scan did not visit (build output, an unknown folder) must not pass as an asset.
           target: file
             ? { kind: 'file', file }
-            : { kind: 'asset', path: resolution.path },
+            : isCode
+              ? { kind: 'unscanned', path: resolution.path }
+              : { kind: 'asset', path: resolution.path },
         });
       } else {
         edges.push({ from, record, target: resolution });

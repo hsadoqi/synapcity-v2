@@ -40,12 +40,14 @@ function isInside(path: string, dir: string): boolean {
 /** Resolves imports the way the toolchain does: each file with its own workspace's tsconfig and `exports`. */
 export function createResolver(
   workspace: Workspace,
-): (fromFile: string, specifier: string) => Resolution {
-  const resolvers = new Map<WorkspacePackage | null, ResolverFactory>();
+): (fromFile: string, specifier: string, typeOnly?: boolean) => Resolution {
+  const resolvers = new Map<string, ResolverFactory>();
   const owner = (file: string) =>
     workspace.packages.find((pkg) => isInside(file, pkg.dir)) ?? null;
-  const resolverFor = (pkg: WorkspacePackage | null) => {
-    let resolver = resolvers.get(pkg);
+  // A type-only import may name a declaration file or a types-only package, which value resolution misses.
+  const resolverFor = (pkg: WorkspacePackage | null, types: boolean) => {
+    const key = `${pkg?.dir ?? ''}\0${types}`;
+    let resolver = resolvers.get(key);
     if (!resolver) {
       resolver = new ResolverFactory({
         ...(pkg?.tsconfig
@@ -56,22 +58,29 @@ export function createResolver(
               },
             }
           : {}),
-        conditionNames: ['import', 'default'],
-        extensions: EXTENSIONS,
+        conditionNames: types
+          ? ['types', 'import', 'default']
+          : ['import', 'default'],
+        extensions: types ? [...EXTENSIONS, '.d.ts'] : EXTENSIONS,
         extensionAlias: { '.js': ['.ts', '.tsx', '.js'] },
-        mainFields: ['module', 'main'],
+        mainFields: types
+          ? ['types', 'typings', 'module', 'main']
+          : ['module', 'main'],
       });
-      resolvers.set(pkg, resolver);
+      resolvers.set(key, resolver);
     }
     return resolver;
   };
 
-  return (fromFile, specifier) => {
+  return (fromFile, specifier, typeOnly = false) => {
     if (specifier.startsWith('node:') || BUILTINS.has(specifier))
       return { kind: 'external', name: specifier };
     // A symlinked path would miss its owning package and that package's tsconfig.
     const from = realpathSync(fromFile);
-    const result = resolverFor(owner(from)).sync(dirname(from), specifier);
+    let result = resolverFor(owner(from), false).sync(dirname(from), specifier);
+    if (!result.path && typeOnly) {
+      result = resolverFor(owner(from), true).sync(dirname(from), specifier);
+    }
     if (!result.path) return { kind: 'unresolved' };
     // Workspace packages resolve to their real directories, so an installed dependency is anything under node_modules.
     if (
