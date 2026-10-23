@@ -257,6 +257,15 @@ describe('edgeRules', () => {
       ).toEqual(['R0 packages/frontend/f/src/bad.ts']);
     });
 
+    it('R0: names the unscanned file in the message', () => {
+      const [violation] = run({
+        'packages/server/s/dist/index.js': 'export const s = 1;',
+        'packages/frontend/f/src/bad.ts': `import '../../../server/s/dist/index.js';`,
+      });
+      expect(violation?.message).toContain('did not visit');
+      expect(violation?.message).toContain('packages/server/s/dist/index.js');
+    });
+
     it('R2: applies the matrix to same-package feature edges (server never imports frontend)', () => {
       expect(
         summary(

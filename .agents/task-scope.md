@@ -4,6 +4,7 @@
 - Exact creates: `packages/dev/boundaries/**` (package, README, source, tests). Updates: `pnpm-lock.yaml` (install of `oxc-parser@0.155.0`, `oxc-resolver@11.24.2` only), root `package.json` (`boundaries` script; `pnpm boundaries` in `verify` and `verify:fast`), root `vitest.config.ts` (project), `AGENTS.md` section 6, `docs/engineering/quality-gates.md`, `docs/engineering/setup.md`, `docs/architecture/workspace-conventions.md` (status line, R0 row), `docs/architecture/decisions/README.md` (candidate entry), `packages/dev/README.md`, this ledger. No application source changed; `apps/web/src/architecture.test.ts` untouched.
 - First run: 997 files across 12 workspaces; 16 genuine pre-existing violations (11 R11 Next.js imports in frontend-ui and frontend-site, 5 R9 barrel-induced module cycles), recorded as 15 named exceptions with removal milestones (M6–M9). Every import in the repository resolved (no R0).
 - Gate proof: a planted `import 'next/headers'` in a real client file failed with exactly one R3; the file was restored with no diff.
+- Dependency evidence (npm registry, checked 2026-10-23): `oxc-parser` 0.155.0 (modified 2026-10-19) and `oxc-resolver` 11.24.2 (modified 2026-07-12) are the registry's current versions and are pinned exactly; `server-only` 0.0.1 is the registry's only version. All three are dev-only tooling or build guards.
 - Verification: see the final report of this task.
 
 ## Active task: Milestone 3.4 boundary enforcement design (2026-10-23)
