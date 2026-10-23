@@ -1,5 +1,7 @@
 # Features Packages
 
+The accepted decision is [ADR-0014](../../docs/architecture/decisions/0014-multi-app-package-boundaries.md). Its runtime dependency matrix is normative; the [ownership map](../../docs/architecture/reorganization-ownership-map.md) assigns existing source to target owners. These READMEs explain category boundaries without creating leaf packages.
+
 Owns: product capabilities that compose domain rules, frontend presentation, data access, and behavior into reusable workflows and experiences.
 
 **Status:** Current direction, selected by the repository owner on 2026-10-23.
@@ -111,12 +113,12 @@ Existing [web features](../../apps/web/src/features) are migration inputs, not p
 
 ## Package design and verification
 
-Choose packages by cohesive capability, dependency/runtime isolation, and expected reuse. Flatten unnecessary private wrapper/barrel layers; a component does not automatically need a package. Exact inventory, sibling-feature interfaces, controller ownership, and platform-specific presentation remain design work.
+Choose packages by cohesive capability, dependency/runtime isolation, and expected reuse. Flatten unnecessary private wrapper/barrel layers; a component does not automatically need a package. The ownership map assigns existing families. Features own product controllers and orchestration; sibling features use explicit public contracts with an acyclic dependency graph. Exact leaf packages, interface signatures, and platform-specific implementations remain implementation design work.
 
 Verify pure rules, meaningful component/workflow behavior, host integration, and boundary isolation. Storybook is a consumer of feature presentation with fixtures and fake capabilities; it does not need production credentials. Runtime-specific and transitive import checks are future enforcement work, not proven by these diagrams.
 
 ## Documentation reconciliation
 
-[ADR-0007](../../docs/architecture/decisions/0007-app-local-auth-and-account-ownership.md) and the [collection ADR](../../docs/architecture/decisions/0011-collection-browse-feature.md) document app-local ownership. Reconcile those placement statements and the [workspace conventions](../../docs/architecture/workspace-conventions.md) during Milestone 2 before extracting packages. Current-direction boundaries do not claim the migration or full documentation reconciliation is complete.
+Placement guidance is reconciled by [ADR-0014](../../docs/architecture/decisions/0014-multi-app-package-boundaries.md), the amended earlier ADRs, workspace conventions, and the package checklist. Existing behavior/security decisions remain in force. The ownership map records the selected destinations; exact leaf-package manifests, export signatures, and enforcement implementation follow in Milestone 3. Source extraction, native presentation, and automated transitive enforcement are not complete.
 
 Related umbrellas: [domain](../domain/README.md), [frontend](../frontend/README.md), [server](../server/README.md), [dev](../dev/README.md).

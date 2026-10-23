@@ -37,18 +37,21 @@ ADRs are numbered sequentially (`0001-*.md`, `0002-*.md`, ...) and never renumbe
 | [0011](0011-resizable-global-panel-shell.md)          | Resizable global panel in the authenticated shell            | Accepted |
 | [0012](0012-owned-space-records.md)                   | Owned Space records and serializable icon identifiers        | Accepted |
 | [0013](0013-document-and-dashboard-persistence.md)    | Document and dashboard persistence boundary                  | Accepted |
+| [0014](0014-multi-app-package-boundaries.md)          | Multi-app package boundaries and staged reorganization       | Accepted |
 
-**Lineage.** The ADRs in `docs/archive/architecture/decisions/` (0001-0016) belong to the previous implementation. They are evidence under `docs/engineering/preservation-policy.md`, not authority, and several describe workspaces that do not exist here (`apps/storybook`, `packages/ui/core`). This index restarted at 0001 for the current repository. When a current ADR needs an archived decision, it restates the decision it adopts rather than citing the archived number.
+**Lineage.** The ADRs in `docs/archive/architecture/decisions/` (0001-0016) belong to the previous implementation. They are evidence under `docs/engineering/preservation-policy.md`, not authority, and their package layout must not be assumed to describe this repository (`packages/ui/core`, for example). This index restarted at 0001 for the current repository. When a current ADR needs an archived decision, it restates the decision it adopts rather than citing the archived number.
+
+ADR-0014 amends placement statements in earlier accepted records without replacing their behavior or security decisions. Both pre-existing ADR-0011 filenames remain intact and must be cited by full filename. Category labels and migration handles do not finalize product terminology.
 
 ## Candidate decisions
 
 Not decided. Each needs an ADR, and the owner's approval, before it is treated as settled.
 
 - **Testing strategy.** Partly addressed by Proposed [ADR-0005](0005-testing-foundation.md): shared Vitest and Playwright config packages and a few smoke tests. The tests now run in `pnpm verify` and CI, pending the owner's approval of that chain change. Still open: coverage thresholds, accessibility gating, browser matrix, and how much of the code the tests must reach (coverage is thin today).
-- **Dependency direction between package categories**, and any tool that enforces it.
-- **Component catalogue** (Storybook or another).
+- **Boundary enforcement implementation.** Category ownership, runtime dependency direction, grouping principles, and migration rules are accepted in [ADR-0014](0014-multi-app-package-boundaries.md). Milestone 3 selects and implements the checking mechanism and executable package conventions. The existing web lexical import test is partial evidence, not transitive workspace enforcement.
+- **Component catalogue governance.** `apps/storybook` exists and exercises stories. Its presence does not resolve the wider catalogue ownership, publishing, and acceptance policy.
 - **Theme editor and preference persistence** (what writes `--font-preference-*` and the other overrides). Preference storage is decided by [ADR-0010](0010-preference-persistence.md); the theme editor is still open.
-- **Persistence, API, routing and state management.** Open per `PRODUCT.md`; the README's technology table is direction, not decision. Authentication is decided separately by [ADR-0006](0006-authentication-with-supabase.md) (Supabase Auth, for identity only). [ADR-0012](0012-owned-space-records.md) adopts only owned Space records and an unapplied migration draft; content relationships and other persistence/API decisions remain open.
+- **Persistence, API, routing and state management.** Open per `PRODUCT.md`; the README's technology table is direction, not decision. Authentication is decided separately by [ADR-0006](0006-authentication-with-supabase.md) (Supabase Auth, for identity only). [ADR-0012](0012-owned-space-records.md) adopts owned Space records; [ADR-0013](0013-document-and-dashboard-persistence.md) adopts document/dashboard persistence and contextual participation within its scope. Preference persistence is scoped by ADR-0010. Hosted migration state must be checked separately; broader persistence/API decisions remain open.
 - **Deployment topology.** Includes the production domain, which does not exist yet. Until it does, `metadataBase` is unset in `apps/web/src/app/layout.tsx` and the build warns that social image URLs resolve to `http://localhost:3000`. Set `metadataBase` once the domain is chosen.
 - **Documentation site content and tooling** for `apps/docs`.
 - **Notifications delivery.** Storage, live updates, email provider, consent, push delivery and scheduling. Recommendations are in [the notifications spec](../../superpowers/specs/2026-10-17-notifications-design.md) (D0 to D6); none is decided.

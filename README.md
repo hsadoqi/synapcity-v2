@@ -1,5 +1,7 @@
 # Synapcity
 
+Architecture reorganization: the selected multi-app boundaries are recorded in [ADR-0014](docs/architecture/decisions/0014-multi-app-package-boundaries.md), with a [current-to-target ownership map](docs/architecture/reorganization-ownership-map.md). These are the target direction; source migrations and automated enforcement follow in later milestones.
+
 **A connected workspace for thinking, planning, and doing.**
 
 Synapcity brings documents, dashboards, tasks, and focused work into one adaptable environment. Capture something while it’s fresh, give it context as it develops, and bring the useful parts into your day.

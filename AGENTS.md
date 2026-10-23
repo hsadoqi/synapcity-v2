@@ -1,5 +1,7 @@
 # Synapcity agent contract
 
+**Architecture reorganization — 2026-10-23:** [ADR-0014](docs/architecture/decisions/0014-multi-app-package-boundaries.md) governs the selected five-category topology and dependency/runtime matrix. Read the [ownership map](docs/architecture/reorganization-ownership-map.md) before moving existing code. Older app-local/category placement statements are amended only within ADR-0014's scope; behavior, security, preservation, and approval requirements continue. Planned consumers and independent boundaries can justify early extraction; a second implemented app is not required. Source migration and transitive automated enforcement are not complete.
+
 This file is the canonical entry-point contract for AI-assisted work in Synapcity. It is intentionally short — it tells a fresh agent what authority to check and where the deeper rules live. It does not duplicate the content of the documents it links to.
 
 Direct instructions from the human repository owner override this document. A tool-specific instruction file may add narrower guidance but must not silently alter product authority, approve an open decision, or weaken a repository safety rule.

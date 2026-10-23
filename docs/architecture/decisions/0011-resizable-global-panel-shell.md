@@ -1,5 +1,7 @@
 # ADR-0011: Resizable global panel in the authenticated shell
 
+> **Placement amendment — 2026-10-23:** [ADR-0014](0014-multi-app-package-boundaries.md) supersedes the shared UI package as the long-term shell owner. One frontend/shells package will group cohesive shells and their local panel interactions; apps provide route and product composition. Panel persistence, keyboard behavior, focus, and responsive interaction remain in force. See the [ownership map](../reorganization-ownership-map.md) for the selected destinations. The original sections below preserve the decision history; conflicting placement statements or placement-related unresolved questions are superseded by this amendment. Source migration is not completed by this documentation change.
+
 **Status:** Accepted
 **Date:** 2026-10-17
 **Deciders:** Repository owner (explicit approval of the implementation scope, dependency, and ADR)

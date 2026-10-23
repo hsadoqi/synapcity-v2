@@ -1,5 +1,7 @@
 # ADR-0011: Collection, an app-local feature for browse mechanics
 
+> **Placement amendment — 2026-10-23:** [ADR-0014](0014-multi-app-package-boundaries.md) supersedes the app-local collection location and second-current-consumer extraction trigger. Generic collection presentation and interaction belong to a cohesive frontend collection family; resource-specific projections, actions, and copy belong to their features. Existing browse behavior and resource ownership remain in force. See the [ownership map](../reorganization-ownership-map.md) for the selected destinations. The original sections below preserve the decision history; conflicting placement statements or placement-related unresolved questions are superseded by this amendment. Source migration is not completed by this documentation change.
+
 **Status:** Accepted  
 **Date:** 2026-10-17  
 **Deciders:** Hanaa Sadoqi (repository owner); accepted by the owner's direct instruction to make collection its own feature and extract it.

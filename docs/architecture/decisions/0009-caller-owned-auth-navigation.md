@@ -1,5 +1,7 @@
 # ADR-0009: Caller-owned auth navigation
 
+> **Placement amendment — 2026-10-23:** [ADR-0014](0014-multi-app-package-boundaries.md) supersedes the all-Next.js assumption and any requirement to wait for a second implemented consumer before isolating navigation bindings. Apps provide platform navigation and link behavior through explicit interfaces. Caller-owned destinations, redirect validation, and authentication behavior remain in force. See the [ownership map](../reorganization-ownership-map.md) for the selected destinations. The original sections below preserve the decision history; conflicting placement statements or placement-related unresolved questions are superseded by this amendment. Source migration is not completed by this documentation change.
+
 **Status:** Accepted  
 **Date:** 2026-10-13 (accepted 2026-10-14)  
 **Deciders:** Hanaa Sadoqi (repository owner); accepted by the owner's direct instruction to proceed on recommendations.

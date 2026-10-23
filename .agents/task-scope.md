@@ -1,3 +1,50 @@
+## Active task: complete Milestone 2 architecture boundaries (2026-10-23)
+
+- Goal and mode: implement the owner's instruction to finish Milestone 2 completely, documenting the already selected multi-app package architecture. The owner subsequently instructed: "skip all checks/running pnpm verify". No verification commands, formatter, tests, diagram rendering, or link checks are run for this completion change.
+- Authority: direct owner decisions in this conversation select domain/frontend/server/features/dev, one shells package with multiple shell entries, feature composition, reusable server libraries, extended fixtures, and early optimization informed by planned desktop/mobile consumers. This adopts implementation boundaries only; product terminology, schemas, APIs, provider/deployment behavior, and wider open product decisions remain outside scope.
+- Location: named architecture-reorganization worktree on docs/reorganization-m2-boundaries, starting at clean commit 91be9693. Preserve the Milestone 1 baseline branch and prior task history. No source/package/config changes, package creates, dependency changes, schema changes, source moves, commits, pushes, PRs, GitHub mutations, or external planning changes.
+- Milestone 2 delivered scope: category boundaries; dependency/runtime matrix; package grouping/public-interface principles; current-to-target ownership map; migration/preservation/compatibility rules; scoped ADR, conventions, package, glossary, and agent-document reconciliation.
+- Source of record: ADR-0014 owns decisions; workspace conventions and checklist own operating guidance; umbrella READMEs explain their boundaries; ownership map assigns source responsibilities; this existing task ledger owns execution status. No second milestone tracker is created.
+- Exact existing documentation updates (27):
+
+- `README.md`
+- `AGENTS.md`
+- `.agents/task-scope.md`
+- `.agents/workflows/architecture-review.md`
+- `.agents/workflows/dependency-boundary-review.md`
+- `docs/architecture/README.md`
+- `docs/architecture/principles.md`
+- `docs/architecture/workspace-conventions.md`
+- `docs/architecture/package-creation-checklist.md`
+- `docs/architecture/decisions/README.md`
+- `docs/architecture/decisions/0001-workspace-topology-and-toolchain.md`
+- `docs/architecture/decisions/0007-app-local-auth-and-account-ownership.md`
+- `docs/architecture/decisions/0008-auth-actions-and-server-operations.md`
+- `docs/architecture/decisions/0009-caller-owned-auth-navigation.md`
+- `docs/architecture/decisions/0010-preference-persistence.md`
+- `docs/architecture/decisions/0011-collection-browse-feature.md`
+- `docs/architecture/decisions/0011-resizable-global-panel-shell.md`
+- `docs/architecture/decisions/0012-owned-space-records.md`
+- `docs/architecture/decisions/0013-document-and-dashboard-persistence.md`
+- `docs/glossary.md`
+- `packages/frontend/ui/README.md`
+- `packages/dev/fixtures/README.md`
+- `packages/domain/README.md`
+- `packages/frontend/README.md`
+- `packages/server/README.md`
+- `packages/features/README.md`
+- `packages/dev/README.md`
+
+- Exact documentation creates (2):
+
+- `docs/architecture/decisions/0014-multi-app-package-boundaries.md`
+- `docs/architecture/reorganization-ownership-map.md`
+
+- Preservation: retain owner-added example lists, older ADR reasoning with explicit placement amendments, all adopted behavior/security requirements, both existing ADR-0011 filenames, and prior task entries. A temporary backup of the pre-edit documentation is kept under /private/tmp.
+- Outcome: the six Milestone 2 documentation deliverables are written. They remain uncommitted and unverified at the owner's request. Milestone 1 baseline checks remain pending; Milestone 3 implements package conventions and boundary enforcement before source migration. No implementation migration or enforcement success is claimed.
+
+---
+
 ## Active task: umbrella boundary READMEs (2026-10-23)
 
 - Goal and mode: implement the owner's direct request to add boundary READMEs under the agreed domain, frontend, server, features, and dev umbrellas, with Mermaid interaction/dependency diagrams. Documentation only; detailed package design and implementation migration remain separate work.

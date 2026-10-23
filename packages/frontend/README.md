@@ -1,5 +1,7 @@
 # Frontend Packages
 
+The accepted decision is [ADR-0014](../../docs/architecture/decisions/0014-multi-app-package-boundaries.md). Its runtime dependency matrix is normative; the [ownership map](../../docs/architecture/reorganization-ownership-map.md) assigns existing source to target owners. These READMEs explain category boundaries without creating leaf packages.
+
 Owns: reusable presentation foundations, visual components, shells, styling foundations, and general frontend interaction behavior.
 
 **Status:** Current direction, selected by the repository owner on 2026-10-23.
@@ -90,7 +92,7 @@ Existing packages are [UI](ui/README.md), [Tailwind configuration and tokens](ta
 
 [RootShell](ui/src/blocks/root-shell/root-shell.tsx), [RootSidebar](ui/src/blocks/sidebar-shell/root-sidebar/root-sidebar.tsx), and the [web authentication page shell](../../apps/web/src/components/shells/auth-page-shell/auth-page-shell.tsx) are inputs to the shells ownership review. Product schemas currently in UI should move to their domain owner.
 
-Collection's general controls/displays and its product-facing composition need an explicit split during the collection migration. This README does not settle every collection component's destination from its current folder name.
+Collection's generic controls, display mechanics, and interaction belong to a cohesive frontend collection family. Resource-specific projections, actions, and copy belong to resource features. The ownership map records that split; migration will assign individual files according to responsibility rather than current folder names.
 
 ## Presentation, testing, and copy
 
@@ -100,8 +102,6 @@ Fixtures and fake capabilities may be supplied by stories/tests, with no product
 
 ## Documentation reconciliation
 
-The [workspace conventions](../../docs/architecture/workspace-conventions.md) currently allow certain Next.js imports because consumers were all Next.js apps; the [package checklist](../../docs/architecture/package-creation-checklist.md) and UI README contain different wording. Reconcile these before migration, preserving existing behavior while defining explicit runtime entry points.
-
-This document establishes target responsibility boundaries. It does not claim extraction, native compatibility, updated exports, or automated enforcement is complete. Exact package APIs, framework adapters, and desktop/mobile renderers remain open design details.
+Placement guidance is reconciled by [ADR-0014](../../docs/architecture/decisions/0014-multi-app-package-boundaries.md), the amended earlier ADRs, workspace conventions, and the package checklist. Existing behavior/security decisions remain in force. The ownership map records the selected destinations; exact leaf-package manifests, export signatures, and enforcement implementation follow in Milestone 3. Source extraction, native presentation, and automated transitive enforcement are not complete.
 
 Related umbrellas: [domain](../domain/README.md), [server](../server/README.md), [features](../features/README.md), [dev](../dev/README.md).

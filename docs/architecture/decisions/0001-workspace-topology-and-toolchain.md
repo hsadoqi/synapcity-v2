@@ -1,5 +1,7 @@
 # ADR-0001: Workspace topology and toolchain
 
+> **Placement amendment — 2026-10-23:** [ADR-0014](0014-multi-app-package-boundaries.md) supersedes the category inventory, server-only-in-app restriction, shared frontend framework coupling, and package creation triggers. Its original toolchain inventory is a dated snapshot; use current manifests and the lockfile for installed versions. The wider testing strategy remains Proposed in ADR-0005. See the [ownership map](../reorganization-ownership-map.md) for the selected destinations. The original sections below preserve the decision history; conflicting placement statements or placement-related unresolved questions are superseded by this amendment. Source migration is not completed by this documentation change.
+
 **Status:** Accepted
 **Date:** 2026-10-13
 **Deciders:** Hanaa Sadoqi (repository owner)

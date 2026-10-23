@@ -1,5 +1,7 @@
 # Server Packages
 
+The accepted decision is [ADR-0014](../../docs/architecture/decisions/0014-multi-app-package-boundaries.md). Its runtime dependency matrix is normative; the [ownership map](../../docs/architecture/reorganization-ownership-map.md) assigns existing source to target owners. These READMEs explain category boundaries without creating leaf packages.
+
 Owns: reusable backend operations, verified identity and authorization support, repositories, persistence adapters, and server-side infrastructure.
 
 **Status:** Current direction, selected by the repository owner on 2026-10-23.
@@ -110,6 +112,6 @@ No schema, permission, provider setting, transport, secret policy, runtime upgra
 
 ## Documentation reconciliation
 
-The [workspace conventions](../../docs/architecture/workspace-conventions.md) currently require server-only code to live in apps. [ADR-0007](../../docs/architecture/decisions/0007-app-local-auth-and-account-ownership.md) and [ADR-0008](../../docs/architecture/decisions/0008-auth-actions-and-server-operations.md) record the existing app-local selection and action/operation responsibilities. Reconcile their placement statements before package migration while preserving their security and behavior requirements.
+Placement guidance is reconciled by [ADR-0014](../../docs/architecture/decisions/0014-multi-app-package-boundaries.md), the amended earlier ADRs, workspace conventions, and the package checklist. Existing behavior/security decisions remain in force. The ownership map records the selected destinations; exact leaf-package manifests, export signatures, and enforcement implementation follow in Milestone 3. Source extraction, native presentation, and automated transitive enforcement are not complete.
 
 Related umbrellas: [domain](../domain/README.md), [frontend](../frontend/README.md), [features](../features/README.md), [dev](../dev/README.md).

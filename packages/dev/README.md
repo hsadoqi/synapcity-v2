@@ -1,5 +1,7 @@
 # Dev Packages
 
+The accepted decision is [ADR-0014](../../docs/architecture/decisions/0014-multi-app-package-boundaries.md). Its runtime dependency matrix is normative; the [ownership map](../../docs/architecture/reorganization-ownership-map.md) assigns existing source to target owners. These READMEs explain category boundaries without creating leaf packages.
+
 ## Purpose
 
 Owns: shared development/build tooling, test infrastructure, synthetic fixtures, sample content, and deterministic scenarios for tests, Storybook, seeds, and explicit local demos.
@@ -87,7 +89,7 @@ A fake capability can simulate success, rejection, latency, or failure without a
 
 ## Current implementation and migration inputs
 
-The [fixtures README](fixtures/README.md) still describes generic-only factories, while [the implementation](fixtures/src/index.ts) includes additional workspace/document/dashboard shapes. It also has rendering-specific values and shared default record identity that need review before expansion. This README records the intended boundary, not a claim that those issues are fixed.
+The [fixtures README](fixtures/README.md) now records that [the implementation](fixtures/src/index.ts) includes generic primitives and workspace/document/dashboard sample shapes. It also has rendering-specific values and shared default record identity that need review before expansion. This README records the intended boundary, not a claim that those issues are fixed.
 
 Several [web features](../../apps/web/src/features) still contain local fixtures. Move those only in scoped migrations that align them with their contract owner, preserve useful scenario coverage, and keep production composition separate.
 
@@ -97,6 +99,6 @@ Shared fixtures are useful where scenarios repeat or relationships need consiste
 
 Check reproducibility, fresh per-record identity, cross-record references, approved contract conformance, malformed-input cases, and isolation from real providers. Test expected behavior against an independent invariant; reusing a fixture factory as both implementation and expected result does not establish correctness.
 
-The existing [package checklist](../../docs/architecture/package-creation-checklist.md) calls dev packages build-time-only, while fixtures also serve tests, seeds, and explicit demo hosts. Reconcile that wording and the fixture package's own README during the relevant milestone. No test result, seed generation, production-bundle audit, or package migration is claimed by this document.
+The [package checklist](../../docs/architecture/package-creation-checklist.md), fixtures README, and [ADR-0014](../../docs/architecture/decisions/0014-multi-app-package-boundaries.md) now distinguish tooling, tests, seeds, explicit demo hosts, and production dependencies. No test result, seed generation, production-bundle audit, or package migration is claimed by this document.
 
 Related umbrellas: [domain](../domain/README.md), [frontend](../frontend/README.md), [server](../server/README.md), [features](../features/README.md).

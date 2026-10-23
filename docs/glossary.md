@@ -1,5 +1,7 @@
 # Working glossary and terminology ledger
 
+**Implementation vocabulary amendment — 2026-10-23:** `domain`, `frontend`, `server`, `features`, and `dev` are the package categories accepted by [ADR-0014](architecture/decisions/0014-multi-app-package-boundaries.md). Names in the [ownership map](architecture/reorganization-ownership-map.md) identify existing capabilities and migration destinations. This architectural naming does not accept provisional product terms, a universal Entity model, new persisted identifiers, or new schemas; the terminology statuses below remain in force.
+
 **Status:** Canonical terminology governance; most product labels below remain working terms  
 **Purpose:** Prevent repeated vocabulary from becoming an accidental naming, schema, route, or package decision
 
