@@ -7,8 +7,9 @@ import type {
   CollectionLayout,
   CollectionSort,
 } from '../../shared';
+import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
+
 import { CollectionSearch } from './collection-search';
-import { CreateButton } from './create-button';
 import { FiltersMenu } from './filters-menu';
 import { LayoutToggleGroup } from './layout-toggle-group';
 import { SortOptionsMenu } from './sort-options-menu';
@@ -19,6 +20,8 @@ type CollectionToolbarProps = {
   context?: string;
   /** Turns on the group submenu in the filter menu. */
   grouping?: CollectionGrouping;
+  /** Every tag in use, for the tag submenu of the filter menu. */
+  tagOptions?: string[];
   query: string;
   onQueryChange: (query: string) => void;
   filters: CollectionFilters;
@@ -27,13 +30,15 @@ type CollectionToolbarProps = {
   onSortChange: (sort: CollectionSort) => void;
   layout: CollectionLayout;
   onLayoutChange: (layout: CollectionLayout) => void;
-  onCreate: () => void;
+  /** Where "View all" goes. Omit to hide the link. */
+  viewAllHref?: string;
 };
 
 export function CollectionToolbar({
-  labels: { singular },
+  labels: { plural },
   context,
   grouping,
+  tagOptions,
   query,
   onQueryChange,
   filters,
@@ -42,21 +47,21 @@ export function CollectionToolbar({
   onSortChange,
   layout,
   onLayoutChange,
-  onCreate,
+  viewAllHref,
 }: CollectionToolbarProps) {
   const placeholder = context
-    ? `Search ${singular}s in ${context}…`
-    : `Search ${singular}s…`;
+    ? `Search ${plural.toLowerCase()} in ${context}…`
+    : `Search ${plural.toLowerCase()}…`;
 
-  // Mobile: search + create share row one, controls wrap to row two.
-  // sm and up: search, controls, create on a single row.
+  // Mobile: search + "View all" share row one, controls wrap to row two.
+  // sm and up: search, controls, "View all" on a single row.
   return (
     <div className="flex flex-wrap items-center gap-2">
       <CollectionSearch
         query={query}
         onQueryChange={onQueryChange}
         placeholder={placeholder}
-        label={`Search ${singular}s`}
+        label={`Search ${plural.toLowerCase()}`}
         className="order-1 min-w-0 flex-1 sm:max-w-sm"
       />
 
@@ -65,16 +70,21 @@ export function CollectionToolbar({
           filters={filters}
           onFiltersChange={onFiltersChange}
           grouping={grouping}
+          tags={tagOptions}
         />
         <SortOptionsMenu sort={sort} onSortChange={onSortChange} />
         <LayoutToggleGroup layout={layout} onLayoutChange={onLayoutChange} />
       </div>
 
-      <CreateButton
-        onCreate={onCreate}
-        singular={singular}
-        className="order-2 ml-auto sm:order-3"
-      />
+      {viewAllHref && (
+        <LinkButton
+          href={viewAllHref}
+          variant="outline"
+          className="order-2 ml-auto sm:order-3"
+        >
+          View all {plural.toLowerCase()}
+        </LinkButton>
+      )}
     </div>
   );
 }

@@ -16,9 +16,11 @@ import { SettingsContent } from '../settings-content';
 // mock; this layout test opens a stand-in in its place.
 const account = tabs.find((tab) => tab.value === 'account')!;
 
-// Each tab loads lazily, and these tests wait up to 5 s for it. The test's own
-// limit must be longer, or a slow machine cuts it off before that wait ends.
-const LOADING_TIMEOUT = 15_000;
+// Each tab loads lazily, and these tests wait up to 10 s for it, several times
+// in a row in the longest one. The test's own limit must exceed that total, or a
+// busy machine (the full parallel run) cuts it off before the waits end.
+const LOADING_TIMEOUT = 60_000;
+const FIND_TIMEOUT = 10_000;
 
 beforeEach(() => {
   stubBrowser();
@@ -60,24 +62,32 @@ describe('SettingsContent', () => {
     tabs
       .filter((tab) => tab.value !== 'account')
       .map((tab) => [tab.label, tab.value]),
-  )('titles the %s page without naming another tab', async (label, value) => {
-    window.location.hash = value;
-    show();
-    // Only the open panel: tabs opened earlier stay mounted, hidden.
-    const panel = await screen.findByRole('tabpanel', {}, { timeout: 5000 });
-    const title = await waitFor(
-      () => {
-        const node = panel.querySelector('[data-slot="card-title"]');
-        if (!node?.textContent) throw new Error('title not loaded');
-        return node.textContent;
-      },
-      { timeout: 5000 },
-    );
-    const otherLabels = tabs
-      .map((tab) => tab.label)
-      .filter((other) => other !== label);
-    expect(otherLabels).not.toContain(title);
-  });
+  )(
+    'titles the %s page without naming another tab',
+    async (label, value) => {
+      window.location.hash = value;
+      show();
+      // Only the open panel: tabs opened earlier stay mounted, hidden.
+      const panel = await screen.findByRole(
+        'tabpanel',
+        {},
+        { timeout: FIND_TIMEOUT },
+      );
+      const title = await waitFor(
+        () => {
+          const node = panel.querySelector('[data-slot="card-title"]');
+          if (!node?.textContent) throw new Error('title not loaded');
+          return node.textContent;
+        },
+        { timeout: FIND_TIMEOUT },
+      );
+      const otherLabels = tabs
+        .map((tab) => tab.label)
+        .filter((other) => other !== label);
+      expect(otherLabels).not.toContain(title);
+    },
+    LOADING_TIMEOUT,
+  );
 
   it(
     'keeps unsaved Theme choices through a visit to another tab',
@@ -86,7 +96,7 @@ describe('SettingsContent', () => {
       show();
       const colorTheme = () =>
         screen.getByRole('combobox', { name: 'Color theme' });
-      await waitFor(() => colorTheme(), { timeout: 5000 });
+      await waitFor(() => colorTheme(), { timeout: FIND_TIMEOUT });
 
       fireEvent.click(colorTheme());
       const dark = await screen.findByRole('option', { name: 'Dark' });
@@ -98,13 +108,14 @@ describe('SettingsContent', () => {
       await screen.findByRole(
         'combobox',
         { name: 'Contrast' },
-        { timeout: 5000 },
+        { timeout: FIND_TIMEOUT },
       );
       fireEvent.click(screen.getByRole('tab', { name: 'Theme' }));
 
       await waitFor(() => expect(colorTheme().textContent).toContain('Dark'));
       expect(
-        within(screen.getByRole('tabpanel')).getByRole('status').textContent,
+        within(screen.getByRole('tabpanel')).getByRole('status', { name: '' })
+          .textContent,
       ).toBe('You have unsaved changes.');
     },
     LOADING_TIMEOUT,
@@ -116,7 +127,7 @@ describe('SettingsContent', () => {
       show();
 
       expect(
-        await screen.findByText('Account panel', {}, { timeout: 5000 }),
+        await screen.findByText('Account panel', {}, { timeout: FIND_TIMEOUT }),
       ).toBeTruthy();
       expect(
         screen

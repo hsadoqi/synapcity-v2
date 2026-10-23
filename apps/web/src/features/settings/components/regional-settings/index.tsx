@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { FieldGroup } from '@synapcity/frontend-ui/core/field';
-import { Separator } from '@synapcity/frontend-ui/core/separator';
-import { useRegionalSettings } from '../../hooks/use-regional-settings';
+import { useSettingsDraft } from '../../hooks/use-settings-draft';
 import {
   LanguageRow,
   TimezoneRow,
@@ -12,11 +11,17 @@ import {
   FirstDayOfWeekRow,
   NumberFormatRow,
 } from './regional-rows';
+import { RegionalPreview } from './regional-preview';
 import { SettingsTabShell } from '../../shared/settings-tabs';
-import { SettingsSection } from '../../shared/settings-section';
+import {
+  SettingsAccordion,
+  SettingsAccordionItem,
+} from '../../shared/settings-accordion';
 
 export function RegionalSettings() {
-  const { regional, updateRegional } = useRegionalSettings();
+  const draft = useSettingsDraft('regional');
+  const regional = draft.draft;
+  const updateRegional = draft.change;
   const [previewDate, setPreviewDate] = useState<Date | null>(null);
   const [timezones, setTimezones] = useState<string[]>([]);
   const [deviceTimezone, setDeviceTimezone] = useState<string | null>(null);
@@ -51,52 +56,56 @@ export function RegionalSettings() {
     <SettingsTabShell
       title="Regional"
       description="How you see dates, times, and numbers."
+      draft={draft}
+      preview={{
+        content: <RegionalPreview regional={regional} now={previewDate} />,
+      }}
     >
-      <SettingsSection title="Language">
-        <FieldGroup>
-          <LanguageRow
-            value={regional.language}
-            onChange={(language) => updateRegional({ language })}
-          />
-        </FieldGroup>
-      </SettingsSection>
-      <Separator />
-      <SettingsSection title="Date & time">
-        <FieldGroup>
-          <TimezoneRow
-            value={regional.timezone}
-            onChange={(timezone) => updateRegional({ timezone })}
-            timezones={timezones}
-            deviceTimezone={deviceTimezone}
-          />
-          <TimeFormatRow
-            value={regional.timeFormat}
-            onChange={(timeFormat) => updateRegional({ timeFormat })}
-            timezone={regional.timezone}
-            language={regional.language}
-            previewDate={previewDate}
-          />
-          <DateFormatRow
-            value={regional.dateFormat}
-            onChange={(dateFormat) => updateRegional({ dateFormat })}
-            timezone={regional.timezone}
-            previewDate={previewDate}
-          />
-          <FirstDayOfWeekRow
-            value={regional.firstDayOfWeek}
-            onChange={(firstDayOfWeek) => updateRegional({ firstDayOfWeek })}
-          />
-        </FieldGroup>
-      </SettingsSection>
-      <Separator />
-      <SettingsSection title="Numbers">
-        <FieldGroup>
-          <NumberFormatRow
-            value={regional.numberFormat}
-            onChange={(numberFormat) => updateRegional({ numberFormat })}
-          />
-        </FieldGroup>
-      </SettingsSection>
+      <SettingsAccordion>
+        <SettingsAccordionItem value="language" title="Language">
+          <FieldGroup>
+            <LanguageRow
+              value={regional.language}
+              onChange={(language) => updateRegional({ language })}
+            />
+          </FieldGroup>
+        </SettingsAccordionItem>
+        <SettingsAccordionItem value="date-time" title="Date & time">
+          <FieldGroup>
+            <TimezoneRow
+              value={regional.timezone}
+              onChange={(timezone) => updateRegional({ timezone })}
+              timezones={timezones}
+              deviceTimezone={deviceTimezone}
+            />
+            <TimeFormatRow
+              value={regional.timeFormat}
+              onChange={(timeFormat) => updateRegional({ timeFormat })}
+              timezone={regional.timezone}
+              language={regional.language}
+              previewDate={previewDate}
+            />
+            <DateFormatRow
+              value={regional.dateFormat}
+              onChange={(dateFormat) => updateRegional({ dateFormat })}
+              timezone={regional.timezone}
+              previewDate={previewDate}
+            />
+            <FirstDayOfWeekRow
+              value={regional.firstDayOfWeek}
+              onChange={(firstDayOfWeek) => updateRegional({ firstDayOfWeek })}
+            />
+          </FieldGroup>
+        </SettingsAccordionItem>
+        <SettingsAccordionItem value="numbers" title="Numbers">
+          <FieldGroup>
+            <NumberFormatRow
+              value={regional.numberFormat}
+              onChange={(numberFormat) => updateRegional({ numberFormat })}
+            />
+          </FieldGroup>
+        </SettingsAccordionItem>
+      </SettingsAccordion>
     </SettingsTabShell>
   );
 }

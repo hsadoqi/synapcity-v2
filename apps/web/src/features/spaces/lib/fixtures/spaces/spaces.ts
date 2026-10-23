@@ -1,8 +1,13 @@
 import { spaceSchema } from '../../../shared/schema';
-import type { Space } from '../../../shared/types';
+import type {
+  EntityKind,
+  Space,
+  SpaceEntity,
+  SpaceEntityItemKind,
+} from '../../../shared/types';
 
 /** Sample data for tests and previews; these are not saved workspace records. */
-export const SPACE_FIXTURES: readonly Space[] = [
+export const SPACE_FIXTURES: readonly SpaceEntity[] = [
   {
     id: 'fixture-space-writing',
     ownerId: '11111111-1111-4111-8111-111111111111',
@@ -12,6 +17,8 @@ export const SPACE_FIXTURES: readonly Space[] = [
     tags: ['writing', 'ideas'],
     createdAt: '2026-10-01T09:00:00Z',
     updatedAt: '2026-10-03T14:30:00Z',
+    pinnedAt: '2026-10-04T09:00:00Z',
+    lastViewedAt: '2026-10-03T14:30:00Z',
   },
   {
     id: 'fixture-space-learning',
@@ -22,6 +29,8 @@ export const SPACE_FIXTURES: readonly Space[] = [
     tags: ['learning'],
     createdAt: '2026-10-02T10:00:00Z',
     updatedAt: '2026-10-04T11:00:00Z',
+    pinnedAt: null,
+    lastViewedAt: '2026-10-05T18:00:00Z',
   },
   {
     id: 'fixture-space-personal',
@@ -31,11 +40,62 @@ export const SPACE_FIXTURES: readonly Space[] = [
     tags: [],
     createdAt: '2026-10-05T08:00:00Z',
     updatedAt: '2026-10-05T08:00:00Z',
+    pinnedAt: null,
+    lastViewedAt: null,
+  },
+  {
+    id: 'fixture-space-client-work',
+    ownerId: '11111111-1111-4111-8111-111111111111',
+    name: 'Client work',
+    icon: 'briefcase',
+    description: 'Proposals, meeting notes, and status boards.',
+    tags: ['work'],
+    createdAt: '2026-09-20T09:00:00Z',
+    updatedAt: '2026-10-01T16:00:00Z',
+    pinnedAt: '2026-10-02T09:00:00Z',
+    lastViewedAt: '2026-10-04T10:00:00Z',
+  },
+  {
+    id: 'fixture-space-health',
+    ownerId: '11111111-1111-4111-8111-111111111111',
+    name: 'Health',
+    icon: 'heart',
+    description: 'Training log, appointments, and sleep notes.',
+    tags: ['personal', 'tracking'],
+    createdAt: '2026-09-15T07:00:00Z',
+    updatedAt: '2026-09-28T07:30:00Z',
+    pinnedAt: null,
+    lastViewedAt: '2026-10-02T07:00:00Z',
+  },
+  {
+    id: 'fixture-space-trips',
+    ownerId: '11111111-1111-4111-8111-111111111111',
+    name: 'Trips',
+    icon: 'plane',
+    tags: ['personal', 'planning'],
+    createdAt: '2026-09-05T12:00:00Z',
+    updatedAt: '2026-09-12T12:00:00Z',
+    pinnedAt: null,
+    lastViewedAt: null,
+  },
+  {
+    id: 'fixture-space-recipes',
+    ownerId: '11111111-1111-4111-8111-111111111111',
+    name: 'Recipes',
+    icon: 'coffee',
+    description: 'Things worth cooking again, and what went wrong last time.',
+    tags: ['personal'],
+    createdAt: '2026-08-30T18:00:00Z',
+    updatedAt: '2026-09-02T18:00:00Z',
+    pinnedAt: null,
+    lastViewedAt: null,
   },
 ];
 
 /** A fresh deterministic record on each call, validated like incoming data. */
-export function createSpaceFixture(overrides: Partial<Space> = {}): Space {
+export function createSpaceEntityFixture(
+  overrides: Partial<SpaceEntity> = {},
+): SpaceEntity {
   return spaceSchema.parse({
     id: 'fixture-space-writing',
     ownerId: '11111111-1111-4111-8111-111111111111',
@@ -47,4 +107,82 @@ export function createSpaceFixture(overrides: Partial<Space> = {}): Space {
     updatedAt: '2026-10-03T14:30:00Z',
     ...overrides,
   });
+}
+
+export const spaceItem = {
+  kind: 'space' as EntityKind,
+  createdAt: SPACE_FIXTURES[0]?.createdAt ?? new Date().toISOString(),
+  updatedAt: SPACE_FIXTURES[0]?.updatedAt ?? new Date().toISOString(),
+  id: SPACE_FIXTURES[0]?.id ?? 'fixture-space',
+  name: SPACE_FIXTURES[0]?.name ?? 'Untitled Space',
+  icon: SPACE_FIXTURES[0]?.icon ?? 'folder',
+  description: SPACE_FIXTURES[0]?.description ?? 'No description provided.',
+  tags: SPACE_FIXTURES[0]?.tags ?? [],
+  pinnedAt: SPACE_FIXTURES[0]?.pinnedAt ?? null,
+  lastViewedAt: SPACE_FIXTURES[0]?.lastViewedAt ?? null,
+  documents: [
+    {
+      id: 'doc1',
+      name: 'Document 1',
+      description: 'This is the first document.',
+      updatedAt: '2026-10-05T08:00:00Z',
+      createdAt: '2026-10-05T08:00:00Z',
+      icon: 'document',
+      kind: 'document' as SpaceEntityItemKind,
+    },
+    {
+      id: 'doc2',
+      name: 'Document 2',
+      updatedAt: '2026-10-05T08:00:00Z',
+      createdAt: '2026-10-05T08:00:00Z',
+      icon: 'document',
+      kind: 'document' as SpaceEntityItemKind,
+    },
+  ],
+  dashboards: [
+    {
+      id: 'dash1',
+      name: 'Dashboard 1',
+      description: 'This is the first dashboard.',
+      updatedAt: '2026-10-05T08:00:00Z',
+      createdAt: '2026-10-05T08:00:00Z',
+      icon: 'boxes',
+      kind: 'dashboard' as SpaceEntityItemKind,
+    },
+    {
+      id: 'dash2',
+      name: 'Dashboard 2',
+      description: 'This is the second dashboard.',
+      updatedAt: '2026-10-05T08:00:00Z',
+      createdAt: '2026-10-05T08:00:00Z',
+      icon: 'boxes',
+      kind: 'dashboard' as SpaceEntityItemKind,
+    },
+  ],
+  documentsTotal: 2,
+  dashboardsTotal: 2,
+};
+
+export function createSpaceFixture(
+  overrides: Partial<Space> & { ownerId?: string } = {},
+): Space {
+  return {
+    ...spaceItem,
+    ...overrides,
+    documents: overrides.documents ?? spaceItem.documents ?? [],
+    dashboards: overrides.dashboards ?? spaceItem.dashboards ?? [],
+    documentsTotal:
+      overrides.documentsTotal ??
+      spaceItem.documentsTotal ??
+      overrides.documents?.length ??
+      spaceItem.documents.length ??
+      0,
+    dashboardsTotal:
+      overrides.dashboardsTotal ??
+      spaceItem.dashboardsTotal ??
+      overrides.dashboards?.length ??
+      spaceItem.dashboards.length ??
+      0,
+    ownerId: overrides.ownerId ?? '11111111-1111-4111-8111-111111111111',
+  };
 }

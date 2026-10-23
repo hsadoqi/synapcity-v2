@@ -1,4 +1,5 @@
 // This page wrapper owns centring and width; the feature AuthShell owns the card and heading.
+// TODO: Extend this to be an actual auth page shell and handle auth views properly (conditionally)
 export const AuthPageShell = ({
   children,
 }: Readonly<{ children: React.ReactNode }>) => {

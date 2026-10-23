@@ -16,6 +16,8 @@ const geistSans = localFont({
 const geistMono = localFont({
   src: '../lib/fonts/GeistMonoVF.woff',
   variable: '--font-geist-mono',
+  // Code only: fetch it when a code element first renders, not on every page.
+  preload: false,
 });
 
 export const metadata: Metadata = createMetadata({ title: 'Synapcity Docs' });

@@ -25,7 +25,9 @@ export function CreateActions({
 }: CreateActionsProps) {
   return (
     <section aria-labelledby={id} className="flex flex-col gap-3">
-      <SectionHeading id={id}>{heading}</SectionHeading>
+      <SectionHeading className="sr-only" id={id}>
+        {heading}
+      </SectionHeading>
       <div className="flex flex-wrap gap-2">
         {actions.map(({ id: actionId, label, icon: Icon }) => (
           <Button

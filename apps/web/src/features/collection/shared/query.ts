@@ -132,6 +132,12 @@ export function applyCollectionQuery(
     ) {
       return false;
     }
+    if (
+      filters.tags.length > 0 &&
+      !item.tags.some((tag) => filters.tags.includes(tag))
+    ) {
+      return false;
+    }
     if (!needle) return true;
     return [item.title, item.subtitle, item.group, ...item.tags]
       .filter(Boolean)
@@ -144,9 +150,55 @@ export function applyCollectionQuery(
     if (sort.field === 'title') {
       return a.title.localeCompare(b.title) * direction;
     }
+    if (sort.field === 'used') {
+      return (lastActive(a) - lastActive(b)) * direction;
+    }
     const key = sort.field === 'created' ? 'createdAt' : 'updatedAt';
     const aTime = new Date(a[key] ?? a.updatedAt).getTime();
     const bTime = new Date(b[key] ?? b.updatedAt).getTime();
     return (aTime - bTime) * direction;
   });
+}
+
+/**
+ * When an item was last in use: the later of when it was opened and when it
+ * changed. Changing something is using it, and an item never opened still has
+ * the time it last changed.
+ */
+function lastActive(item: CollectionItem) {
+  const changed = new Date(item.updatedAt).getTime();
+  const opened = item.lastViewedAt ? new Date(item.lastViewedAt).getTime() : 0;
+  return Math.max(changed, opened);
+}
+
+/** Pinned items first, each group keeping the order it came in. Returns a new list. */
+export function pinnedFirst(items: CollectionItem[]) {
+  return [
+    ...items.filter((item) => item.pinned),
+    ...items.filter((item) => !item.pinned),
+  ];
+}
+
+/**
+ * Most recently in use first (see `lastActive`), so a new or untouched item
+ * still finds a place. Returns a new list.
+ */
+export function byRecency(items: CollectionItem[]) {
+  return [...items].sort((a, b) => lastActive(b) - lastActive(a));
+}
+
+/**
+ * The tags used across `items`, most used first (ties alphabetical), so a
+ * short row of tag chips can show the ones that matter.
+ */
+export function tagsByUse(items: CollectionItem[]) {
+  const counts = new Map<string, number>();
+  for (const item of items) {
+    for (const tag of new Set(item.tags)) {
+      counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    }
+  }
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([tag]) => tag);
 }

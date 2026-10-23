@@ -1,6 +1,6 @@
 # ADR-0012: Owned Space records and serializable icon identifiers
 
-**Status:** Accepted  
+**Status:** Accepted; amended by [ADR-0013](0013-document-and-dashboard-persistence.md) (standalone Space deletion, which never deletes documents or dashboards)  
 **Date:** 2026-10-17  
 **Deciders:** Hanaa Sadoqi (repository owner), by direct approval to draft the migration and add ownership, selection of Lucide icon names, and explicit selection of account-deletion cascade.
 
@@ -13,7 +13,7 @@ The owner requested an app-local spaces feature with a schema, inferred types an
 ## Decision
 
 - Store standalone records in `public.spaces`: database-generated UUID `id`; UUID `owner_id` referencing `auth.users.id`; `name`; nullable `description`; Lucide-name `icon`; `text[]` tags; and non-null `created_at`/`updated_at` timestamps with time zone.
-- Ownership defaults to `auth.uid()`. Authenticated clients may insert and update only `name`, `description`, `icon`, and `tags`; they cannot supply or change IDs, ownership or timestamps. Owner-only select/insert/update RLS and explicit column grants apply together. Anonymous access and standalone Space deletion are not granted.
+- Ownership defaults to `auth.uid()`. Authenticated clients may insert and update only `name`, `description`, `icon`, and `tags`; they cannot supply or change IDs, ownership or timestamps. Owner-only select/insert/update RLS and explicit column grants apply together. Anonymous access is not granted. This migration grants no Space DELETE only because deletion was out of its scope; [ADR-0013](0013-document-and-dashboard-persistence.md) allows deleting a Space and limits the effect on content to removing participation rows.
 - Use `ON DELETE CASCADE` for the owner foreign key. This is the specifically approved account-deletion behavior, not a decision about content membership or the lifecycle of related Documents. No content relationships exist in this migration.
 - Default icon to `folder` and tags to an empty array. Validate icon identifiers as lowercase kebab-case text, never executable SVG or React values. Do not import the entire Lucide catalog into the runtime schema. Catalog membership is a rendering concern: future rendering must handle unavailable/renamed identifiers with a fallback, and future pickers must offer installed names. Tests verify fixture names against installed Lucide 1.55.0.
 - Keep tags as a single-dimensional array of non-null strings. Empty arrays, duplicate labels and empty-string labels are permitted, matching the approved plain `string[]` contract; taxonomy and normalization are not adopted.
@@ -36,7 +36,7 @@ This adopts the bounded storage/ownership contract and an **unapplied migration 
 
 - Application of the migration to Supabase requires a separate reviewed deployment step.
 - Request-bound database adapter, generated database types, row mapping and live RLS verification remain future integration work. The current `getSpace` still calls the existing provisional `/api/spaces/:id` URL; this change does not create its handler or replace its source.
-- Content relationships and standalone Space lifecycle remain open. Any later cascade involving content requires a separate decision.
+- Content relationships and standalone Space lifecycle remain open, except where [ADR-0013](0013-document-and-dashboard-persistence.md) decides participation and Space deletion. Any later cascade involving content requires a separate decision.
 
 ## Governance boundary
 

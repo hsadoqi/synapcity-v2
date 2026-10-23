@@ -15,6 +15,7 @@ const dirname =
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 const config = defineConfig({
   test: {
+    maxWorkers: 2,
     projects: [
       {
         extends: true,
@@ -23,11 +24,18 @@ const config = defineConfig({
           // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
           storybookTest({ configDir: path.join(dirname, '.storybook') }),
         ],
+        // Each story file opens its own page in a real browser. With every file at once, a busy
+        // machine or small CI runner starves the animation, focus and timing assertions and they
+        // fail intermittently (verified: the full suite failed 1-3 different stories per run under
+        // load, then passed 190/190 with two workers). Raise this only with spare CPU.
         // `browser` (headless Chromium) comes from `browserConfig` through
         // `extends: true`. Declaring it here as well merges the two
         // `instances` arrays, and every story then runs twice.
         test: {
           name: 'storybook',
+        },
+        optimizeDeps: {
+          include: ['storybook/theming', 'react-dom', 'react/jsx-runtime'],
         },
       },
     ],

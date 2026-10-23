@@ -4,16 +4,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
   search: '',
   replace: vi.fn(),
+  push: vi.fn(),
   add: vi.fn(),
+  close: vi.fn(),
 }));
 
 vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(mocks.search),
   usePathname: () => '/abc/home',
-  useRouter: () => ({ replace: mocks.replace }),
+  useRouter: () => ({ replace: mocks.replace, push: mocks.push }),
 }));
 vi.mock('@synapcity/frontend-ui/core/toast', () => ({
-  toast: { add: mocks.add },
+  toast: { add: mocks.add, close: mocks.close },
 }));
 
 import { NoticeToast } from './notice-toast';
@@ -24,7 +26,7 @@ describe('NoticeToast', () => {
     mocks.search = '';
   });
 
-  it('shows the listed message as a success toast and removes the parameter', () => {
+  it('shows the listed notice as a toast and removes the parameter', () => {
     mocks.search = 'notice=password-updated';
     render(<NoticeToast />);
 
@@ -33,8 +35,27 @@ describe('NoticeToast', () => {
       id: 'notice-password-updated',
       type: 'success',
       title: 'Password updated.',
+      description: undefined,
+      timeout: 5000,
+      priority: 'low',
+      actionProps: undefined,
     });
     expect(mocks.replace).toHaveBeenCalledWith('/abc/home', { scroll: false });
+  });
+
+  it('passes on the type, description and duration the list gives', () => {
+    mocks.search = 'notice=email-change-step';
+    render(<NoticeToast />);
+
+    expect(mocks.add).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'info',
+        title: 'Link confirmed.',
+        description: expect.stringMatching(/other address/i),
+        timeout: 12000,
+        priority: 'low',
+      }),
+    );
   });
 
   it('keeps the other parameters when it removes its own', () => {

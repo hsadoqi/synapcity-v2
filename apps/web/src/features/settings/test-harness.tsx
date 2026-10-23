@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import {
+  fireEvent,
   render,
   screen,
   waitFor,
@@ -76,3 +77,10 @@ export async function renderWithSettings(ui: ReactNode): Promise<RenderResult> {
 /** The settings the provider currently holds, as parsed JSON. */
 export const currentSettings = () =>
   JSON.parse(screen.getByTestId('settings').textContent!);
+
+/**
+ * Saves the tab's draft. Changes wait in the draft until saved, and one save
+ * writes them all; with one tab rendered, its button is the only one.
+ */
+export const saveTab = () =>
+  fireEvent.click(screen.getByRole('button', { name: 'Save changes' }));

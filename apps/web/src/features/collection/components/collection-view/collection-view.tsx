@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
 
 import {
@@ -20,10 +21,17 @@ import {
   CollectionLoading,
   CollectionNoResults,
 } from '../collection-states';
-import { ActiveFilters, CollectionToolbar } from '../collection-toolbar';
+import {
+  ActiveFilters,
+  CollectionTagChips,
+  CollectionToolbar,
+} from '../collection-toolbar';
 import { CollectionGrid } from './collection-grid';
 import { CollectionHeader } from './collection-header';
 import { CollectionList } from './collection-list';
+
+/** How many tags get a chip; any others are in the filter menu. */
+const TAG_CHIP_LIMIT = 8;
 
 export type CollectionViewProps = {
   /** How to name the items: "document" / "Documents". */
@@ -34,6 +42,15 @@ export type CollectionViewProps = {
   context?: string;
   /** Turns on the group filter and shows each item's group. Omit to hide both. */
   grouping?: CollectionGrouping;
+  /**
+   * Every tag in use, most used first. Turns on the tag filter: a short row of
+   * chips under the toolbar and a Tags submenu in the filter menu.
+   */
+  tagOptions?: string[];
+  /** Which actions the item menu offers. Omit for all of them. */
+  actions?: CollectionItemAction[];
+  /** Content for the card shown when an item's icon is hovered. Omit for none. */
+  renderPreview?: (item: CollectionItem) => ReactNode;
   emptyState: CollectionEmptyCopy;
   items: CollectionItem[];
   state: CollectionState;
@@ -45,8 +62,13 @@ export type CollectionViewProps = {
   onSortChange: (sort: CollectionSort) => void;
   layout: CollectionLayout;
   onLayoutChange: (layout: CollectionLayout) => void;
-  onCreate: () => void;
+  /** Without it the view offers no create button, since one that does nothing is worse than none. */
+  onCreate?: () => void;
+  /** The section title when it should not be the plural, e.g. "All spaces" under a page titled "Spaces". */
+  heading?: string;
   onItemAction?: (action: CollectionItemAction, item: CollectionItem) => void;
+  /** Whose home the toolbar's "View all" link goes to. Omit to hide the link. */
+  userId?: string;
   now?: Date;
 };
 
@@ -56,7 +78,7 @@ export type CollectionViewProps = {
  */
 export type CollectionViewConfig = Pick<
   CollectionViewProps,
-  'labels' | 'icon' | 'context' | 'grouping' | 'emptyState'
+  'labels' | 'icon' | 'context' | 'grouping' | 'tagOptions' | 'emptyState'
 >;
 
 export function CollectionView({
@@ -64,6 +86,9 @@ export function CollectionView({
   icon,
   context,
   grouping,
+  tagOptions,
+  actions,
+  renderPreview,
   emptyState,
   items,
   state,
@@ -76,9 +101,16 @@ export function CollectionView({
   layout,
   onLayoutChange,
   onCreate,
+  heading,
   onItemAction = () => {},
+  userId,
   now = new Date(),
 }: CollectionViewProps) {
+  // Without a signed-in user there is no route to link to.
+  const viewAllHref = userId
+    ? `/${userId}/home/${labels.plural.toLowerCase()}`
+    : undefined;
+
   const itemProps = {
     icon,
     singular: labels.singular,
@@ -86,6 +118,8 @@ export function CollectionView({
     showGroup: grouping !== undefined,
     now,
     onItemAction,
+    actions,
+    renderPreview,
   };
 
   return (
@@ -95,6 +129,7 @@ export function CollectionView({
         context={context}
         count={state === 'populated' ? items.length : 0}
         loading={state === 'loading'}
+        heading={heading}
       />
 
       <div className="flex flex-col gap-3">
@@ -102,6 +137,7 @@ export function CollectionView({
           labels={labels}
           context={context}
           grouping={grouping}
+          tagOptions={tagOptions?.slice(TAG_CHIP_LIMIT)}
           query={query}
           onQueryChange={onQueryChange}
           filters={filters}
@@ -110,8 +146,16 @@ export function CollectionView({
           onSortChange={onSortChange}
           layout={layout}
           onLayoutChange={onLayoutChange}
-          onCreate={onCreate}
+          viewAllHref={viewAllHref}
         />
+        {tagOptions && (
+          <CollectionTagChips
+            tags={tagOptions}
+            limit={TAG_CHIP_LIMIT}
+            filters={filters}
+            onFiltersChange={onFiltersChange}
+          />
+        )}
         <ActiveFilters filters={filters} onFiltersChange={onFiltersChange} />
       </div>
 
@@ -128,7 +172,7 @@ export function CollectionView({
 
       {state === 'no-results' && (
         <CollectionNoResults
-          singular={labels.singular}
+          plural={labels.plural}
           query={query}
           hasFilters={hasActiveFilters(filters)}
           onClearQuery={() => onQueryChange('')}

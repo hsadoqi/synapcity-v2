@@ -72,10 +72,10 @@ describe('SidebarShell', () => {
     expect(
       document
         .querySelector('[data-slot="global-panel-scroll"]')
-        ?.contains(document.querySelector('[data-slot="shell-page-scroll"]')),
+        ?.contains(document.querySelector('[data-slot="shell-page"]')),
     ).toBe(false);
     expect(
-      document.querySelector('[data-slot="shell-page-scroll"]')?.textContent,
+      document.querySelector('[data-slot="shell-page"]')?.textContent,
     ).toBe('Page');
   });
 });

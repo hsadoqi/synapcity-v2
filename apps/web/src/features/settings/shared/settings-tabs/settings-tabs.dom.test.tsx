@@ -19,7 +19,7 @@ const tab = (value: string) => tabs.find((entry) => entry.value === value)!;
 
 // Each tab loads lazily, and these tests wait up to 5 s for it. The test's own
 // limit must be longer, or a slow machine cuts it off before that wait ends.
-const LOADING_TIMEOUT = 15_000;
+const LOADING_TIMEOUT = 30_000;
 // How long to wait for a lazily loaded tab; stays under the test timeout.
 const FIND_TIMEOUT = 10_000;
 

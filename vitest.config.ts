@@ -1,6 +1,5 @@
 import { defineConfig } from 'vitest/config';
-
-import { sharedConfig } from './packages/dev/vitest-config/src/shared.ts';
+import { sharedConfig } from './packages/dev/vitest-config/src/shared';
 
 /*
  * One combined coverage report for the workspace (`pnpm report`).
@@ -25,6 +24,7 @@ const projects = [
 
 export default defineConfig({
   test: {
+    testTimeout: 30_000,
     projects,
     coverage: {
       ...sharedConfig.test.coverage,

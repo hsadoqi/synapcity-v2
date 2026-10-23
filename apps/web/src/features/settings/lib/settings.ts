@@ -10,6 +10,7 @@ import {
   type TransferSettingsPatch,
 } from '../types/import-export';
 import { withCurrentPolicy } from '../types/data-privacy';
+import { legacyFontSizes } from '../types/theme';
 
 export function mergeSettings(value: Settings, patch: SettingsPatch): Settings {
   const mode =
@@ -118,7 +119,21 @@ export function parseImportPatch(input: unknown) {
       }
     } else if (Object.hasOwn(transferSchema.shape, key) && isRecord(value)) {
       for (const [field, item] of Object.entries(value)) {
-        if (key === 'privacy' && Object.hasOwn(legacyPrivacyFields, field)) {
+        if (key === 'appearance' && field === 'fontSize') {
+          // As above, the current setting takes precedence over the old one.
+          if (isRecord(input.theme) && Object.hasOwn(input.theme, 'textSize')) {
+            ignored.push(`${key}.${field}`);
+            continue;
+          }
+          const size =
+            typeof item === 'string' && Object.hasOwn(legacyFontSizes, item)
+              ? legacyFontSizes[item as keyof typeof legacyFontSizes]
+              : undefined;
+          accept('theme', 'textSize', size, `${key}.${field}`);
+        } else if (
+          key === 'privacy' &&
+          Object.hasOwn(legacyPrivacyFields, field)
+        ) {
           const renamed =
             legacyPrivacyFields[field as keyof typeof legacyPrivacyFields];
           // As above, the current name takes precedence over the old one.

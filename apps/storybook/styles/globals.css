@@ -1,16 +1,16 @@
 @import 'tailwindcss';
-@import 'shadcn/tailwind.css';
 @import '@synapcity/frontend-ui/styles.css';
 
-@source '../../';
-@source '../../../packages/frontend/ui/src';
-@source '../../docs/src';
-@source '../../web/src';
+@source '../';
+@source '../../../packages/frontend/ui/src/blocks/';
+@source '../../../packages/frontend/ui/src/components/';
+@source '../../docs/src/';
+@source '../../web/src/';
 
 /* The theme addon puts `light` or `dark` on <html>; paint the canvas and docs pages from the
  * semantic tokens so both modes match the app. */
 .light,
 .dark,
 .docs-story {
-  @apply bg-(--background) text-(--foreground);
+  @apply bg-background text-foreground;
 }

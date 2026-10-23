@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { BoldIcon } from 'lucide-react';
 
-import { Toggle } from '@synapcity/frontend-ui/core/toggle';
+import { Toggle } from '@synapcity/frontend-ui/components/ui/toggle';
 
 const meta: Meta<typeof Toggle> = {
   title: 'Components/Toggle',

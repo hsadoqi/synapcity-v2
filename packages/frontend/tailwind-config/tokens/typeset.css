@@ -5,13 +5,16 @@
  * Vendored upstream: the em-relative spacing and the highlight colour are deliberate typographic
  * values that scale with the typeset size, so they are kept as shipped rather than mapped to the
  * app's spacing scale or colour tokens.
+ *
+ * One deliberate difference from upstream: --typeset-font-mono reads --font-code, not --font-mono,
+ * so code inside .typeset follows the user's code-font preference like the rest of the app.
  */
 
 @layer components {
   .typeset {
     --typeset-font-body: inherit;
     --typeset-font-heading: var(--font-heading);
-    --typeset-font-mono: var(--font-mono);
+    --typeset-font-mono: var(--font-code);
     --typeset-size: 1em;
     --typeset-leading: 1.75;
     --typeset-flow: 1.25em;

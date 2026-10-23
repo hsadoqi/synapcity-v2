@@ -9,6 +9,7 @@ import {
   type FontRole,
 } from '../../../types/fonts';
 import { usePreviewFont } from '../../../hooks/use-preview-font';
+import { PreviewFigure } from '../preview-figure';
 
 const roleStyles: Record<FontRole, string> = {
   heading: 'font-heading text-xl font-semibold tracking-tight',
@@ -25,8 +26,8 @@ const roleNames: Record<FontRole, string> = {
 /**
  * One sentence set in `font`, the role's chosen but not yet saved font. It sets
  * the role's `--font-preference-*` on itself only, so it shows the choice while
- * the rest of the page keeps the saved font. The dashed, indented frame and the
- * "Preview" label mark it as a sample, not content.
+ * the rest of the page keeps the saved font. `PreviewFigure` marks it as a
+ * sample, not content.
  */
 export function FontPreview({
   role,
@@ -44,20 +45,16 @@ export function FontPreview({
     [fontPreferenceVariables[role]]: previewFontValue(font),
   };
   return (
-    <figure
-      aria-label={`${roleNames[role]} font preview`}
-      className="ms-4 flex flex-col gap-1.5 rounded-md border border-dashed border-border bg-muted/30 px-4 py-3"
+    <PreviewFigure
+      label={`${roleNames[role]} font preview`}
       style={fontVariable}
     >
-      <figcaption className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-        Preview
-      </figcaption>
       <p className={cn('text-foreground', roleStyles[role])}>{children}</p>
       {failed && font !== 'default' ? (
         <p className="text-xs text-destructive">
           {`${googleFonts[font].label} couldn’t be loaded from Google Fonts, so this sample uses a fallback font.`}
         </p>
       ) : null}
-    </figure>
+    </PreviewFigure>
   );
 }

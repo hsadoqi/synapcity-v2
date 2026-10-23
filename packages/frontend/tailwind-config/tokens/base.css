@@ -9,8 +9,19 @@
 
 @layer base {
   :root {
-    --radius-base: 0.25rem;
+    /* The two units the Theme tab's Corner radius and Density scale (preferences.css). They are
+       what the app used before those settings existed, so the default presets change nothing. */
+    --radius-unit: 0.25rem;
+    --spacing-unit: 0.25rem;
+    --radius-base: var(--radius-unit);
     --radius: var(--radius-base);
+  }
+
+  /* :root is light, so a page with no theme class (JavaScript off, or before the theme script
+     runs) still has every role defined. Below, the system's dark preference overrides that
+     only while neither class is present; a class always wins. */
+  :root,
+  .light {
     @apply theme-light;
   }
 
@@ -18,10 +29,6 @@
     :root:not(.light):not(.dark) {
       @apply theme-dark;
     }
-  }
-
-  .light {
-    @apply theme-light;
   }
 
   .dark {

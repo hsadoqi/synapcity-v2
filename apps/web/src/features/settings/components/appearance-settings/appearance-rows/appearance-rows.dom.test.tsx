@@ -5,7 +5,6 @@ import { stubBrowser } from '../../../test-harness';
 import {
   ContrastModeRow,
   EnableAnimationsRow,
-  FontSizeRow,
   ReducedMotionRow,
   ShowBordersRow,
 } from '../appearance-rows';
@@ -85,11 +84,6 @@ function expectSelect(id: string, label: string, shown: string) {
 }
 
 describe('select rows', () => {
-  it('names the text size select and shows the current choice', () => {
-    render(<FontSizeRow value="medium" onChange={() => {}} />);
-    expectSelect('font-size', 'Text size', 'Medium');
-  });
-
   it('names the contrast select and shows the current choice', () => {
     render(<ContrastModeRow value="none" onChange={() => {}} />);
     expectSelect('contrast', 'Contrast', 'Standard');

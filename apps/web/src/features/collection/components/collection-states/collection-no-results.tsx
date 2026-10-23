@@ -13,7 +13,7 @@ import {
 } from '@synapcity/frontend-ui/core/empty';
 
 type CollectionNoResultsProps = {
-  singular: string;
+  plural: string;
   query: string;
   hasFilters: boolean;
   onClearQuery: () => void;
@@ -21,7 +21,7 @@ type CollectionNoResultsProps = {
 };
 
 export function CollectionNoResults({
-  singular,
+  plural,
   query,
   hasFilters,
   onClearQuery,
@@ -42,8 +42,8 @@ export function CollectionNoResults({
         </EmptyTitle>
         <EmptyDescription>
           {trimmed
-            ? `No ${singular}s turned up for that search. Try a softer word, or check the spelling.`
-            : `No ${singular}s fit every filter at once. Loosening one usually helps.`}
+            ? `No ${plural.toLowerCase()} turned up for that search. Try a softer word, or check the spelling.`
+            : `No ${plural.toLowerCase()} fit every filter at once. Loosening one usually helps.`}
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent className="flex-row justify-center">

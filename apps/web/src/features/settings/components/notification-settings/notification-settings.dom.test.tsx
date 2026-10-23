@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   currentSettings,
   renderWithSettings,
+  saveTab,
   stubBrowser,
 } from '../../test-harness';
 import {
@@ -81,6 +82,7 @@ describe('NotificationSettings', () => {
       await act(async () => {
         fireEvent.click(screen.getByRole('switch', { name: names[kind] }));
       });
+      saveTab();
 
       expect(currentSettings().notifications).toEqual({
         ...before,
@@ -103,6 +105,7 @@ describe('push notifications and browser permission', () => {
     await act(async () => {
       fireEvent.click(pushSwitch());
     });
+    saveTab();
 
     expect(requestPermission).toHaveBeenCalledOnce();
     expect(currentSettings().notifications.push).toBe(true);
@@ -158,5 +161,32 @@ describe('push notifications and browser permission', () => {
     expect(
       document.getElementById('notifications-push-description')?.textContent,
     ).toMatch(/cannot show notifications/);
+  });
+});
+
+describe('resetting one notification', () => {
+  it('puts the default back in the draft, for Save to keep', async () => {
+    await renderWithSettings(<NotificationSettings />);
+    const sound = () =>
+      screen.getByRole('switch', { name: 'Notification sounds' });
+    const before = currentSettings().notifications.sound;
+
+    fireEvent.click(sound());
+    saveTab();
+    expect(currentSettings().notifications.sound).toBe(!before);
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Reset Notification sounds' }),
+    );
+    // In the draft only: the switch shows the default, nothing is saved yet.
+    expect(sound().getAttribute('aria-checked')).toBe(String(before));
+    expect(currentSettings().notifications.sound).toBe(!before);
+    expect(screen.getByText('Unsaved:')).toBeTruthy();
+
+    saveTab();
+    expect(currentSettings().notifications.sound).toBe(before);
+    expect(
+      screen.queryByRole('button', { name: 'Reset Notification sounds' }),
+    ).toBeNull();
   });
 });

@@ -73,7 +73,7 @@ describe('RootShell', () => {
     expect(
       document.querySelector('[data-slot="authenticated-shell"]'),
     ).toBeNull();
-    expect(screen.queryByRole('button', { name: /navigation$/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Open sidebar' })).toBeNull();
   });
 
   it('is the public shell when the account is null', () => {
@@ -88,7 +88,7 @@ describe('RootShell', () => {
     expect(
       document.querySelector('[data-slot="authenticated-shell"]'),
     ).not.toBeNull();
-    expect(screen.getByRole('button', { name: /navigation$/ })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Open sidebar' })).toBeTruthy();
   });
 
   it('renders header actions', () => {

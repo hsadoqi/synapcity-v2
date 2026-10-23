@@ -27,7 +27,7 @@ describe('AccountPreferencesSync (ADR-0010, every page)', () => {
       KEY,
       JSON.stringify({
         ...settingsDefaults,
-        appearance: { ...settingsDefaults.appearance, fontSize: 'small' },
+        appearance: { ...settingsDefaults.appearance, contrastMode: 'low' },
       }),
     );
     render(<AccountPreferencesSync preferences={accountPart(account)} />);
@@ -40,8 +40,8 @@ describe('AccountPreferencesSync (ADR-0010, every page)', () => {
     expect(cached().regional.language).toBe('de');
     expect(cached().theme.headingFont).toBe('fraunces');
     // Device-only settings stay this browser's own.
-    expect(cached().appearance.fontSize).toBe('small');
-    expect(html.dataset.fontSize).toBe('small');
+    expect(cached().appearance.contrastMode).toBe('low');
+    expect(html.dataset.contrast).toBe('low');
   });
 
   it("applies the display override and sets this device's own values aside", () => {
@@ -49,7 +49,7 @@ describe('AccountPreferencesSync (ADR-0010, every page)', () => {
       KEY,
       JSON.stringify({
         ...settingsDefaults,
-        appearance: { ...settingsDefaults.appearance, fontSize: 'small' },
+        appearance: { ...settingsDefaults.appearance, contrastMode: 'low' },
       }),
     );
     render(
@@ -58,16 +58,14 @@ describe('AccountPreferencesSync (ADR-0010, every page)', () => {
           animationsEnabled: true,
           reducedMotion: false,
           contrastMode: 'high',
-          fontSize: 'large',
           showBorders: false,
         })}
       />,
     );
 
-    expect(html.dataset.fontSize).toBe('large');
     expect(html.dataset.contrast).toBe('high');
-    expect(JSON.parse(localStorage.getItem(SET_ASIDE_KEY)!).fontSize).toBe(
-      'small',
+    expect(JSON.parse(localStorage.getItem(SET_ASIDE_KEY)!).contrastMode).toBe(
+      'low',
     );
   });
 

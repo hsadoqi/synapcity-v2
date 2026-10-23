@@ -2,7 +2,7 @@ import { act, fireEvent, renderHook, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { DataPrivacySettings } from '../components/data-privacy-settings';
-import { renderWithSettings, stubBrowser } from '../test-harness';
+import { renderWithSettings, stubBrowser, saveTab } from '../test-harness';
 import { PRIVACY_POLICY_VERSIONS } from '../types/data-privacy';
 import { useCanCollect } from './use-can-collect';
 
@@ -50,8 +50,10 @@ describe('useCanCollect', () => {
     const toggle = screen.getByRole('switch', { name: 'Error reports' });
 
     fireEvent.click(toggle);
+    saveTab();
     expect(result.current).toBe(true);
     fireEvent.click(toggle);
+    saveTab();
     expect(result.current).toBe(false);
   });
 

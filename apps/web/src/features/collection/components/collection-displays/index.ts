@@ -4,3 +4,6 @@ export * from './display-props';
 export * from './featured-items';
 export * from './item-chips';
 export * from './item-kind';
+export * from './collection-highlights';
+export * from './pinned-panel';
+export * from './recent-carousel';

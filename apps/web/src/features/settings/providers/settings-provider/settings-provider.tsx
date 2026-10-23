@@ -30,6 +30,7 @@ import {
   type DisplaySettings,
 } from '../../lib/scope';
 import { applyFontPreferences } from '../../shared/font-preferences';
+import { applyThemeShape } from '../../shared/theme-shape';
 import { settingsDefaults } from '../../types/settings';
 import type { Settings, SettingsPatch } from '../../types';
 import { themeSchema } from '../../types/theme';
@@ -205,13 +206,8 @@ export function SettingsProvider({
     }
   }, [persist]);
 
-  const {
-    animationsEnabled,
-    showBorders,
-    reducedMotion,
-    contrastMode,
-    fontSize,
-  } = appearance;
+  const { animationsEnabled, showBorders, reducedMotion, contrastMode } =
+    appearance;
   useEffect(() => {
     // Wait for the saved settings: until then these are the defaults, and
     // applying them would undo what the boot script set before first paint.
@@ -223,16 +219,8 @@ export function SettingsProvider({
       showBorders,
       reducedMotion,
       contrastMode,
-      fontSize,
     });
-  }, [
-    isReady,
-    animationsEnabled,
-    showBorders,
-    reducedMotion,
-    contrastMode,
-    fontSize,
-  ]);
+  }, [isReady, animationsEnabled, showBorders, reducedMotion, contrastMode]);
 
   const { headingFont, bodyFont, codeFont } = settings.theme;
   useEffect(() => {
@@ -245,6 +233,15 @@ export function SettingsProvider({
       codeFont,
     });
   }, [isReady, headingFont, bodyFont, codeFont]);
+
+  const { radius, density, textSize } = settings.theme;
+  useEffect(() => {
+    // Same wait as above: the default shape must not undo the saved one.
+    if (!isReady) return;
+    // Styled by tokens/preferences.css; the boot script in the root layout sets
+    // the same attributes before first paint.
+    applyThemeShape(document.documentElement, { radius, density, textSize });
+  }, [isReady, radius, density, textSize]);
 
   const { language } = settings.regional;
   useEffect(() => {

@@ -1,4 +1,9 @@
+/* Hides the scrollbar but keeps scrolling: all three declarations are needed, one per engine
+ * family (legacy Edge, Firefox and current Chromium, WebKit). */
 @utility scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
   &::-webkit-scrollbar {
     display: none;
   }
@@ -13,29 +18,25 @@
   bottom: calc(--spacing(4) + env(safe-area-inset-bottom));
 }
 
-@utility theme-light {
-  color-scheme: light;
+/* What both themes derive the same way from their own roles. Applied inside each theme, not
+ * declared once on :root: a var() resolves where it is declared, so a nested .dark preview inside
+ * a light page must re-declare these against its own roles or it would inherit the page's. */
+@utility theme-derived {
   --background: var(--base-background);
   --foreground: var(--base-foreground);
-  /* Literals, like theme-dark: surfaces stay fixed if a ramp is rethemed. */
-  --card: oklch(100% 0 0);
-  --card-foreground: var(--base-foreground);
-  --popover: oklch(100% 0 0);
-  --popover-foreground: var(--base-foreground);
-  --destructive: oklch(45% 0.245 27.325);
-  --destructive-foreground: var(--base-50);
-  --success: oklch(46% 0.15 145);
-  --success-foreground: var(--base-50);
-  --warning: oklch(82% 0.16 85);
-  --warning-foreground: var(--base-900);
-  --info: oklch(48% 0.16 250);
-  --info-foreground: var(--base-50);
+  --card-foreground: var(--foreground);
+  --popover-foreground: var(--foreground);
   --border: var(--muted);
   --divider: var(--muted-foreground);
-  --input: var(--muted-background);
+  /* Field borders need 3:1 against the card (WCAG 1.4.11), so they mix their own mid grey
+     rather than borrow --muted-background, which is near the page colour. Near L 61% in light,
+     52% in dark; e2e/theme-tokens.e2e.ts measures it. */
+  --input: color-mix(
+    in oklch,
+    var(--base-foreground) 45%,
+    var(--base-background)
+  );
   --ring: var(--base);
-  --link: var(--base-600);
-  --sidebar: var(--base-50);
   --sidebar-foreground: var(--foreground);
   --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: var(--primary-foreground);
@@ -45,15 +46,83 @@
   --sidebar-ring: var(--ring);
 }
 
+/* Each theme is defined once, here: the roles that read the ramps in colors.css, then the
+ * surfaces built on them. base.css applies theme-light to :root, .light and a nested preview,
+ * and theme-dark to .dark and to :root when the system prefers dark and no class is set, so
+ * every case reads the same values. Nothing is declared a second time for a fallback. */
+@utility theme-light {
+  color-scheme: light;
+  @apply theme-derived;
+  --base-foreground: var(--base-950);
+  --base-background: var(--base-50);
+  --primary-foreground: var(--primary-950);
+  --primary-background: var(--primary-50);
+  /* The 500 step under 950 text is 4.18:1 on the neutral ramp, just under AA. Light fills sit
+     one step lighter, at 400 (about 7.6:1). Dark keeps 500 (4.53:1 under 50 text). */
+  --primary: var(--primary-400);
+  --accent: var(--accent-400);
+  --secondary: var(--secondary-400);
+  --accent-foreground: var(--accent-950);
+  --accent-background: var(--accent-100);
+  --secondary-foreground: var(--secondary-950);
+  --secondary-background: var(--secondary-50);
+  --muted: var(--base-200);
+  /* Mixed from this theme's own ink and page, so they hold if a ramp is
+     rethemed. Muted text is about 5.9:1 on the page. */
+  --muted-foreground: color-mix(
+    in oklch,
+    var(--base-foreground) 55%,
+    var(--muted)
+  );
+  --muted-background: color-mix(
+    in oklch,
+    var(--base-background) 45%,
+    var(--muted)
+  );
+  /* Literals, like theme-dark: surfaces stay fixed if a ramp is rethemed. */
+  --card: oklch(100% 0 0);
+  --popover: oklch(100% 0 0);
+  --destructive: oklch(45% 0.245 27.325);
+  --destructive-foreground: var(--base-50);
+  --success: oklch(46% 0.15 145);
+  --success-foreground: var(--base-50);
+  --warning: oklch(82% 0.16 85);
+  --warning-foreground: var(--base-900);
+  --info: oklch(48% 0.16 250);
+  --info-foreground: var(--base-50);
+  --link: var(--base-600);
+  --sidebar: var(--base-50);
+}
+
 @utility theme-dark {
   color-scheme: dark;
-  --background: var(--base-background);
-  --foreground: var(--base-foreground);
+  @apply theme-derived;
+  --base-foreground: var(--base-50);
+  --base-background: var(--base-950);
+  --primary-foreground: var(--primary-50);
+  --primary-background: var(--primary-950);
+  --primary: var(--primary-500);
+  --accent: var(--accent-500);
+  --secondary: var(--secondary-500);
+  --accent-foreground: var(--accent-50);
+  --accent-background: var(--accent-950);
+  --secondary-foreground: var(--secondary-50);
+  --secondary-background: var(--secondary-950);
+  --muted: var(--base-800);
+  /* Muted text is about 8.9:1 on the page. */
+  --muted-foreground: color-mix(
+    in oklch,
+    var(--base-foreground) 67%,
+    var(--muted)
+  );
+  --muted-background: color-mix(
+    in oklch,
+    var(--base-background) 45%,
+    var(--muted)
+  );
   /* Literals so surfaces stay fixed if a ramp is overridden with a brand colour. */
   --card: oklch(20.5% 0 0);
-  --card-foreground: var(--foreground);
   --popover: oklch(20.5% 0 0);
-  --popover-foreground: var(--foreground);
   --destructive: oklch(76% 0.191 22.216);
   --destructive-foreground: var(--base-950);
   --success: oklch(72% 0.14 145);
@@ -62,19 +131,8 @@
   --warning-foreground: var(--base-950);
   --info: oklch(70% 0.14 250);
   --info-foreground: var(--base-950);
-  --border: var(--muted);
-  --divider: var(--muted-foreground);
-  --input: var(--muted-background);
-  --ring: var(--base);
   --link: var(--base-400);
   --sidebar: var(--base-900);
-  --sidebar-foreground: var(--foreground);
-  --sidebar-primary: var(--primary);
-  --sidebar-primary-foreground: var(--primary-foreground);
-  --sidebar-accent: var(--accent);
-  --sidebar-accent-foreground: var(--accent-foreground);
-  --sidebar-border: var(--divider);
-  --sidebar-ring: var(--ring);
 }
 
 @utility bg-selected {

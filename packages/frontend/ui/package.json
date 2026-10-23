@@ -12,7 +12,8 @@
     "./components/*": "./src/components/*/index.ts",
     "./providers/*": "./src/providers/*/index.ts",
     "./blocks": "./src/blocks/index.ts",
-    "./blocks/*": "./src/blocks/*/index.ts"
+    "./blocks/*": "./src/blocks/*/index.ts",
+    "./types/*": "./src/types/*.ts"
   },
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
@@ -54,6 +55,7 @@
     "next-themes": "^0.4.6",
     "react": "19.3.0",
     "react-resizable-panels": "4.14.5",
-    "shadcn": "^4.21.4"
+    "shadcn": "^4.21.4",
+    "zod": "^4.6.7"
   }
 }

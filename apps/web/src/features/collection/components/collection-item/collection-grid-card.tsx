@@ -4,7 +4,7 @@ import { Badge } from '@synapcity/frontend-ui/core/badge';
 
 import { formatUpdated } from '../../shared';
 import { ItemActionsMenu } from './item-actions-menu';
-import { ItemIcon } from './item-icon';
+import { ItemIconPreview } from './item-icon-preview';
 import { ItemOpenButton } from './item-open-button';
 import type { CollectionItemCardProps } from './item-props';
 import { PinnedMark } from './pinned-mark';
@@ -16,15 +16,22 @@ export function CollectionGridCard({
   showGroup,
   now,
   onItemAction,
+  actions,
+  renderPreview,
 }: CollectionItemCardProps) {
   return (
-    <li className="group relative flex flex-col gap-3 rounded-md border border-border bg-card p-4 text-card-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-muted-foreground/40 hover:shadow-xs has-focus-visible:-translate-y-0.5">
+    <li className="relative flex flex-col gap-3 rounded-md border border-border bg-card p-4 text-card-foreground transition-colors hover:bg-muted/50 motion-reduce:transition-none">
       <div className="flex items-start gap-3">
-        <ItemIcon icon={icon} />
+        <ItemIconPreview
+          item={item}
+          icon={icon}
+          renderPreview={renderPreview}
+        />
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <div className="flex items-center gap-2">
             <ItemOpenButton
               title={item.title}
+              href={item.href}
               onOpen={() => onItemAction('open', item)}
             />
             {item.pinned && <PinnedMark />}
@@ -39,6 +46,7 @@ export function CollectionGridCard({
           item={item}
           singular={singular}
           onAction={onItemAction}
+          actions={actions}
         />
       </div>
 
@@ -54,6 +62,12 @@ export function CollectionGridCard({
 
       <p className="mt-auto flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
         <span className="shrink-0">{formatUpdated(item.updatedAt, now)}</span>
+        {item.detail && (
+          <>
+            <span aria-hidden="true">·</span>
+            <span className="truncate">{item.detail}</span>
+          </>
+        )}
         {showGroup && item.group && (
           <>
             <span aria-hidden="true">·</span>

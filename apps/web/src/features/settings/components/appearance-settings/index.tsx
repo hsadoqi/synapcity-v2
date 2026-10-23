@@ -1,77 +1,84 @@
 'use client';
 
 import { FieldGroup } from '@synapcity/frontend-ui/core/field';
-import { Separator } from '@synapcity/frontend-ui/core/separator';
-import { useAppearanceSettings } from '../../hooks/use-appearance-settings';
+import { useSettingsDraft } from '../../hooks/use-settings-draft';
 import { useSettings } from '../../hooks/use-settings';
-import { SettingsSection, SettingsTabShell } from '../../shared';
+import {
+  SettingsAccordion,
+  SettingsAccordionItem,
+  SettingsTabShell,
+} from '../../shared';
 import {
   AllDevicesRow,
   ContrastModeRow,
   EnableAnimationsRow,
-  FontSizeRow,
   ReducedMotionRow,
   ShowBordersRow,
 } from './appearance-rows';
 
 // `appearance.colorScheme` is not shown: it mirrors the Color theme chosen in
-// the Theme tab, which owns it.
+// the Theme tab, which owns it. Text size is chosen there too. Reset covers
+// only what this tab shows.
+const displayFields = [
+  'contrastMode',
+  'showBorders',
+  'animationsEnabled',
+  'reducedMotion',
+] as const;
+
 export function AppearanceSettings() {
-  const { appearance, updateAppearance } = useAppearanceSettings();
+  const draft = useSettingsDraft('appearance', { fields: displayFields });
+  const appearance = draft.draft;
+  const updateAppearance = draft.change;
   const { syncsToAccount, displayOnAllDevices, setDisplayOnAllDevices } =
     useSettings();
 
   return (
     <SettingsTabShell
       title="Display"
-      description="Text size, contrast and motion across the app."
+      description="Contrast and motion across the app."
+      draft={draft}
     >
-      <SettingsSection title="Readability">
-        <FieldGroup>
-          <FontSizeRow
-            value={appearance.fontSize}
-            onChange={(fontSize) => updateAppearance({ fontSize })}
-          />
-          <ContrastModeRow
-            value={appearance.contrastMode}
-            onChange={(contrastMode) => updateAppearance({ contrastMode })}
-          />
-          <ShowBordersRow
-            highContrast={appearance.contrastMode === 'high'}
-            value={appearance.showBorders}
-            onChange={(showBorders) => updateAppearance({ showBorders })}
-          />
-        </FieldGroup>
-      </SettingsSection>
-      <Separator />
-      <SettingsSection title="Motion">
-        <FieldGroup>
-          <EnableAnimationsRow
-            value={appearance.animationsEnabled}
-            onChange={(animationsEnabled) =>
-              updateAppearance({ animationsEnabled })
-            }
-          />
-          <ReducedMotionRow
-            animationsOff={!appearance.animationsEnabled}
-            value={appearance.reducedMotion}
-            onChange={(reducedMotion) => updateAppearance({ reducedMotion })}
-          />
-        </FieldGroup>
-      </SettingsSection>
-      {syncsToAccount && (
-        <>
-          <Separator />
-          <SettingsSection title="Devices">
+      <SettingsAccordion>
+        <SettingsAccordionItem value="readability" title="Readability">
+          <FieldGroup>
+            <ContrastModeRow
+              value={appearance.contrastMode}
+              onChange={(contrastMode) => updateAppearance({ contrastMode })}
+            />
+            <ShowBordersRow
+              highContrast={appearance.contrastMode === 'high'}
+              value={appearance.showBorders}
+              onChange={(showBorders) => updateAppearance({ showBorders })}
+            />
+          </FieldGroup>
+        </SettingsAccordionItem>
+        <SettingsAccordionItem value="motion" title="Motion">
+          <FieldGroup>
+            <EnableAnimationsRow
+              value={appearance.animationsEnabled}
+              onChange={(animationsEnabled) =>
+                updateAppearance({ animationsEnabled })
+              }
+            />
+            <ReducedMotionRow
+              animationsOff={!appearance.animationsEnabled}
+              value={appearance.reducedMotion}
+              onChange={(reducedMotion) => updateAppearance({ reducedMotion })}
+            />
+          </FieldGroup>
+        </SettingsAccordionItem>
+        {syncsToAccount && (
+          <SettingsAccordionItem value="devices" title="Devices">
             <FieldGroup>
               <AllDevicesRow
                 value={displayOnAllDevices}
                 onChange={setDisplayOnAllDevices}
               />
             </FieldGroup>
-          </SettingsSection>
-        </>
-      )}
+          </SettingsAccordionItem>
+        )}
+      </SettingsAccordion>
     </SettingsTabShell>
   );
 }

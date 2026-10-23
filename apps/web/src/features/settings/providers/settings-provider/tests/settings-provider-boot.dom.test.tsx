@@ -37,12 +37,12 @@ describe('SettingsProvider after the boot scripts', () => {
   it('keeps the saved appearance attributes while it restores them', async () => {
     localStorage.setItem(
       PREFERENCES_STORAGE_KEY,
-      JSON.stringify({ appearance: { fontSize: 'large' } }),
+      JSON.stringify({ appearance: { contrastMode: 'high' } }),
     );
-    document.documentElement.dataset.fontSize = 'large';
+    document.documentElement.dataset.contrast = 'high';
     const seen: (string | undefined)[] = [];
     const observer = new MutationObserver(() =>
-      seen.push(document.documentElement.dataset.fontSize),
+      seen.push(document.documentElement.dataset.contrast),
     );
     observer.observe(document.documentElement, { attributes: true });
 
@@ -50,11 +50,11 @@ describe('SettingsProvider after the boot scripts', () => {
     seen.push(
       ...observer
         .takeRecords()
-        .map(() => document.documentElement.dataset.fontSize),
+        .map(() => document.documentElement.dataset.contrast),
     );
     observer.disconnect();
 
-    expect(seen).not.toContain('medium');
-    expect(document.documentElement.dataset.fontSize).toBe('large');
+    expect(seen).not.toContain('none');
+    expect(document.documentElement.dataset.contrast).toBe('high');
   });
 });

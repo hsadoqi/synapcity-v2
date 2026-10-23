@@ -15,8 +15,7 @@
     "@synapcity/frontend-ui": "workspace:*",
     "next": "16.4.0",
     "react": "19.3.0",
-    "react-dom": "19.3.0",
-    "shadcn": "^4.21.4"
+    "react-dom": "19.3.0"
   },
   "devDependencies": {
     "@storybook/addon-a11y": "10.6.1",

@@ -10,6 +10,8 @@ type RowProps<Key extends keyof AppearanceSettings> = {
 
 type SwitchRowProps = {
   id: string;
+  /** The display setting this switch edits; none for one outside the draft. */
+  field?: string;
   label: string;
   description: string;
   value: boolean;
@@ -24,6 +26,7 @@ type SwitchRowProps = {
 
 function SwitchRow({
   id,
+  field,
   label,
   description,
   value,
@@ -34,6 +37,8 @@ function SwitchRow({
   return (
     <SettingRow
       id={id}
+      field={field}
+      toggle
       label={label}
       description={supersededBy ?? description}
       disabled={superseded}
@@ -55,6 +60,7 @@ export const ShowBordersRow = ({
 }: RowProps<'showBorders'> & { highContrast?: boolean }) => (
   <SwitchRow
     id="borders"
+    field="showBorders"
     label="Show component borders"
     description="Give panels and controls a little more definition."
     supersededBy={
@@ -67,6 +73,7 @@ export const ShowBordersRow = ({
 export const EnableAnimationsRow = (props: RowProps<'animationsEnabled'>) => (
   <SwitchRow
     id="animations"
+    field="animationsEnabled"
     label="Enable animations"
     description="Use gentle transitions as you move around."
     {...props}
@@ -79,6 +86,7 @@ export const ReducedMotionRow = ({
 }: RowProps<'reducedMotion'> & { animationsOff?: boolean }) => (
   <SwitchRow
     id="reduced-motion"
+    field="reducedMotion"
     label="Reduce motion"
     description="Skip sliding and zooming. Fades and colour changes stay. Your device's own reduce-motion setting always applies as well."
     supersededBy={
@@ -102,27 +110,6 @@ export const AllDevicesRow = (props: {
   />
 );
 
-export const FontSizeRow = ({ value, onChange }: RowProps<'fontSize'>) => {
-  return (
-    <SettingRow
-      id="font-size"
-      label="Text size"
-      description="Make text across the app smaller or larger."
-    >
-      <SettingsSelect<AppearanceSettings['fontSize']>
-        id="font-size"
-        value={value}
-        onChange={onChange}
-        options={[
-          { value: 'small', label: 'Small' },
-          { value: 'medium', label: 'Medium' },
-          { value: 'large', label: 'Large' },
-        ]}
-      />
-    </SettingRow>
-  );
-};
-
 export const ContrastModeRow = ({
   value,
   onChange,
@@ -130,6 +117,7 @@ export const ContrastModeRow = ({
   return (
     <SettingRow
       id="contrast"
+      field="contrastMode"
       label="Contrast"
       description="Strengthen or soften the lines and secondary text."
     >

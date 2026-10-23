@@ -39,6 +39,9 @@ export const Variants: Story = {
       <Button {...args} variant="link">
         Link
       </Button>
+      <Button {...args} variant="subtle">
+        Subtle
+      </Button>
     </div>
   ),
 };

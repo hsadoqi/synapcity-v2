@@ -47,6 +47,7 @@ export function LanguageRow({ value, onChange }: RowProps<'language'>) {
   return (
     <SettingRow
       id="language"
+      field="language"
       label="Preferred language"
       description="Used to write out times. Menus and labels are in English."
     >
@@ -90,6 +91,7 @@ export function TimezoneRow({
   return (
     <SettingRow
       id="timezone"
+      field="timezone"
       label="Timezone"
       description="Use this timezone when displaying dates and times."
     >
@@ -117,16 +119,12 @@ export function TimeFormatRow({
   previewDate: Date | null;
 }) {
   const preview = previewDate
-    ? new Intl.DateTimeFormat(language, {
-        timeZone: resolveTimezone(timezone),
-        hour: 'numeric',
-        minute: '2-digit',
-        hourCycle: value === '12-hour' ? 'h12' : 'h23',
-      }).format(previewDate)
+    ? formatTime(previewDate, { timeFormat: value, timezone, language })
     : '…';
   return (
     <SettingRow
       id="time"
+      field="timeFormat"
       label="Time format"
       description={`Current time looks like: ${preview}`}
     >
@@ -152,27 +150,13 @@ export function DateFormatRow({
   timezone: RegionalSettings['timezone'];
   previewDate: Date | null;
 }) {
-  const parts = previewDate
-    ? new Intl.DateTimeFormat('en-US', {
-        timeZone: resolveTimezone(timezone),
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      }).formatToParts(previewDate)
-    : [];
-  const month = parts.find((part) => part.type === 'month')?.value;
-  const day = parts.find((part) => part.type === 'day')?.value;
-  const year = parts.find((part) => part.type === 'year')?.value;
-  const preview = !previewDate
-    ? '…'
-    : value === 'MM/DD/YYYY'
-      ? `${month}/${day}/${year}`
-      : value === 'DD/MM/YYYY'
-        ? `${day}/${month}/${year}`
-        : `${year}-${month}-${day}`;
+  const preview = previewDate
+    ? formatDate(previewDate, { dateFormat: value, timezone })
+    : '…';
   return (
     <SettingRow
       id="date"
+      field="dateFormat"
       label="Date format"
       description={`Today looks like: ${preview}`}
     >
@@ -197,6 +181,7 @@ export function FirstDayOfWeekRow({
   return (
     <SettingRow
       id="first-day-of-week"
+      field="firstDayOfWeek"
       label="First day of the week"
       description="Your preferred starting day for calendar weeks."
     >
@@ -229,21 +214,11 @@ const numberFormatParts: Record<
 };
 
 export function NumberFormatRow({ value, onChange }: RowProps<'numberFormat'>) {
-  const { group, decimal, grouping } = numberFormatParts[value];
-  const preview = new Intl.NumberFormat(grouping, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })
-    .formatToParts(1234567.89)
-    .map((part) => {
-      if (part.type === 'group') return group;
-      if (part.type === 'decimal') return decimal;
-      return part.value;
-    })
-    .join('');
+  const preview = formatNumber(value);
   return (
     <SettingRow
       id="number-format"
+      field="numberFormat"
       label="Number format"
       description={`An example number looks like: ${preview}`}
     >
@@ -258,4 +233,61 @@ export function NumberFormatRow({ value, onChange }: RowProps<'numberFormat'>) {
       />
     </SettingRow>
   );
+}
+
+/** The time as the chosen format writes it, in the chosen timezone. */
+export function formatTime(
+  date: Date,
+  {
+    timeFormat,
+    timezone,
+    language,
+  }: Pick<RegionalSettings, 'timeFormat' | 'timezone' | 'language'>,
+): string {
+  return new Intl.DateTimeFormat(language, {
+    timeZone: resolveTimezone(timezone),
+    hour: 'numeric',
+    minute: '2-digit',
+    hourCycle: timeFormat === '12-hour' ? 'h12' : 'h23',
+  }).format(date);
+}
+
+/** The calendar date in the chosen order, as it falls in the chosen timezone. */
+export function formatDate(
+  date: Date,
+  { dateFormat, timezone }: Pick<RegionalSettings, 'dateFormat' | 'timezone'>,
+): string {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: resolveTimezone(timezone),
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date);
+  const month = parts.find((part) => part.type === 'month')?.value;
+  const day = parts.find((part) => part.type === 'day')?.value;
+  const year = parts.find((part) => part.type === 'year')?.value;
+  return dateFormat === 'MM/DD/YYYY'
+    ? `${month}/${day}/${year}`
+    : dateFormat === 'DD/MM/YYYY'
+      ? `${day}/${month}/${year}`
+      : `${year}-${month}-${day}`;
+}
+
+/** A sample number written with the chosen grouping and decimal marks. */
+export function formatNumber(
+  numberFormat: RegionalSettings['numberFormat'],
+  value = 1234567.89,
+): string {
+  const { group, decimal, grouping } = numberFormatParts[numberFormat];
+  return new Intl.NumberFormat(grouping, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
+    .formatToParts(value)
+    .map((part) => {
+      if (part.type === 'group') return group;
+      if (part.type === 'decimal') return decimal;
+      return part.value;
+    })
+    .join('');
 }

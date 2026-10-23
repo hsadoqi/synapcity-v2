@@ -37,7 +37,7 @@ export function CompactItemList({
       isEmpty={visible.length === 0}
       tight
     >
-      <ul className="-mx-2 flex flex-col">
+      <ul className="-mx-2 flex flex-col flex-1">
         {visible.map((item) => (
           <li key={item.id}>
             <CompactItemRow item={item} {...itemProps} />
@@ -59,14 +59,16 @@ function CompactItemRow({
     <button
       type="button"
       onClick={() => onOpen?.(item)}
-      className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-left transition-colors outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
+      className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-left transition-colors motion-reduce:transition-none outline-none hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring"
     >
       <ItemKindTile kind={kindOf(item, kinds)} />
       <span className="flex min-w-0 flex-1 flex-col">
         <span className="truncate text-sm font-medium">{item.title}</span>
-        <span className="truncate text-xs text-muted-foreground">
-          {item.group}
-        </span>
+        {item.group && (
+          <span className="truncate text-xs text-muted-foreground">
+            {item.group}
+          </span>
+        )}
       </span>
       <span className="sr-only">, edited </span>
       <time

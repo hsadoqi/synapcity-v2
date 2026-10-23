@@ -25,6 +25,7 @@ import {
 import type { CollectionSort, CollectionSortField } from '../../shared';
 
 const SORT_OPTIONS: { value: CollectionSortField; label: string }[] = [
+  { value: 'used', label: 'Last used' },
   { value: 'updated', label: 'Last updated' },
   { value: 'created', label: 'Created' },
   { value: 'title', label: 'Title A–Z' },

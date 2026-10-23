@@ -3,12 +3,13 @@ import '../styles/globals.css';
 import { fontVariables } from './fonts';
 import RootProviders from '../components/providers/root-providers';
 import { AuthStatus } from '@/features/auth/components/auth-status';
-import { RootShell } from '@synapcity/frontend-ui/blocks/root-shell';
+import { BreadcrumbRootShell } from '@/components/breadcrumbs';
 import { createMetadata } from '@synapcity/frontend-site/metadata';
 import { UserProvider } from '@/features/auth/client';
 import { getCurrentUser } from '@/features/auth/server';
 import { appearanceBootScript } from '@/features/settings/shared/appearance-attributes';
 import { fontBootScript } from '@/features/settings/shared/font-preferences';
+import { themeShapeBootScript } from '@/features/settings/shared/theme-shape';
 import { AccountPreferencesSync } from '@/features/settings/components/account-preferences-sync';
 import { getAccountPreferences } from '@/features/settings/server/account-preferences';
 import { pageLanguage } from '@/features/settings/types/regional';
@@ -34,21 +35,23 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* Applies saved text size, contrast and motion before first paint. */}
+        {/* Applies saved contrast and motion before first paint. */}
         <script dangerouslySetInnerHTML={{ __html: appearanceBootScript }} />
         {/* Applies saved font choices, and fetches only those, before first paint. */}
         <script dangerouslySetInnerHTML={{ __html: fontBootScript }} />
+        {/* Applies the saved text size, corner radius and density before first paint. */}
+        <script dangerouslySetInnerHTML={{ __html: themeShapeBootScript }} />
       </head>
       <body>
         <AccountPreferencesSync preferences={account} />
         <RootProviders>
           <UserProvider user={user}>
-            <RootShell
+            <BreadcrumbRootShell
               account={user ? accountLinksFor(user.id) : null}
               headerActions={<AuthStatus variant="header" />}
             >
               {children}
-            </RootShell>
+            </BreadcrumbRootShell>
           </UserProvider>
         </RootProviders>
       </body>

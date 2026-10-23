@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { NOTICES, NOTICE_PARAM, isNoticeKey, withNotice } from './notices';
+import {
+  NOTICES,
+  NOTICE_PARAM,
+  NOTICE_TIMEOUTS,
+  isNoticeKey,
+  noticeTimeout,
+  withNotice,
+} from './notices';
 
 describe('isNoticeKey', () => {
   it('accepts every listed key', () => {
@@ -23,11 +30,56 @@ describe('isNoticeKey', () => {
 });
 
 describe('NOTICES', () => {
-  it('gives every key plain, non-empty wording', () => {
-    for (const message of Object.values(NOTICES)) {
-      expect(message.length).toBeGreaterThan(0);
-      expect(message).not.toMatch(/[<>]/);
+  const notices = Object.values(NOTICES);
+
+  it('gives every notice plain, non-empty wording', () => {
+    for (const { title, description } of notices) {
+      expect(title.length).toBeGreaterThan(0);
+      for (const text of [title, description ?? '']) {
+        expect(text).not.toMatch(/[<>]/);
+      }
     }
+  });
+
+  it('ends every sentence with a full stop, matching the rest of the app', () => {
+    for (const { title, description } of notices) {
+      expect(title).toMatch(/\.$/);
+      if (description) expect(description).toMatch(/\.$/);
+    }
+  });
+
+  it('gives every notice a known type and a usable timeout', () => {
+    for (const notice of notices) {
+      expect(Object.keys(NOTICE_TIMEOUTS)).toContain(notice.type);
+      expect(noticeTimeout(notice)).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('only links an action to a same-origin path', () => {
+    for (const { action } of notices) {
+      if (!action) continue;
+      expect(action.label.length).toBeGreaterThan(0);
+      expect(action.href).toMatch(/^\/(?!\/)/);
+    }
+  });
+});
+
+describe('noticeTimeout', () => {
+  it('uses the type default when the notice does not set one', () => {
+    expect(noticeTimeout({ type: 'success', title: 'Done.' })).toBe(
+      NOTICE_TIMEOUTS.success,
+    );
+  });
+
+  it('keeps an error until it is dismissed', () => {
+    expect(noticeTimeout({ type: 'error', title: 'Failed.' })).toBe(0);
+  });
+
+  it('lets a notice set its own, including zero', () => {
+    expect(noticeTimeout({ type: 'info', title: 'Hi.', timeout: 0 })).toBe(0);
+    expect(
+      noticeTimeout({ type: 'success', title: 'Hi.', timeout: 1234 }),
+    ).toBe(1234);
   });
 });
 
@@ -60,23 +112,33 @@ describe('withNotice', () => {
 
 describe('the email notices', () => {
   it('say the address was updated, and what to do after the first of two links', () => {
-    expect(isNoticeKey('email-updated')).toBe(true);
-    expect(NOTICES['email-updated']).toBe('Email address updated.');
-    expect(isNoticeKey('email-change-step')).toBe(true);
-    expect(NOTICES['email-change-step']).toMatch(/other address/i);
+    expect(NOTICES['email-updated']).toEqual({
+      type: 'success',
+      title: 'Email address updated.',
+    });
+    const step = NOTICES['email-change-step'];
+    // Nothing has changed yet, so it is information, not success.
+    expect(step.type).toBe('info');
+    expect(step.description).toMatch(/other address/i);
+    // Two sentences to read: longer than the info default.
+    expect(noticeTimeout(step)).toBeGreaterThan(NOTICE_TIMEOUTS.info);
   });
 });
 
 describe('the account-connected notice', () => {
-  it('is a listed key with plain wording', () => {
-    expect(isNoticeKey('account-connected')).toBe(true);
-    expect(NOTICES['account-connected']).toBe('Account connected.');
+  it('is a success with plain wording', () => {
+    expect(NOTICES['account-connected']).toEqual({
+      type: 'success',
+      title: 'Account connected.',
+    });
   });
 });
 
 describe('the account-deleted notice', () => {
-  it('is a listed key with plain wording', () => {
-    expect(isNoticeKey('account-deleted')).toBe(true);
-    expect(NOTICES['account-deleted']).toBe('Your account has been deleted.');
+  it('confirms the deletion and the sign-out', () => {
+    const notice = NOTICES['account-deleted'];
+    expect(notice.type).toBe('success');
+    expect(notice.title).toBe('Your account has been deleted.');
+    expect(notice.description).toMatch(/signed out everywhere/i);
   });
 });

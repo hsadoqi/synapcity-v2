@@ -1,8 +1,11 @@
 'use client';
 
 import { FieldGroup } from '@synapcity/frontend-ui/core/field';
-import { Separator } from '@synapcity/frontend-ui/core/separator';
-import { SettingsSection, SettingsTabShell } from '../../shared';
+import {
+  SettingsAccordion,
+  SettingsAccordionItem,
+  SettingsTabShell,
+} from '../../shared';
 import { useImportExportSettings } from '../../hooks/use-import-export-settings';
 import { ExportRow, ImportRow, ResetRow } from './import-export-rows';
 import { ImportExportFeedbackAlert } from './import-export-feedback-dialog';
@@ -17,25 +20,29 @@ export function ImportExportSettings() {
       title="Import / Export"
       description="Take your preferences with you, or start fresh."
     >
-      <SettingsSection title="Transfer">
-        <FieldGroup>
-          <ExportRow
-            onExport={importExport.exportSettings}
-            disabled={disabled}
-          />
-          <ImportRow
-            onImport={importExport.importSettings}
-            disabled={disabled}
-            isImporting={isImporting}
-          />
-        </FieldGroup>
-      </SettingsSection>
-      <Separator />
-      <SettingsSection title="Reset">
-        <FieldGroup>
-          <ResetRow onReset={importExport.resetSettings} disabled={disabled} />
-        </FieldGroup>
-      </SettingsSection>
+      <SettingsAccordion>
+        <SettingsAccordionItem value="transfer" title="Transfer">
+          <FieldGroup>
+            <ExportRow
+              onExport={importExport.exportSettings}
+              disabled={disabled}
+            />
+            <ImportRow
+              onImport={importExport.importSettings}
+              disabled={disabled}
+              isImporting={isImporting}
+            />
+          </FieldGroup>
+        </SettingsAccordionItem>
+        <SettingsAccordionItem value="reset" title="Reset">
+          <FieldGroup>
+            <ResetRow
+              onReset={importExport.resetSettings}
+              disabled={disabled}
+            />
+          </FieldGroup>
+        </SettingsAccordionItem>
+      </SettingsAccordion>
       {feedback && (
         <ImportExportFeedbackAlert
           feedback={feedback}

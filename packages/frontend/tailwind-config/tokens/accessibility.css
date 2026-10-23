@@ -1,3 +1,28 @@
+/* The two halves of "keep the look, drop the travel", defined once and applied below and in
+ * preferences.css (the app's own Animations and Reduced motion settings), so the OS preference
+ * and the settings cannot drift apart. */
+@utility motion-no-travel {
+  /* The variables tw-animate-css reads for every enter and exit. */
+  --tw-enter-translate-x: 0;
+  --tw-enter-translate-y: 0;
+  --tw-enter-scale: 1;
+  --tw-enter-rotate: 0;
+  --tw-enter-blur: 0;
+  --tw-exit-translate-x: 0;
+  --tw-exit-translate-y: 0;
+  --tw-exit-scale: 1;
+  --tw-exit-rotate: 0;
+  --tw-exit-blur: 0;
+}
+
+/* Transitions travel too (a sidebar sliding on left and width), so only the ones that change how
+ * something looks stay. */
+@utility motion-visual-transitions-only {
+  transition-property:
+    color, background-color, border-color, text-decoration-color, fill, stroke,
+    opacity, box-shadow, outline-color;
+}
+
 /* Reduced motion keeps what a change looks like and drops how it travels. A fade or a colour
  * change still tells the user something happened; travel, scale and resizing are what trigger
  * vestibular symptoms, so those stop. Nothing is frozen: a spinner keeps turning, because it
@@ -17,18 +42,6 @@
   *,
   *::before,
   *::after {
-    --tw-enter-translate-x: 0;
-    --tw-enter-translate-y: 0;
-    --tw-enter-scale: 1;
-    --tw-enter-rotate: 0;
-    --tw-enter-blur: 0;
-    --tw-exit-translate-x: 0;
-    --tw-exit-translate-y: 0;
-    --tw-exit-scale: 1;
-    --tw-exit-rotate: 0;
-    --tw-exit-blur: 0;
-    transition-property:
-      color, background-color, border-color, text-decoration-color, fill,
-      stroke, opacity, box-shadow, outline-color;
+    @apply motion-no-travel motion-visual-transitions-only;
   }
 }

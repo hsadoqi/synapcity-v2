@@ -25,11 +25,15 @@ const buttonVariants = cva(
         destructive:
           'bg-destructive/10 text-destructive hover:bg-destructive/25 active:bg-destructive/35 focus-visible:border-destructive/40 focus-visible:outline-destructive dark:bg-destructive/20 dark:hover:bg-destructive/30',
         link: 'text-link underline-offset-4 hover:underline hover:decoration-2 active:opacity-70',
+        // A quiet secondary action beside content, such as resetting one
+        // setting: muted until pointed at, never competing with the control.
+        subtle:
+          'text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground hover:decoration-current active:opacity-70',
       },
       size: {
         default:
           "h-7 pointer-coarse:h-11 gap-1.5 px-2.5 text-xs/relaxed has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*='size-'])]:size-3.5",
-        xs: "h-5 pointer-coarse:h-11 gap-1 rounded-sm px-2 text-[0.625rem] has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-2.5",
+        xs: "h-5 pointer-coarse:h-11 gap-1 rounded-sm px-2 text-2xs has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-2.5",
         sm: "h-6 pointer-coarse:h-11 gap-1 px-2 text-xs/relaxed has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
         lg: "h-8 pointer-coarse:h-12 gap-1.5 px-3 text-xs/relaxed has-data-[icon=inline-end]:pr-2.5 has-data-[icon=inline-start]:pl-2.5 [&_svg:not([class*='size-'])]:size-4",
         'icon-xs':

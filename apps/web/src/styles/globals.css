@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 @import '@synapcity/frontend-ui/styles.css';
 
-@source '../';
+@source '../app';
+@source '../components';
+@source '../features';
 @source '../../../../packages/frontend/ui/src';

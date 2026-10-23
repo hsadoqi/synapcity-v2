@@ -21,12 +21,15 @@ type FiltersMenuProps = {
   onFiltersChange: (filters: CollectionFilters) => void;
   /** Adds a submenu to filter by group. Omit, or pass no options, to hide it. */
   grouping?: CollectionGrouping;
+  /** Adds a submenu to filter by tag. Omit, or pass none, to hide it. */
+  tags?: string[];
 };
 
 export function FiltersMenu({
   filters,
   onFiltersChange,
   grouping,
+  tags,
 }: FiltersMenuProps) {
   const activeFilterCount = countActiveFilters(filters);
 
@@ -46,6 +49,7 @@ export function FiltersMenu({
         filters={filters}
         onFiltersChange={onFiltersChange}
         grouping={grouping}
+        tags={tags}
       />
     </DropdownMenu>
   );

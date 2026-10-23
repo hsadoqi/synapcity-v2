@@ -12,6 +12,10 @@ function Tabs({
   return (
     <TabsPrimitive.Root
       data-slot="tabs"
+      // Passed on, not only shown: Base UI's arrow keys and aria-orientation
+      // follow it. Reading it here without passing it on left every tab list
+      // horizontal to the keyboard, whatever it was drawn as.
+      orientation={orientation}
       data-orientation={orientation}
       className={cn(
         'group/tabs flex gap-2 data-horizontal:flex-col',
@@ -23,7 +27,7 @@ function Tabs({
 }
 
 const tabsListVariants = cva(
-  'group/tabs-list inline-flex w-fit items-center justify-center rounded-lg p-0.5 text-muted-foreground group-data-horizontal/tabs:h-8 group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col data-[variant=line]:rounded-none',
+  'group/tabs-list inline-flex w-fit items-center justify-center rounded-lg p-0.5 text-muted-foreground group-data-horizontal/tabs:h-8 pointer-coarse:group-data-horizontal/tabs:h-11 group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col data-[variant=line]:rounded-none',
   {
     variants: {
       variant: {
@@ -72,7 +76,10 @@ function TabsContent({ className, ...props }: TabsPrimitive.Panel.Props) {
   return (
     <TabsPrimitive.Panel
       data-slot="tabs-content"
-      className={cn('flex-1 text-xs/relaxed outline-none', className)}
+      className={cn(
+        'flex-1 text-xs/relaxed outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+        className,
+      )}
       {...props}
     />
   );

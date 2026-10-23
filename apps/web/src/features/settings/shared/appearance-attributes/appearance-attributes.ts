@@ -1,7 +1,6 @@
 import {
   appearanceDefaults,
   contrastModes,
-  fontSizes,
   type AppearanceSettings,
 } from '../../types/appearance';
 
@@ -24,18 +23,13 @@ export function applyAppearance(
   root: HTMLElement,
   appearance: Pick<
     AppearanceSettings,
-    | 'animationsEnabled'
-    | 'showBorders'
-    | 'reducedMotion'
-    | 'contrastMode'
-    | 'fontSize'
+    'animationsEnabled' | 'showBorders' | 'reducedMotion' | 'contrastMode'
   >,
 ) {
   root.dataset.animations = String(appearance.animationsEnabled);
   root.dataset.borders = String(appearance.showBorders);
   root.dataset.reducedMotion = String(appearance.reducedMotion);
   root.dataset.contrast = appearance.contrastMode;
-  root.dataset.fontSize = appearance.fontSize;
 }
 
 /**
@@ -54,6 +48,4 @@ export const appearanceBootScript = `(function(){var a={};try{var s=JSON.parse(l
   appearanceDefaults,
 )};var O={contrastMode:${JSON.stringify(
   contrastModes,
-)},fontSize:${JSON.stringify(
-  fontSizes,
-)}};function b(k){return typeof a[k]==='boolean'?a[k]:D[k]}function e(k){return O[k].indexOf(a[k])>-1?a[k]:D[k]}var d=document.documentElement.dataset;d.animations=String(b('animationsEnabled'));d.borders=String(b('showBorders'));d.reducedMotion=String(b('reducedMotion'));d.contrast=e('contrastMode');d.fontSize=e('fontSize')}catch(x){}})();`;
+)}};function b(k){return typeof a[k]==='boolean'?a[k]:D[k]}function e(k){return O[k].indexOf(a[k])>-1?a[k]:D[k]}var d=document.documentElement.dataset;d.animations=String(b('animationsEnabled'));d.borders=String(b('showBorders'));d.reducedMotion=String(b('reducedMotion'));d.contrast=e('contrastMode')}catch(x){}})();`;

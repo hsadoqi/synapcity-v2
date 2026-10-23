@@ -5,12 +5,15 @@ import { RootContent } from '@synapcity/frontend-ui/blocks/root-shell/root-conte
 import { SidebarShell } from '@synapcity/frontend-ui/blocks/sidebar-shell';
 import React from 'react';
 import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';
+import type { RootBreadcrumb } from '@synapcity/frontend-ui/blocks/root-shell/root-header';
 
 type ShellProps = {
   children: React.ReactNode;
   headerActions?: React.ReactNode;
   /** Optional content for the authenticated shell's session-local utility panel. */
   globalPanel?: React.ReactNode;
+  /** The path to the current page, shown in the header once someone is signed in. */
+  breadcrumbs?: RootBreadcrumb[];
 };
 
 // export default function RootShell({
@@ -84,6 +87,7 @@ export function AuthenticatedShell({
   headerActions,
   account,
   globalPanel,
+  breadcrumbs,
 }: ShellProps & { account: AccountLinks }) {
   return (
     <div
@@ -92,7 +96,13 @@ export function AuthenticatedShell({
     >
       <SkipLinkButton />
       <SidebarShell
-        header={<RootHeader account={account} actions={headerActions} />}
+        header={
+          <RootHeader
+            account={account}
+            actions={headerActions}
+            breadcrumbs={breadcrumbs}
+          />
+        }
         account={account}
         globalPanel={globalPanel}
       >
@@ -107,6 +117,7 @@ export default function RootShell({
   headerActions,
   account,
   globalPanel,
+  breadcrumbs,
 }: ShellProps & {
   /** Present when someone is signed in; the app supplies where they lead. */
   account?: AccountLinks | null;
@@ -116,6 +127,7 @@ export default function RootShell({
       account={account}
       headerActions={headerActions}
       globalPanel={globalPanel}
+      breadcrumbs={breadcrumbs}
     >
       {children}
     </AuthenticatedShell>

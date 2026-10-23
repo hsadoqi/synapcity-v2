@@ -9,6 +9,16 @@
   }
 }
 
+/* A screen with room for a region inside the page to scroll on its own: wide
+   and tall enough. Below it (phones, landscape phones, short windows) the
+   page's content region scrolls as one, so fixed headings above an inner
+   scroll area do not leave it a sliver. */
+@custom-variant roomy {
+  @media (min-width: 48rem) and (min-height: 40rem) {
+    @slot;
+  }
+}
+
 @custom-variant open-overlay {
   &:is(.open-overlay *) {
     @slot;

@@ -1,6 +1,5 @@
 'use client';
 
-import { Separator } from '@synapcity/frontend-ui/core/separator';
 import { FieldGroup } from '@synapcity/frontend-ui/core/field';
 
 import { ProfileSummary } from '@/features/account/components/profile';
@@ -11,7 +10,11 @@ import {
   EmailChange,
   PasswordReset,
 } from '@/features/auth/components';
-import { SettingsTabShell } from '../../shared';
+import {
+  SettingsAccordion,
+  SettingsAccordionItem,
+  SettingsTabShell,
+} from '../../shared';
 
 /**
  * The signed-in person's profile. The name and photo belong to the account
@@ -29,23 +32,29 @@ export const AccountSettings = () => {
       description="Manage your account information and preferences."
     >
       {user ? (
-        <>
-          <FieldGroup>
-            <ProfileSummary name={user.name ?? ''} imageUrl={user.imageUrl} />
-          </FieldGroup>
-          <Separator />
+        // Capped like SettingRow: these rows come from the auth and account
+        // features, so the width is set here rather than in them.
+        <SettingsAccordion>
+          <SettingsAccordionItem value="profile" title="Profile">
+            <FieldGroup className="max-w-3xl">
+              <ProfileSummary name={user.name ?? ''} imageUrl={user.imageUrl} />
+            </FieldGroup>
+          </SettingsAccordionItem>
           {/* Sign-in details belong to the auth feature. */}
-          <FieldGroup>
-            <EmailChange email={user.email} />
-            <PasswordReset />
-            <ConnectedAccounts />
-          </FieldGroup>
-          <Separator />
+          <SettingsAccordionItem value="sign-in" title="Sign-in">
+            <FieldGroup className="max-w-3xl">
+              <EmailChange email={user.email} />
+              <PasswordReset />
+              <ConnectedAccounts />
+            </FieldGroup>
+          </SettingsAccordionItem>
           {/* Last, and apart: it cannot be undone. */}
-          <FieldGroup>
-            <DeleteAccount email={user.email} />
-          </FieldGroup>
-        </>
+          <SettingsAccordionItem value="delete" title="Danger zone">
+            <FieldGroup className="max-w-3xl">
+              <DeleteAccount email={user.email} />
+            </FieldGroup>
+          </SettingsAccordionItem>
+        </SettingsAccordion>
       ) : (
         <p className="text-sm text-muted-foreground">
           Sign in to manage your account.

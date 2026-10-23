@@ -19,6 +19,17 @@ export type CollectionItem = {
   kind?: string;
   tags: string[];
   pinned: boolean;
+  /**
+   * A stored icon name (e.g. 'pen-line') for items that carry their own icon.
+   * Without it the consumer's resource icon is used.
+   */
+  icon?: string;
+  /** Where the item opens. Without it the consumer handles 'open' itself. */
+  href?: string;
+  /** When the owner last opened the item. Never opened means it is left out. */
+  lastViewedAt?: string;
+  /** A short line of facts for the card, row and preview, e.g. "8 documents". */
+  detail?: string;
 };
 
 export type CollectionFilters = {
@@ -26,9 +37,12 @@ export type CollectionFilters = {
   recent: boolean;
   /** Selected group names; empty means every group. */
   groups: string[];
+  /** Selected tags; an item matching any of them stays. Empty means every tag. */
+  tags: string[];
 };
 
-export type CollectionSortField = 'updated' | 'created' | 'title';
+/** `used` is the later of when the item was last opened and when it last changed. */
+export type CollectionSortField = 'used' | 'updated' | 'created' | 'title';
 type CollectionSortDirection = 'asc' | 'desc';
 
 export type CollectionSort = {
@@ -58,14 +72,23 @@ export const EMPTY_FILTERS: CollectionFilters = {
   pinned: false,
   recent: false,
   groups: [],
+  tags: [],
 };
 
 export function hasActiveFilters(filters: CollectionFilters) {
-  return filters.pinned || filters.recent || filters.groups.length > 0;
+  return (
+    filters.pinned ||
+    filters.recent ||
+    filters.groups.length > 0 ||
+    filters.tags.length > 0
+  );
 }
 
 export function countActiveFilters(filters: CollectionFilters) {
   return (
-    Number(filters.pinned) + Number(filters.recent) + filters.groups.length
+    Number(filters.pinned) +
+    Number(filters.recent) +
+    filters.groups.length +
+    filters.tags.length
   );
 }

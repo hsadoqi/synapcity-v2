@@ -99,11 +99,16 @@ describe('settings transfer utilities', () => {
     const exported: Settings = {
       ...settingsDefaults,
       regional: { ...settingsDefaults.regional, language: 'ja' },
-      theme: { ...settingsDefaults.theme, mode: 'dark', bodyFont: 'lora' },
+      theme: {
+        ...settingsDefaults.theme,
+        mode: 'dark',
+        bodyFont: 'lora',
+        textSize: 115,
+      },
       appearance: {
         ...settingsDefaults.appearance,
         colorScheme: 'dark',
-        fontSize: 'large',
+        contrastMode: 'high',
       },
     };
     download(exported);
@@ -112,7 +117,10 @@ describe('settings transfer utilities', () => {
     expect(JSON.parse(contents)).toMatchObject({
       version: 2,
       account: { regional: { language: 'ja' }, theme: { bodyFont: 'lora' } },
-      device: { theme: { mode: 'dark' }, appearance: { fontSize: 'large' } },
+      device: {
+        theme: { mode: 'dark', textSize: 115 },
+        appearance: { contrastMode: 'high' },
+      },
     });
     const result = await importFile(
       new NodeFile([contents], 'prefs.json') as unknown as File,

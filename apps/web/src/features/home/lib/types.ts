@@ -8,4 +8,6 @@ export interface HomePageProps {
   pinned?: CollectionItem[];
   dateLabel?: string;
   dateTime?: string;
+  /** The signed-in owner, for links to their routes. */
+  userId?: string;
 }

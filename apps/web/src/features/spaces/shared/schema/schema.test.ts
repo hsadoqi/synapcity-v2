@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 
-import type { CreateSpaceInput, Space, UpdateSpaceInput } from '../types';
+import type { CreateSpaceInput, SpaceEntity, UpdateSpaceInput } from '../types';
 import { createSpaceSchema, spaceSchema, updateSpaceSchema } from './index';
 
 const savedSpace = {
@@ -11,14 +11,45 @@ const savedSpace = {
   tags: ['writing'],
   createdAt: '2026-10-01T09:00:00Z',
   updatedAt: '2026-10-03T14:30:00Z',
+  pinnedAt: null,
+  lastViewedAt: null,
 };
 
 describe('spaceSchema', () => {
+  it('defaults the pinned and last-viewed times to null when absent', () => {
+    const { pinnedAt, lastViewedAt, ...withoutState } = savedSpace;
+    void pinnedAt;
+    void lastViewedAt;
+
+    expect(spaceSchema.parse(withoutState)).toMatchObject({
+      pinnedAt: null,
+      lastViewedAt: null,
+    });
+  });
+
+  it('keeps the pinned and last-viewed times when they are set', () => {
+    const space = spaceSchema.parse({
+      ...savedSpace,
+      pinnedAt: '2026-10-04T09:00:00Z',
+      lastViewedAt: '2026-10-05T18:00:00+00:00',
+    });
+
+    expect(space.pinnedAt).toBe('2026-10-04T09:00:00Z');
+    expect(space.lastViewedAt).toBe('2026-10-05T18:00:00+00:00');
+  });
+
+  it.each(['pinnedAt', 'lastViewedAt'])('rejects a malformed %s', (field) => {
+    const result = spaceSchema.safeParse({ ...savedSpace, [field]: 'today' });
+
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error.issues[0]?.path).toEqual([field]);
+  });
+
   it('accepts a saved space and infers the shared type', () => {
     const space = spaceSchema.parse(savedSpace);
 
     expect(space).toEqual(savedSpace);
-    expectTypeOf(space).toEqualTypeOf<Space>();
+    expectTypeOf(space).toEqualTypeOf<SpaceEntity>();
   });
 
   it('trims the name while preserving the ID and description', () => {

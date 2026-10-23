@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { expect, waitFor, within } from 'storybook/test';
 
 import { ModeToggle } from '@synapcity/frontend-ui/components/mode-toggle';
 import {
@@ -38,3 +39,23 @@ export const System: Story = {};
 export const Light: Story = { args: { initialMode: 'light' } };
 
 export const Dark: Story = { args: { initialMode: 'dark' } };
+
+/**
+ * The page root carries one mode, said one way: the class the tokens read, the color-scheme the
+ * browser's own controls read, and what useMode() reports all agree, with no stray data-theme.
+ */
+export const RootAgreesWithItself: Story = {
+  play: async ({ canvasElement }) => {
+    const root = document.documentElement;
+    await waitFor(() => {
+      const mode = root.classList.contains('dark') ? 'dark' : 'light';
+      expect(root.hasAttribute('data-theme')).toBe(false);
+      expect(root.style.colorScheme).toBe(mode);
+      expect(
+        within(canvasElement).getByText(mode, {
+          selector: 'strong:last-child',
+        }),
+      ).toBeTruthy();
+    });
+  },
+};

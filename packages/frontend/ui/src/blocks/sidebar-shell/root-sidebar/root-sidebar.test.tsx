@@ -22,7 +22,7 @@ describe('RootSidebar', () => {
   it('shows the context switcher and search in its header', () => {
     renderSidebar();
 
-    expect(screen.getByText('Documentation')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Switch version' })).toBeTruthy();
     expect(screen.getByLabelText('Search')).toBeTruthy();
   });
 

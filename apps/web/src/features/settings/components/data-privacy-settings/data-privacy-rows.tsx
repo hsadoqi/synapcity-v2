@@ -44,6 +44,8 @@ export const PrivacyConsentRow = ({
   return (
     <SettingRow
       id={id}
+      field={purpose}
+      toggle
       label={label}
       description={
         blocked

@@ -18,7 +18,8 @@ type CollectionEmptyProps = {
   icon: LucideIcon;
   singular: string;
   copy: CollectionEmptyCopy;
-  onCreate: () => void;
+  /** Without it the empty state offers no button. */
+  onCreate?: () => void;
 };
 
 export function CollectionEmpty({
@@ -36,12 +37,14 @@ export function CollectionEmpty({
         <EmptyTitle>{copy.title}</EmptyTitle>
         <EmptyDescription>{copy.description}</EmptyDescription>
       </EmptyHeader>
-      <EmptyContent>
-        <Button onClick={onCreate}>
-          <Plus data-icon="inline-start" aria-hidden="true" />
-          New {singular}
-        </Button>
-      </EmptyContent>
+      {onCreate && (
+        <EmptyContent>
+          <Button onClick={onCreate}>
+            <Plus data-icon="inline-start" aria-hidden="true" />
+            New {singular}
+          </Button>
+        </EmptyContent>
+      )}
     </Empty>
   );
 }

@@ -1,5 +1,6 @@
 'use client';
 
+// TODO: Can we make this more generic/reusable so it can be used for contexts/use cases beyond deleting account like deleting a space/document/dashboard/widget(future)?
 import { useActionState, useId } from 'react';
 import Link from 'next/link';
 import { Button, buttonVariants } from '@synapcity/frontend-ui/core/button';

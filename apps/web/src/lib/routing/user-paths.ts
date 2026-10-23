@@ -14,6 +14,10 @@ export function homePathFor(userId: string): string {
   return userPath(userId, 'home');
 }
 
+export function spacesPathFor(userId: string): string {
+  return `${homePathFor(userId)}/spaces`;
+}
+
 export function settingsPathFor(userId: string): string {
   return userPath(userId, 'settings');
 }

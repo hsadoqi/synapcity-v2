@@ -10,7 +10,7 @@ export const RootContent = ({ children }: { children: ReactNode }) => {
       <main
         id="main-content"
         tabIndex={-1}
-        className="flex flex-1 px-6 py-10 outline-none group-data-[global-panel=open]/work-area:py-4 sm:px-10 sm:py-14 sm:group-data-[global-panel=open]/work-area:py-6 lg:px-16 lg:py-16 lg:group-data-[global-panel=open]/work-area:py-8"
+        className="flex flex-1 outline-none transition-[padding] duration-200 ease-out group-data-[global-panel=open]/work-area:py-4 sm:group-data-[global-panel=open]/work-area:py-6 lg:group-data-[global-panel=open]/work-area:py-8"
       >
         {children}
       </main>

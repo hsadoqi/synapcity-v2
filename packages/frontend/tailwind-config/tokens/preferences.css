@@ -1,22 +1,78 @@
-/* What the Appearance settings do to the page. The settings provider writes these
- * attributes on <html> (data-font-size, data-contrast, data-borders, data-animations,
- * data-reduced-motion); nothing else sets them.
+/* What the Appearance and Theme settings do to the page. The settings provider writes these
+ * attributes on <html> (data-text-size, data-contrast, data-borders, data-animations,
+ * data-reduced-motion, data-radius, data-density); nothing else sets them, except the Theme
+ * tab's live preview, which sets data-text-size, data-radius and data-density on its own frame.
  *
  * Like accessibility.css this sits outside every @layer, so it beats the layered theme
  * variables and utilities without touching a component's own classes. */
 
-/* Text size: the whole type scale is derived from --text-base-size. */
-:root[data-font-size='small'] {
-  --text-base-size: 0.875rem;
+/* Text size: the whole type scale is derived from --text-base-size, so one factor on its unit
+ * resizes every text-* step together. The setting is a percentage, not a preset, so the factor
+ * arrives as --text-scale beside the attribute (100% writes 1). Same attribute-only selector as
+ * radius below, so a preview frame carrying its own data-text-size gets its own size. */
+[data-text-size] {
+  --text-base-size: calc(var(--text-base-unit) * var(--text-scale, 1));
 }
 
-:root[data-font-size='large'] {
-  --text-base-size: 1.0625rem;
+/* Corner radius: one factor on the radius unit, so every component's corners follow together
+ * (the radius scale in shared-styles.css is derived from --radius-base). These select on the
+ * attribute alone, not :root, and redeclare the result on the element: a var() resolves where
+ * it is declared, so a preview frame carrying its own data-radius needs its own --radius-base.
+ * The preset names are the allowed values in types/theme.ts; the numbers live only here. */
+[data-radius] {
+  --radius-factor: 1;
+  --radius-base: calc(var(--radius-unit) * var(--radius-factor));
+  --radius: var(--radius-base);
+}
+
+[data-radius='sharp'] {
+  --radius-factor: 0;
+}
+
+[data-radius='default'] {
+  --radius-factor: 1;
+}
+
+[data-radius='soft'] {
+  --radius-factor: 2;
+}
+
+[data-radius='rounded'] {
+  --radius-factor: 3;
+}
+
+/* Density: one factor on Tailwind's --spacing, which every gap, padding, margin, height, width
+ * and size utility multiplies, so controls and icons scale with the rhythm (as in Radix
+ * Themes' scaling). Compact is 0.875 because the default 28px control (h-7) then stays at 24.5px,
+ * over WCAG 2.5.8's 24px minimum target size. Same attribute-only selector as radius above. */
+[data-density] {
+  --density-factor: 1;
+  --spacing: calc(var(--spacing-unit) * var(--density-factor));
+}
+
+[data-density='comfortable'] {
+  --density-factor: 1;
+}
+
+[data-density='compact'] {
+  --density-factor: 0.875;
+}
+
+[data-density='spacious'] {
+  --density-factor: 1.25;
+}
+
+/* A touch screen sizes its controls at 44px (h-11); shrinking the spacing would take them
+ * below that, so Compact is ignored there and reads as Comfortable. Spacious applies. */
+@media (pointer: coarse) {
+  [data-density='compact'] {
+    --density-factor: 1;
+  }
 }
 
 /* Contrast and borders. The order is the precedence: low contrast softens the lines,
- * an explicit "show borders" brings them back, and high contrast beats both. Low only
- * softens lines; text keeps its contrast so it stays readable.
+ * an explicit "show borders" gives them the strength of a field border, and high contrast
+ * beats both. Low only softens lines; text keeps its contrast so it stays readable.
  *
  * Each rule also matches a nested .light or .dark (a theme preview scoped to one mode).
  * Those classes redefine --border and --muted-foreground from their own palette, which
@@ -25,11 +81,23 @@
 :root[data-contrast='low'],
 :root[data-contrast='low'] :is(.light, .dark) {
   --border: color-mix(in oklch, var(--muted) 55%, var(--base-background));
+  /* The seams between regions (--sidebar-border reads this) are lines too, so they soften
+     with the panels instead of staying at full strength beside them. */
+  --divider: color-mix(
+    in oklch,
+    var(--muted-foreground) 45%,
+    var(--base-background)
+  );
 }
 
 :root[data-borders='true'],
 :root[data-borders='true'] :is(.light, .dark) {
-  --border: var(--muted-background);
+  /* Not --muted: that is the border already, so the setting would do nothing at normal
+     contrast. --input is the field border, about 3.7:1 against the page (WCAG 1.4.11's 3:1),
+     so panels and controls get the same definition a text field has. */
+  --border: var(--input);
+  /* Undoes low contrast's softening of the seams; at normal contrast it is already this. */
+  --divider: var(--muted-foreground);
 }
 
 :root[data-contrast='high'],
@@ -51,26 +119,15 @@
 :root[data-animations='false'] *,
 :root[data-animations='false'] *::before,
 :root[data-animations='false'] *::after {
-  --tw-enter-translate-x: 0;
-  --tw-enter-translate-y: 0;
-  --tw-enter-scale: 1;
-  --tw-enter-rotate: 0;
-  --tw-enter-blur: 0;
-  --tw-exit-translate-x: 0;
-  --tw-exit-translate-y: 0;
-  --tw-exit-scale: 1;
-  --tw-exit-rotate: 0;
-  --tw-exit-blur: 0;
+  @apply motion-no-travel;
 }
 
-/* Transitions travel too (a sidebar sliding on left and width), so reduced motion keeps only
- * the ones that change how something looks. Keep this list in step with accessibility.css. */
+/* Reduced motion keeps only the transitions that change how something looks (see
+ * accessibility.css). */
 :root[data-reduced-motion='true'] *,
 :root[data-reduced-motion='true'] *::before,
 :root[data-reduced-motion='true'] *::after {
-  transition-property:
-    color, background-color, border-color, text-decoration-color, fill, stroke,
-    opacity, box-shadow, outline-color;
+  @apply motion-visual-transitions-only;
 }
 
 :root[data-animations='false'] *,

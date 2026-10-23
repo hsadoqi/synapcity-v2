@@ -3,8 +3,11 @@ import { describe, expect, it } from 'vitest';
 import {
   applyCollectionQuery,
   applyItemAction,
+  byRecency,
   formatAgo,
   formatUpdated,
+  pinnedFirst,
+  tagsByUse,
 } from './query';
 import {
   countActiveFilters,
@@ -159,8 +162,26 @@ describe('applyCollectionQuery', () => {
         item({ id: 'unpinned', group: 'Home' }),
         item({ id: 'elsewhere', pinned: true, group: 'Health' }),
       ];
-      const filters = { pinned: true, recent: false, groups: ['Home'] };
+      const filters = {
+        pinned: true,
+        recent: false,
+        groups: ['Home'],
+        tags: [],
+      };
       expect(ids(query(items, { filters }))).toEqual(['match']);
+    });
+
+    it('keeps items that carry any of the selected tags', () => {
+      const items = [
+        item({ id: 'writing', tags: ['writing', 'ideas'] }),
+        item({ id: 'learning', tags: ['learning'] }),
+        item({ id: 'untagged' }),
+      ];
+      const filters = { ...EMPTY_FILTERS, tags: ['ideas', 'learning'] };
+      expect(ids(query(items, { filters })).sort()).toEqual([
+        'learning',
+        'writing',
+      ]);
     });
   });
 
@@ -251,9 +272,107 @@ describe('active filters', () => {
     expect(countActiveFilters(EMPTY_FILTERS)).toBe(0);
     expect(hasActiveFilters(EMPTY_FILTERS)).toBe(false);
 
-    const filters = { pinned: true, recent: true, groups: ['Home', 'Health'] };
-    expect(countActiveFilters(filters)).toBe(4);
+    const filters = {
+      pinned: true,
+      recent: true,
+      groups: ['Home', 'Health'],
+      tags: ['ideas'],
+    };
+    expect(countActiveFilters(filters)).toBe(5);
     expect(hasActiveFilters(filters)).toBe(true);
     expect(hasActiveFilters({ ...EMPTY_FILTERS, groups: ['Home'] })).toBe(true);
+    expect(hasActiveFilters({ ...EMPTY_FILTERS, tags: ['ideas'] })).toBe(true);
+  });
+});
+
+describe('byRecency', () => {
+  it('counts an edit made after the last time it was opened', () => {
+    const items = [
+      item({
+        id: 'viewed-later',
+        updatedAt: daysAgo(9),
+        lastViewedAt: daysAgo(3),
+      }),
+      item({
+        id: 'edited-later',
+        updatedAt: daysAgo(1),
+        lastViewedAt: daysAgo(6),
+      }),
+    ];
+
+    expect(ids(byRecency(items))).toEqual(['edited-later', 'viewed-later']);
+  });
+
+  it('orders by when an item was opened, falling back to when it changed', () => {
+    const items = [
+      item({ id: 'edited', updatedAt: daysAgo(2) }),
+      item({ id: 'opened', updatedAt: daysAgo(9), lastViewedAt: daysAgo(1) }),
+      item({ id: 'old', updatedAt: daysAgo(20) }),
+    ];
+
+    expect(ids(byRecency(items))).toEqual(['opened', 'edited', 'old']);
+  });
+
+  it('returns a new list and leaves the input alone', () => {
+    const items = [
+      item({ id: 'a', updatedAt: daysAgo(3) }),
+      item({ id: 'b', updatedAt: daysAgo(1) }),
+    ];
+
+    expect(ids(byRecency(items))).toEqual(['b', 'a']);
+    expect(ids(items)).toEqual(['a', 'b']);
+  });
+});
+
+describe('tagsByUse', () => {
+  it('lists tags most used first, ties alphabetical', () => {
+    const items = [
+      item({ id: 'a', tags: ['writing', 'ideas'] }),
+      item({ id: 'b', tags: ['ideas', 'work'] }),
+      item({ id: 'c', tags: ['ideas'] }),
+    ];
+
+    expect(tagsByUse(items)).toEqual(['ideas', 'work', 'writing']);
+  });
+
+  it('counts a tag once per item and handles items without tags', () => {
+    const items = [item({ id: 'a', tags: ['x', 'x'] }), item({ id: 'b' })];
+
+    expect(tagsByUse(items)).toEqual(['x']);
+    expect(tagsByUse([])).toEqual([]);
+  });
+});
+
+describe('sorting by last used', () => {
+  const items = [
+    item({ id: 'edited', updatedAt: daysAgo(2) }),
+    item({ id: 'opened', updatedAt: daysAgo(9), lastViewedAt: daysAgo(1) }),
+    item({ id: 'old', updatedAt: daysAgo(20) }),
+  ];
+
+  it('puts the most recently opened or changed first', () => {
+    expect(
+      ids(query(items, { sort: { field: 'used', direction: 'desc' } })),
+    ).toEqual(['opened', 'edited', 'old']);
+  });
+
+  it('reverses when ascending', () => {
+    expect(
+      ids(query(items, { sort: { field: 'used', direction: 'asc' } })),
+    ).toEqual(['old', 'edited', 'opened']);
+  });
+});
+
+describe('pinnedFirst', () => {
+  it('moves pinned items to the front, keeping each group’s order', () => {
+    const items = [
+      item({ id: 'a' }),
+      item({ id: 'b', pinned: true }),
+      item({ id: 'c' }),
+      item({ id: 'd', pinned: true }),
+    ];
+
+    expect(ids(pinnedFirst(items))).toEqual(['b', 'd', 'a', 'c']);
+    expect(ids(items)).toEqual(['a', 'b', 'c', 'd']);
   });
 });

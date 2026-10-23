@@ -67,6 +67,7 @@ describe('Button variants', () => {
       'ghost',
       'destructive',
       'link',
+      'subtle',
     ] as const;
     const classes = variants.map((variant) => buttonVariants({ variant }));
 

@@ -1,14 +1,20 @@
 @import './typeset.css';
 
+/* Only what differs from .typeset: the heading and code fonts already default to the app's. */
 .typeset-docs {
   --typeset-font-body: var(--font-body);
-  --typeset-font-heading: var(--font-heading);
-  --typeset-font-mono: var(--font-code);
-  --typeset-size: 14px;
+  --typeset-size: calc(var(--text-base-size) * 14 / 15);
   --typeset-leading: 1.6;
   --typeset-flow: 1em;
 }
 
 :root {
-  --text-base-size: 0.9375rem;
+  /* The default body size; the Text size setting scales it (tokens/preferences.css). */
+  --text-base-unit: 0.9375rem;
+}
+
+/* Zero specificity, so preferences.css's [data-text-size] wins whatever the import order: it
+ * ties with a plain :root, and this file is imported after it. */
+:where(:root) {
+  --text-base-size: var(--text-base-unit);
 }

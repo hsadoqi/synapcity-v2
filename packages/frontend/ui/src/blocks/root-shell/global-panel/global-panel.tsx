@@ -26,6 +26,13 @@ import {
   ResizablePanelGroup,
 } from '@synapcity/frontend-ui/core/resizable';
 
+/**
+ * Opening and closing glide for this long. It is a CSS transition on the
+ * panel's flex-grow, switched on only around a button, Escape or outside-click
+ * toggle: a drag must follow the pointer, so it never animates.
+ */
+const GLIDE_MS = 200;
+
 const OVERLAYS =
   '[role="menu"], [role="dialog"], [role="alertdialog"], [role="listbox"], [data-slot="popover-content"]';
 const OVERLAY_BACKDROPS =
@@ -83,13 +90,25 @@ export function GlobalPanelShell({
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const regionRef = useRef<HTMLElement | null>(null);
   const lastOpenSize = useRef<number | string>('30%');
+  const glideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
   const [open, setOpen] = useState(false);
+  const [gliding, setGliding] = useState(false);
   const [locked, setLocked] = useState(false);
   const [headerRevealed, setHeaderRevealed] = useState(false);
   const headerHidden = header != null && open && locked && !headerRevealed;
   const setTrigger = useCallback((element: HTMLButtonElement | null) => {
     triggerRef.current = element;
   }, []);
+
+  const glide = useCallback(() => {
+    clearTimeout(glideTimer.current);
+    setGliding(true);
+    glideTimer.current = setTimeout(() => setGliding(false), GLIDE_MS + 50);
+  }, []);
+
+  useEffect(() => () => clearTimeout(glideTimer.current), []);
 
   const restoreFocus = useCallback(() => {
     if (regionRef.current?.contains(document.activeElement)) {
@@ -127,14 +146,17 @@ export function GlobalPanelShell({
 
   const close = useCallback(() => {
     restoreFocus();
+    glide();
     handleRef.current?.collapse();
-  }, [restoreFocus]);
+  }, [restoreFocus, glide]);
 
   const toggle = () => {
     const handle = handleRef.current;
     if (!handle) return;
-    if (handle.isCollapsed()) handle.resize(lastOpenSize.current);
-    else close();
+    if (handle.isCollapsed()) {
+      glide();
+      handle.resize(lastOpenSize.current);
+    } else close();
   };
 
   const rememberSize: NonNullable<GroupProps['onLayoutChanged']> = (
@@ -208,6 +230,8 @@ export function GlobalPanelShell({
       <ResizablePanelGroup
         orientation="vertical"
         onLayoutChanged={rememberSize}
+        data-gliding={gliding ? '' : undefined}
+        className="data-gliding:*:data-[slot=resizable-panel]:transition-[flex-grow] data-gliding:*:data-[slot=resizable-panel]:duration-200 data-gliding:*:data-[slot=resizable-panel]:ease-out"
       >
         <ResizablePanel
           id={panelId}
@@ -238,7 +262,7 @@ export function GlobalPanelShell({
             inert={!open}
             className="flex h-full min-h-0 flex-col bg-muted/50"
           >
-            <div className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-divider bg-background px-4">
+            <div className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-border bg-background px-4">
               <h2 id={`${id}-title`} className="truncate text-sm font-medium">
                 Global panel
               </h2>
@@ -313,12 +337,12 @@ export function GlobalPanelShell({
         />
         <ResizablePanel defaultSize="100%" minSize="4rem">
           <div
-            data-slot="shell-page-scroll"
+            data-slot="shell-page"
             data-global-panel={open ? 'open' : 'closed'}
             role="group"
             aria-label="Work area"
             tabIndex={0}
-            className="group/work-area flex h-full min-h-0 flex-col overflow-y-auto outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
+            className="group/work-area flex h-full min-h-0 flex-col overflow-hidden outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
           >
             {children}
           </div>

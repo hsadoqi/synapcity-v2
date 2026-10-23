@@ -4,3 +4,4 @@ export * from './create-button';
 export * from './filters-menu';
 export * from './layout-toggle-group';
 export * from './sort-options-menu';
+export * from './collection-tag-chips';

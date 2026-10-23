@@ -5,3 +5,4 @@ export * from './item-icon';
 export * from './item-open-button';
 export * from './item-props';
 export * from './pinned-mark';
+export * from './item-icon-preview';

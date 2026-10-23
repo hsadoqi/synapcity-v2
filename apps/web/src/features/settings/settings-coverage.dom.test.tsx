@@ -17,7 +17,7 @@ import { themeSchema } from './types/theme';
 beforeEach(stubBrowser);
 afterEach(() => vi.unstubAllGlobals());
 
-type Control = { role: 'combobox' | 'switch'; name: string };
+type Control = { role: 'combobox' | 'switch' | 'status'; name: string };
 
 // Every setting the Theme, Appearance, Regional, Notifications and Data privacy
 // tabs own has a control named here. A field added to any of those schemas fails this test until it gets one, so a setting
@@ -29,13 +29,15 @@ const themeControls: Record<keyof typeof themeSchema.shape, Control> = {
   headingFont: { role: 'combobox', name: 'Heading font' },
   bodyFont: { role: 'combobox', name: 'Body font' },
   codeFont: { role: 'combobox', name: 'Monospace font' },
+  radius: { role: 'combobox', name: 'Corner radius' },
+  density: { role: 'combobox', name: 'Density' },
+  textSize: { role: 'status', name: 'Text size' },
 };
 
 const appearanceControls: Record<
   Exclude<keyof typeof appearanceSchema.shape, 'colorScheme'>,
   Control
 > = {
-  fontSize: { role: 'combobox', name: 'Text size' },
   contrastMode: { role: 'combobox', name: 'Contrast' },
   showBorders: { role: 'switch', name: 'Show component borders' },
   animationsEnabled: { role: 'switch', name: 'Enable animations' },

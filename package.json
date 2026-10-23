@@ -5,6 +5,7 @@
   "scripts": {
     "build": "turbo run build",
     "build:storybook": "turbo run build-storybook --filter=storybook",
+    "start": "turbo run start",
     "dev": "turbo run dev",
     "dev:web": "turbo run dev --filter=web",
     "dev:docs": "turbo run dev --filter=docs",
@@ -18,7 +19,9 @@
     "test:e2e": "turbo run test:e2e --filter=web",
     "test:storybook": "turbo run test:storybook --filter=storybook",
     "test:watch": "turbo run test:watch",
+    "test:bail": "turbo run test --ui=stream --continue=never -- --bail=1",
     "verify": "pnpm format:check && turbo run lint check-types && pnpm deps && pnpm brand:check && pnpm test:coverage && pnpm test:e2e && pnpm test:storybook && pnpm build",
+    "verify:fast": "pnpm format:check && turbo run lint check-types --ui=stream --continue=never && pnpm deps && pnpm brand:check && turbo run test:coverage --ui=stream --continue=never -- --bail=1 && pnpm test:e2e && pnpm test:storybook && pnpm build",
     "deps": "knip",
     "brand:check": "node scripts/check-brand-assets.mjs",
     "prepare": "git config core.hooksPath .githooks || echo 'git hooks not activated (not a git checkout)'",
@@ -33,7 +36,7 @@
     "typescript": "7.0.2",
     "vitest": "4.1.11"
   },
-  "packageManager": "pnpm@11.25.0",
+  "packageManager": "pnpm@12.15.0",
   "engines": {
     "node": ">=24"
   }

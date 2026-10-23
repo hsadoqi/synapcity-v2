@@ -1,7 +1,9 @@
+import { Separator } from '@synapcity/frontend-ui/core/separator';
+import { Skeleton } from '@synapcity/frontend-ui/core/skeleton';
+
 import {
   CompactItemList,
   CompactItemListSkeleton,
-  FeaturedItems,
   FeaturedItemsSkeleton,
   ItemChips,
   ItemChipsSkeleton,
@@ -17,13 +19,7 @@ export function HomeOverview({
   pinned = [],
 }: Pick<HomePageProps, 'items' | 'pinned'>) {
   return (
-    <div className="flex-1 flex flex-col gap-10 px-4 py-8 sm:px-6 sm:py-12">
-      <FeaturedItems
-        {...OVERVIEW_SECTIONS.continue}
-        items={items.slice(0, 3)}
-        kinds={ITEM_KINDS}
-        now={FIXTURE_NOW}
-      />
+    <div className="flex-1 flex flex-col gap-10">
       <ItemChips
         {...OVERVIEW_SECTIONS.pinned}
         items={pinned}
@@ -45,14 +41,24 @@ export function HomeOverviewSkeleton() {
   return (
     <>
       <FeaturedItemsSkeleton heading={OVERVIEW_SECTIONS.continue.heading} />
-      <ItemChipsSkeleton
-        heading={OVERVIEW_SECTIONS.pinned.heading}
-        headingIcon={OVERVIEW_SECTIONS.pinned.headingIcon}
-      />
-      <CompactItemListSkeleton
-        heading={OVERVIEW_SECTIONS.recent.heading}
-        rows={6}
-      />
+      {/* The tab bar and the overview under it, as CollectionTabs lays them out. */}
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <Skeleton className="h-8 w-56" />
+          <Skeleton className="h-7 w-72" />
+        </div>
+        <Separator />
+        <div className="flex flex-col gap-10">
+          <ItemChipsSkeleton
+            heading={OVERVIEW_SECTIONS.pinned.heading}
+            headingIcon={OVERVIEW_SECTIONS.pinned.headingIcon}
+          />
+          <CompactItemListSkeleton
+            heading={OVERVIEW_SECTIONS.recent.heading}
+            rows={6}
+          />
+        </div>
+      </div>
     </>
   );
 }

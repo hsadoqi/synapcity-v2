@@ -41,13 +41,18 @@ export const settingScope: {
     headingFont: 'account',
     bodyFont: 'account',
     codeFont: 'account',
+    // Taste, like the fonts: it follows the person.
+    radius: 'account',
+    // Depends on the screen and the pointer in use: it stays on the device.
+    density: 'device',
+    // Depends on the screen and the eyes in front of it: it stays on the device.
+    textSize: 'device',
   },
   // Device by default; the person may apply them everywhere (appearanceOverride).
   appearance: {
     animationsEnabled: 'device',
     reducedMotion: 'device',
     contrastMode: 'device',
-    fontSize: 'device',
     colorScheme: 'device',
     showBorders: 'device',
   },
@@ -61,6 +66,7 @@ const accountThemeSchema = themeSchema.pick({
   headingFont: true,
   bodyFont: true,
   codeFont: true,
+  radius: true,
 });
 
 /** The document stored in `user_preferences.preferences`. */
@@ -72,6 +78,7 @@ export const accountPreferencesSchema = z.object({
     headingFont: themeDefaults.headingFont,
     bodyFont: themeDefaults.bodyFont,
     codeFont: themeDefaults.codeFont,
+    radius: themeDefaults.radius,
   }),
   appearanceOverride: displaySchema.optional(),
 });
@@ -91,12 +98,12 @@ export function accountPart(
   settings: Settings,
   appearanceOverride: DisplaySettings | null = null,
 ): AccountPreferences {
-  const { headingFont, bodyFont, codeFont } = settings.theme;
+  const { headingFont, bodyFont, codeFont, radius } = settings.theme;
   return {
     regional: settings.regional,
     notifications: settings.notifications,
     privacy: settings.privacy,
-    theme: { headingFont, bodyFont, codeFont },
+    theme: { headingFont, bodyFont, codeFont, radius },
     ...(appearanceOverride ? { appearanceOverride } : {}),
   };
 }
@@ -104,7 +111,11 @@ export function accountPart(
 /** The device part of `settings`, for export. */
 function devicePart(settings: Settings) {
   return {
-    theme: { mode: settings.theme.mode },
+    theme: {
+      mode: settings.theme.mode,
+      density: settings.theme.density,
+      textSize: settings.theme.textSize,
+    },
     appearance: settings.appearance,
   };
 }
@@ -152,6 +163,8 @@ export function readAccountPreferences(raw: unknown): AccountPreferences {
           headingFont: theme.headingFont,
           bodyFont: theme.bodyFont,
           codeFont: theme.codeFont,
+          // Density is device scope, so a stored account document is not read for it.
+          radius: theme.radius,
         },
       }),
     });

@@ -4,12 +4,18 @@ import { useEffect, useRef } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from '@synapcity/frontend-ui/core/toast';
 
-import { NOTICES, NOTICE_PARAM, isNoticeKey } from '@/lib/routing/notices';
+import {
+  NOTICES,
+  NOTICE_PARAM,
+  isNoticeKey,
+  noticeTimeout,
+} from '@/lib/routing/notices';
 
 /**
- * Shows the confirmation a redirect carried (`?notice=<key>`) as a toast, then
+ * Shows the notice a redirect carried (`?notice=<key>`) as a toast, then
  * removes it from the address so a refresh or a shared link does not show it
- * again. Only keys in the fixed list are shown; anything else is ignored.
+ * again. Only keys in the fixed list are shown, exactly as that list defines
+ * them (type, wording, duration, action); anything else is ignored.
  * Renders nothing. Mount it once, inside a Suspense boundary.
  */
 export function NoticeToast() {
@@ -30,7 +36,26 @@ export function NoticeToast() {
     if (!isNoticeKey(key) || shown.current === key) return;
     shown.current = key;
 
-    toast.add({ id: `notice-${key}`, type: 'success', title: NOTICES[key] });
+    const notice = NOTICES[key];
+    const id = `notice-${key}`;
+    const { action } = notice;
+
+    toast.add({
+      id,
+      type: notice.type,
+      title: notice.title,
+      description: notice.description,
+      timeout: noticeTimeout(notice),
+      // An error interrupts the screen reader; everything else waits its turn.
+      priority: notice.type === 'error' ? 'high' : 'low',
+      actionProps: action && {
+        children: action.label,
+        onClick: () => {
+          toast.close(id);
+          router.push(action.href);
+        },
+      },
+    });
 
     const rest = new URLSearchParams(params.toString());
     rest.delete(NOTICE_PARAM);
