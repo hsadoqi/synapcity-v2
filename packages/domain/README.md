@@ -27,7 +27,7 @@ A schema has one owner. Frontend components, server adapters, feature compositio
 
 React components and hooks, Next.js APIs, DOM effects, browser storage, cookies, SDK clients, network calls, database row mapping, secrets, and concrete repositories belong to other owners. Database constraints and RLS still enforce their own durable security invariants; sharing a validator does not replace them.
 
-A capability's meaning is independent of where it renders. Route containment does not establish ownership. Do not introduce a universal Entity model or an identical package for every product noun merely to complete a diagram.
+A capability's meaning is independent of where it renders. Route containment does not establish ownership. Record kinds extend one base contract for their shared attributes (owner decision, 2026-10-23) and keep their own semantics. Do not create an identical package for every product noun merely to complete a diagram.
 
 ## Dependency boundaries
 

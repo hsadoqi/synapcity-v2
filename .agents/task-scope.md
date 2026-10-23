@@ -1,3 +1,11 @@
+## Active task: Milestone 3.1 package grouping and naming design (2026-10-23)
+
+- Goal and mode: owner asked to start Milestone 3 with 3.1 (package grouping and naming). Brainstorming with the owner, then writing one Proposed design for owner review. No package, manifest, source, config or dependency change.
+- Branch: `chore/reorganization-m3-boundary-enforcement`, created from pushed `e85b3bb2`.
+- Owner decisions this session (2026-10-23): one capability may span categories; separate `frontend/preferences` runtime; preferences (data/runtime) versus settings (screen) naming split; profile/account contracts in `domain/identity`; one `domain/records` package; a base record contract for shared attributes (records were never meant to repeat them; the earlier "no universal Entity model" wording was AI-introduced and is corrected in ADR-0014, the domain README and the ownership map); `frontend/shells` widened to composable app shells and page frames, content passed through children/slots.
+- Exact updates: `.agents/task-scope.md`; `docs/architecture/decisions/0014-multi-app-package-boundaries.md`, `docs/architecture/reorganization-ownership-map.md`, `packages/domain/README.md` (entity-base correction only). Exact creates (1): `docs/superpowers/specs/2026-10-23-m3-package-grouping-design.md`, status Proposed. Commits, pushes, issues, project changes 0.
+- Verification: Prettier on changed files, relative-link check, builder read-through of the spec. Not run: application gates (documentation only).
+
 ## Milestone 1 baseline record (2026-10-23)
 
 - Baseline: clean worktree copy of `1390871eaca37c96713c5f7549d3ec6b4ae0764b` on `refactor/reorganization-m1-baseline`, in the named architecture-reorganization worktree.
