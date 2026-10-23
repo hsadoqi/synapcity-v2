@@ -43,8 +43,8 @@ function html(userId: string | null) {
 }
 
 describe('RootHeaderContent', () => {
-  it('links the logo to the visitor home in the server-rendered HTML', () => {
-    expect(html('user-1')).toContain('href="/user-1/home"');
+  it('leaves the logo to the sidebar once signed in', () => {
+    expect(html('user-1')).not.toContain('Synapcity home');
   });
 
   it('links the logo to the landing page when signed out', () => {
@@ -81,12 +81,42 @@ describe('RootHeader', () => {
     expect(screen.getByRole('banner')).toBeTruthy();
   });
 
-  it('names the logo link and sends it to the account home when signed in', () => {
+  it('shows no logo link when signed in, since the sidebar carries the brand', () => {
     renderHeader(account);
 
+    expect(screen.queryByRole('link', { name: 'Synapcity home' })).toBeNull();
+  });
+
+  it('shows the breadcrumb trail when signed in, ending on the current page', () => {
+    render(
+      <ModeProvider>
+        <TooltipProvider>
+          <SidebarProvider>
+            <RootHeader
+              account={account}
+              breadcrumbs={[
+                { label: 'Spaces', href: '/u/home/spaces' },
+                { label: 'Fitness' },
+              ]}
+            />
+          </SidebarProvider>
+        </TooltipProvider>
+      </ModeProvider>,
+    );
+    const trail = screen.getByRole('navigation', { name: 'Breadcrumb' });
+
     expect(
-      screen.getByRole('link', { name: 'Synapcity home' }).getAttribute('href'),
-    ).toBe('/u/home');
+      within(trail).getByRole('link', { name: 'Spaces' }).getAttribute('href'),
+    ).toBe('/u/home/spaces');
+    expect(
+      within(trail).getByText('Fitness').getAttribute('aria-current'),
+    ).toBe('page');
+  });
+
+  it('shows no breadcrumb when signed out', () => {
+    renderHeader(null);
+
+    expect(screen.queryByRole('navigation', { name: 'Breadcrumb' })).toBeNull();
   });
 
   it('sends the logo to the landing page when signed out', () => {
@@ -99,11 +129,11 @@ describe('RootHeader', () => {
 
   it('shows the sidebar trigger only when signed in', () => {
     const { unmount } = renderHeader(account);
-    expect(screen.getByRole('button', { name: /navigation$/ })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Open sidebar' })).toBeTruthy();
     unmount();
 
     renderHeader(null);
-    expect(screen.queryByRole('button', { name: /navigation$/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Open sidebar' })).toBeNull();
   });
 
   it('groups utility actions in a labelled navigation', () => {

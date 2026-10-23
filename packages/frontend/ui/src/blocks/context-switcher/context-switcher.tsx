@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Check, ChevronsUpDown, GalleryVerticalEnd } from 'lucide-react';
+import { Check, ChevronsUpDown } from 'lucide-react';
 
 import {
   DropdownMenu,
@@ -14,6 +14,10 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@synapcity/frontend-ui/core/sidebar';
+import {
+  SynapcityMark,
+  SynapcityWordmark,
+} from '@synapcity/frontend-ui/components/logo-mark';
 
 export function ContextSwitcher({
   versions,
@@ -29,29 +33,27 @@ export function ContextSwitcher({
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger
-            render={(props) => {
-              return (
-                <SidebarMenuButton
-                  size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                  {...props}
-                >
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                    <GalleryVerticalEnd className="size-4" />
-                  </div>
-                  <div className="flex flex-col gap-0.5 leading-none">
-                    <span className="font-medium">Documentation</span>
-                    <span className="">v{selectedVersion}</span>
-                  </div>
-                  <ChevronsUpDown className="ml-auto" />
-                </SidebarMenuButton>
-              );
-            }}
+            render={(props) => (
+              <SidebarMenuButton
+                size="lg"
+                {...props}
+                className="data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
+              >
+                <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <SynapcityMark className="size-4" />
+                </div>
+                <div className="flex min-w-0 flex-1 items-center leading-none">
+                  <SynapcityWordmark
+                    size="md"
+                    title={null}
+                    className="text-sidebar-foreground"
+                  />
+                </div>
+                <ChevronsUpDown className="ml-auto shrink-0" />
+              </SidebarMenuButton>
+            )}
           />
-          <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width)"
-            align="start"
-          >
+          <DropdownMenuContent align="start">
             {versions.map((version) => (
               <DropdownMenuItem
                 key={version}
