@@ -14,8 +14,46 @@ describe('settings merge and import', () => {
     expect(() =>
       parseImportPatch({
         appearance: { contrastMode: 'extreme', fontSize: 'huge' },
+        theme: { textSize: 97 },
       }),
-    ).toThrow(/Ignored: appearance.contrastMode, appearance.fontSize/);
+    ).toThrow(
+      /Ignored: appearance.contrastMode, appearance.fontSize, theme.textSize/,
+    );
+  });
+
+  it.each([
+    [80, true],
+    [150, true],
+    [75, false],
+    [155, false],
+    [102, false],
+    ['100', false],
+  ])('accepts a text size of %j: %s', (textSize, valid) => {
+    expect(
+      settingsSchema.safeParse({ theme: { mode: 'system', textSize } }).success,
+    ).toBe(valid);
+  });
+
+  it.each([
+    ['small', 95],
+    ['medium', 100],
+    ['large', 115],
+  ])(
+    'reads the old %s text size preset as %i%% on the theme',
+    (fontSize, textSize) => {
+      const { settings } = parseImport({ appearance: { fontSize } });
+      expect(settings.theme.textSize).toBe(textSize);
+      expect(settings.appearance).not.toHaveProperty('fontSize');
+    },
+  );
+
+  it('prefers a saved text size percentage over the old preset', () => {
+    const result = parseImport({
+      appearance: { fontSize: 'large' },
+      theme: { textSize: 90 },
+    });
+    expect(result.settings.theme.textSize).toBe(90);
+    expect(result.ignored).toEqual(['appearance.fontSize']);
   });
 
   it('returns only valid explicit changes in an import patch', () => {
@@ -211,10 +249,8 @@ describe('settings merge and import', () => {
       notifications: false,
       privacy: { tracking: false },
     });
-    expect(result.settings.appearance).toMatchObject({
-      showBorders: true,
-      fontSize: 'large',
-    });
+    expect(result.settings.appearance).toMatchObject({ showBorders: true });
+    expect(result.settings.theme.textSize).toBe(115);
     expect(result.settings.privacy.analytics.granted).toBe(false);
     expect(result.ignored).toEqual(['regional', 'notifications']);
   });

@@ -3,6 +3,10 @@ import { SettingsProvider } from '../../../providers/settings-provider/settings-
 import { SettingsHeader } from '../settings-header/settings-header';
 import { SettingsTabs } from '../../settings-tabs/settings-tabs';
 import { SettingsFooter } from '../settings-footer/settings-footer';
+import {
+  SettingsDraftsProvider,
+  UnsavedChangesGuard,
+} from '../../settings-drafts';
 
 export function SettingsContent({
   name,
@@ -16,15 +20,26 @@ export function SettingsContent({
 }) {
   return (
     <SettingsProvider name={name} account={account}>
-      {/* One reading column. The page shell already pads the sides and caps at
-          max-w-7xl; at that width a row's label and its control sat ~1000px
-          apart. Header, tabs, card and footer share this column so they align. */}
-      <div className="mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col gap-6 py-6 sm:gap-8 sm:py-10">
-        <SettingsHeader />
-        {notice && <p className="text-sm text-muted-foreground">{notice}</p>}
-        <SettingsTabs />
-        <SettingsFooter />
-      </div>
+      {/* Every tab's draft registers here, so leaving the page asks about all
+          unsaved tabs, not only the one in view. */}
+      <SettingsDraftsProvider>
+        {/* As wide as the page shell (max-w-7xl): the side navigation, a tab's
+            settings and its preview rail share it. */}
+        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col py-6 roomy:min-h-0 sm:py-10">
+          <SettingsTabs
+            header={
+              <>
+                <SettingsHeader />
+                {notice && (
+                  <p className="text-sm text-muted-foreground">{notice}</p>
+                )}
+              </>
+            }
+            footer={<SettingsFooter syncsToAccount={account !== undefined} />}
+          />
+        </div>
+        <UnsavedChangesGuard />
+      </SettingsDraftsProvider>
     </SettingsProvider>
   );
 }

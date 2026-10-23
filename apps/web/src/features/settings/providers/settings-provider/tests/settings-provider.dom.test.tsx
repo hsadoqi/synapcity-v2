@@ -12,13 +12,13 @@ import {
   useMode,
 } from '@synapcity/frontend-ui/providers/mode-provider';
 import { SettingsProvider } from '../settings-provider';
-import { useSettings } from '../../hooks/use-settings';
-import { useRegionalSettings } from '../../hooks/use-regional-settings';
-import { useAppearanceSettings } from '../../hooks/use-appearance-settings';
-import { useNotificationSettings } from '../../hooks/use-notification-settings';
-import { useDataPrivacySettings } from '../../hooks/use-data-privacy-settings';
-import { useThemeSettings } from '../../hooks/use-theme-settings';
-import { SettingsHeader } from '../../shared/settings-page/settings-header/settings-header';
+import { useSettings } from '../../../hooks/use-settings';
+import { useRegionalSettings } from '../../../hooks/use-regional-settings';
+import { useAppearanceSettings } from '../../../hooks/use-appearance-settings';
+import { useNotificationSettings } from '../../../hooks/use-notification-settings';
+import { useDataPrivacySettings } from '../../../hooks/use-data-privacy-settings';
+import { useThemeSettings } from '../../../hooks/use-theme-settings';
+import { SettingsHeader } from '../../../shared/settings-page/settings-header';
 
 const KEY = 'synapcity-preferences';
 
@@ -56,7 +56,6 @@ function Controls() {
             animationsEnabled: false,
             reducedMotion: true,
             contrastMode: 'high',
-            fontSize: 'large',
           })
         }
       >
@@ -172,7 +171,6 @@ describe('shared SettingsProvider', () => {
     expect(document.documentElement.dataset.borders).toBe('true');
     expect(document.documentElement.dataset.reducedMotion).toBe('true');
     expect(document.documentElement.dataset.contrast).toBe('high');
-    expect(document.documentElement.dataset.fontSize).toBe('large');
     expect(values().privacy).toMatchObject({
       analytics: { granted: true },
       sharing: { granted: false },

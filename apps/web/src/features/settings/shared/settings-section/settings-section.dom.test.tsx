@@ -19,3 +19,18 @@ describe('SettingsSection', () => {
     ).toContain('rows');
   });
 });
+
+describe('SettingsSection inside an accordion section', () => {
+  it('takes level 4 under the h3 trigger', () => {
+    render(
+      <SettingsSection title="Fonts" level={4}>
+        <p>rows</p>
+      </SettingsSection>,
+    );
+
+    expect(
+      screen.getByRole('heading', { level: 4, name: 'Fonts' }),
+    ).toBeTruthy();
+    expect(screen.getByRole('region', { name: 'Fonts' })).toBeTruthy();
+  });
+});

@@ -113,7 +113,8 @@ describe('SettingsContent', () => {
 
       await waitFor(() => expect(colorTheme().textContent).toContain('Dark'));
       expect(
-        within(screen.getByRole('tabpanel')).getByRole('status').textContent,
+        within(screen.getByRole('tabpanel')).getByRole('status', { name: '' })
+          .textContent,
       ).toBe('You have unsaved changes.');
     },
     LOADING_TIMEOUT,

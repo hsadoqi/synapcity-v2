@@ -16,7 +16,7 @@ import type {
   StoredAccountPreferences,
 } from '../../../lib/account-sync';
 import { accountPart, type DisplaySettings } from '../../../lib/scope';
-import { currentSettings, stubBrowser } from '../../../test-harness';
+import { currentSettings, saveTab, stubBrowser } from '../../../test-harness';
 import { settingsDefaults, type Settings } from '../../../types/settings';
 import { SettingsProvider } from '../settings-provider';
 
@@ -30,7 +30,6 @@ const display = (
   animationsEnabled: true,
   reducedMotion: false,
   contrastMode: 'none',
-  fontSize: 'medium',
   showBorders: false,
   ...overrides,
 });
@@ -50,7 +49,9 @@ function Status() {
   return (
     <>
       <span data-testid="ready">{String(isReady)}</span>
-      <span role="status">{status}</span>
+      <span role="status" aria-label="Provider status">
+        {status}
+      </span>
       <button onClick={() => updateSettings({ regional: { language: 'ja' } })}>
         Change language
       </button>
@@ -110,14 +111,14 @@ describe('SettingsProvider with an account (ADR-0010)', () => {
       KEY,
       JSON.stringify({
         ...settingsDefaults,
-        appearance: { ...settingsDefaults.appearance, fontSize: 'large' },
+        appearance: { ...settingsDefaults.appearance, contrastMode: 'high' },
       }),
     );
     const { account } = sync({
       preferences: accountPart(withLanguage('de')),
     });
     await mount(account);
-    expect(currentSettings().appearance.fontSize).toBe('large');
+    expect(currentSettings().appearance.contrastMode).toBe('high');
   });
 
   it('saves choices made before signing in when the account has none', async () => {
@@ -160,6 +161,7 @@ describe('SettingsProvider with an account (ADR-0010)', () => {
     fireEvent.click(
       screen.getByRole('switch', { name: 'Show component borders' }),
     );
+    saveTab();
     expect(currentSettings().appearance.showBorders).toBe(true);
     expect(save).toHaveBeenCalledOnce();
   });
@@ -172,7 +174,9 @@ describe('SettingsProvider with an account (ADR-0010)', () => {
     await mount(account);
     fireEvent.click(screen.getByText('Change language'));
     await waitFor(() =>
-      expect(screen.getByRole('status').textContent).toBe(
+      expect(
+        screen.getByRole('status', { name: 'Provider status' }).textContent,
+      ).toBe(
         'Changes apply on this device, but could not be saved to your account.',
       ),
     );
@@ -192,9 +196,9 @@ describe('SettingsProvider with an account (ADR-0010)', () => {
     await mount(account);
     fireEvent.click(screen.getByText('Change language'));
     await waitFor(() =>
-      expect(screen.getByRole('status').textContent).toBe(
-        'Sign in again to update your profile.',
-      ),
+      expect(
+        screen.getByRole('status', { name: 'Provider status' }).textContent,
+      ).toBe('Sign in again to update your profile.'),
     );
   });
 
@@ -206,9 +210,9 @@ describe('SettingsProvider with an account (ADR-0010)', () => {
     await mount(account);
     fireEvent.click(screen.getByText('Change language'));
     await waitFor(() =>
-      expect(screen.getByRole('status').textContent).toContain(
-        'could not be saved to your account',
-      ),
+      expect(
+        screen.getByRole('status', { name: 'Provider status' }).textContent,
+      ).toContain('could not be saved to your account'),
     );
   });
 });
@@ -240,6 +244,7 @@ describe('display settings on all devices', () => {
     fireEvent.click(
       screen.getByRole('switch', { name: 'Show component borders' }),
     );
+    saveTab();
     await waitFor(() => expect(save).toHaveBeenCalledTimes(2));
     expect(save.mock.calls[1]![0].appearanceOverride).toEqual(
       display({ showBorders: true }),
@@ -251,20 +256,20 @@ describe('display settings on all devices', () => {
       KEY,
       JSON.stringify({
         ...settingsDefaults,
-        appearance: { ...settingsDefaults.appearance, fontSize: 'small' },
+        appearance: { ...settingsDefaults.appearance, contrastMode: 'low' },
       }),
     );
     const { account, save } = sync({
       preferences: accountPart(
         settingsDefaults,
-        display({ fontSize: 'large' }),
+        display({ contrastMode: 'high' }),
       ),
     });
     await mount(account);
-    expect(currentSettings().appearance.fontSize).toBe('large');
-    expect(stored().appearance.fontSize).toBe('large');
-    expect(JSON.parse(localStorage.getItem(SET_ASIDE_KEY)!).fontSize).toBe(
-      'small',
+    expect(currentSettings().appearance.contrastMode).toBe('high');
+    expect(stored().appearance.contrastMode).toBe('high');
+    expect(JSON.parse(localStorage.getItem(SET_ASIDE_KEY)!).contrastMode).toBe(
+      'low',
     );
 
     await act(async () => {
@@ -272,8 +277,8 @@ describe('display settings on all devices', () => {
         screen.getByRole('switch', { name: 'Use on all my devices' }),
       );
     });
-    expect(currentSettings().appearance.fontSize).toBe('small');
-    expect(stored().appearance.fontSize).toBe('small');
+    expect(currentSettings().appearance.contrastMode).toBe('low');
+    expect(stored().appearance.contrastMode).toBe('low');
     expect(localStorage.getItem(SET_ASIDE_KEY)).toBeNull();
     await waitFor(() => expect(save).toHaveBeenCalled());
     expect(save.mock.lastCall![0]).not.toHaveProperty('appearanceOverride');
@@ -284,16 +289,16 @@ describe('display settings on all devices', () => {
       KEY,
       JSON.stringify({
         ...settingsDefaults,
-        appearance: { ...settingsDefaults.appearance, fontSize: 'large' },
+        appearance: { ...settingsDefaults.appearance, contrastMode: 'high' },
       }),
     );
     localStorage.setItem(
       SET_ASIDE_KEY,
-      JSON.stringify(display({ fontSize: 'small' })),
+      JSON.stringify(display({ contrastMode: 'low' })),
     );
     const { account } = sync({ preferences: accountPart(settingsDefaults) });
     await mount(account);
-    expect(currentSettings().appearance.fontSize).toBe('small');
+    expect(currentSettings().appearance.contrastMode).toBe('low');
     expect(localStorage.getItem(SET_ASIDE_KEY)).toBeNull();
   });
 });

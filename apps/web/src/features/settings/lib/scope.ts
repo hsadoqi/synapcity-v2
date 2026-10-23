@@ -43,15 +43,16 @@ export const settingScope: {
     codeFont: 'account',
     // Taste, like the fonts: it follows the person.
     radius: 'account',
-    // Depends on the screen and the pointer in use, like text size: it stays on the device.
+    // Depends on the screen and the pointer in use: it stays on the device.
     density: 'device',
+    // Depends on the screen and the eyes in front of it: it stays on the device.
+    textSize: 'device',
   },
   // Device by default; the person may apply them everywhere (appearanceOverride).
   appearance: {
     animationsEnabled: 'device',
     reducedMotion: 'device',
     contrastMode: 'device',
-    fontSize: 'device',
     colorScheme: 'device',
     showBorders: 'device',
   },
@@ -110,7 +111,11 @@ export function accountPart(
 /** The device part of `settings`, for export. */
 function devicePart(settings: Settings) {
   return {
-    theme: { mode: settings.theme.mode, density: settings.theme.density },
+    theme: {
+      mode: settings.theme.mode,
+      density: settings.theme.density,
+      textSize: settings.theme.textSize,
+    },
     appearance: settings.appearance,
   };
 }

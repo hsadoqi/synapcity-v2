@@ -83,7 +83,8 @@ describe('setting scope (ADR-0010)', () => {
     [{ notifications: { push: true } }, true],
     [{ notifications: { sound: false } }, true],
     [{ theme: { mode: 'dark' } }, false],
-    [{ appearance: { fontSize: 'large' } }, false],
+    [{ theme: { textSize: 115 } }, false],
+    [{ appearance: { contrastMode: 'high' } }, false],
     [{ unknown: { language: 'fr' } }, false],
   ])('touchesAccount(%j) is %s', (patch, expected) => {
     expect(touchesAccount(patch)).toBe(expected);
@@ -105,7 +106,6 @@ describe('setting scope (ADR-0010)', () => {
           animationsEnabled: true,
           reducedMotion: false,
           contrastMode: 'none',
-          fontSize: 'medium',
           showBorders: false,
         }),
       ),
@@ -174,7 +174,6 @@ describe('readAccountPreferences', () => {
       animationsEnabled: false,
       reducedMotion: true,
       contrastMode: 'high',
-      fontSize: 'large',
       showBorders: true,
     };
     expect(
@@ -182,7 +181,9 @@ describe('readAccountPreferences', () => {
         .appearanceOverride,
     ).toEqual(override);
     expect(
-      readAccountPreferences({ appearanceOverride: { fontSize: 'huge' } }),
+      readAccountPreferences({
+        appearanceOverride: { contrastMode: 'extreme' },
+      }),
     ).not.toHaveProperty('appearanceOverride');
   });
 });
@@ -194,7 +195,7 @@ describe('withAccount', () => {
       regional: { ...settingsDefaults.regional, language: 'fr' as const },
       appearance: {
         ...settingsDefaults.appearance,
-        fontSize: 'small' as const,
+        contrastMode: 'low' as const,
       },
     };
     const account = accountPart({
@@ -203,23 +204,29 @@ describe('withAccount', () => {
     });
     const merged = withAccount(local, account);
     expect(merged.regional.language).toBe('de');
-    expect(merged.appearance.fontSize).toBe('small');
+    expect(merged.appearance.contrastMode).toBe('low');
   });
 });
 
 describe('toTransferFile', () => {
-  it('writes corner radius with the account and density with the device', () => {
+  it('writes corner radius with the account, density and text size with the device', () => {
     const file = toTransferFile({
       ...settingsDefaults,
       theme: {
         ...settingsDefaults.theme,
         radius: 'soft',
         density: 'spacious',
+        textSize: 120,
       },
     });
     expect(file.account.theme.radius).toBe('soft');
     expect(file.account.theme).not.toHaveProperty('density');
-    expect(file.device.theme).toEqual({ mode: 'system', density: 'spacious' });
+    expect(file.account.theme).not.toHaveProperty('textSize');
+    expect(file.device.theme).toEqual({
+      mode: 'system',
+      density: 'spacious',
+      textSize: 120,
+    });
   });
 
   it('reads its own export back to the same theme', () => {
@@ -227,10 +234,13 @@ describe('toTransferFile', () => {
       ...settingsDefaults.theme,
       radius: 'sharp' as const,
       density: 'compact' as const,
+      textSize: 85,
     };
     expect(
       fromTransferFile(toTransferFile({ ...settingsDefaults, theme })),
-    ).toMatchObject({ theme: { radius: 'sharp', density: 'compact' } });
+    ).toMatchObject({
+      theme: { radius: 'sharp', density: 'compact', textSize: 85 },
+    });
   });
 });
 
@@ -245,12 +255,15 @@ describe('fromTransferFile', () => {
       fromTransferFile({
         version: 2,
         account: { regional: { language: 'fr' }, theme: { bodyFont: 'lora' } },
-        device: { theme: { mode: 'dark' }, appearance: { fontSize: 'large' } },
+        device: {
+          theme: { mode: 'dark', textSize: 110 },
+          appearance: { contrastMode: 'high' },
+        },
       }),
     ).toEqual({
       regional: { language: 'fr' },
-      theme: { bodyFont: 'lora', mode: 'dark' },
-      appearance: { fontSize: 'large' },
+      theme: { bodyFont: 'lora', mode: 'dark', textSize: 110 },
+      appearance: { contrastMode: 'high' },
     });
   });
 });

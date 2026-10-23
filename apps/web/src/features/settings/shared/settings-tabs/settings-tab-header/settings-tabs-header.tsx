@@ -7,7 +7,14 @@ export const SettingsTabsHeader = ({
   onTabChange: (value: string) => void;
 }) => {
   return (
-    <div className="settings-tab-bar overflow-hidden border-b border-border shrink-0">
+    // Not overflow-hidden: the active tab's line sits just below the list, on
+    // this rule, and clipping cut it to a sliver.
+    // Sticky, so the tabs stay in reach where the whole page shell scrolls
+    // (small screens). z-10 lifts it over the accordion triggers, which are
+    // positioned and come later in the page. In the sidebar (roomy) it is a
+    // plain list with a rule at its end, which the active tab's line sits on:
+    // the line is drawn just past the list, so pe-1 brings it to the rule.
+    <div className="sticky top-0 z-10 shrink-0 border-b border-border bg-background roomy:static roomy:border-e roomy:border-b-0 roomy:bg-transparent roomy:pe-1">
       <TabsList
         variant="line"
         className="w-full"

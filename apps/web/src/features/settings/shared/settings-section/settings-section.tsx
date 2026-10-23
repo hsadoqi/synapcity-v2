@@ -1,8 +1,13 @@
+'use client';
+
 import { useId, type ReactNode } from 'react';
+import { cn } from '@/lib/utils';
 
 type SettingsSectionProps = {
   title: string;
   children: ReactNode;
+  /** 4 for a group inside an accordion section, whose trigger is already the h3. */
+  level?: 3 | 4;
 };
 
 /**
@@ -10,13 +15,24 @@ type SettingsSectionProps = {
  * section is an h3: set in the heading face and heavier than the row labels,
  * so the groups read before the rows inside them.
  */
-export function SettingsSection({ title, children }: SettingsSectionProps) {
+export function SettingsSection({
+  title,
+  children,
+  level = 3,
+}: SettingsSectionProps) {
   const headingId = useId();
+  const Heading = level === 3 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={headingId} className="flex flex-col gap-3">
-      <h3 id={headingId} className="font-heading text-base font-semibold">
+      <Heading
+        id={headingId}
+        className={cn(
+          'font-heading font-semibold',
+          level === 3 ? 'text-base' : 'text-sm',
+        )}
+      >
         {title}
-      </h3>
+      </Heading>
       {children}
     </section>
   );
