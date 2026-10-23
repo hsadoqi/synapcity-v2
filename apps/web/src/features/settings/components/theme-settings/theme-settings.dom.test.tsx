@@ -73,7 +73,7 @@ describe('ThemeSettings', () => {
     ).toBeTruthy();
   });
 
-  it('outlines the tab as its title, then the Fonts and Shape and spacing sections, and nothing else', async () => {
+  it('outlines the tab as its title, its three sections, and the two typography groups', async () => {
     await renderWithSettings(<ThemeSettings />);
 
     expect(
@@ -83,9 +83,25 @@ describe('ThemeSettings', () => {
       })),
     ).toEqual([
       { level: 2, text: 'Theme' },
-      { level: 3, text: 'Fonts' },
+      { level: 3, text: 'Colors' },
+      { level: 3, text: 'Typography' },
+      { level: 4, text: 'Fonts' },
+      { level: 4, text: 'Size' },
       { level: 3, text: 'Shape and spacing' },
     ]);
+  });
+
+  it('starts with every section open, and collapses one on its own', async () => {
+    await renderWithSettings(<ThemeSettings />);
+    const section = (name: string) => screen.getByRole('button', { name });
+    for (const name of ['Colors', 'Typography', 'Shape and spacing']) {
+      expect(section(name).getAttribute('aria-expanded')).toBe('true');
+    }
+
+    fireEvent.click(section('Typography'));
+
+    expect(section('Typography').getAttribute('aria-expanded')).toBe('false');
+    expect(section('Colors').getAttribute('aria-expanded')).toBe('true');
   });
 
   it('previews a chosen mode, and switches the workspace only on save', async () => {
@@ -100,7 +116,7 @@ describe('ThemeSettings', () => {
         screen.getByText('Always dark, whatever your device is set to.'),
       ).toBeTruthy(),
     );
-    expect(screen.getByRole('status').textContent).toBe(
+    expect(screen.getByRole('status', { name: '' }).textContent).toBe(
       'You have unsaved changes.',
     );
     expect(currentSettings().theme.mode).toBe('system');
@@ -114,7 +130,7 @@ describe('ThemeSettings', () => {
       expect(document.documentElement.classList.contains('dark')).toBe(true),
     );
     expect(saveButton.getAttribute('aria-disabled') === 'true').toBe(true);
-    expect(screen.getByRole('status').textContent).toBe('Saved.');
+    expect(screen.getByRole('status', { name: '' }).textContent).toBe('Saved.');
     // Disabled by its own click, yet still focused: keyboard users keep their place.
     expect(document.activeElement).toBe(saveButton);
   });
@@ -258,7 +274,7 @@ describe('ThemeSettings', () => {
         screen.getByRole('combobox', { name: 'Color theme' }).textContent,
       ).toContain('Dark'),
     );
-    expect(screen.getByRole('status').textContent).toBe(
+    expect(screen.getByRole('status', { name: '' }).textContent).toBe(
       'You have unsaved changes.',
     );
     expect(currentSettings().theme.mode).toBe('system');
@@ -291,19 +307,44 @@ describe('ThemeSettings', () => {
         screen.getByRole('combobox', { name: 'Color theme' }).textContent,
       ).toContain('System default'),
     );
-    expect(screen.getByRole('status').textContent).toBe('');
+    expect(screen.getByRole('status', { name: '' }).textContent).toBe('');
   });
 
-  it('lifts the actions into a bar fixed in view only while there is something to save', async () => {
+  it('keeps its actions in the tab footer, enabled only while there is something to save', async () => {
     await renderWithSettings(<ThemeSettings />);
-    const bar = () => screen.getByRole('status').parentElement!;
-    expect(bar().className).not.toContain('fixed');
+    const save = () => screen.getByRole('button', { name: 'Save changes' });
+    const discard = () => screen.getByRole('button', { name: 'Discard' });
+    expect(save().getAttribute('aria-disabled')).toBe('true');
+    expect(discard().getAttribute('aria-disabled')).toBe('true');
 
     await pick('Color theme', 'Dark');
 
-    await waitFor(() => expect(bar().className).toContain('fixed'));
-    fireEvent.click(screen.getByRole('button', { name: 'Discard' }));
-    await waitFor(() => expect(bar().className).not.toContain('fixed'));
+    await waitFor(() =>
+      expect(save().getAttribute('aria-disabled')).not.toBe('true'),
+    );
+    expect(discard().getAttribute('aria-disabled')).not.toBe('true');
+    fireEvent.click(discard());
+    await waitFor(() =>
+      expect(save().getAttribute('aria-disabled')).toBe('true'),
+    );
+  });
+
+  it('resets every choice to its default in the draft, for Save or Discard to settle', async () => {
+    await renderWithSettings(<ThemeSettings />);
+    const reset = () =>
+      screen.getByRole('button', { name: 'Reset Theme to defaults' });
+    // Nothing differs from the defaults yet.
+    expect(reset().getAttribute('aria-disabled')).toBe('true');
+
+    await pick('Color theme', 'Dark');
+    fireEvent.click(screen.getByRole('button', { name: 'Save changes' }));
+    await waitFor(() => expect(currentSettings().theme.mode).toBe('dark'));
+
+    fireEvent.click(reset());
+    // In the draft only: nothing is saved until Save.
+    expect(currentSettings().theme.mode).toBe('dark');
+    fireEvent.click(screen.getByRole('button', { name: 'Save changes' }));
+    await waitFor(() => expect(currentSettings().theme.mode).toBe('system'));
   });
 
   it('keeps each person’s draft to themselves on the /[userId]/settings route', async () => {
@@ -386,6 +427,30 @@ describe('ThemeSettings corner radius and density', () => {
       expect(document.documentElement.dataset.radius).toBe('rounded'),
     );
     expect(document.documentElement.dataset.density).toBe('spacious');
+  });
+
+  it('steps the text size as a draft: on the sample at once, on the page on save', async () => {
+    await renderWithSettings(<ThemeSettings />);
+    fireEvent.click(screen.getByRole('button', { name: 'Preview' }));
+    await screen.findByRole('figure', { name: 'Live preview' });
+    const size = () => screen.getByRole('status', { name: 'Text size' });
+    expect(size().textContent).toBe('100%');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Larger text' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Larger text' }));
+
+    await waitFor(() => expect(size().textContent).toBe('110%'));
+    expect(frame()?.dataset.textSize).toBe('110');
+    expect(frame()?.style.getPropertyValue('--text-scale')).toBe('1.1');
+    expect(document.documentElement.dataset.textSize).toBe('100');
+    expect(currentSettings().theme.textSize).toBe(100);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    await waitFor(() => expect(currentSettings().theme.textSize).toBe(110));
+    await waitFor(() =>
+      expect(document.documentElement.dataset.textSize).toBe('110'),
+    );
   });
 
   it('discards an unsaved radius', async () => {

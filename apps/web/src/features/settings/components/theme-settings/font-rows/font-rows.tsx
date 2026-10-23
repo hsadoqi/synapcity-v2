@@ -35,8 +35,14 @@ function FontPreferenceRow<T extends FontChoice>({
   // The choice first, then what it looks like: the sample sits under the select
   // it answers to, so screen readers and narrow layouts meet them in that order.
   return (
-    <div className="flex flex-col gap-3">
-      <SettingRow id={id} label={label} description={description}>
+    // The same cap as SettingRow, so the sample lines up with the row above it.
+    <div className="flex max-w-3xl flex-col gap-3">
+      <SettingRow
+        id={id}
+        field={`${role}Font`}
+        label={label}
+        description={description}
+      >
         <SettingsSelect<T>
           id={id}
           value={value}

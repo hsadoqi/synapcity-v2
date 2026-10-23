@@ -71,7 +71,7 @@ test.describe('with a mouse', () => {
     for (const [density, height] of [
       ['compact', 24.5],
       ['comfortable', 28],
-      ['spacious', 31.5],
+      ['spacious', 35],
     ] as const) {
       const fresh = await page.context().newPage();
       expect(await load(fresh, { density })).toMatchObject({ density });
@@ -112,6 +112,6 @@ test.describe('on a touch screen', () => {
 
   test('still grows with Spacious', async ({ page }) => {
     await load(page, { density: 'spacious' });
-    expect((await measure(page)).fieldHeight).toBeCloseTo(49.5, 1);
+    expect((await measure(page)).fieldHeight).toBeCloseTo(55, 1);
   });
 });

@@ -1,8 +1,11 @@
+import { Button } from '@synapcity/frontend-ui/core/button';
 import { Mode } from '@synapcity/frontend-ui/providers/mode-provider';
 import { SettingRow } from '../../../shared/setting-row/setting-row';
 import { SettingsSelect } from '../../../shared/settings-select/settings-select';
-import type { ThemeSettings } from '../../../types/theme';
-import { Sun, Moon, Monitor } from 'lucide-react';
+import { previewTextScaleStyle } from '../../../shared/theme-shape';
+import { textSizeRange, type ThemeSettings } from '../../../types/theme';
+import { PreviewFigure } from '../preview-figure';
+import { Sun, Moon, Monitor, Minus, Plus } from 'lucide-react';
 
 // Each says what the chosen option does, beside the select that chooses it, so it
 // reads true for an unsaved choice as well as a saved one. Whole sentences, not
@@ -23,6 +26,7 @@ export const ThemeModeRow = ({
   return (
     <SettingRow
       id="color-theme"
+      field="mode"
       label="Color theme"
       description={descriptions[value]}
     >
@@ -99,6 +103,7 @@ export const RadiusRow = ({
 }) => (
   <SettingRow
     id="corner-radius"
+    field="radius"
     label="Corner radius"
     description={radii[value].description}
   >
@@ -120,6 +125,7 @@ export const DensityRow = ({
 }) => (
   <SettingRow
     id="density"
+    field="density"
     label="Density"
     description={densities[value].description}
   >
@@ -131,3 +137,80 @@ export const DensityRow = ({
     />
   </SettingRow>
 );
+
+/**
+ * A stepper rather than a select: the size is a percentage, and a step at a time
+ * is how people judge it against the preview. The value is an <output>, so the
+ * row's label names it and each step is announced. A button at its limit stays
+ * focusable, so keyboard focus is not dropped on the page.
+ */
+export const TextSizeRow = ({
+  value,
+  onChange,
+}: {
+  value: number;
+  onChange: (value: number) => void;
+}) => {
+  const { min, max, step } = textSizeRange;
+  // The stepper first, then the sample, as the font rows do. The sample carries
+  // the draft size on itself only (preferences.css scales any element with
+  // data-text-size), so it shows the choice while the page keeps the saved size.
+  return (
+    // The same cap as SettingRow, so the sample lines up with the row above it.
+    <div className="flex max-w-3xl flex-col gap-3">
+      <SettingRow
+        id="text-size"
+        field="textSize"
+        label="Text size"
+        description="Make text across the app smaller or larger. 100% is the standard size."
+      >
+        <div className="flex items-center gap-1">
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            aria-label="Smaller text"
+            disabled={value <= min}
+            focusableWhenDisabled
+            onClick={() => onChange(Math.max(min, value - step))}
+          >
+            <Minus />
+          </Button>
+          <output
+            id="text-size"
+            aria-describedby="text-size-description"
+            className="w-12 text-center text-sm tabular-nums"
+          >
+            {value}%
+          </output>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            aria-label="Larger text"
+            disabled={value >= max}
+            focusableWhenDisabled
+            onClick={() => onChange(Math.min(max, value + step))}
+          >
+            <Plus />
+          </Button>
+        </div>
+      </SettingRow>
+      <PreviewFigure
+        label="Text size preview"
+        sampleProps={{
+          'data-text-size': String(value),
+          style: previewTextScaleStyle({ textSize: value }),
+        }}
+      >
+        <p className="font-heading text-xl font-semibold tracking-tight text-foreground">
+          Notes from the week
+        </p>
+        <p className="font-body text-base text-foreground">
+          Headings, body text and captions grow and shrink together.
+        </p>
+        <p className="text-xs text-muted-foreground">Edited two hours ago</p>
+      </PreviewFigure>
+    </div>
+  );
+};

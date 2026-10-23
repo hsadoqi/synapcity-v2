@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Eye } from 'lucide-react';
 import { Button } from '@synapcity/frontend-ui/core/button';
 import {
@@ -7,6 +8,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@synapcity/frontend-ui/core/popover';
+import { useSettingsTabActive } from '../../../shared/settings-tabs/settings-tab-active';
 import type { ThemeSettings } from '../../../types/theme';
 import { ThemeLivePreview } from '../theme-live-preview';
 
@@ -20,6 +22,10 @@ import { ThemeLivePreview } from '../theme-live-preview';
  * anything outside it is pressed or focused; here that is the point of using
  * it, so only the trigger and Escape close it. The Select menus portal outside
  * the popup, so without this each choice would dismiss the preview it changes.
+ *
+ * Pressing another settings tab is also an outside press, and the Theme tab
+ * stays mounted while hidden, so the preview closes itself when its tab is no
+ * longer the one shown. It stays closed on return.
  */
 export const ThemePreviewPopover = ({
   theme,
@@ -28,33 +34,43 @@ export const ThemePreviewPopover = ({
   theme: ThemeSettings;
   /** Unsaved choices exist, and the preview is the way to see them. */
   hasChanges: boolean;
-}) => (
-  <Popover
-    onOpenChange={(_open, details) => {
-      if (details.reason === 'outside-press' || details.reason === 'focus-out')
-        details.cancel();
-    }}
-  >
-    <PopoverTrigger render={<Button variant="outline" />}>
-      <Eye data-icon="inline-start" />
-      Preview
-      {hasChanges && (
-        <>
-          <span
-            aria-hidden
-            className="size-1.5 rounded-full bg-primary"
-            data-testid="preview-changes-dot"
-          />
-          <span className="sr-only">, with unsaved changes</span>
-        </>
-      )}
-    </PopoverTrigger>
-    <PopoverContent
-      side="right"
-      aria-label="Live preview"
-      className="w-96 max-w-(--available-width)"
+}) => {
+  const active = useSettingsTabActive();
+  const [open, setOpen] = useState(false);
+  if (!active && open) setOpen(false);
+  return (
+    <Popover
+      open={open}
+      onOpenChange={(next, details) => {
+        if (
+          details.reason === 'outside-press' ||
+          details.reason === 'focus-out'
+        )
+          return details.cancel();
+        setOpen(next);
+      }}
     >
-      <ThemeLivePreview theme={theme} />
-    </PopoverContent>
-  </Popover>
-);
+      <PopoverTrigger render={<Button variant="outline" />}>
+        <Eye data-icon="inline-start" />
+        Preview
+        {hasChanges && (
+          <>
+            <span
+              aria-hidden
+              className="size-1.5 rounded-full bg-primary"
+              data-testid="preview-changes-dot"
+            />
+            <span className="sr-only">, with unsaved changes</span>
+          </>
+        )}
+      </PopoverTrigger>
+      <PopoverContent
+        side="right"
+        aria-label="Live preview"
+        className="w-lg max-w-(--available-width)"
+      >
+        <ThemeLivePreview theme={theme} />
+      </PopoverContent>
+    </Popover>
+  );
+};

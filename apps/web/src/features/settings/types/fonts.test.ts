@@ -63,6 +63,7 @@ describe('font preferences in the settings schema', () => {
       codeFont: 'default',
       radius: 'default',
       density: 'comfortable',
+      textSize: 100,
     });
     expect(settingsDefaults.theme.headingFont).toBe('default');
   });
