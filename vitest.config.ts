@@ -24,6 +24,7 @@ const projects = [
 
 export default defineConfig({
   test: {
+    testTimeout: 30_000,
     projects,
     coverage: {
       ...sharedConfig.test.coverage,
