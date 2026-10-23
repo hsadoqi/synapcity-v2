@@ -1,3 +1,10 @@
+## Active task: Milestone 3.4 boundary enforcement design (2026-10-23)
+
+- Goal and mode: choose and design the automated boundary checks with the owner; write one Proposed design. Spikes ran only in the session scratchpad (dependency-cruiser 18.7.0 with TypeScript 7.0.2 and `@swc/core` 1.16.20; Oxc parser/resolver from the existing install); no repository file, dependency or lockfile changed.
+- Owner decisions (2026-10-23): custom checker on `oxc-parser` and `oxc-resolver` ("ok sounds good"); both approved as development dependencies of the checker. Pending in the design: checker location (H1), the `pnpm verify` gate change, and the rules.
+- Exact creates (1): `docs/superpowers/specs/2026-10-23-m3-boundary-enforcement-design.md`. Updates (1): this ledger. Dependencies installed, manifests, lockfile, source, config, commits, pushes 0.
+- Verification: Prettier, link check, builder read-through. Not run: application gates (documentation only).
+
 ## Active task: Milestone 3.3 internal organization design (2026-10-23)
 
 - Goal and mode: design internal file organization for packages with the owner; write one Proposed design.

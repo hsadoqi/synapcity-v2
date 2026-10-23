@@ -62,13 +62,13 @@ Every package is laid out the same way, so a reader finds a unit, its tests and 
 
 ### Naming
 
- 1. **Domain or feature contract?** If a second feature, the server or fixtures need a shape, it belongs in domain. If only one feature's own frontend and server halves (or its host) need it, it belongs in that feature's `contracts/`. Feature contracts may use domain types but never redefine or re-export them (F3).
- 2. `shared` is not a folder name: its meaning is ambiguous. Use the runtime folder (`contracts`, `frontend`, `server`) or a module name. Other grouping names (`lib`, `utils`) are allowed only when the folder's units have no better kind or module name.
- 3. A Next.js-specific unit lives under the folder behind the `./next` entry, not beside framework-neutral code.
+1.  **Domain or feature contract?** If a second feature, the server or fixtures need a shape, it belongs in domain. If only one feature's own frontend and server halves (or its host) need it, it belongs in that feature's `contracts/`. Feature contracts may use domain types but never redefine or re-export them (F3).
+2.  `shared` is not a folder name: its meaning is ambiguous. Use the runtime folder (`contracts`, `frontend`, `server`) or a module name. Other grouping names (`lib`, `utils`) are allowed only when the folder's units have no better kind or module name.
+3.  A Next.js-specific unit lives under the folder behind the `./next` entry, not beside framework-neutral code.
 
 ### Existing packages
 
- 1. `frontend-ui` keeps its current layout and its structure test, including its rule that cross-folder imports use the package's own specifier (`@synapcity/frontend-ui/...`) rather than relative paths. That works there because every component folder is a public unit. New packages use relative folder imports (rule 2), because under explicit `exports` a package cannot reach its own private units through its name. `frontend-site`, `frontend-tailwind-config` and the `dev-*` packages keep their layouts. A scoped change may align them later.
+1.  `frontend-ui` keeps its current layout and its structure test, including its rule that cross-folder imports use the package's own specifier (`@synapcity/frontend-ui/...`) rather than relative paths. That works there because every component folder is a public unit. New packages use relative folder imports (rule 2), because under explicit `exports` a package cannot reach its own private units through its name. `frontend-site`, `frontend-tailwind-config` and the `dev-*` packages keep their layouts. A scoped change may align them later.
 
 ## 6. Calls made by Claude (owner to check)
 
