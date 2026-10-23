@@ -95,4 +95,4 @@ Preserve URLs, IDs, serialized shapes, auth/session and provider behavior, datab
 
 A migration checkpoint demonstrates that its real consumer works through the public interface, temporary bridges have a bounded removal path, prohibited dependencies are detected, and the applicable repository gate is reported honestly. Existing prototype gaps are handled explicitly; no documentation row authorizes new external effects.
 
-This map completes the ownership-assignment part of Milestone 2. Package manifests/exports and automated checks are Milestone 3; source movement and live-provider proof belong to subsequent implementation scopes. Milestone 1 baseline verification remains independently pending until run and recorded.
+This map completes the ownership-assignment part of Milestone 2. Package manifests/exports and automated checks are Milestone 3; source movement and live-provider proof belong to subsequent implementation scopes. The Milestone 1 baseline (`pnpm verify` on `1390871e`) is recorded in the [task-scope ledger](../../.agents/task-scope.md).
