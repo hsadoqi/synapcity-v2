@@ -108,7 +108,7 @@ Accepted 2026-10-23 through the [Milestone 3.2 design](../superpowers/specs/2026
 
 `frontend-ui`'s broad `./lib/*`, `./hooks/*`, `./utils/*` and `./types/*` wildcards predate these rules and are narrowed by the migrations that touch them.
 
-Enforcement is Milestone 3.4. The existing [web architecture test](../../apps/web/src/architecture.test.ts) checks some direct imports within web; it is not a workspace-wide or transitive proof.
+Enforcement is `pnpm boundaries` (see [Boundary checks](#boundary-checks)). The existing [web architecture test](../../apps/web/src/architecture.test.ts) checks some direct imports within web; it is not a workspace-wide or transitive proof.
 
 ## Runtime and platform integration
 
@@ -152,22 +152,22 @@ Accepted 2026-10-23 through the [Milestone 3.4 design](../superpowers/specs/2026
 
 The checker classifies every file by path into package, category and entry graph (in apps, `'use client'` files and what they reach form the browser graph; `'use server'` files are action boundaries), resolves every import including `import type` with the importing workspace's tsconfig and `exports`, and enforces:
 
-| #   | Rule                                                                                                                                                 |
-| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| R0  | Every import resolves and every file parses, so a scan never passes silently (added by the implementation).                                          |
-| R1  | Packages never import app source.                                                                                                                    |
-| R2  | Every edge between categories and entry graphs is allowed by ADR-0014's matrix.                                                                      |
-| R3  | No server code is reachable, directly or transitively, from frontend packages, feature `frontend`/`contracts` graphs or the app browser graph.       |
-| R4  | Domain imports only domain packages and allowlisted portable libraries (initially `zod`).                                                            |
-| R5  | Imports into another package go through its `exports`.                                                                                               |
-| R6  | Feature path rules: `frontend/` and `contracts/` never import `server/`; `contracts/` never imports `frontend/`; only `testing/` imports `testing/`. |
-| R7  | In new packages, cross-folder imports target the folder's `index.ts`.                                                                                |
-| R8  | Production files never import `dev-*` packages, `./testing` entries, tests or stories.                                                               |
-| R9  | No package or module cycles.                                                                                                                         |
-| R10 | Every server entry file starts with `import 'server-only'`.                                                                                          |
-| R11 | `next` imports in frontend packages occur only behind `./next`.                                                                                      |
+| #   | Rule                                                                                                                                                                                         |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R0  | Every import resolves to scanned code or an asset, every file parses, and every package folder is one of the five categories, so a scan never passes silently (added by the implementation). |
+| R1  | Packages never import app source.                                                                                                                                                            |
+| R2  | Every edge between categories and entry graphs is allowed by ADR-0014's matrix.                                                                                                              |
+| R3  | No server code is reachable, directly or transitively, from frontend packages, feature `frontend`/`contracts` graphs or the app browser graph.                                               |
+| R4  | Domain imports only domain packages and allowlisted portable libraries (initially `zod`).                                                                                                    |
+| R5  | Imports into another package go through its `exports`.                                                                                                                                       |
+| R6  | Feature path rules: `frontend/` and `contracts/` never import `server/`; `contracts/` never imports `frontend/`; only `testing/` imports `testing/`.                                         |
+| R7  | In new packages, cross-folder imports target the folder's `index.ts`.                                                                                                                        |
+| R8  | Production files never import `dev-*` packages, `./testing` entries, tests or stories.                                                                                                       |
+| R9  | No package or module cycles. An exception pins the exact cycle members, so a cycle that grows fails again.                                                                                   |
+| R10 | Every server entry file starts with `import 'server-only'`.                                                                                                                                  |
+| R11 | `next` imports in frontend packages occur only behind `./next`.                                                                                                                              |
 
-**Exceptions.** Existing violations are listed one file or edge at a time, each with its rule, reason and removal milestone. An entry that no longer matches fails the run, so the list only shrinks. Category, package or folder-wide exemptions are not allowed. Every rule has a probe that plants a violation in a temporary workspace and proves the check fails.
+**Exceptions.** Existing violations are listed one file or edge at a time, each with its rule, reason and removal milestone. An entry that no longer matches fails the run, so the list only shrinks. Category, package or folder-wide exemptions are not allowed. Every rule has a probe that plants a violation in a temporary workspace and proves the check fails. R3's list of app server-only modules (`APP_SERVER_ONLY`) is checked too: an entry that matches no scanned file fails, so a rename cannot disarm the rule.
 
 ## Tooling and verification
 
@@ -175,4 +175,4 @@ Root scripts in [package.json](../../package.json) define what actually runs. Pa
 
 Tokens remain owned by `frontend-tailwind-config` under ADR-0002; app CSS remains wiring. Product schemas and copied identity/state do not move into generic UI.
 
-Creating a package follows the [package checklist](package-creation-checklist.md). Testing breadth and thresholds remain governed by Proposed ADR-0005 and the existing Definition of Done. Planned boundary checks are not implemented merely because the matrix is documented.
+Creating a package follows the [package checklist](package-creation-checklist.md). Testing breadth and thresholds remain governed by Proposed ADR-0005 and the existing Definition of Done. Boundary checks cover only the rules listed under [Boundary checks](#boundary-checks); the conditional cells of ADR-0014's matrix (for example frontend-to-domain "contracts and pure rules only") are not yet machine-checked.

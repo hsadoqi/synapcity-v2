@@ -15,7 +15,7 @@ The boundary rules fail the build instead of living only in documents. A forbidd
 
 **Non-goals:** moving source or creating feature/domain/server packages (later milestones); checking product behavior; replacing Knip, TypeScript or ESLint.
 
-**Anti-goals:** a check that passes only because current source happens to comply (every rule needs a failing probe); silent scans that find zero files and pass; a broad legacy exemption instead of named paths with removal conditions (ADR-0014 section 6).
+**Anti-goals:** a check that passes only because current source happens to comply (every rule needs a failing probe); silent scans that find zero files and pass; a broad legacy exemption instead of named paths with removal conditions (ADR-0014 migration and preservation contract).
 
 ## 3. Evidence (spikes in the scratchpad, 2026-10-23; no repository change)
 
