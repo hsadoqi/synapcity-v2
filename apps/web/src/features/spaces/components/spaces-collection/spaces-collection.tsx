@@ -1,5 +1,7 @@
+import { CollectionPage } from '@/features/collection/components/collection-page';
+
 import type { SpaceSummary } from '../../shared/types';
-import { SpacesHeader } from './spaces-header';
+import { SPACES_INTRO, SPACES_TITLE } from './spaces-copy';
 import { SpacesIndex } from './spaces-index';
 
 interface SpacesCollectionProps {
@@ -9,14 +11,13 @@ interface SpacesCollectionProps {
 
 export function SpacesCollection({ spaces, userId }: SpacesCollectionProps) {
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-8 lg:py-12">
-      <SpacesHeader />
+    <CollectionPage title={SPACES_TITLE} intro={SPACES_INTRO}>
       {/* No create button until creating a space exists; one that does nothing is worse than none. */}
       <SpacesIndex
         spaces={spaces}
         userId={userId}
         now={new Date().toISOString()}
       />
-    </div>
+    </CollectionPage>
   );
 }

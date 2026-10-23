@@ -3,7 +3,7 @@ import '../styles/globals.css';
 import { fontVariables } from './fonts';
 import RootProviders from '../components/providers/root-providers';
 import { AuthStatus } from '@/features/auth/components/auth-status';
-import { RootShell } from '@synapcity/frontend-ui/blocks/root-shell';
+import { BreadcrumbRootShell } from '@/components/breadcrumbs';
 import { createMetadata } from '@synapcity/frontend-site/metadata';
 import { UserProvider } from '@/features/auth/client';
 import { getCurrentUser } from '@/features/auth/server';
@@ -35,23 +35,23 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* Applies saved text size, contrast and motion before first paint. */}
+        {/* Applies saved contrast and motion before first paint. */}
         <script dangerouslySetInnerHTML={{ __html: appearanceBootScript }} />
         {/* Applies saved font choices, and fetches only those, before first paint. */}
         <script dangerouslySetInnerHTML={{ __html: fontBootScript }} />
-        {/* Applies the saved corner radius and density before first paint. */}
+        {/* Applies the saved text size, corner radius and density before first paint. */}
         <script dangerouslySetInnerHTML={{ __html: themeShapeBootScript }} />
       </head>
       <body>
         <AccountPreferencesSync preferences={account} />
         <RootProviders>
           <UserProvider user={user}>
-            <RootShell
+            <BreadcrumbRootShell
               account={user ? accountLinksFor(user.id) : null}
               headerActions={<AuthStatus variant="header" />}
             >
               {children}
-            </RootShell>
+            </BreadcrumbRootShell>
           </UserProvider>
         </RootProviders>
       </body>

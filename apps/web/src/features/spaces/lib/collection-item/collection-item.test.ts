@@ -24,7 +24,7 @@ describe('describeContents', () => {
     [1, 1, '1 document · 1 dashboard'],
     [3, 0, '3 documents'],
     [0, 1, '1 dashboard'],
-    [0, 0, 'Empty'],
+    [0, 0, 'Nothing in it yet'],
   ])('describes %i documents and %i dashboards', (docs, dashes, expected) => {
     expect(describeContents(docs, dashes)).toBe(expected);
   });
