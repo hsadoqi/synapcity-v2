@@ -41,6 +41,7 @@ export const NotificationRow = ({
   return (
     <SettingRow
       id={id}
+      field={kind}
       toggle
       label={label}
       description={

@@ -5,12 +5,12 @@ import {
   useNotificationPermission,
   type NotificationPermissionState,
 } from '../../hooks/use-notification-permission';
-import { useNotificationSettings } from '../../hooks/use-notification-settings';
+import { useSettingsDraft } from '../../hooks/use-settings-draft';
 import {
   notificationKinds,
   type NotificationKind,
 } from '../../types/notifications';
-import { SettingsTabShell } from '../../shared/settings-tabs/settings-tab-shell/settings-tab-shell';
+import { SettingsTabShell } from '../../shared/settings-tabs';
 import { NotificationRow } from './notification-row';
 
 const pushBlockedReason: Partial<Record<NotificationPermissionState, string>> =
@@ -21,11 +21,14 @@ const pushBlockedReason: Partial<Record<NotificationPermissionState, string>> =
   };
 
 export function NotificationSettings() {
-  const { notifications, updateNotifications } = useNotificationSettings();
+  const draft = useSettingsDraft('notifications');
+  const notifications = draft.draft;
+  const updateNotifications = draft.change;
   const { permission, requestPermission } = useNotificationPermission();
 
   // A saved "on" means nothing without the browser's permission, so push
-  // shows on only when both agree, and is saved on only once permission is given.
+  // shows on only when both agree, and is drafted on only once permission is
+  // given. The permission prompt itself is the browser's, and answers at once.
   const changePush = async (checked: boolean) => {
     if (!checked) return updateNotifications({ push: false });
     const granted =
@@ -50,6 +53,7 @@ export function NotificationSettings() {
     <SettingsTabShell
       title="Notifications"
       description="Choose how Synapcity reaches you. Nothing is sent yet; your choices are saved for when it is."
+      draft={draft}
     >
       <FieldGroup>
         {notificationKinds.map((kind) => (
