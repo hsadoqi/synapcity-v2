@@ -12,6 +12,10 @@ function Tabs({
   return (
     <TabsPrimitive.Root
       data-slot="tabs"
+      // Passed on, not only shown: Base UI's arrow keys and aria-orientation
+      // follow it. Reading it here without passing it on left every tab list
+      // horizontal to the keyboard, whatever it was drawn as.
+      orientation={orientation}
       data-orientation={orientation}
       className={cn(
         'group/tabs flex gap-2 data-horizontal:flex-col',

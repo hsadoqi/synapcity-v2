@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import {
@@ -140,6 +140,23 @@ describe('Tabs', () => {
         .querySelector('[data-slot="tabs"]')
         ?.getAttribute('data-orientation'),
     ).toBe('vertical');
+  });
+
+  // The wrapper once showed `vertical` while Base UI still ran horizontal: the
+  // list said so to screen readers, and only Left and Right moved between tabs.
+  it('hands its orientation to the tabs themselves, keys included', async () => {
+    renderTabs({ orientation: 'vertical' });
+    const list = screen.getByRole('tablist');
+    expect(list.getAttribute('aria-orientation')).toBe('vertical');
+
+    screen.getByRole('tab', { name: 'One' }).focus();
+    fireEvent.keyDown(document.activeElement!, { key: 'ArrowDown' });
+    // Base UI moves focus after the key event, not during it.
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole('tab', { name: 'Two' }),
+      ),
+    );
   });
 
   it('defaults the list to the default variant and honours line', () => {
