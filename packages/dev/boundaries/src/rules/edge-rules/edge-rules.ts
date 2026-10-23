@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { basename, dirname, relative, sep } from 'node:path';
+import { basename, dirname } from 'node:path';
 
 import { classifyFile } from '../../classify/index.ts';
 import { readModule } from '../../imports/index.ts';
@@ -10,6 +10,7 @@ import type {
   Violation,
   Workspace,
 } from '../../model/index.ts';
+import { repoPath, byFileThenRule } from '../../paths/index.ts';
 import { createResolver } from '../../resolve/index.ts';
 import { listSourceFiles } from '../../workspace/index.ts';
 
@@ -19,6 +20,9 @@ export const DOMAIN_LIBRARIES = ['zod'];
 const SOURCE_FILE = /\.[cm]?[jt]sx?$/;
 const INDEX_FILE = /^index\.[cm]?[jt]sx?$/;
 const FEATURE_FOLDERS = new Set(['contracts', 'frontend', 'server', 'testing']);
+const DECLARATION_FILE = /\.d\.[cm]?ts$/;
+const PRODUCTION_IMPORTS_NON_PRODUCTION =
+  'production code never imports dev, testing, test or story code';
 
 /** Every source file in the workspace, classified, and every import edge, resolved. */
 export function buildEdges(workspace: Workspace): {
@@ -58,7 +62,7 @@ export function buildEdges(workspace: Workspace): {
           target: file
             ? { kind: 'file', file }
             : isCode
-              ? { kind: 'unscanned', path: resolution.path }
+              ? { kind: 'unresolved' }
               : { kind: 'asset', path: resolution.path },
         });
       } else {
@@ -75,8 +79,7 @@ export function edgeRules(
   edges: Edge[],
   workspace: Workspace,
 ): Violation[] {
-  const rel = (path: string) =>
-    relative(workspace.root, path).split(sep).join('/');
+  const rel = (path: string) => repoPath(workspace.root, path);
   const violations: Violation[] = [];
   const report = (
     rule: Violation['rule'],
@@ -124,6 +127,16 @@ export function edgeRules(
     }
     if (target.kind === 'unresolved') {
       report('R0', from, specifier, null, 'import does not resolve');
+      continue;
+    }
+    if (target.kind === 'unscanned') {
+      report(
+        'R0',
+        from,
+        specifier,
+        null,
+        `resolves to code the scan did not visit: ${rel(target.path)}`,
+      );
       continue;
     }
     if (target.kind === 'asset') continue;
@@ -195,7 +208,7 @@ export function edgeRules(
           from,
           specifier,
           toPath,
-          'production code never imports dev, testing, test or story code',
+          PRODUCTION_IMPORTS_NON_PRODUCTION,
         );
       } else if (
         from.production &&
@@ -213,7 +226,7 @@ export function edgeRules(
       continue;
     }
 
-    // Same package: the feature path rules (R6), the folder-import rule (R7), and test or story imports (R8).
+    // Same package: the feature path rules (R6), test or story imports (R8), then the folder-import rule (R7).
     if (from.pkg.category === 'features' && from.production) {
       if (
         to.graph === 'feature-server' &&
@@ -241,14 +254,12 @@ export function edgeRules(
       } else if (to.graph === 'testing') {
         report('R6', from, specifier, toPath, 'only testing/ imports testing/');
       }
-    } else if (from.production && !to.production) {
-      report(
-        'R8',
-        from,
-        specifier,
-        toPath,
-        'production code never imports dev, testing, test or story code',
-      );
+    }
+    // A feature file importing testing/ is already R6.
+    const featureTesting =
+      from.pkg.category === 'features' && to.graph === 'testing';
+    if (from.production && !to.production && !featureTesting) {
+      report('R8', from, specifier, toPath, PRODUCTION_IMPORTS_NON_PRODUCTION);
     }
     if (
       !from.pkg.legacy &&
@@ -267,7 +278,5 @@ export function edgeRules(
     }
   }
 
-  return violations.sort(
-    (a, b) => a.file.localeCompare(b.file) || a.rule.localeCompare(b.rule),
-  );
+  return violations.sort(byFileThenRule);
 }

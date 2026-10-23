@@ -123,11 +123,16 @@ export const EXCEPTIONS: readonly Exception[] = [
   },
 ];
 
+const sameMembers = (a: string[] | undefined, b: string[] | undefined) =>
+  a === undefined ||
+  (b !== undefined && a.length === b.length && a.every((m, i) => m === b[i]));
+
 const matches = (exception: Exception, violation: Violation) =>
   exception.rule === violation.rule &&
   exception.file === violation.file &&
   (exception.specifier === undefined ||
-    exception.specifier === violation.specifier);
+    exception.specifier === violation.specifier) &&
+  sameMembers(exception.members, violation.members);
 
 export function applyExceptions(
   violations: Violation[],

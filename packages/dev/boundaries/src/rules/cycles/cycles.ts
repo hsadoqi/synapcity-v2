@@ -1,9 +1,17 @@
-import { relative, sep } from 'node:path';
-
 import type { Edge, Violation, Workspace } from '../../model/index.ts';
+import { repoPath } from '../../paths/index.ts';
 
 /** Strongly connected components with more than one node, or a node with an edge to itself (Tarjan). */
-function cycles(nodes: string[], next: (node: string) => string[]): string[][] {
+function cycles(
+  nodes: string[],
+  neighbours: (node: string) => string[],
+): string[][] {
+  const cache = new Map<string, string[]>();
+  const next = (node: string) => {
+    let list = cache.get(node);
+    if (!list) cache.set(node, (list = neighbours(node)));
+    return list;
+  };
   let counter = 0;
   const index = new Map<string, number>();
   const low = new Map<string, number>();
@@ -44,8 +52,7 @@ function cycles(nodes: string[], next: (node: string) => string[]): string[][] {
 
 /** R9: no cycles in the package graph (all workspace dependencies) or the module graph (including type imports). */
 export function cycleRule(workspace: Workspace, edges: Edge[]): Violation[] {
-  const rel = (path: string) =>
-    relative(workspace.root, path).split(sep).join('/');
+  const rel = (path: string) => repoPath(workspace.root, path);
   const violations: Violation[] = [];
 
   const byName = new Map(workspace.packages.map((pkg) => [pkg.name, pkg]));
@@ -55,12 +62,16 @@ export function cycleRule(workspace: Workspace, edges: Edge[]): Violation[] {
       byName.has(dependency),
     ),
   )) {
+    const members = component
+      .map((name) => `${rel(byName.get(name)!.dir)}/package.json`)
+      .sort();
     violations.push({
       rule: 'R9',
-      file: `${rel(byName.get(component[0]!)!.dir)}/package.json`,
+      file: members[0]!,
       specifier: '',
       target: null,
-      message: `package dependency cycle: ${component.join(' -> ')}`,
+      message: `package dependency cycle among ${component.join(', ')}`,
+      members,
     });
   }
 
@@ -80,7 +91,8 @@ export function cycleRule(workspace: Workspace, edges: Edge[]): Violation[] {
       file: component[0]!,
       specifier: '',
       target: null,
-      message: `module cycle: ${component.join(' -> ')}`,
+      message: `module cycle among ${component.join(', ')}`,
+      members: component,
     });
   }
   return violations.sort((a, b) => a.file.localeCompare(b.file));

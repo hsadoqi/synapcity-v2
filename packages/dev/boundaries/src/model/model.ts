@@ -72,6 +72,8 @@ export interface SourceFile {
 export type Target =
   | { kind: 'file'; file: SourceFile }
   | { kind: 'asset'; path: string }
+  /** Code that resolved but that the scan did not visit (build output, an unlisted folder). */
+  | { kind: 'unscanned'; path: string }
   | { kind: 'external'; name: string }
   | { kind: 'unresolved' };
 
@@ -88,12 +90,16 @@ export interface Violation {
   specifier: string;
   target: string | null;
   message: string;
+  /** R9 only: the repository-relative modules or manifests in the cycle, sorted. */
+  members?: string[];
 }
 
 export interface Exception {
   rule: RuleId;
   file: string;
   specifier?: string;
+  /** R9 only: pins the exception to exactly this cycle, so a cycle that grows fails again. */
+  members?: string[];
   reason: string;
   removal: string;
 }
