@@ -109,7 +109,7 @@ A separate test runs the checker on the real repository and fails if any workspa
 
 - The checker's internal structure, output format details and performance tuning.
 - How the matrix is expressed in code; it must be one table mirroring ADR-0014 section 2, not rules scattered through the code.
-- **3.5:** wiring the package into Turbo and the root coverage projects, and documenting the run in the Definition of Done.
+- **3.5:** wiring the package into the root coverage projects (done: `vitest.config.ts`), and documenting the run in the Definition of Done (done). `pnpm boundaries` stays an uncached root script like `pnpm deps`: it reads every workspace, so a Turbo cache keyed on the package's own inputs would go stale.
 
 ## 10. Recording this design
 
