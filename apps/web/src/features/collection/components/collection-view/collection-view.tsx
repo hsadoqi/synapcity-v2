@@ -30,6 +30,9 @@ import { CollectionGrid } from './collection-grid';
 import { CollectionHeader } from './collection-header';
 import { CollectionList } from './collection-list';
 
+/** How many tags get a chip; any others are in the filter menu. */
+const TAG_CHIP_LIMIT = 8;
+
 export type CollectionViewProps = {
   /** How to name the items: "document" / "Documents". */
   labels: CollectionLabels;
@@ -61,8 +64,8 @@ export type CollectionViewProps = {
   onLayoutChange: (layout: CollectionLayout) => void;
   /** Without it the view offers no create button, since one that does nothing is worse than none. */
   onCreate?: () => void;
-  /** The page has its own heading: keep the title for assistive tech and show only the count. */
-  hideTitle?: boolean;
+  /** The section title when it should not be the plural, e.g. "All spaces" under a page titled "Spaces". */
+  heading?: string;
   onItemAction?: (action: CollectionItemAction, item: CollectionItem) => void;
   /** Whose home the toolbar's "View all" link goes to. Omit to hide the link. */
   userId?: string;
@@ -98,7 +101,7 @@ export function CollectionView({
   layout,
   onLayoutChange,
   onCreate,
-  hideTitle,
+  heading,
   onItemAction = () => {},
   userId,
   now = new Date(),
@@ -126,7 +129,7 @@ export function CollectionView({
         context={context}
         count={state === 'populated' ? items.length : 0}
         loading={state === 'loading'}
-        hideTitle={hideTitle}
+        heading={heading}
       />
 
       <div className="flex flex-col gap-3">
@@ -134,7 +137,7 @@ export function CollectionView({
           labels={labels}
           context={context}
           grouping={grouping}
-          tagOptions={tagOptions}
+          tagOptions={tagOptions?.slice(TAG_CHIP_LIMIT)}
           query={query}
           onQueryChange={onQueryChange}
           filters={filters}
@@ -148,6 +151,7 @@ export function CollectionView({
         {tagOptions && (
           <CollectionTagChips
             tags={tagOptions}
+            limit={TAG_CHIP_LIMIT}
             filters={filters}
             onFiltersChange={onFiltersChange}
           />

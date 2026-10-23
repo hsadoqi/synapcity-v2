@@ -13,6 +13,7 @@ import type { CollectionItem } from '../../shared';
 import { ItemActionsMenu } from '../collection-item/item-actions-menu';
 import { ItemIconPreview } from '../collection-item/item-icon-preview';
 import { ItemOpenButton } from '../collection-item/item-open-button';
+import { PinnedMark } from '../collection-item/pinned-mark';
 import type { CollectionItemsProps } from '../collection-item/item-props';
 
 type RecentCarouselProps = Omit<CollectionItemsProps, 'now' | 'showGroup'> & {
@@ -147,25 +148,29 @@ function CarouselCard({
     <div
       className={cn(
         'relative flex h-full flex-col rounded-md border border-border text-card-foreground transition-colors hover:bg-muted/50 motion-reduce:transition-none',
-        isLead ? 'min-h-48 gap-4 bg-muted p-6' : 'gap-3 bg-card p-4',
+        isLead ? 'min-h-48 gap-4 bg-card p-6' : 'gap-3 bg-card p-4',
       )}
     >
       <ItemIconPreview item={item} icon={icon} renderPreview={renderPreview} />
 
       <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <h3
-          className={cn(
-            isLead
-              ? 'text-2xl font-medium tracking-tight'
-              : 'text-sm font-medium',
-          )}
-        >
-          <ItemOpenButton
-            title={item.title}
-            href={item.href}
-            onOpen={() => onItemAction('open', item)}
-          />
-        </h3>
+        <div className="flex min-w-0 items-center gap-2">
+          <h3
+            className={cn(
+              'min-w-0',
+              isLead
+                ? 'text-2xl font-medium tracking-tight'
+                : 'text-sm font-medium',
+            )}
+          >
+            <ItemOpenButton
+              title={item.title}
+              href={item.href}
+              onOpen={() => onItemAction('open', item)}
+            />
+          </h3>
+          {item.pinned && <PinnedMark />}
+        </div>
         {size !== 'compact' && item.subtitle && (
           <p
             className={cn(
@@ -176,8 +181,15 @@ function CarouselCard({
             {item.subtitle}
           </p>
         )}
-        {isLead && item.detail && (
-          <p className="text-sm text-muted-foreground">{item.detail}</p>
+        {size !== 'compact' && item.detail && (
+          <p
+            className={cn(
+              'text-muted-foreground',
+              isLead ? 'text-sm' : 'truncate text-xs',
+            )}
+          >
+            {item.detail}
+          </p>
         )}
       </div>
 

@@ -10,7 +10,7 @@ type CollectionTagChipsProps = {
   filters: CollectionFilters;
   onFiltersChange: (filters: CollectionFilters) => void;
   /** How many chips to show; the rest stay in the filter menu. */
-  limit?: number;
+  limit: number;
 };
 
 /** A short row of the most used tags, each a toggle for the tag filter. */
@@ -18,7 +18,7 @@ export function CollectionTagChips({
   tags,
   filters,
   onFiltersChange,
-  limit = 8,
+  limit,
 }: CollectionTagChipsProps) {
   const shown = tags.slice(0, limit);
   if (shown.length === 0) return null;
@@ -51,7 +51,7 @@ export function CollectionTagChips({
       ))}
       {tags.length > limit && (
         <span className="text-xs text-muted-foreground">
-          +{tags.length - limit} more in Filter
+          +{tags.length - limit} more in Filter, under More tags
         </span>
       )}
     </div>

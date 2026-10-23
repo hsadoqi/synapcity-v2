@@ -134,6 +134,30 @@ describe('CollectionHighlights', () => {
     expect(edited?.textContent).toContain('Updated');
   });
 
+  it('marks a pinned item in the carousel too', () => {
+    renderHighlights();
+    const [opened, edited] = within(
+      screen.getByRole('list', { name: 'Recently cooked' }),
+    ).getAllByRole('listitem');
+
+    expect(within(opened!).getByRole('img', { name: 'Pinned' })).toBeTruthy();
+    expect(within(edited!).queryByRole('img', { name: 'Pinned' })).toBeNull();
+  });
+
+  it('shows an item’s facts on the lead and medium cards but not the compact ones', () => {
+    renderHighlights({
+      items: ITEMS.map((entry) => ({ ...entry, detail: `${entry.id} facts` })),
+    });
+    const cards = within(
+      screen.getByRole('list', { name: 'Recently cooked' }),
+    ).getAllByRole('listitem');
+
+    expect(within(cards[0]!).getByText('Opened facts')).toBeTruthy();
+    expect(within(cards[1]!).getByText('Edited facts')).toBeTruthy();
+    expect(within(cards[2]!).getByText('Old facts')).toBeTruthy();
+    expect(within(cards[3]!).queryByText('Pinned old facts')).toBeNull();
+  });
+
   it('opens an item through the action callback', () => {
     const { onItemAction } = renderHighlights();
 

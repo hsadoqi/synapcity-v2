@@ -8,11 +8,8 @@ type CollectionHeaderProps = {
   context?: string;
   count: number;
   loading: boolean;
-  /**
-   * For a page that already has its own heading: the title is kept for
-   * assistive tech only and the count stands alone.
-   */
-  hideTitle?: boolean;
+  /** Replaces the plural as the section title, for a page that has its own heading above. */
+  heading?: string;
 };
 
 export function CollectionHeader({
@@ -20,7 +17,7 @@ export function CollectionHeader({
   context,
   count,
   loading,
-  hideTitle = false,
+  heading,
 }: CollectionHeaderProps) {
   const countLabel = `${count} ${count === 1 ? singular : plural.toLowerCase()}`;
   return (
@@ -30,14 +27,8 @@ export function CollectionHeader({
           <p className="truncate text-sm text-muted-foreground">{context}</p>
         )}
         <div className="flex items-baseline gap-3">
-          <h2
-            className={
-              hideTitle
-                ? 'sr-only'
-                : 'text-xl font-semibold tracking-tight text-foreground text-balance'
-            }
-          >
-            {plural}
+          <h2 className="text-xl font-semibold tracking-tight text-foreground text-balance">
+            {heading ?? plural}
           </h2>
           {loading ? (
             <Skeleton className="h-4 w-16" />

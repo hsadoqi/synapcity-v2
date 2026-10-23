@@ -150,6 +150,9 @@ export function applyCollectionQuery(
     if (sort.field === 'title') {
       return a.title.localeCompare(b.title) * direction;
     }
+    if (sort.field === 'used') {
+      return (lastActive(a) - lastActive(b)) * direction;
+    }
     const key = sort.field === 'created' ? 'createdAt' : 'updatedAt';
     const aTime = new Date(a[key] ?? a.updatedAt).getTime();
     const bTime = new Date(b[key] ?? b.updatedAt).getTime();
@@ -157,14 +160,28 @@ export function applyCollectionQuery(
   });
 }
 
-/** When an item was last in use: when it was opened, else when it changed. */
+/**
+ * When an item was last in use: the later of when it was opened and when it
+ * changed. Changing something is using it, and an item never opened still has
+ * the time it last changed.
+ */
 function lastActive(item: CollectionItem) {
-  return new Date(item.lastViewedAt ?? item.updatedAt).getTime();
+  const changed = new Date(item.updatedAt).getTime();
+  const opened = item.lastViewedAt ? new Date(item.lastViewedAt).getTime() : 0;
+  return Math.max(changed, opened);
+}
+
+/** Pinned items first, each group keeping the order it came in. Returns a new list. */
+export function pinnedFirst(items: CollectionItem[]) {
+  return [
+    ...items.filter((item) => item.pinned),
+    ...items.filter((item) => !item.pinned),
+  ];
 }
 
 /**
- * Most recently in use first. An item never opened counts from its last
- * change, so a new or untouched item still finds a place. Returns a new list.
+ * Most recently in use first (see `lastActive`), so a new or untouched item
+ * still finds a place. Returns a new list.
  */
 export function byRecency(items: CollectionItem[]) {
   return [...items].sort((a, b) => lastActive(b) - lastActive(a));

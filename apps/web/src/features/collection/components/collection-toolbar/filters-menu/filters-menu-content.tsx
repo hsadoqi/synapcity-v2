@@ -82,7 +82,7 @@ export function FiltersMenuContent({
         <>
           <DropdownMenuSeparator />
           <CollectionFilterMenu
-            label="Tags"
+            label="More tags"
             items={tags}
             selected={filters.tags}
             onToggle={toggleTag}

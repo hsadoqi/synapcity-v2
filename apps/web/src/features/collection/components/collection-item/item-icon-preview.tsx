@@ -20,9 +20,10 @@ type ItemIconPreviewProps = {
 };
 
 /**
- * The item's icon, which shows a preview card when hovered. The preview only
- * repeats what the card or row and its page already say, so it is a
- * convenience for the mouse and nothing a keyboard or screen reader needs.
+ * The item's icon, which shows a preview card when hovered. The preview is a
+ * convenience for the mouse: it is not reachable from the keyboard or by touch,
+ * so every fact in it must also be on the item's own page, and the card or row
+ * should already carry the ones that matter.
  */
 export function ItemIconPreview({
   item,

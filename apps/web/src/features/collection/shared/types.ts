@@ -41,7 +41,8 @@ export type CollectionFilters = {
   tags: string[];
 };
 
-export type CollectionSortField = 'updated' | 'created' | 'title';
+/** `used` is the later of when the item was last opened and when it last changed. */
+export type CollectionSortField = 'used' | 'updated' | 'created' | 'title';
 type CollectionSortDirection = 'asc' | 'desc';
 
 export type CollectionSort = {

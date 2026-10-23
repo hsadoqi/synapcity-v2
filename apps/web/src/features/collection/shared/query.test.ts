@@ -6,6 +6,7 @@ import {
   byRecency,
   formatAgo,
   formatUpdated,
+  pinnedFirst,
   tagsByUse,
 } from './query';
 import {
@@ -285,6 +286,23 @@ describe('active filters', () => {
 });
 
 describe('byRecency', () => {
+  it('counts an edit made after the last time it was opened', () => {
+    const items = [
+      item({
+        id: 'viewed-later',
+        updatedAt: daysAgo(9),
+        lastViewedAt: daysAgo(3),
+      }),
+      item({
+        id: 'edited-later',
+        updatedAt: daysAgo(1),
+        lastViewedAt: daysAgo(6),
+      }),
+    ];
+
+    expect(ids(byRecency(items))).toEqual(['edited-later', 'viewed-later']);
+  });
+
   it('orders by when an item was opened, falling back to when it changed', () => {
     const items = [
       item({ id: 'edited', updatedAt: daysAgo(2) }),
@@ -322,5 +340,39 @@ describe('tagsByUse', () => {
 
     expect(tagsByUse(items)).toEqual(['x']);
     expect(tagsByUse([])).toEqual([]);
+  });
+});
+
+describe('sorting by last used', () => {
+  const items = [
+    item({ id: 'edited', updatedAt: daysAgo(2) }),
+    item({ id: 'opened', updatedAt: daysAgo(9), lastViewedAt: daysAgo(1) }),
+    item({ id: 'old', updatedAt: daysAgo(20) }),
+  ];
+
+  it('puts the most recently opened or changed first', () => {
+    expect(
+      ids(query(items, { sort: { field: 'used', direction: 'desc' } })),
+    ).toEqual(['opened', 'edited', 'old']);
+  });
+
+  it('reverses when ascending', () => {
+    expect(
+      ids(query(items, { sort: { field: 'used', direction: 'asc' } })),
+    ).toEqual(['old', 'edited', 'opened']);
+  });
+});
+
+describe('pinnedFirst', () => {
+  it('moves pinned items to the front, keeping each group’s order', () => {
+    const items = [
+      item({ id: 'a' }),
+      item({ id: 'b', pinned: true }),
+      item({ id: 'c' }),
+      item({ id: 'd', pinned: true }),
+    ];
+
+    expect(ids(pinnedFirst(items))).toEqual(['b', 'd', 'a', 'c']);
+    expect(ids(items)).toEqual(['a', 'b', 'c', 'd']);
   });
 });

@@ -65,6 +65,15 @@ describe('CollectionView', () => {
     expect(screen.queryByRole('button', { name: 'New recipe' })).toBeNull();
   });
 
+  it('uses a given heading in place of the plural', () => {
+    renderView({ heading: 'All recipes' });
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'All recipes' }),
+    ).toBeTruthy();
+    expect(screen.queryByRole('heading', { name: 'Recipes' })).toBeNull();
+  });
+
   it('links to the full list in the toolbar when there is a user', () => {
     renderView({ userId: 'u1' });
 
@@ -193,7 +202,9 @@ describe('CollectionView', () => {
       const group = screen.getByRole('group', { name: 'Filter by tag' });
 
       expect(within(group).getAllByRole('button')).toHaveLength(8);
-      expect(within(group).getByText('+3 more in Filter')).toBeTruthy();
+      expect(
+        within(group).getByText('+3 more in Filter, under More tags'),
+      ).toBeTruthy();
     });
   });
 
