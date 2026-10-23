@@ -38,6 +38,42 @@ Group coherent modules within a package: several shells can share one shells pac
 
 Do not infer a new product noun, schema, or durable identifier from a package name. Existing provisional labels retain their approved bounded technical use; follow the [glossary](../glossary.md) before a terminology change.
 
+Prefer the name the code and durable identifiers already use. Name a package by responsibility, never by technique or vagueness: `containers`, `layouts`, `utils`, `common` and `shared` are not package names.
+
+A new package must earn its boundary through at least one of: a different runtime, different dependencies, a different consumer set (planned consumers count), independent testing, or a different rate of change. Folder size alone is not a reason. Grow a package through explicit modules before splitting it. Fields shared by several contracts go in a base contract inside the owning package, not in a separate cross-cutting package. Browser platform effects are frontend packages and backend provider integration is server; there is no separate platform category.
+
+### Package inventory
+
+Accepted 2026-10-23 through the [Milestone 3.1 design](../superpowers/specs/2026-10-23-m3-package-grouping-design.md), which records each package's current source inputs and the owner's decisions. A package is created by the migration that first moves code into it, never as an empty skeleton.
+
+| Package                               | Owns                                                                                                    | First code |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------- | ---------- |
+| `domain-records`                      | Base record contract; Space, Document and Dashboard contracts as separate modules extending it          | M4         |
+| `domain-preferences`                  | Preference schemas, defaults, account/device scope, merging, import/transfer validation, consent policy | M4         |
+| `domain-identity`                     | Credential, profile, name and avatar contracts; verified-identity contract                              | M4         |
+| `frontend-ui` (existing)              | Primitives, generic components and form pieces, generic hooks, low-level layout primitives              | exists     |
+| `frontend-shells`                     | Composable app shells and page frames                                                                   | M6         |
+| `frontend-collection`                 | Browse projections, query mechanics, generic controls and displays, local browse state                  | M7         |
+| `frontend-settings`                   | Settings presentation pieces                                                                            | M8         |
+| `frontend-preferences`                | Browser preference runtime: device store, apply functions, boot scripts, mode, consent state            | M8         |
+| `frontend-error-reports`              | Consent-gated browser error reporting and event scrubbing                                               | M8         |
+| `frontend-auth`                       | Auth presentation pieces                                                                                | M9         |
+| `frontend-site` (existing)            | Site metadata and brand presentation                                                                    | exists     |
+| `frontend-tailwind-config` (existing) | Tokens and styling foundation                                                                           | exists     |
+| `server-data`                         | Space, Document and Dashboard repositories, queries and row mapping                                     | M7         |
+| `server-account`                      | Profile, avatar and account-preference operations                                                       | M8         |
+| `server-auth`                         | Verified identity, auth operations, verified-caller helpers                                             | M9         |
+| `features-spaces`                     | Space browsing and detail                                                                               | M7         |
+| `features-settings`                   | The Settings experience: editors, drafts, guard, import/export, account sync                            | M8         |
+| `features-auth`                       | Sign-in, registration, password, email and session workflows                                            | M9         |
+| `features-account`                    | Name, avatar and profile workflows                                                                      | M9         |
+| `features-documents`                  | Document browsing                                                                                       | M10        |
+| `features-dashboards`                 | Dashboard browsing                                                                                      | M10        |
+| `features-home`                       | Home, aggregating the resource features                                                                 | M11        |
+| `dev-*` (five existing)               | Tooling, test configuration and fixtures; `dev-fixtures` grows scenarios and sample content             | exists     |
+
+**Preferences and Settings** are different packages on purpose: preferences are the data, rules, persistence and browser runtime; Settings is the screen that edits them.
+
 ## Public interfaces and dependencies
 
 A package's `exports` defines its supported public interface. Consumers do not bypass it with filesystem paths or import private source. Internal dependencies use `workspace:*`. The complete production dependency matrix and non-production exceptions are owned by [ADR-0014](decisions/0014-multi-app-package-boundaries.md#2-dependency-and-runtime-matrix).
@@ -70,6 +106,8 @@ Follow existing accepted policies for account/device preference reconciliation, 
 ## Internal organization
 
 Organize around actual responsibilities. Do not generate empty shared/client/server/components trees or a forwarding wrapper for every function. Use folders when they group meaningful implementation, tests, stories, and private helpers.
+
+Frontend components compose through `children` and named slots rather than configuration props. A frame owns structure and shared behavior (resizing, collapsing, focus, responsive regions, rail/header/footer layout); its consumer supplies the content. Boolean flags that switch between unrelated layouts are not allowed; a second frame is. `frontend-shells` applies this to app shells and page frames; a frame tied to one product workflow stays in its feature.
 
 Current UI component-folder/story/test rules remain enforced by its package-structure test until a scoped change updates that contract. They are specific to that package, not a rule for every future package. Milestone 3 defines executable templates and tooling.
 

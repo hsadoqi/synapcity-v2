@@ -73,11 +73,11 @@ The [Space schema currently lives in UI](../frontend/ui/src/types/entity-schema.
 
 ### Example Packages
 
-- spaces
-- documents
-- dashboards
-- preferences
-- identity
+- `records` ----> Base record contract, with `spaces`, `documents` and `dashboards` modules extending it
+- `preferences` ----> Preference data, rules, scope and consent policy
+- `identity` ----> Credential, profile and verified-identity contracts
+
+The full list is the [package inventory](../../docs/architecture/workspace-conventions.md#package-inventory).
 
 ## Package design and verification
 

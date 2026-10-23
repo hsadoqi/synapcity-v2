@@ -1,6 +1,6 @@
 # Milestone 3.1: package grouping and naming
 
-**Status:** Proposed, awaiting owner approval.
+**Status:** Accepted by the owner on 2026-10-23 and recorded in the [workspace conventions](../../architecture/workspace-conventions.md#package-inventory). Kept as the record of decisions and source inputs.
 **Date:** 2026-10-23
 **Branch:** `chore/reorganization-m3-boundary-enforcement`
 **Governing decision:** [ADR-0014](../../architecture/decisions/0014-multi-app-package-boundaries.md). This design turns its responsibility families into concrete packages. It does not change the dependency matrix.
