@@ -148,12 +148,13 @@ Record the baseline before code migration. Milestone 1 baseline verification rem
 
 ## Boundary checks
 
-Accepted 2026-10-23 through the [Milestone 3.4 design](../superpowers/specs/2026-10-23-m3-boundary-enforcement-design.md); being implemented in `dev-boundaries`. Until `pnpm boundaries` exists and runs in `pnpm verify`, these rules are not enforced.
+Accepted 2026-10-23 through the [Milestone 3.4 design](../superpowers/specs/2026-10-23-m3-boundary-enforcement-design.md); enforced by `pnpm boundaries` (`dev-boundaries`) inside `pnpm verify`. Pre-existing violations are named in `packages/dev/boundaries/src/exceptions/exceptions.ts`, each with its removal milestone.
 
 The checker classifies every file by path into package, category and entry graph (in apps, `'use client'` files and what they reach form the browser graph; `'use server'` files are action boundaries), resolves every import including `import type` with the importing workspace's tsconfig and `exports`, and enforces:
 
 | #   | Rule                                                                                                                                                 |
 | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R0  | Every import resolves and every file parses, so a scan never passes silently (added by the implementation).                                          |
 | R1  | Packages never import app source.                                                                                                                    |
 | R2  | Every edge between categories and entry graphs is allowed by ADR-0014's matrix.                                                                      |
 | R3  | No server code is reachable, directly or transitively, from frontend packages, feature `frontend`/`contracts` graphs or the app browser graph.       |

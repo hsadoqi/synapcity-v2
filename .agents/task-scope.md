@@ -1,3 +1,11 @@
+## Active task: Milestone 3.4 boundary checker implementation (2026-10-23)
+
+- Goal and mode: implement the accepted 3.4 design per `docs/superpowers/plans/2026-10-23-m3-boundary-checker.md`, native execution chosen by the owner ("ill go with ur recs"). Commits not authorized; the owner committed progress during the run.
+- Exact creates: `packages/dev/boundaries/**` (package, README, source, tests). Updates: `pnpm-lock.yaml` (install of `oxc-parser@0.155.0`, `oxc-resolver@11.24.2` only), root `package.json` (`boundaries` script; `pnpm boundaries` in `verify` and `verify:fast`), root `vitest.config.ts` (project), `AGENTS.md` section 6, `docs/engineering/quality-gates.md`, `docs/engineering/setup.md`, `docs/architecture/workspace-conventions.md` (status line, R0 row), `docs/architecture/decisions/README.md` (candidate entry), `packages/dev/README.md`, this ledger. No application source changed; `apps/web/src/architecture.test.ts` untouched.
+- First run: 997 files across 12 workspaces; 16 genuine pre-existing violations (11 R11 Next.js imports in frontend-ui and frontend-site, 5 R9 barrel-induced module cycles), recorded as 15 named exceptions with removal milestones (M6–M9). Every import in the repository resolved (no R0).
+- Gate proof: a planted `import 'next/headers'` in a real client file failed with exactly one R3; the file was restored with no diff.
+- Verification: see the final report of this task.
+
 ## Active task: Milestone 3.4 boundary enforcement design (2026-10-23)
 
 - Goal and mode: choose and design the automated boundary checks with the owner; write one Proposed design. Spikes ran only in the session scratchpad (dependency-cruiser 18.7.0 with TypeScript 7.0.2 and `@swc/core` 1.16.20; Oxc parser/resolver from the existing install); no repository file, dependency or lockfile changed.
