@@ -10,9 +10,10 @@ const REPOSITORY = resolve(import.meta.dirname, '../../../../..');
 
 describe('the repository', () => {
   let result: CheckResult;
+  // The scan reads every workspace file, which outlasts the default hook timeout under parallel load.
   beforeAll(() => {
     result = check(REPOSITORY, EXCEPTIONS, APP_SERVER_ONLY);
-  });
+  }, 60_000);
 
   it('has no boundary violations beyond the named exceptions', () => {
     expect(
