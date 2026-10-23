@@ -44,7 +44,7 @@ This is the normative production-source matrix. **Yes** means public imports are
 Conditions:
 
 - Same-category and sibling-feature imports use explicit public interfaces, have a named responsibility, and remain acyclic. A shared contract or app-level composition is preferred over importing another feature's private implementation.
-- Frontend may consume a portable domain type needed by its public presentation contract. Canonical schemas and product workflows remain outside frontend; generic controls should prefer presentation props.
+- Frontend may import domain contracts and pure rules (types, schemas, validation, pure functions) through domain's public interface (owner decision, 2026-10-23). Frontend still may not own canonical schemas, redefine product rules, or hold product workflows; those stay in domain and features. Generic controls should prefer presentation props.
 - Feature contracts contain portable types/validation or view-model contracts, never React, DOM, SDK clients, or a server implementation. They may reuse explicit sibling feature contracts without creating a reverse domain dependency.
 - Feature server entries are backend orchestration/loaders. Presentation remains in the presentation entry; an app backend may compose that presentation after loading safe data.
 - Development configuration and dedicated tests/stories/seed/demo hosts may consume development utilities and the public interfaces they exercise. This is a non-production exception, not permission for a shipped entry to reach fixtures.
@@ -60,7 +60,7 @@ flowchart TB
     serverEntry --> services["Server operations"]
     contracts --> domain["Domain contracts and rules"]
     services --> domain
-    foundations -.->|narrow presentation type only| domain
+    foundations -->|contracts and pure rules| domain
 ```
 
 An allowed import does not require an app to consume every category. Docs can use presentation without account operations; Storybook uses public presentation with fixtures; native clients reuse only compatible contracts, behavior, and rendering implementations.

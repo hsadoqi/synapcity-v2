@@ -5,6 +5,7 @@
 - Owner decisions this session (2026-10-23): one capability may span categories; separate `frontend/preferences` runtime; preferences (data/runtime) versus settings (screen) naming split; profile/account contracts in `domain/identity`; one `domain/records` package; a base record contract for shared attributes (records were never meant to repeat them; the earlier "no universal Entity model" wording was AI-introduced and is corrected in ADR-0014, the domain README and the ownership map); `frontend/shells` widened to composable app shells and page frames, content passed through children/slots.
 - Exact updates: `.agents/task-scope.md`; `docs/architecture/decisions/0014-multi-app-package-boundaries.md`, `docs/architecture/reorganization-ownership-map.md`, `packages/domain/README.md` (entity-base correction only). Exact creates (1): `docs/superpowers/specs/2026-10-23-m3-package-grouping-design.md`, status Proposed. Commits, pushes, issues, project changes 0.
 - Verification: Prettier on changed files, relative-link check, builder read-through of the spec. Not run: application gates (documentation only).
+- Follow-up (owner approved 2026-10-23, "ok"): widened ADR-0014's Frontend-to-Domain condition to contracts and pure rules; updated its diagram, the frontend and domain READMEs, and the spec (O1 resolved). Additional updates: `packages/frontend/README.md`.
 
 ## Milestone 1 baseline record (2026-10-23)
 

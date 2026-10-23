@@ -39,7 +39,7 @@ flowchart TB
     server["Server operations and repositories"] --> domain
     fixtures["Development fixture factories"] --> domain
     host["Application composition"] --> domain
-    frontend["Frontend component, when its public contract requires a domain type"] -.-> domain
+    frontend["Frontend packages, for contracts and pure rules"] --> domain
 ```
 
 Domain production modules may depend on other portable domain modules through explicit, acyclic public interfaces and on approved platform-independent libraries. They do not import applications, frontend, server, features, or development fixtures.
