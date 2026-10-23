@@ -36,6 +36,18 @@ describe('readModule imports', () => {
     ]);
   });
 
+  it('does not count a local re-export of an imported binding as a second edge', () => {
+    expect(imports(`import { s } from './s';\nexport { s };`)).toEqual([
+      {
+        specifier: './s',
+        typeOnly: false,
+        kind: 'import',
+        literal: true,
+        line: 1,
+      },
+    ]);
+  });
+
   it('marks export type as type-only', () => {
     expect(imports(`export type { T } from './t';`)[0]?.typeOnly).toBe(true);
   });

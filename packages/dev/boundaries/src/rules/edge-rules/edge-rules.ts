@@ -1,0 +1,269 @@
+import { readFileSync } from 'node:fs';
+import { basename, dirname, relative, sep } from 'node:path';
+
+import { classifyFile } from '../../classify/index.ts';
+import { readModule } from '../../imports/index.ts';
+import { isAllowed } from '../../matrix/index.ts';
+import type {
+  Edge,
+  SourceFile,
+  Violation,
+  Workspace,
+} from '../../model/index.ts';
+import { createResolver } from '../../resolve/index.ts';
+import { listSourceFiles } from '../../workspace/index.ts';
+
+/** Platform-independent libraries domain code may import (R4). */
+export const DOMAIN_LIBRARIES = ['zod'];
+
+const SOURCE_FILE = /\.[cm]?[jt]sx?$/;
+const INDEX_FILE = /^index\.[cm]?[jt]sx?$/;
+const FEATURE_FOLDERS = new Set(['contracts', 'frontend', 'server', 'testing']);
+
+/** Every source file in the workspace, classified, and every import edge, resolved. */
+export function buildEdges(workspace: Workspace): {
+  files: Map<string, SourceFile>;
+  edges: Edge[];
+} {
+  const resolve = createResolver(workspace);
+  const files = new Map<string, SourceFile>();
+  for (const pkg of workspace.packages) {
+    for (const path of listSourceFiles(pkg)) {
+      const read = readModule(path, readFileSync(path, 'utf8'));
+      files.set(path, {
+        path,
+        pkg,
+        ...classifyFile(path, pkg, read.directive),
+        ...read,
+      });
+    }
+  }
+  const edges: Edge[] = [];
+  for (const from of files.values()) {
+    for (const record of from.imports) {
+      if (!record.literal) {
+        edges.push({ from, record, target: { kind: 'unresolved' } });
+        continue;
+      }
+      const resolution = resolve(from.path, record.specifier);
+      if (resolution.kind === 'path') {
+        const file = SOURCE_FILE.test(resolution.path)
+          ? files.get(resolution.path)
+          : undefined;
+        edges.push({
+          from,
+          record,
+          target: file
+            ? { kind: 'file', file }
+            : { kind: 'asset', path: resolution.path },
+        });
+      } else {
+        edges.push({ from, record, target: resolution });
+      }
+    }
+  }
+  return { files, edges };
+}
+
+/** R0, R1, R2, R4, R5, R6, R7, R8 and R11: rules judged one file or one import at a time. */
+export function edgeRules(
+  files: Map<string, SourceFile>,
+  edges: Edge[],
+  workspace: Workspace,
+): Violation[] {
+  const rel = (path: string) =>
+    relative(workspace.root, path).split(sep).join('/');
+  const violations: Violation[] = [];
+  const report = (
+    rule: Violation['rule'],
+    file: SourceFile,
+    specifier: string,
+    target: string | null,
+    message: string,
+  ) =>
+    violations.push({ rule, file: rel(file.path), specifier, target, message });
+
+  for (const file of files.values()) {
+    if (file.parseError)
+      report('R0', file, '', null, `does not parse: ${file.parseError}`);
+    const segments = rel(file.path)
+      .slice(rel(file.pkg.dir).length + 1)
+      .split('/');
+    if (
+      file.pkg.category === 'features' &&
+      file.production &&
+      segments[0] === 'src' &&
+      !FEATURE_FOLDERS.has(segments[1] ?? '')
+    ) {
+      report(
+        'R6',
+        file,
+        '',
+        null,
+        'feature source must sit under contracts/, frontend/, server/ or testing/',
+      );
+    }
+  }
+
+  for (const { from, record, target } of edges) {
+    const specifier = record.specifier;
+    if (!record.literal) {
+      if (from.production)
+        report(
+          'R0',
+          from,
+          specifier,
+          null,
+          'dynamic import argument is not a string literal',
+        );
+      continue;
+    }
+    if (target.kind === 'unresolved') {
+      report('R0', from, specifier, null, 'import does not resolve');
+      continue;
+    }
+    if (target.kind === 'asset') continue;
+
+    if (target.kind === 'external') {
+      if (
+        from.graph === 'domain' &&
+        from.production &&
+        !DOMAIN_LIBRARIES.includes(target.name)
+      ) {
+        report(
+          'R4',
+          from,
+          specifier,
+          target.name,
+          `domain may import only ${DOMAIN_LIBRARIES.join(', ')}`,
+        );
+      }
+      const inNextFolder = rel(from.path).startsWith(
+        `${rel(from.pkg.dir)}/src/next/`,
+      );
+      if (
+        from.pkg.category === 'frontend' &&
+        from.production &&
+        target.name === 'next' &&
+        !inNextFolder
+      ) {
+        report(
+          'R11',
+          from,
+          specifier,
+          target.name,
+          'Next.js imports belong behind the ./next entry',
+        );
+      }
+      continue;
+    }
+
+    const to = target.file;
+    const toPath = rel(to.path);
+    if (to.pkg.category === 'app' && from.pkg.category !== 'app') {
+      report('R1', from, specifier, toPath, 'packages never import app source');
+      continue;
+    }
+
+    if (to.pkg !== from.pkg) {
+      if (from.pkg.category === 'app' && to.pkg.category === 'app') {
+        // Apps have no exports, so a relative path is the only way in; the finding is the app-to-app edge.
+        if (from.production) {
+          report(
+            'R2',
+            from,
+            specifier,
+            toPath,
+            'apps never import another app',
+          );
+        }
+      } else if (specifier.startsWith('.') || specifier.startsWith('/')) {
+        report(
+          'R5',
+          from,
+          specifier,
+          toPath,
+          'import another package through its exports, not a relative path',
+        );
+      } else if (from.production && !to.production) {
+        report(
+          'R8',
+          from,
+          specifier,
+          toPath,
+          'production code never imports dev, testing, test or story code',
+        );
+      } else if (
+        from.production &&
+        to.production &&
+        !isAllowed(from.graph, to.graph)
+      ) {
+        report(
+          'R2',
+          from,
+          specifier,
+          toPath,
+          `${from.graph} may not import ${to.graph} (ADR-0014 matrix)`,
+        );
+      }
+      continue;
+    }
+
+    // Same package: the feature path rules (R6), the folder-import rule (R7), and test or story imports (R8).
+    if (from.pkg.category === 'features' && from.production) {
+      if (
+        to.graph === 'feature-server' &&
+        (from.graph === 'feature-frontend' ||
+          from.graph === 'feature-contracts')
+      ) {
+        report(
+          'R6',
+          from,
+          specifier,
+          toPath,
+          `${from.graph} never imports feature server code`,
+        );
+      } else if (
+        to.graph === 'feature-frontend' &&
+        from.graph === 'feature-contracts'
+      ) {
+        report(
+          'R6',
+          from,
+          specifier,
+          toPath,
+          'feature contracts never import feature frontend code',
+        );
+      } else if (to.graph === 'testing') {
+        report('R6', from, specifier, toPath, 'only testing/ imports testing/');
+      }
+    } else if (from.production && !to.production) {
+      report(
+        'R8',
+        from,
+        specifier,
+        toPath,
+        'production code never imports dev, testing, test or story code',
+      );
+    }
+    if (
+      !from.pkg.legacy &&
+      from.pkg.category !== 'app' &&
+      specifier.startsWith('.') &&
+      dirname(to.path) !== dirname(from.path) &&
+      !INDEX_FILE.test(basename(to.path))
+    ) {
+      report(
+        'R7',
+        from,
+        specifier,
+        toPath,
+        'import another folder through its index.ts, not a file inside it',
+      );
+    }
+  }
+
+  return violations.sort(
+    (a, b) => a.file.localeCompare(b.file) || a.rule.localeCompare(b.rule),
+  );
+}

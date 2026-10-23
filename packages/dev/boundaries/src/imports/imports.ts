@@ -64,11 +64,15 @@ export function readModule(path: string, source: string): ModuleRead {
   for (const statement of result.module.staticExports) {
     const bySpecifier = new Map<string, { typeOnly: boolean; start: number }>();
     for (const entry of statement.entries) {
-      if (!entry.moduleRequest) continue;
-      const seen = bySpecifier.get(entry.moduleRequest.value);
-      bySpecifier.set(entry.moduleRequest.value, {
+      // Only `export … from '…'` is an edge. `import { s } from 'x'; export { s }` is recorded by the
+      // module record as an indirect re-export of 'x': that request precedes the entry, while a real
+      // re-export's request follows it. (The record's statement span covers the import, not the export.)
+      const request = entry.moduleRequest;
+      if (!request || request.start < entry.start) continue;
+      const seen = bySpecifier.get(request.value);
+      bySpecifier.set(request.value, {
         typeOnly: (seen?.typeOnly ?? true) && entry.isType,
-        start: statement.start,
+        start: seen?.start ?? entry.start,
       });
     }
     for (const [specifier, { typeOnly, start }] of bySpecifier) {
