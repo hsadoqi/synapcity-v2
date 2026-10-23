@@ -28,15 +28,13 @@ describe('applyAppearance', () => {
       animationsEnabled: false,
       showBorders: true,
       reducedMotion: true,
-      contrastMode: 'high',
-      fontSize: 'large',
-    });
+      contrastMode: 'high'
+        });
     expect(dataset()).toEqual({
       animations: 'false',
       borders: 'true',
       reducedMotion: 'true',
-      contrast: 'high',
-      fontSize: 'large',
+      contrast: 'high'
     });
   });
 });

@@ -5,6 +5,7 @@ import {
   currentSettings,
   renderWithSettings,
   stubBrowser,
+  saveTab,
 } from '../../test-harness';
 import { AppearanceSettings } from './index';
 
@@ -33,6 +34,7 @@ describe('AppearanceSettings', () => {
     fireEvent.click(
       screen.getByRole('switch', { name: 'Show component borders' }),
     );
+    saveTab();
 
     expect(currentSettings().appearance.showBorders).toBe(true);
     expect(currentSettings().appearance.animationsEnabled).toBe(true);
@@ -42,6 +44,7 @@ describe('AppearanceSettings', () => {
     await renderWithSettings(<AppearanceSettings />);
 
     fireEvent.click(screen.getByRole('switch', { name: 'Enable animations' }));
+    saveTab();
 
     expect(currentSettings().appearance.animationsEnabled).toBe(false);
     expect(currentSettings().appearance.showBorders).toBe(false);
@@ -56,12 +59,11 @@ describe('AppearanceSettings', () => {
         .getAttribute('aria-checked'),
     ).toBe('false');
     expect(
-      screen.getByRole('combobox', { name: 'Text size' }).textContent,
-    ).toContain('Medium');
-    expect(
       screen.getByRole('combobox', { name: 'Contrast' }).textContent,
     ).toContain('Standard');
     expect(screen.queryByText('Color theme')).toBeNull();
+    // Text size moved to the Theme tab.
+    expect(screen.queryByText('Text size')).toBeNull();
   });
 
   it('locks reduced motion on while animations are off, keeping its saved value', async () => {
@@ -82,6 +84,7 @@ describe('AppearanceSettings', () => {
     await renderWithSettings(<AppearanceSettings />);
 
     fireEvent.click(screen.getByRole('switch', { name: 'Reduce motion' }));
+    saveTab();
 
     expect(currentSettings().appearance).toEqual({
       ...currentSettings().appearance,
