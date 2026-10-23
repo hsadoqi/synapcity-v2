@@ -94,6 +94,31 @@ describe('Toaster', () => {
     );
   });
 
+  it.each([
+    ['success', 'bg-success'],
+    ['info', 'bg-info'],
+    ['warning', 'bg-warning'],
+    ['error', 'bg-destructive'],
+  ])('puts the %s icon on a chip in its status colour', async (type, fill) => {
+    renderToaster();
+
+    add({ title: 'Message', type });
+    await screen.findByText('Message');
+
+    const icon = document.querySelector('[data-slot="toast-icon"]');
+    expect(icon?.getAttribute('data-type')).toBe(type);
+    expect(icon?.className).toContain(fill);
+  });
+
+  it('does not treat an inherited name as a type', async () => {
+    renderToaster();
+
+    add({ title: 'Message', type: 'constructor' });
+    await screen.findByText('Message');
+
+    expect(document.querySelector('[data-slot="toast-icon"]')).toBeNull();
+  });
+
   it('hides icons from assistive tech', async () => {
     renderToaster();
 

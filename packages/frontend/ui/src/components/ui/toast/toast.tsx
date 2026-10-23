@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import { Toast as ToastPrimitive } from '@base-ui/react/toast';
 import { cn } from 'cn';
 
@@ -145,39 +144,56 @@ function ToastClose({
   );
 }
 
+/*
+ * Each status icon sits on a chip filled with its status colour and drawn in
+ * that colour's foreground: the pairs the tokens define to contrast, in both
+ * themes. A bare coloured icon would not hold 3:1 for every status (the light
+ * theme's warning yellow on the popover is well under it). The shape differs
+ * per type too, so colour is never the only cue.
+ */
+const toastIcons = {
+  success: {
+    Icon: CircleCheckIcon,
+    chip: 'bg-success text-success-foreground',
+  },
+  info: { Icon: InfoIcon, chip: 'bg-info text-info-foreground' },
+  warning: {
+    Icon: TriangleAlertIcon,
+    chip: 'bg-warning text-warning-foreground',
+  },
+  error: {
+    Icon: OctagonXIcon,
+    chip: 'bg-destructive text-destructive-foreground',
+  },
+  loading: { Icon: Loader2Icon, chip: 'text-muted-foreground' },
+} as const;
+
+function isToastIconType(
+  type: string | undefined,
+): type is keyof typeof toastIcons {
+  return type !== undefined && Object.hasOwn(toastIcons, type);
+}
+
 function ToastIcon({ type }: { type: string | undefined }) {
-  let icon: React.ReactNode = null;
-
-  if (type === 'success') {
-    icon = <CircleCheckIcon aria-hidden="true" />;
-  }
-
-  if (type === 'info') {
-    icon = <InfoIcon aria-hidden="true" />;
-  }
-
-  if (type === 'warning') {
-    icon = <TriangleAlertIcon aria-hidden="true" />;
-  }
-
-  if (type === 'error') {
-    icon = <OctagonXIcon className="text-destructive" aria-hidden="true" />;
-  }
-
-  if (type === 'loading') {
-    icon = <Loader2Icon className="animate-spin" aria-hidden="true" />;
-  }
-
-  if (!icon) {
+  if (!isToastIconType(type)) {
     return null;
   }
+
+  const { Icon, chip } = toastIcons[type];
 
   return (
     <span
       data-slot="toast-icon"
-      className="shrink-0 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4"
+      data-type={type}
+      className={cn(
+        'flex size-6 shrink-0 items-center justify-center rounded-full [&_svg]:pointer-events-none [&_svg]:size-4',
+        chip,
+      )}
     >
-      {icon}
+      <Icon
+        className={cn(type === 'loading' && 'animate-spin')}
+        aria-hidden="true"
+      />
     </span>
   );
 }
