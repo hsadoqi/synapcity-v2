@@ -1,5 +1,5 @@
 'use client';
-
+// TODO: Shouldnt this be in the ui package? why or why not?
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { ComponentProps } from 'react';
 import { RootShell } from '@synapcity/frontend-ui/blocks/root-shell';

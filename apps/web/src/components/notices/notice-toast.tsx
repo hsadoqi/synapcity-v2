@@ -1,5 +1,6 @@
 'use client';
 
+// TODO: Does this just handle success? Add functionality to handle different use cases and types.
 import { useEffect, useRef } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from '@synapcity/frontend-ui/core/toast';
