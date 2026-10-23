@@ -81,8 +81,8 @@ The host supplies where a link leads and how an action is invoked. A callback ex
 - `ui` ----> Reusable DOM primitives and visual components
 - `shells` ----> Shell layout and shell interaction
 - `collection` ----> Browse behavior and DOM collection views
-- `settings` ----> Settings presentation and editing workflows
-- `auth` ----> Reusable authentication presentation/workflows
+- `settings` ----> Reusable settings presentation (rows, sections, editor controls); the editing workflow is `features/settings`
+- `auth` ----> Reusable authentication presentation (form pieces, status and confirmation views); auth workflows are `features/auth`
 - `site` ----> Existing site metadata/brand concerns
 - `tailwind-config` ----> Existing styling foundation
 

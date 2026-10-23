@@ -90,9 +90,9 @@ sequenceDiagram
 
 The example does not prescribe one verification order for every capability. Existing enumeration protection, provider-specific verification, failure semantics, and database enforcement must survive extraction.
 
-## Initial grouping candidates
+## Initial grouping
 
-The discussed candidates are auth operations/identity support, account/profile/preference operations, and data repositories. These are candidate package groupings, not created paths or finalized export names.
+[ADR-0014](../../docs/architecture/decisions/0014-multi-app-package-boundaries.md#4-grouping-and-public-interface-principles) settles the initial grouping: auth operations/identity support, account/profile/preference operations, and data repositories. Package paths, manifests, and export names are Milestone 3 work; none is created here.
 
 A persistence package may contain separate modules for Spaces, Documents, and Dashboards. A new query does not automatically require a new package. Keep a concrete owner and narrow API rather than growing an unrestricted backend utility bucket.
 
@@ -101,7 +101,7 @@ Current inputs include [auth operations](../../apps/web/src/features/auth/server
 ### Example packages
 
 - `auth` ----> Verified identity, auth operations, verified caller helpers, identity/provider translation, session-related backend behavior
-- `account` ----> Account/profile/preference operations, metadata. updates and persistence
+- `account` ----> Account/profile/preference operations, metadata updates and persistence
 - `data` ----> Resource repositories, database row mapping, participation queries, shared persistence infrastructure and provider adapters for Spaces/Documents/Dashboards
 
 ## Verification and undecided details

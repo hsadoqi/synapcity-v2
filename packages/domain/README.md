@@ -81,7 +81,7 @@ The [Space schema currently lives in UI](../frontend/ui/src/types/entity-schema.
 
 ## Package design and verification
 
-Group cohesive contracts and rules by capability. A new helper, type, or schema does not automatically need a package. Exact package grouping, names, exports, and migration scope will be refined before implementation.
+Group cohesive contracts and rules by capability. A new helper, type, or schema does not automatically need a package. ADR-0014 settles the responsibility families; exact leaf packages, names, and exports are Milestone 3 work, and migration scope is set per extraction.
 
 For each extraction, check pure behavior, schema compatibility, and consumers in features, server code, and fixtures. Runtime validation and TypeScript checks cover different failures. Boundary enforcement is intended work, not implemented by this document.
 

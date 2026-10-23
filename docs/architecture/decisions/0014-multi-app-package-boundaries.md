@@ -114,6 +114,8 @@ The selected grouping families are:
 | Resource experiences and Home | Feature groups preserve capability semantics; Home aggregates them rather than owning their records                                                                                                                       |
 | Fixtures                      | Extend the existing dev fixtures package with contract-aligned factories, scenarios, and sample content                                                                                                                   |
 
+One capability may have packages in several categories when each package holds only its own category's responsibility. For example, a `frontend/settings` package can hold reusable settings presentation while `features/settings` composes the Settings experience; `frontend/auth` beside `features/auth`, and domain or server packages for the same capability, follow the same rule. A shared capability name does not move workflows, product copy, or data access into frontend, nor presentation into domain or server.
+
 Keep domain record contracts distinct by kind even where common fields are factored into a shared internal helper. Exact leaf-package names, manifest/export syntax, and private file templates are Milestone 3 implementation design; the owner/responsibility assignments above are settled here.
 
 Public interfaces expose supported capabilities and entry points, not every internal file. Mixed-runtime packages need separate portable, presentation, and backend entries; a default barrel must not make server implementation reachable through frontend code. Concrete interface signatures are specified and checked with all consumers during the relevant migration.

@@ -1,3 +1,11 @@
+## Active task: verify and close Milestone 2 (2026-10-23)
+
+- Goal and mode: owner asked to ensure Milestone 2 is complete against the six parts and three results in the private roadmap notes. Reviewing, then reconciling documentation only.
+- Authority: the owner confirmed on 2026-10-23 that one capability can have packages in several categories (for example `frontend/settings` beside `features/settings`, plus domain/server packages), each holding only its category's responsibility.
+- Exact updates (6): `.agents/task-scope.md`; `docs/architecture/decisions/0014-multi-app-package-boundaries.md` (one paragraph in section 4); `docs/architecture/workspace-conventions.md` (one sentence); `packages/frontend/README.md` (two example descriptions, owner list entries kept); `packages/server/README.md` (grouping wording aligned with ADR-0014, one typo); `packages/domain/README.md` (one sentence pointing leaf design to Milestone 3). Creates, source/package/config/dependency changes, commits, pushes and external mutations 0.
+- Verification: `pnpm format:check`; `git diff --check`; relative link and anchor validation over every Markdown file touched by Milestone 2; all 14 Mermaid diagrams parsed and rendered with Mermaid 11.17.2 in headless Chromium (scratch install outside the repository). Not run: `pnpm verify`, lint, types, tests, build; documentation-only change.
+- Outcome: the earlier "unwritten checks" gap from the completion entry below is closed. One pre-existing broken link remains in a historical entry of this ledger (`phase-03-two-layer-navigation-shell-brief.md`, not in this repository); history is not rewritten. Milestone 1 baseline verification is still pending and remains a prerequisite for Milestone 3 implementation and later source migration.
+
 ## Active task: complete Milestone 2 architecture boundaries (2026-10-23)
 
 - Goal and mode: implement the owner's instruction to finish Milestone 2 completely, documenting the already selected multi-app package architecture. The owner subsequently instructed: "skip all checks/running pnpm verify". No verification commands, formatter, tests, diagram rendering, or link checks are run for this completion change.
