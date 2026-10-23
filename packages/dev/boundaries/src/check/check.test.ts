@@ -63,4 +63,11 @@ describe('check', () => {
       ),
     ).toThrow('@t/frontend-empty');
   });
+
+  it('fails when an app server-only path matches no scanned file', () => {
+    const result = check(root(), [], ['apps/web/src/lib/gone.ts']);
+    expect(result.violations.map((v) => `${v.rule} ${v.file}`)).toEqual([
+      'R3 apps/web/src/lib/gone.ts',
+    ]);
+  });
 });

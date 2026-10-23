@@ -54,4 +54,12 @@ describe('serverGuardRule (R10)', () => {
       ),
     ).toEqual(['R10 packages/server/s/src/other.ts']);
   });
+
+  it('allows app server modules to import the guard (Next.js hardening)', () => {
+    expect(
+      run({
+        'apps/web/src/lib/server-thing.ts': `import 'server-only';\nexport const x = 1;`,
+      }),
+    ).toEqual([]);
+  });
 });

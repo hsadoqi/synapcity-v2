@@ -140,3 +140,12 @@ describe('loadWorkspace paths', () => {
     expect(ws.packages[0]?.dir.startsWith(realpathSync(root))).toBe(true);
   });
 });
+
+describe('loadWorkspace categories', () => {
+  it('fails on a package folder outside the five categories instead of skipping it', () => {
+    const root = workspace({
+      'packages/shared/x/package.json': manifest('@t/shared-x'),
+    });
+    expect(() => loadWorkspace(root)).toThrow('packages/shared');
+  });
+});

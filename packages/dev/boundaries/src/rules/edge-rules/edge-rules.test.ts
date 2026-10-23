@@ -232,4 +232,55 @@ describe('edgeRules', () => {
       target: 'packages/server/s/src/index.ts',
     });
   });
+
+  describe('review fixes', () => {
+    it("R0: fails an import that resolves to source the scan skips, such as another package's dist", () => {
+      expect(
+        summary(
+          run({
+            'packages/server/s/dist/index.js': 'export const s = 1;',
+            'packages/frontend/f/src/bad.ts': `import '../../../server/s/dist/index.js';`,
+          }),
+        ),
+      ).toEqual(['R0 packages/frontend/f/src/bad.ts']);
+    });
+
+    it('R2: applies the matrix to same-package feature edges (server never imports frontend)', () => {
+      expect(
+        summary(
+          run({
+            'packages/features/feat/src/server/bad.ts': `import '../frontend/index.ts';`,
+          }),
+        ),
+      ).toEqual(['R2 packages/features/feat/src/server/bad.ts']);
+    });
+
+    it('R8: fails a feature production file importing its own story', () => {
+      expect(
+        summary(
+          run({
+            'packages/features/feat/src/frontend/x.stories.tsx':
+              'export default {};',
+            'packages/features/feat/src/frontend/bad.ts': `import './x.stories.tsx';`,
+          }),
+        ),
+      ).toEqual(['R8 packages/features/feat/src/frontend/bad.ts']);
+    });
+
+    it('R0: resolves type-only imports of declaration files and types-only packages', () => {
+      expect(
+        summary(
+          run({
+            'packages/frontend/f/src/types.d.ts': 'export type T = string;',
+            'packages/frontend/f/src/uses-types.ts': `import type { T } from './types';\nexport type U = T;`,
+            'node_modules/typesonly/package.json': manifest('typesonly', {
+              types: 'index.d.ts',
+            }),
+            'node_modules/typesonly/index.d.ts': 'export type P = number;',
+            'packages/frontend/f/src/uses-package-types.ts': `import type { P } from 'typesonly';\nexport type Q = P;`,
+          }),
+        ),
+      ).toEqual([]);
+    });
+  });
 });

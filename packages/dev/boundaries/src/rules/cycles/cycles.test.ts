@@ -59,4 +59,15 @@ describe('cycleRule (R9)', () => {
       }).map((v) => v.file),
     ).toEqual(['packages/frontend/f/src/t1.ts']);
   });
+
+  it('records the cycle members on the violation, so exceptions can pin them', () => {
+    const [violation] = run({
+      'packages/frontend/f/src/m1.ts': `import './m2.ts';`,
+      'packages/frontend/f/src/m2.ts': `import './m1.ts';`,
+    });
+    expect(violation?.members).toEqual([
+      'packages/frontend/f/src/m1.ts',
+      'packages/frontend/f/src/m2.ts',
+    ]);
+  });
 });

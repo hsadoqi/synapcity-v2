@@ -53,4 +53,23 @@ describe('applyExceptions', () => {
     const stale = exception('R9', 'gone.ts');
     expect(applyExceptions([], [stale]).stale).toEqual([stale]);
   });
+
+  it('matches an R9 exception only while the cycle keeps exactly its recorded members', () => {
+    const grown: Violation = {
+      ...violation('R9', 'a.ts', ''),
+      members: ['a.ts', 'b.ts', 'z.ts'],
+    };
+    const recorded: Exception = {
+      ...exception('R9', 'a.ts'),
+      members: ['a.ts', 'b.ts'],
+    };
+    const result = applyExceptions([grown], [recorded]);
+    expect(result.remaining).toEqual([grown]);
+    expect(result.stale).toEqual([recorded]);
+    const same: Violation = {
+      ...violation('R9', 'a.ts', ''),
+      members: ['a.ts', 'b.ts'],
+    };
+    expect(applyExceptions([same], [recorded]).remaining).toEqual([]);
+  });
 });
