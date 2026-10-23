@@ -36,6 +36,7 @@ export function ContextSwitcher({
             render={(props) => (
               <SidebarMenuButton
                 size="lg"
+                aria-label="Switch version"
                 {...props}
                 className="data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
               >

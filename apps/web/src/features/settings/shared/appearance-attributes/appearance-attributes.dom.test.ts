@@ -57,7 +57,6 @@ describe('appearanceBootScript', () => {
       showBorders: true,
       reducedMotion: true,
       contrastMode: 'low',
-      fontSize: 'small',
     } as const;
     boot(JSON.stringify({ appearance: saved }));
     const fromScript = dataset();
@@ -74,7 +73,6 @@ describe('appearanceBootScript', () => {
       JSON.stringify({
         appearance: {
           showBorders: true,
-          fontSize: 'huge',
           contrastMode: '"><script>',
           reducedMotion: 'yes',
         },
@@ -85,7 +83,6 @@ describe('appearanceBootScript', () => {
       borders: 'true',
       reducedMotion: 'false',
       contrast: 'none',
-      fontSize: 'medium',
     });
   });
 
@@ -93,7 +90,7 @@ describe('appearanceBootScript', () => {
     'never throws on unusable storage: %s',
     (saved) => {
       expect(() => boot(saved)).not.toThrow();
-      expect(dataset().fontSize).toBe('medium');
+      expect(dataset().contrast).toBe(appearanceDefaults.contrastMode);
     },
   );
 });

@@ -16,9 +16,10 @@ import { SettingsContent } from '../settings-content';
 // mock; this layout test opens a stand-in in its place.
 const account = tabs.find((tab) => tab.value === 'account')!;
 
-// Each tab loads lazily, and these tests wait up to 10 s for it. The test's own
-// limit must be longer, or a slow machine cuts it off before that wait ends.
-const LOADING_TIMEOUT = 30_000;
+// Each tab loads lazily, and these tests wait up to 10 s for it, several times
+// in a row in the longest one. The test's own limit must exceed that total, or a
+// busy machine (the full parallel run) cuts it off before the waits end.
+const LOADING_TIMEOUT = 60_000;
 const FIND_TIMEOUT = 10_000;
 
 beforeEach(() => {
