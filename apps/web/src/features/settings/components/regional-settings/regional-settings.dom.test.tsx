@@ -4,6 +4,7 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { renderToString } from 'react-dom/server';
@@ -21,6 +22,14 @@ import { settingsDefaults } from '../../types/settings';
 import type { RegionalSettings as RegionalSettingsType } from '../../types/regional';
 import { RegionalSettings } from './index';
 import { AppearanceSettings } from '../appearance-settings';
+
+// Changes wait in the tab's draft until saved; one save writes them all.
+function saveTab(title = 'Regional') {
+  const card = screen
+    .getByRole('heading', { level: 2, name: title })
+    .closest('[data-slot="card"]') as HTMLElement;
+  fireEvent.click(within(card).getByRole('button', { name: 'Save changes' }));
+}
 
 const initialRegional: RegionalSettingsType = {
   language: 'de',
@@ -156,6 +165,7 @@ describe('regional controls', () => {
       const mounted = await mount();
       expect(document.querySelectorAll('[data-slot="card"]')).toHaveLength(1);
       await choose(label, option);
+      saveTab();
       const expected = { ...initialRegional, [field]: value };
       expect(values().regional).toEqual(expected);
       expect(
@@ -181,6 +191,7 @@ describe('regional controls', () => {
         .value,
     ).toBe('US/Eastern');
     await choose('Timezone', 'UTC');
+    saveTab();
     expect(values().regional.timezone).toBe('UTC');
   });
 
@@ -192,6 +203,7 @@ describe('regional controls', () => {
     await mount();
     const device = Intl.DateTimeFormat().resolvedOptions().timeZone;
     await choose('Timezone', `Device (${device.replaceAll('_', ' ')})`);
+    saveTab();
     expect(values().regional.timezone).toBe('system');
     expect(
       JSON.parse(localStorage.getItem('synapcity-preferences')!).regional
@@ -222,6 +234,7 @@ describe('regional controls', () => {
     // screen reader read English in a German voice (WCAG 3.1.1).
     expect(document.documentElement.lang).toBe('en');
     await choose('Preferred language', '日本語 — Japanese');
+    saveTab();
     expect(values().regional.language).toBe('ja');
     expect(document.documentElement.lang).toBe('en');
   });
@@ -247,6 +260,7 @@ describe('regional controls', () => {
     fireEvent.click(
       screen.getByRole('switch', { name: 'Show component borders' }),
     );
+    saveTab('Display');
     expect(values().appearance.showBorders).toBe(true);
     expect(values().regional).toEqual(initialRegional);
   });
