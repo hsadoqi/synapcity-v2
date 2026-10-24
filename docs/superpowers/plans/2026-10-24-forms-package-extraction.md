@@ -79,7 +79,8 @@ What the migrating features must not redo:
 - Do not call React Hook Form's `reset()` on such a form: it also resets the DOM form and would wipe what was typed. The binding syncs values from the form's own data before validating, because React 19 resets a form after its action finishes and React Hook Form does not see that.
 - Do not copy the server's state into React Hook Form's errors; show `state` from the binding.
 - Test a migrated form with an empty submit with JavaScript off and with it on, as the pilot's end-to-end tests do.
-- Auth forms that other forms compose (login, register, update password) have more than one field and non-text inputs; the pilot covers one text field. Check password reveal and focus order on the first multi-field form.
+- Register was migrated as the multi-field pilot: its tests compare the browser's refusal with the server's `firstRefusal` for the same input, and check the reveal and the JavaScript-off path end to end. Copy those tests when migrating login and update password.
+- The binding validates files and repeated names; the avatar form's preview flow has not been tried with it.
 
 ## Risks
 

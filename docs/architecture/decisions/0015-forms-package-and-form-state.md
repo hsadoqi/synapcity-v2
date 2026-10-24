@@ -51,7 +51,7 @@ Governs the placement of form interaction foundations, the form-state library, a
 ## Unresolved
 
 - **Server errors into form state.** Server errors are handled: eight existing forms (login, register, forgot password, update password, email change, delete account, name, avatar) show an action's `{ error, fields }` state, and `useActionForm` shows that same state as it is, so the shared field marking, message linking and focus keep working. What stays open is copying a server result into React Hook Form's own error store, which no current form needs because every server error targets one named field. Decide it against the first form that needs React Hook Form to own server errors (for example nested or array fields).
-- **The other seven forms.** Only forgot password uses `useActionForm`. Register, update password and delete account have several fields, and the avatar form has a file input, which the binding does not validate (it reads string values only). Each is checked when it migrates; password reveal and focus order across fields are checked on the first multi-field one.
+- **The other six forms.** Forgot password and register use `useActionForm`. Login, update password, email change, delete account, name and avatar do not yet; each is checked when it migrates. The binding validates files and repeated names (added after the pilot), but the avatar form's own flow, which previews the chosen image, has not been tried with it.
 - **A newer `react-hook-form`.** 7.91.0 is the registry's latest but fails the repository's release-age policy until it is old enough; moving off the pinned 7.90.0 is a separate change.
 
 ## Implementation notes
@@ -63,7 +63,9 @@ Added 2026-10-24 after extraction Parts A and B. They record what was found; the
 - **Versions.** `react-hook-form` 7.90.0 and `@hookform/resolvers` 6.0.0, pinned exactly in the forms package only. Their peer ranges cover React 19.3.0, Zod 4.6.7 and each other. `@hookform/resolvers` 6.0.0 was run against Zod 4.6.7: messages come through and `.trim()` applies to the parsed values.
 - **Boundary.** Only `packages/frontend/forms` can resolve `react-hook-form`, because nothing is hoisted; no boundary rule was added.
 - **Storybook discovery** of stories in new packages was settled in M5.3; the forms package lists its stories there.
-- **Verification.** Unit and DOM tests, end-to-end tests with JavaScript on and off, and Storybook stories with the a11y addon's axe checks pass. The manual keyboard and screen-reader check of the pilot has not been done.
+- **Register, the multi-field pilot.** Register (three fields, a password reveal) was migrated after forgot password. For the same input the browser refuses with the message and field the server's `firstRefusal` gives, marks only that field and focuses it; tests compare the two directly, including a password that fails the custom character check. The reveal and the server-side refusal with JavaScript off are checked end to end.
+- **Files and repeated names.** The binding passes `File` values through and turns a name that appears more than once into a list. A chosen file is checked in a Storybook story, because jsdom's `FormData` ignores a file a test assigns.
+- **Verification.** Unit and DOM tests, end-to-end tests with JavaScript on and off for both pilots, and Storybook stories with the a11y addon's axe checks pass. The manual keyboard and screen-reader check has not been done.
 
 ## Governance boundary
 
