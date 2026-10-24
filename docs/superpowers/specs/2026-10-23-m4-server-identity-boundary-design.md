@@ -1,6 +1,6 @@
 # Milestone 4: server identity boundary
 
-**Status:** Accepted by the owner on 2026-10-23 ("i accept all your recommendations": Q1–Q3 as recommended and calls C1–C6). Implementation plan: [2026-10-23-m4-server-identity-boundary.md](../plans/2026-10-23-m4-server-identity-boundary.md). The builder check's findings are folded in (section 12).
+**Status:** Accepted by the owner on 2026-10-23 ("i accept all your recommendations": Q1–Q3 as recommended and calls C1–C6). Implemented on `chore/reorganization-m4-server-identity` the same day; live-provider checks in section 4.4 remain the owner's. Implementation plan: [2026-10-23-m4-server-identity-boundary.md](../plans/2026-10-23-m4-server-identity-boundary.md). The builder check's findings are folded in (section 12).
 **Date:** 2026-10-23
 **Branch:** `chore/reorganization-m4-server-identity`
 **Governing decisions:** [ADR-0014](../../architecture/decisions/0014-multi-app-package-boundaries.md) (categories, matrix, host bindings), [ADR-0006](../../architecture/decisions/0006-authentication-with-supabase.md) (Supabase Auth, `getClaims`/`getUser`, development fixture mode), [ADR-0008](../../architecture/decisions/0008-auth-actions-and-server-operations.md) (request-bound clients, no forwarding wrappers), the [workspace conventions](../../architecture/workspace-conventions.md) (inventory, entry points, organization, boundary checks).

@@ -52,7 +52,7 @@ Milestone numbers follow the reorganization roadmap (owner decision, 2026-10-23)
 | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------- |
 | `domain-records`                      | Base record contract; Space, Document and Dashboard contracts as separate modules extending it                                                               | M5            |
 | `domain-preferences`                  | Preference schemas, defaults, account/device scope, merging, import/transfer validation, consent policy                                                      | M6            |
-| `domain-identity`                     | Credential, profile, name and avatar contracts; verified-identity contract                                                                                   | M4\* / M7     |
+| `domain-identity`                     | Credential, profile, name and avatar contracts; verified-identity contract                                                                                   | M4 (exists)   |
 | `frontend-ui` (existing)              | Primitives, generic components and form pieces, generic hooks, low-level layout primitives                                                                   | exists        |
 | `frontend-shells`                     | Composable app shells and page frames                                                                                                                        | M5            |
 | `frontend-collection`                 | Browse projections, query mechanics, generic controls and displays, local browse state                                                                       | M5            |
@@ -66,8 +66,8 @@ Milestone numbers follow the reorganization roadmap (owner decision, 2026-10-23)
 | `frontend-tailwind-config` (existing) | Tokens and styling foundation                                                                                                                                | exists        |
 | `server-data`                         | Space, Document and Dashboard repositories, queries and row mapping                                                                                          | M5            |
 | `server-account`                      | Profile, avatar and account-preference operations                                                                                                            | M6            |
-| `server-auth`                         | Verified identity, auth operations, verified-caller helpers                                                                                                  | M4\* / M7     |
-| `server-supabase`                     | Request-bound server client from host-supplied cookies, session refresh helpers, provider-error translation; the only server package importing `@supabase/*` | M4\* / M5     |
+| `server-auth`                         | Verified identity, auth operations, verified-caller helpers                                                                                                  | M4 (exists)   |
+| `server-supabase`                     | Request-bound server client from host-supplied cookies, session refresh helpers, provider-error translation; the only server package importing `@supabase/*` | M4 (exists)   |
 | `features-spaces`                     | Space browsing and detail                                                                                                                                    | M5            |
 | `features-settings`                   | The Settings experience: editors, drafts, guard, import/export, account sync                                                                                 | M6            |
 | `features-auth`                       | Sign-in, registration, password, email and session workflows                                                                                                 | M7            |
@@ -78,7 +78,7 @@ Milestone numbers follow the reorganization roadmap (owner decision, 2026-10-23)
 | `dev-*` (five existing)               | Tooling, test configuration and fixtures; `dev-fixtures` grows scenarios and sample content                                                                  | exists        |
 | `dev-boundaries`                      | Workspace boundary checker (`pnpm boundaries`) and its violation probes                                                                                      | M3.4          |
 
-\* The M4 design decides which packages hold the server identity contract and its provider adapter. Packages it does not use first receive code in the milestone after the slash.
+M4 created `domain-identity`, `server-auth` and `server-supabase` for the server identity boundary ([M4 design](../superpowers/specs/2026-10-23-m4-server-identity-boundary-design.md)). Their remaining scope arrives later: credential and profile contracts and auth operations in M7, session refresh in M7, repository support in M5.
 
 **Preferences and Settings** are different packages on purpose: preferences are the data, rules, persistence and browser runtime; Settings is the screen that edits them.
 

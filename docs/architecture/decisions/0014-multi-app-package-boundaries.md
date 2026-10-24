@@ -149,7 +149,7 @@ This ADR supersedes **placement and extraction-trigger assumptions only** in ADR
 
 Their toolchain, provider, validation, persistence, security, navigation-destination, styling, accessibility, and product-behavior decisions continue within their scopes. Amendments in each affected record preserve the original reasoning as history. Existing duplicate ADR-0011 numbers remain identified by full filename; this reorganization does not renumber them.
 
-Only category READMEs exist for the new umbrellas at the Milestone 2 snapshot. Source remains largely app-local and existing package exports remain unchanged. The [ownership map](../reorganization-ownership-map.md) identifies the transition; it does not claim packages have been created.
+Only category READMEs exist for the new umbrellas at the Milestone 2 snapshot. Source remains largely app-local and existing package exports remain unchanged. The [ownership map](../reorganization-ownership-map.md) identifies the transition; it does not claim packages have been created. Milestone 4 (2026-10-23) created the first leaf packages, `domain-identity`, `server-auth` and `server-supabase`, for the server identity boundary ([M4 design](../../superpowers/specs/2026-10-23-m4-server-identity-boundary-design.md)); other source remains app-local.
 
 ## What this does not decide
 

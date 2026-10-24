@@ -75,7 +75,7 @@ The [Space schema currently lives in UI](../frontend/ui/src/types/entity-schema.
 
 - `records` ----> Base record contract, with `spaces`, `documents` and `dashboards` modules extending it
 - `preferences` ----> Preference data, rules, scope and consent policy
-- `identity` ----> Credential, profile and verified-identity contracts
+- `identity` ----> Credential, profile and verified-identity contracts. Exists since M4 with the verified-identity result ([README](identity/README.md))
 
 The full list is the [package inventory](../../docs/architecture/workspace-conventions.md#package-inventory).
 
