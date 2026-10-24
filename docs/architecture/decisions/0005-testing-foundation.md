@@ -12,10 +12,10 @@
 
 Adopt two config packages under `packages/dev/`, following the `@synapcity/dev-*` convention of `dev-eslint-config` and `dev-typescript-config`:
 
-- `@synapcity/dev-vitest-config` exports `baseConfig` (Node, `src/**/*.test.{ts,tsx}`, no globals), `reactConfig` (jsdom plus Testing Library cleanup) and `chromiumBrowser()` (headless Chromium through Playwright).
+- `@synapcity/dev-vitest-config` exports `baseConfig` (Node, `src/**/*.test.{ts,tsx}`, no globals), `reactConfig` (jsdom plus Testing Library cleanup), `chromiumBrowser()` (headless Chromium through Playwright) and, since Milestone 4, `serverOnlyAlias` (`./server-only`: maps only the `server-only` specifier to an empty module so tests can load server entries without the `react-server` condition).
 - `@synapcity/dev-playwright-config` exports `createPlaywrightConfig({ port, command, testDir? })` for end-to-end tests: a `webServer`, `**/*.e2e.ts`, Chromium, CI-only retries.
 
-Consumers: `frontend-ui` (`reactConfig`), `frontend-site` (`baseConfig`), `storybook` (`chromiumBrowser()` in its story-test project) and `web` (end-to-end). Root `pnpm test` and `pnpm test:e2e` run them through Turborepo tasks `test` and `test:e2e`.
+Consumers: `frontend-ui` (`reactConfig`), `frontend-site` (`baseConfig`), `server-auth` and `server-supabase` (`baseConfig` with `serverOnlyAlias`), `storybook` (`chromiumBrowser()` in its story-test project) and `web` (`baseConfig` and `reactConfig` with `serverOnlyAlias`, and end-to-end). Root `pnpm test` and `pnpm test:e2e` run them through Turborepo tasks `test` and `test:e2e`.
 
 Pins: `vitest` and `@vitest/browser-playwright` 4.1.12 to match `apps/storybook` (raised from 4.1.11 on 2026-10-23 for the `@vitest/mocker` advisories GHSA-qxg6-89mg-rqv8 and GHSA-xp26-3454-mjgp); `@playwright/test` and `playwright` 1.64.0. Vitest 5.0.4 is the registry latest (checked 2026-10-13); `@storybook/addon-vitest` 10.6.1 allows `^5` (10.6.3 still does), so staying on 4 is a deliberate choice to avoid upgrading an existing dependency as a side effect, not a compatibility block.
 

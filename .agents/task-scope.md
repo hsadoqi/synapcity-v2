@@ -9,6 +9,7 @@
 - Bridges: none. `getVerifiedClaims` and `getCaller` remain canonical for their M7 callers.
 - Environment note: under the sandbox pnpm cannot hard-link from the global store and falls back to `node_modules/.pnpm-store`; one plain install emptied `node_modules/.pnpm`, and `pnpm install --force` restored it. No lockfile drift resulted.
 - Execution ledger and rulings: `.superpowers/sdd/2026-10-23-m4-server-identity-boundary/progress.md` (git-ignored); the rulings are repeated in the final report.
+- Post-implementation review (owner request "review M4 work ... and apply any optimizations, enhancements"): added `apps/web/src/identity-boundary.test.ts` (direct-call ratchet), `apps/web/src/lib/supabase/server.test.ts`, `apps/web/src/features/account/server/caller.test.ts`; implementation notes in ADR-0005, ADR-0006, ADR-0008; design section 13. No source behavior changed.
 - Verification: see the final report of this task. Live Supabase checks (design section 4.4) are the owner's and were not run.
 
 ## Active task: Milestone 3.4 boundary checker implementation (2026-10-23)

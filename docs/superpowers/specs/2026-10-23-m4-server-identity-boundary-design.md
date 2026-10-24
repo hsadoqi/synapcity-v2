@@ -177,7 +177,7 @@ None planned. Every rewired caller imports the new packages directly. `getVerifi
 5. Documentation: ownership map rows, inventory note that the three packages exist, ADR-0014 section 7 current-implementation note, task-scope ledger, decisions index (react-server item).
 6. `pnpm verify`, then the owner's manual checks.
 
-## 9. Owner questions
+## 9. Owner questions (answered 2026-10-23: all recommendations accepted)
 
 | #   | Question                                                                                                                                                                                              | Recommendation                                                                                                                                                |
 | --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -214,3 +214,11 @@ A fresh reviewer read the proposed design against the repository. Resolved:
 - The fixture-check count is 37.
 
 Additional call: **C7** the rewired actions log under `getCallerIdentity` instead of `getCaller`; the logged fields (`code`, `status`) and the cases that log are unchanged.
+
+## 13. Post-implementation review (2026-10-23)
+
+A review pass after implementation added:
+
+- `apps/web/src/identity-boundary.test.ts`, a ratchet that lists the files still allowed to call Supabase `getClaims()`/`getUser()` directly, with call counts and the milestone for each. A new direct call fails it, and so does a listed call that disappears. This enforces the completion criterion on the app side; `pnpm boundaries` does not check call sites.
+- Tests for the host binding (`lib/supabase/server.test.ts`: env, cookie read/write, a new client per call) and for `getCallerIdentity` itself (`features/account/server/caller.test.ts`: the three results and code-only logging).
+- Implementation notes in ADR-0005 (the `server-only` alias and its consumers), ADR-0006 and ADR-0008 (where the client and the caller check now live).
