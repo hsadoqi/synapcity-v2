@@ -134,3 +134,7 @@ The owner approves this ADR before the migration is written or run, as the proje
 - Device-scope sync is requested.
 - Preferences grow per context (per workspace or per document) rather than per person.
 - A general persistence or API decision supersedes the server-action write path.
+
+## Implementation note, 2026-10-24: Milestone 6.1
+
+The schemas (`settingsSchema` and its sections), `settingScope`, the account document schema, merging, reconciliation, the export file format and the consent policy now live in [`@synapcity/domain-preferences`](../../../packages/domain/preferences/README.md), unchanged in shape and behavior. The `synapcity-preferences` and `synapcity-device-display` browser entries, the boot scripts and font loading are still in `apps/web/src/features/settings` until Milestone 6.2. The shared-look cookie that amends this record's device storage arrives with Milestone 6.3. Design: [M6 design](../../superpowers/specs/2026-10-24-m6-preferences-settings-design.md).
