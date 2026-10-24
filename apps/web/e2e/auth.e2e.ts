@@ -339,3 +339,49 @@ test.describe('focus after a failed submit', () => {
     await expect(page.getByLabel('Email')).toBeFocused();
   });
 });
+
+test.describe('forgot password validates in the browser and still works without it', () => {
+  test('with JavaScript on, an empty email is refused without a request to the server', async ({
+    page,
+  }) => {
+    const posts: string[] = [];
+    page.on('request', (request) => {
+      if (request.method() === 'POST') posts.push(request.url());
+    });
+    await page.goto('/auth/forgot-password');
+    await submitWithoutNativeValidation(page, 'Send reset link');
+
+    const alert = page.locator('form').getByRole('alert');
+    await expect(alert).toHaveText('Enter your email.');
+    await expect(page.getByLabel('Email')).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    );
+    await expect(page.getByLabel('Email')).toBeFocused();
+    expect(posts).toEqual([]);
+  });
+
+  test.describe('with JavaScript off', () => {
+    test.use({ javaScriptEnabled: false });
+
+    test('the form still posts to the server action, which refuses an empty email the same way', async ({
+      page,
+    }) => {
+      await page.goto('/auth/forgot-password');
+      await page.getByRole('button', { name: 'Send reset link' }).click();
+
+      const alert = page.locator('form').getByRole('alert');
+      await expect(alert).toHaveText('Enter your email.');
+      const messageId = await alert.getAttribute('id');
+      expect(messageId).toBeTruthy();
+      await expect(page.getByLabel('Email')).toHaveAttribute(
+        'aria-invalid',
+        'true',
+      );
+      await expect(page.getByLabel('Email')).toHaveAttribute(
+        'aria-describedby',
+        messageId!,
+      );
+    });
+  });
+});
