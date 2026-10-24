@@ -61,7 +61,7 @@ describe('nudgeLayoutItem', () => {
       { dx: 1, dy: 0, dw: 0, dh: 0 },
       12,
     );
-    expect(next.find((n) => n.i === 'a')).toMatchObject({ x: 3, y: 2 });
+    expect(next.find((n) => n.i === 'a')).toMatchObject({ x: 3, y: 0 });
     expect(next.find((n) => n.i === 'b')).toEqual({
       i: 'b',
       x: 0,
@@ -69,6 +69,19 @@ describe('nudgeLayoutItem', () => {
       w: 3,
       h: 2,
     });
+  });
+
+  it('pushes a colliding item using the grid layout behavior', () => {
+    const items = [
+      item({ x: 0, y: 0, w: 2, h: 2 }),
+      item({ i: 'b', x: 2, y: 0, w: 2, h: 2 }),
+    ];
+    const next = nudgeLayoutItem(items, 'a', { dx: 1, dy: 0, dw: 0, dh: 0 }, 6);
+
+    expect(next).toMatchObject([
+      { i: 'a', x: 1, y: 0, w: 2, h: 2 },
+      { i: 'b', x: 2, y: 2, w: 2, h: 2 },
+    ]);
   });
 
   it('keeps the item inside the grid on the right', () => {

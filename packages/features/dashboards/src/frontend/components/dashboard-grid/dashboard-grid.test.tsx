@@ -1,6 +1,6 @@
 import { createComposition } from '@synapcity/domain-dashboards';
 import { emptyRecords } from '@synapcity/domain-prototypes';
-import { screen } from '@testing-library/react';
+import { act, fireEvent, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { renderWithStore } from '../../../testing';
@@ -20,6 +20,42 @@ describe('DashboardGrid', () => {
       records: emptyRecords(),
     });
     expect(screen.getByText('No widgets yet')).toBeDefined();
+  });
+
+  it('selects widgets with Space and ignores repeated Space and input arrows', () => {
+    const { store } = renderWithStore(<DashboardGrid />);
+    const state = store().getState();
+    const widget = state.composition.widgets.find(
+      (item) => item.type === 'stat',
+    )!;
+    const metric = state.records.metric[widget.source.id]!;
+
+    act(() => state.toggleEditMode());
+    const group = screen.getByRole('group', {
+      name: widget.title,
+      exact: true,
+    });
+    fireEvent.keyDown(group, { key: ' ', repeat: true });
+    expect(store().getState().selectedWidgetId).toBeNull();
+
+    fireEvent.keyDown(group, { key: ' ' });
+    expect(store().getState().selectedWidgetId).toBe(widget.id);
+    fireEvent.keyDown(group, { key: ' ', repeat: true });
+    expect(store().getState().selectedWidgetId).toBe(widget.id);
+
+    const before = store()
+      .getState()
+      .composition.layouts.lg.find((item) => item.i === widget.id);
+    fireEvent.keyDown(
+      screen.getByRole('spinbutton', {
+        name: `${metric.name} value`,
+      }),
+      { key: 'ArrowRight' },
+    );
+    const after = store()
+      .getState()
+      .composition.layouts.lg.find((item) => item.i === widget.id);
+    expect(after).toEqual(before);
   });
 });
 

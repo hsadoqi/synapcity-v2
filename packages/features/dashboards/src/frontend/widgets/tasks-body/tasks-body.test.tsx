@@ -51,4 +51,23 @@ describe('TasksBody', () => {
     );
     expect(screen.getByText('No tasks yet.')).toBeDefined();
   });
+
+  it('adds a task from the empty state', () => {
+    const { project } = sample();
+    const onAddTask = vi.fn();
+    render(
+      <TasksBody
+        project={project}
+        tasks={[]}
+        onToggleTask={() => {}}
+        onAddTask={onAddTask}
+      />,
+    );
+    fireEvent.change(screen.getByRole('textbox', { name: 'New task' }), {
+      target: { value: '  Draft launch plan  ' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Add' }));
+
+    expect(onAddTask).toHaveBeenCalledWith('  Draft launch plan  ');
+  });
 });

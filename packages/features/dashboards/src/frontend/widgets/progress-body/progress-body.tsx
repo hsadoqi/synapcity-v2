@@ -29,11 +29,16 @@ export function ProgressBody({
             <Input
               key={goal.current}
               type="number"
+              min={0}
               defaultValue={goal.current}
               className="w-20"
               onBlur={(event) => {
                 const value = event.currentTarget.valueAsNumber;
-                if (Number.isFinite(value)) onChange({ current: value });
+                if (Number.isFinite(value) && value >= 0) {
+                  onChange({ current: value });
+                } else {
+                  event.currentTarget.value = String(goal.current);
+                }
               }}
               onKeyDown={(event) => {
                 if (event.key === 'Enter') event.currentTarget.blur();
@@ -45,11 +50,16 @@ export function ProgressBody({
             <Input
               key={goal.target}
               type="number"
+              min={0}
               defaultValue={goal.target}
               className="w-20"
               onBlur={(event) => {
                 const value = event.currentTarget.valueAsNumber;
-                if (Number.isFinite(value)) onChange({ target: value });
+                if (Number.isFinite(value) && value >= 0) {
+                  onChange({ target: value });
+                } else {
+                  event.currentTarget.value = String(goal.target);
+                }
               }}
               onKeyDown={(event) => {
                 if (event.key === 'Enter') event.currentTarget.blur();

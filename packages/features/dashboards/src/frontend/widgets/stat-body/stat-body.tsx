@@ -24,7 +24,11 @@ export function StatBody({
               className="w-28"
               onBlur={(event) => {
                 const value = event.currentTarget.valueAsNumber;
-                if (Number.isFinite(value)) onValueChange(value);
+                if (Number.isFinite(value)) {
+                  onValueChange(value);
+                } else {
+                  event.currentTarget.value = String(metric.value);
+                }
               }}
               onKeyDown={(event) => {
                 if (event.key === 'Enter') event.currentTarget.blur();

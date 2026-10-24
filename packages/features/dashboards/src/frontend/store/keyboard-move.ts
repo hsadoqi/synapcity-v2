@@ -1,3 +1,5 @@
+import { moveElement, verticalCompactor } from 'react-grid-layout/core';
+
 import type { GridItem, LayoutItem } from '@synapcity/domain-grids';
 
 /** A change in grid units. Move changes x/y; resize changes w/h. */
@@ -36,13 +38,22 @@ export function nudgeLayoutItem(
   delta: LayoutDelta,
   cols: number,
 ): LayoutItem[] {
-  return items.map((item) => {
-    if (item.i !== id)
-      return { i: item.i, x: item.x, y: item.y, w: item.w, h: item.h };
-    const w = clamp(item.w + delta.dw, item.minW, Math.min(item.maxW, cols));
-    const h = Math.max(item.minH, item.h + delta.dh);
-    const x = clamp(item.x + delta.dx, 0, Math.max(0, cols - w));
-    const y = Math.max(0, item.y + delta.dy);
-    return { i: item.i, x, y, w, h };
-  });
+  const layout = items.map((item) => ({ ...item }));
+  const item = layout.find((candidate) => candidate.i === id);
+  if (!item) return layout.map(({ i, x, y, w, h }) => ({ i, x, y, w, h }));
+
+  const w = clamp(item.w + delta.dw, item.minW, Math.min(item.maxW, cols));
+  const h = Math.max(item.minH, item.h + delta.dh);
+  const x = clamp(item.x + delta.dx, 0, Math.max(0, cols - w));
+  const y = Math.max(0, item.y + delta.dy);
+  if (x === item.x && y === item.y && w === item.w && h === item.h) {
+    return layout.map(({ i, x, y, w, h }) => ({ i, x, y, w, h }));
+  }
+
+  item.w = w;
+  item.h = h;
+  const moved = moveElement(layout, item, x, y, true, false, 'vertical', cols);
+  return verticalCompactor
+    .compact(moved, cols)
+    .map(({ i, x, y, w, h }) => ({ i, x, y, w, h }));
 }

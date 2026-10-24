@@ -106,6 +106,7 @@ export function DashboardGrid() {
     if (!editMode || event.target !== event.currentTarget) return;
     if (event.key === ' ') {
       event.preventDefault();
+      if (event.repeat) return;
       selectWidget(selectedWidgetId === id ? null : id);
       return;
     }

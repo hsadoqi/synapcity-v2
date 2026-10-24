@@ -68,6 +68,21 @@ describe('createDashboardStore', () => {
     ).toBe(true);
   });
 
+  it('clears keyboard selection when its widget is hidden or removed', () => {
+    const store = createDashboardStore(init());
+    store.getState().addWidget('notes');
+    const id = store.getState().composition.widgets[0]!.id;
+
+    store.getState().selectWidget(id);
+    store.getState().setWidgetStatus(id, 'hidden');
+    expect(store.getState().selectedWidgetId).toBeNull();
+
+    store.getState().setWidgetStatus(id, 'active');
+    store.getState().selectWidget(id);
+    store.getState().removeWidget(id);
+    expect(store.getState().selectedWidgetId).toBeNull();
+  });
+
   it('leaves the state untouched for a widget that does not exist', () => {
     const store = createDashboardStore(init());
     const before = store.getState();
