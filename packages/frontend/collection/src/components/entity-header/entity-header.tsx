@@ -33,20 +33,25 @@ export function EntityHeader({
   onRename,
   onArchive,
 }: EntityHeaderProps) {
+  // Only actions the caller can carry out; a button that does nothing is worse than none.
   const quickActions = [
     {
       label: 'New document',
-      onNew: onNewDocument || (() => {}),
+      onNew: onNewDocument,
       icon: FileText,
       variant: 'default' as const,
     },
     {
       label: 'New dashboard',
-      onNew: onNewDashboard || (() => {}),
+      onNew: onNewDashboard,
       icon: LayoutDashboard,
       variant: 'outline' as const,
     },
-  ];
+  ].filter(
+    (action): action is typeof action & { onNew: () => void } =>
+      action.onNew !== undefined,
+  );
+  const hasMoreActions = onRename !== undefined || onArchive !== undefined;
 
   return (
     <header className="flex min-w-0 flex-1 flex-col gap-6">
@@ -59,6 +64,7 @@ export function EntityHeader({
         )}
       </div>
 
+      {(quickActions.length > 0 || hasMoreActions) && (
       <div className="flex flex-wrap items-center gap-2">
         {quickActions.map((action) => (
           <Button
@@ -72,6 +78,7 @@ export function EntityHeader({
         ))}
         <EntityMoreActions onRename={onRename} onArchive={onArchive} />
       </div>
+      )}
     </header>
   );
 }

@@ -48,4 +48,25 @@ describe('EntityShell', () => {
 
     expect(screen.queryByText('Recent Items')).toBeNull();
   });
+
+  it('offers no action it cannot carry out', () => {
+    render(<EntityShell entity={space} />);
+
+    expect(screen.queryByRole('button')).toBeNull();
+  });
+
+  it('links each recent item to the address it carries', () => {
+    render(
+      <EntityShell
+        entity={space}
+        recentItems={[
+          { ...recent[0]!, href: '/u1/home/spaces/s1/documents/doc-1' },
+        ]}
+      />,
+    );
+
+    expect(
+      screen.getByRole('link', { name: /Launch plan/ }).getAttribute('href'),
+    ).toBe('/u1/home/spaces/s1/documents/doc-1');
+  });
 });

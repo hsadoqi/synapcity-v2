@@ -38,4 +38,25 @@ describe('RecentEntityItems', () => {
     expect(link.getAttribute('href')).toBe('/u1/documents/doc-1');
     expect(link.hasAttribute('data-host-link')).toBe(true);
   });
+
+  it('links an item to its own address when it has one', () => {
+    render(
+      inHost(
+        <RecentEntityItems
+          items={[{ ...doc, href: '/u1/home/spaces/s1/documents/doc-1' }]}
+        />,
+      ),
+    );
+
+    expect(
+      screen.getByRole('link', { name: /Launch plan/ }).getAttribute('href'),
+    ).toBe('/u1/home/spaces/s1/documents/doc-1');
+  });
+
+  it('lists an item with no address as text, not a link', () => {
+    render(inHost(<RecentEntityItems items={[doc]} />));
+
+    expect(screen.queryByRole('link')).toBeNull();
+    expect(screen.getByText('Launch plan')).toBeTruthy();
+  });
 });

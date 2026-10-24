@@ -4,7 +4,6 @@ import { Separator } from '@synapcity/frontend-ui/core/separator';
 import { RecentEntityItems } from '../recent-entity-items';
 import { EntityHeader } from '../entity-header';
 import type { EntityItem } from '../../types';
-import { toast } from '@synapcity/frontend-ui/core/toast';
 
 interface EntityShellProps {
   entity: EntityItem;
@@ -23,28 +22,10 @@ export function EntityShell({
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-12 px-6 py-10 lg:py-14">
       <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
-        <EntityHeader
-          name={entity.name}
-          description={entity.description}
-          onNewDocument={() => {
-            toast.add({ type: 'info', title: 'New document created' });
-          }}
-          onNewDashboard={() => {
-            toast.add({ type: 'info', title: 'New dashboard created' });
-          }}
-          onRename={() => {
-            toast.add({ type: 'info', title: `${entity.name} renamed` });
-          }}
-          onArchive={() => {
-            toast.add({ type: 'info', title: `${entity.name} archived` });
-          }}
-        />
-        {recentItems.length > 0 && (
-          <RecentEntityItems
-            items={recentItems}
-            prefix={`/${entity.kind}s/${entity.id}`}
-          />
-        )}
+        {/* No header actions until creating, renaming and archiving exist; a
+            button that only says it worked is worse than none. */}
+        <EntityHeader name={entity.name} description={entity.description} />
+        {recentItems.length > 0 && <RecentEntityItems items={recentItems} />}
       </div>
 
       <Separator />

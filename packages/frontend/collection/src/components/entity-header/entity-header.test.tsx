@@ -47,4 +47,18 @@ describe('EntityHeader', () => {
 
     expect(screen.queryByRole('button', { name: 'More actions' })).toBeNull();
   });
+
+  it('offers only the quick actions the caller can carry out', () => {
+    render(<EntityHeader name="Research" onNewDocument={() => {}} />);
+
+    expect(screen.getByRole('button', { name: 'New document' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'New dashboard' })).toBeNull();
+  });
+
+  it('shows no quick action that would do nothing', () => {
+    render(<EntityHeader name="Research" />);
+
+    expect(screen.queryByRole('button', { name: 'New document' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'New dashboard' })).toBeNull();
+  });
 });

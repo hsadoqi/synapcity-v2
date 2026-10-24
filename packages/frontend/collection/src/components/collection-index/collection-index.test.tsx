@@ -151,4 +151,45 @@ describe('CollectionIndex', () => {
     expect(screen.getByText('No recipes yet')).toBeTruthy();
     expect(screen.queryByRole('button', { name: /New recipe/ })).toBeNull();
   });
+
+  describe('when a pin fails because the session ended', () => {
+    const signedOut = () =>
+      vi.fn(() =>
+        Promise.resolve({
+          ok: false as const,
+          error: 'Sign in again to update your profile.',
+          signedOut: true,
+        }),
+      );
+
+    async function pinA() {
+      fireEvent.click(
+        screen.getAllByRole('button', { name: 'Actions for a' })[0]!,
+      );
+      fireEvent.click(await screen.findByRole('menuitem', { name: 'Pin' }));
+      await screen.findByText('Sign in again to update your profile.');
+    }
+
+    it('offers a way to sign in again through the host', async () => {
+      renderIndex({
+        highlightsFrom: 0,
+        onSetPinned: signedOut(),
+        signInHref: '/auth/login?next=%2Fthings',
+      });
+
+      await pinA();
+
+      expect(
+        screen.getByRole('link', { name: 'Sign in again' }).getAttribute('href'),
+      ).toBe('/auth/login?next=%2Fthings');
+    });
+
+    it('shows only the message when the host gives no sign-in address', async () => {
+      renderIndex({ highlightsFrom: 0, onSetPinned: signedOut() });
+
+      await pinA();
+
+      expect(screen.queryByRole('link', { name: 'Sign in again' })).toBeNull();
+    });
+  });
 });

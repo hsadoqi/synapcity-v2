@@ -13,4 +13,6 @@ export type EntityItem = {
   kind: EntityKind;
   createdAt: string;
   updatedAt: string;
+  /** Where the item opens. The blocks link it here; without one they fall back to their prefix, or show it as text. */
+  href?: string;
 };

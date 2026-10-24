@@ -7,7 +7,8 @@ import { formatEntityDate } from '../../utils';
 
 interface RecentEntityItemsProps {
   items?: EntityItem[];
-  prefix: string;
+  /** Builds an address for items that carry none: `${prefix}/${item.id}`. */
+  prefix?: string;
   label?: string;
 }
 
@@ -32,26 +33,39 @@ export function RecentEntityItems({
       </h2>
       <ul className="flex flex-col">
         {items.map((item) => {
+          const href =
+            item.href ?? (prefix === undefined ? undefined : `${prefix}/${item.id}`);
+          const content = (
+            <>
+              <EntityIcon
+                name={item.icon}
+                className="size-4 shrink-0 text-muted-foreground"
+                aria-hidden="true"
+              />
+              <span className="min-w-0 flex-1 truncate">{item.name}</span>
+              <time
+                dateTime={item.updatedAt}
+                className="shrink-0 text-xs text-muted-foreground"
+                suppressHydrationWarning
+              >
+                {formatEntityDate(item.updatedAt)}
+              </time>
+            </>
+          );
           return (
             <li key={item.id}>
-              <Link
-                href={`${prefix}/${item.id}`}
-                className="flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-foreground outline-none transition-colors hover:bg-background focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <EntityIcon
-                  name={item.icon}
-                  className="size-4 shrink-0 text-muted-foreground"
-                  aria-hidden="true"
-                />
-                <span className="min-w-0 flex-1 truncate">{item.name}</span>
-                <time
-                  dateTime={item.updatedAt}
-                  className="shrink-0 text-xs text-muted-foreground"
-                  suppressHydrationWarning
+              {href === undefined ? (
+                <div className="flex items-center gap-2 px-2 py-1.5 text-sm text-foreground">
+                  {content}
+                </div>
+              ) : (
+                <Link
+                  href={href}
+                  className="flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-foreground outline-none transition-colors hover:bg-background focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  {formatEntityDate(item.updatedAt)}
-                </time>
-              </Link>
+                  {content}
+                </Link>
+              )}
             </li>
           );
         })}
