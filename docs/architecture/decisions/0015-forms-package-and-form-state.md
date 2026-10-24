@@ -50,8 +50,8 @@ Governs the placement of form interaction foundations, the form-state library, a
 
 ## Unresolved
 
-- **Server errors into form state.** The pilot shows the server action's `{ error, fields }` state as it is and does not copy it into React Hook Form's errors, so the form looks and focuses identically. Mapping a server result onto React Hook Form errors is still open for a form that needs React Hook Form to own server errors (for example nested or array fields). Decide against the first such form.
-- **A multi-field pilot.** The pilot covers one text field. Password reveal, focus order across several fields, and non-text inputs are checked on the first multi-field form (Auth login or register, M7).
+- **Server errors into form state.** Server errors are handled: eight existing forms (login, register, forgot password, update password, email change, delete account, name, avatar) show an action's `{ error, fields }` state, and `useActionForm` shows that same state as it is, so the shared field marking, message linking and focus keep working. What stays open is copying a server result into React Hook Form's own error store, which no current form needs because every server error targets one named field. Decide it against the first form that needs React Hook Form to own server errors (for example nested or array fields).
+- **The other seven forms.** Only forgot password uses `useActionForm`. Register, update password and delete account have several fields, and the avatar form has a file input, which the binding does not validate (it reads string values only). Each is checked when it migrates; password reveal and focus order across fields are checked on the first multi-field one.
 - **A newer `react-hook-form`.** 7.91.0 is the registry's latest but fails the repository's release-age policy until it is old enough; moving off the pinned 7.90.0 is a separate change.
 
 ## Implementation notes
