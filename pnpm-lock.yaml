@@ -398,6 +398,9 @@ importers:
       '@synapcity/dev-eslint-config':
         specifier: workspace:*
         version: link:../../packages/dev/eslint-config
+      '@synapcity/dev-fixtures':
+        specifier: workspace:*
+        version: link:../../packages/dev/fixtures
       '@synapcity/dev-playwright-config':
         specifier: workspace:*
         version: link:../../packages/dev/playwright-config

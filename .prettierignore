@@ -14,3 +14,4 @@ docs/archive
 **/coverage/**
 storybook-static
 .impeccable
+.superpowers

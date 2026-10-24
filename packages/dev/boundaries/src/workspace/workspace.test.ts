@@ -163,4 +163,21 @@ describe('loadWorkspace categories', () => {
     });
     expect(() => loadWorkspace(root)).toThrow('packages/shared');
   });
+
+  it('skips a hidden folder under packages that holds no package, such as a tool’s scratch folder', () => {
+    const root = workspace({
+      'packages/domain/x/package.json': manifest('@t/domain-x'),
+      'packages/.claude/.cc-writes/scratch': '',
+    });
+    expect(loadWorkspace(root).packages.map((pkg) => pkg.name)).toEqual([
+      '@t/domain-x',
+    ]);
+  });
+
+  it('still fails on a hidden folder that holds a package, which would go unchecked', () => {
+    const root = workspace({
+      'packages/.hidden/x/package.json': manifest('@t/hidden-x'),
+    });
+    expect(() => loadWorkspace(root)).toThrow('packages/.hidden');
+  });
 });
