@@ -5,7 +5,7 @@ import { fixtureSpaceSource } from './fixture-space-source';
 import { serverSpaceSource } from './server-space-source';
 import type { SpaceSource } from './space-source';
 
-export type { SetPinnedOutcome, SpaceSource } from './space-source';
+export type { SpaceSource } from './space-source';
 export { serverSpaceSource };
 
 /**

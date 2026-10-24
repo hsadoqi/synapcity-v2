@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import { getVerifiedIdentity } from '@/features/auth/server/session';
-import { listSpaces } from '@/features/spaces/server/space-repository';
+import { getSpaceSource } from '@/features/spaces/server/space-source';
 
 /** The signed-in owner's spaces. Row-level security does the scoping. */
 export async function GET() {
@@ -13,7 +13,8 @@ export async function GET() {
     return NextResponse.json({ error: 'Not signed in' }, { status: 401 });
   }
 
-  return NextResponse.json(await listSpaces(), {
+  const source = await getSpaceSource();
+  return NextResponse.json(await source.list(), {
     headers: { 'Cache-Control': 'no-store' },
   });
 }

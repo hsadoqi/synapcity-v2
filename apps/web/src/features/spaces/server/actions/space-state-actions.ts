@@ -11,17 +11,15 @@ import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import { createClient } from '@/lib/supabase/server';
 
 import type { SetSpacePinnedResult } from '../../shared/types';
+import { serverSpaceSource } from '../space-source';
 
 const spaceIdSchema = z.uuid();
-
-/** A view recorded less than this long ago is not recorded again. */
-const VIEW_THROTTLE_MS = 60_000;
 
 /**
  * Pins or unpins one of the caller's spaces. The browser asks for a change; the
  * database stamps the time, so `pinnedAt` in the result is the server's own.
- * Row-level security limits the write to the caller's own spaces, and `select`
- * returns the written row so a write it turned away cannot look saved.
+ * Row-level security limits the write to the caller's own spaces, and a write
+ * it turned away is reported as a failure, never as saved.
  */
 export async function setSpacePinned(
   spaceId: unknown,
@@ -39,23 +37,18 @@ export async function setSpacePinned(
     return { ok: false, error: found.failure, signedOut: found.signedOut };
   }
 
-  const { data, error } = await supabase
-    .from('spaces')
-    // Any non-null value means "pin"; the database replaces it with its clock.
-    .update({ pinned_at: pinned ? new Date().toISOString() : null })
-    .eq('id', id.data)
-    .select('pinned_at');
-  if (error || !data?.length) {
-    logFailure('setSpacePinned', error ?? { code: 'row_not_written' });
+  const outcome = await serverSpaceSource(supabase).setPinned(id.data, pinned);
+  if (!outcome.ok) {
+    logFailure('setSpacePinned', outcome.error as { code?: string });
     return { ok: false, error: SAVE_FAILED };
   }
-  return { ok: true, pinnedAt: data[0]?.pinned_at ?? null };
+  return { ok: true, pinnedAt: outcome.pinnedAt };
 }
 
 /**
- * Notes that the caller opened one of their spaces. It is skipped when the last
- * view was under a minute ago, and it never reports a failure to the person:
- * a view that was not recorded is not worth interrupting them for.
+ * Notes that the caller opened one of their spaces. The write skips a view
+ * recorded under a minute ago, and a failure is logged, never reported to the
+ * person: a view that was not recorded is not worth interrupting them for.
  */
 export async function recordSpaceView(spaceId: unknown): Promise<void> {
   if (fixtureModeEnabled()) return;
@@ -66,12 +59,7 @@ export async function recordSpaceView(spaceId: unknown): Promise<void> {
   const found = await getCallerIdentity(supabase);
   if (!('identity' in found)) return;
 
-  const now = Date.now();
-  const cutoff = new Date(now - VIEW_THROTTLE_MS).toISOString();
-  const { error } = await supabase
-    .from('spaces')
-    .update({ last_viewed_at: new Date(now).toISOString() })
-    .eq('id', id.data)
-    .or(`last_viewed_at.is.null,last_viewed_at.lt.${cutoff}`);
-  if (error) logFailure('recordSpaceView', error);
+  const outcome = await serverSpaceSource(supabase).recordView(id.data);
+  if (!outcome.ok)
+    logFailure('recordSpaceView', outcome.error as { code?: string });
 }

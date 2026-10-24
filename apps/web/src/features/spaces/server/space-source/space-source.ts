@@ -5,7 +5,7 @@ import type {
 } from '@synapcity/domain-records';
 
 /** What pinning reports: the database-stamped time, or the error to log. */
-export type SetPinnedOutcome =
+type SetPinnedOutcome =
   { ok: true; pinnedAt: string | null } | { ok: false; error: unknown };
 
 /**

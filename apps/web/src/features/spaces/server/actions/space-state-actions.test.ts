@@ -98,11 +98,16 @@ describe('setSpacePinned', () => {
     expect(mocks.update).not.toHaveBeenCalled();
   });
 
-  it('does not report success when no row was written', async () => {
+  it('does not report success when no row was written, and logs the code', async () => {
     mocks.select.mockResolvedValue({ data: [], error: null });
 
-    await expect(setSpacePinned(ID, true)).resolves.toMatchObject({
+    await expect(setSpacePinned(ID, true)).resolves.toEqual({
       ok: false,
+      error: 'Could not save your changes. Try again.',
+    });
+    expect(console.warn).toHaveBeenCalledWith('setSpacePinned failed', {
+      code: 'row_not_written',
+      status: undefined,
     });
   });
 

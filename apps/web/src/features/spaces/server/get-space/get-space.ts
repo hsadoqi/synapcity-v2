@@ -1,25 +1,51 @@
+import type { BaseRecord } from '@synapcity/domain-records';
 import { notFound } from 'next/navigation';
 
-import { spaceItem as sampleSpace } from '../../lib/fixtures';
-import type { Space } from '../../shared/types';
-import { findSpace } from '../space-repository';
+import type { DashboardItem, DocumentItem, Space } from '../../shared/types';
+import { getSpaceSource } from '../space-source';
 
+/** A participating record as the detail page lists it. */
+function asItem<Kind extends 'document' | 'dashboard'>(
+  record: BaseRecord,
+  kind: Kind,
+) {
+  return {
+    id: record.id,
+    name: record.name,
+    description: record.description,
+    updatedAt: record.updatedAt,
+    createdAt: record.createdAt,
+    icon: record.icon,
+    kind,
+  };
+}
+
+/**
+ * One of the owner's Spaces with the documents and dashboards taking part in
+ * it. A Space with none shows empty states; sample items exist only in the
+ * fixture source.
+ */
 export async function getSpace(spaceId: string): Promise<Space> {
-  const spaceEntity = await findSpace(spaceId);
+  const source = await getSpaceSource();
+  const spaceEntity = await source.find(spaceId);
   if (!spaceEntity) notFound();
 
-  // Placeholder until documents and dashboards are persisted (ADR-0013).
-  const documents = sampleSpace.documents;
-  const dashboards = sampleSpace.dashboards;
+  const [documentRecords, dashboardRecords] = await Promise.all([
+    source.listDocuments(spaceId),
+    source.listDashboards(spaceId),
+  ]);
+  const documents: DocumentItem[] = documentRecords.map((record) =>
+    asItem(record, 'document'),
+  );
+  const dashboards: DashboardItem[] = dashboardRecords.map((record) =>
+    asItem(record, 'dashboard'),
+  );
 
   return {
     ...spaceEntity,
     kind: 'space',
-    documents: documents.map((doc) => ({ ...doc, kind: 'document' as const })),
-    dashboards: dashboards.map((dash) => ({
-      ...dash,
-      kind: 'dashboard' as const,
-    })),
+    documents,
+    dashboards,
     documentsTotal: documents.length,
     dashboardsTotal: dashboards.length,
   };
