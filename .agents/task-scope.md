@@ -1,3 +1,11 @@
+## Active task: forms engine Tasks 5 onward (2026-10-24)
+
+- Goal and mode: implementation of the remaining tasks of `docs/superpowers/plans/2026-10-24-forms-schema-driven-engine.md`, starting with Task 5 (built-in renderers and the default registry). The owner asked for the remaining tasks to be implemented after the extraction Part B pull request was opened (2026-10-24). Branch `feat/frontend-forms-renderers`, created from `feat/frontend-forms-react-hook-form` (pull request #67; retarget to `main` once it merges).
+- Exact creates: units under `packages/frontend/forms/src/` named in each task's Files line. Exact updates: the forms package's indexes, README and manifest as each task needs; the engine plan's checkboxes; this ledger.
+- Not changed: `apps/**`, other packages, dependency versions, ADRs (D1, whether the engine gets its own ADR, is still the owner's).
+- Decision points that stop for the owner: D1; the Task 6a choice of building `FormRenderer` on `useActionForm` versus React Hook Form's `handleSubmit` alone.
+- Verification per task: the package's tests, type check and lint; `pnpm boundaries` and `pnpm deps`; Storybook for tasks that add stories. Commits and pushes: authorized by the owner. Merging is not authorized.
+
 ## Active task: forms extraction Part B, React Hook Form and the pilot (2026-10-24)
 
 - Goal and mode: implementation of Part B of `docs/superpowers/plans/2026-10-24-forms-package-extraction.md`: React Hook Form behind `@synapcity/frontend-forms`, one binding, one pilot form. The owner approved using the latest compatible versions of the two libraries (2026-10-24). Branch `feat/frontend-forms-react-hook-form`, created from `refactor/frontend-forms-extraction` (stacked; retarget to `main` as each merges).
