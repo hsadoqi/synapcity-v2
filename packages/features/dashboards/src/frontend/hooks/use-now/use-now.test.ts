@@ -22,4 +22,9 @@ describe('useNow', () => {
     unmount();
     expect(vi.getTimerCount()).toBe(0);
   });
+
+  it('starts no clock when the interval is null', () => {
+    renderHook(() => useNow(null));
+    expect(vi.getTimerCount()).toBe(0);
+  });
 });

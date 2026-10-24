@@ -1,4 +1,5 @@
 import { act, fireEvent, screen } from '@testing-library/react';
+import { Profiler } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { renderWithStore } from '../../../testing';
@@ -31,5 +32,42 @@ describe('ConnectedWidget', () => {
       screen.getByRole('checkbox', { name: 'Write launch notes' }),
     );
     expect(own().getState().records.task).not.toBe(before);
+  });
+
+  it('does not re-render a widget when records it does not show change', () => {
+    let statRenders = 0;
+    const { store } = renderWithStore(
+      <Profiler id="stat" onRender={() => statRenders++}>
+        <ConnectedWidget widgetId="wgt_seed1" />
+      </Profiler>,
+    );
+    const before = statRenders;
+    const taskId = Object.keys(store().getState().records.task)[0]!;
+    act(() => store().getState().toggleTask(taskId));
+    expect(statRenders).toBe(before);
+  });
+
+  it('re-renders a widget when the records it shows change', () => {
+    let statRenders = 0;
+    const { store } = renderWithStore(
+      <Profiler id="stat" onRender={() => statRenders++}>
+        <ConnectedWidget widgetId="wgt_seed1" />
+      </Profiler>,
+    );
+    const before = statRenders;
+    const metric = Object.values(store().getState().records.metric)[0]!;
+    act(() =>
+      store().setState((s) => ({
+        records: {
+          ...s.records,
+          metric: {
+            ...s.records.metric,
+            [metric.id]: { ...metric, value: 99 },
+          },
+        },
+      })),
+    );
+    expect(statRenders).toBeGreaterThan(before);
+    expect(screen.getByText('99')).toBeDefined();
   });
 });
