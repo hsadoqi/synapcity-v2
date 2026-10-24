@@ -8,7 +8,8 @@
 - M5.1 exact creates: `packages/domain/records/**` (manifest, configs, README, `src/base`, `src/spaces` with tests). Updates: root `vitest.config.ts` (project), `pnpm-lock.yaml` (one importer plus two workspace links; no version changes), `apps/web/package.json` and `packages/frontend/ui/package.json` (workspace dependency), `packages/frontend/ui/src/types/entity.ts`, `apps/web/src/features/spaces/shared/types/index.ts`, `lib/owned-records/{owned-records.ts,owned-records.test.ts}`, nine Space importers, the ownership map, workspace conventions, ADR-0014 section 7, the domain README, the design status line, this ledger. Deletes: `frontend-ui/src/types/entity-schema.ts`, `features/spaces/shared/schema/{schema.ts,index.ts}`; the Space schema test moved to `domain-records`.
 - M5.1 not changed: queries, actions, components, fixtures, RLS, persisted shapes, every message; `SetSpacePinnedResult`, `OwnedRecordSummary`, `SetRecordPinnedResult` and the screen-only shapes stay in the app and `frontend-ui`.
 - Environment note: the sandbox creates an empty `packages/.claude/.cc-writes`; `pnpm boundaries` rejects it as an unknown category, so it was removed with `rmdir` before the run. It may reappear.
-- Next: Q4, Q5, Q7 are asked before M5.2 and M5.3.
+- Owner answers 2026-10-24: Q4 replace the Space detail sample documents and dashboards with empty states (implemented in M5.4); Q5 host-supplied link capability with a `./next` binding; Q7 stories as components move. Recorded in the design, section 9.
+- Next: M5.2.
 
 ## Active task: Milestone 4 server identity boundary (2026-10-23)
 

@@ -14,7 +14,7 @@ Behavior does not change. Every Spaces page, action, API route and fixture-mode 
 
 ## 2. Goals, non-goals, anti-goals
 
-**Goals**
+**Goals**:
 
 - `domain-records` exists with the base record contract and the Space module; there is one definition of the ten shared record fields.
 - `server-data` exists with the Space repository and the pin/view writes, receiving a request-bound client from the host.
@@ -23,7 +23,7 @@ Behavior does not change. Every Spaces page, action, API route and fixture-mode 
 - The app's Spaces routes, actions and API routes become thin host bindings.
 - The boundary exception list shrinks (section 6).
 
-**Non-goals**
+**Non-goals**:
 
 - Documents and Dashboards repositories, actions and features (M8). Their importers only switch to the moved collection package and, if Q3 is accepted, to the shared base contract.
 - Home aggregation (M9). Home only re-points its collection imports.
@@ -118,7 +118,7 @@ Root `.` plus module subpaths only if a consumer needs a narrower interface. Run
 - `space-state-actions.ts` stays an app `'use server'` file (hosts own action entry points): parse input, fixture check, `getCallerIdentity`, then the feature command; maps outcomes to today's messages and `signedOut` flag; logs as today.
 - `api/spaces` routes: unchanged access check (M4), then the source.
 - Fixture binding (Q6): one host module `features/spaces`-free, e.g. `apps/web/src/lib/demo/space-source.ts`, holds the fixture-mode `SpaceSource` and its records. R8 keeps it out of `dev-fixtures`. `dev-fixtures` gains contract-based Space factories for tests and stories.
-- Space detail placeholder (Q4): kept as is and moved into the host binding with an explicit "sample content" label in code, removal condition M8, unless the owner chooses to replace it now.
+- Space detail placeholder (Q4, owner decision 2026-10-24): the sample documents and dashboards are not moved. Space detail shows empty states for both until participation reads come from Supabase (M8). A real user's Space never receives sample data. Fixtures stay available to build features in development and production (owner decision, 2026-10-24: no boundary rule against production files importing fixtures for now), so the host demo source (Q6) may keep sample documents and dashboards, but only in explicit fixture mode. The loader and its tests change in M5.4 when `get-space` moves; this is a visible change, approved by the owner.
 
 ### 4.6 Tests and verification
 
@@ -162,7 +162,7 @@ Proposed: none. If the collection move is split across commits, a temporary re-e
 5. **M5.5 (only if Q2 = include) Shells.** `frontend-shells` with `RootShell`, sidebar, header, user menu taking host links; docs app consumer.
 6. **Close-out.** Ownership map rows, inventory "exists" notes, ADR-0014 section 7 note, decisions index (Storybook item), task-scope ledger; `pnpm verify`; owner manual checks.
 
-## 9. Owner questions (Q3 and Q6 answered 2026-10-23 with the recommendation; Q1 and Q2 on their defaults; Q4, Q5, Q7 open)
+## 9. Owner questions (Q3 and Q6 answered 2026-10-23 with the recommendation; Q1 and Q2 on their defaults; Q4, Q5, Q7 answered 2026-10-24)
 
 | #   | Question                                                                                                                                     | Recommendation                                                                                                                                                                                                                                                   |
 | --- | -------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -173,6 +173,12 @@ Proposed: none. If the collection move is split across commits, a temporary re-e
 | Q5  | Shared presentation and Next.js navigation: host-supplied link capability with a `./next` binding, or keep `next/link` behind `./next` only? | Host-supplied link capability in the root entry, Next binding in `./next`. Root stays framework-neutral and the docs app (or a later non-Next host) can supply its own link.                                                                                     |
 | Q6  | Where does fixture-mode Space data live, given R8 bars production files from `dev-fixtures`?                                                 | In one host-owned demo source in `apps/web`. `dev-fixtures` gets contract-based factories for tests and stories only.                                                                                                                                            |
 | Q7  | Do moved collection components all need stories in M5?                                                                                       | Yes, as they move (conventions, Units). It is the main size driver of M5.3.                                                                                                                                                                                      |
+
+**Answers, 2026-10-24 (owner decisions).**
+
+- **Q4:** replace, not preserve. Space detail shows empty states for documents and dashboards, with no sample data, until participation is read from Supabase. This overrides the recommendation to preserve and label the placeholder. Implemented in M5.4 with `get-space`; the sample `spaceItem` documents and dashboards and the default documents and dashboards of `createSpaceFixture` leave the real-user path and live only behind fixture mode (`dev-fixtures` factories keep contract-based Space data for tests and stories).
+- **Q5:** host-supplied link capability in the root entry, with a `./next` binding.
+- **Q7:** yes, every moved collection component gets a story as it moves.
 
 ## 10. Calls made by Claude (owner to check)
 
