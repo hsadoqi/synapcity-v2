@@ -42,6 +42,15 @@ describe('requireOwner', () => {
     expect(digest).toContain('/auth/login?next=%2Fu1%2Fhome');
   });
 
+  it('treats a failed claims check as signed out and sends them to sign in', async () => {
+    getClaims.mockResolvedValue({
+      data: null,
+      error: { code: 'bad_jwt', status: 401 },
+    });
+
+    expect(await failure('u1')).toContain('/auth/login?next=%2Fu1%2Fhome');
+  });
+
   it('answers 404, not 403, for someone else’s id so ids are not confirmed', async () => {
     getClaims.mockResolvedValue({ data: { claims: { sub: 'someone-else' } } });
 

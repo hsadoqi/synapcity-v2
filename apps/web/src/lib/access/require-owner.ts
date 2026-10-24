@@ -1,3 +1,4 @@
+import { isOwner } from '@synapcity/server-auth';
 import { notFound, redirect } from 'next/navigation';
 
 import { homePathFor } from '../routing/user-paths';
@@ -6,7 +7,10 @@ import {
   fixtureModeEnabled,
   FIXTURE_USER_ID,
 } from './dev-fixture';
-import { getVerifiedClaims } from '../../features/auth/server/session';
+import {
+  getVerifiedClaims,
+  getVerifiedIdentity,
+} from '../../features/auth/server/session';
 
 type Claims = NonNullable<Awaited<ReturnType<typeof getVerifiedClaims>>>;
 
@@ -35,12 +39,17 @@ export async function requireOwner(userId: string): Promise<OwnerAccess> {
     return { kind: 'fixture', claims: fixtureClaims };
   }
 
-  const claims = await getVerifiedClaims();
+  const identity = await getVerifiedIdentity();
 
-  if (!claims) {
+  if (identity.status !== 'verified') {
     redirect(`/auth/login?next=${encodeURIComponent(homePathFor(userId))}`);
   }
-  if (claims.sub !== userId) notFound();
+  if (!isOwner(identity, userId)) notFound();
+
+  // Display readers (the settings page) still need the provider's claims
+  // until Milestone 7; this is the same memoized read, not a second check.
+  const claims = await getVerifiedClaims();
+  if (!claims) notFound();
 
   return { kind: 'verified', claims };
 }
