@@ -1,6 +1,6 @@
 # Forms schema-driven engine implementation plan
 
-> **Status: approved by the owner on 2026-10-24 (plan and steps), not yet executable because the preconditions below are unmet.** A review the same day then changed D7 (verified against the installed Zod), fixed a markdown defect, corrected statements about the earlier implementations, corrected the test commands, and verified most open assumptions (see Evidence); those corrections have not been re-confirmed by the owner. Builds on the forms extraction plan and ADR-0015 (React Hook Form, package `frontend-forms`), which arrive in the same change. This plan does not repeat them. Steps use checkbox syntax so a later run can track them.
+> **Status: approved by the owner on 2026-10-24 (plan and steps), not yet executable because the preconditions below are unmet.** A review the same day then changed D7 (verified against the installed Zod), fixed a markdown defect, corrected statements about the earlier implementations, corrected the test commands, moved the file layout to the workspace conventions, and verified most open assumptions (see Evidence); those corrections have not been re-confirmed by the owner. **Progress:** Tasks 1 to 4 are implemented on `feat/frontend-forms-engine`; what that taught the plan is folded into the tasks below. Builds on the forms extraction plan and ADR-0015 (React Hook Form, package `frontend-forms`), which arrive in the same change. This plan does not repeat them. Steps use checkbox syntax so a later run can track them.
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Give `frontend-forms` a declarative form engine: a caller supplies a Zod object schema and describes how each key is presented and when it applies, and gets a rendered, validated, accessible form.
@@ -13,8 +13,8 @@
 
 ## Preconditions
 
-- [ ] Extraction Part A is merged: the `frontend-forms` package exists at `packages/frontend/forms`. Tasks 1 to 4 start here. They need no React Hook Form.
-- [ ] Extraction Part B is merged: React Hook Form is pinned and the package has its binding. Tasks 5 to 9 start here.
+- [x] Tasks 1 to 4 do not wait for extraction Part A. Task 1 creates `packages/frontend/forms` with the engine's pure modules as its first code, so the package is never an empty skeleton (D16). Part A later adds the moved form units to the existing package, and its task A2 changes from creating the package to extending it.
+- [ ] Extraction Parts A and B are merged: the moved form units exist, React Hook Form is pinned and the package has its binding. Tasks 5 to 9 start here.
 - [ ] The owner approves decision D1 below (engine scope inside `frontend-forms`).
 
 The plan relies on these decisions of ADR-0015, restated here so it stays readable if that draft moves: React Hook Form is the form-state library; the package is `frontend-forms` at `packages/frontend/forms`; only that package imports React Hook Form; validation schemas stay in `domain` and the package owns none; primitives stay in `frontend-ui` and are composed, not forked; extraction (Part A) lands before library adoption (Part B).
@@ -23,7 +23,7 @@ The plan relies on these decisions of ADR-0015, restated here so it stays readab
 
 - Package path `packages/frontend/forms`, name `@synapcity/frontend-forms`. Root `.` entry plus `./testing`. Entries point at TypeScript source. No build step.
 - Only this package imports `react-hook-form` (ADR-0015 decision 3).
-- One package, `frontend-forms`. The engine, the bindings, the renderers, the containers and `./testing` share one runtime, one set of dependencies and one set of consumers, so none earns its own boundary. `definition/`, `state/` and `validation/` import neither React nor React Hook Form, so they can move to a domain package if a server consumer appears (see the roadmap).
+- One package, `frontend-forms`. The engine, the bindings, the renderers, the containers and `./testing` share one runtime, one set of dependencies and one set of consumers, so none earns its own boundary. `types/` and the pure `utils/` units (`define-form`, `describe-schema-field`, `is-empty-value`, `resolve-field-states`, `build-schema`, `define-form-from-schema`) import neither React nor React Hook Form, so they can move to a domain package if a server consumer appears (see the roadmap).
 - Dependencies: `@synapcity/frontend-ui` and `zod` only inside Tasks 1 to 5; no new third-party dependency in this plan.
 - UI is built from `frontend-ui` primitives and semantic classes. No raw `<button>` or `<label>`, no palette colours, no `style={{}}`, no bracket values, no `!important`.
 - No `any`. `unknown` is narrowed with guards.
@@ -107,6 +107,7 @@ Still unverified:
 - **D13. Schema-only forms.** A caller may pass just a Zod object schema and labels. The explicit field list stays the primary form; inference covers strings, numbers, booleans and enums only, and anything else needs an override or an exclusion. Labels are never derived from key names. Requiredness comes from the schema (`baseRequired`), not only from the `require` effect.
 - **D14. Error display.** Field errors always show under their field. A summary of all errors is on by default and can be turned off, but never replaces the inline messages. The form-level error may carry a title. It clears on the next edit or submit. The engine renders no toast; `onInvalid` and the submit result let the caller route errors elsewhere.
 - **D15. Category.** `frontend`, not `features`. The workspace conventions give `frontend` presentation and interaction foundations and `features` product composition and workflows. The engine has no product vocabulary, no workflow and no server work. A form definition for a product screen belongs to the feature that owns the screen, or to the domain schema it validates with. A `features-forms` package would imply a product capability that does not exist, would carry the `./contracts`, `./frontend` and `./server` shape for no reason, and would make every feature that needs a generic form reach into a sibling feature. The only other placement considered is the `domain-forms` extraction in the roadmap, and only if a server consumer appears.
+- **D16. Package creation order.** The first draft waited for extraction Part A to create the package. To start now, Task 1 creates `frontend-forms` with the engine's pure modules as its first code, and Part A later extends the existing package. This reorders the sequence in the extraction plan; ADR-0015's rule that extraction comes before library adoption still holds, because React Hook Form arrives no earlier than Part B. It was chosen as the recommended default when the owner asked to proceed, and the owner confirmed it on 2026-10-24. The extraction plan's task A2 is updated to match: it extends the existing package instead of creating it.
 
 ## Review Focus
 
@@ -120,21 +121,29 @@ Still unverified:
 
 ## File structure
 
-All under `packages/frontend/forms/src/engine/` unless noted.
+All under `packages/frontend/forms/src/`, in kind folders directly under `src/` (a one-module package), with one folder per unit holding its source, tests and an `index.ts`, and an `index.ts` per kind folder (workspace conventions, Internal organization).
 
-| Path                                                                                 | Responsibility                                                                |
-| ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
-| `definition/field-config.ts`                                                         | `FieldConfig` union, `FieldDependency`, `FieldCondition`, `FieldOption` types |
-| `definition/define-form.ts`                                                          | `defineForm`, `FormDefinition`, `FormDefinitionError`                         |
-| `state/resolve-field-states.ts`                                                      | condition evaluation and `FieldState`                                         |
-| `validation/build-schema.ts`                                                         | derived Zod object schema for the current states                              |
-| `registry/field-renderer-registry.ts`                                                | registry class and `UnknownFieldTypeError`                                    |
-| `registry/field-renderer-provider.tsx`                                               | provider, `useFieldRendererRegistry`                                          |
-| `renderers/*.tsx`, `renderers/create-default-registry.ts`                            | built-in renderers and the default registry                                   |
-| `form/create-form-resolver.ts`, `form/use-form-builder.ts`, `form/form-renderer.tsx` | React Hook Form integration and the renderer                                  |
-| `containers/*.tsx`                                                                   | plain, card, section, dialog and sheet containers around the form             |
-| `../testing/`                                                                        | `./testing` entry: a fixture form and test helpers                            |
-| `../index.ts`                                                                        | root entry re-exporting the public surface                                    |
+| Path                                                                                                                                                | Responsibility                                                                                                      |
+| --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `types/field-config.ts`                                                                                                                             | `FieldConfig` union, `FieldDependency`, `FieldCondition`, `FieldOption`, `FieldGroup`, `FormRule` types             |
+| `types/form-definition.ts`                                                                                                                          | `FormDefinition`, `FieldState`, `FormDefinitionIssue` types                                                         |
+| `utils/define-form/`                                                                                                                                | `defineForm`, `FormDefinitionError`                                                                                 |
+| `utils/describe-schema-field/`                                                                                                                      | `describeSchemaField`                                                                                               |
+| `utils/is-empty-value/`                                                                                                                             | `isEmptyValue`                                                                                                      |
+| `utils/resolve-field-states/`                                                                                                                       | condition evaluation and field states                                                                               |
+| `utils/build-schema/`                                                                                                                               | `buildSchema`, `createSchemaBuilder`                                                                                |
+| `utils/define-form-from-schema/`                                                                                                                    | schema-only forms (Task 10)                                                                                         |
+| `utils/create-form-resolver/`                                                                                                                       | the React Hook Form resolver                                                                                        |
+| `providers/field-renderer-provider/`                                                                                                                | `FieldRendererRegistry`, `UnknownFieldTypeError`, the provider, `useFieldRendererRegistry`, `createDefaultRegistry` |
+| `providers/form-builder-provider/`                                                                                                                  | `FormBuilderProvider`                                                                                               |
+| `hooks/use-form-builder/`                                                                                                                           | `useFormBuilder`                                                                                                    |
+| `components/field-frame/`, `components/text-renderer/`, `components/number-renderer/`, `components/select-renderer/`, `components/toggle-renderer/` | the built-in renderers                                                                                              |
+| `components/form-renderer/`                                                                                                                         | `FormRenderer` and its stories                                                                                      |
+| `components/field-view/`, `components/form-group/`, `components/error-summary/`, `components/form-error/`                                           | pieces of the renderer                                                                                              |
+| `components/form-container/`                                                                                                                        | the containers: plain, card, section, dialog, sheet                                                                 |
+| `testing/`                                                                                                                                          | the `./testing` entry: a fixture form and test helpers; no shipped code imports it                                  |
+| `index.ts`                                                                                                                                          | the root entry, re-exporting the public surface                                                                     |
+| `purity.test.ts`                                                                                                                                    | checks that the pure units import neither React nor React Hook Form                                                 |
 
 ---
 
@@ -142,8 +151,8 @@ All under `packages/frontend/forms/src/engine/` unless noted.
 
 **Files:**
 
-- Create: `definition/field-config.ts`, `definition/define-form.ts`, `definition/define-form.test.ts`
-- Modify: `../index.ts`
+- Create the package: `packages/frontend/forms/package.json` (exports `.` only for now), `tsconfig.json`, `eslint.config.mjs`, `vitest.config.mts`, `README.md`. Register it in the root `vitest.config.ts` `projects`. `pnpm install` adds its importer to `pnpm-lock.yaml`, using only versions already in the lockfile. Declare `"types": ["node"]` in the tsconfig: TypeScript 7.0.2 does not include `@types/node` on its own, and the purity test reads files.
+- Create: `types/field-config.ts`, `types/form-definition.ts`, `types/index.ts`, `utils/define-form/` and `utils/describe-schema-field/` (source, test and `index.ts` each), `utils/index.ts`, `src/index.ts`.
 
 **Interfaces:**
 
@@ -192,7 +201,7 @@ A group is a run of adjacent fields that share a `group` id, rendered later as a
 
 ### Task 2: Field state resolution
 
-**Files:** Create `state/resolve-field-states.ts`, `state/resolve-field-states.test.ts`.
+**Files:** Create `utils/resolve-field-states/` and `utils/is-empty-value/` (source, test and `index.ts` each). Modify `utils/index.ts`.
 
 **Interfaces:**
 
@@ -209,7 +218,7 @@ Semantics to implement exactly: a field with no `show` dependency is visible; wi
   - `a field the schema does not mark optional is required without any dependency`.
   - `require makes a field required only while met`.
   - `a hidden field reads as empty to its dependents` (`c` shown when `b` is empty, `b` hidden by `a` → `c` visible).
-  - `isEmptyValue` is `false` for `0` and `false`, `true` for `''`, `null`, `undefined`, `[]`.
+  - `isEmptyValue` is `false` for `0` and `false`, `true` for `''`, `null`, `undefined`, `[]` and `NaN`.
   - `gt and lt are false for non-numeric values` (including `NaN` and `undefined`).
   - `contains works on strings and arrays and is false for undefined`.
   - `resolves generated acyclic definitions without looping` (a small seeded generator written in the test file, no new dependency; 200 definitions, each resolved against random values).
@@ -220,7 +229,7 @@ Semantics to implement exactly: a field with no `show` dependency is visible; wi
 
 ### Task 3: Derived validation schema
 
-**Files:** Create `validation/build-schema.ts`, `validation/build-schema.test.ts`.
+**Files:** Create `utils/build-schema/` (source, test and `index.ts`) and `src/purity.test.ts`. Modify `utils/index.ts`.
 
 **Interfaces:**
 
@@ -236,6 +245,8 @@ Semantics to implement exactly: a field with no `show` dependency is visible; wi
   - `fails an empty value for a field whose require effect is met`, with the issue at that field's `name` and the `required` message.
   - `uses the caller's required message when given`.
   - `passes the caller's schema messages through unchanged` (e.g. `z.string().min(3, 'Too short')` yields `'Too short'`).
+  - `fails a required field whose key is absent from the values, not only an empty one`.
+  - `an empty required field reports only the required message, not also the schema's own rule for a non-empty value`.
   - `validates only keys that have a field` (a schema key with no field does not fail the form).
   - `createSchemaBuilder returns the same schema instance for states with the same visible and required fields`.
   - `createSchemaBuilder returns a new schema when a field's visibility or requirement changes`.
@@ -244,13 +255,13 @@ Semantics to implement exactly: a field with no `show` dependency is visible; wi
   - `a rule's message lands on its path field`.
   - `the narrowed schema is built from shape, so a schema with plain checks per key (min, regex) keeps them`.
 - [ ] **Step 2: Run** → FAIL.
-- [ ] **Step 3: Implement** `buildSchema` by building a new object from `definition.schema.shape` for the visible keys (never `.pick()`, which throws on a refined schema), applying each applicable rule as a refinement; wrap required fields with a refinement using `isEmptyValue`.
+- [ ] **Step 3: Implement** `buildSchema` by building a new object from `definition.schema.shape` for the visible keys (never `.pick()`, which throws on a refined schema), applying each applicable rule as a refinement; a field required only by a `require` dependency is built as `z.unknown().refine(not empty).pipe(base)`. Starting from `unknown` makes Zod validate the key even when it is absent from the values (Zod skips an optional key that is absent, so a plain refinement on the schema never runs for an untouched field), and checking emptiness before piping into the schema means an empty field reports only "required", not also the schema's own rule.
 - [ ] **Step 4: Run** → PASS.
 - [ ] **Step 5: Commit** `feat(forms): derive the form schema from visible fields`.
 
 ### Task 4: Renderer registry and provider
 
-**Files:** Create `registry/field-renderer-registry.ts`, `registry/field-renderer-provider.tsx`, and a test file for each.
+**Files:** Switch the package to the React tooling: `package.json` (`react`, `react-dom`, `@testing-library/react`, `@testing-library/dom`, `jsdom`, `@types/react`, `@types/react-dom`; versions as in `frontend-collection`), `tsconfig.json` (extend `react-library.json`), `eslint.config.mjs` (`react-internal`), and `vitest.config.ts` renamed to `vitest.config.mts` with the React test config. Create `providers/field-renderer-provider/` with `field-renderer-registry.ts`, `field-renderer-provider.tsx`, a test for each, and `index.ts`; `providers/index.ts`.
 
 **Interfaces:**
 
@@ -271,13 +282,13 @@ The default registry comes from Task 5. Until then the provider's default is an 
   - `extend adds a renderer for one provider and leaves the base registry unchanged`.
   - `useFieldRendererRegistry throws outside a provider`.
 - [ ] **Step 2: Run** → FAIL.
-- [ ] **Step 3: Implement** the registry over a `Map<string, FieldRenderer>`; the provider clones once in `useState`, then applies `extend`.
+- [ ] **Step 3: Implement** the registry over a `Map<string, FieldRenderer>`; the provider clones once in `useState`, then applies `extend`. Render a component that comes from the registry with `createElement(registry.resolve(type), props)`: JSX on a resolved component trips the `react-hooks/static-components` lint rule.
 - [ ] **Step 4: Run** → PASS.
 - [ ] **Step 5: Commit** `feat(forms): add the scoped field renderer registry`.
 
 ### Task 5: Built-in renderers and default registry
 
-**Files:** Create `renderers/text-renderer.tsx`, `number-renderer.tsx`, `select-renderer.tsx`, `toggle-renderer.tsx`, `field-frame.tsx`, `create-default-registry.ts`, and a test for each renderer. Modify `registry/field-renderer-provider.tsx` to default to `createDefaultRegistry()`.
+**Files:** Create `components/field-frame/`, `components/text-renderer/`, `components/number-renderer/`, `components/select-renderer/` and `components/toggle-renderer/` (source, test and `index.ts` each), and `providers/field-renderer-provider/create-default-registry.ts` with its test. Modify `providers/field-renderer-provider/field-renderer-provider.tsx` to default to `createDefaultRegistry()`.
 
 **Interfaces:**
 
@@ -301,7 +312,7 @@ Colour, date, slider, radio, multiselect, file and tags renderers are deferred u
 
 ### Task 6a: React Hook Form integration and the core renderer
 
-**Files:** Create `form/create-form-resolver.ts`, `form/use-form-builder.ts`, `form/form-renderer.tsx`, and a test for each.
+**Files:** Create `utils/create-form-resolver/`, `hooks/use-form-builder/` and `components/form-renderer/` (source, test and `index.ts` each); kind-folder indexes.
 
 **Interfaces:**
 
@@ -317,6 +328,7 @@ Colour, date, slider, radio, multiselect, file and tags renderers are deferred u
   - `a field shows no error before it is touched or the form is submitted`.
   - `shows a schema error under the field and moves focus to the first invalid field`.
   - `focuses the first invalid field in definition order even when a conditional field registered later` (the library's own focus follows registration order).
+  - `a nullable key that is not optional starts as null, so an untouched field validates` (Zod fails such a key when it is absent).
   - `a field that becomes required shows the required message on submit`.
   - `a cross-field rule's message shows under its path field on submit, and not while one of the rule's fields is hidden`.
   - `a field shown by a later change appears and its value is submitted`.
@@ -335,7 +347,7 @@ Colour, date, slider, radio, multiselect, file and tags renderers are deferred u
 
 ### Task 6b: Submit results and error display
 
-**Files:** Create `form/error-summary.tsx`, `form/form-error.tsx`, and a test for each. Modify `form/form-renderer.tsx` and its test.
+**Files:** Create `components/error-summary/` and `components/form-error/` (source, test and `index.ts` each). Modify `components/form-renderer/` and its test.
 
 **Interfaces:**
 
@@ -363,7 +375,7 @@ Colour, date, slider, radio, multiselect, file and tags renderers are deferred u
 
 ### Task 6c: Groups, initial values, hand-laid-out forms and render isolation
 
-**Files:** Create `form/form-builder-provider.tsx`, `form/field-view.tsx`, `form/form-group.tsx`, and a test for each. Modify `form/form-renderer.tsx`, `form/use-form-builder.ts` and their tests.
+**Files:** Create `providers/form-builder-provider/`, `components/field-view/` and `components/form-group/` (source, test and `index.ts` each). Modify `components/form-renderer/`, `hooks/use-form-builder/` and their tests.
 
 **Interfaces:**
 
@@ -389,7 +401,7 @@ Colour, date, slider, radio, multiselect, file and tags renderers are deferred u
 
 ### Task 7: Form containers
 
-**Files:** Create `containers/form-container.tsx`, `containers/plain-container.tsx`, `containers/card-container.tsx`, `containers/section-container.tsx`, `containers/dialog-container.tsx`, `containers/sheet-container.tsx`, and a test for each. Modify `form/form-renderer.tsx` and its test.
+**Files:** Create `components/form-container/` with `form-container.tsx`, `plain-container.tsx`, `card-container.tsx`, `section-container.tsx`, `dialog-container.tsx`, `sheet-container.tsx`, a test for each, and `index.ts`. Modify `components/form-renderer/` and its test.
 
 **Interfaces:**
 
@@ -419,7 +431,7 @@ Colour, date, slider, radio, multiselect, file and tags renderers are deferred u
 
 ### Task 8: Stories and a consumer proof
 
-**Files:** Create `src/testing/index.ts`, `src/testing/fixture-form.ts`, `src/testing/form-test-helpers.tsx`, `src/testing/form-test-helpers.test.tsx`, `src/engine/form/form-renderer.stories.tsx`. Modify `apps/storybook/.storybook/main.ts` (glob for the new package, following M5.3) and `package.json` (`./testing` export).
+**Files:** Create `src/testing/index.ts`, `src/testing/fixture-form.ts`, `src/testing/form-test-helpers.tsx`, `src/testing/form-test-helpers.test.tsx`, `src/components/form-renderer/form-renderer.stories.tsx`. Modify `apps/storybook/.storybook/main.ts` (glob for the new package, following M5.3) and `package.json` (`./testing` export).
 
 **Interfaces:** Produces `fixtureForm: FormDefinition` and the Zod object schema it is built from (a generic form: text name, number scale, switch, select, and a note field shown when the switch is on, in one declared group; no product vocabulary). Also produces the test helpers `renderForm(definition, options?)`, `fillField(label: string, value: string): Promise<void>`, `submitForm(): Promise<void>` and `expectFieldError(label: string, message: string): void`. Only tests, stories and dev hosts import the `./testing` entry. Testing Library is declared as a peer of the package for this entry; the repo already uses it, so no new dependency enters the lockfile.
 
@@ -432,7 +444,7 @@ Colour, date, slider, radio, multiselect, file and tags renderers are deferred u
 **Files:** Modify `packages/frontend/forms/README.md`, `docs/architecture/workspace-conventions.md` (inventory row), `docs/architecture/reorganization-ownership-map.md`, `docs/architecture/decisions/README.md`, `.agents/task-scope.md`. Create the ADR from decision D1 once the owner approves it.
 
 - [ ] **Step 1:** Document the public surface, the field-state semantics (D3), the client-only limit (D4), and the deferred list. Add three short guides: when to use the engine and when to keep a native-action form (D4); how a feature registers its own `custom:*` renderers once, through `FieldRendererProvider`'s `extend`; and how to map between a domain value and a form value by wrapping `initialValues` and `onSubmit` in two small mapping functions.
-- [ ] **Step 2: Run** `pnpm verify` → all checks pass. A package with no consumer yet may make `pnpm deps` (Knip) report unused files or exports; settle that with the registration pattern from Part A, not by ignoring the report.
+- [ ] **Step 2: Run** `pnpm verify` → all checks pass. `pnpm deps` (Knip) and `pnpm boundaries` both passed for the package with no consumer after Tasks 1 to 4; run them again once the components exist, and settle anything they report with the registration pattern from Part A, not by ignoring it.
 - [ ] **Step 3:** Report what ran, what did not run, and what the tests do not cover. A manual keyboard and screen-reader pass on the story form is not covered by the automated checks.
 - [ ] **Step 4: Commit** `docs(forms): document the form engine`.
 
@@ -440,7 +452,7 @@ Colour, date, slider, radio, multiselect, file and tags renderers are deferred u
 
 Can be built any time after Task 1; it needs no React Hook Form. Task 10 runs after Task 8 only so the stories can show it.
 
-**Files:** Create `definition/define-form-from-schema.ts`, `definition/define-form-from-schema.test.ts`. Modify `../index.ts`, `src/engine/form/form-renderer.stories.tsx`.
+**Files:** Create `utils/define-form-from-schema/` (source, test and `index.ts`). Modify `utils/index.ts`, `src/components/form-renderer/form-renderer.stories.tsx`.
 
 **Interfaces:**
 
@@ -514,7 +526,7 @@ Everything suggested for the engine, sorted by when it is built. The tasks above
 | Icons, tooltips, read-only fields                                                                                                                                                                                                                                                                                                        | A consumer asks                                                                                                                                                                                                |
 | Multi-step and tab forms                                                                                                                                                                                                                                                                                                                 | A wizard consumer exists                                                                                                                                                                                       |
 | Built-in toast routing, dismissible and warning-level form messages                                                                                                                                                                                                                                                                      | A consumer wants them; `onInvalid` is the hook until then                                                                                                                                                      |
-| Move `definition/`, `state/` and `validation/` to a `domain-forms` package, so a server action can apply the same visibility-aware validation                                                                                                                                                                                            | A server operation must validate against the same form definition. Not before: today the engine is client-only (D4), and a definition carries presentation properties that would need splitting from its rules |
+| Move `types/` and the pure `utils/` units to a `domain-forms` package, so a server action can apply the same visibility-aware validation                                                                                                                                                                                                 | A server operation must validate against the same form definition. Not before: today the engine is client-only (D4), and a definition carries presentation properties that would need splitting from its rules |
 | Field value adapters (`format` and `parse`) for renderers whose value type differs from the schema's, such as a date string and a `Date`                                                                                                                                                                                                 | A date or colour renderer with a mismatched value type                                                                                                                                                         |
 | Virtualization of large forms, if the benchmark demands it: use a maintained virtual list (`@tanstack/react-virtual` 3.14.22 is current on the registry) with measured row heights, not fixed heights; check focus-first-error, tab order and screen-reader order for fields that are not in the DOM; needs approval as a new dependency | The benchmark misses a budget                                                                                                                                                                                  |
 
