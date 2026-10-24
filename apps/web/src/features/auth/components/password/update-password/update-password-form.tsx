@@ -4,11 +4,11 @@ import { useActionState, useId } from 'react';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
 import { updatePassword } from '@/features/auth/server/actions/actions';
+import { type AuthState } from '@/features/auth/types';
 import {
   MIN_PASSWORD_LENGTH,
   PASSWORD_REQUIREMENTS,
-  type AuthState,
-} from '@/features/auth/types';
+} from '@synapcity/domain-identity';
 import {
   FormField,
   useFocusFirstError,

@@ -5,17 +5,19 @@ import { redirect } from 'next/navigation';
 
 import { authErrorPath, callbackUrl } from '@/lib/routing/auth-flow';
 import {
-  ALREADY_YOUR_EMAIL,
   authFailure,
   authSuccess,
+  type AuthState,
+} from '@/features/auth/types';
+import {
+  ALREADY_YOUR_EMAIL,
   emailRequestSchema,
   everyRefusal,
   firstRefusal,
   signInSchema,
   signUpSchema,
   updatePasswordSchema,
-  type AuthState,
-} from '@/features/auth/types';
+} from '@synapcity/domain-identity';
 import {
   authErrorFields,
   authErrorMessage,

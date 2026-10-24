@@ -1,4 +1,7 @@
-import { PASSWORD_REQUIREMENTS, type AuthFieldName } from '../../types';
+import {
+  PASSWORD_REQUIREMENTS,
+  type AuthFieldName,
+} from '@synapcity/domain-identity';
 
 /**
  * Whether a Supabase Auth error code means "slow down". These say nothing about

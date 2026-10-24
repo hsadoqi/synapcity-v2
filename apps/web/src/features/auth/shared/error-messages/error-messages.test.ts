@@ -4,7 +4,7 @@ import {
   MIN_PASSWORD_LENGTH,
   PASSWORD_REQUIREMENTS,
   PASSWORD_TOO_SHORT_MESSAGE,
-} from '../../types';
+} from '@synapcity/domain-identity';
 import {
   authErrorFields,
   authErrorMessage,
