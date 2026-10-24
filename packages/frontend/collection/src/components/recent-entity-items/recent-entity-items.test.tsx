@@ -7,7 +7,6 @@ import {
 } from '../../providers';
 import type { DocumentItem } from '../../types';
 import { RecentEntityItems } from './recent-entity-items';
-import { RecentEntityRow } from './recent-entity-row';
 
 const HostLink: CollectionLink = (props) => <a {...props} data-host-link />;
 const inHost = (ui: React.ReactElement) => (
@@ -34,22 +33,6 @@ describe('RecentEntityItems', () => {
 
   it('lists each item as a host link under the prefix', () => {
     render(inHost(<RecentEntityItems items={[doc]} prefix="/u1/documents" />));
-
-    const link = screen.getByRole('link', { name: /Launch plan/ });
-    expect(link.getAttribute('href')).toBe('/u1/documents/doc-1');
-    expect(link.hasAttribute('data-host-link')).toBe(true);
-  });
-});
-
-describe('RecentEntityRow', () => {
-  it('is a host link to the given address', () => {
-    render(
-      inHost(
-        <ul>
-          <RecentEntityRow entity={doc} slug="/u1/documents/doc-1" />
-        </ul>,
-      ),
-    );
 
     const link = screen.getByRole('link', { name: /Launch plan/ });
     expect(link.getAttribute('href')).toBe('/u1/documents/doc-1');

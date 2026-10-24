@@ -42,5 +42,6 @@ export * from './layout-toggle-group';
 export * from './pinned-mark';
 export * from './pinned-panel';
 export * from './recent-carousel';
-export * from './recent-entity';
+export * from './recent-entity-items';
+export * from './recent-entity-row';
 export * from './sort-options-menu';

@@ -1,12 +1,9 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import { ChefHat, Pin, Soup } from 'lucide-react';
+import { ChefHat, Soup } from 'lucide-react';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { CollectionItem } from '../../types';
-import { CompactItemList } from '../compact-item-list';
-import { FeaturedItems } from '../featured-items';
-import { ItemChips } from '../item-chips';
-import type { CollectionKinds } from '../../types';
+import type { CollectionItem, CollectionKinds } from '../../types';
+import { FeaturedItems } from './featured-items';
 
 // Invented kinds: the displays must take every resource word from props.
 const KINDS: CollectionKinds = {
@@ -83,47 +80,5 @@ describe('FeaturedItems', () => {
     render(<FeaturedItems id="cook-heading" {...section} items={[]} />);
 
     expect(screen.getByText('Nothing cooked yet.')).toBeTruthy();
-  });
-});
-
-describe('ItemChips', () => {
-  it('lists each item as a button under an iconned heading', () => {
-    const onOpen = vi.fn();
-    render(
-      <ItemChips
-        id="saved-heading"
-        heading="Saved"
-        headingIcon={Pin}
-        emptyMessage="Nothing saved."
-        kinds={KINDS}
-        items={[item('a'), item('b', { kind: 'unknown' })]}
-        onOpen={onOpen}
-      />,
-    );
-
-    const region = screen.getByRole('region', { name: 'Saved' });
-    fireEvent.click(within(region).getByRole('button', { name: 'Title b' }));
-    expect(onOpen).toHaveBeenCalledWith(expect.objectContaining({ id: 'b' }));
-  });
-});
-
-describe('CompactItemList', () => {
-  it('shows up to the limit, with each item’s group and age', () => {
-    render(
-      <CompactItemList
-        id="recent-heading"
-        {...section}
-        heading="Recent"
-        items={[item('a'), item('b'), item('c')]}
-        limit={2}
-      />,
-    );
-
-    const region = screen.getByRole('region', { name: 'Recent' });
-    expect(within(region).getAllByRole('listitem')).toHaveLength(2);
-    expect(within(region).getAllByText('Weeknights')).toHaveLength(2);
-    expect(within(region).getAllByText('2h ago')).toHaveLength(2);
-    // The kind is named for screen readers inside each tile.
-    expect(within(region).getAllByText('Recipe')).toHaveLength(2);
   });
 });
