@@ -1,4 +1,4 @@
-import type { SpaceEntity } from '@synapcity/domain-records';
+import type { SpaceEntity } from '@synapcity/domain-spaces';
 
 /** A document taking part in a Space, as the detail page lists it. */
 export type DocumentItem = {

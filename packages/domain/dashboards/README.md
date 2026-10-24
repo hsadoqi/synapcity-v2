@@ -1,0 +1,33 @@
+# @synapcity/domain-dashboards
+
+Owns: dashboard composition. The widgets a dashboard shows, where they sit at each breakpoint, its display settings, and the pure operations that change them.
+
+Runtime: portable TypeScript with no third-party runtime dependencies. Depends on [`domain-grids`](../grids/README.md) for layout math and [`domain-prototypes`](../prototypes/README.md) for the records widgets point at. Category rules: [domain README](../README.md) and [ADR-0014](../../../docs/architecture/decisions/0014-multi-app-package-boundaries.md).
+
+Source: the `dashboard-core` dashboard module of the responsive-grid prototype.
+
+## What this package does not decide
+
+- **The dashboard record.** Name, owner and timestamps belong to the ADR-0013 dashboard record, whose contract joins this package in Milestone 8 (owner decision, 2026-10-24). `DashboardComposition` is only `{ settings, widgets, layouts }`, so its operations take no `now` and touch no timestamps; the caller updates the record when it saves.
+- **Widget and layout storage.** ADR-0013 leaves it unresolved. Nothing here is persisted.
+- **The widget source model.** `PRODUCT.md` leaves it open. These widgets use the prototype's answer: a record-backed widget points at one prototype record through `source`, and a query widget (calendar, feed) describes what to select.
+- **A widget registry.** The ownership map adopts none. `WIDGET_SIZES` is layout data, not a registry; the add-widget palette and its labels are feature copy.
+
+## Public interface
+
+`@synapcity/domain-dashboards` (root entry):
+
+| Export                                                                                                | Meaning                                                                                                                                                                                        |
+| ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Widget`, `WidgetType`, `StatWidget` … `FeedWidget`, `WidgetStatus`, `WidgetHighlight`, `WidgetPatch` | Widget instances. `title` is the view's label, independent of the record's name                                                                                                                |
+| `DashboardComposition`, `DashboardSettings`, `DEFAULT_SETTINGS`                                       | Widgets, per-breakpoint layouts and settings (columns 1–4, card radius, widget titles)                                                                                                         |
+| `WIDGET_SIZES`                                                                                        | Default and minimum size of each widget type per breakpoint                                                                                                                                    |
+| `createWidget`                                                                                        | A new widget and, for record-backed types, its new record                                                                                                                                      |
+| `addWidget`, `removeWidget`, `duplicateWidget`, `updateWidget`, `setWidgetStatus`                     | Widget changes. Only an active widget gets a layout entry, and an id already on the dashboard is ignored. Removing a widget leaves its record; a duplicate is a second view of the same record |
+| `activeWidgets`, `widgetsWithStatus`                                                                  | Widgets by status; hidden and archived widgets have no layout entry                                                                                                                            |
+| `createComposition`, `duplicateComposition`, `updateSettings`, `layoutsForWidgets`                    | New, copied (fresh widget ids, same records) and re-packed compositions                                                                                                                        |
+| `applyLayoutChange`, `gridLayoutFor`                                                                  | Store a layout the grid reported for one breakpoint; build the render layout of the active widgets                                                                                             |
+
+## Scripts
+
+`lint`, `check-types`, `test`, `test:coverage`. Tests sit beside each unit.

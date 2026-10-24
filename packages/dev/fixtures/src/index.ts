@@ -3,7 +3,7 @@ import { LayoutDashboard, type LucideIcon } from 'lucide-react';
 /*
  * Seeded fake data for tests, stories and local development. Generic
  * primitives, plus a named factory for each accepted domain contract: Space
- * (ADR-0012) has `createSpaceEntity`, built on `@synapcity/domain-records`.
+ * (ADR-0012) has `createSpaceEntity`, built on `@synapcity/domain-spaces`.
  * Add a factory when another entity's contract is accepted.
  *
  * Each call to `createFixtures` builds its own `Faker` instance, so one

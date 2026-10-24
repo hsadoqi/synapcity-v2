@@ -1,7 +1,7 @@
 import { itemFromRecord } from '@synapcity/frontend-collection';
 import type { CollectionItem } from '@synapcity/frontend-collection';
 
-import type { SpaceSummary } from '@synapcity/domain-records';
+import type { SpaceSummary } from '@synapcity/domain-spaces';
 
 import { spacePath } from '../space-paths';
 

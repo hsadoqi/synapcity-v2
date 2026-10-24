@@ -1,8 +1,5 @@
-import type {
-  BaseRecord,
-  SpaceEntity,
-  SpaceSummary,
-} from '@synapcity/domain-records';
+import type { BaseRecord } from '@synapcity/domain-records';
+import type { SpaceEntity, SpaceSummary } from '@synapcity/domain-spaces';
 
 /** What pinning reports: the database-stamped time, or the error to log. */
 export type SetPinnedOutcome =

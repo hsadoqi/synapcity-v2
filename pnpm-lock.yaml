@@ -349,6 +349,9 @@ importers:
       '@synapcity/domain-records':
         specifier: workspace:*
         version: link:../../packages/domain/records
+      '@synapcity/domain-spaces':
+        specifier: workspace:*
+        version: link:../../packages/domain/spaces
       '@synapcity/features-spaces':
         specifier: workspace:*
         version: link:../../packages/features/spaces
@@ -521,9 +524,15 @@ importers:
       '@faker-js/faker':
         specifier: 10.6.0
         version: 10.6.0
-      '@synapcity/domain-records':
+      '@synapcity/domain-dashboards':
         specifier: workspace:*
-        version: link:../../domain/records
+        version: link:../../domain/dashboards
+      '@synapcity/domain-prototypes':
+        specifier: workspace:*
+        version: link:../../domain/prototypes
+      '@synapcity/domain-spaces':
+        specifier: workspace:*
+        version: link:../../domain/spaces
       lucide-react:
         specifier: ^1.55.0
         version: 1.55.0(@types/react@19.3.0)(react@19.3.0)
@@ -606,6 +615,61 @@ importers:
         specifier: 4.1.12
         version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/browser-playwright@4.1.12)(@vitest/coverage-v8@4.1.12)(jsdom@30.1.2)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
 
+  packages/domain/dashboards:
+    dependencies:
+      '@synapcity/domain-grids':
+        specifier: workspace:*
+        version: link:../grids
+      '@synapcity/domain-prototypes':
+        specifier: workspace:*
+        version: link:../prototypes
+    devDependencies:
+      '@synapcity/dev-eslint-config':
+        specifier: workspace:*
+        version: link:../../dev/eslint-config
+      '@synapcity/dev-typescript-config':
+        specifier: workspace:*
+        version: link:../../dev/typescript-config
+      '@synapcity/dev-vitest-config':
+        specifier: workspace:*
+        version: link:../../dev/vitest-config
+      '@vitest/coverage-v8':
+        specifier: 4.1.12
+        version: 4.1.12(@vitest/browser@4.1.12)(vitest@4.1.12)
+      eslint:
+        specifier: 10.9.1
+        version: 10.9.1(jiti@2.7.0)(supports-color@7.2.0)
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: 4.1.12
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/browser-playwright@4.1.12)(@vitest/coverage-v8@4.1.12)(jsdom@30.1.2)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
+
+  packages/domain/grids:
+    devDependencies:
+      '@synapcity/dev-eslint-config':
+        specifier: workspace:*
+        version: link:../../dev/eslint-config
+      '@synapcity/dev-typescript-config':
+        specifier: workspace:*
+        version: link:../../dev/typescript-config
+      '@synapcity/dev-vitest-config':
+        specifier: workspace:*
+        version: link:../../dev/vitest-config
+      '@vitest/coverage-v8':
+        specifier: 4.1.12
+        version: 4.1.12(@vitest/browser@4.1.12)(vitest@4.1.12)
+      eslint:
+        specifier: 10.9.1
+        version: 10.9.1(jiti@2.7.0)(supports-color@7.2.0)
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: 4.1.12
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/browser-playwright@4.1.12)(@vitest/coverage-v8@4.1.12)(jsdom@30.1.2)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
+
   packages/domain/identity:
     devDependencies:
       '@synapcity/dev-eslint-config':
@@ -633,8 +697,70 @@ importers:
         specifier: ^4.6.7
         version: 4.6.7
 
+  packages/domain/prototypes:
+    dependencies:
+      '@synapcity/domain-records':
+        specifier: workspace:*
+        version: link:../records
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
+    devDependencies:
+      '@synapcity/dev-eslint-config':
+        specifier: workspace:*
+        version: link:../../dev/eslint-config
+      '@synapcity/dev-typescript-config':
+        specifier: workspace:*
+        version: link:../../dev/typescript-config
+      '@synapcity/dev-vitest-config':
+        specifier: workspace:*
+        version: link:../../dev/vitest-config
+      '@vitest/coverage-v8':
+        specifier: 4.1.12
+        version: 4.1.12(@vitest/browser@4.1.12)(vitest@4.1.12)
+      eslint:
+        specifier: 10.9.1
+        version: 10.9.1(jiti@2.7.0)(supports-color@7.2.0)
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: 4.1.12
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/browser-playwright@4.1.12)(@vitest/coverage-v8@4.1.12)(jsdom@30.1.2)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
+
   packages/domain/records:
     dependencies:
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
+    devDependencies:
+      '@synapcity/dev-eslint-config':
+        specifier: workspace:*
+        version: link:../../dev/eslint-config
+      '@synapcity/dev-typescript-config':
+        specifier: workspace:*
+        version: link:../../dev/typescript-config
+      '@synapcity/dev-vitest-config':
+        specifier: workspace:*
+        version: link:../../dev/vitest-config
+      '@vitest/coverage-v8':
+        specifier: 4.1.12
+        version: 4.1.12(@vitest/browser@4.1.12)(vitest@4.1.12)
+      eslint:
+        specifier: 10.9.1
+        version: 10.9.1(jiti@2.7.0)(supports-color@7.2.0)
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: 4.1.12
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/browser-playwright@4.1.12)(@vitest/coverage-v8@4.1.12)(jsdom@30.1.2)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
+
+  packages/domain/spaces:
+    dependencies:
+      '@synapcity/domain-records':
+        specifier: workspace:*
+        version: link:../records
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -666,6 +792,9 @@ importers:
       '@synapcity/domain-records':
         specifier: workspace:*
         version: link:../../domain/records
+      '@synapcity/domain-spaces':
+        specifier: workspace:*
+        version: link:../../domain/spaces
       '@synapcity/frontend-collection':
         specifier: workspace:*
         version: link:../../frontend/collection
@@ -877,6 +1006,27 @@ importers:
         specifier: 4.1.12
         version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/browser-playwright@4.1.12)(@vitest/coverage-v8@4.1.12)(jsdom@30.1.2)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
 
+  packages/frontend/tokens:
+    devDependencies:
+      '@synapcity/dev-typescript-config':
+        specifier: workspace:*
+        version: link:../../dev/typescript-config
+      '@synapcity/dev-vitest-config':
+        specifier: workspace:*
+        version: link:../../dev/vitest-config
+      '@types/node':
+        specifier: 26.6.5
+        version: 26.6.5
+      '@vitest/coverage-v8':
+        specifier: 4.1.12
+        version: 4.1.12(@vitest/browser@4.1.12)(vitest@4.1.12)
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: 4.1.12
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/browser-playwright@4.1.12)(@vitest/coverage-v8@4.1.12)(jsdom@30.1.2)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
+
   packages/frontend/ui:
     dependencies:
       '@base-ui/react':
@@ -885,6 +1035,9 @@ importers:
       '@synapcity/frontend-tailwind-config':
         specifier: workspace:*
         version: link:../tailwind-config
+      '@synapcity/frontend-tokens':
+        specifier: workspace:*
+        version: link:../tokens
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -998,6 +1151,9 @@ importers:
       '@synapcity/domain-records':
         specifier: workspace:*
         version: link:../../domain/records
+      '@synapcity/domain-spaces':
+        specifier: workspace:*
+        version: link:../../domain/spaces
       '@synapcity/server-supabase':
         specifier: workspace:*
         version: link:../supabase

@@ -1,0 +1,15 @@
+/*
+ * Synapcity "Precision Canvas" tokens — the single source of token values.
+ * Files are copied verbatim from the Claude Design export in
+ * project/_ds/synapcity-design-system-<id>/tokens. Keep this layer unlayered so
+ * it wins over Tailwind's default theme variables of the same name.
+ */
+@import './fonts.css';
+@import './colors.css';
+@import './typography.css';
+@import './spacing.css';
+@import './layout.css';
+@import './radius.css';
+@import './elevation.css';
+@import './motion.css';
+@import './base.css';

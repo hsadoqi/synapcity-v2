@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./prototype-workspace": "./src/prototype-workspace.ts",
     "./data/*": "./seed/*.json"
   },
   "scripts": {
@@ -15,7 +16,9 @@
   },
   "dependencies": {
     "@faker-js/faker": "10.6.0",
-    "@synapcity/domain-records": "workspace:*",
+    "@synapcity/domain-dashboards": "workspace:*",
+    "@synapcity/domain-prototypes": "workspace:*",
+    "@synapcity/domain-spaces": "workspace:*",
     "lucide-react": "^1.55.0"
   },
   "devDependencies": {
