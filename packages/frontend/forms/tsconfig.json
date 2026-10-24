@@ -1,5 +1,5 @@
 {
-  "extends": "@synapcity/dev-typescript-config/base.json",
+  "extends": "@synapcity/dev-typescript-config/react-library.json",
   "compilerOptions": {
     "strictNullChecks": true,
     "module": "preserve",
@@ -8,5 +8,5 @@
     "types": ["node"]
   },
   "include": ["src"],
-  "exclude": ["node_modules", ".turbo", "./vitest.config.ts"]
+  "exclude": ["node_modules", ".turbo"]
 }

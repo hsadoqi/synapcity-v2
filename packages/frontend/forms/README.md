@@ -2,7 +2,7 @@
 
 Owns: the form interaction foundations ([ADR-0015](../../../docs/architecture/decisions/0015-forms-package-and-form-state.md)) and, in this package, the schema-driven form engine from the [engine plan](../../../docs/superpowers/plans/2026-10-24-forms-schema-driven-engine.md). The caller passes a Zod object schema, normally from `domain`, and describes how each key is presented and when it applies; the package checks that description, works out which fields are visible, enabled and required for the current values, and (in later tasks) builds the validation schema, renders the form and shows its errors. The package owns no product schema, copy or workflow.
 
-Runtime: browser and server rendering, framework-neutral. Dependency: `zod`. Category rules: [frontend README](../README.md) and [ADR-0014](../../../docs/architecture/decisions/0014-multi-app-package-boundaries.md).
+Runtime: browser and server rendering, framework-neutral. Dependencies: `react` and `zod`. React Hook Form arrives with extraction Part B and stays inside this package. Category rules: [frontend README](../README.md) and [ADR-0014](../../../docs/architecture/decisions/0014-multi-app-package-boundaries.md).
 
 History: created by Task 1 of the engine plan, ahead of extraction Part A, with the engine's pure modules as its first code (decision D16 in the plan, awaiting the owner's confirmation). Part A later adds the form pieces that move out of `apps/web`.
 
@@ -10,13 +10,15 @@ History: created by Task 1 of the engine plan, ahead of extraction Part A, with 
 
 `@synapcity/frontend-forms` (root entry):
 
-| Export                                             | Meaning                                                                                                                                                                                              |
-| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `defineForm`, `FormDefinitionError`                | Checks a definition when it is written and throws one error listing every problem. Call it at module scope so a broken definition fails in a test or build, never while rendering.                   |
-| `describeSchemaField`                              | Describes one key of an object schema: its kind, whether it accepts `undefined` or `null`, an email format, enum values.                                                                             |
-| `resolveFieldStates`, `isEmptyValue`               | Works out whether each field is visible, enabled and required for the current values, in dependency order; a hidden field reads as empty to its dependents. `0` and `false` are values, never empty. |
-| `buildSchema`, `createSchemaBuilder`               | The caller's schema narrowed to the visible fields, with `require` dependencies and cross-field rules applied. The builder caches by which fields are visible and required.                          |
-| `FieldConfig` and its parts, `FormDefinition`, ... | The types: the field union, conditions and dependencies, groups, cross-field rules, field state, and the issues `defineForm` reports.                                                                |
+| Export                                              | Meaning                                                                                                                                                                                              |
+| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `defineForm`, `FormDefinitionError`                 | Checks a definition when it is written and throws one error listing every problem. Call it at module scope so a broken definition fails in a test or build, never while rendering.                   |
+| `describeSchemaField`                               | Describes one key of an object schema: its kind, whether it accepts `undefined` or `null`, an email format, enum values.                                                                             |
+| `resolveFieldStates`, `isEmptyValue`                | Works out whether each field is visible, enabled and required for the current values, in dependency order; a hidden field reads as empty to its dependents. `0` and `false` are values, never empty. |
+| `buildSchema`, `createSchemaBuilder`                | The caller's schema narrowed to the visible fields, with `require` dependencies and cross-field rules applied. The builder caches by which fields are visible and required.                          |
+| `FieldRendererRegistry`, `UnknownFieldTypeError`    | Maps a field type to the component that renders it. Scoped: `clone` gives a provider its own copy. There is no fallback renderer; an unknown type throws an error that names the type.               |
+| `FieldRendererProvider`, `useFieldRendererRegistry` | Supplies the renderers to the forms below it. The registry is copied once on mount; `extend` adds a feature's `custom:*` renderers for that provider only.                                           |
+| `FieldConfig` and its parts, `FormDefinition`, ...  | The types: the field union, conditions and dependencies, groups, cross-field rules, field state, and the issues `defineForm` reports.                                                                |
 
 ## Rules
 
@@ -26,6 +28,7 @@ History: created by Task 1 of the engine plan, ahead of extraction Part A, with 
 - Field names must be schema keys and must not be `type`, `root`, `ref`, `types`, `message` or `form`, which collide with React Hook Form's internal error shapes.
 - The narrowed schema is built from `schema.shape`, never `.pick()`, which throws on a refined schema in Zod 4.6.7. A field required by a `require` dependency starts from `unknown`, because Zod does not validate an optional key that is absent from the input.
 - A key that is nullable but not optional fails when it is absent, so the form must start it as `null`. A cross-field rule runs alongside ordinary field issues, but Zod skips it when a type error exists elsewhere in the object.
+- Render a component that comes from the registry with `createElement(registry.resolve(type), props)`; JSX on a resolved component trips the `react-hooks/static-components` lint rule.
 - Errors and messages name fields and types, never values.
 
 ## Scripts
