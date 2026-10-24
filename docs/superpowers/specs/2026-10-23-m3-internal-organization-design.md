@@ -1,6 +1,7 @@
 # Milestone 3.3: internal file organization
 
 **Status:** Accepted by the owner on 2026-10-23 and recorded in the [workspace conventions](../../architecture/workspace-conventions.md#internal-organization). Kept as the record of evidence and decisions.
+**Amendment (owner decision F4, 2026-10-23):** units are grouped under kind folders (`types/`, `schemas/`, `utils/`, `components/`, `hooks/`, `providers/`) even when a kind has one unit; `utils/` is a kind folder rather than a last resort; type-only declarations may be plain files in `types/`. Unit folders with tests stay inside their kind folder. The current rule is in the [workspace conventions](../../architecture/workspace-conventions.md#internal-organization); rule text below that contradicts it is superseded.
 **Date:** 2026-10-23
 **Branch:** `chore/reorganization-m3-boundary-enforcement`
 **Builds on:** the [package inventory](../../architecture/workspace-conventions.md#package-inventory) (3.1) and [entry points](../../architecture/workspace-conventions.md#entry-points) (3.2).
@@ -26,11 +27,12 @@ Every package is laid out the same way, so a reader finds a unit, its tests and 
 
 ## 4. Owner decisions (2026-10-23)
 
-| #   | Decision                                                                                                                                                                                                                        |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| F1  | Keep the folder look: every unit (component, hook, helper, schema, rule) has its own folder with an `index.ts`. The owner prefers it as more organized and easier to read.                                                      |
-| F2  | Feature entry names stay `./contracts`, `./frontend`, `./server`, `./testing` (owner delegated the naming; kept because `./types` would contradict the no-types-only-entries rule and `./model` collides with domain).          |
-| F3  | Features never re-export domain contracts. Consumers import a domain contract from its domain package. A temporary migration bridge is the only exception and records its consumers and removal condition (ADR-0014 section 6). |
+| #   | Decision                                                                                                                                                                                                                                                                                                                              |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| F1  | Keep the folder look: every unit (component, hook, helper, schema, rule) has its own folder with an `index.ts`. The owner prefers it as more organized and easier to read.                                                                                                                                                            |
+| F2  | Feature entry names stay `./contracts`, `./frontend`, `./server`, `./testing` (owner delegated the naming; kept because `./types` would contradict the no-types-only-entries rule and `./model` collides with domain).                                                                                                                |
+| F3  | Features never re-export domain contracts. Consumers import a domain contract from its domain package. A temporary migration bridge is the only exception and records its consumers and removal condition (ADR-0014 section 6).                                                                                                       |
+| F4  | Kind folders (2026-10-23, after Milestone 4): group units under `types/`, `schemas/` and `utils/` (and the presentation kinds), each with an `index.ts`, even when a kind holds one unit. The owner applied it to `domain-identity` and `server-auth` and asked for the rule to follow ("this is what i want....so change the rule"). |
 
 ## 5. Rules
 
@@ -47,7 +49,7 @@ Every package is laid out the same way, so a reader finds a unit, its tests and 
 1. Source lives under `src/`. Each package entry has one entry file: `src/index.ts` for a root `.` entry, `src/<entry>/index.ts` for a named entry.
 2. **Feature packages** mirror their entries at the top of `src/`:
 
-   ```
+   ```text
    src/
      contracts/   ./contracts: the feature's own shapes, view models, command and capability interfaces
      frontend/    ./frontend: presentation, hooks, providers, client state
@@ -62,13 +64,12 @@ Every package is laid out the same way, so a reader finds a unit, its tests and 
 
 ### Naming
 
-1.  **Domain or feature contract?** If a second feature, the server or fixtures need a shape, it belongs in domain. If only one feature's own frontend and server halves (or its host) need it, it belongs in that feature's `contracts/`. Feature contracts may use domain types but never redefine or re-export them (F3).
-2.  `shared` is not a folder name: its meaning is ambiguous. Use the runtime folder (`contracts`, `frontend`, `server`) or a module name. Other grouping names (`lib`, `utils`) are allowed only when the folder's units have no better kind or module name.
-3.  A Next.js-specific unit lives under the folder behind the `./next` entry, not beside framework-neutral code.
+1.**Domain or feature contract?** If a second feature, the server or fixtures need a shape, it belongs in domain. If only one feature's own frontend and server halves (or its host) need it, it belongs in that feature's `contracts/`. Feature contracts may use domain types but never redefine or re-export them (F3). 2.`shared` is not a folder name: its meaning is ambiguous. Use the runtime folder (`contracts`, `frontend`, `server`) or a module name. Other grouping names (`lib`, `utils`) are allowed only when the folder's units have no better kind or module name.
+3.A Next.js-specific unit lives under the folder behind the `./next` entry, not beside framework-neutral code.
 
 ### Existing packages
 
-1.  `frontend-ui` keeps its current layout and its structure test, including its rule that cross-folder imports use the package's own specifier (`@synapcity/frontend-ui/...`) rather than relative paths. That works there because every component folder is a public unit. New packages use relative folder imports (rule 2), because under explicit `exports` a package cannot reach its own private units through its name. `frontend-site`, `frontend-tailwind-config` and the `dev-*` packages keep their layouts. A scoped change may align them later.
+1.`frontend-ui` keeps its current layout and its structure test, including its rule that cross-folder imports use the package's own specifier (`@synapcity/frontend-ui/...`) rather than relative paths. That works there because every component folder is a public unit. New packages use relative folder imports (rule 2), because under explicit `exports` a package cannot reach its own private units through its name. `frontend-site`, `frontend-tailwind-config` and the `dev-*` packages keep their layouts. A scoped change may align them later.
 
 ## 6. Calls made by Claude (owner to check)
 
