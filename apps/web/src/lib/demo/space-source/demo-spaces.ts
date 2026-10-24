@@ -1,5 +1,6 @@
 import { baseRecordSchema } from '@synapcity/domain-records';
-import type { BaseRecord, SpaceEntity } from '@synapcity/domain-records';
+import type { BaseRecord } from '@synapcity/domain-records';
+import type { SpaceEntity } from '@synapcity/domain-spaces';
 
 /*
  * Fixture-mode data (ADR-0006, development amendment; design Q6): what the demo

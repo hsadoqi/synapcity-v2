@@ -1,0 +1,17 @@
+:root {
+  /* Elevation is reserved for temporary layers only — never fixed chrome */
+  --shadow-none: none;
+  --shadow-toolbar: 0 1px 1px rgb(0 0 0 / 0.32), 0 6px 18px rgb(0 0 0 / 0.26);
+  --shadow-popover: 0 1px 2px rgb(0 0 0 / 0.38), 0 12px 32px rgb(0 0 0 / 0.34);
+  --shadow-dialog: 0 2px 4px rgb(0 0 0 / 0.42), 0 24px 64px rgb(0 0 0 / 0.42);
+
+  --z-base: 0; /* @kind other */
+  --z-sticky: 100; /* @kind other */
+  --z-sidebar: 200; /* @kind other */
+  --z-panel: 300; /* @kind other */
+  --z-toolbar: 500; /* @kind other */
+  --z-popover: 600; /* @kind other */
+  --z-overlay: 700; /* @kind other */
+  --z-dialog: 800; /* @kind other */
+  --z-toast: 900; /* @kind other */
+}

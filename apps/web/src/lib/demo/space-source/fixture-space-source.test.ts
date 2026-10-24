@@ -1,4 +1,5 @@
-import { baseRecordSchema, spaceSchema } from '@synapcity/domain-records';
+import { baseRecordSchema } from '@synapcity/domain-records';
+import { spaceSchema } from '@synapcity/domain-spaces';
 import { findEntityIcon } from '@synapcity/frontend-collection';
 import { describe, expect, it } from 'vitest';
 

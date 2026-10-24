@@ -1,0 +1,26 @@
+:root {
+  --app-header-height: 56px;
+  --sidebar-width: 240px;
+  --sidebar-width-collapsed: 56px;
+  --document-spine-width: 88px;
+  --document-content-width: 680px;
+  --document-wide-content-width: 832px;
+  --context-panel-width: 400px;
+  --context-panel-width-min: 320px;
+  --context-panel-width-max: 512px;
+  --context-rail-width: 44px;
+  --document-canvas-padding-inline: 64px;
+  --document-canvas-padding-block: 48px;
+  --document-prose-measure: 68ch; /* @kind other */
+
+  --control-height-xs: 24px;
+  --control-height-sm: 28px;
+  --control-height-md: 32px;
+  --control-height-lg: 36px;
+  --icon-size-xs: 12px;
+  --icon-size-sm: 14px;
+  --icon-size-md: 16px;
+  --icon-size-lg: 18px;
+  --toolbar-button-size: 28px;
+  --rail-button-size: 32px;
+}

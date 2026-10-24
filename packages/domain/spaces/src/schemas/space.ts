@@ -4,7 +4,7 @@ import {
   ICON_NAME_PATTERN,
   baseRecordInputSchema,
   baseRecordSchema,
-} from '../../base';
+} from '@synapcity/domain-records';
 
 const name = z.string().trim().min(1, 'Enter a space name.');
 // Store the Lucide identifier, never a React component or SVG markup.

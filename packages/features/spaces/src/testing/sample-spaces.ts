@@ -1,4 +1,4 @@
-import type { SpaceSummary } from '@synapcity/domain-records';
+import type { SpaceSummary } from '@synapcity/domain-spaces';
 import { createSpaceEntity } from '@synapcity/dev-fixtures';
 
 import type { Space } from '../contracts';

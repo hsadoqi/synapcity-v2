@@ -21,6 +21,7 @@
     "@supabase/supabase-js": "2.117.3",
     "@synapcity/domain-identity": "workspace:*",
     "@synapcity/domain-records": "workspace:*",
+    "@synapcity/domain-spaces": "workspace:*",
     "@synapcity/features-spaces": "workspace:*",
     "@synapcity/frontend-collection": "workspace:*",
     "@synapcity/frontend-site": "workspace:*",

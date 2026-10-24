@@ -2,7 +2,7 @@
 
 Owns: the Space queries and writes against a Supabase request client the host supplies (ADR-0012, ADR-0013). Reads the owner's Spaces and the documents and dashboards that take part in one Space, and writes the two Space states a person changes: pinned and last viewed. Documents and dashboards as records of their own (their queries and writes) arrive with Milestone 8.
 
-Runtime: server only. The root file starts with `import 'server-only'`, and no other file in the package imports it. Dependencies: `@synapcity/domain-records` for the contracts, `@synapcity/server-supabase` for the client type (type-only import), `zod`. Category rules: [server README](../README.md) and [ADR-0014](../../../docs/architecture/decisions/0014-multi-app-package-boundaries.md).
+Runtime: server only. The root file starts with `import 'server-only'`, and no other file in the package imports it. Dependencies: `@synapcity/domain-records` for the base record contract and `@synapcity/domain-spaces` for the Space contract, `@synapcity/server-supabase` for the client type (type-only import), `zod`. Category rules: [server README](../README.md) and [ADR-0014](../../../docs/architecture/decisions/0014-multi-app-package-boundaries.md).
 
 ## Public interface
 

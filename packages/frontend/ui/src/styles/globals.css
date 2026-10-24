@@ -1,4 +1,5 @@
 @import 'shadcn/tailwind.css';
 @import '@synapcity/frontend-tailwind-config';
+@import '@synapcity/frontend-tokens/tokens.css';
 
 @source '../';

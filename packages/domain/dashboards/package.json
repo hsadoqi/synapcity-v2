@@ -1,0 +1,28 @@
+{
+  "name": "@synapcity/domain-dashboards",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint . --cache --cache-strategy content --max-warnings 0",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@synapcity/domain-grids": "workspace:*",
+    "@synapcity/domain-prototypes": "workspace:*"
+  },
+  "devDependencies": {
+    "@synapcity/dev-eslint-config": "workspace:*",
+    "@synapcity/dev-typescript-config": "workspace:*",
+    "@synapcity/dev-vitest-config": "workspace:*",
+    "@vitest/coverage-v8": "4.1.12",
+    "eslint": "10.9.1",
+    "typescript": "7.0.2",
+    "vitest": "4.1.12"
+  }
+}

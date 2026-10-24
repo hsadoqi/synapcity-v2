@@ -1,4 +1,4 @@
-import type { SpaceSummary } from '@synapcity/domain-records';
+import type { SpaceSummary } from '@synapcity/domain-spaces';
 import {
   CollectionPage,
   CollectionPageSkeleton,

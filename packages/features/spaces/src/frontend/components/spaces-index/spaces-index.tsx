@@ -12,7 +12,7 @@ import type {
   CollectionItemAction,
 } from '@synapcity/frontend-collection';
 
-import type { SpaceSummary } from '@synapcity/domain-records';
+import type { SpaceSummary } from '@synapcity/domain-spaces';
 
 import type { SetSpacePinnedResult } from '../../../contracts';
 import { toCollectionItem } from '../../utils';
