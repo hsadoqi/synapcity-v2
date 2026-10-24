@@ -21,6 +21,7 @@ const projects = [
   'packages/domain/records',
   'packages/dev/boundaries',
   'packages/dev/fixtures',
+  'packages/features/spaces',
   'packages/frontend/site',
   'packages/frontend/collection',
   'packages/frontend/ui',

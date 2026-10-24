@@ -15,7 +15,10 @@ const mocks = vi.hoisted(() => ({
 import { CollectionNavigationProvider } from '@synapcity/frontend-collection';
 import { createSpaceEntity } from '@synapcity/dev-fixtures';
 import type { SpaceSummary } from '@synapcity/domain-records';
-import { SpacesCollection, SpacesCollectionSkeleton } from './spaces-collection';
+import {
+  SpacesCollection,
+  SpacesCollectionSkeleton,
+} from './spaces-collection';
 
 /** The host's navigation: plain links, and a `push` this test can watch. */
 function HostNavigation({ children }: { children: React.ReactNode }) {
@@ -111,11 +114,13 @@ describe('SpacesCollectionSkeleton', () => {
 
 describe('SpacesCollection', () => {
   it('names the page and the list, and counts the spaces', () => {
-    render(<SpacesCollection
+    render(
+      <SpacesCollection
         spaces={FEW}
         userId="u1"
         setSpacePinned={mocks.setSpacePinned}
-      />);
+      />,
+    );
 
     expect(
       screen.getByRole('heading', { level: 1, name: 'Spaces' }),
@@ -127,11 +132,13 @@ describe('SpacesCollection', () => {
   });
 
   it('links each space to its page under the owner', () => {
-    render(<SpacesCollection
+    render(
+      <SpacesCollection
         spaces={[FEW[0]!]}
         userId="u1"
         setSpacePinned={mocks.setSpacePinned}
-      />);
+      />,
+    );
 
     expect(
       screen
@@ -144,11 +151,13 @@ describe('SpacesCollection', () => {
   });
 
   it('shows what each space holds', () => {
-    render(<SpacesCollection
+    render(
+      <SpacesCollection
         spaces={[FEW[0]!]}
         userId="u1"
         setSpacePinned={mocks.setSpacePinned}
-      />);
+      />,
+    );
 
     expect(
       screen.getAllByText('8 documents · 1 dashboard').length,
@@ -157,22 +166,26 @@ describe('SpacesCollection', () => {
 
   describe('with a few spaces', () => {
     it('shows just the list, with no carousel or pinned panel repeating it', () => {
-      render(<SpacesCollection
-        spaces={FEW}
-        userId="u1"
-        setSpacePinned={mocks.setSpacePinned}
-      />);
+      render(
+        <SpacesCollection
+          spaces={FEW}
+          userId="u1"
+          setSpacePinned={mocks.setSpacePinned}
+        />,
+      );
 
       expect(screen.queryByRole('list', { name: 'Recently used' })).toBeNull();
       expect(screen.queryByRole('region', { name: /Pinned/ })).toBeNull();
     });
 
     it('puts pinned spaces first, then the most recently used', () => {
-      render(<SpacesCollection
-        spaces={FEW}
-        userId="u1"
-        setSpacePinned={mocks.setSpacePinned}
-      />);
+      render(
+        <SpacesCollection
+          spaces={FEW}
+          userId="u1"
+          setSpacePinned={mocks.setSpacePinned}
+        />,
+      );
 
       const names = screen
         .getAllByRole('link')
@@ -183,11 +196,13 @@ describe('SpacesCollection', () => {
     });
 
     it('marks a pinned space in the list', () => {
-      render(<SpacesCollection
-        spaces={FEW}
-        userId="u1"
-        setSpacePinned={mocks.setSpacePinned}
-      />);
+      render(
+        <SpacesCollection
+          spaces={FEW}
+          userId="u1"
+          setSpacePinned={mocks.setSpacePinned}
+        />,
+      );
 
       expect(screen.getAllByRole('img', { name: 'Pinned' })).toHaveLength(1);
     });
@@ -195,11 +210,13 @@ describe('SpacesCollection', () => {
 
   describe('with many spaces', () => {
     it('puts the space used last first in the carousel', () => {
-      render(<SpacesCollection
-        spaces={MANY}
-        userId="u1"
-        setSpacePinned={mocks.setSpacePinned}
-      />);
+      render(
+        <SpacesCollection
+          spaces={MANY}
+          userId="u1"
+          setSpacePinned={mocks.setSpacePinned}
+        />,
+      );
 
       expect(carouselTitles().slice(0, 3)).toEqual([
         'Learning',
@@ -209,11 +226,13 @@ describe('SpacesCollection', () => {
     });
 
     it('lists the pinned space in the pinned panel', () => {
-      render(<SpacesCollection
-        spaces={MANY}
-        userId="u1"
-        setSpacePinned={mocks.setSpacePinned}
-      />);
+      render(
+        <SpacesCollection
+          spaces={MANY}
+          userId="u1"
+          setSpacePinned={mocks.setSpacePinned}
+        />,
+      );
       const panel = screen.getByRole('region', { name: /Pinned/ });
 
       expect(within(panel).getByRole('link', { name: 'Writing' })).toBeTruthy();
@@ -223,11 +242,13 @@ describe('SpacesCollection', () => {
     });
 
     it('hides the highlights while searching', () => {
-      render(<SpacesCollection
-        spaces={MANY}
-        userId="u1"
-        setSpacePinned={mocks.setSpacePinned}
-      />);
+      render(
+        <SpacesCollection
+          spaces={MANY}
+          userId="u1"
+          setSpacePinned={mocks.setSpacePinned}
+        />,
+      );
 
       fireEvent.change(
         screen.getByRole('searchbox', { name: 'Search spaces' }),
@@ -239,11 +260,13 @@ describe('SpacesCollection', () => {
     });
 
     it('hides the highlights while a tag filter is on', () => {
-      render(<SpacesCollection
-        spaces={MANY}
-        userId="u1"
-        setSpacePinned={mocks.setSpacePinned}
-      />);
+      render(
+        <SpacesCollection
+          spaces={MANY}
+          userId="u1"
+          setSpacePinned={mocks.setSpacePinned}
+        />,
+      );
 
       fireEvent.click(
         within(screen.getByRole('group', { name: 'Filter by tag' })).getByRole(
@@ -257,11 +280,13 @@ describe('SpacesCollection', () => {
     });
 
     it('pins at once and saves in the background', async () => {
-      render(<SpacesCollection
-        spaces={MANY}
-        userId="u1"
-        setSpacePinned={mocks.setSpacePinned}
-      />);
+      render(
+        <SpacesCollection
+          spaces={MANY}
+          userId="u1"
+          setSpacePinned={mocks.setSpacePinned}
+        />,
+      );
 
       fireEvent.click(
         screen.getAllByRole('button', { name: 'Actions for Learning' })[0]!,
@@ -282,11 +307,13 @@ describe('SpacesCollection', () => {
         ok: false,
         error: 'Could not save your changes. Try again.',
       });
-      render(<SpacesCollection
-        spaces={MANY}
-        userId="u1"
-        setSpacePinned={mocks.setSpacePinned}
-      />);
+      render(
+        <SpacesCollection
+          spaces={MANY}
+          userId="u1"
+          setSpacePinned={mocks.setSpacePinned}
+        />,
+      );
 
       fireEvent.click(
         screen.getAllByRole('button', { name: 'Actions for Learning' })[0]!,
@@ -304,11 +331,13 @@ describe('SpacesCollection', () => {
   });
 
   it('offers only open and pin in a space’s menu', async () => {
-    render(<SpacesCollection
+    render(
+      <SpacesCollection
         spaces={FEW}
         userId="u1"
         setSpacePinned={mocks.setSpacePinned}
-      />);
+      />,
+    );
 
     fireEvent.click(
       screen.getAllByRole('button', { name: 'Actions for Learning' })[0]!,
@@ -321,11 +350,13 @@ describe('SpacesCollection', () => {
   });
 
   it('opens a space from its menu', async () => {
-    render(<SpacesCollection
+    render(
+      <SpacesCollection
         spaces={FEW}
         userId="u1"
         setSpacePinned={mocks.setSpacePinned}
-      />);
+      />,
+    );
 
     fireEvent.click(
       screen.getAllByRole('button', { name: 'Actions for Learning' })[0]!,
@@ -336,11 +367,13 @@ describe('SpacesCollection', () => {
   });
 
   it('searches the list and says so when nothing matches', () => {
-    render(<SpacesCollection
+    render(
+      <SpacesCollection
         spaces={FEW}
         userId="u1"
         setSpacePinned={mocks.setSpacePinned}
-      />);
+      />,
+    );
     const search = screen.getByRole('searchbox', { name: 'Search spaces' });
 
     fireEvent.change(search, { target: { value: 'writ' } });
@@ -352,11 +385,13 @@ describe('SpacesCollection', () => {
   });
 
   it('sorts by last used by default', () => {
-    render(<SpacesCollection
+    render(
+      <SpacesCollection
         spaces={FEW}
         userId="u1"
         setSpacePinned={mocks.setSpacePinned}
-      />);
+      />,
+    );
 
     expect(
       screen.getByRole('button', { name: /Sort by/ }).textContent,
@@ -364,11 +399,13 @@ describe('SpacesCollection', () => {
   });
 
   it('starts as a list and switches to tiles and back', () => {
-    const { container } = render(<SpacesCollection
+    const { container } = render(
+      <SpacesCollection
         spaces={FEW}
         userId="u1"
         setSpacePinned={mocks.setSpacePinned}
-      />);
+      />,
+    );
     const grid = () => container.querySelector('ul.grid-cols-1');
     const listButton = screen.getByRole('button', { name: 'List view' });
     const gridButton = screen.getByRole('button', { name: 'Grid view' });
@@ -385,21 +422,25 @@ describe('SpacesCollection', () => {
   });
 
   it('offers no view-all link', () => {
-    render(<SpacesCollection
+    render(
+      <SpacesCollection
         spaces={FEW}
         userId="u1"
         setSpacePinned={mocks.setSpacePinned}
-      />);
+      />,
+    );
 
     expect(screen.queryByRole('link', { name: /View all/ })).toBeNull();
   });
 
   it('shows the empty state when there are no spaces', () => {
-    render(<SpacesCollection
+    render(
+      <SpacesCollection
         spaces={[]}
         userId="u1"
         setSpacePinned={mocks.setSpacePinned}
-      />);
+      />,
+    );
 
     expect(screen.getByText('No spaces yet')).toBeTruthy();
     // Creating a space does not exist yet, so nothing pretends to offer it.

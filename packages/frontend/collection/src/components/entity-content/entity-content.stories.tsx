@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { EntityContent } from './entity-content';
 import type { EntityItem } from '../../types';
 
-const createFixture = (): EntityItem => ({
+const entity: EntityItem = {
   id: 's1',
   name: 'Research',
   description: 'Everything for the research workstream.',
@@ -11,14 +11,13 @@ const createFixture = (): EntityItem => ({
   kind: 'space',
   createdAt: '2026-10-01T12:00:00.000Z',
   updatedAt: '2026-10-16T09:30:00.000Z',
-});
+};
 
 const meta: Meta<typeof EntityContent> = {
   title: 'Blocks/Entity/EntityContent',
   component: EntityContent,
   args: {
-    userId: 'u1',
-    createFixture,
+    entity,
     getRecentItems: () => [],
     children: <p className="text-muted-foreground">Page content</p>,
   },

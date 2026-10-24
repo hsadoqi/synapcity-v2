@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@synapcity/dev-eslint-config": "workspace:*",
+    "@synapcity/dev-fixtures": "workspace:*",
     "@synapcity/dev-typescript-config": "workspace:*",
     "@synapcity/dev-vitest-config": "workspace:*",
     "@synapcity/frontend-collection": "workspace:*",

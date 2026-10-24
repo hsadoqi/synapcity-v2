@@ -1,26 +1,31 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { EntityContent } from './entity-content';
 import type { EntityItem } from '../../types';
 
-const createFixture = (): EntityItem => ({
+const entity: EntityItem = {
   id: 's1',
   name: 'Research',
   icon: 'folder',
   kind: 'space',
   createdAt: '2026-10-01T12:00:00.000Z',
   updatedAt: '2026-10-16T09:30:00.000Z',
-});
+};
+
+const recent: EntityItem = {
+  id: 'd1',
+  name: 'Launch plan',
+  icon: 'file-text',
+  kind: 'document',
+  createdAt: '2026-10-02T12:00:00.000Z',
+  updatedAt: '2026-10-15T09:30:00.000Z',
+};
 
 describe('EntityContent', () => {
-  it('renders the fixture entity with the page content', () => {
+  it('renders the entity it is given with the page content', () => {
     render(
-      <EntityContent
-        userId="u1"
-        createFixture={createFixture}
-        getRecentItems={() => []}
-      >
+      <EntityContent entity={entity} getRecentItems={() => []}>
         <p>Page</p>
       </EntityContent>,
     );
@@ -29,29 +34,16 @@ describe('EntityContent', () => {
     expect(screen.getByText('Page')).toBeTruthy();
   });
 
-  it('passes the user id to the fixture as the owner', () => {
-    const owners: Array<string | undefined> = [];
+  it('chooses the recent items from the entity and lists them', () => {
+    const getRecentItems = vi.fn(() => [recent]);
     render(
       <EntityContent
-        userId="u9"
-        createFixture={(args) => {
-          owners.push(args.ownerId);
-          return createFixture();
-        }}
-        getRecentItems={() => []}
+        entity={entity}
+        getRecentItems={getRecentItems}
       />,
     );
 
-    expect(owners).toContain('u9');
-  });
-
-  it('renders no entity without a fixture', () => {
-    render(
-      <EntityContent userId="u1" getRecentItems={() => []}>
-        <p>Page</p>
-      </EntityContent>,
-    );
-
-    expect(screen.queryByText('Page')).toBeNull();
+    expect(getRecentItems).toHaveBeenCalledWith(entity);
+    expect(screen.getByRole('link', { name: /Launch plan/ })).toBeTruthy();
   });
 });

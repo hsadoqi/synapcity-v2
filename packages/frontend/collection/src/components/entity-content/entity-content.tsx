@@ -1,27 +1,24 @@
+import type { ReactNode } from 'react';
+
 import type { EntityItem } from '../../types';
 import { EntityShell } from '../entity-shell';
 
 export function EntityContent<T extends EntityItem>({
-  userId,
-  createFixture,
+  entity,
   getRecentItems,
   children,
 }: {
-  userId: string;
-  createFixture?: ({ ownerId }: { ownerId?: string }) => T;
+  entity: T;
   getRecentItems: (entity: T) => EntityItem[];
-  children?: React.ReactNode;
+  children?: ReactNode;
 }) {
-  const entityItem = createFixture?.({ ownerId: userId });
   // Chosen here, on the server, so only plain data reaches the client shell.
-  const recentItems = entityItem ? getRecentItems(entityItem) : [];
+  const recentItems = getRecentItems(entity);
   return (
     <div className="flex flex-col flex-1 gap-6">
-      {entityItem && (
-        <EntityShell entity={{ ...entityItem }} recentItems={recentItems}>
-          {children}
-        </EntityShell>
-      )}
+      <EntityShell entity={{ ...entity }} recentItems={recentItems}>
+        {children}
+      </EntityShell>
     </div>
   );
 }
