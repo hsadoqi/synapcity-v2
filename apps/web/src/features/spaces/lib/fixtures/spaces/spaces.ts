@@ -1,126 +1,21 @@
-import { spaceSchema } from '@synapcity/domain-records';
-import type { SpaceEntity } from '@synapcity/domain-records';
+import { DEMO_SPACES } from '@/lib/demo/space-source';
 
 import type {
-  EntityKind,
   Space,
   SpaceEntityItemKind,
-} from '../../../shared/types';
+} from '@synapcity/features-spaces/contracts';
 
-/** Sample data for tests and previews; these are not saved workspace records. */
-export const SPACE_FIXTURES: readonly SpaceEntity[] = [
-  {
-    id: 'fixture-space-writing',
-    ownerId: '11111111-1111-4111-8111-111111111111',
-    name: 'Writing',
-    icon: 'pen-line',
-    description: 'Ideas, drafts, and reference material for writing.',
-    tags: ['writing', 'ideas'],
-    createdAt: '2026-10-01T09:00:00Z',
-    updatedAt: '2026-10-03T14:30:00Z',
-    pinnedAt: '2026-10-04T09:00:00Z',
-    lastViewedAt: '2026-10-03T14:30:00Z',
-  },
-  {
-    id: 'fixture-space-learning',
-    ownerId: '11111111-1111-4111-8111-111111111111',
-    name: 'Learning',
-    icon: 'book-open',
-    description: 'Notes and resources for things I want to understand.',
-    tags: ['learning'],
-    createdAt: '2026-10-02T10:00:00Z',
-    updatedAt: '2026-10-04T11:00:00Z',
-    pinnedAt: null,
-    lastViewedAt: '2026-10-05T18:00:00Z',
-  },
-  {
-    id: 'fixture-space-personal',
-    ownerId: '11111111-1111-4111-8111-111111111111',
-    name: 'Personal',
-    icon: 'house',
-    tags: [],
-    createdAt: '2026-10-05T08:00:00Z',
-    updatedAt: '2026-10-05T08:00:00Z',
-    pinnedAt: null,
-    lastViewedAt: null,
-  },
-  {
-    id: 'fixture-space-client-work',
-    ownerId: '11111111-1111-4111-8111-111111111111',
-    name: 'Client work',
-    icon: 'briefcase',
-    description: 'Proposals, meeting notes, and status boards.',
-    tags: ['work'],
-    createdAt: '2026-09-20T09:00:00Z',
-    updatedAt: '2026-10-01T16:00:00Z',
-    pinnedAt: '2026-10-02T09:00:00Z',
-    lastViewedAt: '2026-10-04T10:00:00Z',
-  },
-  {
-    id: 'fixture-space-health',
-    ownerId: '11111111-1111-4111-8111-111111111111',
-    name: 'Health',
-    icon: 'heart',
-    description: 'Training log, appointments, and sleep notes.',
-    tags: ['personal', 'tracking'],
-    createdAt: '2026-09-15T07:00:00Z',
-    updatedAt: '2026-09-28T07:30:00Z',
-    pinnedAt: null,
-    lastViewedAt: '2026-10-02T07:00:00Z',
-  },
-  {
-    id: 'fixture-space-trips',
-    ownerId: '11111111-1111-4111-8111-111111111111',
-    name: 'Trips',
-    icon: 'plane',
-    tags: ['personal', 'planning'],
-    createdAt: '2026-09-05T12:00:00Z',
-    updatedAt: '2026-09-12T12:00:00Z',
-    pinnedAt: null,
-    lastViewedAt: null,
-  },
-  {
-    id: 'fixture-space-recipes',
-    ownerId: '11111111-1111-4111-8111-111111111111',
-    name: 'Recipes',
-    icon: 'coffee',
-    description: 'Things worth cooking again, and what went wrong last time.',
-    tags: ['personal'],
-    createdAt: '2026-08-30T18:00:00Z',
-    updatedAt: '2026-09-02T18:00:00Z',
-    pinnedAt: null,
-    lastViewedAt: null,
-  },
-];
-
-/** A fresh deterministic record on each call, validated like incoming data. */
-export function createSpaceEntityFixture(
-  overrides: Partial<SpaceEntity> = {},
-): SpaceEntity {
-  return spaceSchema.parse({
-    id: 'fixture-space-writing',
-    ownerId: '11111111-1111-4111-8111-111111111111',
-    name: 'Writing',
-    icon: 'pen-line',
-    description: 'Ideas, drafts, and reference material for writing.',
-    tags: ['writing', 'ideas'],
-    createdAt: '2026-10-01T09:00:00Z',
-    updatedAt: '2026-10-03T14:30:00Z',
-    ...overrides,
-  });
-}
-
-export const spaceItem = {
-  kind: 'space' as EntityKind,
-  createdAt: SPACE_FIXTURES[0]?.createdAt ?? new Date().toISOString(),
-  updatedAt: SPACE_FIXTURES[0]?.updatedAt ?? new Date().toISOString(),
-  id: SPACE_FIXTURES[0]?.id ?? 'fixture-space',
-  name: SPACE_FIXTURES[0]?.name ?? 'Untitled Space',
-  icon: SPACE_FIXTURES[0]?.icon ?? 'folder',
-  description: SPACE_FIXTURES[0]?.description ?? 'No description provided.',
-  tags: SPACE_FIXTURES[0]?.tags ?? [],
-  pinnedAt: SPACE_FIXTURES[0]?.pinnedAt ?? null,
-  lastViewedAt: SPACE_FIXTURES[0]?.lastViewedAt ?? null,
+const spaceItem = {
+  kind: 'space' as const,
+  createdAt: DEMO_SPACES[0]?.createdAt ?? new Date().toISOString(),
+  updatedAt: DEMO_SPACES[0]?.updatedAt ?? new Date().toISOString(),
+  id: DEMO_SPACES[0]?.id ?? 'fixture-space',
+  name: DEMO_SPACES[0]?.name ?? 'Untitled Space',
+  icon: DEMO_SPACES[0]?.icon ?? 'folder',
+  description: DEMO_SPACES[0]?.description ?? 'No description provided.',
+  tags: DEMO_SPACES[0]?.tags ?? [],
+  pinnedAt: DEMO_SPACES[0]?.pinnedAt ?? null,
+  lastViewedAt: DEMO_SPACES[0]?.lastViewedAt ?? null,
   documents: [
     {
       id: 'doc1',

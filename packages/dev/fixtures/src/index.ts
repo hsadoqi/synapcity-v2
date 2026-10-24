@@ -2,9 +2,9 @@ import { Faker, base, en } from '@faker-js/faker';
 import { LayoutDashboard, type LucideIcon } from 'lucide-react';
 /*
  * Seeded fake data for tests, stories and local development. Generic
- * primitives only: no Synapcity domain entity is modelled here, because the
- * data model is undecided (docs/architecture/decisions/README.md). Add a
- * named factory once an entity is accepted.
+ * primitives, plus a named factory for each accepted domain contract: Space
+ * (ADR-0012) has `createSpaceEntity`, built on `@synapcity/domain-records`.
+ * Add a factory when another entity's contract is accepted.
  *
  * Each call to `createFixtures` builds its own `Faker` instance, so one
  * consumer cannot change another's sequence through shared global state. The
@@ -121,3 +121,5 @@ export function createFixtures(seed: number = DEFAULT_SEED) {
 }
 
 export type Fixtures = ReturnType<typeof createFixtures>;
+
+export { createSpaceEntity } from './spaces';
