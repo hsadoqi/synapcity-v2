@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { mergeSettings, parseImport, parseImportPatch } from './settings';
-import { settingsDefaults, settingsSchema } from '../types/settings';
-import { PRIVACY_POLICY_VERSIONS } from '../types/data-privacy';
+import { mergeSettings, parseImport, parseImportPatch } from './merge-settings';
+import { settingsDefaults, settingsSchema } from '../../schemas';
+import { PRIVACY_POLICY_VERSIONS } from '../../schemas';
 
 describe('settings merge and import', () => {
   it('fills appearance fields missing from an older saved object', () => {

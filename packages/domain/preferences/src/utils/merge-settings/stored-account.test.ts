@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { withoutStoredAccount } from './settings';
+import { withoutStoredAccount } from './merge-settings';
 
 describe('withoutStoredAccount', () => {
   it('drops the account entry and keeps every preference as stored', () => {

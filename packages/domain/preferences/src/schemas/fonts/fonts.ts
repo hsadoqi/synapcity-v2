@@ -172,34 +172,15 @@ export const codeFonts = [
   'roboto-mono',
 ] as const satisfies readonly FontChoice[];
 
-/** What each role uses when no override is set. Keep in step with layout.tsx (ADR-0003). */
+/** What each role uses when no override is set. Keep in step with the fonts the web app loads in apps/web/src/app/layout.tsx (ADR-0003). */
 const defaultFontLabels: Record<FontRole, string> = {
   heading: 'Geist',
   body: 'Inter',
   code: 'Geist Mono',
 };
 
-export const fontPreferenceVariables: Record<FontRole, string> = {
-  heading: '--font-preference-heading',
-  body: '--font-preference-body',
-  code: '--font-preference-code',
-};
-
 export function fontLabel(role: FontRole, id: FontChoice): string {
   return id === 'default'
     ? `Default (${defaultFontLabels[role]})`
     : googleFonts[id].label;
-}
-
-/** The Google Fonts stylesheet that defines the family. */
-export function fontStylesheetUrl(id: GoogleFontId): string {
-  const { family, weights } = googleFonts[id];
-  const query = family.split(' ').join('+');
-  return `https://fonts.googleapis.com/css2?family=${query}:wght@${weights}&display=swap`;
-}
-
-/** The value written to `--font-preference-*`: the family, then a generic fallback. */
-export function fontStack(id: GoogleFontId): string {
-  const { family, generic } = googleFonts[id];
-  return `'${family}', ${generic}`;
 }

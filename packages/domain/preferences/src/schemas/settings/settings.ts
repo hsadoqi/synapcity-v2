@@ -1,10 +1,10 @@
 import z from 'zod';
 
-import { appearanceSchema, appearanceDefaults } from './appearance';
-import { notificationsSchema, notificationsDefaults } from './notifications';
-import { dataPrivacySchema, dataPrivacyDefaults } from './data-privacy';
-import { themeSchema, themeDefaults } from './theme';
-import { regionalDefaults, regionalSchema } from './regional';
+import { appearanceSchema, appearanceDefaults } from '../appearance';
+import { notificationsSchema, notificationsDefaults } from '../notifications';
+import { dataPrivacySchema, dataPrivacyDefaults } from '../data-privacy';
+import { themeSchema, themeDefaults } from '../theme';
+import { regionalDefaults, regionalSchema } from '../regional';
 
 export const settingsSchema = z.object({
   regional: regionalSchema.clone().optional().default(regionalDefaults),

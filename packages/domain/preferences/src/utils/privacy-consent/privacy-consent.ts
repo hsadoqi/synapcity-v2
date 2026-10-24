@@ -2,7 +2,7 @@ import {
   PRIVACY_POLICY_VERSIONS,
   type DataPrivacySettings,
   type PrivacyPurpose,
-} from '../../types/data-privacy';
+} from '../../schemas';
 
 /** What the browser asks for, read at runtime and never saved. */
 export type PrivacySignals = { globalPrivacyControl: boolean };

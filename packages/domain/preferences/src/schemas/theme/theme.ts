@@ -1,6 +1,6 @@
 import z from 'zod';
 
-import { bodyFonts, codeFonts, headingFonts } from './fonts';
+import { bodyFonts, codeFonts, headingFonts } from '../fonts';
 
 /**
  * The corner radius and density presets. Names only: the factor behind each lives in one place,

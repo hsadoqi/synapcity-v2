@@ -1,15 +1,12 @@
 import { z } from 'zod';
 
-import { mergeSettings, parseImportPatch } from './settings';
-import { appearanceSchema } from '../types/appearance';
-import { dataPrivacyDefaults, dataPrivacySchema } from '../types/data-privacy';
-import {
-  notificationsDefaults,
-  notificationsSchema,
-} from '../types/notifications';
-import { regionalDefaults, regionalSchema } from '../types/regional';
-import { settingsDefaults, type Settings } from '../types/settings';
-import { themeDefaults, themeSchema } from '../types/theme';
+import { mergeSettings, parseImportPatch } from '../merge-settings';
+import { appearanceSchema } from '../../schemas';
+import { dataPrivacyDefaults, dataPrivacySchema } from '../../schemas';
+import { notificationsDefaults, notificationsSchema } from '../../schemas';
+import { regionalDefaults, regionalSchema } from '../../schemas';
+import { settingsDefaults, type Settings } from '../../schemas';
+import { themeDefaults, themeSchema } from '../../schemas';
 
 /**
  * Where each preference lives (ADR-0010). `account` follows the person and is

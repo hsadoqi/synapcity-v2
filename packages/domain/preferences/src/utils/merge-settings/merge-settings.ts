@@ -4,13 +4,10 @@ import {
   settingsSchema,
   type Settings,
   type SettingsPatch,
-} from '../types/settings';
-import {
-  transferSchema,
-  type TransferSettingsPatch,
-} from '../types/import-export';
-import { withCurrentPolicy } from '../types/data-privacy';
-import { legacyFontSizes } from '../types/theme';
+} from '../../schemas';
+import { transferSchema, type TransferSettingsPatch } from '../../schemas';
+import { withCurrentPolicy } from '../../schemas';
+import { legacyFontSizes } from '../../schemas';
 
 export function mergeSettings(value: Settings, patch: SettingsPatch): Settings {
   const mode =

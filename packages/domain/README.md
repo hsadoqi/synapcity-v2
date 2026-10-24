@@ -74,7 +74,7 @@ The Space and base record contracts live in [`domain-records`](records/README.md
 ### Example Packages
 
 - `records` ----> Base record contract, with `spaces`, `documents` and `dashboards` modules extending it. Exists since M5.1 with the base and Space modules ([README](records/README.md))
-- `preferences` ----> Preference data, rules, scope and consent policy
+- `preferences` ----> Preference data, rules, scope and consent policy. Exists since M6.1 ([README](preferences/README.md))
 - `identity` ----> Credential, profile and verified-identity contracts. Exists since M4 with the verified-identity result ([README](identity/README.md))
 
 The full list is the [package inventory](../../docs/architecture/workspace-conventions.md#package-inventory).

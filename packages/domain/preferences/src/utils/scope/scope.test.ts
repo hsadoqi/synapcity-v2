@@ -10,7 +10,7 @@ import {
   touchesAccount,
   withAccount,
 } from './scope';
-import { settingsDefaults, settingsSchema } from '../types/settings';
+import { settingsDefaults, settingsSchema } from '../../schemas';
 
 function unwrapShape(section: keyof typeof settingsSchema.shape) {
   let schema: unknown = settingsSchema.shape[section];
@@ -265,5 +265,30 @@ describe('fromTransferFile', () => {
       theme: { bodyFont: 'lora', mode: 'dark', textSize: 110 },
       appearance: { contrastMode: 'high' },
     });
+  });
+});
+
+describe('export files from before the move', () => {
+  it('imports a version 2 file written before the move', () => {
+    expect(
+      fromTransferFile({
+        version: 2,
+        account: {
+          regional: { language: 'de' },
+          theme: { headingFont: 'lora' },
+        },
+        device: { theme: { mode: 'dark' }, appearance: { showBorders: true } },
+      }),
+    ).toEqual({
+      regional: { language: 'de' },
+      theme: { headingFont: 'lora', mode: 'dark' },
+      appearance: { showBorders: true },
+    });
+  });
+
+  it('passes a newer file through untouched, for the importer to refuse', () => {
+    const newer = { version: 3, account: {}, device: {} };
+
+    expect(fromTransferFile(newer)).toBe(newer);
   });
 });

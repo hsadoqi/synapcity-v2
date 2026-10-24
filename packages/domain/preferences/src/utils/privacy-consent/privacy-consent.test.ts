@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  PRIVACY_POLICY_VERSIONS,
-  dataPrivacySchema,
-} from '../../types/data-privacy';
+import { PRIVACY_POLICY_VERSIONS, dataPrivacySchema } from '../../schemas';
 import { canCollect, isBlockedBySignals } from './privacy-consent';
 
 const none = { globalPrivacyControl: false };
