@@ -38,9 +38,10 @@ export const lookCookieExpression = `(function(){try{var p=${JSON.stringify(
 
 /**
  * A script expression that evaluates to the saved preferences object the boot
- * scripts read: the fully valid shared look cookie, otherwise the document in
- * `localStorage`, otherwise `{}`. It never throws. One bad or missing cookie
- * field rejects the whole cookie and takes the fallback as a unit.
+ * scripts read: the server-resolved look, then a fully valid shared look
+ * cookie, then the document in `localStorage`, otherwise `{}`. It never throws.
+ * One bad or missing cookie field rejects the whole cookie and takes the
+ * fallback as a unit.
  */
 export function lookSourceExpression(storageKey: string): string {
   return `(function(){try{var s=document.documentElement.getAttribute('data-synapcity-look');if(s){var c=JSON.parse(s);if(c&&c.v===${LOOK_VERSION}&&c.theme&&c.appearance)return{theme:c.theme,appearance:c.appearance}}}catch(x){}var c=${lookCookieExpression};if(c)return{theme:c.theme,appearance:c.appearance};try{return JSON.parse(localStorage.getItem(${JSON.stringify(storageKey)})||'{}')}catch(x){return{}}})()`;
