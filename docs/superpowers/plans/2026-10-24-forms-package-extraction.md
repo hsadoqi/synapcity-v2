@@ -55,22 +55,31 @@
 
 ### Task B1: Verify before adding
 
-- [ ] Re-read the registry for `react-hook-form` and `@hookform/resolvers`; read each version's documentation for Zod 4 resolver usage, controlled versus uncontrolled inputs, and form-level errors.
-- [ ] Verify an approach for React 19 `useActionState` and Next.js 16 server actions with React Hook Form. Mark anything not verifiable as NOT VERIFIABLE.
-- [ ] Resolve the progressive-enhancement question from ADR-0015 against a concrete pilot.
-- [ ] Owner approves the exact versions and the dependency addition.
+- [x] Re-read the registry for `react-hook-form` and `@hookform/resolvers`; read each version's documentation for Zod 4 resolver usage, controlled versus uncontrolled inputs, and form-level errors. _(Done 2026-10-24. Registry: `react-hook-form` 7.91.0 and `@hookform/resolvers` 6.0.0 are the latest; peer ranges cover React 19.3.0, Zod 4.6.7 and each other. The documentation read is the libraries' current documentation as indexed by Context7, not a copy pinned to the installed versions; the installed `@hookform/resolvers` 6.0.0 was also run against Zod 4.6.7: messages come through, `.trim()` applies to the parsed values, and an absent key gives Zod's generic message.)_
+- [x] Verify an approach for React 19 `useActionState` and Next.js 16 server actions with React Hook Form. Mark anything not verifiable as NOT VERIFIABLE. _(The documented pattern calls the action dispatcher inside `handleSubmit`, on a `<form>` with no `action`, so it needs JavaScript. NOT VERIFIABLE from the documentation: keeping the `action` attribute and intercepting submit. That approach is verified by tests and end-to-end runs in this repository instead; see B2.)_
+- [x] Resolve the progressive-enhancement question from ADR-0015 against a concrete pilot. _(Resolved 2026-10-24: the form keeps its `action`, so it works before hydration, and the submit handler validates in the browser first once hydrated. An end-to-end test with JavaScript off shows the native path still posts to the server action and gets the same refusal, with the same `aria-invalid` and `aria-describedby`.)_
+- [x] Owner approves the exact versions and the dependency addition. _(The owner approved using the latest compatible versions on 2026-10-24. Resolved: `react-hook-form` 7.90.0 and `@hookform/resolvers` 6.0.0, pinned exactly. 7.91.0 was published under a day earlier and fails the repository's release-age policy; pnpm 12 would have written a `minimumReleaseAgeExclude` entry for it into `pnpm-workspace.yaml` by itself, which was reverted because a policy exemption is the owner's decision. Moving to 7.91.0 is a separate change once it is old enough.)_
 
 ### Task B2: Binding and pilot
 
-- [ ] Add the dependencies to the forms package only. Pin exact versions. Confirm no peer-dependency warning is silenced.
-- [ ] Add the binding (schema in, field and form state out, server result mapped to errors). Name it when this task is written.
-- [ ] Migrate one pilot form. Forgot-password is the smallest consumer; the owner may choose another. Keep user-visible behavior identical.
-- [ ] Tests: validation, server-error mapping, first-error focus, pending state. Story with axe checks. Manual keyboard and screen-reader check.
-- [ ] Add a boundary rule that only the forms package imports `react-hook-form`, or record why review is enough.
+- [x] Add the dependencies to the forms package only. Pin exact versions. Confirm no peer-dependency warning is silenced. _(Done: no warning appeared and none was silenced; the lockfile gains the two libraries and the resolver's own dependency `@standard-schema/utils@0.3.0`.)_
+- [x] Add the binding (schema in, field and form state out, server result mapped to errors). Name it when this task is written. _(`useActionForm`. The server's state is shown as it is, not copied into React Hook Form's errors, because the pilot must look identical; the browser's refusal is shaped like a server refusal so the form renders and focuses both the same way.)_
+- [x] Migrate one pilot form. Forgot-password is the smallest consumer; the owner may choose another. Keep user-visible behavior identical. _(Forgot-password migrated. Its card tests typed no email before submitting and expected the mocked server reply; with browser validation an empty email is refused first, so those tests now type an address. The refusal text, marking, focus and the existing end-to-end tests are unchanged.)_
+- [ ] Tests: validation, server-error mapping, first-error focus, pending state. Story with axe checks. Manual keyboard and screen-reader check. _(Done: validation, first-error focus and pending state, in unit and end-to-end tests. Not done: a story with axe checks, and the manual keyboard and screen-reader check, which needs a person.)_
+- [x] Add a boundary rule that only the forms package imports `react-hook-form`, or record why review is enough. _(No rule added. Only `packages/frontend/forms` can resolve `react-hook-form`: nothing is hoisted, so an import in any other workspace fails to type-check or build. Review covers a future package adding the dependency to its own manifest.)_
 
 ### Task B3: Hand off
 
-- [ ] Record which features migrate in their own milestones (Settings M6, Auth and Account M7) and what they must not redo.
+- [x] Record which features migrate in their own milestones (Settings M6, Auth and Account M7) and what they must not redo. _(Below.)_
+
+What the migrating features must not redo:
+
+- Use `useActionForm` for a form that still submits to a server action, with the same schema the action validates with. Do not write a second schema or a second set of messages.
+- Keep the form's `action` and `noValidate`. Do not replace them with an `onSubmit`-only form, which stops working before hydration.
+- Do not call React Hook Form's `reset()` on such a form: it also resets the DOM form and would wipe what was typed. The binding syncs values from the form's own data before validating, because React 19 resets a form after its action finishes and React Hook Form does not see that.
+- Do not copy the server's state into React Hook Form's errors; show `state` from the binding.
+- Test a migrated form with an empty submit with JavaScript off and with it on, as the pilot's end-to-end tests do.
+- Auth forms that other forms compose (login, register, update password) have more than one field and non-text inputs; the pilot covers one text field. Check password reveal and focus order on the first multi-field form.
 
 ## Risks
 
