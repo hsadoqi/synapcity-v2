@@ -1,3 +1,13 @@
+## Active task: Milestone 7 Auth and Account design (2026-10-24)
+
+- Goal and mode: documentation only. Write one Proposed design for moving `apps/web/src/features/auth` and `features/account` into packages, with owner questions, so a plan can follow after approval.
+- Branch: `docs/m7-auth-account-design` from `main` at `ba00942c`.
+- Exact create (1): `docs/superpowers/specs/2026-10-24-m7-auth-account-design.md`. Exact update (1): this ledger.
+- Not changed: source, packages, manifests, dependencies, lockfile, config, ADRs, the inventory and the ownership map (they are updated by the approved plans, not by this design).
+- Evidence: files and import counts read from the repository at `ba00942c` and the open pull request for React Hook Form (#67, file list only). Not verified: what the recent-sign-in check should become, the inputs each moved unit needs from `lib/`, and any live provider behavior.
+- Open for the owner: Q1 to Q5 in the design, in particular holding M7.4 and M7.5 until #67 merges.
+- Commits and pushes: not authorized beyond a local commit. Merging is not authorized.
+
 ## Active task: forms engine Tasks 5 onward (2026-10-24)
 
 - Goal and mode: implementation of the remaining tasks of `docs/superpowers/plans/2026-10-24-forms-schema-driven-engine.md`, starting with Task 5 (built-in renderers and the default registry). The owner asked for the remaining tasks to be implemented after the extraction Part B pull request was opened (2026-10-24). Branch `feat/frontend-forms-renderers`, created from `feat/frontend-forms-react-hook-form` (pull request #67; retarget to `main` once it merges).
