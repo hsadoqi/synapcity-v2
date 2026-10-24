@@ -50,11 +50,20 @@ Governs the placement of form interaction foundations, the form-state library, a
 
 ## Unresolved
 
-- **Progressive enhancement.** Today's forms submit as native forms and work before hydration. A React Hook Form `handleSubmit` flow runs in JavaScript. Whether the binding keeps a native `action` path, validates on the client only as an addition, or accepts client-only submit for some forms is open. Decide against the first pilot form.
-- **Server errors into form state.** Mapping an action's `fields` and `error` onto React Hook Form errors, and keeping first-error focus correct, needs a verified approach for React 19 `useActionState` and Next.js 16 server actions.
-- **`@hookform/resolvers` 6.0.0** is a new major. Its Zod 4 support and API must be read from the version's own documentation at implementation time. This ADR makes no claim about its API.
-- **Exact versions** of `react-hook-form` and `@hookform/resolvers` are pinned when the dependency is added, after re-reading the registry. Both are architecturally relevant dependencies and are introduced by a task the owner approves.
-- **Storybook discovery of stories in new packages** is open per the decisions index and is expected to be settled by M5. The forms package depends on that answer for its stories.
+- **Server errors into form state.** The pilot shows the server action's `{ error, fields }` state as it is and does not copy it into React Hook Form's errors, so the form looks and focuses identically. Mapping a server result onto React Hook Form errors is still open for a form that needs React Hook Form to own server errors (for example nested or array fields). Decide against the first such form.
+- **A multi-field pilot.** The pilot covers one text field. Password reveal, focus order across several fields, and non-text inputs are checked on the first multi-field form (Auth login or register, M7).
+- **A newer `react-hook-form`.** 7.91.0 is the registry's latest but fails the repository's release-age policy until it is old enough; moving off the pinned 7.90.0 is a separate change.
+
+## Implementation notes
+
+Added 2026-10-24 after extraction Parts A and B. They record what was found; they do not change the decision above.
+
+- **Progressive enhancement: resolved.** `useActionForm` keeps the form's `action` and `noValidate`, so the form works before hydration. Once hydrated, the submit handler validates the form's own `FormData` against the same schema the server action uses, shows a refusal at once in the server's shape, and otherwise calls the action unchanged. An end-to-end test with JavaScript off shows the native path still reaches the server action and gets the same refusal. React Hook Form's documented pattern (calling the action dispatcher inside `handleSubmit` on a form with no `action`) needs JavaScript and was not used.
+- **React 19 resets a form after its action finishes and React Hook Form does not see that reset,** so values are synced from the form's data just before validating. React Hook Form's `reset()` also resets the DOM form and must not be used on such a form.
+- **Versions.** `react-hook-form` 7.90.0 and `@hookform/resolvers` 6.0.0, pinned exactly in the forms package only. Their peer ranges cover React 19.3.0, Zod 4.6.7 and each other. `@hookform/resolvers` 6.0.0 was run against Zod 4.6.7: messages come through and `.trim()` applies to the parsed values.
+- **Boundary.** Only `packages/frontend/forms` can resolve `react-hook-form`, because nothing is hoisted; no boundary rule was added.
+- **Storybook discovery** of stories in new packages was settled in M5.3; the forms package lists its stories there.
+- **Verification.** Unit and DOM tests, end-to-end tests with JavaScript on and off, and Storybook stories with the a11y addon's axe checks pass. The manual keyboard and screen-reader check of the pilot has not been done.
 
 ## Governance boundary
 
