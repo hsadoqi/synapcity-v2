@@ -44,6 +44,7 @@ export function removeWidget(
   c: DashboardComposition,
   widgetId: string,
 ): DashboardComposition {
+  if (!c.widgets.some((w) => w.id === widgetId)) return c;
   return {
     ...c,
     widgets: c.widgets.filter((w) => w.id !== widgetId),

@@ -80,6 +80,11 @@ describe('widget operations', () => {
     expect(Object.keys(records.goal)).toHaveLength(1);
   });
 
+  it('returns the same composition when removing a widget that is not there', () => {
+    const { c } = compositionWith('stat');
+    expect(removeWidget(c, 'missing')).toBe(c);
+  });
+
   it('only patches presentation fields', () => {
     const { c } = compositionWith('stat');
     const id = c.widgets[0]!.id;
