@@ -177,4 +177,60 @@ describe('useActionForm', () => {
     expect(errors).not.toHaveBeenCalled();
     errors.mockRestore();
   });
+
+  it('refuses an empty file input against a file schema', async () => {
+    const fileSchema = z.object({
+      avatar: z
+        .instanceof(File)
+        .refine((file) => file.size > 0, 'Choose an image.'),
+    });
+    const action = vi.fn();
+    function FileForm() {
+      const { formProps, state } = useActionForm({
+        schema: fileSchema,
+        action,
+        state: {},
+      });
+      return (
+        <form {...formProps} aria-label="test form">
+          <input aria-label="avatar" type="file" name="avatar" />
+          <p data-testid="error">{state.error ?? ''}</p>
+        </form>
+      );
+    }
+    render(<FileForm />);
+    await submit();
+    expect(action).not.toHaveBeenCalled();
+    expect(screen.getByTestId('error').textContent).toBe('Choose an image.');
+
+    // A chosen file is checked in the Storybook story: jsdom's FormData reads
+    // the input's internal file list, which a test cannot set.
+  });
+
+  it('keeps every value of a name that appears more than once', async () => {
+    const listSchema = z.object({
+      tag: z.array(z.string()).min(2, 'Pick two tags.'),
+    });
+    const action = vi.fn();
+    function ListForm() {
+      const { formProps, state } = useActionForm({
+        schema: listSchema,
+        action,
+        state: {},
+      });
+      return (
+        <form {...formProps} aria-label="test form">
+          <input aria-label="a" type="checkbox" name="tag" value="a" />
+          <input aria-label="b" type="checkbox" name="tag" value="b" />
+          <p data-testid="error">{state.error ?? ''}</p>
+        </form>
+      );
+    }
+    render(<ListForm />);
+    fireEvent.click(screen.getByLabelText('a'));
+    fireEvent.click(screen.getByLabelText('b'));
+    await submit();
+    expect(screen.getByTestId('error').textContent).toBe('');
+    expect(action).toHaveBeenCalledTimes(1);
+  });
 });

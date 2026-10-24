@@ -54,14 +54,22 @@ export interface UseActionFormResult<
   };
   readonly register: (name: FieldName<TSchema>) => UseFormRegisterReturn;
   /** The browser's refusal while there is one, otherwise the server's state. */
-  readonly state: TState | ActionFormRefusal<FieldName<TSchema>>;
+  readonly state: (TState | ActionFormRefusal<FieldName<TSchema>>) &
+    FormFeedback;
 }
 
-/** The text values a form holds. Files are the server's business. */
-function valuesOf(formData: FormData): Record<string, string> {
-  const values: Record<string, string> = {};
-  for (const [name, value] of formData.entries()) {
-    if (typeof value === 'string') values[name] = value;
+type FormValue = FormDataEntryValue | FormDataEntryValue[];
+
+/**
+ * What a form holds, the way the schema sees it: a name that appears once is
+ * its value (a string, or a `File` from a file input), and a name that appears
+ * more than once, such as a group of checkboxes, is the list of its values.
+ */
+function valuesOf(formData: FormData): Record<string, FormValue> {
+  const values: Record<string, FormValue> = {};
+  for (const name of new Set(formData.keys())) {
+    const all = formData.getAll(name);
+    values[name] = all.length === 1 ? (all[0] as FormDataEntryValue) : all;
   }
   return values;
 }
