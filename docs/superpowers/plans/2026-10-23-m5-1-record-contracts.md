@@ -55,7 +55,7 @@
   - `type SpaceEntity`, `CreateSpaceInput`, `UpdateSpaceInput` (inferred, as in `frontend-ui/src/types/entity.ts` today)
   - `type SpaceSummary = SpaceEntity & { documentsTotal: number; dashboardsTotal: number }` (doc comment copied from `features/spaces/shared/types/index.ts`)
 
-- [ ] **Step 1: Move the Space schema test.** `git mv apps/web/src/features/spaces/shared/schema/schema.test.ts packages/domain/records/src/spaces/schemas/space.test.ts`. Change only its imports: types from `'../types'`, schemas from `'./index'` (already). Add:
+- [x] **Step 1: Move the Space schema test.** `git mv apps/web/src/features/spaces/shared/schema/schema.test.ts packages/domain/records/src/spaces/schemas/space.test.ts`. Change only its imports: types from `'../types'`, schemas from `'./index'` (already). Add:
 
   ```ts
   it('keeps the saved field order of today’s Space schema', () => {
@@ -91,13 +91,13 @@
   });
   ```
 
-- [ ] **Step 2: Write `base-record.test.ts`.** Cases: parses a full record and keeps `pinnedAt`/`lastViewedAt`; defaults both to `null` when absent; rejects `name: '  '`, `icon: 'Pen'`, `ownerId: 'x'`, `createdAt: '2026-10-01'` (no offset); trims `name`; issue messages for a blank name are not `'Enter a space name.'` (base has no Space copy).
-- [ ] **Step 3: Write the manifest and configs.** `package.json` as `domain-identity`'s but `name` `@synapcity/domain-records`, `exports` root only, `dependencies: { "zod": "^4.6.7" }`, and the same scripts and devDependencies minus `zod`. `tsconfig.json`, `eslint.config.mjs`, `vitest.config.ts` copied unchanged. Add the root Vitest project. Run `pnpm install` (if the sandbox empties `node_modules/.pnpm`, run `pnpm install --force`, as recorded in the M4 ledger).
-- [ ] **Step 4: Run the tests to see them fail.** `pnpm --filter @synapcity/domain-records test`. Expected: FAIL, modules `../types` / `./index` / `./base-record` not found.
-- [ ] **Step 5: Implement the schemas and types** in the files listed, with the Interfaces above and the Global Constraints' exact values. Doc comments: carry over the ADR-0012 comment from `entity-schema.ts` to `spaceSchema` (including "Space remains a provisional label; content relationships and lifecycle stay undecided") and the "Store the Lucide identifier, never a React component or SVG markup" comment to the icon rule. `src/index.ts` re-exports `./base` and `./spaces`.
-- [ ] **Step 6: Run the tests to see them pass.** `pnpm --filter @synapcity/domain-records test lint check-types`. Expected: all pass.
-- [ ] **Step 7: README.** Sections like `domain-identity`'s: `Owns:` (the base record contract and the Space contract; Document and Dashboard modules arrive in M8, their schema already uses the base), runtime (`zod` only), public-interface table (each export above, one line), rules (base fields change only with a matching ADR-0012/0013 schema change; screen-only shapes never live here; Space is a provisional label per the glossary).
-- [ ] **Step 8: Checkpoint commit** (if authorized): `feat(domain-records): add the base record and Space contracts`.
+- [x] **Step 2: Write `base-record.test.ts`.** Cases: parses a full record and keeps `pinnedAt`/`lastViewedAt`; defaults both to `null` when absent; rejects `name: '  '`, `icon: 'Pen'`, `ownerId: 'x'`, `createdAt: '2026-10-01'` (no offset); trims `name`; issue messages for a blank name are not `'Enter a space name.'` (base has no Space copy).
+- [x] **Step 3: Write the manifest and configs.** `package.json` as `domain-identity`'s but `name` `@synapcity/domain-records`, `exports` root only, `dependencies: { "zod": "^4.6.7" }`, and the same scripts and devDependencies minus `zod`. `tsconfig.json`, `eslint.config.mjs`, `vitest.config.ts` copied unchanged. Add the root Vitest project. Run `pnpm install` (if the sandbox empties `node_modules/.pnpm`, run `pnpm install --force`, as recorded in the M4 ledger).
+- [x] **Step 4: Run the tests to see them fail.** `pnpm --filter @synapcity/domain-records test`. Expected: FAIL, modules `../types` / `./index` / `./base-record` not found.
+- [x] **Step 5: Implement the schemas and types** in the files listed, with the Interfaces above and the Global Constraints' exact values. Doc comments: carry over the ADR-0012 comment from `entity-schema.ts` to `spaceSchema` (including "Space remains a provisional label; content relationships and lifecycle stay undecided") and the "Store the Lucide identifier, never a React component or SVG markup" comment to the icon rule. `src/index.ts` re-exports `./base` and `./spaces`.
+- [x] **Step 6: Run the tests to see them pass.** `pnpm --filter @synapcity/domain-records test lint check-types`. Expected: all pass.
+- [x] **Step 7: README.** Sections like `domain-identity`'s: `Owns:` (the base record contract and the Space contract; Document and Dashboard modules arrive in M8, their schema already uses the base), runtime (`zod` only), public-interface table (each export above, one line), rules (base fields change only with a matching ADR-0012/0013 schema change; screen-only shapes never live here; Space is a provisional label per the glossary).
+- [x] **Step 8: Checkpoint commit** (if authorized): `feat(domain-records): add the base record and Space contracts`.
 
 ### Task 2: Space consumers use `domain-records`; old copies removed
 
@@ -113,12 +113,12 @@
 - Consumes: Task 1's root exports.
 - Produces: no new names. After this task every use of `spaceSchema`, `createSpaceSchema`, `updateSpaceSchema`, `SpaceEntity`, `CreateSpaceInput`, `UpdateSpaceInput`, `SpaceSummary` imports `@synapcity/domain-records`; screen-only shapes and `SetSpacePinnedResult` keep their current import paths.
 
-- [ ] **Step 1: Repoint the imports** in the files listed. Split mixed imports: domain names from `@synapcity/domain-records`, the rest unchanged.
-- [ ] **Step 2: Delete the old copies** listed above.
-- [ ] **Step 3: Check nothing points at them.** `rg -n "types/entity-schema|spaces/shared/schema|SpaceEntity|CreateSpaceInput|UpdateSpaceInput|SpaceSummary" apps packages -g '!**/node_modules/**' -g '!**/dist/**'`. Expected: only `@synapcity/domain-records` imports, `packages/domain/records/**`, and `frontend-ui/src/types/entity.ts`'s type import.
-- [ ] **Step 4: Run the affected checks.** `pnpm install`, then `pnpm --filter web check-types lint test` and `pnpm --filter @synapcity/frontend-ui check-types lint test`. Expected: pass with the same test counts as before, minus the 1 moved file in `web`.
-- [ ] **Step 5: Boundaries.** `pnpm boundaries`. Expected: pass, no new exception; `frontend-ui` → `domain-records` resolves through the root (R2, R5).
-- [ ] **Step 6: Checkpoint commit** (if authorized): `refactor(spaces): use the Space contract from domain-records`.
+- [x] **Step 1: Repoint the imports** in the files listed. Split mixed imports: domain names from `@synapcity/domain-records`, the rest unchanged.
+- [x] **Step 2: Delete the old copies** listed above.
+- [x] **Step 3: Check nothing points at them.** `rg -n "types/entity-schema|spaces/shared/schema|SpaceEntity|CreateSpaceInput|UpdateSpaceInput|SpaceSummary" apps packages -g '!**/node_modules/**' -g '!**/dist/**'`. Expected: only `@synapcity/domain-records` imports, `packages/domain/records/**`, and `frontend-ui/src/types/entity.ts`'s type import.
+- [x] **Step 4: Run the affected checks.** `pnpm install`, then `pnpm --filter web check-types lint test` and `pnpm --filter @synapcity/frontend-ui check-types lint test`. Expected: pass with the same test counts as before, minus the 1 moved file in `web`.
+- [x] **Step 5: Boundaries.** `pnpm boundaries`. Expected: pass, no new exception; `frontend-ui` → `domain-records` resolves through the root (R2, R5).
+- [x] **Step 6: Checkpoint commit** (if authorized): `refactor(spaces): use the Space contract from domain-records`.
 
 ### Task 3: Documents and Dashboards re-based on the base contract (Q3)
 
@@ -132,11 +132,11 @@
 - Consumes: `baseRecordSchema` from Task 1.
 - Produces: unchanged `ownedRecordSchema`, `OwnedRecord`, `OwnedRecordSummary`, `listOwnedRecordSummaries`, `setOwnedRecordPinned`, `OwnedRecordTable`, `SetRecordPinnedResult`.
 
-- [ ] **Step 1: Add the guard test** to `describe('ownedRecordSchema')`: `it('is the shared base record contract', () => expect(ownedRecordSchema).toBe(baseRecordSchema))`, and a case rejecting `name: '  '` and `icon: 'Bad Icon'` (Review Focus 3).
-- [ ] **Step 2: Run it to see it fail.** `pnpm --filter web exec vitest run src/lib/owned-records`. Expected: FAIL on the identity assertion.
-- [ ] **Step 3: Re-base the schema** as listed under Files.
-- [ ] **Step 4: Run the documents, dashboards and owned-records tests.** `pnpm --filter web exec vitest run src/lib/owned-records src/features/documents src/features/dashboards`. Expected: PASS, unchanged counts plus the new cases.
-- [ ] **Step 5: Checkpoint commit** (if authorized): `refactor(owned-records): use the base record contract from domain-records`.
+- [x] **Step 1: Add the guard test** to `describe('ownedRecordSchema')`: `it('is the shared base record contract', () => expect(ownedRecordSchema).toBe(baseRecordSchema))`, and a case rejecting `name: '  '` and `icon: 'Bad Icon'` (Review Focus 3).
+- [x] **Step 2: Run it to see it fail.** `pnpm --filter web exec vitest run src/lib/owned-records`. Expected: FAIL on the identity assertion.
+- [x] **Step 3: Re-base the schema** as listed under Files.
+- [x] **Step 4: Run the documents, dashboards and owned-records tests.** `pnpm --filter web exec vitest run src/lib/owned-records src/features/documents src/features/dashboards`. Expected: PASS, unchanged counts plus the new cases.
+- [x] **Step 5: Checkpoint commit** (if authorized): `refactor(owned-records): use the base record contract from domain-records`.
 
 ### Task 4: Records, then the repository gate
 
@@ -144,10 +144,10 @@
 
 - Modify: `docs/architecture/reorganization-ownership-map.md` (rows `lib/owned-records`, `UI types`, `spaces`: M5.1 note naming what moved and what stays); `docs/architecture/workspace-conventions.md` (inventory: `domain-records` First code `M5 (exists)`; the sentence after the table names it); `docs/architecture/decisions/0014-multi-app-package-boundaries.md` (section 7 current-implementation sentence: `domain-records` created in M5.1; the base record's fields are the ten listed in its README); `packages/domain/README.md` (status sentence if it still says no domain package exists beyond identity); `.agents/task-scope.md` (M5 entry: execution, exact creates/updates/deletes, verification); the design's status line (M5.1 implemented)
 
-- [ ] **Step 1: Update the records** listed. No owner quotes; decisions as "owner decision, 2026-10-23".
-- [ ] **Step 2: Repository gate.** `pnpm verify`. Expected: every stage passes. If Playwright browsers are missing, `pnpm exec playwright install chromium` once. If the sandbox blocks the e2e server, rerun that stage outside the sandbox and report which run passed.
-- [ ] **Step 3: Report** per AGENTS.md section 9: what moved, what was preserved (field order, messages, RLS), checks run and not run (live Supabase not exercised; no manual UI check is needed because no component changed, and the report says so), remaining M5 work (5.2–5.4, Q4, Q5, Q7).
-- [ ] **Step 4: Checkpoint commit** (if authorized): `docs: record milestone 5.1 record contracts`.
+- [x] **Step 1: Update the records** listed. No owner quotes; decisions as "owner decision, 2026-10-23".
+- [x] **Step 2: Repository gate.** `pnpm verify`. Expected: every stage passes. If Playwright browsers are missing, `pnpm exec playwright install chromium` once. If the sandbox blocks the e2e server, rerun that stage outside the sandbox and report which run passed.
+- [x] **Step 3: Report** per AGENTS.md section 9: what moved, what was preserved (field order, messages, RLS), checks run and not run (live Supabase not exercised; no manual UI check is needed because no component changed, and the report says so), remaining M5 work (5.2–5.4, Q4, Q5, Q7).
+- [x] **Step 4: Checkpoint commit** (if authorized): `docs: record milestone 5.1 record contracts`.
 
 ## Left open on purpose
 
