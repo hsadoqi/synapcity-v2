@@ -339,3 +339,110 @@ test.describe('focus after a failed submit', () => {
     await expect(page.getByLabel('Email')).toBeFocused();
   });
 });
+
+test.describe('forgot password validates in the browser and still works without it', () => {
+  test('with JavaScript on, an empty email is refused without a request to the server', async ({
+    page,
+  }) => {
+    const posts: string[] = [];
+    page.on('request', (request) => {
+      if (request.method() === 'POST') posts.push(request.url());
+    });
+    await page.goto('/auth/forgot-password');
+    await submitWithoutNativeValidation(page, 'Send reset link');
+
+    const alert = page.locator('form').getByRole('alert');
+    await expect(alert).toHaveText('Enter your email.');
+    await expect(page.getByLabel('Email')).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    );
+    await expect(page.getByLabel('Email')).toBeFocused();
+    expect(posts).toEqual([]);
+  });
+
+  test.describe('with JavaScript off', () => {
+    test.use({ javaScriptEnabled: false });
+
+    test('the form still posts to the server action, which refuses an empty email the same way', async ({
+      page,
+    }) => {
+      await page.goto('/auth/forgot-password');
+      await page.getByRole('button', { name: 'Send reset link' }).click();
+
+      const alert = page.locator('form').getByRole('alert');
+      await expect(alert).toHaveText('Enter your email.');
+      const messageId = await alert.getAttribute('id');
+      expect(messageId).toBeTruthy();
+      await expect(page.getByLabel('Email')).toHaveAttribute(
+        'aria-invalid',
+        'true',
+      );
+      await expect(page.getByLabel('Email')).toHaveAttribute(
+        'aria-describedby',
+        messageId!,
+      );
+    });
+  });
+});
+
+test.describe('register validates in the browser and still works without it', () => {
+  test('with JavaScript on, a short password is refused without a request, and the reveal still works', async ({
+    page,
+  }) => {
+    const posts: string[] = [];
+    page.on('request', (request) => {
+      if (request.method() === 'POST') posts.push(request.url());
+    });
+    await page.goto('/auth/register');
+    await page.waitForLoadState('networkidle');
+    await page.getByLabel('Name').fill('Ada Lovelace');
+    await page.getByLabel('Email').fill('ada@example.com');
+    const password = page.getByLabel('Password', { exact: true });
+    await password.fill('short');
+    await page
+      .getByRole('button', { name: 'Create account', exact: true })
+      .click();
+
+    await expect(page.locator('form').getByRole('alert')).toHaveText(
+      'Use a password of at least 8 characters.',
+    );
+    await expect(password).toHaveAttribute('aria-invalid', 'true');
+    await expect(password).toBeFocused();
+    await expect(page.getByLabel('Email')).not.toHaveAttribute(
+      'aria-invalid',
+      /.*/,
+    );
+    expect(posts).toEqual([]);
+
+    const toggle = page.getByRole('button', { name: 'Show password' });
+    await toggle.click();
+    await expect(password).toHaveAttribute('type', 'text');
+    await expect(password).toHaveValue('short');
+  });
+
+  test.describe('with JavaScript off', () => {
+    test.use({ javaScriptEnabled: false });
+
+    test('the form still posts to the server action, which refuses the same way', async ({
+      page,
+    }) => {
+      await page.goto('/auth/register');
+      await page.getByLabel('Name').fill('Ada Lovelace');
+      await page.getByLabel('Email').fill('ada@example.com');
+      await page.getByLabel('Password', { exact: true }).fill('short');
+      await page
+        .getByRole('button', { name: 'Create account', exact: true })
+        .click();
+
+      const alert = page.locator('form').getByRole('alert');
+      await expect(alert).toHaveText(
+        'Use a password of at least 8 characters.',
+      );
+      await expect(
+        page.getByLabel('Password', { exact: true }),
+      ).toHaveAttribute('aria-invalid', 'true');
+      await expect(page.getByLabel('Email')).toHaveValue('ada@example.com');
+    });
+  });
+});

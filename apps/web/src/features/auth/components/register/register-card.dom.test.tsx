@@ -13,10 +13,31 @@ vi.mock('@/features/auth/server/actions/actions', () => ({
   signInWithOAuth: mocks.signInWithOAuth,
 }));
 
+import { firstRefusal, signUpSchema } from '@/features/auth/types';
 import { RegisterCard } from './register-card';
 
-const submit = () =>
+type Typed = { name: string; email: string; password: string };
+const VALID: Typed = {
+  name: 'Ada Lovelace',
+  email: 'ada@example.com',
+  password: 'Analytical1!',
+};
+
+/**
+ * Types into each field, then submits. The form validates in the browser
+ * first, so a test that wants the server's reply sends what the schema accepts.
+ */
+const submit = (typed: Typed = VALID) =>
   act(async () => {
+    for (const [label, value] of [
+      ['Name', typed.name],
+      ['Email', typed.email],
+      ['Password', typed.password],
+    ] as const) {
+      fireEvent.change(screen.getByLabelText(label, { exact: true }), {
+        target: { value },
+      });
+    }
     fireEvent.submit(
       screen.getByRole('button', { name: 'Create account' }).closest('form')!,
     );
@@ -114,5 +135,80 @@ describe('RegisterCard', () => {
       'Check your email',
     );
     expect(screen.queryByText(/Requested for/)).toBeNull();
+  });
+
+  it.each<[string, Typed]>([
+    ['nothing typed', { name: '', email: '', password: '' }],
+    ['only a name', { name: 'Ada', email: '', password: '' }],
+    [
+      'no name',
+      { name: '   ', email: 'ada@example.com', password: 'Analytical1!' },
+    ],
+    [
+      'a short password',
+      { name: 'Ada', email: 'ada@example.com', password: 'short' },
+    ],
+    [
+      'a password missing a symbol',
+      { name: 'Ada', email: 'ada@example.com', password: 'Analytical1' },
+    ],
+  ])(
+    'refuses %s in the browser with the message and field the server would give',
+    async (_label, typed) => {
+      render(<RegisterCard next="/after" />);
+
+      await submit(typed);
+
+      const parsed = signUpSchema.safeParse(typed);
+      expect(parsed.success).toBe(false);
+      const expected = firstRefusal(parsed.error!);
+      expect(mocks.signUp).not.toHaveBeenCalled();
+      const alert = screen.getByRole('alert');
+      expect(alert.textContent).toBe(expected.message);
+      for (const label of ['Name', 'Email', 'Password']) {
+        const field = screen.getByLabelText(label, { exact: true });
+        const marked = expected.fields.includes(
+          label.toLowerCase() as (typeof expected.fields)[number],
+        );
+        expect(field.getAttribute('aria-invalid')).toBe(marked ? 'true' : null);
+      }
+      const first = screen.getByLabelText(
+        expected.fields[0] === 'name'
+          ? 'Name'
+          : expected.fields[0] === 'email'
+            ? 'Email'
+            : 'Password',
+        { exact: true },
+      );
+      expect(document.activeElement).toBe(first);
+    },
+  );
+
+  it('keeps what was typed in every field when the browser refuses', async () => {
+    render(<RegisterCard next="/after" />);
+
+    await submit({ name: 'Ada', email: 'ada@example.com', password: 'short' });
+
+    expect((screen.getByLabelText('Name') as HTMLInputElement).value).toBe(
+      'Ada',
+    );
+    expect((screen.getByLabelText('Email') as HTMLInputElement).value).toBe(
+      'ada@example.com',
+    );
+    expect(
+      (screen.getByLabelText('Password', { exact: true }) as HTMLInputElement)
+        .value,
+    ).toBe('short');
+  });
+
+  it('sends the destination with a valid sign-up', async () => {
+    render(<RegisterCard next="/after" />);
+
+    await submit();
+
+    expect(mocks.signUp).toHaveBeenCalledTimes(1);
+    const formData = mocks.signUp.mock.calls[0]?.[1] as FormData;
+    expect(formData.get('next')).toBe('/after');
+    expect(formData.get('email')).toBe('ada@example.com');
   });
 });

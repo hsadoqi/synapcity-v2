@@ -1,5 +1,5 @@
 export { defineForm, type FormDefinitionError } from './define-form';
-export { describeSchemaField } from './describe-schema-field';
+export { describeSchemaField, unwrapSchema } from './describe-schema-field';
 export type {
   SchemaFieldDescription,
   SchemaFieldKind,
