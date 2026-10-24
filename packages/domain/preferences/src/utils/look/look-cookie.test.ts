@@ -43,6 +43,10 @@ describe('look cookie', () => {
       'a b.com',
       'http://a.com',
       'a..com',
+      '-a.com',
+      'a-.com',
+      `${'a'.repeat(64)}.com`,
+      `${'a'.repeat(250)}.com`,
     ])
       expect(sanitizeCookieDomain(bad), String(bad)).toBeUndefined();
   });

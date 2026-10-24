@@ -18,7 +18,15 @@ export const LOOK_COOKIE_MAX_LENGTH = 2000;
  */
 export function sanitizeCookieDomain(domain: string | undefined | null) {
   const value = domain?.trim().toLowerCase();
-  return value && /^\.?[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(value)
+  if (!value) return undefined;
+  const host = value.startsWith('.') ? value.slice(1) : value;
+  if (host.length > 253) return undefined;
+  const labels = host.split('.');
+  if (labels.length < 2) return undefined;
+  return labels.every(
+    (label) =>
+      label.length <= 63 && /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/.test(label),
+  )
     ? value
     : undefined;
 }
