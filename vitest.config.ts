@@ -21,6 +21,7 @@ const projects = [
   'packages/dev/fixtures',
   'packages/frontend/site',
   'packages/frontend/ui',
+  'packages/server/auth',
 ];
 
 export default defineConfig({
