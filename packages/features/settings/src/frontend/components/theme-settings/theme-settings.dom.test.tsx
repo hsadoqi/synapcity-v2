@@ -5,23 +5,14 @@ import {
   currentSettings,
   renderWithSettings,
   stubBrowser,
-} from '../../test-harness';
+} from '../../testing';
 import { themeDraftStorageKey } from '../../hooks/use-theme-draft';
-
-const mocks = vi.hoisted(() => ({
-  params: null as { userId?: string } | null,
-}));
-vi.mock('next/navigation', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('next/navigation')>()),
-  useParams: () => mocks.params,
-}));
 
 const THEME_DRAFT_STORAGE_KEY = themeDraftStorageKey();
 import { ThemeSettings } from './index';
 
 beforeEach(() => {
   stubBrowser();
-  mocks.params = null;
 });
 afterEach(() => vi.unstubAllGlobals());
 
@@ -352,9 +343,7 @@ describe('ThemeSettings', () => {
       themeDraftStorageKey('someone-else'),
       JSON.stringify({ mode: 'dark' }),
     );
-    mocks.params = { userId: 'ada' };
-
-    await renderWithSettings(<ThemeSettings />);
+    await renderWithSettings(<ThemeSettings />, { draftScope: 'ada' });
     // Someone else's unsaved choice is not offered.
     await waitFor(() =>
       expect(

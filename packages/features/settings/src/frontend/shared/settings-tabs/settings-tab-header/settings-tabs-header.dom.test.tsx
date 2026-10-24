@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { Tabs } from '@synapcity/frontend-ui/core/tabs';
 
-import tabs from '../../../lib/data/tabs';
+import tabs from '../../../lib/data';
 import { SettingsTabsHeader } from './settings-tabs-header';
 
 const mount = (onTabChange = vi.fn()) => {

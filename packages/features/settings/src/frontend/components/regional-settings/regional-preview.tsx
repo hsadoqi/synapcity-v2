@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@synapcity/frontend-ui/lib/utils';
 import type { RegionalSettings } from '@synapcity/domain-preferences';
 import { formatDate, formatNumber, formatTime } from './regional-rows';
 

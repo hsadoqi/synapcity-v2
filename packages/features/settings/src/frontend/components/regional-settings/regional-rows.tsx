@@ -1,9 +1,9 @@
 'use client';
 
 import { useMemo } from 'react';
-import { SettingRow } from '../../shared/setting-row/setting-row';
-import { SettingsCombobox } from '../../shared/settings-combobox/settings-combobox';
-import { SettingsSelect } from '../../shared/settings-select/settings-select';
+import { SettingRow } from '../../shared/setting-row';
+import { SettingsCombobox } from '../../shared/settings-combobox';
+import { SettingsSelect } from '../../shared/settings-select';
 import {
   resolveTimezone,
   SYSTEM_TIMEZONE,

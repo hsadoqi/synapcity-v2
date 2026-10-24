@@ -9,8 +9,8 @@ import {
 import { expect, vi } from 'vitest';
 import { ModeProvider } from '@synapcity/frontend-preferences';
 
-import { useSettings } from './hooks/use-settings';
-import { SettingsProvider } from './providers/settings-provider';
+import { useSettings } from '../hooks/use-settings';
+import { SettingsProvider } from '../providers/settings-provider';
 
 /** jsdom has no matchMedia, ResizeObserver or getAnimations, which the providers and Base UI read. */
 export function stubBrowser() {
@@ -59,10 +59,13 @@ function ReadSettings() {
 }
 
 /** Mounts `ui` inside the real providers and waits until stored settings load. */
-export async function renderWithSettings(ui: ReactNode): Promise<RenderResult> {
+export async function renderWithSettings(
+  ui: ReactNode,
+  options: { draftScope?: string } = {},
+): Promise<RenderResult> {
   const result = render(
     <ModeProvider attribute="class" defaultTheme="system" enableSystem>
-      <SettingsProvider>
+      <SettingsProvider draftScope={options.draftScope}>
         {ui}
         <ReadSettings />
       </SettingsProvider>

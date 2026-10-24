@@ -3,7 +3,7 @@
 import {
   settingsDraftStorageKey,
   useSettingsDraft,
-} from './use-settings-draft';
+} from '../use-settings-draft';
 
 /** Where the Theme tab's unsaved choices are kept; see `useSettingsDraft`. */
 export function themeDraftStorageKey(userId?: string): string {

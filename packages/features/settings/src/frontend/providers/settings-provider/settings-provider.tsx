@@ -16,7 +16,7 @@ import {
   withoutStoredAccount,
 } from '@synapcity/domain-preferences';
 import { reconcile } from '@synapcity/domain-preferences';
-import type { AccountSync } from '../../lib/account-sync';
+import type { AccountSync } from '../../../contracts';
 import {
   accountPart,
   displayOf,
@@ -57,6 +57,7 @@ type SettingsContextType = {
   /** Whether display settings apply on all the person's devices. */
   displayOnAllDevices: boolean;
   setDisplayOnAllDevices: (on: boolean) => void;
+  draftScope?: string;
 };
 
 export const SettingsContext = createContext<SettingsContextType | null>(null);
@@ -65,11 +66,14 @@ export function SettingsProvider({
   children,
   name: initialName = null,
   account,
+  draftScope,
 }: {
   children: ReactNode;
   name?: string | null;
   /** Signed in: the saved account preferences and how to save them (ADR-0010). */
   account?: AccountSync;
+  /** Host identity used to keep per-person drafts separate in this tab. */
+  draftScope?: string;
 }) {
   const [storedSettings, setStoredSettings] = useState(settingsDefaults);
   const current = useRef(settingsDefaults);
@@ -353,6 +357,7 @@ export function SettingsProvider({
       syncsToAccount,
       displayOnAllDevices,
       setDisplayOnAllDevices,
+      draftScope,
     }),
     [
       settings,
@@ -363,6 +368,7 @@ export function SettingsProvider({
       syncsToAccount,
       displayOnAllDevices,
       setDisplayOnAllDevices,
+      draftScope,
     ],
   );
 

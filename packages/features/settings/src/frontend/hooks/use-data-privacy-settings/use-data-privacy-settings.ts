@@ -7,7 +7,7 @@ import {
   type DataPrivacySettingsPatch,
   type PrivacyPurpose,
 } from '@synapcity/domain-preferences';
-import { useSettings } from './use-settings';
+import { useSettings } from '../use-settings';
 
 export function useDataPrivacySettings() {
   const { settings, updateSettings } = useSettings();

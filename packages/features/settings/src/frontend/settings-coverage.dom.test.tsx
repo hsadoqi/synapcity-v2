@@ -6,7 +6,7 @@ import { DataPrivacySettings } from './components/data-privacy-settings';
 import { NotificationSettings } from './components/notification-settings';
 import { RegionalSettings } from './components/regional-settings';
 import { ThemeSettings } from './components/theme-settings';
-import { renderWithSettings, stubBrowser } from './test-harness';
+import { renderWithSettings, stubBrowser } from './testing';
 import { appearanceSchema } from '@synapcity/domain-preferences';
 import { dataPrivacySchema } from '@synapcity/domain-preferences';
 import { transferSchema } from '@synapcity/domain-preferences';

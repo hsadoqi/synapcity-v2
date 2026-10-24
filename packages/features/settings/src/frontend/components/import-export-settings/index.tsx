@@ -4,9 +4,9 @@ import { FieldGroup } from '@synapcity/frontend-ui/core/field';
 import {
   SettingsAccordion,
   SettingsAccordionItem,
-  SettingsTabShell,
-} from '../../shared';
-import { useImportExportSettings } from '../../hooks/use-import-export-settings';
+} from '../../shared/settings-accordion';
+import { SettingsTabShell } from '../../shared/settings-tabs/settings-tab-shell';
+import { useImportExportSettings } from '../../hooks';
 import {
   ExportRow,
   ImportRow,

@@ -3,7 +3,7 @@ import {
   TRANSFER_FILE_VERSION,
 } from '@synapcity/domain-preferences';
 import { parseImportPatch } from '@synapcity/domain-preferences';
-import type { ImportResult } from '../types/import-export';
+import type { ImportResult } from '../../types';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);

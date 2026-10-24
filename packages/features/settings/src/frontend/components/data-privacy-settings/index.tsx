@@ -2,7 +2,7 @@
 
 import { FieldGroup } from '@synapcity/frontend-ui/core/field';
 import { Separator } from '@synapcity/frontend-ui/core/separator';
-import { SettingsTabShell } from '../../shared/settings-tabs';
+import { SettingsTabShell } from '../../shared/settings-tabs/settings-tab-shell';
 import { canCollect, isBlockedBySignals } from '@synapcity/domain-preferences';
 import {
   choose,

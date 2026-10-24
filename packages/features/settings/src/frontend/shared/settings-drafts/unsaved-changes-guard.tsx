@@ -12,7 +12,7 @@ import {
   AlertDialogTitle,
 } from '@synapcity/frontend-ui/core/alert-dialog';
 import { Button } from '@synapcity/frontend-ui/core/button';
-import tabs from '../../lib/data/tabs';
+import { settingsTabItems } from '../../lib/data/tab-items';
 import { useSettingsDrafts } from './settings-drafts';
 
 // A draft's section is its key in the settings; the tab list names it for people.
@@ -20,8 +20,8 @@ const sectionTab: Record<string, string> = {
   privacy: 'data-privacy',
 };
 const tabLabel = (section: string) =>
-  tabs.find((tab) => tab.value === (sectionTab[section] ?? section))?.label ??
-  section;
+  settingsTabItems.find((tab) => tab.value === (sectionTab[section] ?? section))
+    ?.label ?? section;
 
 /** The in-app link this click would leave the page by, or null to let it be. */
 function leavingBy(event: MouseEvent): HTMLAnchorElement | null {

@@ -10,7 +10,8 @@ import {
   type ReactNode,
 } from 'react';
 import { Tabs, TabsContent } from '@synapcity/frontend-ui/core/tabs';
-import tabs from '../../lib/data/tabs';
+import tabs from '../../lib/data';
+import { settingsTabItems } from '../../lib/data/tab-items';
 import { SettingsTabsHeader } from './settings-tab-header';
 import { SettingsTabActive } from './settings-tab-active';
 import { useRoomyLayout } from '../../hooks/use-settings-layout';
@@ -18,11 +19,14 @@ import { useRoomyLayout } from '../../hooks/use-settings-layout';
 export const SettingsTabs = ({
   header,
   footer,
+  accountTab,
 }: {
   /** The page's heading, above the tabs: atop the side navigation when roomy. */
   header?: ReactNode;
   /** The page's closing note: under the side navigation when roomy, else last. */
   footer?: ReactNode;
+  /** Host-owned Account content, loaded only when that tab is visited. */
+  accountTab?: () => Promise<ComponentType>;
 }) => {
   // A side navigation on a roomy screen, a strip across the top otherwise. The
   // orientation is the markup's, not only the look's: the arrow keys follow it.
@@ -40,7 +44,9 @@ export const SettingsTabs = ({
   useEffect(() => {
     const sync = () => {
       const value = window.location.hash.slice(1);
-      setTab(tabs.some((tab) => tab.value === value) ? value : 'account');
+      setTab(
+        settingsTabItems.some((tab) => tab.value === value) ? value : 'account',
+      );
     };
 
     sync();
@@ -54,10 +60,13 @@ export const SettingsTabs = ({
       tabs.map((t) => ({
         value: t.value,
         Component: lazy(async () => ({
-          default: (await t.component()) as unknown as ComponentType,
+          default:
+            t.value === 'account' && accountTab
+              ? await accountTab()
+              : await t.component(),
         })),
       })),
-    [],
+    [accountTab],
   );
 
   return (

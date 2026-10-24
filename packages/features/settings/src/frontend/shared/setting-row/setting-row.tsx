@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@synapcity/frontend-ui/lib/utils';
 import { Button } from '@synapcity/frontend-ui/core/button';
 import {
   Field,
@@ -9,7 +9,7 @@ import {
   FieldDescription,
   FieldLabel,
 } from '@synapcity/frontend-ui/core/field';
-import { useSettingsDraftFields } from '../settings-drafts/settings-draft-fields';
+import { useSettingsDraftFields } from '../settings-drafts';
 
 type SettingRowProps = {
   id: string;

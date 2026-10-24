@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@synapcity/frontend-ui/lib/utils';
 import { previewFontValue } from '@synapcity/frontend-preferences';
 import { fontPreferenceVariables } from '@synapcity/frontend-preferences';
 import {

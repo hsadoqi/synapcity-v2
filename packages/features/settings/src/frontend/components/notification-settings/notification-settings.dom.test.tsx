@@ -6,7 +6,7 @@ import {
   renderWithSettings,
   saveTab,
   stubBrowser,
-} from '../../test-harness';
+} from '../../testing';
 import {
   notificationKinds,
   notificationsDefaults,

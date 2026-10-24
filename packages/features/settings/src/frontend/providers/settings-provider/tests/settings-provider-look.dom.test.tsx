@@ -7,12 +7,12 @@ import {
   settingsDefaults,
 } from '@synapcity/domain-preferences';
 import { ModeProvider, readLookCookie } from '@synapcity/frontend-preferences';
-import { SettingsProvider } from '../settings-provider';
+import { SettingsProvider } from '..';
 import { useAppearanceSettings } from '../../../hooks/use-appearance-settings';
 import { useRegionalSettings } from '../../../hooks/use-regional-settings';
 import { useSettings } from '../../../hooks/use-settings';
 import { SettingsHeader } from '../../../shared/settings-page/settings-header';
-import { stubBrowser } from '../../../test-harness';
+import { stubBrowser } from '../../../testing';
 
 function Controls() {
   const { settings, isReady } = useSettings();

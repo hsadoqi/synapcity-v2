@@ -2,7 +2,7 @@
 
 import { useId } from 'react';
 import { PanelLeft, FileText, Plus, ArrowUpRight, Check } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@synapcity/frontend-ui/lib/utils';
 import { usePrefersDark } from '@synapcity/frontend-preferences';
 import { previewFontStyle } from '@synapcity/frontend-preferences';
 import {

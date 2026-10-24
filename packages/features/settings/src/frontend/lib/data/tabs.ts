@@ -1,75 +1,35 @@
-import {
-  Palette,
-  Globe,
-  Bell,
-  Database,
-  Download,
-  User,
-  Eye,
-} from 'lucide-react';
+import { settingsTabItems } from './tab-items';
 
-export default [
-  {
-    value: 'account',
-    label: 'Account',
-    icon: User,
-    component: () =>
-      import('../../components/account-settings').then(
-        (mod) => mod.AccountSettings,
-      ),
+export default settingsTabItems.map((tab) => ({
+  ...tab,
+  component: () => {
+    switch (tab.value) {
+      case 'account':
+        return Promise.resolve(() => null);
+      case 'theme':
+        return import('../../components/theme-settings').then(
+          (module) => module.ThemeSettings,
+        );
+      case 'appearance':
+        return import('../../components/appearance-settings').then(
+          (module) => module.AppearanceSettings,
+        );
+      case 'regional':
+        return import('../../components/regional-settings').then(
+          (module) => module.RegionalSettings,
+        );
+      case 'notifications':
+        return import('../../components/notification-settings').then(
+          (module) => module.NotificationSettings,
+        );
+      case 'data-privacy':
+        return import('../../components/data-privacy-settings').then(
+          (module) => module.DataPrivacySettings,
+        );
+      case 'import-export':
+        return import('../../components/import-export-settings').then(
+          (module) => module.ImportExportSettings,
+        );
+    }
   },
-  {
-    value: 'theme',
-    label: 'Theme',
-    icon: Palette,
-    component: () =>
-      import('../../components/theme-settings').then(
-        (mod) => mod.ThemeSettings,
-      ),
-  },
-  {
-    value: 'appearance',
-    label: 'Display',
-    icon: Eye,
-    component: () =>
-      import('../../components/appearance-settings').then(
-        (mod) => mod.AppearanceSettings,
-      ),
-  },
-  {
-    value: 'regional',
-    label: 'Regional',
-    icon: Globe,
-    component: () =>
-      import('../../components/regional-settings').then(
-        (mod) => mod.RegionalSettings,
-      ),
-  },
-  {
-    value: 'notifications',
-    label: 'Notifications',
-    icon: Bell,
-    component: () =>
-      import('../../components/notification-settings').then(
-        (mod) => mod.NotificationSettings,
-      ),
-  },
-  {
-    value: 'data-privacy',
-    label: 'Data privacy',
-    icon: Database,
-    component: () =>
-      import('../../components/data-privacy-settings').then(
-        (mod) => mod.DataPrivacySettings,
-      ),
-  },
-  {
-    value: 'import-export',
-    label: 'Import / Export',
-    icon: Download,
-    component: () =>
-      import('../../components/import-export-settings').then(
-        (mod) => mod.ImportExportSettings,
-      ),
-  },
-];
+}));

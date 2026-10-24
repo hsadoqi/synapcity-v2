@@ -11,17 +11,14 @@ import { ModeProvider } from '@synapcity/frontend-preferences';
 import { AppearanceSettings } from '../../../components/appearance-settings';
 import { useSettings } from '../../../hooks/use-settings';
 import type { StoredAccountPreferences } from '@synapcity/domain-preferences';
-import type {
-  AccountSync,
-  SavePreferencesResult,
-} from '../../../lib/account-sync';
+import type { AccountSync, SavePreferencesResult } from '../../../../contracts';
 import {
   accountPart,
   type DisplaySettings,
 } from '@synapcity/domain-preferences';
-import { currentSettings, saveTab, stubBrowser } from '../../../test-harness';
+import { currentSettings, saveTab, stubBrowser } from '../../../testing';
 import { settingsDefaults, type Settings } from '@synapcity/domain-preferences';
-import { SettingsProvider } from '../settings-provider';
+import { SettingsProvider } from '..';
 
 const KEY = 'synapcity-preferences';
 const SET_ASIDE_KEY = 'synapcity-device-display';

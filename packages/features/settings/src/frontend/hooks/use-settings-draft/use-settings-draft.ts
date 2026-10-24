@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useParams } from 'next/navigation';
 import type { z } from 'zod';
 import type { Settings } from '@synapcity/domain-preferences';
 import { appearanceSchema } from '@synapcity/domain-preferences';
@@ -10,8 +9,8 @@ import { notificationsSchema } from '@synapcity/domain-preferences';
 import { regionalSchema } from '@synapcity/domain-preferences';
 import { settingsDefaults } from '@synapcity/domain-preferences';
 import { themeSchema } from '@synapcity/domain-preferences';
-import { useRegisterSettingsDraft } from '../shared/settings-drafts';
-import { useSettings } from './use-settings';
+import { useRegisterSettingsDraft } from '../../shared/settings-drafts';
+import { useSettings } from '../use-settings';
 
 export type DraftSection = keyof Settings;
 
@@ -110,13 +109,11 @@ export function useSettingsDraft<S extends DraftSection>(
     fields?: readonly (keyof Settings[S])[];
   } = {},
 ) {
-  const { settings, updateSettings } = useSettings();
+  const { settings, updateSettings, draftScope } = useSettings();
   const saved = settings[section];
   const defaults = settingsDefaults[section];
   const same = options.same ?? ((_field, a, b) => sameJson(a, b));
-  // Null outside the app router (tests): the bare key then applies.
-  const userId = useParams<{ userId?: string }>()?.userId;
-  const key = settingsDraftStorageKey(section, userId);
+  const key = settingsDraftStorageKey(section, draftScope);
   const [changes, setChanges] = useState<Changes<S>>({});
   const restored = useRef(false);
 

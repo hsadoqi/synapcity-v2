@@ -1,8 +1,8 @@
 import { screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import tabs from '../../lib/data/tabs';
-import { renderWithSettings, stubBrowser } from '../../test-harness';
+import tabs from '../../lib/data';
+import { renderWithSettings, stubBrowser } from '../../testing';
 import { SettingsTabs } from './settings-tabs';
 
 beforeEach(() => {

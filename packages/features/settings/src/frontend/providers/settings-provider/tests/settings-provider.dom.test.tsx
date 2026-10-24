@@ -8,7 +8,7 @@ import {
 } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ModeProvider, useMode } from '@synapcity/frontend-preferences';
-import { SettingsProvider } from '../settings-provider';
+import { SettingsProvider } from '..';
 import { useSettings } from '../../../hooks/use-settings';
 import { useRegionalSettings } from '../../../hooks/use-regional-settings';
 import { useAppearanceSettings } from '../../../hooks/use-appearance-settings';

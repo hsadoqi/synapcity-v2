@@ -1,7 +1,7 @@
 'use client';
 
 import { Check } from 'lucide-react';
-import { useSettings } from '../../../hooks/use-settings';
+import { useSettings } from '../../../hooks';
 
 export const SettingsHeader = () => {
   const { status, name } = useSettings();

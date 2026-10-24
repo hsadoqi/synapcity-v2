@@ -10,9 +10,9 @@ import {
   CardFooter,
 } from '@synapcity/frontend-ui/core/card';
 import { ReactNode } from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@synapcity/frontend-ui/lib/utils';
 import type { useSettingsDraft } from '../../../hooks/use-settings-draft';
-import { SettingsDraftFields } from '../../settings-drafts/settings-draft-fields';
+import { SettingsDraftFields } from '../../settings-drafts';
 import { SettingsTabFooter } from '../settings-tab-footer';
 import { useWideLayout } from '../../../hooks/use-settings-layout';
 import {

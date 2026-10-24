@@ -6,8 +6,8 @@ import { useSettings } from '../../hooks/use-settings';
 import {
   SettingsAccordion,
   SettingsAccordionItem,
-  SettingsTabShell,
-} from '../../shared';
+} from '../../shared/settings-accordion';
+import { SettingsTabShell } from '../../shared/settings-tabs/settings-tab-shell';
 import {
   AllDevicesRow,
   ContrastModeRow,

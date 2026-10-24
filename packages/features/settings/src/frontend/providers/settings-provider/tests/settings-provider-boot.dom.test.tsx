@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { PREFERENCES_STORAGE_KEY } from '@synapcity/frontend-preferences';
 import { fontBootScript } from '@synapcity/frontend-preferences';
-import { renderWithSettings, stubBrowser } from '../../../test-harness';
+import { renderWithSettings, stubBrowser } from '../../../testing';
 
 beforeEach(stubBrowser);
 afterEach(() => vi.unstubAllGlobals());

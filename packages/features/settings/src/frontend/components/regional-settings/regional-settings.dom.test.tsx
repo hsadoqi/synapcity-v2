@@ -16,7 +16,7 @@ import { DateFormatRow, NumberFormatRow, TimeFormatRow } from './regional-rows';
 import {
   SettingsContext,
   SettingsProvider,
-} from '../../providers/settings-provider/settings-provider';
+} from '../../providers/settings-provider';
 import { useSettings } from '../../hooks/use-settings';
 import { settingsDefaults } from '@synapcity/domain-preferences';
 import type { RegionalSettings as RegionalSettingsType } from '@synapcity/domain-preferences';

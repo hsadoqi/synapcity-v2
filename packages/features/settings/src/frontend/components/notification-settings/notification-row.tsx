@@ -1,6 +1,6 @@
 import { Switch } from '@synapcity/frontend-ui/core/switch';
 import type { NotificationKind } from '@synapcity/domain-preferences';
-import { SettingRow } from '../../shared/setting-row/setting-row';
+import { SettingRow } from '../../shared/setting-row';
 
 // Keyed by the schema, so a new notification setting does not compile until
 // it has a label and a description here. Say what the channel does; whether

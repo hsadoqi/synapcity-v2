@@ -2,8 +2,8 @@ import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ModeProvider } from '@synapcity/frontend-preferences';
 
-import { SettingsProvider } from '../settings-provider';
-import { SettingsHeader } from '../../../shared';
+import { SettingsProvider } from '..';
+import { SettingsHeader } from '../../../shared/settings-page/settings-header';
 
 const page = (name: string | null) => (
   <ModeProvider attribute="class" defaultTheme="system" enableSystem>

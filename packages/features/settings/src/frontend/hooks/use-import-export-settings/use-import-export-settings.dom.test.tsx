@@ -5,14 +5,16 @@ import { ModeProvider } from '@synapcity/frontend-preferences';
 
 const mocks = vi.hoisted(() => ({ download: vi.fn(), importFile: vi.fn() }));
 
-vi.mock('../utils/download', () => ({ download: mocks.download }));
-vi.mock('../utils/import', () => ({ importFile: mocks.importFile }));
+vi.mock('../../utils', () => ({
+  download: mocks.download,
+  importFile: mocks.importFile,
+}));
 
-import { stubBrowser } from '../test-harness';
-import { SettingsProvider } from '../providers/settings-provider/settings-provider';
+import { stubBrowser } from '../../testing';
+import { SettingsProvider } from '../../providers/settings-provider';
 import { settingsDefaults } from '@synapcity/domain-preferences';
 import { useImportExportSettings } from './use-import-export-settings';
-import { useSettings } from './use-settings';
+import { useSettings } from '../use-settings';
 
 const wrapper = ({ children }: { children: ReactNode }) => (
   <ModeProvider attribute="class" defaultTheme="system" enableSystem>

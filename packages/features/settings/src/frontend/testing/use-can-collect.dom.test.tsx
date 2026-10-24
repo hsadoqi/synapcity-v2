@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { useCanCollect } from '@synapcity/frontend-preferences';
 import { DataPrivacySettings } from '../components/data-privacy-settings';
-import { renderWithSettings, stubBrowser, saveTab } from '../test-harness';
+import { renderWithSettings, stubBrowser, saveTab } from '../testing';
 
 beforeEach(stubBrowser);
 

@@ -10,7 +10,7 @@ import {
   notificationKinds,
   type NotificationKind,
 } from '@synapcity/domain-preferences';
-import { SettingsTabShell } from '../../shared/settings-tabs';
+import { SettingsTabShell } from '../../shared/settings-tabs/settings-tab-shell';
 import { NotificationRow } from './notification-row';
 
 const pushBlockedReason: Partial<Record<NotificationPermissionState, string>> =

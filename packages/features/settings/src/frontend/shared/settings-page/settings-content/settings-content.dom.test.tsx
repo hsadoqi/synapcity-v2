@@ -8,8 +8,8 @@ import {
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ModeProvider } from '@synapcity/frontend-preferences';
 
-import { stubBrowser } from '../../../test-harness';
-import tabs from '../../../lib/data/tabs';
+import { stubBrowser } from '../../../testing';
+import tabs from '../../../lib/data';
 import { SettingsContent } from '../settings-content';
 
 // Account reads the signed-in user and server actions, which its own tests

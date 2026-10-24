@@ -6,7 +6,7 @@ import {
   currentSettings,
   renderWithSettings,
   stubBrowser,
-} from '../../test-harness';
+} from '../../testing';
 import { SettingsDraftsProvider } from './settings-drafts';
 import { UnsavedChangesGuard } from './unsaved-changes-guard';
 
@@ -23,7 +23,6 @@ async function mount() {
       <NotificationSettings />
       {/* A plain link: the guard acts on the click in the page, whatever
           renders the link (a Next Link renders this same element). */}
-      {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
       <a href="/elsewhere" onClick={followed}>
         Leave
       </a>

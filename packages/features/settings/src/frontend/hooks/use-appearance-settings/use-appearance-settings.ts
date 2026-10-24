@@ -2,7 +2,7 @@
 
 import { useCallback } from 'react';
 import type { AppearanceSettingsPatch } from '@synapcity/domain-preferences';
-import { useSettings } from './use-settings';
+import { useSettings } from '../use-settings';
 
 export function useAppearanceSettings() {
   const { settings, updateSettings } = useSettings();

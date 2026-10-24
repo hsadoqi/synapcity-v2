@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { stubBrowser } from '../../../test-harness';
+import { stubBrowser } from '../../../testing';
 import { BodyFontRow, CodeFontRow, HeadingFontRow } from './font-rows';
 
 beforeEach(stubBrowser);

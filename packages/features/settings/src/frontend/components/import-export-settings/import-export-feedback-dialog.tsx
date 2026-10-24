@@ -7,7 +7,7 @@ import {
   AlertDescription,
 } from '@synapcity/frontend-ui/core/alert';
 import { CircleAlert, CheckCircle2 } from 'lucide-react';
-import type { TransferFeedback } from '../../types/import-export';
+import type { TransferFeedback } from '../../types';
 
 export const ImportExportFeedbackAlert = ({
   feedback,

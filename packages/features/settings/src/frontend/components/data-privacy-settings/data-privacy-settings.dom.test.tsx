@@ -6,7 +6,7 @@ import {
   renderWithSettings,
   saveTab,
   stubBrowser,
-} from '../../test-harness';
+} from '../../testing';
 import { PRIVACY_POLICY_VERSIONS } from '@synapcity/domain-preferences';
 import { DataPrivacySettings } from './index';
 

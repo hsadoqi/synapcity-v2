@@ -1,12 +1,11 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useSettings } from './use-settings';
+import { useSettings } from '../use-settings';
 import { transferSchema } from '@synapcity/domain-preferences';
-import { type TransferFeedback } from '../types/import-export';
+import { type TransferFeedback } from '../../types';
 import { settingsDefaults } from '@synapcity/domain-preferences';
-import { download } from '../utils/download';
-import { importFile } from '../utils/import';
+import { download, importFile } from '../../utils';
 
 export function useImportExportSettings() {
   const { settings, updateSettings, isReady } = useSettings();

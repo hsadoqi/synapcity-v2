@@ -1,5 +1,5 @@
 import { toTransferFile } from '@synapcity/domain-preferences';
-import { type TransferFeedback } from '../types/import-export';
+import { type TransferFeedback } from '../../types';
 import {
   type TransferSettings,
   transferSchema,

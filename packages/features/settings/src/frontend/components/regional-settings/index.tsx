@@ -12,7 +12,7 @@ import {
   NumberFormatRow,
 } from './regional-rows';
 import { RegionalPreview } from './regional-preview';
-import { SettingsTabShell } from '../../shared/settings-tabs';
+import { SettingsTabShell } from '../../shared/settings-tabs/settings-tab-shell';
 import {
   SettingsAccordion,
   SettingsAccordionItem,

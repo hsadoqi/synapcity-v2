@@ -14,14 +14,14 @@ import { ImportExportSettings } from './index';
 import {
   SettingsContext,
   SettingsProvider,
-} from '../../providers/settings-provider/settings-provider';
+} from '../../providers/settings-provider';
 import { useSettings } from '../../hooks/use-settings';
 import { settingsDefaults, type Settings } from '@synapcity/domain-preferences';
 import { toTransferFile } from '@synapcity/domain-preferences';
 import { parseImport } from '@synapcity/domain-preferences';
 import { transferSchema } from '@synapcity/domain-preferences';
-import { download } from '../../utils/download';
-import { importFile } from '../../utils/import';
+import { download } from '../../utils';
+import { importFile } from '../../utils';
 
 const objectUrls = {
   create: vi.fn((_blob: Blob) => 'blob:settings-download'),

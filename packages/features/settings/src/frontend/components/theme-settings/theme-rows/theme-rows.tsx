@@ -1,7 +1,7 @@
 import { Button } from '@synapcity/frontend-ui/core/button';
 import { Mode } from '@synapcity/frontend-preferences';
-import { SettingRow } from '../../../shared/setting-row/setting-row';
-import { SettingsSelect } from '../../../shared/settings-select/settings-select';
+import { SettingRow } from '../../../shared/setting-row';
+import { SettingsSelect } from '../../../shared/settings-select';
 import { previewTextScaleStyle } from '@synapcity/frontend-preferences';
 import {
   textSizeRange,

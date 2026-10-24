@@ -2,7 +2,7 @@
 
 import { FieldGroup } from '@synapcity/frontend-ui/core/field';
 import { useThemeDraft } from '../../hooks/use-theme-draft';
-import { SettingsTabShell } from '../../shared/settings-tabs';
+import { SettingsTabShell } from '../../shared/settings-tabs/settings-tab-shell';
 import {
   SettingsAccordion,
   SettingsAccordionItem,
@@ -11,12 +11,7 @@ import { SettingsSection } from '../../shared/settings-section';
 import { ThemePreviewPopover } from './theme-preview-popover';
 import { ThemeLivePreview } from './theme-live-preview';
 import { useWideLayout } from '../../hooks/use-settings-layout';
-import {
-  DensityRow,
-  RadiusRow,
-  TextSizeRow,
-  ThemeModeRow,
-} from './theme-rows/theme-rows';
+import { DensityRow, RadiusRow, TextSizeRow, ThemeModeRow } from './theme-rows';
 import { BodyFontRow, CodeFontRow, HeadingFontRow } from './font-rows';
 
 /**

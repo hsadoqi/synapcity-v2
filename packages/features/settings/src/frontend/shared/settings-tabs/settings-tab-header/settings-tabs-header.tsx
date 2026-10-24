@@ -1,5 +1,5 @@
 import { TabsList, TabsTrigger } from '@synapcity/frontend-ui/core/tabs';
-import tabs from '../../../lib/data/tabs';
+import { settingsTabItems } from '../../../lib/data/tab-items';
 
 export const SettingsTabsHeader = ({
   onTabChange,
@@ -20,7 +20,7 @@ export const SettingsTabsHeader = ({
         className="w-full"
         aria-label="Settings categories"
       >
-        {tabs.map(({ value, label, icon: Icon }) => (
+        {settingsTabItems.map(({ value, label, icon: Icon }) => (
           <TabsTrigger
             key={value}
             value={value}

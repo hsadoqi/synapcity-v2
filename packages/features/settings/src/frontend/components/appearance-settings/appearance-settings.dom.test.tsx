@@ -6,7 +6,7 @@ import {
   renderWithSettings,
   stubBrowser,
   saveTab,
-} from '../../test-harness';
+} from '../../testing';
 import { AppearanceSettings } from './index';
 
 beforeEach(stubBrowser);

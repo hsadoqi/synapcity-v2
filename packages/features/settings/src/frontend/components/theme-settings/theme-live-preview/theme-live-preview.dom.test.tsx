@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { stubBrowser } from '../../../test-harness';
+import { stubBrowser } from '../../../testing';
 import {
   themeDefaults,
   type ThemeSettings,
