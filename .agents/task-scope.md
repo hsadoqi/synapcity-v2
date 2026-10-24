@@ -4,7 +4,11 @@
 - Branch: `chore/reorganization-m5-spaces-slice` from `main` at `c3cd87a6` (M4 squash-merged as #58).
 - Exact creates (2): `docs/superpowers/specs/2026-10-23-m5-spaces-slice-design.md`; `docs/superpowers/plans/2026-10-23-m5-1-record-contracts.md` (M5.1 plan). Updates (1): this ledger. Design amended after the answers (status, `SetSpacePinnedResult` stays out of domain, field order, fixture factories timing). Source, packages, manifests, dependencies, config, commits, pushes and external mutations 0.
 - Evidence: read at the M4 branch tip `6f542782`; `git diff` against `c3cd87a6` is empty for every cited path.
-- Next: owner reviews the M5.1 plan and chooses an execution method; Q4, Q5, Q7 are asked before M5.2 and M5.3.
+- M5.1 execution (2026-10-24): the owner chose inline execution of `docs/superpowers/plans/2026-10-23-m5-1-record-contracts.md`; the owner made the commits during the run and Claude made none.
+- M5.1 exact creates: `packages/domain/records/**` (manifest, configs, README, `src/base`, `src/spaces` with tests). Updates: root `vitest.config.ts` (project), `pnpm-lock.yaml` (one importer plus two workspace links; no version changes), `apps/web/package.json` and `packages/frontend/ui/package.json` (workspace dependency), `packages/frontend/ui/src/types/entity.ts`, `apps/web/src/features/spaces/shared/types/index.ts`, `lib/owned-records/{owned-records.ts,owned-records.test.ts}`, nine Space importers, the ownership map, workspace conventions, ADR-0014 section 7, the domain README, the design status line, this ledger. Deletes: `frontend-ui/src/types/entity-schema.ts`, `features/spaces/shared/schema/{schema.ts,index.ts}`; the Space schema test moved to `domain-records`.
+- M5.1 not changed: queries, actions, components, fixtures, RLS, persisted shapes, every message; `SetSpacePinnedResult`, `OwnedRecordSummary`, `SetRecordPinnedResult` and the screen-only shapes stay in the app and `frontend-ui`.
+- Environment note: the sandbox creates an empty `packages/.claude/.cc-writes`; `pnpm boundaries` rejects it as an unknown category, so it was removed with `rmdir` before the run. It may reappear.
+- Next: Q4, Q5, Q7 are asked before M5.2 and M5.3.
 
 ## Active task: Milestone 4 server identity boundary (2026-10-23)
 

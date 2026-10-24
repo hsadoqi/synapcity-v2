@@ -50,7 +50,7 @@ Milestone numbers follow the reorganization roadmap (owner decision, 2026-10-23)
 
 | Package                               | Owns                                                                                                                                                         | First code    |
 | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------- |
-| `domain-records`                      | Base record contract; Space, Document and Dashboard contracts as separate modules extending it                                                               | M5            |
+| `domain-records`                      | Base record contract; Space, Document and Dashboard contracts as separate modules extending it                                                               | M5.1 (exists) |
 | `domain-preferences`                  | Preference schemas, defaults, account/device scope, merging, import/transfer validation, consent policy                                                      | M6            |
 | `domain-identity`                     | Profile, name and avatar schemas; verified-identity contract                                                                                                 | M4 (exists)   |
 | `frontend-ui` (existing)              | Primitives, generic components and form pieces, generic hooks, low-level layout primitives                                                                   | exists        |
@@ -78,7 +78,7 @@ Milestone numbers follow the reorganization roadmap (owner decision, 2026-10-23)
 | `dev-*` (five existing)               | Tooling, test configuration and fixtures; `dev-fixtures` grows scenarios and sample content                                                                  | exists        |
 | `dev-boundaries`                      | Workspace boundary checker (`pnpm boundaries`) and its violation probes                                                                                      | M3.4          |
 
-M4 created `domain-identity`, `server-auth` and `server-supabase` for the server identity boundary ([M4 design](../superpowers/specs/2026-10-23-m4-server-identity-boundary-design.md)). Their remaining scope arrives later: credential and profile contracts and auth operations in M7, session refresh in M7, repository support in M5.
+M4 created `domain-identity`, `server-auth` and `server-supabase` for the server identity boundary ([M4 design](../superpowers/specs/2026-10-23-m4-server-identity-boundary-design.md)). Their remaining scope arrives later: credential and profile contracts and auth operations in M7, session refresh in M7, repository support in M5. M5.1 created `domain-records` with the base record and Space contracts; its Document and Dashboard modules arrive in M8.
 
 **Preferences and Settings** are different packages on purpose: preferences are the data, rules, persistence and browser runtime; Settings is the screen that edits them.
 
