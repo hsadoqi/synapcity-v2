@@ -61,4 +61,20 @@ describe('NumberRenderer', () => {
   it('shows a non-number value as empty', () => {
     expect(show(props({ value: 'x' })).value).toBe('');
   });
+
+  it('renders a range input that emits a number', () => {
+    const p = props({
+      field: {
+        type: 'range',
+        name: 'n',
+        label: 'N',
+        props: { min: 0, max: 100, step: 5 },
+      },
+    });
+    const input = show(p);
+    expect(input.type).toBe('range');
+    expect([input.min, input.max, input.step]).toEqual(['0', '100', '5']);
+    fireEvent.change(input, { target: { value: '40' } });
+    expect(p.onChange).toHaveBeenCalledWith(40);
+  });
 });

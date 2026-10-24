@@ -64,6 +64,8 @@ export interface TextFieldConfig<
     readonly maxLength?: number;
     readonly autoComplete?: string;
     readonly inputMode?: InputMode;
+    /** A browser hint only: the schema decides. Keep the two in step. */
+    readonly pattern?: string;
   };
 }
 
@@ -76,6 +78,24 @@ export interface PasswordFieldConfig<
     readonly placeholder?: string;
     readonly minLength?: number;
     readonly maxLength?: number;
+  };
+}
+
+/**
+ * A date, time, month, week or colour picker. The value is the string the
+ * browser gives (`2026-05-04`, `09:30`, or `#rrggbb` for a colour); nothing chosen is `''`.
+ */
+export interface DateTimeFieldConfig<
+  TName extends string = string,
+> extends FieldBase<TName> {
+  readonly type:
+    'date' | 'time' | 'datetime-local' | 'month' | 'week' | 'color';
+  readonly props?: {
+    /** In the input's own format, such as `2026-01-01` for a date. */
+    readonly min?: string;
+    readonly max?: string;
+    readonly step?: number;
+    readonly autoComplete?: string;
   };
 }
 
@@ -97,7 +117,8 @@ export interface FileFieldConfig<
 export interface NumberFieldConfig<
   TName extends string = string,
 > extends FieldBase<TName> {
-  readonly type: 'number';
+  /** `range` is a slider over the same values. */
+  readonly type: 'number' | 'range';
   readonly props?: {
     readonly min?: number;
     readonly max?: number;
@@ -134,6 +155,7 @@ export type FieldConfig<TName extends string = string> =
   | TextFieldConfig<TName>
   | PasswordFieldConfig<TName>
   | FileFieldConfig<TName>
+  | DateTimeFieldConfig<TName>
   | NumberFieldConfig<TName>
   | SelectFieldConfig<TName>
   | ToggleFieldConfig<TName>

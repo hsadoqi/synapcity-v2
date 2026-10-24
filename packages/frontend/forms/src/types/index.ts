@@ -6,6 +6,7 @@ export type {
   FieldConfig,
   FieldDependency,
   FieldGroup,
+  DateTimeFieldConfig,
   FieldOption,
   FileFieldConfig,
   InputMode,

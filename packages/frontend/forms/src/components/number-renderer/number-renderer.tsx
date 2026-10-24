@@ -6,7 +6,7 @@ import { Input } from '@synapcity/frontend-ui/core/input';
 import type { FieldRendererProps } from '../../types';
 
 /**
- * A number field. A cleared or unparsable entry is `undefined`, never `NaN`,
+ * A number field, or a `range` slider over the same values. A cleared or unparsable entry is `undefined`, never `NaN`,
  * so an optional number validates as "not given".
  */
 export function NumberRenderer({
@@ -21,7 +21,8 @@ export function NumberRenderer({
   describedBy,
   focusRef,
 }: FieldRendererProps) {
-  const props = field.type === 'number' ? field.props : undefined;
+  const isNumber = field.type === 'number' || field.type === 'range';
+  const props = isNumber ? field.props : undefined;
   const shown =
     typeof value === 'number' && Number.isFinite(value) ? String(value) : '';
   return (
@@ -29,8 +30,8 @@ export function NumberRenderer({
       ref={focusRef as Ref<HTMLInputElement>}
       id={id}
       name={field.name}
-      type="number"
-      inputMode="decimal"
+      type={field.type === 'range' ? 'range' : 'number'}
+      inputMode={field.type === 'range' ? undefined : 'decimal'}
       value={shown}
       min={props?.min}
       max={props?.max}

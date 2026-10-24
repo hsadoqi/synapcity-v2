@@ -282,6 +282,30 @@ describe('FormRenderer with onSubmit', () => {
   });
 });
 
+describe('FormRenderer starting values', () => {
+  it('starts a number or range field as undefined, not an empty string', async () => {
+    const onSubmit = vi.fn();
+    const numbers = defineForm({
+      schema: z.object({
+        volume: z.number().optional(),
+        count: z.number().optional(),
+      }),
+      fields: [
+        {
+          type: 'range',
+          name: 'volume',
+          label: 'Volume',
+          props: { min: 0, max: 10 },
+        },
+        { type: 'number', name: 'count', label: 'Count' },
+      ],
+    });
+    render(<FormRenderer definition={numbers} onSubmit={onSubmit} />);
+    await submit();
+    expect(onSubmit).toHaveBeenCalledWith({});
+  });
+});
+
 describe('FormRenderer cross-field rules', () => {
   const ruleSchema = z.object({
     change: z.boolean().optional(),

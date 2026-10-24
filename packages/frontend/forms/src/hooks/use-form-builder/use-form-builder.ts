@@ -52,6 +52,7 @@ function startingValue(definition: FormDefinition, name: string): unknown {
   if (nullable && !optional) return null;
   if (
     field.type === 'number' ||
+    field.type === 'range' ||
     field.type === 'select' ||
     field.type === 'file'
   ) {

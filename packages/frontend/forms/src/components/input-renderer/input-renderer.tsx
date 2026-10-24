@@ -21,7 +21,8 @@ const BY_TYPE = {
 >;
 
 /**
- * Text, email, password, tel, url, search and textarea fields. A value that is
+ * Text, email, password, tel, url, search, textarea, and the date, time,
+ * month, week and colour pickers. A value that is
  * not a string shows as empty. Email, URL and password text is never
  * autocapitalised, autocorrected or spellchecked, because the browser would
  * change what the person typed.
@@ -99,6 +100,29 @@ export function InputRenderer({
         placeholder={field.props?.placeholder}
         minLength={field.props?.minLength}
         maxLength={field.props?.maxLength}
+        pattern={field.props?.pattern}
+        onChange={(event) => onChange(event.target.value)}
+      />
+    );
+  }
+
+  if (
+    field.type === 'date' ||
+    field.type === 'time' ||
+    field.type === 'datetime-local' ||
+    field.type === 'month' ||
+    field.type === 'week' ||
+    field.type === 'color'
+  ) {
+    return (
+      <Input
+        {...shared}
+        ref={focusRef as Ref<HTMLInputElement>}
+        type={field.type}
+        min={field.props?.min}
+        max={field.props?.max}
+        step={field.props?.step}
+        autoComplete={field.props?.autoComplete}
         onChange={(event) => onChange(event.target.value)}
       />
     );
