@@ -124,6 +124,12 @@ function FormRendererWith<TSchema extends z.ZodObject>({
   const asyncFlushes = useRef(new Map<string, AsyncFlush>());
   const pendingFocus = useRef<string | undefined>(undefined);
   const submitting = useRef(false);
+  /**
+   * True from a valid submit until it finishes: async checks, then the handler.
+   * Not set while the schema is checked, so an invalid submit never flickers
+   * the form disabled.
+   */
+  const [checking, setChecking] = useState(false);
   const [refusal, setRefusal] = useState<ActionFormRefusal>();
   const isAction = props.action !== undefined;
 
@@ -241,6 +247,9 @@ function FormRendererWith<TSchema extends z.ZodObject>({
   const pending = isAction
     ? props.pending === true
     : form.formState.isSubmitting;
+  // Fields lock only for a submit that passed the schema (and while a server
+  // action runs), never while typing.
+  const locked = checking || (isAction && props.pending === true);
 
   // A server refusal names fields; their groups stay unfolded while it is shown.
   const forcedOpen = new Set(
@@ -270,6 +279,7 @@ function FormRendererWith<TSchema extends z.ZodObject>({
             : undefined
         }
         requiredHint={props.messages?.requiredHint ?? DEFAULT_REQUIRED_HINT}
+        locked={locked}
         onFocusTarget={onFocusTarget}
         onAsyncFlush={onAsyncFlush}
       />
@@ -281,12 +291,16 @@ function FormRendererWith<TSchema extends z.ZodObject>({
       void form.handleSubmit(
         async () => {
           setRefusal(undefined);
+          // Read before locking: a disabled control is left out of FormData.
+          const data = new FormData(element);
+          setChecking(true);
           const refused = await refusedByAsyncChecks();
+          setChecking(false);
           if (refused.length > 0) {
             revealAndFocus(refused);
             return;
           }
-          startTransition(() => props.action?.(new FormData(element)));
+          startTransition(() => props.action?.(data));
         },
         (errors) => setRefusal(firstRefusal(errors)),
       )(event);
@@ -298,10 +312,12 @@ function FormRendererWith<TSchema extends z.ZodObject>({
     }
     void form.handleSubmit(async (values: FieldValues) => {
       submitting.current = true;
+      setChecking(true);
       form.clearErrors('root');
       const refused = await refusedByAsyncChecks();
       if (refused.length > 0) {
         submitting.current = false;
+        setChecking(false);
         revealAndFocus(refused);
         return;
       }
@@ -317,6 +333,7 @@ function FormRendererWith<TSchema extends z.ZodObject>({
         });
       } finally {
         submitting.current = false;
+        setChecking(false);
       }
     }, focusFirstInvalid)(event);
   };
@@ -365,8 +382,8 @@ function FormRendererWith<TSchema extends z.ZodObject>({
         ) : null}
         <Button
           type="submit"
-          disabled={pending}
-          aria-busy={pending || undefined}
+          disabled={pending || locked}
+          aria-busy={pending || locked || undefined}
         >
           {props.submitLabel ?? 'Save'}
         </Button>

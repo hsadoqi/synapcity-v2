@@ -108,6 +108,32 @@ function VirtualizedDemo() {
   );
 }
 
+/** A clear button and the dropdown button stay clickable but out of the tab order while open. */
+export const OpenWithClear: Story = {
+  render: () => (
+    <Combobox items={zones} defaultValue="UTC">
+      <ComboboxInput aria-label="Timezone" showClear />
+      <ComboboxContent>
+        <ComboboxList>
+          {(zone: string) => (
+            <ComboboxItem key={zone} value={zone}>
+              {zone}
+            </ComboboxItem>
+          )}
+        </ComboboxList>
+      </ComboboxContent>
+    </Combobox>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.getByRole('button', { name: 'Clear selection' }),
+    ).toHaveAttribute('tabindex', '-1');
+    await userEvent.click(canvas.getByRole('combobox', { name: 'Timezone' }));
+    await expect(await screen.findByRole('listbox')).toBeVisible();
+  },
+};
+
 export const Virtualized: Story = {
   render: () => <VirtualizedDemo />,
   play: async ({ canvasElement }) => {
@@ -121,8 +147,7 @@ export const Virtualized: Story = {
     await waitFor(() =>
       expect(screen.getByRole('option', { name: 'Place 30' })).toBeVisible(),
     );
-    await userEvent.keyboard('{Escape}');
-    // The list is checked at rest, once it has finished closing.
-    await waitFor(() => expect(screen.queryByRole('listbox')).toBeNull());
+    // Left open with a row highlighted, so the accessibility check covers the
+    // open state: highlight contrast, and nothing focusable hidden behind it.
   },
 };

@@ -107,6 +107,33 @@ function VirtualExample({ enabled = true }: { enabled?: boolean }) {
   );
 }
 
+describe('ComboboxInput buttons', () => {
+  it('keeps the dropdown and clear buttons out of the tab order, leaving the input as the one stop', () => {
+    render(
+      <Combobox items={zones} defaultValue="UTC">
+        <ComboboxInput aria-label="Timezone" showClear />
+      </Combobox>,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Clear selection' }).tabIndex,
+    ).toBe(-1);
+    expect(screen.getByRole('combobox', { name: 'Timezone' }).tabIndex).toBe(0);
+  });
+
+  it('keeps the dropdown button out of the tab order', () => {
+    render(
+      <Combobox items={zones}>
+        <ComboboxInput aria-label="Timezone" />
+      </Combobox>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Show options' }).tabIndex).toBe(
+      -1,
+    );
+  });
+});
+
 describe('ComboboxVirtualList', () => {
   const openLong = () =>
     fireEvent.keyDown(screen.getByRole('combobox', { name: 'Long list' }), {

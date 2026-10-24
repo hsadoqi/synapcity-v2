@@ -1,6 +1,6 @@
 'use client';
 
-import { createElement, useCallback, useEffect, useRef } from 'react';
+import { createElement, useCallback, useEffect } from 'react';
 import { useController, type Control, type FieldValues } from 'react-hook-form';
 import type { z } from 'zod';
 
@@ -34,6 +34,8 @@ export interface EngineFieldProps {
   readonly markedBy?: string;
   /** Spoken for a required control that cannot carry `aria-required`. */
   readonly requiredHint: string;
+  /** The form is submitting: every control is disabled until it finishes. */
+  readonly locked: boolean;
   readonly onFocusTarget: (name: string, element: HTMLElement | null) => void;
   /** Registers how to run the field's async check now, for submit; `null` unregisters. */
   readonly onAsyncFlush?: (name: string, flush: AsyncFlush | null) => void;
@@ -57,6 +59,7 @@ export function EngineField({
   showOwnError,
   markedBy,
   requiredHint,
+  locked,
   onFocusTarget,
   onAsyncFlush,
 }: EngineFieldProps) {
@@ -65,7 +68,6 @@ export function EngineField({
     name: field.name,
   });
   const validation = field.asyncValidation;
-  const hadFocus = useRef(false);
 
   const ready =
     validation !== undefined &&
@@ -79,23 +81,9 @@ export function EngineField({
     value: bound.value,
     ready,
     getValues,
-    onStart: () => {
-      // The control carries the field's id (a radio group holds its focused item).
-      const control = document.getElementById(id);
-      hadFocus.current =
-        control !== null && control.contains(document.activeElement);
-    },
   });
+  // A background check never takes the field away from someone typing.
   const validating = async.status === 'validating';
-  const lockWhileValidating =
-    validating && validation?.disableWhileValidating !== false;
-
-  // Disabling the control drops focus; give it back once the check is done.
-  useEffect(() => {
-    if (validating || !hadFocus.current) return;
-    hadFocus.current = false;
-    document.getElementById(id)?.focus();
-  }, [validating, id]);
 
   const { flush } = async;
   useEffect(() => {
@@ -158,7 +146,7 @@ export function EngineField({
         onChange: bound.onChange,
         onBlur: bound.onBlur,
         invalid,
-        disabled: !state.enabled || lockWhileValidating,
+        disabled: !state.enabled || locked,
         required: state.required,
         describedBy,
         focusRef,

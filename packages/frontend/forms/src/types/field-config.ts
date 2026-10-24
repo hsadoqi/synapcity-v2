@@ -51,7 +51,9 @@ export interface AsyncFieldCheckContext {
  * A check that needs the network or another slow source, such as "is this
  * handle taken". It runs only once the field's own schema accepts the value
  * and the value is not empty. Results for a value are remembered, and the same
- * value in flight is checked once.
+ * value in flight is checked once. While typing it runs in the background and
+ * the field stays editable; on submit the form locks until every check has
+ * answered.
  */
 export interface AsyncFieldValidation {
   /** Resolves to an error message, or `undefined` when the value is accepted. */
@@ -63,8 +65,6 @@ export interface AsyncFieldValidation {
   readonly debounceMs?: number;
   /** A check that takes longer fails with `messages.failed`. Defaults to 8000. */
   readonly timeoutMs?: number;
-  /** Disable the control while the check runs. Defaults to `true`. */
-  readonly disableWhileValidating?: boolean;
   readonly messages?: {
     /** Announced while the check runs. Defaults to `Validating…`. */
     readonly validating?: string;

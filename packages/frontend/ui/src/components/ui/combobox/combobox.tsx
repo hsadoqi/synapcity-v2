@@ -43,6 +43,10 @@ function ComboboxClear({ className, ...props }: ComboboxPrimitive.Clear.Props) {
       data-slot="combobox-clear"
       render={<InputGroupButton variant="ghost" size="icon-xs" />}
       aria-label="Clear selection"
+      // Out of the tab order, as in the WAI-ARIA combobox pattern: the input
+      // is the one keyboard stop (deleting its text clears it), and while the
+      // list is open Base UI hides everything outside it, this button included.
+      tabIndex={-1}
       className={cn(className)}
       {...props}
     >
@@ -76,6 +80,9 @@ function ComboboxInput({
             render={<ComboboxTrigger />}
             data-slot="input-group-button"
             aria-label="Show options"
+            // Out of the tab order, as in the WAI-ARIA combobox pattern: the
+            // keyboard opens the list from the input (ArrowDown, Alt+ArrowDown).
+            tabIndex={-1}
             className="group-has-data-[slot=combobox-clear]/input-group:hidden data-pressed:bg-transparent"
             disabled={disabled}
           />
@@ -125,11 +132,14 @@ function ComboboxContent({
 }
 
 function ComboboxList({ className, ...props }: ComboboxPrimitive.List.Props) {
+  // While the popup fades out it is inert, so it stops scrolling too: a
+  // scrollable region nobody can reach is an accessibility error (axe
+  // scrollable-region-focusable), even for the 100ms of the exit animation.
   return (
     <ComboboxPrimitive.List
       data-slot="combobox-list"
       className={cn(
-        'scrollbar-hidden max-h-[min(calc(--spacing(72)---spacing(9)),calc(var(--available-height)---spacing(9)))] scroll-py-1 overflow-y-auto overscroll-contain p-1 data-empty:p-0',
+        'group-data-closed/combobox-content:overflow-hidden scrollbar-hidden max-h-[min(calc(--spacing(72)---spacing(9)),calc(var(--available-height)---spacing(9)))] scroll-py-1 overflow-y-auto overscroll-contain p-1 data-empty:p-0',
         className,
       )}
       {...props}
