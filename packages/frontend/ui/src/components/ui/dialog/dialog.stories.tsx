@@ -1,4 +1,4 @@
-import { useRef, useState, type ComponentProps } from 'react';
+import React, { type ComponentProps } from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, fn, screen, userEvent, waitFor, within } from 'storybook/test';
 
@@ -236,7 +236,7 @@ export const PointerDismissalDisabled: Story = {
 };
 
 function ControlledExample(props: ComponentProps<typeof Dialog>) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = React.useState(false);
   return (
     <Example
       {...props}
@@ -269,9 +269,9 @@ export const Controlled: Story = {
 };
 
 function FormExample(props: ComponentProps<typeof Dialog>) {
-  const [open, setOpen] = useState(false);
-  const [savedName, setSavedName] = useState('');
-  const input = useRef<HTMLInputElement>(null);
+  const [open, setOpen] = React.useState(false);
+  const [savedName, setSavedName] = React.useState('');
+  const input = React.useRef<HTMLInputElement>(null);
   return (
     <>
       <Dialog {...props} open={open} onOpenChange={setOpen}>

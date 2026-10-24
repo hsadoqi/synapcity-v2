@@ -100,10 +100,10 @@ Current inputs include [auth operations](../../apps/web/src/features/auth/server
 
 ### Example packages
 
-- `auth` ----> Verified identity, auth operations, verified caller helpers, identity/provider translation, session-related backend behavior
+- `auth` ----> Verified identity, auth operations, verified caller helpers, identity/provider translation, session-related backend behavior. Exists since M4 with the identity boundary ([README](auth/README.md))
 - `account` ----> Account/profile/preference operations, metadata updates and persistence
 - `data` ----> Resource repositories, database row mapping, participation queries, shared persistence infrastructure for Spaces/Documents/Dashboards, using the client from `supabase`
-- `supabase` ----> Supabase adapter: request-bound server client, session refresh, provider-error translation; the only server package importing the SDK
+- `supabase` ----> Supabase adapter: request-bound server client, session refresh, provider-error translation; the only server package importing the SDK. Exists since M4 with the request client and identity adapter ([README](supabase/README.md))
 
 ## Verification and undecided details
 

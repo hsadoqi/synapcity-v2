@@ -2,11 +2,17 @@ import { fileURLToPath } from 'node:url';
 
 import { baseConfig } from '@synapcity/dev-vitest-config/base';
 import { reactConfig } from '@synapcity/dev-vitest-config/react';
+import { serverOnlyAlias } from '@synapcity/dev-vitest-config/server-only';
 import { defineConfig, mergeConfig } from 'vitest/config';
 
 // Mirrors `paths` in tsconfig.json, so modules that import `@/...` can be
-// tested instead of having to use relative imports to stay testable.
-const alias = { '@': fileURLToPath(new URL('./src', import.meta.url)) };
+// tested instead of having to use relative imports to stay testable. The
+// `server-only` entry lets tests load server packages (see the alias's own
+// comment in dev-vitest-config).
+const alias = [
+  { find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) },
+  serverOnlyAlias,
+];
 
 // Two projects: ordinary tests stay in Node; only `*.dom.test.tsx` files run in
 // jsdom with the shared React setup.

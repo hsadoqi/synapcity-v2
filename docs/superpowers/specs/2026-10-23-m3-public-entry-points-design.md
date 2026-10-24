@@ -1,6 +1,7 @@
 # Milestone 3.2: public entry points and runtime separation
 
 **Status:** Accepted by the owner on 2026-10-23 and recorded in the [workspace conventions](../../architecture/workspace-conventions.md#entry-points). Kept as the record of evidence and decisions.
+**Renumbering (owner decision, 2026-10-23):** milestone numbers M4 and later in this record use the earlier numbering. The roadmap sequence now governs (M4 server identity boundary, M5 Spaces slice, M6 Preferences and Settings, M7 Auth and Account, M8 Documents and Dashboards, M9 Home, M10 sweep); current numbers are in the [package inventory](../../architecture/workspace-conventions.md#package-inventory).
 **Date:** 2026-10-23
 **Branch:** `chore/reorganization-m3-boundary-enforcement`
 **Builds on:** [ADR-0014](../../architecture/decisions/0014-multi-app-package-boundaries.md) section 2 (dependency matrix) and the [package inventory](../../architecture/workspace-conventions.md#package-inventory) from 3.1.

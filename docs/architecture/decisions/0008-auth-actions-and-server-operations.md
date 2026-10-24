@@ -71,3 +71,7 @@ Landed on `refactor/auth-features`, at the layout [ADR-0007](0007-app-local-auth
 - **Deviation from item 6:** `requestPasswordReset` reports `over_request_rate_limit` as well as `over_email_send_rate_limit`, matching `resendConfirmation`. Previously the request limit was answered with the neutral "a reset link is on its way" reply. The owner approved this as a bug fix. Rate-limit codes carry no account information, and every other provider outcome is still answered neutrally.
 
 Not verified by this work: email delivery, OAuth, or a live Supabase session. Mocked tests prove the contract at the SDK boundary, and the Playwright suite reaches the form and navigation behaviour, not the provider.
+
+## Implementation note, 2026-10-23: Milestone 4
+
+Decision item 3 is answered for identity: the host constructs the request-bound client (`createClient()` delegating to `@synapcity/server-supabase` `createRequestClient` with host-supplied cookies) and passes server packages an explicit capability, here an `IdentityProvider` built by `supabaseIdentityProvider(client)`. No module singleton or cross-user client exists. The verified-caller requirement is met through `@synapcity/server-auth` for the rewired actions; the operations in this record still use `getUser()` directly until Milestone 7. Design: [M4 design](../../superpowers/specs/2026-10-23-m4-server-identity-boundary-design.md).

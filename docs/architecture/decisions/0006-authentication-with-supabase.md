@@ -114,6 +114,10 @@ Additions made at the repository owner's request. They keep the decision above (
 
 Verified by automated tests only (mocked provider and framework boundaries): the operations, actions, callback branches, pages and components above. **Not verified live**: that the first of two email-change links returns with a `message` and no `code` (assumed); that an emailed link yields `otp` or `magiclink` in `amr` (both accepted; any other name makes deletion refuse, so it fails closed); the wording of the Magic Link email the deletion link arrives in; cross-device behavior of PKCE links; and `next build`, Playwright and Storybook, which were not run for this work.
 
+## Implementation note, 2026-10-23: Milestone 4 server identity boundary
+
+Placement only; the provider, session model and rules above are unchanged. The request-bound server client is built by `@synapcity/server-supabase` (`createRequestClient`) from cookies and environment that `apps/web/src/lib/supabase/server.ts` still supplies. Access decisions go through `@synapcity/server-auth`: `getVerifiedIdentity` (claims, reusing the memoized `getVerifiedClaims` read) for `requireOwner` and the Spaces API routes, and `getCallerIdentity` (`getUser()`) for the Spaces, Documents, Dashboards and preferences actions. `getVerifiedClaims()` keeps its meaning, a fixture is never a verified identity, and `apps/web/src/identity-boundary.test.ts` lists the files still allowed to call `getClaims()`/`getUser()` directly (all scheduled for M7). Design: [M4 design](../../superpowers/specs/2026-10-23-m4-server-identity-boundary-design.md).
+
 ## Reconsideration conditions
 
 A requirement the cookie-session model cannot meet (for example native clients), a Supabase pricing or availability change, a security incident, or a decision to adopt a different persistence or identity stack.

@@ -1,6 +1,7 @@
 # Milestone 3.1: package grouping and naming
 
 **Status:** Accepted by the owner on 2026-10-23 and recorded in the [workspace conventions](../../architecture/workspace-conventions.md#package-inventory). Kept as the record of decisions and source inputs.
+**Renumbering (owner decision, 2026-10-23):** milestone numbers M4 and later in this record use the earlier numbering. The roadmap sequence now governs (M4 server identity boundary, M5 Spaces slice, M6 Preferences and Settings, M7 Auth and Account, M8 Documents and Dashboards, M9 Home, M10 sweep); current numbers are in the [package inventory](../../architecture/workspace-conventions.md#package-inventory).
 **Date:** 2026-10-23
 **Branch:** `chore/reorganization-m3-boundary-enforcement`
 **Governing decision:** [ADR-0014](../../architecture/decisions/0014-multi-app-package-boundaries.md). This design turns its responsibility families into concrete packages. It does not change the dependency matrix.

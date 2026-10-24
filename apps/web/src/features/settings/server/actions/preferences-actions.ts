@@ -1,7 +1,7 @@
 'use server';
 
 import {
-  getCaller,
+  getCallerIdentity,
   logFailure,
   SAVE_FAILED,
 } from '@/features/account/server/caller';
@@ -34,8 +34,8 @@ export async function saveAccountPreferences(
       : undefined;
 
   const supabase = await createClient();
-  const found = await getCaller(supabase);
-  if (!('caller' in found)) {
+  const found = await getCallerIdentity(supabase);
+  if (!('identity' in found)) {
     return { ok: false, error: found.failure, signedOut: found.signedOut };
   }
 
@@ -45,7 +45,7 @@ export async function saveAccountPreferences(
     .from('user_preferences')
     .upsert(
       {
-        user_id: found.caller.id,
+        user_id: found.identity.userId,
         preferences: parsed.data,
         schema_version: 1,
         ...(timezone && { device_timezone: timezone }),

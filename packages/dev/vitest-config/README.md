@@ -2,11 +2,12 @@
 
 Owns: the shared Vitest presets that workspaces compose with `mergeConfig`.
 
-| Export      | Gives                                                                         |
-| ----------- | ----------------------------------------------------------------------------- |
-| `./base`    | `baseConfig`: Node environment, `src/**/*.test.{ts,tsx}`, no globals          |
-| `./react`   | `reactConfig`: `baseConfig` plus jsdom and automatic Testing Library cleanup  |
-| `./browser` | `chromiumBrowser()`: headless Chromium through Playwright, for `test.browser` |
+| Export          | Gives                                                                                                                                                                                                                                           |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `./base`        | `baseConfig`: Node environment, `src/**/*.test.{ts,tsx}`, no globals                                                                                                                                                                            |
+| `./react`       | `reactConfig`: `baseConfig` plus jsdom and automatic Testing Library cleanup                                                                                                                                                                    |
+| `./browser`     | `chromiumBrowser()`: headless Chromium through Playwright, for `test.browser`                                                                                                                                                                   |
+| `./server-only` | `serverOnlyAlias`: a `resolve.alias` entry mapping exactly `server-only` to an empty module, so tests can load server entries (the real module throws without the `react-server` condition, which would also swap `react` for its server build) |
 
 A workspace adds a `vitest.config.ts`:
 

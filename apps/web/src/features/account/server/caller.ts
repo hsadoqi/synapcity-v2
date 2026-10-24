@@ -1,4 +1,7 @@
 import { isAuthRetryableFetchError } from '@supabase/supabase-js';
+import type { VerifiedIdentity } from '@synapcity/domain-identity/types';
+import { verifyIdentityWithProvider } from '@synapcity/server-auth';
+import { supabaseIdentityProvider } from '@synapcity/server-supabase';
 
 import { createClient } from '@/lib/supabase/server';
 
@@ -39,6 +42,30 @@ export async function getCaller(supabase: Supabase): Promise<CallerResult> {
   if (!error && data.user) return { caller: data.user };
   logFailure('getCaller', error);
   if (isAuthRetryableFetchError(error)) return { failure: SAVE_FAILED };
+  return { failure: SIGN_IN_AGAIN, signedOut: true };
+}
+
+/** Who is asking, through the identity boundary, or the message to show instead. */
+export type CallerIdentityResult =
+  { identity: VerifiedIdentity } | { failure: string; signedOut?: true };
+
+/**
+ * The verified caller for actions that need only who is asking, checked
+ * through the identity boundary with a fresh provider lookup (ADR-0006).
+ * Replies and logging match `getCaller`: an outage gets "try again", anything
+ * else asks the person to sign in again, and every failure is logged by code
+ * and status only. Profile actions that need the provider's user record keep
+ * `getCaller` until Milestone 7.
+ */
+export async function getCallerIdentity(
+  supabase: Supabase,
+): Promise<CallerIdentityResult> {
+  const { result, failure } = await verifyIdentityWithProvider(
+    supabaseIdentityProvider(supabase),
+  );
+  if (result.status === 'verified') return { identity: result.identity };
+  logFailure('getCallerIdentity', failure);
+  if (result.status === 'unavailable') return { failure: SAVE_FAILED };
   return { failure: SIGN_IN_AGAIN, signedOut: true };
 }
 

@@ -1,14 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { getVerifiedClaims } = vi.hoisted(() => ({
-  getVerifiedClaims: vi.fn(),
+const { getVerifiedIdentity } = vi.hoisted(() => ({
+  getVerifiedIdentity: vi.fn(),
 }));
 const { listSpaces } = vi.hoisted(() => ({ listSpaces: vi.fn() }));
 const { fixtureModeEnabled } = vi.hoisted(() => ({
   fixtureModeEnabled: vi.fn(() => false),
 }));
 
-vi.mock('@/features/auth/server/session', () => ({ getVerifiedClaims }));
+vi.mock('@/features/auth/server/session', () => ({ getVerifiedIdentity }));
 vi.mock('@/features/spaces/server/space-repository', () => ({ listSpaces }));
 vi.mock('@/lib/access/dev-fixture', () => ({ fixtureModeEnabled }));
 
@@ -21,7 +21,7 @@ describe('GET /api/spaces', () => {
   });
 
   it('rejects a signed-out request without reading any spaces', async () => {
-    getVerifiedClaims.mockResolvedValue(null);
+    getVerifiedIdentity.mockResolvedValue({ status: 'signed-out' });
 
     const response = await GET();
 
@@ -30,7 +30,10 @@ describe('GET /api/spaces', () => {
   });
 
   it('returns the owner’s spaces uncached', async () => {
-    getVerifiedClaims.mockResolvedValue({ sub: 'u1' });
+    getVerifiedIdentity.mockResolvedValue({
+      status: 'verified',
+      identity: { userId: 'u1' },
+    });
     listSpaces.mockResolvedValue([{ id: 's1' }]);
 
     const response = await GET();
@@ -45,6 +48,6 @@ describe('GET /api/spaces', () => {
     listSpaces.mockResolvedValue([]);
 
     expect((await GET()).status).toBe(200);
-    expect(getVerifiedClaims).not.toHaveBeenCalled();
+    expect(getVerifiedIdentity).not.toHaveBeenCalled();
   });
 });

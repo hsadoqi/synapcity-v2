@@ -3,7 +3,7 @@
 import { z } from 'zod';
 
 import {
-  getCaller,
+  getCallerIdentity,
   logFailure,
   SAVE_FAILED,
 } from '@/features/account/server/caller';
@@ -34,8 +34,8 @@ export async function setSpacePinned(
   }
 
   const supabase = await createClient();
-  const found = await getCaller(supabase);
-  if (!('caller' in found)) {
+  const found = await getCallerIdentity(supabase);
+  if (!('identity' in found)) {
     return { ok: false, error: found.failure, signedOut: found.signedOut };
   }
 
@@ -63,8 +63,8 @@ export async function recordSpaceView(spaceId: unknown): Promise<void> {
   if (!id.success) return;
 
   const supabase = await createClient();
-  const found = await getCaller(supabase);
-  if (!('caller' in found)) return;
+  const found = await getCallerIdentity(supabase);
+  if (!('identity' in found)) return;
 
   const now = Date.now();
   const cutoff = new Date(now - VIEW_THROTTLE_MS).toISOString();

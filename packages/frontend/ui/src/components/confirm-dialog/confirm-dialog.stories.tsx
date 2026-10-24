@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { useState } from 'react';
+import * as React from 'react';
 
 import { ConfirmDialog } from '@synapcity/frontend-ui/components/confirm-dialog';
 import { Button } from '@synapcity/frontend-ui/core/button';
@@ -27,7 +27,7 @@ type Story = StoryObj<typeof ConfirmDialog>;
 export const Destructive: Story = {
   args: { variant: 'destructive' },
   render: function Render(args) {
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = React.useState(false);
     return (
       <>
         <Button variant="outline" onClick={() => setOpen(true)}>
