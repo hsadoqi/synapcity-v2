@@ -33,6 +33,7 @@ const projects = [
   'packages/frontend/collection',
   'packages/frontend/error-reports',
   'packages/frontend/preferences',
+  'packages/frontend/forms',
   'packages/frontend/tokens',
   'packages/frontend/ui',
   'packages/server/auth',
