@@ -52,12 +52,12 @@ describe('AgendaActionsMenu toolbar', () => {
       />,
     );
     const pin = screen.getByRole('button', { name: 'Pin' });
-    expect(pin.className).toContain('@sm/agenda:inline-flex');
+    expect(pin.className).toContain('@3xs/actions:inline-flex');
     fireEvent.click(pin);
     expect(items[0]!.onSelect).toHaveBeenCalledTimes(1);
 
     const compact = container.querySelector(
-      '[data-slot="agenda-menu-compact"] button',
+      '[data-slot="actions-toolbar-more-compact"] button',
     )!;
     fireEvent.click(compact);
     const menu = await screen.findByRole('menu');
@@ -74,7 +74,9 @@ describe('AgendaActionsMenu toolbar', () => {
       />,
     );
     fireEvent.click(
-      container.querySelector('[data-slot="agenda-menu-wide"] button')!,
+      container.querySelector(
+        '[data-slot="actions-toolbar-more-wide"] button',
+      )!,
     );
     const menu = await screen.findByRole('menu');
     expect(menu.textContent).toContain('Help');
@@ -90,7 +92,7 @@ describe('AgendaActionsMenu toolbar', () => {
       />,
     );
     expect(
-      container.querySelector('[data-slot="agenda-menu-wide"]'),
+      container.querySelector('[data-slot="actions-toolbar-more-wide"]'),
     ).toBeNull();
   });
 });
@@ -124,10 +126,10 @@ describe('AgendaActionsMenu settings presentation', () => {
       name: 'Agenda settings',
     });
     expect(dialogTrigger!.parentElement!.className).toContain(
-      '@sm/agenda:block',
+      '@3xs/actions:block',
     );
     expect(viewTrigger!.parentElement!.className).toContain(
-      '@sm/agenda:hidden',
+      '@3xs/actions:hidden',
     );
   });
 

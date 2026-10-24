@@ -11,9 +11,9 @@ const meta = {
   args: { title: 'Settings', description: 'Manage your agenda preferences' },
   argTypes: { trigger: { control: false } },
   decorators: [
-    // The toolbar answers to its `@container/agenda` ancestor's width.
+    // The toolbar folds by the room it is given, here 32rem.
     (Story) => (
-      <div className="@container/agenda flex w-lg justify-end rounded-xl bg-card p-3">
+      <div className="flex w-lg rounded-xl bg-card p-3">
         <Story />
       </div>
     ),
@@ -45,27 +45,33 @@ const toolbarItems = [
 const visible = (element: Element | null) =>
   element !== null && getComputedStyle(element).display !== 'none';
 
-/** 32rem wide, past `@sm`: icon items are buttons, "More actions" holds Help. */
+/** 32rem of room, past `@3xs`: icon items are buttons, "More actions" holds Help. */
 export const WideToolbar: Story = {
   args: { menuItems: toolbarItems },
   play: async ({ canvasElement }) => {
     const pin = within(canvasElement).getByRole('button', { name: 'Pin' });
     await expect(visible(pin)).toBe(true);
     await expect(
-      visible(canvasElement.querySelector('[data-slot="agenda-menu-compact"]')),
+      visible(
+        canvasElement.querySelector(
+          '[data-slot="actions-toolbar-more-compact"]',
+        ),
+      ),
     ).toBe(false);
     await expect(
-      visible(canvasElement.querySelector('[data-slot="agenda-menu-wide"]')),
+      visible(
+        canvasElement.querySelector('[data-slot="actions-toolbar-more-wide"]'),
+      ),
     ).toBe(true);
   },
 };
 
-/** 18rem wide, under `@sm`: only settings and "More actions", which holds everything. */
+/** 12rem of room, under `@3xs`: only settings and "More actions", which holds everything. */
 export const CompactToolbar: Story = {
   args: { menuItems: toolbarItems },
   decorators: [
     (Story) => (
-      <div className="@container/agenda flex w-2xs justify-end rounded-xl bg-card p-3">
+      <div className="flex w-48 rounded-xl bg-card p-3">
         <Story />
       </div>
     ),
@@ -74,7 +80,11 @@ export const CompactToolbar: Story = {
     const pin = within(canvasElement).queryByRole('button', { name: 'Pin' });
     await expect(pin).toBeNull();
     await expect(
-      visible(canvasElement.querySelector('[data-slot="agenda-menu-compact"]')),
+      visible(
+        canvasElement.querySelector(
+          '[data-slot="actions-toolbar-more-compact"]',
+        ),
+      ),
     ).toBe(true);
   },
 };
