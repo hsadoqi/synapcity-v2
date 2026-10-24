@@ -44,6 +44,32 @@
   display: none;
 }
 
+/*
+ * The resize corner is a cue, revealed like the widget's drag cue: on hover,
+ * on keyboard focus inside the item, and while resizing. Only where the
+ * pointer can hover; on touch, which cannot, it stays visible.
+ */
+@media (pointer: fine) {
+  .dashboard-grid
+    .react-grid-item
+    > .react-resizable-handle.dashboard-resize-handle {
+    opacity: 0;
+    transition: opacity 150ms;
+  }
+
+  .dashboard-grid
+    .react-grid-item:hover
+    > .react-resizable-handle.dashboard-resize-handle,
+  .dashboard-grid
+    .react-grid-item:focus-within
+    > .react-resizable-handle.dashboard-resize-handle,
+  .dashboard-grid
+    .react-grid-item.resizing
+    > .react-resizable-handle.dashboard-resize-handle {
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .dashboard-grid,
   .dashboard-grid .react-grid-item {

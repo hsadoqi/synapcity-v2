@@ -1,1 +1,5 @@
-export { WidgetShell } from './widget-shell';
+export {
+  WidgetShell,
+  type WidgetShellActions,
+  type WidgetShellToolbar,
+} from './widget-shell';
