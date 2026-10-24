@@ -1,1 +1,0 @@
-export { createSpaceFixture } from './spaces';

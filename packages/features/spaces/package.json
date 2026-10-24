@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     "./contracts": "./src/contracts/index.ts",
+    "./frontend": "./src/frontend/index.ts",
     "./server": "./src/server/index.ts"
   },
   "scripts": {
@@ -16,16 +17,20 @@
   },
   "dependencies": {
     "@synapcity/domain-records": "workspace:*",
+    "@synapcity/frontend-collection": "workspace:*",
+    "@synapcity/frontend-ui": "workspace:*",
     "@synapcity/server-data": "workspace:*",
     "@synapcity/server-supabase": "workspace:*",
+    "lucide-react": "^1.55.0",
+    "react": "19.3.0",
     "server-only": "0.0.1"
   },
   "devDependencies": {
+    "@storybook/nextjs-vite": "10.6.3",
     "@synapcity/dev-eslint-config": "workspace:*",
     "@synapcity/dev-fixtures": "workspace:*",
     "@synapcity/dev-typescript-config": "workspace:*",
     "@synapcity/dev-vitest-config": "workspace:*",
-    "@synapcity/frontend-collection": "workspace:*",
     "@testing-library/dom": "10.4.2",
     "@testing-library/react": "16.3.3",
     "@types/node": "26.6.5",
@@ -35,6 +40,7 @@
     "eslint": "10.9.1",
     "jsdom": "30.1.2",
     "react-dom": "19.3.0",
+    "storybook": "10.6.3",
     "typescript": "7.0.2",
     "vitest": "4.1.12"
   }

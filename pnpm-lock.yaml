@@ -663,16 +663,31 @@ importers:
       '@synapcity/domain-records':
         specifier: workspace:*
         version: link:../../domain/records
+      '@synapcity/frontend-collection':
+        specifier: workspace:*
+        version: link:../../frontend/collection
+      '@synapcity/frontend-ui':
+        specifier: workspace:*
+        version: link:../../frontend/ui
       '@synapcity/server-data':
         specifier: workspace:*
         version: link:../../server/data
       '@synapcity/server-supabase':
         specifier: workspace:*
         version: link:../../server/supabase
+      lucide-react:
+        specifier: ^1.55.0
+        version: 1.55.0(@types/react@19.3.0)(react@19.3.0)
+      react:
+        specifier: 19.3.0
+        version: 19.3.0
       server-only:
         specifier: 0.0.1
         version: 0.0.1
     devDependencies:
+      '@storybook/nextjs-vite':
+        specifier: 10.6.3
+        version: 10.6.3(@babel/core@8.0.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(next@16.4.3(@babel/core@8.0.1)(@opentelemetry/api@1.9.1)(@playwright/test@1.64.0)(@types/node@26.6.5)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rollup@4.64.7)(storybook@10.6.3(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(supports-color@7.2.0)(typescript@7.0.2)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
       '@synapcity/dev-eslint-config':
         specifier: workspace:*
         version: link:../../dev/eslint-config
@@ -685,9 +700,6 @@ importers:
       '@synapcity/dev-vitest-config':
         specifier: workspace:*
         version: link:../../dev/vitest-config
-      '@synapcity/frontend-collection':
-        specifier: workspace:*
-        version: link:../../frontend/collection
       '@testing-library/dom':
         specifier: 10.4.2
         version: 10.4.2
@@ -715,6 +727,9 @@ importers:
       react-dom:
         specifier: 19.3.0
         version: 19.3.0(react@19.3.0)
+      storybook:
+        specifier: 10.6.3
+        version: 10.6.3(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0)
       typescript:
         specifier: 7.0.2
         version: 7.0.2
