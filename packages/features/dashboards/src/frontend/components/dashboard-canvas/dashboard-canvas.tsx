@@ -34,7 +34,7 @@ export function DashboardCanvas() {
           className="mx-auto flex w-full flex-col gap-2"
           style={{ maxWidth: frameWidth }}
         >
-          <p className="m-0 font-mono text-xs text-muted-foreground tabular-nums">
+          <p className="m-0 text-xs text-muted-foreground tabular-nums">
             {FRAME_LABEL[breakpoint]} · {frameWidth}px
           </p>
           <div className="rounded-xl border border-border bg-background px-5 pt-7 pb-10">

@@ -129,4 +129,17 @@ describe('WidgetShell', () => {
       screen.queryByRole('button', { name: 'Rename Steps today' }),
     ).toBeNull();
   });
+
+  it('shows the title in edit mode even when titles are hidden, so the rename button is never invisible', () => {
+    setup({}, { editMode: true, showWidgetTitles: false });
+    expect(
+      screen.getByRole('heading', { name: 'Steps today' }).className,
+    ).not.toContain('sr-only');
+  });
+
+  it('stays named while its title is edited', () => {
+    setup();
+    fireEvent.click(screen.getByRole('button', { name: 'Rename Steps today' }));
+    expect(screen.getByRole('region', { name: 'Steps today' })).toBeDefined();
+  });
 });

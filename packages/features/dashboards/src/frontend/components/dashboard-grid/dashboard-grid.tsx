@@ -14,6 +14,8 @@ import ReactGridLayout, {
   type Layout,
 } from 'react-grid-layout';
 
+import { cn } from '@synapcity/frontend-ui/lib/utils';
+
 import { useDashboardStore, type DashboardStore } from '../../store';
 import { ConnectedWidget } from '../connected-widget';
 import { DashboardEmptyState } from '../dashboard-empty-state';
@@ -45,7 +47,10 @@ function renderResizeHandle(axis: string, ref: Ref<HTMLElement>) {
     <span
       ref={ref as Ref<HTMLSpanElement>}
       aria-hidden="true"
-      className={`react-resizable-handle react-resizable-handle-${axis} dashboard-resize-handle`}
+      className={cn(
+        'react-resizable-handle dashboard-resize-handle',
+        `react-resizable-handle-${axis}`,
+      )}
     >
       <svg
         viewBox="0 0 256 256"

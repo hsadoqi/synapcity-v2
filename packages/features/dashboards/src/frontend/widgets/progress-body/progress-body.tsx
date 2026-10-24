@@ -22,7 +22,7 @@ export function ProgressBody({ goal }: { goal: Goal }) {
       >
         {/* The width is the one dynamic value: the goal's progress. */}
         <div
-          className="h-full bg-primary transition-[width] duration-300 motion-reduce:transition-none"
+          className="h-full bg-primary transition-all duration-300 motion-reduce:transition-none"
           style={{ width: `${percent}%` }}
         />
       </div>

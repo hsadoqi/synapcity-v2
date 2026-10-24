@@ -66,9 +66,10 @@ function WidgetTitle({
   onRename: (title: string) => void;
 }) {
   const [draft, setDraft] = useState<string | null>(null);
+  // In edit mode the title always shows, so its rename button is never focusable but invisible.
   const heading = cn(
     'm-0 truncate text-base font-semibold text-foreground',
-    !visible && 'sr-only',
+    !visible && !editMode && 'sr-only',
   );
 
   if (draft !== null) {
@@ -77,19 +78,22 @@ function WidgetTitle({
       if (next && next !== title) onRename(next);
       setDraft(null);
     };
+    // Inside the heading, so the widget stays named by its title while it is edited.
     return (
-      <input
-        aria-label="Widget title"
-        autoFocus
-        value={draft}
-        onChange={(event) => setDraft(event.target.value)}
-        onBlur={commit}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter') commit();
-          if (event.key === 'Escape') setDraft(null);
-        }}
-        className="w-full border-0 bg-transparent p-0 text-base font-semibold text-foreground outline-none"
-      />
+      <h2 id={id} className={heading}>
+        <input
+          aria-label="Widget title"
+          autoFocus
+          value={draft}
+          onChange={(event) => setDraft(event.target.value)}
+          onBlur={commit}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') commit();
+            if (event.key === 'Escape') setDraft(null);
+          }}
+          className="w-full border-0 bg-transparent p-0 text-base font-semibold text-foreground outline-none"
+        />
+      </h2>
     );
   }
 
