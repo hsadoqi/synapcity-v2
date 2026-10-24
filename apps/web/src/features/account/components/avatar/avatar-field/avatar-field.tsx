@@ -8,7 +8,7 @@ import {
   AVATAR_ACCEPT,
   MAX_AVATAR_BYTES,
   avatarFileSchema,
-} from '@/features/account/types';
+} from '@synapcity/domain-identity';
 import { ProfileAvatar, isUploadedAvatar } from '@/features/account/shared';
 import { useProfileForm } from '../../profile';
 

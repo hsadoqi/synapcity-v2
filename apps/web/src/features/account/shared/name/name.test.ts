@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { checkName } from './name';
-import { MAX_NAME_LENGTH, profileSchema } from '../../types';
+import { MAX_NAME_LENGTH, profileSchema } from '@synapcity/domain-identity';
 
 describe('checkName', () => {
   it('accepts a name and trims it', () => {

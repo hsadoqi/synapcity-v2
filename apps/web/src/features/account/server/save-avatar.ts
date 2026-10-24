@@ -1,4 +1,4 @@
-import { avatarFileSchema } from '@/features/account/types';
+import { avatarFileSchema } from '@synapcity/domain-identity';
 import { providerImageFrom } from '@/features/account/shared/provider-image';
 import { detectImageType, extensionFor } from './image-type';
 import { withAvatarUrl } from './profile-metadata';

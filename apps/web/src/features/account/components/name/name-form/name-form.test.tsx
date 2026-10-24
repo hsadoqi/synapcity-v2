@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { ProfileState } from '@/features/account/types';
-import { MAX_NAME_LENGTH } from '@/features/account/types';
+import { MAX_NAME_LENGTH } from '@synapcity/domain-identity';
 
 /**
  * Renders the real form with the state a submit returned. `useActionState` is

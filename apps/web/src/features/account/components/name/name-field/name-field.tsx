@@ -1,7 +1,7 @@
 'use client';
 
 import { FormField, fieldErrorProps } from '@synapcity/frontend-forms';
-import { MAX_NAME_LENGTH } from '@/features/account/types';
+import { MAX_NAME_LENGTH } from '@synapcity/domain-identity';
 import { useProfileForm } from '../../profile';
 
 /** The display-name input. Place it inside a `ProfileFormShell`. */

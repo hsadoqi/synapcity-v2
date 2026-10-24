@@ -1,4 +1,4 @@
-import type { ProfileInput } from './schema';
+import type { ProfileInput } from '@synapcity/domain-identity';
 
 /** Profile fields an error can point at, so the form can mark them invalid. */
 type ProfileFieldName = keyof ProfileInput | 'avatar';
