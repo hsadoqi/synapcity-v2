@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { spaceSchema } from '@synapcity/domain-records';
 import { findEntityIcon } from '@synapcity/frontend-ui/blocks/entity/entity-icon';
 
-import { spaceSchema } from '../../../shared/schema';
 import {
   SPACE_FIXTURES,
   createSpaceEntityFixture,

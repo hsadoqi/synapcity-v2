@@ -1,11 +1,11 @@
 import { z } from 'zod';
+import { spaceSchema } from '@synapcity/domain-records';
+import type { SpaceEntity, SpaceSummary } from '@synapcity/domain-records';
 
 import { fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import { createClient } from '@/lib/supabase/server';
 
 import { SPACE_FIXTURES } from '../../lib/fixtures';
-import { spaceSchema } from '../../shared/schema';
-import type { SpaceEntity, SpaceSummary } from '../../shared/types';
 
 const COLUMNS =
   'id, owner_id, name, description, icon, tags, created_at, updated_at, pinned_at, last_viewed_at';

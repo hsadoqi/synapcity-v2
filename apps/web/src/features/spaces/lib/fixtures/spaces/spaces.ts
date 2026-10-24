@@ -1,8 +1,9 @@
-import { spaceSchema } from '../../../shared/schema';
+import { spaceSchema } from '@synapcity/domain-records';
+import type { SpaceEntity } from '@synapcity/domain-records';
+
 import type {
   EntityKind,
   Space,
-  SpaceEntity,
   SpaceEntityItemKind,
 } from '../../../shared/types';
 
