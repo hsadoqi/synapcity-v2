@@ -16,7 +16,7 @@
   "dependencies": {
     "@synapcity/domain-preferences": "workspace:*",
     "next-themes": "^0.4.6",
-    "react": "19.3.0"
+    "react": "19.3.1"
   },
   "devDependencies": {
     "@storybook/nextjs-vite": "10.6.3",
