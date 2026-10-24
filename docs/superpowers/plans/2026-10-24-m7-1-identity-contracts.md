@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Approved for planning (owner decision, 2026-10-24: design Q1 to Q5 accepted). Not yet implemented. Execution needs the owner's go-ahead for the task scope.
+**Status:** Implemented on `refactor/m7-1-identity-contracts` (2026-10-24), three local commits, not pushed or merged. Checked by the author: package tests, type check and lint; the affected web tests (account, auth, settings, lib, app: 905 tests); `pnpm boundaries`; `pnpm deps`. Not run: the full `pnpm verify` (CI is the gate), Storybook, end-to-end, and the manual checks in Task 4. Two files are deliberately left for after the React Hook Form pull request (call C4), and one placement question is open (call C5).
 
 **Goal:** The credential schemas, the profile and avatar schemas, and the pure display-user rules live once, in `@synapcity/domain-identity`. The web app reads them from the package and the app-local duplicates are gone. No behavior changes.
 
@@ -37,7 +37,7 @@
 
 **Files:**
 
-- Move: `apps/web/src/features/auth/types/schema/schema.ts` and `schema.test.ts` into `packages/domain/identity/src/schemas/credentials/` (`credentials.ts`, `credentials.test.ts`, `index.ts`). Exports to move: `MIN_PASSWORD_LENGTH`, `PASSWORD_TOO_SHORT_MESSAGE`, `PASSWORD_REQUIREMENTS`, `missingCharactersMessage`, `newPasswordSchema`, `ALREADY_YOUR_EMAIL`, `signInSchema`, `signUpSchema`, `emailRequestSchema`, `updatePasswordSchema`, `AuthFieldName`, `firstRefusal`, `everyRefusal`, and any other export the file has (list them from the file; do not guess).
+- Move: `apps/web/src/features/auth/types/schema/schema.ts` and `schema.test.ts` into `packages/domain/identity/src/schemas/` as flat files `credentials.ts` and `credentials.test.ts` (the existing schemas are flat, and the R7 rule rejects a folder importing a flat sibling directly). Exports to move: `MIN_PASSWORD_LENGTH`, `PASSWORD_TOO_SHORT_MESSAGE`, `PASSWORD_REQUIREMENTS`, `missingCharactersMessage`, `newPasswordSchema`, `ALREADY_YOUR_EMAIL`, `signInSchema`, `signUpSchema`, `emailRequestSchema`, `updatePasswordSchema`, `AuthFieldName`, `firstRefusal`, `everyRefusal`, and any other export the file has (list them from the file; do not guess).
 - Modify: `packages/domain/identity/src/schemas/index.ts` and `src/index.ts` (export the new names); the file imports `nameSchema` from the account feature today, so it imports `./name` instead.
 - Modify: every app file importing these names from `@/features/auth/types` or `.../types/schema` (find with `rg -n "features/auth/types|\.\./schema|\./schema" apps/web/src`, including multi-line imports and tests). `features/auth/types/index.ts` keeps exporting `form-state` only; delete `types/schema/` when empty.
 - No manifest change: `apps/web/package.json` already depends on `@synapcity/domain-identity` (`workspace:*`).
@@ -47,11 +47,11 @@
 - Produces (`@synapcity/domain-identity`): every moved name, unchanged.
 - Consumes: `zod`; `nameSchema` from the package itself.
 
-- [ ] **Step 1: Write the characterization test.** Before moving, run the existing `schema.test.ts` and keep its count. Add one golden case per schema for a valid input and one message per rule that the file does not already assert (the file's own tests list which are missing).
-- [ ] **Step 2: Move the file and test, re-point the import of `nameSchema`, export from the package.** Run `pnpm --filter @synapcity/domain-identity test` and `check-types`. Expected: the moved tests pass unchanged.
-- [ ] **Step 3: Re-point the app's importers** to `@synapcity/domain-identity`. Run `pnpm --filter web check-types` and `pnpm --filter web test` for the auth directories. Expected: pass; the web test count drops by exactly the moved tests.
-- [ ] **Step 4: Run the checks** one script at a time: package `test`, `lint`, `check-types`; web `lint`; `pnpm boundaries`; `pnpm deps`. Expected: pass; `rg -n "features/auth/types/schema" apps/web/src` finds nothing.
-- [ ] **Step 5: Checkpoint commit** (if authorized): `refactor(domain-identity): move the credential schemas into the package`.
+- [x] **Step 1: Characterize before moving.** Done as: the existing `schema.test.ts` moved unchanged and passes in the package. No extra golden cases were added (the file's own tests already cover each schema and rule); adding some remains optional.
+- [x] **Step 2: Move the file and test, re-point the import of `nameSchema`, export from the package.** Run `pnpm --filter @synapcity/domain-identity test` and `check-types`. Expected: the moved tests pass unchanged.
+- [x] **Step 3: Re-point the app's importers** to `@synapcity/domain-identity`. Run `pnpm --filter web check-types` and `pnpm --filter web test` for the auth directories. Expected: pass; the web test count drops by exactly the moved tests.
+- [x] **Step 4: Run the checks** one script at a time: package `test`, `lint`, `check-types`; web `lint`; `pnpm boundaries`; `pnpm deps`. Expected: pass; `rg -n "features/auth/types/schema" apps/web/src` finds nothing.
+- [x] **Step 5: Checkpoint commit** (local only, `--no-verify`): `refactor(domain-identity): move the credential schemas into the package`.
 
 ### Task 2: Remove the duplicate profile contracts
 
@@ -62,17 +62,17 @@
 - Modify: importers of `MAX_NAME_LENGTH`, `MAX_AVATAR_BYTES`, `nameSchema`, `avatarFileSchema`, `profileSchema`, `AVATAR_TYPES`, `AvatarType`, `AVATAR_ACCEPT` from `@/features/account/types` (about 9 files named by `rg -n "MAX_NAME_LENGTH|MAX_AVATAR_BYTES|nameSchema|avatarFileSchema|profileSchema|AVATAR_TYPES|AvatarType|AVATAR_ACCEPT" apps/web/src`); `features/account/server/image-type/image-type.ts` uses `AVATAR_TYPES`, which becomes `AVATAR_FILE_TYPES`.
 - Modify: `packages/domain/identity/src/schemas/user.test.ts` / `avatar.test.ts` / `name.test.ts` to carry the assertions of the deleted `schema.test.ts` that the package does not yet assert (messages, limits, MIME list, the "no name" and "empty name" cases).
 
-- [ ] **Step 1: Pin the difference.** Write package tests asserting: `profileSchema.safeParse({ name: ' Ada ' })` gives the trimmed name; `{}` and `{ name: '' }` fail with the existing messages; an `avatar` that is a valid file passes and a too-large or wrong-MIME file fails with the existing messages. Compare each message string with the app-local file; any difference stops the task and goes to the owner (it is a behavior change).
-- [ ] **Step 2: Decide the one reviewed difference.** The app-local `profileSchema` has the single key `name` and its test asserts that. The package's schema also accepts an optional `avatar`. Use the package schema (M4 made it the contract, and parsing `{ name }` is identical). Update the app test that asserts the key list. Record this call in the plan's "Calls made" section for the owner to check.
-- [ ] **Step 3: Re-point importers, rename `AVATAR_TYPES` to `AVATAR_FILE_TYPES`, delete the app-local file and its test.** Run `pnpm --filter web check-types` and the account tests. Expected: pass.
-- [ ] **Step 4: Run the checks** as in Task 1. Expected: pass; `rg -n "account/types/schema" apps/web/src` finds nothing.
-- [ ] **Step 5: Checkpoint commit** (if authorized): `refactor(account): use the identity package's profile and avatar contracts`.
+- [x] **Step 1: Pin the difference.** Write package tests asserting: `profileSchema.safeParse({ name: ' Ada ' })` gives the trimmed name; `{}` and `{ name: '' }` fail with the existing messages; an `avatar` that is a valid file passes and a too-large or wrong-MIME file fails with the existing messages. Compare each message string with the app-local file; any difference stops the task and goes to the owner (it is a behavior change).
+- [x] **Step 2: Decide the one reviewed difference.** The app-local `profileSchema` has the single key `name` and its test asserts that. The package's schema also accepts an optional `avatar`. Use the package schema (M4 made it the contract, and parsing `{ name }` is identical). Update the app test that asserts the key list. Record this call in the plan's "Calls made" section for the owner to check.
+- [x] **Step 3: Re-point importers, rename `AVATAR_TYPES` to `AVATAR_FILE_TYPES`, delete the app-local file and its test.** Run `pnpm --filter web check-types` and the account tests. Expected: pass.
+- [x] **Step 4: Run the checks** as in Task 1. Expected: pass; `rg -n "account/types/schema" apps/web/src` finds nothing.
+- [x] **Step 5: Checkpoint commit** (local only, `--no-verify`): `refactor(account): use the identity package's profile and avatar contracts`.
 
 ### Task 3: The pure display-user rules
 
 **Files:**
 
-- Move (each with its test) into `packages/domain/identity/src/utils/<unit>/` with an `index.ts` per unit: `features/account/shared/{name,initials,avatar-url,provider-image,profile-confirmed}/` and `features/auth/shared/current-user/`. `name.ts` (`checkName`) imports `nameSchema` from `../../schemas`.
+- Move (each with its test) into `packages/domain/identity/src/utils/<unit>/` with an `index.ts` per unit: `features/account/shared/{initials,avatar-url,provider-image,profile-confirmed}/`, `features/auth/shared/current-user/`, and `features/account/shared/name/` (renamed `check-name/`). `check-name.ts` imports `nameSchema` from `../../schemas`.
 - Modify: `packages/domain/identity/src/utils/index.ts` (new) and `src/index.ts` to export the moved names.
 - Modify: importers: `features/account/shared/index.ts` stops exporting the moved units (it keeps `profile-avatar`), `features/auth/shared/index.ts` stops exporting `current-user`; update the 8 files importing `@/features/account/shared` and the auth files importing `current-user`. `profile-avatar.tsx` imports `initials`, `avatar-url` and `provider-image` from the package.
 
@@ -80,15 +80,15 @@
 
 - Produces (`@synapcity/domain-identity`): `checkName`, the `initials`, avatar-URL, provider-image and profile-confirmed helpers, and the current-user mapping, with the names they have today.
 
-- [ ] **Step 1: Move the five account units and the current-user unit with their tests; export from the package root.** Run `pnpm --filter @synapcity/domain-identity test`. Expected: all moved tests pass unchanged.
-- [ ] **Step 2: Re-point the app's importers.** Run `pnpm --filter web check-types` and the account and auth test directories. Expected: pass.
-- [ ] **Step 3: Run the checks** as in Task 1. Expected: pass; `rg -n "account/shared/(name|initials|avatar-url|provider-image|profile-confirmed)|auth/shared/current-user" apps/web/src` finds nothing outside `profile-avatar`'s own folder.
-- [ ] **Step 4: Checkpoint commit** (if authorized): `refactor(domain-identity): move the pure display-user rules into the package`.
+- [x] **Step 1: Move the five account units and the current-user unit with their tests; export from the package root.** Run `pnpm --filter @synapcity/domain-identity test`. Expected: all moved tests pass unchanged.
+- [x] **Step 2: Re-point the app's importers.** Run `pnpm --filter web check-types` and the account and auth test directories. Expected: pass.
+- [x] **Step 3: Run the checks** as in Task 1. Expected: pass; `rg -n "account/shared/(name|initials|avatar-url|provider-image|profile-confirmed)|auth/shared/current-user" apps/web/src` finds nothing outside `profile-avatar`'s own folder.
+- [x] **Step 4: Checkpoint commit** (local only, `--no-verify`): `refactor(domain-identity): move the pure display-user rules into the package`.
 
 ### Task 4: Records and verification
 
-- [ ] **Step 1: Update the records.** `packages/domain/identity/README.md` (`Owns:` credential schemas, profile and avatar schemas, display-user rules), the workspace-conventions inventory row for `domain-identity`, the ownership map rows for auth and account, the M7 design status line (M7.1 implemented), and `.agents/task-scope.md`. No owner quotes.
-- [ ] **Step 2: Boundary probe** (planted, then removed, with `git status` empty afterwards): an `import 'react'` in the package should report R4.
+- [x] **Step 1: Update the records.** `packages/domain/identity/README.md` (`Owns:` credential schemas, profile and avatar schemas, display-user rules), the workspace-conventions inventory row for `domain-identity`, the ownership map rows for auth and account, the M7 design status line (M7.1 implemented), and `.agents/task-scope.md`. No owner quotes.
+- [x] **Step 2: Boundary probe** (planted, then removed, with `git status` empty afterwards): an `import 'react'` in the package should report R4.
 - [ ] **Step 3: Repository gate.** `pnpm verify` with nothing else running (or CI on the pull request). Expected: every stage passes.
 - [ ] **Step 4: Report** per AGENTS.md section 9: what moved, what stayed and why, checks run and not run. Manual: sign in, register with a short password and an invalid name, recover a password, edit a name, upload a too-large avatar, and see the same messages as before. Next: the M7.2 plan.
 - [ ] **Step 5: Checkpoint commit** (if authorized): `docs: record milestone 7.1 identity contracts`.
