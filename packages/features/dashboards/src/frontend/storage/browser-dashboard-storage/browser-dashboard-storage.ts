@@ -99,7 +99,7 @@ export function browserDashboardStorage({
       raw = store().getItem(key);
     } catch (cause) {
       onError({ kind: 'read', key, cause });
-      return null;
+      throw cause;
     }
     if (raw === null) return null;
     let cause: unknown;

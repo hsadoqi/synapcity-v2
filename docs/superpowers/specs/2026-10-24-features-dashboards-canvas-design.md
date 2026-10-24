@@ -186,6 +186,7 @@ Taken stock for a later decision; none of it is in this work. "Keep" means bring
 
 Further suggestions, not in the prototype:
 
+- **Version history (deferred, owner intent 2026-10-24).** The owner expects users eventually to inspect history for dashboards, documents and widgets. The `DashboardStorage` port is a replaceable persistence seam, not a revision guarantee: this design stores only current state. A future cross-feature design must decide revision scope and identity, which data is captured, retention, migration, and restore semantics before changing persisted contracts. No history UI or revision schema is part of this work.
 - **Keyboard layout editing.** React Grid Layout's drag and resize are pointer-only. Move and resize actions in the widget settings menu (move up, down, left, right; wider, narrower; taller, shorter), built on `domain-grids`, would make layout editing accessible. This is the most important gap.
 - **Undo** after remove, archive and hide, through the installed toast, instead of a confirmation dialog for everything but permanent removal.
 - **Editing record values.** The prototype edits tasks, notes and habit days, but a stat's value or a goal's target can only be changed by the simulation. A small edit form per record-backed widget would close that.

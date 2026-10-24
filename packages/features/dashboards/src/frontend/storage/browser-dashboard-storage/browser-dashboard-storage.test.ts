@@ -115,12 +115,54 @@ describe('browserDashboardStorage', () => {
     );
   });
 
-  it('reports read failures and rejects writes that could not be saved', async () => {
-    const failing = {
+  it('rejects unreadable saved data', async () => {
+    const failingRead = {
       ...mapStorage().storage,
       getItem: () => {
         throw new Error('blocked');
       },
+    } as Storage;
+    const readError = vi.fn();
+    const readAdapter = browserDashboardStorage({
+      ownerId: OWNER,
+      storage: failingRead,
+      onError: readError,
+    });
+    await expect(readAdapter.load(DASH)).rejects.toThrow('blocked');
+    expect(readError).toHaveBeenCalledWith(
+      expect.objectContaining({ kind: 'read' }),
+    );
+  });
+
+  it('does not overwrite saved records when reading them fails', async () => {
+    const existing = sample().records;
+    const saved = JSON.stringify(existing);
+    const { map, storage } = mapStorage({ [RECORDS_KEY]: saved });
+    const failingRead = {
+      ...storage,
+      getItem: () => {
+        throw new Error('blocked');
+      },
+    } as Storage;
+    const onError = vi.fn();
+    const adapter = browserDashboardStorage({
+      ownerId: OWNER,
+      storage: failingRead,
+      onError,
+    });
+
+    await expect(adapter.saveRecords(emptyRecords())).rejects.toThrow(
+      'blocked',
+    );
+    expect(map.get(RECORDS_KEY)).toBe(saved);
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({ kind: 'read', key: RECORDS_KEY }),
+    );
+  });
+
+  it('rejects writes that could not be saved', async () => {
+    const failingWrite = {
+      ...mapStorage().storage,
       setItem: () => {
         throw new Error('quota');
       },
@@ -128,16 +170,9 @@ describe('browserDashboardStorage', () => {
     const onError = vi.fn();
     const adapter = browserDashboardStorage({
       ownerId: OWNER,
-      storage: failing,
+      storage: failingWrite,
       onError,
     });
-    await expect(adapter.load(DASH)).resolves.toEqual({
-      composition: null,
-      records: null,
-    });
-    expect(onError).toHaveBeenCalledWith(
-      expect.objectContaining({ kind: 'read' }),
-    );
     await expect(
       adapter.saveComposition(DASH, sample().composition),
     ).rejects.toThrow();
