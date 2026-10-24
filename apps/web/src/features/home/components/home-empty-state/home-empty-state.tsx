@@ -1,4 +1,4 @@
-import type { CollectionItem } from '@/features/collection/shared';
+import type { CollectionItem } from '@synapcity/frontend-collection';
 
 import { HomeEmptyRecent } from './home-empty-recent';
 import { HomeEmptyRecentSkeleton } from './home-empty-recent-skeleton';

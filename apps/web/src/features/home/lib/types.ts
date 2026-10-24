@@ -1,4 +1,4 @@
-import type { CollectionItem } from '@/features/collection/shared';
+import type { CollectionItem } from '@synapcity/frontend-collection';
 
 type HomeState = 'populated' | 'loading' | 'empty';
 

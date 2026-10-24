@@ -9,12 +9,12 @@ import {
 import type {
   CollectionKinds,
   CreateAction,
-} from '@/features/collection/components';
+} from '@synapcity/frontend-collection';
 
 /**
  * Home's configuration for the collection displays on its overview: the words,
  * the item kinds and what can be created. The displays themselves live in
- * `features/collection`.
+ * `@synapcity/frontend-collection`.
  */
 
 /** How the overview shows each kind of item. */

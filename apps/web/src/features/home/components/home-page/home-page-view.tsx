@@ -7,7 +7,7 @@ import {
   CollectionTabs,
   CreateActions,
   FeaturedItems,
-} from '@/features/collection/components';
+} from '@synapcity/frontend-collection';
 
 import { FIXTURE_NOW } from '../../lib/fixture-clock';
 import { fixtureDate } from '../../lib/overview.fixtures';

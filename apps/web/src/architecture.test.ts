@@ -142,14 +142,6 @@ function buildRules(serverModules: Set<string>): Rule[] {
       ],
     },
     {
-      // Resource features (spaces, documents, dashboards…) consume collection,
-      // so collection must stay unaware of them: they pass labels, icons and
-      // copy in instead.
-      name: 'collection depends on no other feature',
-      from: /^features\/collection\//,
-      forbid: [/^features\/(?!collection\/)[^/]+\//],
-    },
-    {
       name: 'common form presentation does not depend on a feature',
       from: /^components\/forms\//,
       forbid: [/^features\//],
