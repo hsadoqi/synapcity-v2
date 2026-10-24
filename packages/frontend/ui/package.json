@@ -10,10 +10,10 @@
     "./core/*": "./src/components/ui/*/index.ts",
     "./components": "./src/components/index.ts",
     "./components/*": "./src/components/*/index.ts",
+    "./next/*": "./src/next/*/index.ts",
     "./providers/*": "./src/providers/*/index.ts",
     "./blocks": "./src/blocks/index.ts",
-    "./blocks/*": "./src/blocks/*/index.ts",
-    "./types/*": "./src/types/*.ts"
+    "./blocks/*": "./src/blocks/*/index.ts"
   },
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
@@ -47,7 +47,6 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
-    "@synapcity/domain-records": "workspace:*",
     "@synapcity/frontend-tailwind-config": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",

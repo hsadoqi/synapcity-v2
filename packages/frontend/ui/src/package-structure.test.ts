@@ -26,6 +26,7 @@ const COMPONENT_ROOTS = [
   'components/ui',
   'blocks',
   'providers',
+  'next',
 ] as const;
 
 const list = (dir: string) => readdirSync(dir).sort();
@@ -192,6 +193,7 @@ describe('package.json exports', () => {
       'components/ui': './core/',
       blocks: './blocks/',
       providers: './providers/',
+      next: './next/',
     };
 
     for (const base of COMPONENT_ROOTS) {

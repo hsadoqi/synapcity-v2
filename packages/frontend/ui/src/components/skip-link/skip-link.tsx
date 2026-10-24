@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@synapcity/frontend-ui/lib/utils';
-import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
+import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 
 export const SkipLinkButton = () => {
   return (

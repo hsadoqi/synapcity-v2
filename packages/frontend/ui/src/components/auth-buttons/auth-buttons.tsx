@@ -3,8 +3,8 @@
 import { usePathname } from 'next/navigation';
 import { cn } from 'cn';
 
-import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
-import type { LinkButtonProps } from '@synapcity/frontend-ui/components/link-button';
+import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
+import type { LinkButtonProps } from '@synapcity/frontend-ui/next/link-button';
 
 type AuthButtonsVariant = 'header' | 'hero';
 
