@@ -3,6 +3,11 @@ import { emptyRecords } from '@synapcity/domain-prototypes';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { DashboardStorage } from '../../../contracts';
+import {
+  SEED_OWNER,
+  memoryDashboardStorage,
+  seededWorkspace,
+} from '../../../testing';
 import { createDashboardStore } from '../../store';
 import { connectSaves } from './index';
 
@@ -85,5 +90,40 @@ describe('connectSaves', () => {
     win.dispatchEvent(new Event('pagehide'));
     vi.advanceTimersByTime(1000);
     expect(storage.saveComposition).toHaveBeenCalledTimes(1);
+  });
+
+  it('saves records before the composition, so a widget is never saved without its record', () => {
+    const { store, storage } = setup();
+    const order: string[] = [];
+    storage.saveRecords.mockImplementation(
+      async () => void order.push('records'),
+    );
+    storage.saveComposition.mockImplementation(
+      async () => void order.push('composition'),
+    );
+    store.getState().addWidget('stat');
+    vi.advanceTimersByTime(400);
+    expect(order).toEqual(['records', 'composition']);
+  });
+
+  it('saves an edit at one breakpoint and loads the others unchanged', async () => {
+    const { composition, records } = seededWorkspace();
+    const storage = memoryDashboardStorage(SEED_OWNER);
+    const store = createDashboardStore({
+      composition,
+      records,
+      ownerId: SEED_OWNER,
+      breakpoint: 'md',
+    });
+    connectSaves(store, storage, 'dash-1');
+    const [first, ...rest] = composition.layouts.md;
+    store
+      .getState()
+      .applyLayoutChange('md', [{ ...first!, x: 1, y: 40 }, ...rest]);
+    vi.advanceTimersByTime(400);
+    const saved = (await storage.load('dash-1')).composition!;
+    expect(saved.layouts.md[0]).toMatchObject({ x: 1, y: 40 });
+    expect(saved.layouts.lg).toEqual(composition.layouts.lg);
+    expect(saved.layouts.sm).toEqual(composition.layouts.sm);
   });
 });

@@ -33,9 +33,10 @@ export function connectSaves(
     clearTimeout(timer);
     timer = undefined;
     const { composition, records } = store.getState();
+    // Records first: a widget saved before its record could point at nothing.
+    if (recordsDirty) void storage.saveRecords(records).catch(report);
     if (compositionDirty)
       void storage.saveComposition(dashboardId, composition).catch(report);
-    if (recordsDirty) void storage.saveRecords(records).catch(report);
     compositionDirty = false;
     recordsDirty = false;
   }
