@@ -232,15 +232,27 @@ describe('edgeRules', () => {
   });
 
   describe('R7', () => {
-    it('fails importing a file inside another folder in a new package, and allows the folder', () => {
+    it('requires an index when importing a unit that its folder publishes', () => {
       expect(
         summary(
           run({
+            'packages/features/feat/src/frontend/a/index.ts': `export { a } from './a.ts';`,
+            'packages/features/feat/src/frontend/a/a.ts': 'export const a = 1;',
+            'packages/features/feat/src/frontend/a/private-helper.ts':
+              'export const helper = 1;',
+            'packages/features/feat/src/frontend/star/index.ts': `export * from './thing.ts';`,
+            'packages/features/feat/src/frontend/star/thing.ts':
+              'export const thing = 1;',
             'packages/features/feat/src/frontend/bad.ts': `import { a } from './a/a.ts';\nexport { a };`,
             'packages/features/feat/src/frontend/ok.ts': `import { a } from './a';\nexport { a };`,
+            'packages/features/feat/src/frontend/private.ts': `import { helper } from './a/private-helper.ts';\nexport { helper };`,
+            'packages/features/feat/src/frontend/star-bad.ts': `import { thing } from './star/thing.ts';\nexport { thing };`,
           }),
         ),
-      ).toEqual(['R7 packages/features/feat/src/frontend/bad.ts']);
+      ).toEqual([
+        'R7 packages/features/feat/src/frontend/bad.ts',
+        'R7 packages/features/feat/src/frontend/star-bad.ts',
+      ]);
     });
     it('leaves legacy packages to their own structure rules', () => {
       expect(

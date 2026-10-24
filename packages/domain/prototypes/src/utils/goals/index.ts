@@ -1,1 +1,1 @@
-export { goalPercent } from './goals';
+export { goalPercent, updateGoal } from './goals';

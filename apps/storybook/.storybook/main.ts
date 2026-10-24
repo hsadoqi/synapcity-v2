@@ -8,6 +8,7 @@ const config: StorybookConfig = {
     '../../../packages/frontend/ui/src/blocks/**/*.stories.@(ts|tsx)',
     '../../../packages/frontend/preferences/src/**/*.stories.@(ts|tsx)',
     '../../../packages/frontend/collection/src/**/*.stories.@(ts|tsx)',
+    '../../../packages/features/dashboards/src/**/*.stories.@(ts|tsx)',
     '../../../packages/features/spaces/src/**/*.stories.@(ts|tsx)',
     '../../../packages/features/settings/src/**/*.stories.@(ts|tsx)',
   ],

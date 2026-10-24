@@ -1,10 +1,12 @@
 @import 'tailwindcss';
 @import '@synapcity/frontend-ui/styles.css';
+@import '@synapcity/features-dashboards/styles.css';
 
 @source '../';
 @source '../../../packages/frontend/ui/src/blocks/';
 @source '../../../packages/frontend/ui/src/components/';
 @source '../../../packages/frontend/collection/src/';
+@source '../../../packages/features/dashboards/src/';
 @source '../../../packages/features/spaces/src/';
 @source '../../../packages/features/settings/src/';
 @source '../../docs/src/';

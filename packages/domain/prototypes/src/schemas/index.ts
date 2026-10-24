@@ -14,3 +14,4 @@ export {
   prototypeRecordSchemas,
   taskSchema,
 } from './prototype-records';
+export { prototypeRecordsSchema } from './prototype-records-table';
