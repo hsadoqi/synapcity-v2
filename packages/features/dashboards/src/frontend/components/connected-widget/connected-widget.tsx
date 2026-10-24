@@ -21,6 +21,7 @@ const WIDGET_TABLES: Record<WidgetType, readonly PrototypeRecordKind[]> = {
   notes: ['note'],
   tasks: ['project', 'task'],
   calendar: ['event'],
+  agenda: ['event'],
   feed: ['activity'],
 };
 
@@ -28,6 +29,7 @@ const WIDGET_TABLES: Record<WidgetType, readonly PrototypeRecordKind[]> = {
 const TIME_WIDGETS: ReadonlySet<WidgetType> = new Set([
   'habit',
   'calendar',
+  'agenda',
   'feed',
 ]);
 

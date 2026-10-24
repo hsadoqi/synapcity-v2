@@ -1,6 +1,7 @@
 import type { WidgetType } from '@synapcity/domain-dashboards';
 import {
   ActivityIcon,
+  CalendarDaysIcon,
   CalendarIcon,
   FileTextIcon,
   FlameIcon,
@@ -20,6 +21,7 @@ export const WIDGET_CATALOG: readonly {
   { type: 'tasks', label: 'Task list', Icon: ListChecksIcon },
   { type: 'feed', label: 'Recent activity', Icon: ActivityIcon },
   { type: 'calendar', label: 'Schedule', Icon: CalendarIcon },
+  { type: 'agenda', label: 'Agenda', Icon: CalendarDaysIcon },
   { type: 'notes', label: 'Notes', Icon: FileTextIcon },
   { type: 'habit', label: 'Habit tracker', Icon: RepeatIcon },
   { type: 'progress', label: 'Goal tracker', Icon: TargetIcon },

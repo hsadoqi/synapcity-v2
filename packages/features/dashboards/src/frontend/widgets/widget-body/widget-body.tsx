@@ -5,6 +5,7 @@ import {
   type PrototypeRecords,
 } from '@synapcity/domain-prototypes';
 
+import { AgendaBody } from '../agenda-body';
 import { CalendarBody } from '../calendar-body';
 import { FeedBody } from '../feed-body';
 import { HabitBody } from '../habit-body';
@@ -97,6 +98,8 @@ export function WidgetBody({
     }
     case 'calendar':
       return <CalendarBody events={records.event} now={now} />;
+    case 'agenda':
+      return <AgendaBody events={records.event} now={now} />;
     case 'feed':
       return (
         <FeedBody
