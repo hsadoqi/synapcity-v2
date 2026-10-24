@@ -3,7 +3,12 @@ import {
   createComposition,
   createWidget,
 } from '@synapcity/domain-dashboards';
-import { emptyRecords } from '@synapcity/domain-prototypes';
+import {
+  emptyRecords,
+  newRecord,
+  putRecord,
+  touchRecord,
+} from '@synapcity/domain-prototypes';
 import { describe, expect, it, vi } from 'vitest';
 
 import { browserDashboardStorage } from './index';
@@ -139,5 +144,66 @@ describe('browserDashboardStorage', () => {
     expect(onError).toHaveBeenCalledWith(
       expect.objectContaining({ kind: 'write', key: COMPOSITION_KEY }),
     );
+  });
+
+  it('keeps records another tab saved when this tab saves its older copy', async () => {
+    const { storage } = mapStorage();
+    const tabA = browserDashboardStorage({ ownerId: OWNER, storage });
+    const tabB = browserDashboardStorage({ ownerId: OWNER, storage });
+    const start = sample().records;
+    await tabA.saveRecords(start);
+    const metric = {
+      ...newRecord('metric', 'Added in A', { ownerId: OWNER, now: 1000 }),
+      value: 1,
+      unit: '',
+      note: '',
+    };
+    await tabA.saveRecords(putRecord(start, 'metric', metric));
+    const note = Object.values(start.note)[0]!;
+    await tabB.saveRecords(
+      putRecord(start, 'note', {
+        ...touchRecord(note, 2000),
+        body: 'Edited in B',
+      }),
+    );
+    const { records } = await tabA.load(DASH);
+    expect(records?.metric[metric.id]).toEqual(metric);
+    expect(records?.note[note.id]?.body).toBe('Edited in B');
+  });
+
+  it('keeps the newer copy of a record both tabs changed', async () => {
+    const { storage } = mapStorage();
+    const adapter = browserDashboardStorage({ ownerId: OWNER, storage });
+    const start = sample().records;
+    const note = Object.values(start.note)[0]!;
+    await adapter.saveRecords(
+      putRecord(start, 'note', { ...touchRecord(note, 5000), body: 'newer' }),
+    );
+    await adapter.saveRecords(
+      putRecord(start, 'note', { ...touchRecord(note, 3000), body: 'older' }),
+    );
+    expect((await adapter.load(DASH)).records?.note[note.id]?.body).toBe(
+      'newer',
+    );
+  });
+
+  it('refuses to load, rather than risk overwriting, when an invalid value cannot be set aside', async () => {
+    const bad = '{"settings":{}}';
+    const { map, storage } = mapStorage({ [COMPOSITION_KEY]: bad });
+    const full = {
+      ...storage,
+      setItem: (key: string, value: string) => {
+        if (key.endsWith('.invalid')) throw new Error('quota');
+        map.set(key, value);
+      },
+    } as Storage;
+    const onError = vi.fn();
+    const adapter = browserDashboardStorage({
+      ownerId: OWNER,
+      storage: full,
+      onError,
+    });
+    await expect(adapter.load(DASH)).rejects.toThrow();
+    expect(map.get(COMPOSITION_KEY)).toBe(bad);
   });
 });
