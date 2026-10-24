@@ -52,7 +52,7 @@ What callers read from the result:
 
 Development fixture mode (`lib/access/dev-fixture.ts`) is checked by the host at 37 call sites before any client is built. No portable identity contract exists; "verified" currently means Supabase claims or a Supabase user object.
 
-`lib/data/user.ts` has no importers and is not an identity contract (a sample object and a `console.log`). It is outside M4; see section 11.
+`lib/data/user.ts` has no importers and is not an identity contract (a sample object and a `console.log`). It is outside M4; see section 11. The owner removed it on 2026-10-23 (commit `95fe3ba5`).
 
 ## 4. Design
 
@@ -198,7 +198,7 @@ None planned. Every rewired caller imports the new packages directly. `getVerifi
 
 ## 11. Left out, found along the way
 
-- `apps/web/src/lib/data/user.ts`: unused sample user with a fake password and a `console.log`. Removing it needs owner approval (preservation policy); not part of M4.
+- `apps/web/src/lib/data/user.ts`: unused sample user with a fake password and a `console.log`. Not part of M4; the owner removed it on 2026-10-23 (commit `95fe3ba5`).
 - The base record contract, record-schema messages and preference contracts: M5 and M6 designs, from the evidence gathered on 2026-10-23 (the Space and document/dashboard schemas share all ten fields; identity schemas embed form copy).
 
 ## 12. Builder check (2026-10-23)
