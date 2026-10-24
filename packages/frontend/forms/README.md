@@ -28,7 +28,7 @@ History: created by Task 1 of the engine plan, ahead of extraction Part A, with 
 ## Rules
 
 - Kind folders directly under `src/`, one folder per unit with its tests and an `index.ts`; imports between folders go through the folder's `index.ts`.
-- `types/` and the pure `utils/` units import neither React nor React Hook Form, so they can move to a domain package if a server consumer appears.
+- the definition types (`types/field-config.ts`, `types/form-definition.ts`) and the pure `utils/` units import neither React nor React Hook Form, so they can move to a domain package if a server consumer appears.
 - A field carries no schema: the caller's schema owns validation. `defineForm` rejects a schema with object-level refinements, because Zod 4.6.7 cannot narrow one; cross-field checks are passed as `rules`.
 - Field names must be schema keys and must not be `type`, `root`, `ref`, `types`, `message` or `form`, which collide with React Hook Form's internal error shapes.
 - The narrowed schema is built from `schema.shape`, never `.pick()`, which throws on a refined schema in Zod 4.6.7. A field required by a `require` dependency starts from `unknown`, because Zod does not validate an optional key that is absent from the input.

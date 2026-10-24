@@ -9,10 +9,12 @@ const here = dirname(fileURLToPath(import.meta.url));
 /*
  * The pure modules import neither React nor React Hook Form, so they can move
  * to a domain package if a server consumer appears. A new pure unit is added to
- * this list; units that render or bind the form library are not on it.
+ * this list; units that render or bind the form library, and the renderer
+ * types in `types/field-renderer.ts`, are not on it.
  */
 const PURE = [
-  'types',
+  'types/field-config.ts',
+  'types/form-definition.ts',
   'utils/define-form',
   'utils/describe-schema-field',
   'utils/is-empty-value',
@@ -31,6 +33,7 @@ const FORBIDDEN = [
 
 function sources(directory: string): string[] {
   if (!existsSync(directory)) return [];
+  if (statSync(directory).isFile()) return [directory];
   return readdirSync(directory).flatMap((entry) => {
     const path = join(directory, entry);
     if (statSync(path).isDirectory()) return sources(path);

@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
+import type { FieldRenderer } from '../../types';
 import {
   FieldRendererRegistry,
   UnknownFieldTypeError,
-  type FieldRenderer,
 } from './field-renderer-registry';
 
 const renderer = (): FieldRenderer => () => null;

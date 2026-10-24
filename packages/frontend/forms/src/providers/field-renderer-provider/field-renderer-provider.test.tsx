@@ -7,11 +7,8 @@ import {
   FieldRendererProvider,
   useFieldRendererRegistry,
 } from './field-renderer-provider';
-import {
-  FieldRendererRegistry,
-  type FieldRenderer,
-  type FieldRendererProps,
-} from './field-renderer-registry';
+import type { FieldRenderer, FieldRendererProps } from '../../types';
+import { FieldRendererRegistry } from './field-renderer-registry';
 
 const field: FieldConfig = { type: 'text', name: 'a', label: 'A' };
 const props: FieldRendererProps = {
@@ -41,9 +38,18 @@ afterEach(() => {
 });
 
 describe('FieldRendererProvider', () => {
-  it('supplies an empty registry when none is given', () => {
+  it('supplies the built-in renderers when no registry is given', () => {
     render(
       <FieldRendererProvider>
+        <Probe type="text" />
+      </FieldRendererProvider>,
+    );
+    expect(screen.getByRole('textbox')).toBeTruthy();
+  });
+
+  it('starts from an empty registry when one is passed', () => {
+    render(
+      <FieldRendererProvider registry={new FieldRendererRegistry()}>
         <Probe type="text" />
       </FieldRendererProvider>,
     );

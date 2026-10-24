@@ -23,7 +23,7 @@ The plan relies on these decisions of ADR-0015, restated here so it stays readab
 
 - Package path `packages/frontend/forms`, name `@synapcity/frontend-forms`. Root `.` entry plus `./testing`. Entries point at TypeScript source. No build step.
 - Only this package imports `react-hook-form` (ADR-0015 decision 3).
-- One package, `frontend-forms`. The engine, the bindings, the renderers, the containers and `./testing` share one runtime, one set of dependencies and one set of consumers, so none earns its own boundary. `types/` and the pure `utils/` units (`define-form`, `describe-schema-field`, `is-empty-value`, `resolve-field-states`, `build-schema`, `define-form-from-schema`) import neither React nor React Hook Form, so they can move to a domain package if a server consumer appears (see the roadmap).
+- One package, `frontend-forms`. The engine, the bindings, the renderers, the containers and `./testing` share one runtime, one set of dependencies and one set of consumers, so none earns its own boundary. the definition types (`types/field-config.ts`, `types/form-definition.ts`) and the pure `utils/` units (`define-form`, `describe-schema-field`, `is-empty-value`, `resolve-field-states`, `build-schema`, `define-form-from-schema`) import neither React nor React Hook Form, so they can move to a domain package if a server consumer appears (see the roadmap).
 - Dependencies: `@synapcity/frontend-ui` and `zod` only inside Tasks 1 to 5; no new third-party dependency in this plan.
 - UI is built from `frontend-ui` primitives and semantic classes. No raw `<button>` or `<label>`, no palette colours, no `style={{}}`, no bracket values, no `!important`.
 - No `any`. `unknown` is narrowed with guards.
@@ -297,7 +297,17 @@ The default registry comes from Task 5. Until then the provider's default is an 
 
 Colour, date, slider, radio, multiselect, file and tags renderers are deferred until `frontend-ui` has the primitives. `custom:*` is the escape hatch meanwhile.
 
-- [ ] **Step 1: Write the failing tests:**
+**Done 2026-10-24.** As built, differing from the plan above:
+
+- `FieldRendererProps` gains `focusRef?: Ref<HTMLElement>`, attached to each renderer's focusable control, so Task 6a can move focus to the first invalid field. Base UI's checkbox, switch and select are not native inputs, so React Hook Form cannot attach a ref to them on its own.
+- `FieldFrame` renders the label, the control (as `children`), the description and the error; `fieldIds(id)` and `fieldDescribedBy(id, …)` give the ids. Renderers render the control only, and the frame is placed around them by Task 6a.
+- Base UI checkbox and switch put `id` on a hidden native input and name the visible control themselves from the label that targets it. Their names are checked by role and name in the tests.
+- The number renderer keeps `type="number"` and adds `inputMode="decimal"`; a cleared or unparsable entry emits `undefined`.
+- The test that two forms never share an id moves to Task 6a, which generates the ids.
+- `FieldRenderer` and `FieldRendererProps` live in `types/field-renderer.ts`, not in the provider folder: renderers importing them through the provider made a module cycle (renderer, provider, default registry, renderer) that `pnpm boundaries` reported. They import React types, so `types/field-renderer.ts` is not in the purity test's set; the provider still re-exports them.
+- Not done here: a story for each renderer (Task 8).
+
+- [x] **Step 1: Write the failing tests:**
   - `text renderer wires the label, aria-invalid and aria-describedby`.
   - `two fields, and the same form rendered twice, never share an id`.
   - `number renderer emits a number, and undefined (not NaN) when cleared`.
@@ -305,10 +315,10 @@ Colour, date, slider, radio, multiselect, file and tags renderers are deferred u
   - `toggle renderers emit booleans`.
   - `createDefaultRegistry resolves every built-in type`.
   - `a provider with no registry prop resolves 'text'`.
-- [ ] **Step 2: Run** → FAIL.
-- [ ] **Step 3: Implement** the renderers over the primitives. `className` only for layout, per the design-system rules.
-- [ ] **Step 4: Run** → PASS.
-- [ ] **Step 5: Commit** `feat(forms): add built-in field renderers`.
+- [x] **Step 2: Run** → FAIL.
+- [x] **Step 3: Implement** the renderers over the primitives. `className` only for layout, per the design-system rules.
+- [x] **Step 4: Run** → PASS.
+- [x] **Step 5: Commit** `feat(forms): add built-in field renderers`.
 
 ### Task 6a: React Hook Form integration and the core renderer
 
@@ -526,7 +536,7 @@ Everything suggested for the engine, sorted by when it is built. The tasks above
 | Icons, tooltips, read-only fields                                                                                                                                                                                                                                                                                                        | A consumer asks                                                                                                                                                                                                |
 | Multi-step and tab forms                                                                                                                                                                                                                                                                                                                 | A wizard consumer exists                                                                                                                                                                                       |
 | Built-in toast routing, dismissible and warning-level form messages                                                                                                                                                                                                                                                                      | A consumer wants them; `onInvalid` is the hook until then                                                                                                                                                      |
-| Move `types/` and the pure `utils/` units to a `domain-forms` package, so a server action can apply the same visibility-aware validation                                                                                                                                                                                                 | A server operation must validate against the same form definition. Not before: today the engine is client-only (D4), and a definition carries presentation properties that would need splitting from its rules |
+| Move the definition types (`types/field-config.ts`, `types/form-definition.ts`) and the pure `utils/` units to a `domain-forms` package, so a server action can apply the same visibility-aware validation                                                                                                                               | A server operation must validate against the same form definition. Not before: today the engine is client-only (D4), and a definition carries presentation properties that would need splitting from its rules |
 | Field value adapters (`format` and `parse`) for renderers whose value type differs from the schema's, such as a date string and a `Date`                                                                                                                                                                                                 | A date or colour renderer with a mismatched value type                                                                                                                                                         |
 | Virtualization of large forms, if the benchmark demands it: use a maintained virtual list (`@tanstack/react-virtual` 3.14.22 is current on the registry) with measured row heights, not fixed heights; check focus-first-error, tab order and screen-reader order for fields that are not in the DOM; needs approval as a new dependency | The benchmark misses a budget                                                                                                                                                                                  |
 

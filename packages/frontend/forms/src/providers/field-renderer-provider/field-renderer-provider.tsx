@@ -2,13 +2,14 @@
 
 import { createContext, useContext, useState, type ReactNode } from 'react';
 
-import { FieldRendererRegistry } from './field-renderer-registry';
+import { createDefaultRegistry } from './create-default-registry';
+import type { FieldRendererRegistry } from './field-renderer-registry';
 
 const FieldRendererContext = createContext<FieldRendererRegistry | null>(null);
 
 export interface FieldRendererProviderProps {
   readonly children: ReactNode;
-  /** The renderers to start from. The provider works on a copy. */
+  /** The renderers to start from (the built-in ones by default). The provider works on a copy. */
   readonly registry?: FieldRendererRegistry;
   /** Adds renderers for this provider only, such as a feature's `custom:*` types. */
   readonly extend?: (registry: FieldRendererRegistry) => void;
@@ -25,7 +26,7 @@ export function FieldRendererProvider({
   extend,
 }: FieldRendererProviderProps) {
   const [scoped] = useState(() => {
-    const copy = (registry ?? new FieldRendererRegistry()).clone();
+    const copy = (registry ?? createDefaultRegistry()).clone();
     extend?.(copy);
     return copy;
   });

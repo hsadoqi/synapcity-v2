@@ -22,3 +22,4 @@ export type {
   FormDefinitionIssue,
   FormDefinitionIssueCode,
 } from './form-definition';
+export type { FieldRenderer, FieldRendererProps } from './field-renderer';
