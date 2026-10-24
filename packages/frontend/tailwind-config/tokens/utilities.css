@@ -206,11 +206,15 @@
   );
 }
 
+/* Secondary-button states: like the filled states, the fill mixed toward the page. Dark
+   --secondary is the 500 step, only 4.53:1 under its 50 text, so a tint toward the ink
+   lightened it below AA (3.78:1 pressed). Toward the page the label gains contrast in both
+   themes. */
 @utility bg-secondary-hover {
   background-color: color-mix(
     in oklch,
     var(--secondary),
-    var(--foreground) 10%
+    var(--background) 10%
   );
 }
 
@@ -218,6 +222,6 @@
   background-color: color-mix(
     in oklch,
     var(--secondary),
-    var(--foreground) 16%
+    var(--background) 16%
   );
 }
