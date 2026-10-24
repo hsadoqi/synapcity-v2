@@ -2,17 +2,18 @@
 
 **Status:** Canonical navigation index
 
-Start with `docs/architecture/principles.md` — the responsibility and ownership principles that govern all architecture work.
+Start with the [architecture principles](principles.md), then the [ADR index](decisions/README.md). Read the scope and unresolved sections of the relevant decisions before assuming an adjacent choice is settled.
 
-Technical directions and their scoped governance live in `docs/architecture/decisions/` as ADRs. The ADR index (`docs/architecture/decisions/README.md`) lists every current ADR with its status, and a candidate list of decisions that remain open. Read an ADR's own "Unresolved" section before assuming a question is settled.
+- [ADR-0014: Multi-app package boundaries](decisions/0014-multi-app-package-boundaries.md) records the accepted category ownership, runtime dependency matrix, package grouping principles, and migration rules.
+- [Workspace conventions](workspace-conventions.md) translates the accepted decisions into package placement, naming, runtime, and interface conventions.
+- [Package creation checklist](package-creation-checklist.md) records the questions to answer before creating a leaf package.
+- [Current-to-target ownership map](reorganization-ownership-map.md) assigns existing implementation families to their selected destinations and names the transitional exceptions. It is not a second progress ledger.
+- Umbrella boundary references: [domain](../../packages/domain/README.md), [frontend](../../packages/frontend/README.md), [server](../../packages/server/README.md), [features](../../packages/features/README.md), and [dev](../../packages/dev/README.md).
 
-The ADRs in `docs/archive/architecture/decisions/` describe the previous implementation. They are evidence, not authority (`docs/engineering/preservation-policy.md`).
+Web, docs, and Storybook are current apps; desktop and mobile are planned consumers. Their differing runtime needs inform the target now. Most source remains in its existing location. Documentation of the target does not claim that package extraction, native presentation, or automated boundary enforcement is complete.
 
-- [Workspace conventions](workspace-conventions.md) — how the current workspaces are laid out, named and built (ADR-0001).
-- [Package creation checklist](package-creation-checklist.md) — what to answer before adding a package.
+The [task scope](../../.agents/task-scope.md) records execution scope and handoff. Milestone 1 baseline verification remains separate; Milestone 3 implements package conventions and boundary enforcement before source migrations.
 
-`docs/architecture/designs/` is for proposed designs. It is currently empty. A design there is a review artifact, not governing architecture, until its stated approval and ADR requirements are met.
+Proposed designs and [discovery material](../discovery/README.md) remain evidence until their approval requirements are met. ADRs in `docs/archive/architecture/decisions/` belong to the previous implementation and are historical evidence under the [preservation policy](../engineering/preservation-policy.md).
 
-This foundation deliberately does not select database technology, API style, product route design, or state-management libraries. Those are decided one at a time as real requirements justify them (see `docs/product/mvp.md`). The technology table in the root `README.md` states direction, not decision.
-
-Non-authoritative future possibilities and revisit triggers live in [`docs/discovery/`](../discovery/README.md). Discovery entries are evidence, not requirements or accepted ADRs.
+These package decisions do not choose new product scope, terminology, schemas, route designs, API transports, state libraries, or deployments. Existing accepted decisions continue within their own scopes.

@@ -27,7 +27,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
-    "@storybook/nextjs-vite": "10.6.1",
+    "@storybook/nextjs-vite": "10.6.3",
     "@synapcity/dev-eslint-config": "workspace:*",
     "@synapcity/dev-fixtures": "workspace:*",
     "@synapcity/dev-typescript-config": "workspace:*",
@@ -37,13 +37,13 @@
     "@types/node": "26.6.5",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
-    "@vitest/coverage-v8": "4.1.11",
+    "@vitest/coverage-v8": "4.1.12",
     "eslint": "10.9.1",
     "jsdom": "30.1.2",
     "react-dom": "19.3.0",
-    "storybook": "10.6.1",
+    "storybook": "10.6.3",
     "typescript": "7.0.2",
-    "vitest": "4.1.11"
+    "vitest": "4.1.12"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
@@ -51,7 +51,7 @@
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",
     "lucide-react": "^1.55.0",
-    "next": "16.4.0",
+    "next": "16.4.3",
     "next-themes": "^0.4.6",
     "react": "19.3.0",
     "react-resizable-panels": "4.14.5",

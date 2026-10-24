@@ -1,5 +1,7 @@
 # ADR-0013: Document and dashboard persistence boundary
 
+> **Placement amendment — 2026-10-23:** [ADR-0014](0014-multi-app-package-boundaries.md) supersedes the instruction to stay app-local pending a topology selection. Domain owns existing portable resource contracts, server owns authorized persistence and participation queries, features own resource experiences, and apps bind requests. Canonical record ownership, contextual participation, schemas, and RLS requirements remain in force. See the [ownership map](../reorganization-ownership-map.md) for the selected destinations. The original sections below preserve the decision history; conflicting placement statements or placement-related unresolved questions are superseded by this amendment. Source migration is not completed by this documentation change.
+
 **Status:** Accepted  
 **Date:** 2026-10-17 (drafted), 2026-10-18 (accepted)  
 **Deciders:** Hanaa Sadoqi (repository owner), by direct approval on 2026-10-18 of: separate tables per kind with the same name, description, icon, tags and timestamp fields as Spaces; per-kind participation tables; per-Space presentation data on the participation row; Space deletion that leaves its documents and dashboards in place; provisional "Add to space" / "Remove from space" wording; and the simplest removal behavior for now.

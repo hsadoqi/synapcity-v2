@@ -20,21 +20,22 @@
     "test:storybook": "turbo run test:storybook --filter=storybook",
     "test:watch": "turbo run test:watch",
     "test:bail": "turbo run test --ui=stream --continue=never -- --bail=1",
-    "verify": "pnpm format:check && turbo run lint check-types && pnpm deps && pnpm brand:check && pnpm test:coverage && pnpm test:e2e && pnpm test:storybook && pnpm build",
-    "verify:fast": "pnpm format:check && turbo run lint check-types --ui=stream --continue=never && pnpm deps && pnpm brand:check && turbo run test:coverage --ui=stream --continue=never -- --bail=1 && pnpm test:e2e && pnpm test:storybook && pnpm build",
+    "verify": "pnpm format:check && turbo run lint check-types && pnpm deps && pnpm boundaries && pnpm brand:check && pnpm test:coverage && pnpm test:e2e && pnpm test:storybook && pnpm build",
+    "verify:fast": "pnpm format:check && turbo run lint check-types --ui=stream --continue=never && pnpm deps && pnpm boundaries && pnpm brand:check && turbo run test:coverage --ui=stream --continue=never -- --bail=1 && pnpm test:e2e && pnpm test:storybook && pnpm build",
     "deps": "knip",
+    "boundaries": "pnpm --filter @synapcity/dev-boundaries boundaries",
     "brand:check": "node scripts/check-brand-assets.mjs",
     "prepare": "git config core.hooksPath .githooks || echo 'git hooks not activated (not a git checkout)'",
     "ui:add": "pnpm dlx shadcn@latest add -c apps/web",
     "report": "vitest run --coverage"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "4.1.11",
+    "@vitest/coverage-v8": "4.1.12",
     "knip": "^6.38.0",
     "prettier": "3.9.6",
     "turbo": "^2.11.7",
     "typescript": "7.0.2",
-    "vitest": "4.1.11"
+    "vitest": "4.1.12"
   },
   "packageManager": "pnpm@12.15.0",
   "engines": {

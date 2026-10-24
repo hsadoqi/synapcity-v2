@@ -1,5 +1,7 @@
 # Architecture principles
 
+Package topology and responsibility boundaries are now selected separately in [ADR-0014](decisions/0014-multi-app-package-boundaries.md). The scope statement below describes what this principles document itself selects, not an assertion that topology remains undecided throughout the repository.
+
 **Status:** Canonical architecture principles
 **Scope:** Principles only. No package topology, database, API, routing, or state-management technology is selected here. See `PRODUCT.md`'s "Open product decisions", `docs/glossary.md`, and `docs/architecture/decisions/README.md`'s candidate list for what remains open, and `docs/architecture/decisions/README.md` for the ADR process that resolves consequential choices one at a time.
 
