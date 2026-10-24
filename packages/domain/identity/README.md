@@ -1,6 +1,6 @@
 # @synapcity/domain-identity
 
-Owns: portable identity contracts. The verified-identity result that server code receives from the identity boundary (Milestone 4), and the name, avatar and profile schemas. Credential schemas (email and password) are planned for a separate `domain-auth` package; display-user projection waits for Milestone 7.
+Owns: portable identity contracts. The verified-identity result that server code receives from the identity boundary (Milestone 4), and the name, avatar and profile schemas. Email and password schemas (sign-in, sign-up, new password) are planned for a separate `domain-auth` package, which will import `nameSchema` from here; display-user projection waits for Milestone 7.
 
 Runtime: portable TypeScript. The only runtime dependency is `zod`, for the schemas. Category rules: [domain README](../README.md) and [ADR-0014](../../../docs/architecture/decisions/0014-multi-app-package-boundaries.md).
 
