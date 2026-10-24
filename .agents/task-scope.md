@@ -16,7 +16,8 @@
 - M5.2 changed on purpose: a real user's Space detail now shows the documents and dashboards that take part in that Space (an empty state when none) instead of the same sample items for everyone; fixture mode keeps its samples. Development seed data now includes sample documents, dashboards and participation.
 - M5.2 not changed: every message, the `signedOut` flag, `api/spaces` status codes and headers, RLS, persisted shapes, fixture mode semantics, the JSON seeds in `dev-fixtures`.
 - Verification note: the seed check ran against a throwaway local Postgres 16 with a minimal Supabase stub (no Docker, so no Supabase stack) and passed; it is deleted. PostgREST was not run, so the embedded-relation reads in `server-data` are verified only against stub clients; the owner checks a Space with and without items against live Supabase.
-- Next: Task 6 gate and report, then M5.3 (collection).
+- M5.3 plan written (2026-10-24): `docs/superpowers/plans/2026-10-24-m5-3-collection.md` (one create; docs only). Eight tasks: package and navigation capability, whole-feature move, entity blocks, `link-button` behind `frontend-ui/next/*`, three unit-split and story tasks, records and gate. Awaiting the owner's review before execution.
+- Next: owner reviews the M5.3 plan; execution is inline.
 
 ## Active task: Milestone 4 server identity boundary (2026-10-23)
 
