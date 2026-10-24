@@ -1,3 +1,4 @@
+import { lookSourceExpression } from '../look-source';
 import {
   fontPreferenceVariables,
   fontStack,
@@ -138,9 +139,7 @@ const bootRoles = (Object.keys(roleFields) as FontRole[]).map((role) => [
  * one. It reads the raw saved JSON and accepts only ids from the catalog, so
  * tampered storage can neither throw nor inject a URL or a font stack.
  */
-export const fontBootScript = `(function(){try{var s=JSON.parse(localStorage.getItem(${JSON.stringify(
-  PREFERENCES_STORAGE_KEY,
-)})||'{}');var t=s&&s.theme;if(!t||typeof t!=='object')return;var C=${JSON.stringify(
+export const fontBootScript = `(function(){try{var s=${lookSourceExpression(PREFERENCES_STORAGE_KEY)};var t=s&&s.theme;if(!t||typeof t!=='object')return;var C=${JSON.stringify(
   bootCatalog,
 )};var R=${JSON.stringify(
   bootRoles,

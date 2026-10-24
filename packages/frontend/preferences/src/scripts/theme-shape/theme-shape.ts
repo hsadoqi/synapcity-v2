@@ -1,3 +1,4 @@
+import { lookSourceExpression } from '../look-source';
 import type { CSSProperties } from 'react';
 import { PREFERENCES_STORAGE_KEY } from '../appearance-attributes';
 import {
@@ -61,9 +62,7 @@ export function previewTextScaleStyle(
  * before text size was a percentage hold `appearance.fontSize` instead, read
  * through the same legacy map as the importer until the settings are next saved.
  */
-export const themeShapeBootScript = `(function(){try{var t={},a={};try{var s=JSON.parse(localStorage.getItem(${JSON.stringify(
-  PREFERENCES_STORAGE_KEY,
-)})||'{}');if(s&&typeof s.theme==='object'&&s.theme)t=s.theme;if(s&&typeof s.appearance==='object'&&s.appearance)a=s.appearance}catch(x){}var O=${JSON.stringify(
+export const themeShapeBootScript = `(function(){try{var t={},a={};try{var s=${lookSourceExpression(PREFERENCES_STORAGE_KEY)};if(s&&typeof s.theme==='object'&&s.theme)t=s.theme;if(s&&typeof s.appearance==='object'&&s.appearance)a=s.appearance}catch(x){}var O=${JSON.stringify(
   { radius: radii, density: densities },
 )};var D=${JSON.stringify({
   radius: themeDefaults.radius,

@@ -1,3 +1,4 @@
+import { lookSourceExpression } from '../look-source';
 import {
   appearanceDefaults,
   contrastModes,
@@ -42,9 +43,7 @@ export function applyAppearance(
  * tampered storage can neither throw nor write an arbitrary attribute. The
  * allowed values and fallbacks come from the schema, not from a second list.
  */
-export const appearanceBootScript = `(function(){var a={};try{var s=JSON.parse(localStorage.getItem(${JSON.stringify(
-  PREFERENCES_STORAGE_KEY,
-)})||'{}');if(s&&typeof s.appearance==='object'&&s.appearance)a=s.appearance}catch(x){}try{var D=${JSON.stringify(
+export const appearanceBootScript = `(function(){var a={};try{var s=${lookSourceExpression(PREFERENCES_STORAGE_KEY)};if(s&&typeof s.appearance==='object'&&s.appearance)a=s.appearance}catch(x){}try{var D=${JSON.stringify(
   appearanceDefaults,
 )};var O={contrastMode:${JSON.stringify(
   contrastModes,

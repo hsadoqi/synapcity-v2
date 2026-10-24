@@ -5,7 +5,7 @@ import { fontBootScript } from './font-preferences';
 import { themeShapeBootScript } from './theme-shape';
 
 describe('boot scripts', () => {
-  it('inlines each boot script exactly as before the move', () => {
+  it('inlines each boot script exactly as recorded in the fixture', () => {
     expect(appearanceBootScript).toBe(expected.appearance);
     expect(themeShapeBootScript).toBe(expected.themeShape);
     expect(fontBootScript).toBe(expected.font);
