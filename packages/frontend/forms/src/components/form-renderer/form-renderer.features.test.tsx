@@ -49,7 +49,7 @@ describe('FormRenderer async validation', () => {
   const handle = () => screen.getByLabelText('Handle') as HTMLInputElement;
   const status = () => document.querySelector('[role="status"]');
 
-  it('checks once after typing stops, saying Validating and disabling the field meanwhile', async () => {
+  it('checks once after typing stops, saying Validating while the field stays editable', async () => {
     vi.useFakeTimers();
     const { definition, calls } = manual();
     render(<FormRenderer definition={definition} onSubmit={vi.fn()} />);
@@ -64,7 +64,9 @@ describe('FormRenderer async validation', () => {
 
     expect(calls.map((call) => call.value)).toEqual(['adal']);
     expect(status()?.textContent).toBe('Validating…');
-    expect(handle().disabled).toBe(true);
+    // A background check never takes the field away from someone typing.
+    expect(handle().disabled).toBe(false);
+    expect(document.activeElement).toBe(handle());
 
     await act(async () => calls[0]?.answer('That handle is taken.'));
 
@@ -88,10 +90,9 @@ describe('FormRenderer async validation', () => {
     expect(check).not.toHaveBeenCalled();
   });
 
-  it('keeps the field enabled when disableWhileValidating is false, with a custom status', async () => {
+  it('says a custom validating message', async () => {
     vi.useFakeTimers();
     const { definition } = manual({
-      disableWhileValidating: false,
       messages: { validating: 'Checking the handle…' },
     });
     render(<FormRenderer definition={definition} onSubmit={vi.fn()} />);
@@ -99,8 +100,74 @@ describe('FormRenderer async validation', () => {
     type('Handle', 'ada');
     await wait(300);
 
-    expect(handle().disabled).toBe(false);
     expect(status()?.textContent).toBe('Checking the handle…');
+  });
+
+  it('locks every field and the submit button while submit-time checks and the handler run', async () => {
+    const { definition, calls } = manual();
+    let finish: () => void = () => {};
+    const onSubmit = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          finish = resolve;
+        }),
+    );
+    render(<FormRenderer definition={definition} onSubmit={onSubmit} />);
+    const save = screen.getByRole('button', {
+      name: 'Save',
+    }) as HTMLButtonElement;
+
+    type('Handle', 'ada');
+    await submit();
+    expect(handle().disabled).toBe(true);
+    expect(save.disabled).toBe(true);
+    expect(save.getAttribute('aria-busy')).toBe('true');
+
+    await act(async () => calls[0]?.answer(undefined));
+    expect(onSubmit).toHaveBeenCalledWith({ handle: 'ada' });
+    expect(handle().disabled).toBe(true);
+
+    await act(async () => finish());
+    expect(handle().disabled).toBe(false);
+    expect(save.disabled).toBe(false);
+  });
+
+  it('never locks the form for a submit the schema refuses', async () => {
+    const { definition } = manual();
+    render(<FormRenderer definition={definition} onSubmit={vi.fn()} />);
+
+    type('Handle', 'a');
+    await submit();
+
+    expect(handle().disabled).toBe(false);
+    expect(document.activeElement).toBe(handle());
+  });
+
+  it('unlocks and focuses the field once a submit-time check refuses', async () => {
+    const { definition, calls } = manual();
+    render(<FormRenderer definition={definition} onSubmit={vi.fn()} />);
+
+    type('Handle', 'ada');
+    await submit();
+    expect(handle().disabled).toBe(true);
+    await act(async () => calls[0]?.answer('That handle is taken.'));
+
+    expect(handle().disabled).toBe(false);
+    expect(document.activeElement).toBe(handle());
+  });
+
+  it('posts the values a server action was submitted with, though the fields lock during the check', async () => {
+    const { definition, calls } = manual();
+    const action = vi.fn();
+    render(<FormRenderer definition={definition} action={action} />);
+
+    type('Handle', 'ada');
+    await submit();
+    expect(handle().disabled).toBe(true);
+    await act(async () => calls[0]?.answer(undefined));
+
+    expect(action).toHaveBeenCalledTimes(1);
+    expect((action.mock.calls[0]?.[0] as FormData).get('handle')).toBe('ada');
   });
 
   it('runs the check at once on submit, waits for it, then submits an accepted value', async () => {

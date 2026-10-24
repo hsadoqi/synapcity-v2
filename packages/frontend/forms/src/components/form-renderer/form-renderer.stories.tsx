@@ -276,8 +276,9 @@ const profile = defineForm({
 });
 
 /**
- * An async check: debounced while typing, "Validating…" with the field
- * disabled while it runs, and run at once on submit, which waits for it.
+ * An async check: debounced while typing, with "Validating…" while it runs and
+ * the field still editable. Submit runs it at once and locks the form until it
+ * and the handler finish.
  */
 export const AsyncValidation: Story = {
   args: { definition: profile as never, onSubmit: fn() },
