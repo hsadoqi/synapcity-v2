@@ -189,11 +189,11 @@ export function SettingsProvider({
       setDisplayOverride(override.current);
       current.current = reconciled.settings;
       setStoredSettings(reconciled.settings);
+      saveLook(reconciled.settings);
       try {
         // Cache it, so the boot scripts paint these values on the next load.
         writeStoredPreferences(JSON.stringify(reconciled.settings));
         announcePreferencesSaved();
-        saveLook(reconciled.settings);
       } catch {
         // Still applied for this visit.
       }
@@ -272,10 +272,12 @@ export function SettingsProvider({
       current.current = next;
       setStoredSettings(next);
       if (next.theme.mode !== mode) setMode(next.theme.mode);
+      // The cookie is an independent persistence channel. A blocked
+      // localStorage write must not prevent the look from reaching docs.
+      saveLook(next);
       try {
         writeStoredPreferences(JSON.stringify(next));
         announcePreferencesSaved();
-        saveLook(next);
         setStatus('Saved');
       } catch {
         setStatus('Changes applied. Browser storage is unavailable.');
@@ -310,10 +312,10 @@ export function SettingsProvider({
       setDisplayOverride(override.current);
       current.current = next;
       setStoredSettings(next);
+      saveLook(next);
       try {
         writeStoredPreferences(JSON.stringify(next));
         announcePreferencesSaved();
-        saveLook(next);
         setStatus('Saved');
       } catch {
         setStatus('Changes applied. Browser storage is unavailable.');

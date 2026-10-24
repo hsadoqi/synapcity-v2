@@ -1,4 +1,4 @@
-import { LOOK_COOKIE_NAME, LOOK_VERSION } from '@synapcity/domain-preferences';
+import { lookCookieExpression } from '../look-source/look-source';
 
 /** The key `next-themes` keeps its choice under (its default). */
 export const MODE_STORAGE_KEY = 'theme';
@@ -10,4 +10,4 @@ export const MODE_STORAGE_KEY = 'theme';
  * class and color-scheme on <html>. With no valid cookie it does nothing and
  * `next-themes` behaves as before. It never throws.
  */
-export const modeBootScript = `(function(){try{var m=document.cookie.match(/(?:^|; )${LOOK_COOKIE_NAME}=([^;]*)/);if(!m)return;var c=JSON.parse(decodeURIComponent(m[1]));if(!c||c.v!==${LOOK_VERSION}||!c.theme)return;var v=c.theme.mode;if(v!=='light'&&v!=='dark'&&v!=='system')return;try{localStorage.setItem(${JSON.stringify(MODE_STORAGE_KEY)},v)}catch(x){}var r=v==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):v;var e=document.documentElement;e.classList.remove('light','dark');e.classList.add(r);e.style.colorScheme=r}catch(x){}})();`;
+export const modeBootScript = `(function(){try{var c=${lookCookieExpression};if(!c)return;var v=c.theme.mode;try{localStorage.setItem(${JSON.stringify(MODE_STORAGE_KEY)},v)}catch(x){}var r=v==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):v;var e=document.documentElement;e.classList.remove('light','dark');e.classList.add(r);e.style.colorScheme=r}catch(x){}})();`;

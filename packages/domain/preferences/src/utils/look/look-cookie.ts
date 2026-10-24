@@ -57,7 +57,10 @@ export function lookFromCookieHeader(
 ): Look | null {
   if (!header) return null;
   const prefix = `${LOOK_COOKIE_NAME}=`;
-  const entry = header.split('; ').find((part) => part.startsWith(prefix));
+  const entry = header
+    .split(';')
+    .map((part) => part.trimStart())
+    .find((part) => part.startsWith(prefix));
   return entry ? parseLookCookieValue(entry.slice(prefix.length)) : null;
 }
 

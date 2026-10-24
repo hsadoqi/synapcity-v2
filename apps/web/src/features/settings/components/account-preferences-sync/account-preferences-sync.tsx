@@ -54,12 +54,14 @@ export function AccountPreferencesSync({
       const reconciled = reconcile(settings, preferences, readDeviceDisplay());
       writeDeviceDisplay(reconciled.setAside);
       settings = reconciled.settings;
+      // Cookie persistence is independent of localStorage. A browser may
+      // block one while still accepting the other.
+      saveLook(settings);
       try {
         writeStoredPreferences(JSON.stringify(settings));
         // Collectors follow consent through this event (privacy is account
         // scope, so it may just have changed).
         announcePreferencesSaved();
-        saveLook(settings);
       } catch {
         // Still applied for this visit.
       }

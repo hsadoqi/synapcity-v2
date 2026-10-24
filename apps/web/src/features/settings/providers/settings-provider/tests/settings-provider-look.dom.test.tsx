@@ -78,6 +78,21 @@ describe('SettingsProvider and the shared look', () => {
     expect(screen.getByRole('status').textContent).toBe('Saved');
   });
 
+  it('still saves the shared look when localStorage is unavailable', async () => {
+    mount();
+    await ready();
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+
+    fireEvent.click(screen.getByText('High contrast'));
+
+    expect(readLookCookie()?.appearance.contrastMode).toBe('high');
+    expect(screen.getByRole('status').textContent).toBe(
+      'Changes applied. Browser storage is unavailable.',
+    );
+  });
+
   it('keeps a mode chosen elsewhere', async () => {
     // As the boot script leaves it: the cookie and next-themes' entry say dark,
     // the saved document still says light.

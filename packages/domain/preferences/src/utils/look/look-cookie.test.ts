@@ -78,6 +78,9 @@ describe('look cookie', () => {
       lookFromCookieHeader(`a=1; ${LOOK_COOKIE_NAME}=${value}; b=2`),
     ).toEqual(look);
     expect(lookFromCookieHeader('a=1; b=2')).toBeNull();
+    expect(lookFromCookieHeader(`a=1;${LOOK_COOKIE_NAME}=${value}`)).toEqual(
+      look,
+    );
     expect(lookFromCookieHeader(null)).toBeNull();
     expect(lookFromCookieHeader(`x${LOOK_COOKIE_NAME}=${value}`)).toBeNull();
   });
