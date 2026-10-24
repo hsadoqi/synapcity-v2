@@ -469,12 +469,16 @@ describe('FormRenderer list and range fields', () => {
     expect(onSubmit).not.toHaveBeenCalled();
     expect(screen.getByText('Pick a skill.')).toBeTruthy();
 
-    fireEvent.keyDown(screen.getByLabelText('Skills'), { key: 'ArrowDown' });
+    fireEvent.keyDown(screen.getByRole('combobox', { name: 'Skills' }), {
+      key: 'ArrowDown',
+    });
     await act(async () =>
       fireEvent.click(await screen.findByRole('option', { name: 'Design' })),
     );
     // A multiselect stays open after a pick; close it like a person would.
-    fireEvent.keyDown(screen.getByLabelText('Skills'), { key: 'Escape' });
+    fireEvent.keyDown(screen.getByRole('combobox', { name: 'Skills' }), {
+      key: 'Escape',
+    });
     type('Topics', 'research');
     fireEvent.keyDown(screen.getByLabelText('Topics'), { key: 'Enter' });
     await submit();
