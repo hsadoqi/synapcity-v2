@@ -1,5 +1,6 @@
 import { EntityContent, EntityItemCard } from '@synapcity/frontend-collection';
-import { EntityItem, Space } from '../shared/types';
+import type { EntityItem } from '@synapcity/frontend-collection';
+import type { Space } from '@synapcity/features-spaces/contracts';
 import { SpaceCollections } from './space-collections';
 import { createSpaceFixture } from '../lib/fixtures';
 

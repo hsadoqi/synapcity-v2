@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 
-import { recordSpaceView } from '../../server/actions/space-state-actions';
+import { recordSpaceView } from '@/lib/spaces/space-state-actions';
 
 /**
  * Notes that the person opened this space, once the page is on screen. It

@@ -1,9 +1,12 @@
+import { notFound } from 'next/navigation';
+import { getSpace } from '@synapcity/features-spaces/server';
+
 import { RecordSpaceView } from '@/features/spaces/components/record-space-view';
 import { SpaceContent } from '@/features/spaces/components/space-content';
-import { getSpace } from '@/features/spaces/server/get-space';
 import { COLLECTION_LABELS, SetBreadcrumbs } from '@/components/breadcrumbs';
 import { requireOwner } from '@/lib/access/require-owner';
 import { spacesPathFor } from '@/lib/routing/user-paths';
+import { getSpaceSource } from '@/lib/spaces';
 
 export default async function SpaceShowPage({
   params,
@@ -12,7 +15,8 @@ export default async function SpaceShowPage({
 }) {
   const { userId, spaceId } = await params;
   await requireOwner(userId);
-  const awaitedSpace = await getSpace(spaceId);
+  const awaitedSpace = await getSpace(await getSpaceSource(), spaceId);
+  if (!awaitedSpace) notFound();
 
   return (
     <>

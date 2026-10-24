@@ -12,12 +12,12 @@ const mocks = vi.hoisted(() => ({
   setSpacePinned: vi.fn(),
 }));
 
-vi.mock('../../server/actions/space-state-actions', () => ({
+vi.mock('@/lib/spaces/space-state-actions', () => ({
   setSpacePinned: mocks.setSpacePinned,
 }));
 
 import { CollectionNavigationProvider } from '@synapcity/frontend-collection';
-import { SPACE_FIXTURES } from '../../lib/fixtures';
+import { DEMO_SPACES } from '@/lib/demo/space-source';
 import type { SpaceSummary } from '@synapcity/domain-records';
 import { SpacesCollection } from './spaces-collection';
 import { SpacesCollectionSkeleton } from './spaces-collection-skeleton';
@@ -37,7 +37,7 @@ const render = (ui: React.ReactElement) =>
   renderInto(ui, { wrapper: HostNavigation });
 
 const summarise = (index: number, extra: Partial<SpaceSummary> = {}) => ({
-  ...SPACE_FIXTURES[index]!,
+  ...DEMO_SPACES[index]!,
   documentsTotal: 8,
   dashboardsTotal: 1,
   ...extra,

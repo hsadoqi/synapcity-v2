@@ -13,7 +13,7 @@ import type {
 } from '@synapcity/frontend-collection';
 
 import { toCollectionItem } from '../../lib/collection-item';
-import { setSpacePinned } from '../../server/actions/space-state-actions';
+import { setSpacePinned } from '@/lib/spaces/space-state-actions';
 import type { SpaceSummary } from '@synapcity/domain-records';
 import { SpacePreview } from './space-preview';
 

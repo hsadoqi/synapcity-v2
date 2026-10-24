@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import { getVerifiedIdentity } from '@/features/auth/server/session';
-import { getSpaceSource } from '@/features/spaces/server/space-source';
+import { getSpaceSource } from '@/lib/spaces';
 
 /** One of the owner's spaces; someone else's is indistinguishable from none. */
 export async function GET(

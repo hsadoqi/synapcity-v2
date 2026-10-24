@@ -5,7 +5,7 @@ const { recordSpaceView } = vi.hoisted(() => ({
   recordSpaceView: vi.fn(() => Promise.resolve()),
 }));
 
-vi.mock('../../server/actions/space-state-actions', () => ({
+vi.mock('@/lib/spaces/space-state-actions', () => ({
   recordSpaceView,
 }));
 

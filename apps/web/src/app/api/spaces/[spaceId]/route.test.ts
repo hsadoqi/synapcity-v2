@@ -12,7 +12,7 @@ const { fixtureModeEnabled } = vi.hoisted(() => ({
 }));
 
 vi.mock('@/features/auth/server/session', () => ({ getVerifiedIdentity }));
-vi.mock('@/features/spaces/server/space-source', () => ({ getSpaceSource }));
+vi.mock('@/lib/spaces', () => ({ getSpaceSource }));
 vi.mock('@/lib/access/dev-fixture', () => ({ fixtureModeEnabled }));
 
 import { GET } from './route';
