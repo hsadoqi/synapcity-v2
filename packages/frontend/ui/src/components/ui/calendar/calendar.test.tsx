@@ -14,7 +14,7 @@ describe('Calendar', () => {
     expect(container.querySelector('[data-slot="calendar"]')).toBeTruthy();
     expect(
       screen
-        .getByRole('button', { name: /Monday, May 4th, 2026/ })
+        .getByRole('gridcell', { name: /Monday, May 4th, 2026/ })
         .getAttribute('aria-label'),
     ).toMatch(/^4, Monday/);
   });

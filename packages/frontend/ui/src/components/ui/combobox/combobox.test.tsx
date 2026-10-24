@@ -8,6 +8,8 @@ import {
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
+  ComboboxVirtualList,
+  useComboboxVirtualizer,
 } from '@synapcity/frontend-ui/core/combobox';
 
 const zones = ['UTC', 'Europe/Paris', 'Asia/Tokyo'];
@@ -78,5 +80,68 @@ describe('Combobox', () => {
         expect.anything(),
       ),
     );
+  });
+});
+
+const many = Array.from({ length: 1000 }, (_, index) => `Option ${index + 1}`);
+
+function VirtualExample({ enabled = true }: { enabled?: boolean }) {
+  const virtualizer = useComboboxVirtualizer();
+  return (
+    <Combobox
+      items={many}
+      virtualized={enabled}
+      onItemHighlighted={virtualizer.onItemHighlighted}
+    >
+      <ComboboxInput aria-label="Long list" />
+      <ComboboxContent>
+        <ComboboxVirtualList virtualizer={virtualizer} enabled={enabled}>
+          {(item: string, index: number) => (
+            <ComboboxItem key={item} value={item} index={index}>
+              {item}
+            </ComboboxItem>
+          )}
+        </ComboboxVirtualList>
+      </ComboboxContent>
+    </Combobox>
+  );
+}
+
+describe('ComboboxVirtualList', () => {
+  const openLong = () =>
+    fireEvent.keyDown(screen.getByRole('combobox', { name: 'Long list' }), {
+      key: 'ArrowDown',
+    });
+
+  it('renders only a window of a long list, with a spacer for the rest', async () => {
+    render(<VirtualExample />);
+    openLong();
+
+    const options = await screen.findAllByRole('option');
+    expect(options.length).toBeLessThanOrEqual(20);
+    expect(options[0]?.textContent).toBe('Option 1');
+    const list = document.querySelector('[data-slot="combobox-list"]');
+    expect(list?.lastElementChild?.getAttribute('aria-hidden')).toBe('true');
+  });
+
+  it('windows the filtered items, not the full list', async () => {
+    render(<VirtualExample />);
+    openLong();
+    fireEvent.change(screen.getByRole('combobox'), {
+      target: { value: 'Option 999' },
+    });
+
+    await waitFor(() =>
+      expect(screen.getAllByRole('option').map((o) => o.textContent)).toEqual([
+        'Option 999',
+      ]),
+    );
+  });
+
+  it('renders every row when windowing is off', async () => {
+    render(<VirtualExample enabled={false} />);
+    openLong();
+
+    expect(await screen.findAllByRole('option')).toHaveLength(1000);
   });
 });

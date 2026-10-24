@@ -11,6 +11,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from '@synapcity/frontend-ui/core/input-group';
+import { useVirtualList } from '@synapcity/frontend-ui/hooks/use-virtual-list';
 import { CheckIcon, ChevronDownIcon, XIcon } from 'lucide-react';
 
 const Combobox = ComboboxPrimitive.Root;
@@ -238,9 +239,12 @@ function ComboboxChip({
   className,
   children,
   showRemove = true,
+  removeLabel = 'Remove',
   ...props
 }: ComboboxPrimitive.Chip.Props & {
   showRemove?: boolean;
+  /** The remove button's accessible name, such as `Remove Design`. */
+  removeLabel?: string;
 }) {
   return (
     <ComboboxPrimitive.Chip
@@ -257,6 +261,7 @@ function ComboboxChip({
           render={<Button variant="ghost" size="icon-xs" />}
           className="-ml-1 opacity-50 hover:opacity-100"
           data-slot="combobox-chip-remove"
+          aria-label={removeLabel}
         >
           <XIcon className="pointer-events-none" />
         </ComboboxPrimitive.ChipRemove>
@@ -282,6 +287,108 @@ function useComboboxAnchor() {
   return React.useRef<HTMLDivElement | null>(null);
 }
 
+/**
+ * Connects a `Combobox` root to its `ComboboxVirtualList`, so moving through
+ * the options with the keyboard scrolls a row that is not rendered into view.
+ * Pass `onItemHighlighted` to the root, set `virtualized` on the root while the
+ * list is windowed, and pass the virtualizer to the list.
+ */
+interface ComboboxVirtualizer {
+  /** Called by the list with how to scroll a row into view, or `null` when it unmounts. */
+  readonly register: (scrollToIndex: ((index: number) => void) | null) => void;
+  readonly onItemHighlighted: (
+    value: unknown,
+    details: { readonly reason: string; readonly index: number },
+  ) => void;
+}
+
+function useComboboxVirtualizer(): ComboboxVirtualizer {
+  const scrollToIndex = React.useRef<((index: number) => void) | null>(null);
+  return React.useMemo<ComboboxVirtualizer>(
+    () => ({
+      register: (scroll) => {
+        scrollToIndex.current = scroll;
+      },
+      onItemHighlighted: (_value, { reason, index }) => {
+        if (reason === 'keyboard' && index >= 0) scrollToIndex.current?.(index);
+      },
+    }),
+    [],
+  );
+}
+
+/**
+ * The option list, rendering only the rows in view (between two spacers) when
+ * `enabled`. Rows are the root's filtered items; give each `ComboboxItem` the
+ * `index` it is called with. Off, it renders every row like `ComboboxList`.
+ */
+function ComboboxVirtualList<Item>({
+  virtualizer,
+  enabled = true,
+  estimateRowHeight,
+  overscan,
+  children,
+  ...props
+}: Omit<ComboboxPrimitive.List.Props, 'children'> & {
+  virtualizer: ComboboxVirtualizer;
+  enabled?: boolean;
+  estimateRowHeight?: number;
+  overscan?: number;
+  children: (item: Item, index: number) => React.ReactNode;
+}) {
+  const items = ComboboxPrimitive.useFilteredItems<Item>();
+  const list = React.useRef<HTMLDivElement | null>(null);
+  const virtual = useVirtualList({
+    count: items.length,
+    enabled,
+    estimateRowHeight,
+    overscan,
+  });
+  const { viewportRef, measureRow, scrollToIndex, range } = virtual;
+
+  React.useEffect(() => {
+    virtualizer.register(scrollToIndex);
+    return () => virtualizer.register(null);
+  }, [virtualizer, scrollToIndex]);
+
+  // Rows are one height; measure a rendered one in place of the estimate.
+  React.useEffect(() => {
+    measureRow(
+      list.current?.querySelector<HTMLElement>('[data-slot="combobox-item"]') ??
+        null,
+    );
+  }, [measureRow, range.start, range.end]);
+
+  const setList = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      list.current = node;
+      viewportRef(node);
+    },
+    [viewportRef],
+  );
+
+  const rows: React.ReactNode[] = [];
+  for (let index = range.start; index < range.end; index += 1) {
+    rows.push(
+      <React.Fragment key={index}>
+        {children(items[index] as Item, index)}
+      </React.Fragment>,
+    );
+  }
+
+  return (
+    <ComboboxList ref={setList} onScroll={virtual.onScroll} {...props}>
+      {virtual.paddingTop > 0 ? (
+        <div aria-hidden style={{ height: virtual.paddingTop }} />
+      ) : null}
+      {rows}
+      {virtual.paddingBottom > 0 ? (
+        <div aria-hidden style={{ height: virtual.paddingBottom }} />
+      ) : null}
+    </ComboboxList>
+  );
+}
+
 export {
   Combobox,
   ComboboxInput,
@@ -299,4 +406,7 @@ export {
   ComboboxTrigger,
   ComboboxValue,
   useComboboxAnchor,
+  ComboboxVirtualList,
+  useComboboxVirtualizer,
 };
+export type { ComboboxVirtualizer };

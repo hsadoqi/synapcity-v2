@@ -18,10 +18,18 @@ const toFormValue = (date: Date | undefined) =>
   date ? format(date, 'yyyy-MM-dd') : '';
 
 /** Days outside `min` and `max` cannot be chosen. */
-function outside(min?: Date, max?: Date): Matcher[] {
+function outside(min?: Date, max?: Date, step?: number): Matcher[] {
   const matchers: Matcher[] = [];
   if (min) matchers.push({ before: min });
   if (max) matchers.push({ after: max });
+  if (step !== undefined && Number.isFinite(step) && step > 0) {
+    const base = min ?? new Date(1970, 0, 1);
+    const dayNumber = (date: Date) =>
+      Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) /
+      (24 * 60 * 60 * 1000);
+    const baseDay = dayNumber(base);
+    matchers.push((date) => (dayNumber(date) - baseDay) % step !== 0);
+  }
   return matchers;
 }
 
@@ -50,10 +58,17 @@ interface PickerTriggerProps {
   readonly id?: string;
   readonly placeholder?: string;
   readonly disabled?: boolean;
+  /**
+   * Accepted so a form can pass it through, but not put on the trigger: a
+   * button cannot be `aria-required`, and a hidden input cannot be `required`.
+   * The form's own validation owns the rule.
+   */
   readonly required?: boolean;
   /** Earliest and latest day that can be chosen. */
   readonly min?: Date;
   readonly max?: Date;
+  /** Allowed interval in days, based on `min` or 1970-01-01. */
+  readonly step?: number;
   readonly className?: string;
   readonly ref?: React.Ref<HTMLButtonElement>;
   readonly onBlur?: React.FocusEventHandler<HTMLButtonElement>;
@@ -81,9 +96,10 @@ export function DatePicker({
   name,
   placeholder = 'Pick a date',
   disabled,
-  required,
+  required: _required,
   min,
   max,
+  step,
   formatValue = (date) => format(date, 'PPP'),
   className,
   ref,
@@ -113,7 +129,6 @@ export function DatePicker({
               id={id}
               variant="outline"
               disabled={disabled}
-              aria-required={required || undefined}
               className={className}
               {...aria}
             >
@@ -127,7 +142,7 @@ export function DatePicker({
             mode="single"
             selected={date}
             defaultMonth={date ?? min}
-            disabled={outside(min, max)}
+            disabled={outside(min, max, step)}
             autoFocus
             onSelect={(next) => {
               setDate(next);
@@ -162,9 +177,10 @@ export function DateRangePicker({
   toName,
   placeholder = 'Pick a date range',
   disabled,
-  required,
+  required: _required,
   min,
   max,
+  step,
   numberOfMonths = 2,
   formatValue = (date) => format(date, 'LLL dd, y'),
   className,
@@ -200,7 +216,6 @@ export function DateRangePicker({
               id={id}
               variant="outline"
               disabled={disabled}
-              aria-required={required || undefined}
               className={className}
               {...aria}
             >
@@ -214,7 +229,7 @@ export function DateRangePicker({
             mode="range"
             selected={range}
             defaultMonth={range?.from ?? min}
-            disabled={outside(min, max)}
+            disabled={outside(min, max, step)}
             numberOfMonths={numberOfMonths}
             autoFocus
             onSelect={setRange}

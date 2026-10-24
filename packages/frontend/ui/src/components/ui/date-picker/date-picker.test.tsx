@@ -20,6 +20,14 @@ async function pick(trigger: HTMLElement, day: RegExp) {
 }
 
 describe('DatePicker', () => {
+  it('does not put aria-required or required on the trigger button', () => {
+    render(<DatePicker id="due" required />);
+
+    const trigger = screen.getByRole('button');
+    expect(trigger.hasAttribute('aria-required')).toBe(false);
+    expect(trigger.hasAttribute('required')).toBe(false);
+  });
+
   it('shows the placeholder until a date is chosen, on a trigger that carries the id and ARIA', () => {
     render(
       <DatePicker
@@ -82,6 +90,28 @@ describe('DatePicker', () => {
     const after = screen.getByRole('button', { name: /May 21st, 2026/ });
     expect(before.hasAttribute('disabled')).toBe(true);
     expect(after.hasAttribute('disabled')).toBe(true);
+  });
+
+  it('limits choices to the requested day interval', async () => {
+    render(
+      <DatePicker defaultValue={may4} min={new Date(2026, 4, 3)} step={7} />,
+    );
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /May 4th, 2026/ }));
+    });
+
+    expect(
+      (
+        await screen.findByRole('button', {
+          name: /^4, Monday, May 4th, 2026/,
+        })
+      ).hasAttribute('disabled'),
+    ).toBe(true);
+    expect(
+      screen
+        .getByRole('button', { name: /May 10th, 2026/ })
+        .hasAttribute('disabled'),
+    ).toBe(false);
   });
 
   it('formats the label with formatValue when given', () => {
