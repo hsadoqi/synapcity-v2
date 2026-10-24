@@ -1,3 +1,4 @@
+import { AuthRetryableFetchError } from '@supabase/supabase-js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
@@ -125,6 +126,36 @@ describe('saveAccountPreferences in development fixture mode', () => {
     expect(result).toMatchObject({ ok: false });
     expect(!result.ok && result.error).toContain('Fixture mode');
     expect(mocks.createClient).not.toHaveBeenCalled();
+    expect(mocks.upsert).not.toHaveBeenCalled();
+  });
+});
+
+describe('saveAccountPreferences caller identity', () => {
+  it('tells the caller to try again when the provider is unreachable', async () => {
+    mocks.getUser.mockResolvedValue({
+      data: { user: null },
+      error: new AuthRetryableFetchError('fetch failed', 0),
+    });
+
+    await expect(saveAccountPreferences(preferences, 'UTC')).resolves.toEqual({
+      ok: false,
+      error: 'Could not save your changes. Try again.',
+    });
+    expect(mocks.upsert).not.toHaveBeenCalled();
+  });
+
+  it('asks a signed-out caller to sign in again and logs it by code only', async () => {
+    mocks.getUser.mockResolvedValue({ data: { user: null }, error: null });
+
+    await expect(saveAccountPreferences(preferences, 'UTC')).resolves.toEqual({
+      ok: false,
+      error: 'Sign in again to update your profile.',
+      signedOut: true,
+    });
+    expect(console.warn).toHaveBeenCalledWith('getCallerIdentity failed', {
+      code: undefined,
+      status: undefined,
+    });
     expect(mocks.upsert).not.toHaveBeenCalled();
   });
 });
