@@ -1,3 +1,13 @@
+## Active task: clear the CI dependency audit on main (2026-10-23)
+
+- Goal and mode: owner asked to fix the failing `security` CI job (`pnpm audit --audit-level=moderate` on main at bd61324a: 4 critical, 5 high, 8 moderate). Implementing a security-only dependency change on `fix/security-audit-2026-10-23`, separate from milestone work.
+- Exact changes: patch-level bumps of existing dependencies only. `next` 16.4.0 to 16.4.3 in `apps/storybook`, `packages/frontend/ui` and `packages/frontend/site` (matching `apps/web` and `apps/docs`); Storybook packages and `eslint-plugin-storybook` 10.6.1 to 10.6.3; `vitest`, `@vitest/browser-playwright` and `@vitest/coverage-v8` 4.1.11 to 4.1.12 (stays on Vitest 4 per ADR-0005); `shadcn` ^4.21.4 to ^4.22.1, which moves its zod to 4.x. Lockfile refresh of transitive `body-parser` 2.4.0, `undici` 7.30.1 and 8.12.3, `fast-uri` 3.1.9; no new overrides. `packageExtensions` key follows `eslint-plugin-storybook` to 10.6.3. ADR-0005 and the vitest-config README pin text updated.
+- Removed: `patches/@storybook__nextjs-vite@10.6.1.patch` and its `patchedDependencies` entry. Storybook 10.6.3 ships the same `parentRenderTree: { data: { bfcacheId: 0 } }` fixture upstream (checked in the published `dist/_browser-chunks`). Recovery: the patch stays in Git history at bd61324a.
+- Not changed: `@next/eslint-plugin-next` stays 16.4.0 (no advisory); Vitest 5 and the open Dependabot branches remain separate changes. No new dependency, override, schema, API or architecture decision.
+- Verification: `pnpm audit --audit-level=moderate` reports no known vulnerabilities; `pnpm peers check` clean; full `pnpm verify` results reported in the handoff.
+
+Earlier scopes below are retained as history and grant no additional mutation authority.
+
 ## Active task: repair main integration on feat/build-spaces-feature (2026-10-17)
 
 - Goal and mode: owner requested fixing the main integration, then explicitly approved saving recovery state, aborting the duplicate-history rebase, and merging fetched origin/main (c5f03cf) into feat/build-spaces-feature. Implementing integration only.
