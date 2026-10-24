@@ -1,6 +1,6 @@
 # Forms schema-driven engine implementation plan
 
-> **Status: approved by the owner on 2026-10-24 (plan and steps), not yet executable because the preconditions below are unmet.** A review the same day then changed D7 (verified against the installed Zod), fixed a markdown defect, corrected statements about the earlier implementations, corrected the test commands, moved the file layout to the workspace conventions, and verified most open assumptions (see Evidence); those corrections have not been re-confirmed by the owner. Builds on the forms extraction plan and ADR-0015 (React Hook Form, package `frontend-forms`), which arrive in the same change. This plan does not repeat them. Steps use checkbox syntax so a later run can track them.
+> **Status: approved by the owner on 2026-10-24 (plan and steps), not yet executable because the preconditions below are unmet.** A review the same day then changed D7 (verified against the installed Zod), fixed a markdown defect, corrected statements about the earlier implementations, corrected the test commands, moved the file layout to the workspace conventions, and verified most open assumptions (see Evidence); those corrections have not been re-confirmed by the owner. **Progress:** Tasks 1 to 4 are implemented on `feat/frontend-forms-engine`; what that taught the plan is folded into the tasks below. Builds on the forms extraction plan and ADR-0015 (React Hook Form, package `frontend-forms`), which arrive in the same change. This plan does not repeat them. Steps use checkbox syntax so a later run can track them.
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Give `frontend-forms` a declarative form engine: a caller supplies a Zod object schema and describes how each key is presented and when it applies, and gets a rendered, validated, accessible form.
@@ -151,7 +151,7 @@ All under `packages/frontend/forms/src/`, in kind folders directly under `src/` 
 
 **Files:**
 
-- Create the package: `packages/frontend/forms/package.json` (exports `.` only for now), `tsconfig.json`, `eslint.config.mjs`, `vitest.config.mts`, `README.md`. Register it in the root `vitest.config.ts` `projects`. `pnpm install` adds its importer to `pnpm-lock.yaml`, using only versions already in the lockfile.
+- Create the package: `packages/frontend/forms/package.json` (exports `.` only for now), `tsconfig.json`, `eslint.config.mjs`, `vitest.config.mts`, `README.md`. Register it in the root `vitest.config.ts` `projects`. `pnpm install` adds its importer to `pnpm-lock.yaml`, using only versions already in the lockfile. Declare `"types": ["node"]` in the tsconfig: TypeScript 7.0.2 does not include `@types/node` on its own, and the purity test reads files.
 - Create: `types/field-config.ts`, `types/form-definition.ts`, `types/index.ts`, `utils/define-form/` and `utils/describe-schema-field/` (source, test and `index.ts` each), `utils/index.ts`, `src/index.ts`.
 
 **Interfaces:**
@@ -218,7 +218,7 @@ Semantics to implement exactly: a field with no `show` dependency is visible; wi
   - `a field the schema does not mark optional is required without any dependency`.
   - `require makes a field required only while met`.
   - `a hidden field reads as empty to its dependents` (`c` shown when `b` is empty, `b` hidden by `a` → `c` visible).
-  - `isEmptyValue` is `false` for `0` and `false`, `true` for `''`, `null`, `undefined`, `[]`.
+  - `isEmptyValue` is `false` for `0` and `false`, `true` for `''`, `null`, `undefined`, `[]` and `NaN`.
   - `gt and lt are false for non-numeric values` (including `NaN` and `undefined`).
   - `contains works on strings and arrays and is false for undefined`.
   - `resolves generated acyclic definitions without looping` (a small seeded generator written in the test file, no new dependency; 200 definitions, each resolved against random values).
@@ -245,6 +245,8 @@ Semantics to implement exactly: a field with no `show` dependency is visible; wi
   - `fails an empty value for a field whose require effect is met`, with the issue at that field's `name` and the `required` message.
   - `uses the caller's required message when given`.
   - `passes the caller's schema messages through unchanged` (e.g. `z.string().min(3, 'Too short')` yields `'Too short'`).
+  - `fails a required field whose key is absent from the values, not only an empty one`.
+  - `an empty required field reports only the required message, not also the schema's own rule for a non-empty value`.
   - `validates only keys that have a field` (a schema key with no field does not fail the form).
   - `createSchemaBuilder returns the same schema instance for states with the same visible and required fields`.
   - `createSchemaBuilder returns a new schema when a field's visibility or requirement changes`.
@@ -253,13 +255,13 @@ Semantics to implement exactly: a field with no `show` dependency is visible; wi
   - `a rule's message lands on its path field`.
   - `the narrowed schema is built from shape, so a schema with plain checks per key (min, regex) keeps them`.
 - [ ] **Step 2: Run** → FAIL.
-- [ ] **Step 3: Implement** `buildSchema` by building a new object from `definition.schema.shape` for the visible keys (never `.pick()`, which throws on a refined schema), applying each applicable rule as a refinement; wrap required fields with a refinement using `isEmptyValue`.
+- [ ] **Step 3: Implement** `buildSchema` by building a new object from `definition.schema.shape` for the visible keys (never `.pick()`, which throws on a refined schema), applying each applicable rule as a refinement; a field required only by a `require` dependency is built as `z.unknown().refine(not empty).pipe(base)`. Starting from `unknown` makes Zod validate the key even when it is absent from the values (Zod skips an optional key that is absent, so a plain refinement on the schema never runs for an untouched field), and checking emptiness before piping into the schema means an empty field reports only "required", not also the schema's own rule.
 - [ ] **Step 4: Run** → PASS.
 - [ ] **Step 5: Commit** `feat(forms): derive the form schema from visible fields`.
 
 ### Task 4: Renderer registry and provider
 
-**Files:** Create `providers/field-renderer-provider/` with `field-renderer-registry.ts`, `field-renderer-provider.tsx`, a test for each, and `index.ts`; `providers/index.ts`.
+**Files:** Switch the package to the React tooling: `package.json` (`react`, `react-dom`, `@testing-library/react`, `@testing-library/dom`, `jsdom`, `@types/react`, `@types/react-dom`; versions as in `frontend-collection`), `tsconfig.json` (extend `react-library.json`), `eslint.config.mjs` (`react-internal`), and `vitest.config.ts` renamed to `vitest.config.mts` with the React test config. Create `providers/field-renderer-provider/` with `field-renderer-registry.ts`, `field-renderer-provider.tsx`, a test for each, and `index.ts`; `providers/index.ts`.
 
 **Interfaces:**
 
@@ -280,7 +282,7 @@ The default registry comes from Task 5. Until then the provider's default is an 
   - `extend adds a renderer for one provider and leaves the base registry unchanged`.
   - `useFieldRendererRegistry throws outside a provider`.
 - [ ] **Step 2: Run** → FAIL.
-- [ ] **Step 3: Implement** the registry over a `Map<string, FieldRenderer>`; the provider clones once in `useState`, then applies `extend`.
+- [ ] **Step 3: Implement** the registry over a `Map<string, FieldRenderer>`; the provider clones once in `useState`, then applies `extend`. Render a component that comes from the registry with `createElement(registry.resolve(type), props)`: JSX on a resolved component trips the `react-hooks/static-components` lint rule.
 - [ ] **Step 4: Run** → PASS.
 - [ ] **Step 5: Commit** `feat(forms): add the scoped field renderer registry`.
 
@@ -326,6 +328,7 @@ Colour, date, slider, radio, multiselect, file and tags renderers are deferred u
   - `a field shows no error before it is touched or the form is submitted`.
   - `shows a schema error under the field and moves focus to the first invalid field`.
   - `focuses the first invalid field in definition order even when a conditional field registered later` (the library's own focus follows registration order).
+  - `a nullable key that is not optional starts as null, so an untouched field validates` (Zod fails such a key when it is absent).
   - `a field that becomes required shows the required message on submit`.
   - `a cross-field rule's message shows under its path field on submit, and not while one of the rule's fields is hidden`.
   - `a field shown by a later change appears and its value is submitted`.
@@ -441,7 +444,7 @@ Colour, date, slider, radio, multiselect, file and tags renderers are deferred u
 **Files:** Modify `packages/frontend/forms/README.md`, `docs/architecture/workspace-conventions.md` (inventory row), `docs/architecture/reorganization-ownership-map.md`, `docs/architecture/decisions/README.md`, `.agents/task-scope.md`. Create the ADR from decision D1 once the owner approves it.
 
 - [ ] **Step 1:** Document the public surface, the field-state semantics (D3), the client-only limit (D4), and the deferred list. Add three short guides: when to use the engine and when to keep a native-action form (D4); how a feature registers its own `custom:*` renderers once, through `FieldRendererProvider`'s `extend`; and how to map between a domain value and a form value by wrapping `initialValues` and `onSubmit` in two small mapping functions.
-- [ ] **Step 2: Run** `pnpm verify` → all checks pass. A package with no consumer yet may make `pnpm deps` (Knip) report unused files or exports; settle that with the registration pattern from Part A, not by ignoring the report.
+- [ ] **Step 2: Run** `pnpm verify` → all checks pass. `pnpm deps` (Knip) and `pnpm boundaries` both passed for the package with no consumer after Tasks 1 to 4; run them again once the components exist, and settle anything they report with the registration pattern from Part A, not by ignoring it.
 - [ ] **Step 3:** Report what ran, what did not run, and what the tests do not cover. A manual keyboard and screen-reader pass on the story form is not covered by the automated checks.
 - [ ] **Step 4: Commit** `docs(forms): document the form engine`.
 
