@@ -24,6 +24,10 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
   GripVerticalIcon,
+  LockIcon,
+  LockOpenIcon,
+  PinIcon,
+  PinOffIcon,
   Settings2Icon,
 } from 'lucide-react';
 import { useId, useState, type ReactNode } from 'react';
@@ -243,6 +247,37 @@ export function WidgetShell({
 }) {
   const titleId = useId();
   const [showingSettings, setShowingSettings] = useState(false);
+  /*
+   * The shell's own actions, after the content's. Pin surfaces the widget
+   * elsewhere and is always offered; lock and size are layout, so edit mode
+   * only. Show is not here: a hidden widget is not on the dashboard, so it is
+   * shown again from the widgets panel.
+   */
+  const shellActions: ToolbarAction[] = [
+    {
+      label: widget.pinned ? 'Unpin' : 'Pin',
+      icon: widget.pinned ? <PinOffIcon /> : <PinIcon />,
+      onSelect: () => actions.update({ pinned: !widget.pinned }),
+    },
+    ...(editMode
+      ? [
+          {
+            label: widget.locked ? 'Unlock position' : 'Lock position',
+            icon: widget.locked ? <LockOpenIcon /> : <LockIcon />,
+            onSelect: () => actions.update({ locked: !widget.locked }),
+          },
+          {
+            label: widget.resizable === false ? 'Allow resizing' : 'Keep size',
+            onSelect: () =>
+              actions.update({ resizable: widget.resizable === false }),
+          },
+        ]
+      : []),
+    { label: 'Hide', onSelect: actions.hide },
+    { label: 'Archive', onSelect: actions.archive },
+  ];
+  const toolbarActions = [...(toolbar?.actions ?? []), ...shellActions];
+  const movable = editMode && !widget.locked;
   const toolbarSettings = toolbar?.settings && {
     ...toolbar.settings,
     onOpenView: () => setShowingSettings(true),
@@ -257,7 +292,8 @@ export function WidgetShell({
         'group/widget relative flex w-full min-w-0 flex-col overflow-hidden border border-border bg-card text-card-foreground',
         CARD_RADIUS[settings.cardRadius],
         widget.collapsed ? 'h-auto self-start' : 'h-full',
-        editMode && 'cursor-grab outline outline-ring active:cursor-grabbing',
+        editMode && 'outline outline-ring',
+        movable && 'cursor-grab active:cursor-grabbing',
       )}
     >
       <header className="relative flex h-12 w-full shrink-0 items-center gap-2 px-3.5">
@@ -268,7 +304,7 @@ export function WidgetShell({
             HIGHLIGHT_BAR[widget.highlight],
           )}
         />
-        {editMode && (
+        {movable && (
           // A cue only: the whole widget drags in edit mode, and the keyboard
           // moves it with the arrow keys. Hidden until hover or focus where
           // the pointer can hover; always shown on touch, which cannot.
@@ -287,13 +323,11 @@ export function WidgetShell({
             onRename={(title) => actions.update({ title })}
           />
         </div>
-        {(toolbar?.actions?.length || toolbarSettings) && (
-          <ActionsToolbar
-            className="flex-1"
-            actions={toolbar?.actions}
-            settings={toolbarSettings}
-          />
-        )}
+        <ActionsToolbar
+          className="flex-1"
+          actions={toolbarActions}
+          settings={toolbarSettings}
+        />
         <Button
           variant="ghost"
           size="icon-sm"

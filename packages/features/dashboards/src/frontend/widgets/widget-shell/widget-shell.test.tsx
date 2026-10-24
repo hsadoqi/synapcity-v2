@@ -171,9 +171,46 @@ describe('WidgetShell', () => {
     );
   });
 
-  it('adds no toolbar without content actions', () => {
-    setup();
-    expect(document.querySelector('[data-slot="actions-toolbar"]')).toBeNull();
+  it('offers pin, hide and archive in view mode, and the layout actions only in edit mode', async () => {
+    const actions = setup({}, { editMode: false });
+    expect(screen.getByRole('button', { name: 'Pin' })).toBeDefined();
+    expect(screen.queryByRole('button', { name: 'Lock position' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Pin' }));
+    expect(actions.update).toHaveBeenCalledWith({ pinned: true });
+
+    const [compact] = screen.getAllByRole('button', { name: 'More actions' });
+    fireEvent.click(compact!);
+    const menu = await screen.findByRole('menu');
+    expect(menu.textContent).toContain('Hide');
+    expect(menu.textContent).toContain('Archive');
+    expect(menu.textContent).not.toContain('Keep size');
+  });
+
+  it('locks, unpins and stops resizing through update', async () => {
+    const actions = setup({ pinned: true, locked: false });
+    fireEvent.click(screen.getByRole('button', { name: 'Unpin' }));
+    expect(actions.update).toHaveBeenCalledWith({ pinned: false });
+    fireEvent.click(screen.getByRole('button', { name: 'Lock position' }));
+    expect(actions.update).toHaveBeenCalledWith({ locked: true });
+    const [compact] = screen.getAllByRole('button', { name: 'More actions' });
+    fireEvent.click(compact!);
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Keep size' }));
+    expect(actions.update).toHaveBeenCalledWith({ resizable: false });
+  });
+
+  it('hides and archives from the toolbar', async () => {
+    const actions = setup({}, { editMode: false });
+    const [compact] = screen.getAllByRole('button', { name: 'More actions' });
+    fireEvent.click(compact!);
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Hide' }));
+    expect(actions.hide).toHaveBeenCalledTimes(1);
+  });
+
+  it('drops the drag cue of a locked widget', () => {
+    setup({ locked: true });
+    expect(
+      document.querySelector('[data-slot="widget-drag-handle"]'),
+    ).toBeNull();
   });
 
   it("shows the content's actions in the header", () => {
