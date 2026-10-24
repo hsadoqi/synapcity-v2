@@ -96,7 +96,7 @@ The example does not prescribe one verification order for every capability. Exis
 
 A persistence package may contain separate modules for Spaces, Documents, and Dashboards. A new query does not automatically require a new package. Keep a concrete owner and narrow API rather than growing an unrestricted backend utility bucket.
 
-Current inputs include [auth operations](../../apps/web/src/features/auth/server/operations/operations.ts), [account caller helpers](../../apps/web/src/features/account/server/caller.ts), [Space repository code](../../apps/web/src/features/spaces/server/space-repository/space-repository.ts), and [shared document/dashboard persistence](../../apps/web/src/lib/owned-records/owned-records.ts). These remain app-local until migrated.
+Current inputs include [auth operations](../../apps/web/src/features/auth/server/operations/operations.ts), [account caller helpers](../../apps/web/src/features/account/server/caller.ts), the [Space source](../../apps/web/src/features/spaces/server/space-source) (its server implementation sits over [`server-data`](data/README.md)), and [shared document/dashboard persistence](../../apps/web/src/lib/owned-records/owned-records.ts). These remain app-local until migrated.
 
 ### Example packages
 
