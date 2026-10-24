@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-import type { PrototypeRecords } from '../types';
 import {
   activitySchema,
   assetSchema,
@@ -37,4 +36,4 @@ export const prototypeRecordsSchema = z.strictObject({
   note: tableOf(noteSchema),
   link: tableOf(linkSchema),
   asset: tableOf(assetSchema),
-}) satisfies z.ZodType<PrototypeRecords>;
+});

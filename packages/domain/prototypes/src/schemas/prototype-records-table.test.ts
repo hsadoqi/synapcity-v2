@@ -1,4 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
+
+import type { PrototypeRecords } from '../types';
 
 import { newRecord } from '../utils/new-record';
 import { emptyRecords } from '../utils/record-tables';
@@ -7,6 +9,12 @@ import { prototypeRecordsSchema } from './index';
 const ctx = { ownerId: '11111111-1111-4111-8111-111111111111', now: 0 };
 
 describe('prototypeRecordsSchema', () => {
+  it('parses to the PrototypeRecords type', () => {
+    expectTypeOf(
+      prototypeRecordsSchema.parse(emptyRecords()),
+    ).toEqualTypeOf<PrototypeRecords>();
+  });
+
   it('accepts every table empty', () => {
     expect(prototypeRecordsSchema.parse(emptyRecords())).toEqual(
       emptyRecords(),
