@@ -92,11 +92,11 @@ The host supplies where a link leads and how an action is invoked. A callback ex
 
 ## Current implementation and migration inputs
 
-Existing packages are [UI](ui/README.md), [Tailwind configuration and tokens](tailwind-config/README.md), and [site metadata/brand support](site/README.md). Their documented current exports remain usable until a scoped migration changes them.
+Existing packages are [UI](ui/README.md), [collection](collection/README.md), [Tailwind configuration and tokens](tailwind-config/README.md), and [site metadata/brand support](site/README.md). Their documented current exports remain usable until a scoped migration changes them.
 
 [RootShell](ui/src/blocks/root-shell/root-shell.tsx), [RootSidebar](ui/src/blocks/sidebar-shell/root-sidebar/root-sidebar.tsx), and the [web authentication page shell](../../apps/web/src/components/shells/auth-page-shell/auth-page-shell.tsx) are inputs to the shells ownership review. Product schemas currently in UI should move to their domain owner.
 
-Collection's generic controls, display mechanics, and interaction belong to a cohesive frontend collection family. Resource-specific projections, actions, and copy belong to resource features. The ownership map records that split; migration will assign individual files according to responsibility rather than current folder names.
+Collection's generic controls, display mechanics, and interaction belong to a cohesive frontend collection family. Resource-specific projections, actions, and copy belong to resource features. The ownership map records that split; migration will assign individual files according to responsibility rather than current folder names. M5.3 moved the generic part into [`frontend-collection`](collection/README.md); resource-specific projections and copy stay with Spaces, Documents and Dashboards.
 
 ## Presentation, testing, and copy
 

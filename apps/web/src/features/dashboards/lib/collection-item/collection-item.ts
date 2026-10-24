@@ -1,6 +1,7 @@
-import { itemFromRecord } from '@/features/collection/shared';
-import type { CollectionItem } from '@/features/collection/shared';
+import { itemFromRecord } from '@synapcity/frontend-collection';
+import type { CollectionItem } from '@synapcity/frontend-collection';
 import type { OwnedRecordSummary } from '@/lib/owned-records';
+import { dashboardPathFor } from '@/lib/routing/user-paths';
 
 /** Which spaces a dashboard is in, in a few words: "In 2 spaces", or "Not in a space". */
 export function describeSpaces(spaces: number) {
@@ -14,7 +15,7 @@ export function toCollectionItem(
   userId: string,
 ): CollectionItem {
   return itemFromRecord(record, {
-    href: `/${userId}/home/dashboards/${record.id}`,
+    href: dashboardPathFor(userId, record.id),
     detail: describeSpaces(record.spacesTotal),
   });
 }

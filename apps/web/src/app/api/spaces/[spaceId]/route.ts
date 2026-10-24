@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import { getVerifiedIdentity } from '@/features/auth/server/session';
-import { findSpace } from '@/features/spaces/server/space-repository';
+import { getSpaceSource } from '@/lib/spaces';
 
 /** One of the owner's spaces; someone else's is indistinguishable from none. */
 export async function GET(
@@ -17,7 +17,7 @@ export async function GET(
   }
 
   const { spaceId } = await params;
-  const space = await findSpace(spaceId);
+  const space = await (await getSpaceSource()).find(spaceId);
   if (!space) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }

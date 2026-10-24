@@ -6,6 +6,9 @@ export type RequestCookies = {
   set(name: string, value: string, options: CookieOptions): void;
 };
 
+/** The client a request builds; what data modules take as their first argument. */
+export type SupabaseServerClient = ReturnType<typeof createRequestClient>;
+
 /**
  * A Supabase client bound to one request's cookies. Build one per request and
  * never keep it in a module variable: it carries that caller's session.

@@ -1,3 +1,5 @@
+import { NextCollectionNavigation } from '@synapcity/frontend-collection/next';
+
 import { requireOwner } from '@/lib/access/require-owner';
 
 export default async function UserLayout({
@@ -9,5 +11,5 @@ export default async function UserLayout({
 }) {
   await requireOwner((await params).userId);
 
-  return children;
+  return <NextCollectionNavigation>{children}</NextCollectionNavigation>;
 }

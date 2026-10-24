@@ -6,12 +6,13 @@ import { LayoutDashboard } from 'lucide-react';
 import {
   CollectionIndex,
   type SetPinnedResult,
-} from '@/features/collection/components/collection-index';
+} from '@synapcity/frontend-collection';
 import type {
   CollectionItem,
   CollectionItemAction,
-} from '@/features/collection/shared';
+} from '@synapcity/frontend-collection';
 import type { OwnedRecordSummary } from '@/lib/owned-records';
+import { homePathFor, signInPathFor } from '@/lib/routing/user-paths';
 
 import { toCollectionItem } from '../../lib/collection-item';
 import { setDashboardPinned } from '../../server/actions/dashboard-state-actions';
@@ -40,7 +41,9 @@ async function saveDashboardPinned(
   pinned: boolean,
 ): Promise<SetPinnedResult> {
   const result = await setDashboardPinned(id, pinned);
-  return result.ok ? { ok: true } : { ok: false, error: result.error };
+  return result.ok
+    ? { ok: true }
+    : { ok: false, error: result.error, signedOut: result.signedOut };
 }
 
 /** The dashboards index: the shared browse page, filled with dashboards. */
@@ -68,6 +71,7 @@ export function DashboardsIndex({
       actions={DASHBOARD_ACTIONS}
       renderPreview={(item) => <DashboardPreview item={item} />}
       onSetPinned={saveDashboardPinned}
+      signInHref={signInPathFor(`${homePathFor(userId)}/dashboards`)}
     />
   );
 }

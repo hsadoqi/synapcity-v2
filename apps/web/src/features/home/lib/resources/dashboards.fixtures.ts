@@ -1,4 +1,4 @@
-import type { CollectionItem } from '@/features/collection/shared';
+import type { CollectionItem } from '@synapcity/frontend-collection';
 
 import { daysAgo } from '../fixture-clock';
 

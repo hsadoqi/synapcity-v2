@@ -4,7 +4,7 @@ import { FileIcon, FolderIcon, SearchIcon } from 'lucide-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { Button } from '@synapcity/frontend-ui/core/button';
-import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
+import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 import {
   Empty,
   EmptyContent,

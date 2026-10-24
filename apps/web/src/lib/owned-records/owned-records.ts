@@ -1,4 +1,5 @@
-import { z } from 'zod';
+import type { z } from 'zod';
+import { baseRecordSchema } from '@synapcity/domain-records';
 
 import type { createClient } from '@/lib/supabase/server';
 
@@ -16,22 +17,8 @@ const PARTICIPATION = {
   dashboards: 'space_dashboards',
 } as const;
 
-const timestampSchema = z.iso.datetime({ offset: true });
-
-/** A saved document or dashboard, as the app uses it. */
-export const ownedRecordSchema = z.object({
-  id: z.string().min(1),
-  ownerId: z.uuid(),
-  name: z.string().trim().min(1),
-  description: z.string().optional(),
-  // A Lucide identifier, never a component or markup.
-  icon: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
-  tags: z.array(z.string()),
-  createdAt: timestampSchema,
-  updatedAt: timestampSchema,
-  pinnedAt: timestampSchema.nullable().default(null),
-  lastViewedAt: timestampSchema.nullable().default(null),
-});
+/** A saved document or dashboard, as the app uses it: the shared base record. */
+export const ownedRecordSchema = baseRecordSchema;
 
 export type OwnedRecord = z.infer<typeof ownedRecordSchema>;
 

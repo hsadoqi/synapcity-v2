@@ -102,6 +102,13 @@ function readPackage(dir: string, category: Category): WorkspacePackage | null {
   };
 }
 
+/** True when a folder directly holds a package (`<dir>/<name>/package.json`). */
+function holdsPackage(dir: string): boolean {
+  return subdirectories(dir).some((child) =>
+    existsSync(join(child, 'package.json')),
+  );
+}
+
 /** Workspaces at `apps/<name>` and `packages/<category>/<name>`. */
 export function loadWorkspace(requestedRoot: string): Workspace {
   // The resolver returns real paths; package directories must use the same form.
@@ -113,6 +120,10 @@ export function loadWorkspace(requestedRoot: string): Workspace {
   }
   for (const categoryDir of subdirectories(join(root, 'packages'))) {
     const category = basename(categoryDir) as Category;
+    // A hidden folder with no package in it is a tool's scratch space (an
+    // editor or sandbox writes one here); skipping it hides nothing. One that
+    // holds a package still fails below, so it cannot go unchecked.
+    if (category.startsWith('.') && !holdsPackage(categoryDir)) continue;
     if (!CATEGORIES.has(category)) {
       throw new Error(
         `boundaries: packages/${category} is not one of the five categories (${[...CATEGORIES].join(', ')}); packages in it would go unchecked`,

@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { baseRecordSchema } from '@synapcity/domain-records';
 
 import {
   listOwnedRecordSummaries,
@@ -31,6 +32,27 @@ function clientReturning(result: { data: unknown; error: unknown }) {
 }
 
 describe('ownedRecordSchema', () => {
+  it('is the shared base record contract', () => {
+    expect(ownedRecordSchema).toBe(baseRecordSchema);
+  });
+
+  it('still rejects a blank name and a bad icon after the re-base', () => {
+    const result = ownedRecordSchema.safeParse({
+      id: 'x',
+      ownerId: row.owner_id,
+      name: '  ',
+      icon: 'Bad Icon',
+      tags: [],
+      createdAt: '2026-10-01T09:00:00Z',
+      updatedAt: '2026-10-03T14:30:00Z',
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues.map((i) => i.path[0])).toEqual(
+      expect.arrayContaining(['name', 'icon']),
+    );
+  });
+
   it('defaults the pinned and last-viewed times to null', () => {
     const parsed = ownedRecordSchema.parse({
       id: 'x',

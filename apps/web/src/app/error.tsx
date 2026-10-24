@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { reportCaughtError } from '@/features/error-reports/client';
 import { Button } from '@synapcity/frontend-ui/core/button';
-import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
+import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 
 import {
   MESSAGE_HEADING_ID,

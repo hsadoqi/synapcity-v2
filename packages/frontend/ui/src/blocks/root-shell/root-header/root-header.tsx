@@ -6,7 +6,7 @@ import {
 } from '@synapcity/frontend-ui/components/logo-mark';
 import { ModeToggle } from '@synapcity/frontend-ui/components/mode-toggle';
 import Link from 'next/link';
-import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
+import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 import { Cog } from 'lucide-react';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';

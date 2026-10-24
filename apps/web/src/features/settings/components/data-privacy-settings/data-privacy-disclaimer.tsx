@@ -1,5 +1,5 @@
 import { ShieldCheck } from 'lucide-react';
-import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
+import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 
 export const DataPrivacyDisclaimer = () => {
   return (

@@ -1,6 +1,6 @@
 import {
   fireEvent,
-  render,
+  render as renderInto,
   screen,
   waitFor,
   within,
@@ -12,16 +12,30 @@ const mocks = vi.hoisted(() => ({
   setDocumentPinned: vi.fn(),
 }));
 
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: mocks.push }) }));
 vi.mock('../../server/actions/document-state-actions', () => ({
   setDocumentPinned: mocks.setDocumentPinned,
 }));
 
 import type { OwnedRecordSummary } from '@/lib/owned-records';
 
+import { CollectionNavigationProvider } from '@synapcity/frontend-collection';
 import { DOCUMENT_FIXTURES } from '../../lib/fixtures';
 import { DocumentsCollection } from './documents-collection';
 import { DocumentsCollectionSkeleton } from './documents-collection-skeleton';
+
+/** The host's navigation: plain links, and a `push` this test can watch. */
+function HostNavigation({ children }: { children: React.ReactNode }) {
+  return (
+    <CollectionNavigationProvider
+      value={{ Link: (props) => <a {...props} />, push: mocks.push }}
+    >
+      {children}
+    </CollectionNavigationProvider>
+  );
+}
+
+const render = (ui: React.ReactElement) =>
+  renderInto(ui, { wrapper: HostNavigation });
 
 const MANY: OwnedRecordSummary[] = [...DOCUMENT_FIXTURES];
 // Three of them: the first two pinned (see the fixtures), the third not.
@@ -168,6 +182,27 @@ describe('DocumentsCollection', () => {
       expect(
         within(panel).queryByRole('link', { name: unpinned.name }),
       ).toBeNull();
+    });
+    it('offers to sign in again, back to this page, when the session ended', async () => {
+      mocks.setDocumentPinned.mockResolvedValue({
+        ok: false,
+        error: 'Sign in again to update your profile.',
+        signedOut: true,
+      });
+      render(<DocumentsCollection documents={MANY} userId="u1" />);
+
+      fireEvent.click(
+        screen.getAllByRole('button', {
+          name: `Actions for ${unpinned.name}`,
+        })[0]!,
+      );
+      fireEvent.click(await screen.findByRole('menuitem', { name: 'Pin' }));
+
+      expect(
+        (
+          await screen.findByRole('link', { name: 'Sign in again' })
+        ).getAttribute('href'),
+      ).toBe('/auth/login?next=%2Fu1%2Fhome%2Fdocuments');
     });
   });
 

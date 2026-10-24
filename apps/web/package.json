@@ -20,6 +20,9 @@
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.117.3",
     "@synapcity/domain-identity": "workspace:*",
+    "@synapcity/domain-records": "workspace:*",
+    "@synapcity/features-spaces": "workspace:*",
+    "@synapcity/frontend-collection": "workspace:*",
     "@synapcity/frontend-site": "workspace:*",
     "@synapcity/frontend-ui": "workspace:*",
     "@synapcity/server-auth": "workspace:*",
@@ -36,6 +39,7 @@
   "devDependencies": {
     "@playwright/test": "1.64.0",
     "@synapcity/dev-eslint-config": "workspace:*",
+    "@synapcity/dev-fixtures": "workspace:*",
     "@synapcity/dev-playwright-config": "workspace:*",
     "@synapcity/dev-typescript-config": "workspace:*",
     "@synapcity/dev-vitest-config": "workspace:*",

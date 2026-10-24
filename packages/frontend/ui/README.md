@@ -11,7 +11,8 @@ It owns no theme tokens. Tokens live in `@synapcity/frontend-tailwind-config` ([
 | Import                                     | Provides                                                                                                                                 |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | `@synapcity/frontend-ui/core/<name>`       | A shadcn component, for example `@synapcity/frontend-ui/core/button`                                                                     |
-| `@synapcity/frontend-ui/components/<name>` | A Synapcity component, for example `.../components/link-button`                                                                          |
+| `@synapcity/frontend-ui/components/<name>` | A Synapcity component, for example `.../components/section-heading`                                                                      |
+| `@synapcity/frontend-ui/next/<name>`       | A component that needs Next.js, for example `.../next/link-button` (the only place in this package that imports `next`)                  |
 | `@synapcity/frontend-ui/blocks/<name>`     | A larger composition, for example `.../blocks/root-shell`                                                                                |
 | `@synapcity/frontend-ui/providers/<name>`  | A context provider, for example `.../providers/mode-provider`                                                                            |
 | `@synapcity/frontend-ui/lib/<name>`        | Helpers: `utils` (`cn`, [ADR-0004](../../../docs/architecture/decisions/0004-class-merging-with-cn.md)), `account-links`, `sidebar-data` |
@@ -26,11 +27,11 @@ It owns no theme tokens. Tokens live in `@synapcity/frontend-tailwind-config` ([
 Every component is a folder named after it. The folder is the unit; nothing sits loose beside its siblings.
 
 ```text
-src/components/link-button/
-  link-button.tsx          the component
-  link-button.stories.tsx  stories (Storybook, with the a11y checks)
-  link-button.test.tsx     tests (Vitest, jsdom)
-  index.ts                 the folder's public surface: re-exports from ./link-button
+src/components/section-heading/
+  section-heading.tsx          the component
+  section-heading.stories.tsx  stories (Storybook, with the a11y checks)
+  section-heading.test.tsx     tests (Vitest, jsdom)
+  index.ts                     the folder's public surface: re-exports from ./section-heading
 ```
 
 - `components/ui/<name>/` holds shadcn components (`core/<name>`), `components/<name>/` the Synapcity ones, `blocks/<name>/` compositions and `providers/<name>/` providers. A block's sub-components are nested folders (`blocks/root-shell/root-header/`).

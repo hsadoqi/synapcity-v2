@@ -18,11 +18,15 @@ import { sharedConfig } from './packages/dev/vitest-config/src/shared';
 const projects = [
   'apps/web',
   'packages/domain/identity',
+  'packages/domain/records',
   'packages/dev/boundaries',
   'packages/dev/fixtures',
+  'packages/features/spaces',
   'packages/frontend/site',
+  'packages/frontend/collection',
   'packages/frontend/ui',
   'packages/server/auth',
+  'packages/server/data',
   'packages/server/supabase',
 ];
 

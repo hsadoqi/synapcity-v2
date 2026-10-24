@@ -7,7 +7,7 @@ import {
   FeaturedItemsSkeleton,
   ItemChips,
   ItemChipsSkeleton,
-} from '@/features/collection/components';
+} from '@synapcity/frontend-collection';
 
 import { FIXTURE_NOW } from '../../lib/fixture-clock';
 import { ITEM_KINDS, OVERVIEW_SECTIONS } from '../../lib/overview';

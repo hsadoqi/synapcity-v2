@@ -17,7 +17,6 @@ export * from '@synapcity/frontend-ui/components/auth-buttons';
 export * from '@synapcity/frontend-ui/components/confirm-dialog';
 export * from '@synapcity/frontend-ui/components/empty-note';
 export * from '@synapcity/frontend-ui/components/icon-button';
-export * from '@synapcity/frontend-ui/components/link-button';
 export * from '@synapcity/frontend-ui/components/loading-region';
 export * from '@synapcity/frontend-ui/components/logo-mark';
 export * from '@synapcity/frontend-ui/components/mode-toggle';

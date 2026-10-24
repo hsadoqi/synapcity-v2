@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
+import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 
 /**
  * A way back in for a form whose session has gone. Signing in returns to the

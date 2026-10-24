@@ -3,7 +3,7 @@ import {
   LinkButton,
   type LinkButtonSize,
   type LinkButtonVariant,
-} from '@synapcity/frontend-ui/components/link-button';
+} from '@synapcity/frontend-ui/next/link-button';
 
 type AuthType = 'login' | 'register' | 'forgot-password' | 'update-password';
 

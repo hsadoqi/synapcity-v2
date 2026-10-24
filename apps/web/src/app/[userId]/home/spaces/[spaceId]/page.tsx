@@ -1,9 +1,16 @@
-import { RecordSpaceView } from '@/features/spaces/components/record-space-view';
-import { SpaceContent } from '@/features/spaces/components/space-content';
-import { getSpace } from '@/features/spaces/server/get-space';
+import { notFound } from 'next/navigation';
+import {
+  RecordSpaceView,
+  SpaceContent,
+} from '@synapcity/features-spaces/frontend';
+import { getSpace } from '@synapcity/features-spaces/server';
+
 import { COLLECTION_LABELS, SetBreadcrumbs } from '@/components/breadcrumbs';
+import { logFailure } from '@/features/account/server/caller';
 import { requireOwner } from '@/lib/access/require-owner';
-import { spacesPathFor } from '@/lib/routing/user-paths';
+import { homePathFor, spacesPathFor } from '@/lib/routing/user-paths';
+import { getSpaceSource } from '@/lib/spaces';
+import { recordSpaceView } from '@/lib/spaces/space-state-actions';
 
 export default async function SpaceShowPage({
   params,
@@ -12,7 +19,12 @@ export default async function SpaceShowPage({
 }) {
   const { userId, spaceId } = await params;
   await requireOwner(userId);
-  const awaitedSpace = await getSpace(spaceId);
+  const awaitedSpace = await getSpace(await getSpaceSource(), spaceId, {
+    // The space still shows, with a note that its items could not be loaded.
+    onItemsError: (error) =>
+      logFailure('getSpace items', error as { code?: string; status?: number }),
+  });
+  if (!awaitedSpace) notFound();
 
   return (
     <>
@@ -22,8 +34,8 @@ export default async function SpaceShowPage({
           { label: awaitedSpace.name },
         ]}
       />
-      <RecordSpaceView spaceId={spaceId} />
-      <SpaceContent userId={userId} spaceItem={awaitedSpace} />
+      <RecordSpaceView spaceId={spaceId} recordSpaceView={recordSpaceView} />
+      <SpaceContent homePath={homePathFor(userId)} space={awaitedSpace} />
     </>
   );
 }
