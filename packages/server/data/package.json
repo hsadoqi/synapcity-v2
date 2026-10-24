@@ -24,7 +24,7 @@
     "@synapcity/dev-typescript-config": "workspace:*",
     "@synapcity/dev-vitest-config": "workspace:*",
     "@vitest/coverage-v8": "4.1.12",
-    "eslint": "10.9.1",
+    "eslint": "10.13.0",
     "typescript": "7.0.2",
     "vitest": "4.1.12"
   }

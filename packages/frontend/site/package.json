@@ -27,7 +27,7 @@
     "@types/node": "26.6.5",
     "@types/react": "19.3.0",
     "@vitest/coverage-v8": "4.1.12",
-    "eslint": "10.9.1",
+    "eslint": "10.13.0",
     "next": "16.4.3",
     "react": "19.3.0",
     "typescript": "7.0.2",
