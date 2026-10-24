@@ -2,6 +2,7 @@ import type { z } from 'zod';
 
 import type {
   DefineFormInput,
+  FieldConfig,
   FormDefinition,
   FormDefinitionIssue,
 } from '../../types';
@@ -27,6 +28,42 @@ export class FormDefinitionError extends Error {
     );
     this.name = 'FormDefinitionError';
     this.issues = issues;
+  }
+}
+
+/** A browser `pattern` is anchored for the whole value; a schema regex may spell the anchors. */
+function stripAnchors(source: string): string {
+  return source.replace(/^\^/, '').replace(/(?<!\\)\$$/, '');
+}
+
+/**
+ * A text field's browser `pattern` must be one of the schema's own `regex`
+ * checks, or the browser and the schema would disagree about the same value.
+ */
+function patternMismatch(
+  schema: z.ZodObject,
+  field: FieldConfig,
+  shapeKeys: ReadonlySet<string>,
+): boolean {
+  const pattern = patternOf(field);
+  if (pattern === undefined || !shapeKeys.has(field.name)) return false;
+  const wanted = stripAnchors(pattern);
+  const patterns = describeSchemaField(schema, field.name).patterns ?? [];
+  return !patterns.some((source) => stripAnchors(source) === wanted);
+}
+
+/** The browser `pattern` of a text field; other types have none. */
+function patternOf(field: FieldConfig): string | undefined {
+  switch (field.type) {
+    case 'text':
+    case 'email':
+    case 'tel':
+    case 'url':
+    case 'search':
+    case 'textarea':
+      return field.props?.pattern;
+    default:
+      return undefined;
   }
 }
 
@@ -58,6 +95,8 @@ export function defineForm<TSchema extends z.ZodObject>(
       issues.push({ code: 'unknown-field', name: field.name });
     if (RESERVED_NAMES.has(field.name))
       issues.push({ code: 'reserved-name', name: field.name });
+    if (patternMismatch(schema, field, shapeKeys))
+      issues.push({ code: 'pattern-mismatch', name: field.name });
   }
 
   const groupIds = new Set<string>();

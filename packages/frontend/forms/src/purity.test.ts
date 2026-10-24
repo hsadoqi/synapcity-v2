@@ -20,6 +20,8 @@ const PURE = [
   'utils/is-empty-value',
   'utils/resolve-field-states',
   'utils/build-schema',
+  'utils/async-check',
+  'utils/date-value',
   'utils/define-form-from-schema',
 ];
 

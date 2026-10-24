@@ -40,7 +40,8 @@ function watchedNames(definition: FormDefinition): string[] {
 }
 
 /**
- * Where a field starts. A toggle is off and text is empty. A key the schema
+ * Where a field starts. A toggle is off, text is empty, and a multiselect or
+ * tags field is an empty list. A key the schema
  * allows to be `null` but not to be missing starts as `null`, because Zod fails
  * such a key when it is absent. Anything else starts undefined.
  */
@@ -50,11 +51,13 @@ function startingValue(definition: FormDefinition, name: string): unknown {
   if (field.type === 'checkbox' || field.type === 'switch') return false;
   const { optional, nullable } = describeSchemaField(definition.schema, name);
   if (nullable && !optional) return null;
+  if (field.type === 'multiselect' || field.type === 'tags') return [];
   if (
     field.type === 'number' ||
     field.type === 'range' ||
     field.type === 'select' ||
-    field.type === 'file'
+    field.type === 'file' ||
+    field.type === 'date-range'
   ) {
     return undefined;
   }

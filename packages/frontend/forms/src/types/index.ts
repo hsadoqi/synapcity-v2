@@ -1,4 +1,6 @@
 export type {
+  AsyncFieldCheckContext,
+  AsyncFieldValidation,
   ConditionOperator,
   CustomFieldConfig,
   DependencyEffect,
@@ -6,16 +8,21 @@ export type {
   FieldConfig,
   FieldDependency,
   FieldGroup,
+  DateRangeFieldConfig,
   DateTimeFieldConfig,
   FieldOption,
   FileFieldConfig,
   InputMode,
   FormRule,
+  MultiSelectFieldConfig,
   NumberFieldConfig,
   PasswordFieldConfig,
+  RadioFieldConfig,
   SelectFieldConfig,
+  TagsFieldConfig,
   TextFieldConfig,
   ToggleFieldConfig,
+  VirtualizeOption,
 } from './field-config';
 export type {
   DefineFormInput,

@@ -72,8 +72,32 @@ describe('describeSchemaField', () => {
   });
 
   it('reports anything it does not map as other', () => {
-    expect(describeSchemaField(schema, 'list').kind).toBe('other');
     expect(describeSchemaField(schema, 'when').kind).toBe('other');
+  });
+
+  it('describes an array and what each element is', () => {
+    expect(describeSchemaField(schema, 'list')).toMatchObject({
+      kind: 'array',
+      element: { kind: 'string' },
+    });
+    const tags = z.object({ picks: z.array(z.enum(['a', 'b'])).optional() });
+    expect(describeSchemaField(tags, 'picks')).toMatchObject({
+      kind: 'array',
+      optional: true,
+      element: { kind: 'enum', enumValues: ['a', 'b'] },
+    });
+  });
+
+  it('lists the sources of a string schema regex checks', () => {
+    const slugs = z.object({
+      slug: z
+        .string()
+        .min(2)
+        .regex(/^[a-z-]+$/),
+      plain: z.string(),
+    });
+    expect(describeSchemaField(slugs, 'slug').patterns).toEqual(['^[a-z-]+$']);
+    expect(describeSchemaField(slugs, 'plain').patterns).toBeUndefined();
   });
 
   it('throws naming the key when the schema has no such key', () => {

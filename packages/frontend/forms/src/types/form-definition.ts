@@ -24,6 +24,7 @@ export type FormDefinitionIssueCode =
   | 'schema-has-refinements'
   | 'reserved-name'
   | 'cannot-infer'
+  | 'pattern-mismatch'
   | 'cycle';
 
 /** One problem found while checking a form definition. Names only, never values. */
