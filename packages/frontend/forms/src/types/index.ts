@@ -7,6 +7,8 @@ export type {
   FieldDependency,
   FieldGroup,
   FieldOption,
+  FileFieldConfig,
+  InputMode,
   FormRule,
   NumberFieldConfig,
   PasswordFieldConfig,

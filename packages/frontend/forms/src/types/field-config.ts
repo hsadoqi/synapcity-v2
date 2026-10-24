@@ -50,14 +50,20 @@ interface FieldBase<TName extends string> {
   readonly dependencies?: readonly FieldDependency<TName>[];
 }
 
+export type InputMode =
+  'text' | 'email' | 'tel' | 'url' | 'search' | 'numeric' | 'decimal' | 'none';
+
+/** A single-line text entry (or a textarea). `inputMode` overrides the keyboard the type implies. */
 export interface TextFieldConfig<
   TName extends string = string,
 > extends FieldBase<TName> {
-  readonly type: 'text' | 'email' | 'textarea';
+  readonly type: 'text' | 'email' | 'tel' | 'url' | 'search' | 'textarea';
   readonly props?: {
     readonly placeholder?: string;
+    readonly minLength?: number;
     readonly maxLength?: number;
     readonly autoComplete?: string;
+    readonly inputMode?: InputMode;
   };
 }
 
@@ -68,6 +74,23 @@ export interface PasswordFieldConfig<
   readonly props: {
     readonly autoComplete: 'current-password' | 'new-password';
     readonly placeholder?: string;
+    readonly minLength?: number;
+    readonly maxLength?: number;
+  };
+}
+
+/**
+ * A file chooser. The value is a `File` (or a list of them when `multiple`);
+ * nothing chosen is `undefined` (or an empty list). Pair it with `z.file()`.
+ */
+export interface FileFieldConfig<
+  TName extends string = string,
+> extends FieldBase<TName> {
+  readonly type: 'file';
+  readonly props?: {
+    /** The file types offered, as in the HTML `accept` attribute, such as `image/*`. */
+    readonly accept?: string;
+    readonly multiple?: boolean;
   };
 }
 
@@ -110,6 +133,7 @@ export interface CustomFieldConfig<
 export type FieldConfig<TName extends string = string> =
   | TextFieldConfig<TName>
   | PasswordFieldConfig<TName>
+  | FileFieldConfig<TName>
   | NumberFieldConfig<TName>
   | SelectFieldConfig<TName>
   | ToggleFieldConfig<TName>

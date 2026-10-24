@@ -16,6 +16,8 @@ const schema = z.object({
   wrapped: z.number().optional().nullable(),
   list: z.array(z.string()),
   when: z.date(),
+  upload: z.file(),
+  optUpload: z.file().optional(),
 });
 
 describe('describeSchemaField', () => {
@@ -76,5 +78,16 @@ describe('describeSchemaField', () => {
 
   it('throws naming the key when the schema has no such key', () => {
     expect(() => describeSchemaField(schema, 'zzz')).toThrow('zzz');
+  });
+
+  it('reports z.file() as a file, wrapped or not', () => {
+    expect(describeSchemaField(schema, 'upload')).toMatchObject({
+      kind: 'file',
+      optional: false,
+    });
+    expect(describeSchemaField(schema, 'optUpload')).toMatchObject({
+      kind: 'file',
+      optional: true,
+    });
   });
 });

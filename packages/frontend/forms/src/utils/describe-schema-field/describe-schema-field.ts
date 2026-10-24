@@ -1,7 +1,7 @@
 import type { z } from 'zod';
 
 export type SchemaFieldKind =
-  'string' | 'number' | 'boolean' | 'enum' | 'other';
+  'string' | 'number' | 'boolean' | 'enum' | 'file' | 'other';
 
 export interface SchemaFieldDescription {
   readonly kind: SchemaFieldKind;
@@ -72,6 +72,7 @@ export function describeSchemaField(
     };
   }
   if (type === 'number') return { kind: 'number', ...base };
+  if (type === 'file') return { kind: 'file', ...base };
   if (type === 'boolean') return { kind: 'boolean', ...base };
   if (type === 'enum') {
     const options = (

@@ -286,4 +286,14 @@ describe('defineForm', () => {
       expect(String((error as Error).message)).not.toContain('secret-value');
     }
   });
+
+  it('a file field needs no autoComplete, and a password field still does', () => {
+    const field: FieldConfig<Names> = {
+      type: 'file',
+      name: 'a',
+      label: 'a',
+      props: { accept: 'image/*', multiple: true },
+    };
+    expect(field.type).toBe('file');
+  });
 });

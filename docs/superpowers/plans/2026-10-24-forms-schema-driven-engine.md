@@ -305,7 +305,8 @@ Colour, date, slider, radio, multiselect, file and tags renderers are deferred u
 - The number renderer keeps `type="number"` and adds `inputMode="decimal"`; a cleared or unparsable entry emits `undefined`.
 - The test that two forms never share an id moves to Task 6a, which generates the ids.
 - `FieldRenderer` and `FieldRendererProps` live in `types/field-renderer.ts`, not in the provider folder: renderers importing them through the provider made a module cycle (renderer, provider, default registry, renderer) that `pnpm boundaries` reported. They import React types, so `types/field-renderer.ts` is not in the purity test's set; the provider still re-exports them.
-- Not done here: a story for each renderer (Task 8).
+- Widened afterwards, at the owner's request, to cover the inputs the app's forms use: `text-renderer` became `input-renderer` (`InputRenderer`) and handles text, email, tel, url, search, password and textarea; `minLength` joins `maxLength` on text and password fields; a `file` field type (`FileFieldConfig`, `props.accept` and `props.multiple`) is rendered by `FileRenderer`; `describeSchemaField` reports `z.file()` as kind `file`. Email, URL and password text is never autocapitalised, autocorrected or spellchecked. A file input cannot be controlled, so `FileRenderer` reports the choice (a `File`, or a list when `multiple`, `undefined` when cleared) and empties the input when the form value returns to nothing. Task 10 should infer `file` for `z.file()` keys.
+- Not done here: a story for each renderer (Task 8), and a `hidden` input, `date`, `color` and `range` inputs (see the roadmap).
 
 - [x] **Step 1: Write the failing tests:**
   - `text renderer wires the label, aria-invalid and aria-describedby`.
