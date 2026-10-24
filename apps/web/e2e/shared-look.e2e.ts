@@ -1,5 +1,13 @@
-import { expect, test, type Page } from '@playwright/test';
-import { lookOf, settingsDefaults } from '@synapcity/domain-preferences';
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { expect, test, type BrowserContext, type Page } from '@playwright/test';
+import {
+  headingFonts,
+  lookOf,
+  parseLook,
+  settingsDefaults,
+  type Look,
+} from '@synapcity/domain-preferences';
 
 /*
  * Guards the shared look across the two apps. Web and docs run on different ports of
@@ -12,6 +20,7 @@ const WEB = 'http://localhost:8080';
 const DOCS = 'http://localhost:4000';
 const STORAGE_KEY = 'synapcity-preferences';
 const COOKIE = 'synapcity-look';
+const AUTH_STATE = resolve(process.cwd(), 'e2e/.auth/account.json');
 
 const serverLook = lookOf({
   ...settingsDefaults,
@@ -29,6 +38,18 @@ const serverLook = lookOf({
 });
 const cookieHeader = (value: unknown) =>
   `${COOKIE}=${encodeURIComponent(JSON.stringify(value))}`;
+
+async function readLookCookie(context: BrowserContext): Promise<Look | null> {
+  const cookie = (await context.cookies(WEB)).find(
+    (candidate) => candidate.name === COOKIE,
+  );
+  if (!cookie) return null;
+  try {
+    return parseLook(JSON.parse(decodeURIComponent(cookie.value)));
+  } catch {
+    return null;
+  }
+}
 
 type Parsed = { mode: boolean; textSize?: string; density?: string };
 
@@ -166,4 +187,63 @@ test('a tampered cookie is ignored', async ({ page, context }) => {
   const docs = await atParse(page, DOCS);
   expect(docs.textSize).toBe('100');
   expect(docs.density).toBe('comfortable');
+});
+
+test('authenticated web rendering prefers account fonts over a stale cookie', async ({
+  browser,
+}) => {
+  test.skip(
+    !existsSync(AUTH_STATE),
+    'Create e2e/.auth/account.json with an existing signed-in account to run this check.',
+  );
+
+  const context = await browser.newContext({ storageState: AUTH_STATE });
+  try {
+    const page = await context.newPage();
+    await page.addInitScript(
+      (key) => localStorage.removeItem(key),
+      STORAGE_KEY,
+    );
+    await context.clearCookies({ name: COOKIE });
+    await page.goto(`${WEB}/auth/register`, { waitUntil: 'domcontentloaded' });
+    await expect(
+      page.getByRole('button', { name: 'Account menu' }),
+    ).toBeVisible();
+    await expect.poll(() => readLookCookie(context)).not.toBeNull();
+
+    const accountLook = await readLookCookie(context);
+    expect(accountLook).not.toBeNull();
+    const staleFont = headingFonts.find(
+      (font) => font !== accountLook!.theme.headingFont,
+    );
+    expect(staleFont).toBeDefined();
+
+    const staleLook: Look = {
+      ...accountLook!,
+      theme: { ...accountLook!.theme, headingFont: staleFont! },
+    };
+    await context.addCookies([
+      {
+        name: COOKIE,
+        value: encodeURIComponent(JSON.stringify(staleLook)),
+        url: WEB,
+      },
+    ]);
+
+    const response = await context.request.get(`${WEB}/auth/register`);
+    expect(response.ok()).toBe(true);
+    const htmlTag = (await response.text()).match(/<html[^>]*>/)?.[0];
+    const encodedLook = htmlTag?.match(/data-synapcity-look="([^"]*)"/)?.[1];
+    expect(encodedLook).toBeTruthy();
+
+    const renderedLook = parseLook(
+      JSON.parse(encodedLook!.replaceAll('&quot;', '"')),
+    );
+    expect(renderedLook?.theme.headingFont).toBe(
+      accountLook!.theme.headingFont,
+    );
+    expect(renderedLook?.theme.headingFont).not.toBe(staleFont);
+  } finally {
+    await context.close();
+  }
 });
