@@ -6,3 +6,4 @@ export * from './input-renderer';
 export * from './number-renderer';
 export * from './select-renderer';
 export * from './toggle-renderer';
+export * from './form-renderer';

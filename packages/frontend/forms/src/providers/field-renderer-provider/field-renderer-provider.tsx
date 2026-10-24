@@ -46,3 +46,8 @@ export function useFieldRendererRegistry(): FieldRendererRegistry {
   }
   return registry;
 }
+
+/** The registry from the nearest provider, or `null` when there is none. */
+export function useOptionalFieldRendererRegistry(): FieldRendererRegistry | null {
+  return useContext(FieldRendererContext);
+}

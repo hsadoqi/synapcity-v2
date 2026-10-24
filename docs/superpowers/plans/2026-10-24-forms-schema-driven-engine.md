@@ -333,7 +333,18 @@ Colour, date, slider, radio, multiselect, file and tags renderers are deferred u
   - `useFormBuilder(options: { definition: FormDefinition; initialValues?: Readonly<Record<string, unknown>>; mode?: 'onBlur' | 'onChange' | 'onSubmit' }): { form: UseFormReturn; states: Readonly<Record<string, FieldState>> }`, using `useWatch` for only the names that conditions read; default mode `'onBlur'`.
   - `FormRenderer<TSchema extends z.ZodObject>(props: { definition: FormDefinition<TSchema>; initialValues?: Readonly<Partial<z.infer<TSchema>>>; onSubmit(values: Partial<z.infer<TSchema>>): void | Promise<void>; onCancel?(): void; submitLabel?: string; cancelLabel?: string; afterSubmit?: 'keep' | 'clear'; messages?: { required?: string } })`. Values are `Partial` because hidden fields are omitted. It checks every field type against the registry and throws one `UnknownFieldTypeError` listing the unknown types.
 
-- [ ] **Step 1: Write the failing tests** (Testing Library, user-event):
+**Done 2026-10-24.** The owner chose one core with two submit modes. As built:
+
+- `FormRenderer` takes either `onSubmit` (the browser submits to a handler; needs JavaScript, D4) or `action` with optional `state` and `pending` (the form keeps its `action`, so it works before hydration; once hydrated it validates and posts the form's own `FormData` only when valid, and shows one refusal at a time, the way the server does). D4 therefore no longer applies to forms that submit to a server action.
+- Fields are controlled by React Hook Form, so the engine does not need `useActionForm`'s `FormData` sync: React 19's reset after an action does not touch controlled inputs. `firstRefusal` is shared between the two.
+- `disabled` goes to the renderer only: passed to the controller, React Hook Form would leave the field's value out of what is submitted, and disabled fields are kept and validated.
+- `useFormBuilder` stays internal for now; it returns React Hook Form's form object, and Task 6c decides the public shape of hand-laid-out forms.
+- Without a `FieldRendererProvider`, `FormRenderer` uses the built-in renderers.
+- The default submit-failed message never contains the thrown error's text.
+- Not covered by a test: that the dirty state resets after a successful submit (it is not observable from outside yet).
+- Five deliberate breakages (focus order, double submit, action without validation, `afterSubmit: 'clear'`, leaking the thrown text) were each caught by a test.
+
+- [x] **Step 1: Write the failing tests** (Testing Library, user-event):
   - `submits only visible values` (hidden field absent from the payload).
   - `a hidden required field does not block submit`.
   - `a field shows no error before it is touched or the form is submitted`.
@@ -351,10 +362,22 @@ Colour, date, slider, radio, multiselect, file and tags renderers are deferred u
   - `does not clear the form after a failed submit, even when afterSubmit is clear`.
   - `a definition with no fields renders only its buttons and submits an empty object`.
   - `throws naming the type when a field type has no renderer`.
-- [ ] **Step 2: Run** `pnpm --filter @synapcity/frontend-forms test form` → FAIL.
-- [ ] **Step 3: Implement** the three units. Type the form with the three generics, `useForm<Input, unknown, Output>`, so `handleSubmit` receives the parsed output. Leave `shouldUnregister` at its default (`false`) and say so in a comment: D3 relies on hidden values being retained. Wrap the caller's `onSubmit` in `try/catch` and call `setError('root.serverError', ...)` on a throw, with a message that never contains field values, because the library does not swallow submit errors. Controllers forward the field `ref`. Buttons are `frontend-ui` `Button`; the form-level error uses the message piece from the extraction.
-- [ ] **Step 4: Run** → PASS.
-- [ ] **Step 5: Commit** `feat(forms): add the schema-driven form renderer`.
+- [x] **Step 2: Run** `pnpm --filter @synapcity/frontend-forms test form` → FAIL.
+- [x] **Step 3: Implement** the three units. Type the form with the three generics, `useForm<Input, unknown, Output>`, so `handleSubmit` receives the parsed output. Leave `shouldUnregister` at its default (`false`) and say so in a comment: D3 relies on hidden values being retained. Wrap the caller's `onSubmit` in `try/catch` and call `setError('root.serverError', ...)` on a throw, with a message that never contains field values, because the library does not swallow submit errors. Controllers forward the field `ref`. Buttons are `frontend-ui` `Button`; the form-level error uses the message piece from the extraction.
+- [x] **Step 4: Run** → PASS.
+- [x] **Step 5: Commit** `feat(forms): add the schema-driven form renderer`.
+
+### Tasks 5b to 5h: what the responsive-grid prototype covers and this plan had deferred
+
+Added 2026-10-24 after a full comparison with the owner's prototype (`synapcity-responsive-grid/packages/forms`). The prototype is a sketch, but it covers more kinds of field and behaviour than this plan scheduled. Each item below was "eventually" and is now a task. They follow Task 6a, because every field renders through `FormRenderer`.
+
+- **5b. More native inputs.** `date`, `time`, `datetime-local`, `month`, `week`, `color` and `range` through `frontend-ui`'s `Input` (no new primitive is needed; the earlier reason for deferring them was wrong). Text fields gain `pattern`. String values for the date and time types, a number for `range`.
+- **5c. Choice fields.** `radio` (add `frontend-ui`'s radio group with `pnpm ui:add radio-group`), a checkbox group for several values (`multiselect`), and select `multiple`, `clearable` and `searchable` (searchable uses `frontend-ui`'s combobox). `tags` waits for a tags input component.
+- **5d. Async validation.** A field may declare `validateAsync(value, values, signal)`. Debounced (300 ms default), aborted when the value changes again, given up after a timeout (5 s default), deduplicated by value, keyed by field `name`, shown as "checking" on the field, and run again before submit. Fixes the prototype's bugs (it was passed `form.watch` rather than the values, keyed state by `id`, and aborted every validator on every change).
+- **5e. Nested names.** A field `name` may be a dot path into a nested object schema (`address.city`); names, conditions and errors use paths, and `describeSchemaField` walks them. Array paths stay with field arrays.
+- **5f. Collapsible sections.** A group may be `collapsible` (and `defaultOpen`), using `frontend-ui`'s accordion; a section with an invalid field opens on submit.
+- **5g. Reading other values from a custom renderer.** `useFieldValues(names)` from the package, so a `custom:*` renderer can depend on other fields without importing React Hook Form (ADR-0015 decision 3); this replaces the prototype's `FormProvider`.
+- **5h. Opt-in virtualization.** `virtualized` on `FormRenderer` for very long forms, with measured row heights, and focus and tab order checked for fields scrolled out of the DOM. A new dependency (`@tanstack/react-virtual`) needs the owner's approval first.
 
 ### Task 6b: Submit results and error display
 
