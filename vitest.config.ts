@@ -22,6 +22,7 @@ const projects = [
   'packages/frontend/site',
   'packages/frontend/ui',
   'packages/server/auth',
+  'packages/server/supabase',
 ];
 
 export default defineConfig({
