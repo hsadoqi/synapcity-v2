@@ -1,3 +1,15 @@
+## Active task: Forms ADR, extraction plan and engine plan (2026-10-24)
+
+- Goal and mode: documentation, plus setup of the implementation branch. Record ADR-0015 (React Hook Form, package `frontend-forms`), the extraction plan, and the schema-driven engine plan. The owner accepted all recommendations for the engine plan and asked for implementation on a new branch whose name starts with `feat/` (2026-10-24).
+- Branches: `docs/frontend-forms-plan` from `origin/main` at `adcb3f0d` (this documentation change). `feat/frontend-forms-engine` for implementation, created from the documentation branch, with no source yet.
+- Exact creates (3): `docs/architecture/decisions/0015-forms-package-and-form-state.md`; `docs/superpowers/plans/2026-10-24-forms-package-extraction.md`; `docs/superpowers/plans/2026-10-24-forms-schema-driven-engine.md`. Exact updates (4): `docs/architecture/decisions/README.md` (index row and candidate bullet); `docs/architecture/workspace-conventions.md` (inventory: `frontend-forms` row, form pieces out of the `frontend-ui` row); `docs/architecture/reorganization-ownership-map.md` (forms row); this ledger.
+- Origin of the ADR and the extraction plan: copied unchanged from uncommitted files in the worktree of branch `docs/forms-package-plan`, which was only read. Its three tracked edits were re-applied to current `main` by hand because the inventory table was re-aligned after that branch was cut.
+- Not changed: source, packages, manifests, dependencies, lockfile, config, other inventory and ownership-map rows.
+- External mutation: the description of merged PR #61 was rewritten to the pull request template (1); the original body is kept in the session scratchpad.
+- Commits and pushes: authorized by the owner for this documentation change. Merging is not authorized.
+- Evidence: package versions from the npm registry (2026-10-24); Zod 4.6.7 behavior by running it; React Hook Form and `@hookform/resolvers` documentation through Context7; the `form` attribute checked in jsdom 30.1.2; pnpm file-filter behavior observed. Details are in the engine plan's Evidence section.
+- Open for the owner: decisions D1 to D15 in the engine plan; the ADR number when committed; stale items in the copied documents (the ADR's Storybook-discovery item and the extraction plan's matching precondition are settled on `main` since M5.3, and the ADR's line-count figure is not reproduced by a recount); Part A (extraction) before the engine's package-dependent tasks, or an explicit reordering.
+
 ## Active task: dashboard review findings F1, F13, F16-F19 and F25 (2026-10-24)
 
 - Goal and mode: implement the owner's requested review follow-ups across the dashboard prototype and `feat/features-dashboards`; implementing test-first where behavior changes.
