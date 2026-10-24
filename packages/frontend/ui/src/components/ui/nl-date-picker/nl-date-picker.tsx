@@ -4,19 +4,19 @@ import * as React from 'react';
 import { parseDate } from 'chrono-node';
 import { CalendarIcon } from 'lucide-react';
 
-import { Calendar } from '@/components/ui/calendar';
-import { Field, FieldLabel } from '@/components/ui/field';
+import { Calendar } from '@synapcity/frontend-ui/core/calendar';
+import { Field, FieldLabel } from '@synapcity/frontend-ui/core/field';
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
-} from '@/components/ui/input-group';
+} from '@synapcity/frontend-ui/core/input-group';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
+} from '@synapcity/frontend-ui/core/popover';
 
 function formatDate(date: Date | undefined) {
   if (!date) {

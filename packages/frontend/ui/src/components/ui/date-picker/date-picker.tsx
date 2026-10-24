@@ -56,6 +56,7 @@ interface PickerTriggerProps {
   readonly max?: Date;
   readonly className?: string;
   readonly ref?: React.Ref<HTMLButtonElement>;
+  readonly onBlur?: React.FocusEventHandler<HTMLButtonElement>;
   readonly 'aria-invalid'?: boolean;
   readonly 'aria-describedby'?: string;
   readonly 'aria-labelledby'?: string;
@@ -86,6 +87,7 @@ export function DatePicker({
   formatValue = (date) => format(date, 'PPP'),
   className,
   ref,
+  onBlur,
   onValueChange,
   defaultValue,
   ...rest
@@ -107,6 +109,7 @@ export function DatePicker({
           render={
             <Button
               ref={ref}
+              onBlur={onBlur}
               id={id}
               variant="outline"
               disabled={disabled}
@@ -166,6 +169,7 @@ export function DateRangePicker({
   formatValue = (date) => format(date, 'LLL dd, y'),
   className,
   ref,
+  onBlur,
   onValueChange,
   defaultValue,
   ...rest
@@ -192,6 +196,7 @@ export function DateRangePicker({
           render={
             <Button
               ref={ref}
+              onBlur={onBlur}
               id={id}
               variant="outline"
               disabled={disabled}

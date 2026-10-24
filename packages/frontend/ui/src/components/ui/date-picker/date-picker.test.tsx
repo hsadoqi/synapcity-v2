@@ -104,6 +104,15 @@ describe('DatePicker', () => {
     render(<DatePicker ref={ref} />);
     expect(ref.current).toBe(screen.getByRole('button'));
   });
+
+  it('reports blur from the trigger', () => {
+    const onBlur = vi.fn();
+    render(<DatePicker onBlur={onBlur} />);
+
+    fireEvent.blur(screen.getByRole('button'));
+
+    expect(onBlur).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('DateRangePicker', () => {

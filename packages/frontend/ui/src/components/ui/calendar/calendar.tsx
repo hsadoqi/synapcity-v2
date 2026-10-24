@@ -4,7 +4,10 @@ import * as React from 'react';
 import { cn } from 'cn';
 import {
   DayPicker,
+  formatDay,
   getDefaultClassNames,
+  labelDayButton,
+  labelGridcell,
   type DayButton,
   type Locale,
 } from 'react-day-picker';
@@ -24,6 +27,7 @@ function Calendar({
   buttonVariant = 'ghost',
   locale,
   formatters,
+  labels,
   components,
   ...props
 }: React.ComponentProps<typeof DayPicker> & {
@@ -46,6 +50,16 @@ function Calendar({
         formatMonthDropdown: (date) =>
           date.toLocaleString(locale?.code, { month: 'short' }),
         ...formatters,
+      }}
+      labels={{
+        // Axe requires the visible day number to appear verbatim in the
+        // accessible name. DayPicker's English default uses an ordinal
+        // ("4th"), which does not contain the visible text "4" as a word.
+        labelDayButton: (date, modifiers, options, dateLib) =>
+          `${(formatters?.formatDay ?? formatDay)(date, options, dateLib)}, ${labelDayButton(date, modifiers, options, dateLib)}`,
+        labelGridcell: (date, modifiers, options, dateLib) =>
+          `${(formatters?.formatDay ?? formatDay)(date, options, dateLib)}, ${labelGridcell(date, modifiers, options, dateLib)}`,
+        ...labels,
       }}
       classNames={{
         root: cn('w-fit', defaultClassNames.root),
