@@ -1,12 +1,12 @@
 ## Active task: frontend-forms engine, Tasks 1 to 4 (2026-10-24)
 
 - Goal and mode: implementation of Tasks 1 to 4 of `docs/superpowers/plans/2026-10-24-forms-schema-driven-engine.md` (the pure engine modules and the scoped renderer registry). The owner approved the plan and its steps and asked for implementation on a new branch starting with `feat/`. Branch `feat/frontend-forms-engine`, created from `docs/frontend-forms-plan` (the documentation change that carries ADR-0015 and the plans). Tasks 5 onward are not started: they need extraction Parts A and B.
-- Decision awaiting the owner: D16 in the plan. Task 1 created the package with the engine's pure modules as its first code instead of waiting for extraction Part A, so Part A's task A2 changes from creating the package to extending it. Chosen as the recommended default; not yet confirmed.
+- Decision confirmed by the owner (2026-10-24): D16 in the plan. Task 1 created the package with the engine's pure modules as its first code instead of waiting for extraction Part A, so Part A's task A2 now extends the package instead of creating it.
 - Exact creates: `packages/frontend/forms/**` (manifest, tsconfig, lint and test configs, README, source, tests). Exact updates: root `vitest.config.ts` (one project entry); `pnpm-lock.yaml` (one importer, no version changes); this ledger.
 - Not changed: `apps/**`, every other package, the dependencies' versions, the decisions index and the inventory (the `frontend-forms` row already arrived with the documentation change). The package has no consumer yet.
 - Verification run: the package's tests (87), type check, lint and Prettier; `pnpm deps` and `pnpm boundaries` (both exit 0, no violations across 26 workspaces); eight deliberate breakages of the code, each caught by a test and then restored. Not run for this branch: the full `pnpm verify` (end-to-end, Storybook, build); the pre-push hook runs it when the branch is pushed.
 - Findings recorded in the plan: Zod does not validate an absent optional key, so a field required by a dependency is built from `unknown`; TypeScript 7.0.2 needs `types: ["node"]` declared; a nullable key that is not optional must start as `null`; rendering a registry-resolved component needs `createElement` to satisfy the `react-hooks/static-components` rule.
-- Commits: made by Claude as the implementation steps the owner approved. Pushes for this branch: 0.
+- Commits: made by Claude as the implementation steps the owner approved. Push of this branch and a draft pull request stacked on the documentation change: authorized by the owner (2026-10-24).
 
 ## Active task: Forms ADR, extraction plan and engine plan (2026-10-24)
 
