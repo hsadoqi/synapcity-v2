@@ -14,7 +14,7 @@ const meta: Meta<typeof SpacesCollection> = {
   decorators: [withStubNavigation],
   args: {
     spaces: sampleSummaries,
-    userId: 'u1',
+    homePath: '/u1/home',
     setSpacePinned: fn(async () => ({ ok: true as const, pinnedAt: null })),
   },
 };

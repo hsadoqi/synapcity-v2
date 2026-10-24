@@ -32,7 +32,7 @@ describe('describeContents', () => {
 
 describe('toCollectionItem', () => {
   it('maps a space onto the browse feature’s item', () => {
-    expect(toCollectionItem(space, 'user-1')).toEqual({
+    expect(toCollectionItem(space, '/user-1/home')).toEqual({
       id: 'space-1',
       title: 'Writing',
       subtitle: 'Drafts.',
@@ -49,17 +49,21 @@ describe('toCollectionItem', () => {
 
   it('is pinned exactly when the space has a pinned time', () => {
     expect(
-      toCollectionItem({ ...space, pinnedAt: '2026-10-04T09:00:00Z' }, 'u')
-        .pinned,
+      toCollectionItem(
+        { ...space, pinnedAt: '2026-10-04T09:00:00Z' },
+        '/u/home',
+      ).pinned,
     ).toBe(true);
-    expect(toCollectionItem(space, 'u').pinned).toBe(false);
+    expect(toCollectionItem(space, '/u/home').pinned).toBe(false);
   });
 
   it('carries the last-viewed time only when there is one', () => {
     expect(
-      toCollectionItem({ ...space, lastViewedAt: '2026-10-05T18:00:00Z' }, 'u')
-        .lastViewedAt,
+      toCollectionItem(
+        { ...space, lastViewedAt: '2026-10-05T18:00:00Z' },
+        '/u/home',
+      ).lastViewedAt,
     ).toBe('2026-10-05T18:00:00Z');
-    expect(toCollectionItem(space, 'u').lastViewedAt).toBeUndefined();
+    expect(toCollectionItem(space, '/u/home').lastViewedAt).toBeUndefined();
   });
 });

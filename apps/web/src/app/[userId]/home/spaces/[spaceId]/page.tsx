@@ -6,8 +6,9 @@ import {
 import { getSpace } from '@synapcity/features-spaces/server';
 
 import { COLLECTION_LABELS, SetBreadcrumbs } from '@/components/breadcrumbs';
+import { logFailure } from '@/features/account/server/caller';
 import { requireOwner } from '@/lib/access/require-owner';
-import { spacesPathFor } from '@/lib/routing/user-paths';
+import { homePathFor, spacesPathFor } from '@/lib/routing/user-paths';
 import { getSpaceSource } from '@/lib/spaces';
 import { recordSpaceView } from '@/lib/spaces/space-state-actions';
 
@@ -18,7 +19,11 @@ export default async function SpaceShowPage({
 }) {
   const { userId, spaceId } = await params;
   await requireOwner(userId);
-  const awaitedSpace = await getSpace(await getSpaceSource(), spaceId);
+  const awaitedSpace = await getSpace(await getSpaceSource(), spaceId, {
+    // The space still shows, with a note that its items could not be loaded.
+    onItemsError: (error) =>
+      logFailure('getSpace items', error as { code?: string; status?: number }),
+  });
   if (!awaitedSpace) notFound();
 
   return (
@@ -30,7 +35,7 @@ export default async function SpaceShowPage({
         ]}
       />
       <RecordSpaceView spaceId={spaceId} recordSpaceView={recordSpaceView} />
-      <SpaceContent userId={userId} space={awaitedSpace} />
+      <SpaceContent homePath={homePathFor(userId)} space={awaitedSpace} />
     </>
   );
 }

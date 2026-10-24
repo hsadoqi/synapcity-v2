@@ -1,8 +1,5 @@
 import type { SpaceEntity } from '@synapcity/domain-records';
 
-/** What can take part in a Space (ADR-0013). */
-export type SpaceEntityItemKind = 'document' | 'dashboard';
-
 /** A document taking part in a Space, as the detail page lists it. */
 export type DocumentItem = {
   id: string;
@@ -11,7 +8,7 @@ export type DocumentItem = {
   updatedAt: string;
   createdAt: string;
   icon: string;
-  kind: SpaceEntityItemKind;
+  kind: 'document';
 };
 
 /** A dashboard taking part in a Space, as the detail page lists it. */
@@ -22,10 +19,8 @@ export type DashboardItem = {
   updatedAt: string;
   createdAt: string;
   icon: string;
-  kind: SpaceEntityItemKind;
+  kind: 'dashboard';
 };
-
-export type SpaceItem = DocumentItem | DashboardItem;
 
 /** One Space with what takes part in it: the detail page's view model. */
 export type Space = SpaceEntity & {
@@ -34,4 +29,9 @@ export type Space = SpaceEntity & {
   dashboards: DashboardItem[];
   documentsTotal: number;
   dashboardsTotal: number;
+  /**
+   * Set when what takes part in the Space could not be read. The lists are
+   * then empty because they are unknown, not because the Space has nothing.
+   */
+  itemsUnavailable?: true;
 };

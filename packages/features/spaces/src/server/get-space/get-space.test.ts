@@ -97,15 +97,58 @@ describe('getSpace', () => {
     expect(result.dashboardsTotal).toBe(1);
   });
 
-  it('returns null for a missing space and reads no items', async () => {
+  it('returns null for a missing space', async () => {
     stub.find.mockResolvedValue(null);
 
     expect(await getSpace(source, 'missing')).toBeNull();
-    expect(stub.listDocuments).not.toHaveBeenCalled();
-    expect(stub.listDashboards).not.toHaveBeenCalled();
   });
 
-  it('propagates source failures', async () => {
+  it('reads the space and what takes part in it at the same time', async () => {
+    let releaseFind: (value: unknown) => void = () => {};
+    stub.find.mockReturnValue(
+      new Promise((resolve) => {
+        releaseFind = resolve;
+      }),
+    );
+
+    const pending = getSpace(source, 's1');
+    await Promise.resolve();
+
+    // Both item reads started while the space itself was still loading.
+    expect(stub.listDocuments).toHaveBeenCalledWith('s1');
+    expect(stub.listDashboards).toHaveBeenCalledWith('s1');
+    releaseFind(space);
+    await expect(pending).resolves.toMatchObject({ id: 's1' });
+  });
+
+  it('still shows the space when its items cannot be read, and says so', async () => {
+    const error = new Error('participation unavailable');
+    stub.find.mockResolvedValue(space);
+    stub.listDocuments.mockRejectedValue(error);
+    const onItemsError = vi.fn();
+
+    const result = (await getSpace(source, 's1', { onItemsError }))!;
+
+    expect(result).toMatchObject({
+      id: 's1',
+      documents: [],
+      dashboards: [],
+      documentsTotal: 0,
+      dashboardsTotal: 0,
+      itemsUnavailable: true,
+    });
+    expect(onItemsError).toHaveBeenCalledExactlyOnceWith(error);
+  });
+
+  it('marks nothing unavailable when the items load', async () => {
+    stub.find.mockResolvedValue(space);
+
+    const result = (await getSpace(source, 's1'))!;
+
+    expect(result.itemsUnavailable).toBeUndefined();
+  });
+
+  it('propagates a failure to read the space itself', async () => {
     const error = new Error('Connection failed');
     stub.find.mockRejectedValue(error);
 

@@ -20,13 +20,14 @@ import { SpacePreview } from '../space-preview';
 
 interface SpacesIndexProps {
   spaces: SpaceSummary[];
-  userId: string;
+  homePath: string;
   /** The moment the page was rendered, so server and browser label dates alike. */
   now: string;
   setSpacePinned: (
     spaceId: string,
     pinned: boolean,
   ) => Promise<SetSpacePinnedResult>;
+  signInHref?: string;
 }
 
 const LABELS = { singular: 'space', plural: 'Spaces' };
@@ -43,13 +44,14 @@ const EMPTY_STATE = {
 /** The spaces index: the shared browse page, filled with spaces. */
 export function SpacesIndex({
   spaces,
-  userId,
+  homePath,
   now,
   setSpacePinned,
+  signInHref,
 }: SpacesIndexProps) {
   const items = useMemo<CollectionItem[]>(
-    () => spaces.map((space) => toCollectionItem(space, userId)),
-    [spaces, userId],
+    () => spaces.map((space) => toCollectionItem(space, homePath)),
+    [spaces, homePath],
   );
 
   return (
@@ -67,8 +69,11 @@ export function SpacesIndex({
       renderPreview={(item) => <SpacePreview item={item} />}
       onSetPinned={async (id, pinned): Promise<SetPinnedResult> => {
         const result = await setSpacePinned(id, pinned);
-        return result.ok ? { ok: true } : { ok: false, error: result.error };
+        return result.ok
+          ? { ok: true }
+          : { ok: false, error: result.error, signedOut: result.signedOut };
       }}
+      signInHref={signInHref}
     />
   );
 }

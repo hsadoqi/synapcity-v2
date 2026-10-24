@@ -15,7 +15,7 @@ const meta: Meta<typeof SpacePreview> = {
       </div>
     ),
   ],
-  args: { item: toCollectionItem(sampleSummaries[0]!, 'u1') },
+  args: { item: toCollectionItem(sampleSummaries[0]!, '/u1/home') },
 };
 
 export default meta;
@@ -26,5 +26,5 @@ export const Default: Story = {};
 
 /** A space with neither. */
 export const Plain: Story = {
-  args: { item: toCollectionItem(sampleSummaries[2]!, 'u1') },
+  args: { item: toCollectionItem(sampleSummaries[2]!, '/u1/home') },
 };

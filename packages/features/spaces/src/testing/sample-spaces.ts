@@ -36,10 +36,10 @@ export const sampleSummaries: SpaceSummary[] = [
   },
 ];
 
-const item = (
+const item = <Kind extends 'document' | 'dashboard'>(
   id: string,
   name: string,
-  kind: 'document' | 'dashboard',
+  kind: Kind,
   updatedAt: string,
 ) => ({
   id,

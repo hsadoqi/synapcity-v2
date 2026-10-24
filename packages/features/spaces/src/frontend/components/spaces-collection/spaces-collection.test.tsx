@@ -117,7 +117,7 @@ describe('SpacesCollection', () => {
     render(
       <SpacesCollection
         spaces={FEW}
-        userId="u1"
+        homePath="/u1/home"
         setSpacePinned={mocks.setSpacePinned}
       />,
     );
@@ -135,7 +135,7 @@ describe('SpacesCollection', () => {
     render(
       <SpacesCollection
         spaces={[FEW[0]!]}
-        userId="u1"
+        homePath="/u1/home"
         setSpacePinned={mocks.setSpacePinned}
       />,
     );
@@ -154,7 +154,7 @@ describe('SpacesCollection', () => {
     render(
       <SpacesCollection
         spaces={[FEW[0]!]}
-        userId="u1"
+        homePath="/u1/home"
         setSpacePinned={mocks.setSpacePinned}
       />,
     );
@@ -169,7 +169,7 @@ describe('SpacesCollection', () => {
       render(
         <SpacesCollection
           spaces={FEW}
-          userId="u1"
+          homePath="/u1/home"
           setSpacePinned={mocks.setSpacePinned}
         />,
       );
@@ -182,7 +182,7 @@ describe('SpacesCollection', () => {
       render(
         <SpacesCollection
           spaces={FEW}
-          userId="u1"
+          homePath="/u1/home"
           setSpacePinned={mocks.setSpacePinned}
         />,
       );
@@ -199,7 +199,7 @@ describe('SpacesCollection', () => {
       render(
         <SpacesCollection
           spaces={FEW}
-          userId="u1"
+          homePath="/u1/home"
           setSpacePinned={mocks.setSpacePinned}
         />,
       );
@@ -213,7 +213,7 @@ describe('SpacesCollection', () => {
       render(
         <SpacesCollection
           spaces={MANY}
-          userId="u1"
+          homePath="/u1/home"
           setSpacePinned={mocks.setSpacePinned}
         />,
       );
@@ -229,7 +229,7 @@ describe('SpacesCollection', () => {
       render(
         <SpacesCollection
           spaces={MANY}
-          userId="u1"
+          homePath="/u1/home"
           setSpacePinned={mocks.setSpacePinned}
         />,
       );
@@ -245,7 +245,7 @@ describe('SpacesCollection', () => {
       render(
         <SpacesCollection
           spaces={MANY}
-          userId="u1"
+          homePath="/u1/home"
           setSpacePinned={mocks.setSpacePinned}
         />,
       );
@@ -263,7 +263,7 @@ describe('SpacesCollection', () => {
       render(
         <SpacesCollection
           spaces={MANY}
-          userId="u1"
+          homePath="/u1/home"
           setSpacePinned={mocks.setSpacePinned}
         />,
       );
@@ -283,7 +283,7 @@ describe('SpacesCollection', () => {
       render(
         <SpacesCollection
           spaces={MANY}
-          userId="u1"
+          homePath="/u1/home"
           setSpacePinned={mocks.setSpacePinned}
         />,
       );
@@ -310,7 +310,7 @@ describe('SpacesCollection', () => {
       render(
         <SpacesCollection
           spaces={MANY}
-          userId="u1"
+          homePath="/u1/home"
           setSpacePinned={mocks.setSpacePinned}
         />,
       );
@@ -334,7 +334,7 @@ describe('SpacesCollection', () => {
     render(
       <SpacesCollection
         spaces={FEW}
-        userId="u1"
+        homePath="/u1/home"
         setSpacePinned={mocks.setSpacePinned}
       />,
     );
@@ -353,7 +353,7 @@ describe('SpacesCollection', () => {
     render(
       <SpacesCollection
         spaces={FEW}
-        userId="u1"
+        homePath="/u1/home"
         setSpacePinned={mocks.setSpacePinned}
       />,
     );
@@ -370,7 +370,7 @@ describe('SpacesCollection', () => {
     render(
       <SpacesCollection
         spaces={FEW}
-        userId="u1"
+        homePath="/u1/home"
         setSpacePinned={mocks.setSpacePinned}
       />,
     );
@@ -388,7 +388,7 @@ describe('SpacesCollection', () => {
     render(
       <SpacesCollection
         spaces={FEW}
-        userId="u1"
+        homePath="/u1/home"
         setSpacePinned={mocks.setSpacePinned}
       />,
     );
@@ -402,7 +402,7 @@ describe('SpacesCollection', () => {
     const { container } = render(
       <SpacesCollection
         spaces={FEW}
-        userId="u1"
+        homePath="/u1/home"
         setSpacePinned={mocks.setSpacePinned}
       />,
     );
@@ -425,7 +425,7 @@ describe('SpacesCollection', () => {
     render(
       <SpacesCollection
         spaces={FEW}
-        userId="u1"
+        homePath="/u1/home"
         setSpacePinned={mocks.setSpacePinned}
       />,
     );
@@ -437,7 +437,7 @@ describe('SpacesCollection', () => {
     render(
       <SpacesCollection
         spaces={[]}
-        userId="u1"
+        homePath="/u1/home"
         setSpacePinned={mocks.setSpacePinned}
       />,
     );

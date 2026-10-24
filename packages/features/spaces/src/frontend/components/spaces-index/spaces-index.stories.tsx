@@ -11,7 +11,7 @@ const meta: Meta<typeof SpacesIndex> = {
   decorators: [withStubNavigation],
   args: {
     spaces: sampleSummaries,
-    userId: 'u1',
+    homePath: '/u1/home',
     now: '2026-10-20T12:00:00Z',
     setSpacePinned: fn(async () => ({
       ok: true as const,

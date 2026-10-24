@@ -1,1 +1,1 @@
-export { getSpace } from './get-space';
+export { getSpace, type GetSpaceOptions } from './get-space';

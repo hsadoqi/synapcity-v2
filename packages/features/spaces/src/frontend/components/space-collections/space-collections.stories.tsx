@@ -12,7 +12,7 @@ const meta: Meta<typeof SpaceCollections> = {
   component: SpaceCollections,
   tags: ['autodocs'],
   decorators: [withStubNavigation],
-  args: { userId: 'u1', entity: sampleSpace },
+  args: { homePath: '/u1/home', space: sampleSpace },
 };
 
 export default meta;
@@ -21,4 +21,4 @@ type Story = StoryObj<typeof SpaceCollections>;
 export const Default: Story = {};
 
 /** Nothing takes part in the space yet. */
-export const Empty: Story = { args: { entity: sampleEmptySpace } };
+export const Empty: Story = { args: { space: sampleEmptySpace } };

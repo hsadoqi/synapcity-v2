@@ -3,6 +3,11 @@ import type { Metadata } from 'next';
 import { SpacesCollection } from '@synapcity/features-spaces/frontend';
 import { COLLECTION_LABELS, SetBreadcrumbs } from '@/components/breadcrumbs';
 import { requireOwner } from '@/lib/access/require-owner';
+import {
+  homePathFor,
+  signInPathFor,
+  spacesPathFor,
+} from '@/lib/routing/user-paths';
 import { getSpaceSource } from '@/lib/spaces';
 import { setSpacePinned } from '@/lib/spaces/space-state-actions';
 
@@ -22,8 +27,9 @@ export default async function SpacesPage({
       <SetBreadcrumbs items={[{ label: COLLECTION_LABELS.spaces }]} />
       <SpacesCollection
         spaces={spaces}
-        userId={userId}
+        homePath={homePathFor(userId)}
         setSpacePinned={setSpacePinned}
+        signInHref={signInPathFor(spacesPathFor(userId))}
       />
     </>
   );

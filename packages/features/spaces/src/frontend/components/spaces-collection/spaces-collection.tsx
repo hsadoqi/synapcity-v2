@@ -14,27 +14,32 @@ const SPACES_INTRO =
 
 interface SpacesCollectionProps {
   spaces: SpaceSummary[];
-  userId: string;
+  /** The owner's home address; every Space link is built under it. */
+  homePath: string;
   /** The host's pin action; the index shows a change at once and saves it through this. */
   setSpacePinned: (
     spaceId: string,
     pinned: boolean,
   ) => Promise<SetSpacePinnedResult>;
+  /** Where to sign in again when a pin fails because the session ended. */
+  signInHref?: string;
 }
 
 export function SpacesCollection({
   spaces,
-  userId,
+  homePath,
   setSpacePinned,
+  signInHref,
 }: SpacesCollectionProps) {
   return (
     <CollectionPage title={SPACES_TITLE} intro={SPACES_INTRO}>
       {/* No create button until creating a space exists; one that does nothing is worse than none. */}
       <SpacesIndex
         spaces={spaces}
-        userId={userId}
+        homePath={homePath}
         now={new Date().toISOString()}
         setSpacePinned={setSpacePinned}
+        signInHref={signInHref}
       />
     </CollectionPage>
   );

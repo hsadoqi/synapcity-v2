@@ -14,4 +14,13 @@ describe('the Space detail shapes', () => {
     expectTypeOf<DocumentItem>().toExtend<EntityItem>();
     expectTypeOf<DashboardItem>().toExtend<EntityItem>();
   });
+
+  it('say exactly which kind each item is', () => {
+    expectTypeOf<DocumentItem['kind']>().toEqualTypeOf<'document'>();
+    expectTypeOf<DashboardItem['kind']>().toEqualTypeOf<'dashboard'>();
+  });
+
+  it('can say that the items could not be read', () => {
+    expectTypeOf<Space['itemsUnavailable']>().toEqualTypeOf<true | undefined>();
+  });
 });
