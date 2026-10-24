@@ -1,7 +1,7 @@
 import { act, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { PRIVACY_POLICY_VERSIONS } from '@/features/settings/types/data-privacy';
+import { PRIVACY_POLICY_VERSIONS } from '@synapcity/domain-preferences';
 import { createFakeSentry, type FakeSentry } from './fake-sentry';
 
 const fake = vi.hoisted(() => ({ current: undefined as unknown }));
