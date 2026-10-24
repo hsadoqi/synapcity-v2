@@ -2,7 +2,10 @@
 
 import {
   startTransition,
+  useCallback,
+  useEffect,
   useId,
+  useMemo,
   useRef,
   useState,
   type FormEvent,
@@ -11,7 +14,7 @@ import type { FieldErrors, FieldValues } from 'react-hook-form';
 import type { z } from 'zod';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
-import type { FormDefinition } from '../../types';
+import type { FieldConfig, FieldGroup, FormDefinition } from '../../types';
 import type { FormFeedback } from '../../hooks/use-action-form';
 import { useFocusFirstError } from '../../hooks/use-focus-first-error';
 import { useFormBuilder } from '../../hooks/use-form-builder';
@@ -26,9 +29,11 @@ import {
   type ActionFormRefusal,
 } from '../../utils/first-refusal';
 import { FormMessage } from '../form-message';
-import { EngineField } from './engine-field';
+import { EngineField, type AsyncFlush } from './engine-field';
+import { FormGroup } from './form-group';
 
 const DEFAULT_SUBMIT_FAILED = 'Something went wrong. Try again.';
+const DEFAULT_REQUIRED_HINT = 'Required';
 
 type Values<TSchema extends z.ZodObject> = Partial<z.infer<TSchema>>;
 
@@ -43,6 +48,8 @@ interface FormRendererBaseProps<TSchema extends z.ZodObject> {
     readonly required?: string;
     /** Shown when `onSubmit` throws. Never the thrown error's own text. */
     readonly submitFailed?: string;
+    /** Read out for a required control that cannot carry `aria-required`. Defaults to `Required`. */
+    readonly requiredHint?: string;
   };
 }
 
@@ -114,17 +121,114 @@ function FormRendererWith<TSchema extends z.ZodObject>({
   });
 
   const focusTargets = useRef(new Map<string, HTMLElement | null>());
+  const asyncFlushes = useRef(new Map<string, AsyncFlush>());
+  const pendingFocus = useRef<string | undefined>(undefined);
   const submitting = useRef(false);
   const [refusal, setRefusal] = useState<ActionFormRefusal>();
   const isAction = props.action !== undefined;
 
+  const groupById = useMemo(
+    () => new Map(definition.groups.map((group) => [group.id, group])),
+    [definition],
+  );
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(
+      definition.groups.map((group) => [group.id, group.defaultOpen !== false]),
+    ),
+  );
+
+  const onFocusTarget = useCallback(
+    (name: string, element: HTMLElement | null) =>
+      focusTargets.current.set(name, element),
+    [],
+  );
+  const onAsyncFlush = useCallback((name: string, flush: AsyncFlush | null) => {
+    if (flush) asyncFlushes.current.set(name, flush);
+    else asyncFlushes.current.delete(name);
+  }, []);
+
+  /** The folded collapsible groups that hold any of these fields. */
+  const foldedGroupsOf = (names: readonly string[]): string[] => {
+    const ids = new Set<string>();
+    for (const name of names) {
+      const field = definition.fields.find((each) => each.name === name);
+      const group = field?.group ? groupById.get(field.group) : undefined;
+      if (group?.collapsible === true && openGroups[group.id] !== true)
+        ids.add(group.id);
+    }
+    return [...ids];
+  };
+
+  const [, setFocusRequest] = useState(0);
+  // Focus waits for the render that unfolds a group or re-enables a field
+  // after its async check; a target that is still disabled is tried again on
+  // the next render.
+  useEffect(() => {
+    const name = pendingFocus.current;
+    if (name === undefined) return;
+    const target = focusTargets.current.get(name);
+    if (target === null || target === undefined) {
+      pendingFocus.current = undefined;
+      return;
+    }
+    if ((target as HTMLInputElement).disabled === true) return;
+    pendingFocus.current = undefined;
+    target.focus();
+  });
+
+  /** Unfolds every group holding one of these fields, then focuses the first. */
+  const revealAndFocus = (names: readonly string[]) => {
+    const first = names[0];
+    if (first === undefined) return;
+    const folded = foldedGroupsOf(names);
+    const target = focusTargets.current.get(first);
+    if (
+      folded.length === 0 &&
+      target !== null &&
+      target !== undefined &&
+      (target as HTMLInputElement).disabled !== true
+    ) {
+      target.focus();
+      return;
+    }
+    pendingFocus.current = first;
+    setFocusRequest((count) => count + 1);
+    if (folded.length > 0) {
+      setOpenGroups((current) => ({
+        ...current,
+        ...Object.fromEntries(folded.map((id) => [id, true])),
+      }));
+    }
+  };
+
   const focusFirstInvalid = (errors: FieldErrors) => {
-    const first = definition.fields.find(
+    revealAndFocus(
+      definition.fields
+        .filter(
+          (field) =>
+            states[field.name]?.visible === true &&
+            errors[field.name] !== undefined,
+        )
+        .map((field) => field.name),
+    );
+  };
+
+  /** Runs every visible field's async check now; resolves to the fields it refused, in form order. */
+  const refusedByAsyncChecks = async (): Promise<string[]> => {
+    const checked = definition.fields.filter(
       (field) =>
         states[field.name]?.visible === true &&
-        errors[field.name] !== undefined,
+        asyncFlushes.current.has(field.name),
     );
-    if (first) focusTargets.current.get(first.name)?.focus();
+    const results = await Promise.all(
+      checked.map((field) => asyncFlushes.current.get(field.name)!()),
+    );
+    return checked
+      .filter((_, index) => {
+        const status = results[index]?.status;
+        return status === 'invalid' || status === 'failed';
+      })
+      .map((field) => field.name);
   };
 
   // In action mode the form shows one refusal at a time, the way the server does.
@@ -138,12 +242,50 @@ function FormRendererWith<TSchema extends z.ZodObject>({
     ? props.pending === true
     : form.formState.isSubmitting;
 
+  // A server refusal names fields; their groups stay unfolded while it is shown.
+  const forcedOpen = new Set(
+    isAction && shown.error
+      ? (shown.fields ?? []).flatMap((name) => {
+          const field = definition.fields.find((each) => each.name === name);
+          return field?.group ? [field.group] : [];
+        })
+      : [],
+  );
+
+  const renderField = (field: FieldConfig) =>
+    states[field.name]?.visible === true ? (
+      <EngineField
+        key={field.name}
+        field={field}
+        id={`${formId}-${field.name}`}
+        state={states[field.name]!}
+        control={form.control}
+        registry={registry}
+        schema={definition.schema.shape[field.name] as z.ZodType}
+        getValues={form.getValues}
+        showOwnError={!isAction}
+        markedBy={
+          isAction && shown.error && shown.fields?.includes(field.name)
+            ? messageId
+            : undefined
+        }
+        requiredHint={props.messages?.requiredHint ?? DEFAULT_REQUIRED_HINT}
+        onFocusTarget={onFocusTarget}
+        onAsyncFlush={onAsyncFlush}
+      />
+    ) : null;
+
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     const element = event.currentTarget;
     if (isAction) {
       void form.handleSubmit(
-        () => {
+        async () => {
           setRefusal(undefined);
+          const refused = await refusedByAsyncChecks();
+          if (refused.length > 0) {
+            revealAndFocus(refused);
+            return;
+          }
           startTransition(() => props.action?.(new FormData(element)));
         },
         (errors) => setRefusal(firstRefusal(errors)),
@@ -157,6 +299,12 @@ function FormRendererWith<TSchema extends z.ZodObject>({
     void form.handleSubmit(async (values: FieldValues) => {
       submitting.current = true;
       form.clearErrors('root');
+      const refused = await refusedByAsyncChecks();
+      if (refused.length > 0) {
+        submitting.current = false;
+        revealAndFocus(refused);
+        return;
+      }
       try {
         await props.onSubmit?.(values as Values<TSchema>);
         if (props.afterSubmit === 'clear') form.reset(defaults);
@@ -182,27 +330,32 @@ function FormRendererWith<TSchema extends z.ZodObject>({
       onSubmit={onSubmit}
       className="flex flex-col gap-4"
     >
-      {definition.fields.map((field) =>
-        states[field.name]?.visible === true ? (
-          <EngineField
-            key={field.name}
-            field={field}
-            id={`${formId}-${field.name}`}
-            state={states[field.name]!}
-            control={form.control}
-            registry={registry}
-            showOwnError={!isAction}
-            markedBy={
-              isAction && shown.error && shown.fields?.includes(field.name)
-                ? messageId
-                : undefined
+      {segmentsOf(definition.fields, groupById).map((segment) => {
+        if (segment.group === undefined) return renderField(segment.fields[0]!);
+        const visible = segment.fields.filter(
+          (field) => states[field.name]?.visible === true,
+        );
+        if (visible.length === 0) return null;
+        const { group } = segment;
+        return (
+          <FormGroup
+            key={`group-${group.id}`}
+            group={group}
+            id={`${formId}-group-${group.id}`}
+            open={openGroups[group.id] === true || forcedOpen.has(group.id)}
+            onOpenChange={(open) =>
+              setOpenGroups((current) => ({ ...current, [group.id]: open }))
             }
-            onFocusTarget={(name, element) =>
-              focusTargets.current.set(name, element)
+            errorCount={
+              visible.filter(
+                (field) => form.formState.errors[field.name] !== undefined,
+              ).length
             }
-          />
-        ) : null,
-      )}
+          >
+            {visible.map(renderField)}
+          </FormGroup>
+        );
+      })}
       <FormMessage id={messageId} state={{ error: formError }} />
       <div className="flex justify-end gap-2">
         {props.onCancel ? (
@@ -220,4 +373,37 @@ function FormRendererWith<TSchema extends z.ZodObject>({
       </div>
     </form>
   );
+}
+
+interface Segment {
+  readonly group?: FieldGroup;
+  readonly fields: FieldConfig[];
+}
+
+/**
+ * The fields in order, with each group's adjacent run of fields gathered into
+ * one segment (`defineForm` guarantees a group is one run). An ungrouped field
+ * is a segment of its own.
+ */
+function segmentsOf(
+  fields: readonly FieldConfig[],
+  groups: ReadonlyMap<string, FieldGroup>,
+): Segment[] {
+  const segments: Segment[] = [];
+  for (const field of fields) {
+    const last = segments[segments.length - 1];
+    if (
+      field.group !== undefined &&
+      last?.group !== undefined &&
+      last.group.id === field.group
+    ) {
+      last.fields.push(field);
+      continue;
+    }
+    segments.push({
+      group: field.group === undefined ? undefined : groups.get(field.group),
+      fields: [field],
+    });
+  }
+  return segments;
 }

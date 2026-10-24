@@ -63,4 +63,44 @@ describe('SelectRenderer', () => {
     expect(trigger.getAttribute('aria-invalid')).toBe('true');
     expect(trigger.getAttribute('aria-describedby')).toBe('id-s-error');
   });
+
+  it('offers Clear on a clearable select once something is chosen', () => {
+    const p = props({
+      value: 'a',
+      field: {
+        type: 'select',
+        name: 's',
+        label: 'S',
+        options: [{ value: 'a', label: 'Alpha' }],
+        props: { clearable: true },
+      },
+    });
+    render(<SelectRenderer {...p} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Clear S' }));
+
+    expect(p.onChange).toHaveBeenCalledWith(undefined);
+  });
+
+  it('offers no Clear while nothing is chosen or when not clearable', () => {
+    render(<SelectRenderer {...props({ value: 'a' })} />);
+    expect(screen.queryByRole('button', { name: /Clear/ })).toBeNull();
+  });
+
+  it('switches to a filter input when searchable', () => {
+    render(
+      <SelectRenderer
+        {...props({
+          field: {
+            type: 'select',
+            name: 's',
+            label: 'S',
+            options: [{ value: 'a', label: 'Alpha' }],
+            props: { searchable: true },
+          },
+        })}
+      />,
+    );
+    expect(screen.getByRole('combobox').tagName).toBe('INPUT');
+  });
 });

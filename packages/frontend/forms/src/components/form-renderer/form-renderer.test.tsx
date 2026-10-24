@@ -306,6 +306,53 @@ describe('FormRenderer starting values', () => {
   });
 });
 
+describe('FormRenderer picker and choice fields', () => {
+  it('adapts calendar and radio choices back to schema strings', async () => {
+    const onSubmit = vi.fn();
+    const choices = defineForm({
+      schema: z.object({
+        due: z.string(),
+        frequency: z.enum(['daily', 'weekly']),
+      }),
+      fields: [
+        { type: 'date', name: 'due', label: 'Due date' },
+        {
+          type: 'radio',
+          name: 'frequency',
+          label: 'Frequency',
+          options: [
+            { value: 'daily', label: 'Daily' },
+            { value: 'weekly', label: 'Weekly' },
+          ],
+        },
+      ],
+    });
+    render(
+      <FormRenderer
+        definition={choices}
+        initialValues={{ due: '2026-05-04', frequency: 'weekly' }}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Due date' }));
+    });
+    await act(async () => {
+      fireEvent.click(
+        await screen.findByRole('button', { name: /May 11th, 2026/ }),
+      );
+    });
+    fireEvent.click(screen.getByRole('radio', { name: 'Daily' }));
+    await submit();
+
+    expect(onSubmit).toHaveBeenCalledWith({
+      due: '2026-05-11',
+      frequency: 'daily',
+    });
+  });
+});
+
 describe('FormRenderer cross-field rules', () => {
   const ruleSchema = z.object({
     change: z.boolean().optional(),

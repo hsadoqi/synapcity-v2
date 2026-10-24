@@ -286,14 +286,7 @@ describe('InputRenderer', () => {
     });
   });
 
-  it.each([
-    'date',
-    'time',
-    'datetime-local',
-    'month',
-    'week',
-    'color',
-  ] as const)(
+  it.each(['time', 'datetime-local', 'month', 'week', 'color'] as const)(
     'renders a %s input that emits the string the browser gives',
     (type) => {
       const props = base({
@@ -312,7 +305,6 @@ describe('InputRenderer', () => {
       expect(input.type).toBe(type);
       // A value the colour picker returns, not a colour used for styling.
       const value = {
-        date: '2026-05-04',
         time: '09:30',
         'datetime-local': '2026-05-04T09:30',
         month: '2026-05',
@@ -324,25 +316,25 @@ describe('InputRenderer', () => {
     },
   );
 
-  it('passes min, max and step to date and time inputs', () => {
+  it('passes min, max and step to native time inputs', () => {
     render(
       <>
         {label('id-a')}
         <InputRenderer
           {...base({
-            type: 'date',
+            type: 'time',
             name: 'a',
             label: 'A',
-            props: { min: '2026-01-01', max: '2026-12-31', step: 7 },
+            props: { min: '09:00', max: '17:00', step: 60 },
           })}
         />
       </>,
     );
     const input = screen.getByLabelText('A') as HTMLInputElement;
     expect([input.min, input.max, input.step]).toEqual([
-      '2026-01-01',
-      '2026-12-31',
-      '7',
+      '09:00',
+      '17:00',
+      '60',
     ]);
   });
 

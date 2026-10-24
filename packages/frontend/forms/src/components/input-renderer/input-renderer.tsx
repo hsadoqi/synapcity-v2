@@ -21,8 +21,8 @@ const BY_TYPE = {
 >;
 
 /**
- * Text, email, password, tel, url, search, textarea, and the date, time,
- * month, week and colour pickers. A value that is
+ * Text, email, password, tel, url, search, textarea, and the native time,
+ * datetime-local, month, week and colour inputs. A value that is
  * not a string shows as empty. Email, URL and password text is never
  * autocapitalised, autocorrected or spellchecked, because the browser would
  * change what the person typed.
@@ -107,7 +107,6 @@ export function InputRenderer({
   }
 
   if (
-    field.type === 'date' ||
     field.type === 'time' ||
     field.type === 'datetime-local' ||
     field.type === 'month' ||
