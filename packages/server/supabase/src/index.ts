@@ -9,3 +9,4 @@ export {
   outcomeFromClaims,
   supabaseIdentityProvider,
 } from './supabase-identity-provider';
+export * from './auth-operations';

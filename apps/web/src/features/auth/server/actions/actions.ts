@@ -43,10 +43,10 @@ import {
   registerWithPassword,
   requestRecoveryEmail,
   resendEmailChange as resendEmailChangeOperation,
-  sendAccountDeletionLink,
   sendOwnPasswordReset,
   startAccountLink,
-} from '../operations';
+} from '@synapcity/server-supabase';
+import { sendAccountDeletionLink } from '../operations';
 
 /**
  * Development fixture mode has no session (ADR-0006, development amendment),
@@ -124,7 +124,7 @@ export async function signUp(
   const { email, name, password } = parsed.data;
   const user = { email, name };
 
-  const outcome = await registerWithPassword({
+  const outcome = await registerWithPassword(await createClient(), {
     email,
     password,
     name,
@@ -208,7 +208,7 @@ export async function requestPasswordReset(
   const { email } = parsed.data;
   const user = { email, name: '' };
 
-  const outcome = await requestRecoveryEmail({
+  const outcome = await requestRecoveryEmail(await createClient(), {
     email,
     resetRedirect: callbackUrl(getOrigin(), '/auth/update-password', 'reset'),
   });
@@ -346,7 +346,10 @@ export async function requestEmailChange(
   const redirectTo = await emailChangeRedirect();
   if (!redirectTo) return signedOutFailure(email);
 
-  const outcome = await changeEmail({ newEmail: email, redirectTo });
+  const outcome = await changeEmail(await createClient(), {
+    newEmail: email,
+    redirectTo,
+  });
   switch (outcome.kind) {
     case 'signed-out':
       return signedOutFailure(email);
@@ -383,7 +386,9 @@ export async function resendEmailChange(
   const redirectTo = await emailChangeRedirect();
   if (!redirectTo) return signedOutFailure('');
 
-  const outcome = await resendEmailChangeOperation({ redirectTo });
+  const outcome = await resendEmailChangeOperation(await createClient(), {
+    redirectTo,
+  });
   switch (outcome.kind) {
     case 'signed-out':
       return signedOutFailure('');
@@ -419,7 +424,7 @@ export async function requestOwnPasswordReset(
 
   // Where to come back to once the new password is chosen: here, not home.
   const back = `/auth/update-password?${new URLSearchParams({ next: settingsPathFor(user.id) })}`;
-  const outcome = await sendOwnPasswordReset({
+  const outcome = await sendOwnPasswordReset(await createClient(), {
     resetRedirect: callbackUrl(getOrigin(), back, 'reset'),
   });
 
@@ -462,7 +467,7 @@ export async function connectAccount(
   const user = await getCurrentUser();
   if (!user) return signedOutFailure('');
 
-  const outcome = await startAccountLink({
+  const outcome = await startAccountLink(await createClient(), {
     provider,
     redirectTo: callbackUrl(getOrigin(), settingsPathFor(user.id), 'link'),
   });
@@ -553,7 +558,9 @@ export async function disconnectAccount(
   const user = await getCurrentUser();
   if (!user) return signedOutFailure('');
 
-  const outcome = await disconnectAccountOperation({ provider });
+  const outcome = await disconnectAccountOperation(await createClient(), {
+    provider,
+  });
 
   switch (outcome.kind) {
     case 'signed-out':

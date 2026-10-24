@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Approved for planning (owner decision, 2026-10-24: design Q1 to Q5 accepted; "whatever you suggest" for call C5). Task A is implemented on `refactor/m7-2-server-packages`; Tasks B and C are not started. Call C1 below amends the M7 design.
+**Status:** Approved for planning (owner decision, 2026-10-24: design Q1 to Q5 accepted; "whatever you suggest" for call C5). Task A is implemented on `refactor/m7-2-server-packages` (local commits, not pushed); Tasks B and C are not started. Call C1 below amends the M7 design.
 
 **Goal:** The provider-facing auth operations, the session refresh helper and the profile operations leave `apps/web` for the server packages, behind typed outcomes, with no change in behavior. Server Actions, redirects, fixture mode and logging stay in the web app.
 
@@ -49,11 +49,11 @@
 - Produces (`@synapcity/server-supabase`): the seven operations and their `*Input` / `*Outcome` types, unchanged.
 - Consumes: `SupabaseServerClient`; `isRateLimited`, `OAuthProvider` from `@synapcity/domain-identity`; `isAuthRetryableFetchError`, `isAuthSessionMissingError` from `@supabase/supabase-js` (allowed here).
 
-- [ ] **Step 1: Move the two pure helpers** (`isRateLimited`, `oauth-providers`) into `domain-identity` with their tests; export from the root; re-point importers. Run package and affected web tests.
-- [ ] **Step 2: Move the seven operations and their tests** into `server-supabase`; replace `createClient()` with the `client` argument; keep every outcome and message-free reply. Run `pnpm --filter @synapcity/server-supabase test`, `lint`, `check-types`.
-- [ ] **Step 3: Re-point the actions** and update the two ratchet tests. Run the web `features/auth`, `identity-boundary` and `architecture` tests, `check-types` and `lint`.
-- [ ] **Step 4: Run the checks:** `pnpm boundaries`; `pnpm deps`. Expected: pass; `rg -n "@supabase/" apps/web/src` shows only the remaining intended files (Task B and C finish the rest).
-- [ ] **Step 5: Checkpoint commit** (local only): `refactor(server-supabase): move the provider auth operations into the package`.
+- [x] **Step 1: Move the two pure helpers** (`isRateLimited`, `oauth-providers`) into `domain-identity` with their tests; export from the root; re-point importers. Run package and affected web tests.
+- [x] **Step 2: Move the seven operations and their tests** into `server-supabase`; replace `createClient()` with the `client` argument; keep every outcome and message-free reply. Run `pnpm --filter @synapcity/server-supabase test`, `lint`, `check-types`.
+- [x] **Step 3: Re-point the actions** and update the two ratchet tests. Run the web `features/auth`, `identity-boundary` and `architecture` tests, `check-types` and `lint`.
+- [x] **Step 4: Run the checks:** `pnpm boundaries`; `pnpm deps`. Expected: pass; `rg -n "@supabase/" apps/web/src` shows only the remaining intended files (Task B and C finish the rest).
+- [x] **Step 5: Checkpoint commit** (local only): `refactor(server-supabase): move the provider auth operations into the package`.
 
 ### Task B: Session refresh helper
 
@@ -80,11 +80,12 @@
 
 ## Calls made (owner to check)
 
-| #   | Call                                                                                                                                       | Why                                                                                                                                                  |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| C1  | The provider auth operations live in `server-supabase`, not `server-auth` (amends M7 design 4.3).                                           | `server-supabase` depends on `server-auth`; the reverse would be a cycle, and the operations are Supabase SDK calls. `server-auth` stays provider-agnostic. |
-| C2  | `sendAccountDeletionLink` and `deleteOwnAccount` stay in the app until M7.5.                                                               | They use the recent-sign-in check (design Q5) and one logs; they move with the delete-account flow.                                                    |
-| C3  | `isRateLimited` and the OAuth provider list move to `domain-identity`.                                                                      | Pure rules used by both the server operations and the copy code; neither server nor feature code may import the other.                              |
+| #   | Call                                                                                                                  | Why                                                                                                                                                         |
+| --- | --------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C1  | The provider auth operations live in `server-supabase`, not `server-auth` (amends M7 design 4.3).                     | `server-supabase` depends on `server-auth`; the reverse would be a cycle, and the operations are Supabase SDK calls. `server-auth` stays provider-agnostic. |
+| C2  | `sendAccountDeletionLink` and `deleteOwnAccount` stay in the app until M7.5.                                          | They use the recent-sign-in check (design Q5) and one logs; they move with the delete-account flow.                                                         |
+| C4  | Two tests asserting "builds a fresh request-bound client for every call" were removed from the moved operation tests. | The package no longer builds clients; the property belongs to the host binding, which `apps/web/src/lib/supabase/server.test.ts` already covers.            |
+| C3  | `isRateLimited` and the OAuth provider list move to `domain-identity`.                                                | Pure rules used by both the server operations and the copy code; neither server nor feature code may import the other.                                      |
 
 ## Recovery
 

@@ -5,8 +5,15 @@ describe('@synapcity/server-supabase root entry', () => {
     const entry = await import('./index');
 
     expect(Object.keys(entry).sort()).toEqual([
+      'changeEmail',
       'createRequestClient',
+      'disconnectAccount',
       'outcomeFromClaims',
+      'registerWithPassword',
+      'requestRecoveryEmail',
+      'resendEmailChange',
+      'sendOwnPasswordReset',
+      'startAccountLink',
       'supabaseIdentityProvider',
     ]);
   });
