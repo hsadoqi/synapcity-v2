@@ -13,6 +13,8 @@ Runtime: browser and server rendering, framework-neutral. Links and navigation c
 
 `apps/web` mounts `NextCollectionNavigation` in `app/[userId]/layout.tsx`, so every collection and Space page under it navigates client-side.
 
+Two host-facing details: an `EntityItem` may carry its own `href`, which the entity blocks use before any prefix (an item with neither is shown as text, not a dead link); and `SetPinnedResult` may carry `signedOut`, for which `CollectionIndex` offers "Sign in again" when the host gives it a `signInHref`. `EntityHeader` shows only the actions it is given handlers for.
+
 ## Rules
 
 - One folder per unit under `src/components/`, `src/providers/`, `src/utils/` and `src/types/`, each with its `index.ts`; components have a story and, where behavior is tested, a test beside them. Imports between folders go through the folder's `index.ts`.

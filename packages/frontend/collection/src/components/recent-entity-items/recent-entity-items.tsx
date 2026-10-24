@@ -34,7 +34,8 @@ export function RecentEntityItems({
       <ul className="flex flex-col">
         {items.map((item) => {
           const href =
-            item.href ?? (prefix === undefined ? undefined : `${prefix}/${item.id}`);
+            item.href ??
+            (prefix === undefined ? undefined : `${prefix}/${item.id}`);
           const content = (
             <>
               <EntityIcon

@@ -180,7 +180,9 @@ describe('CollectionIndex', () => {
       await pinA();
 
       expect(
-        screen.getByRole('link', { name: 'Sign in again' }).getAttribute('href'),
+        screen
+          .getByRole('link', { name: 'Sign in again' })
+          .getAttribute('href'),
       ).toBe('/auth/login?next=%2Fthings');
     });
 

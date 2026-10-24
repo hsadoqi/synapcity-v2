@@ -65,19 +65,19 @@ export function EntityHeader({
       </div>
 
       {(quickActions.length > 0 || hasMoreActions) && (
-      <div className="flex flex-wrap items-center gap-2">
-        {quickActions.map((action) => (
-          <Button
-            key={action.label}
-            variant={action.variant}
-            onClick={action.onNew}
-          >
-            <action.icon data-icon="inline-start" aria-hidden="true" />
-            {action.label}
-          </Button>
-        ))}
-        <EntityMoreActions onRename={onRename} onArchive={onArchive} />
-      </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {quickActions.map((action) => (
+            <Button
+              key={action.label}
+              variant={action.variant}
+              onClick={action.onNew}
+            >
+              <action.icon data-icon="inline-start" aria-hidden="true" />
+              {action.label}
+            </Button>
+          ))}
+          <EntityMoreActions onRename={onRename} onArchive={onArchive} />
+        </div>
       )}
     </header>
   );

@@ -183,6 +183,27 @@ describe('DashboardsCollection', () => {
         within(panel).queryByRole('link', { name: unpinned.name }),
       ).toBeNull();
     });
+    it('offers to sign in again, back to this page, when the session ended', async () => {
+      mocks.setDashboardPinned.mockResolvedValue({
+        ok: false,
+        error: 'Sign in again to update your profile.',
+        signedOut: true,
+      });
+      render(<DashboardsCollection dashboards={MANY} userId="u1" />);
+
+      fireEvent.click(
+        screen.getAllByRole('button', {
+          name: `Actions for ${unpinned.name}`,
+        })[0]!,
+      );
+      fireEvent.click(await screen.findByRole('menuitem', { name: 'Pin' }));
+
+      expect(
+        (
+          await screen.findByRole('link', { name: 'Sign in again' })
+        ).getAttribute('href'),
+      ).toBe('/auth/login?next=%2Fu1%2Fhome%2Fdashboards');
+    });
   });
 
   it('offers only open and pin in a dashboard’s menu', async () => {

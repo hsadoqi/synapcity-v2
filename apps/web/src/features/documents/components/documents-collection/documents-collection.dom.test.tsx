@@ -183,6 +183,27 @@ describe('DocumentsCollection', () => {
         within(panel).queryByRole('link', { name: unpinned.name }),
       ).toBeNull();
     });
+    it('offers to sign in again, back to this page, when the session ended', async () => {
+      mocks.setDocumentPinned.mockResolvedValue({
+        ok: false,
+        error: 'Sign in again to update your profile.',
+        signedOut: true,
+      });
+      render(<DocumentsCollection documents={MANY} userId="u1" />);
+
+      fireEvent.click(
+        screen.getAllByRole('button', {
+          name: `Actions for ${unpinned.name}`,
+        })[0]!,
+      );
+      fireEvent.click(await screen.findByRole('menuitem', { name: 'Pin' }));
+
+      expect(
+        (
+          await screen.findByRole('link', { name: 'Sign in again' })
+        ).getAttribute('href'),
+      ).toBe('/auth/login?next=%2Fu1%2Fhome%2Fdocuments');
+    });
   });
 
   it('offers only open and pin in a document’s menu', async () => {

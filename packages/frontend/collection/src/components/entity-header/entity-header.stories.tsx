@@ -25,3 +25,13 @@ export const Default: Story = {};
 export const WithoutDescription: Story = {
   args: { description: undefined },
 };
+
+/** With no handlers there are no buttons: an action that does nothing is not offered. */
+export const WithoutActions: Story = {
+  args: {
+    onNewDocument: undefined,
+    onNewDashboard: undefined,
+    onRename: undefined,
+    onArchive: undefined,
+  },
+};

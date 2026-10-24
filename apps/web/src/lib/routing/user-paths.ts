@@ -18,6 +18,21 @@ export function spacesPathFor(userId: string): string {
   return `${homePathFor(userId)}/spaces`;
 }
 
+/** A document's top-level route (ADR-0013, item 9); its page arrives with Milestone 8. */
+export function documentPathFor(userId: string, documentId: string): string {
+  return `${homePathFor(userId)}/documents/${documentId}`;
+}
+
+/** A dashboard's top-level route (ADR-0013, item 9); its page arrives with Milestone 8. */
+export function dashboardPathFor(userId: string, dashboardId: string): string {
+  return `${homePathFor(userId)}/dashboards/${dashboardId}`;
+}
+
+/** Sign in, then come back to `path`; the sign-in page checks the destination. */
+export function signInPathFor(path: string): string {
+  return `/auth/login?next=${encodeURIComponent(path)}`;
+}
+
 export function settingsPathFor(userId: string): string {
   return userPath(userId, 'settings');
 }

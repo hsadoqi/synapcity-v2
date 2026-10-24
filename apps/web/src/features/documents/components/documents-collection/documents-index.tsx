@@ -12,6 +12,7 @@ import type {
   CollectionItemAction,
 } from '@synapcity/frontend-collection';
 import type { OwnedRecordSummary } from '@/lib/owned-records';
+import { homePathFor, signInPathFor } from '@/lib/routing/user-paths';
 
 import { toCollectionItem } from '../../lib/collection-item';
 import { setDocumentPinned } from '../../server/actions/document-state-actions';
@@ -40,7 +41,9 @@ async function saveDocumentPinned(
   pinned: boolean,
 ): Promise<SetPinnedResult> {
   const result = await setDocumentPinned(id, pinned);
-  return result.ok ? { ok: true } : { ok: false, error: result.error };
+  return result.ok
+    ? { ok: true }
+    : { ok: false, error: result.error, signedOut: result.signedOut };
 }
 
 /** The documents index: the shared browse page, filled with documents. */
@@ -68,6 +71,7 @@ export function DocumentsIndex({
       actions={DOCUMENT_ACTIONS}
       renderPreview={(item) => <DocumentPreview item={item} />}
       onSetPinned={saveDocumentPinned}
+      signInHref={signInPathFor(`${homePathFor(userId)}/documents`)}
     />
   );
 }

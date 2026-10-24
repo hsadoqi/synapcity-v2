@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition, type ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
 
 import { Alert, AlertDescription } from '@synapcity/frontend-ui/core/alert';
+import { buttonVariants } from '@synapcity/frontend-ui/core/button';
 
 import { useCollectionNavigation } from '../../providers';
 import {
@@ -26,7 +27,8 @@ import { CollectionHighlights } from '../collection-highlights';
 import { CollectionView } from '../collection-view';
 
 /** What saving a pin change reports back. */
-export type SetPinnedResult = { ok: true } | { ok: false; error: string };
+export type SetPinnedResult =
+  { ok: true } | { ok: false; error: string; signedOut?: boolean };
 
 export type CollectionIndexProps = {
   /** Every item the owner has, in any order. */
@@ -47,6 +49,12 @@ export type CollectionIndexProps = {
   renderPreview?: (item: CollectionItem) => ReactNode;
   /** Saves a pin change. The index shows it at once and puts it back on failure. */
   onSetPinned: (id: string, pinned: boolean) => Promise<SetPinnedResult>;
+  /**
+   * Where to sign in again, when a save fails because the session ended. The
+   * host builds it so the person comes back to this page; without it the
+   * index shows only the message.
+   */
+  signInHref?: string;
   /**
    * The carousel and pinned panel appear only with more items than this. With
    * fewer they would just repeat the list, so pinned items lead the list.
@@ -77,14 +85,18 @@ export function CollectionIndex({
   renderPreview,
   onSetPinned,
   highlightsFrom = 6,
+  signInHref,
 }: CollectionIndexProps) {
-  const { push } = useCollectionNavigation();
+  const { Link, push } = useCollectionNavigation();
   const [items, setItems] = useState<CollectionItem[]>(initialItems);
   const [query, setQuery] = useState('');
   const [filters, setFilters] = useState<CollectionFilters>(EMPTY_FILTERS);
   const [sort, setSort] = useState<CollectionSort>(DEFAULT_SORT);
   const [layout, setLayout] = useState<CollectionLayout>('list');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{
+    message: string;
+    signedOut: boolean;
+  } | null>(null);
   const [, startTransition] = useTransition();
 
   const nowDate = useMemo(() => new Date(now), [now]);
@@ -122,7 +134,10 @@ export function CollectionIndex({
         const result = await onSetPinned(item.id, next);
         if (!result.ok) {
           setPinned(item.id, item.pinned);
-          setError(result.error);
+          setError({
+            message: result.error,
+            signedOut: result.signedOut === true,
+          });
         }
       });
     }
@@ -140,7 +155,17 @@ export function CollectionIndex({
     <div className="flex flex-col gap-8">
       {error && (
         <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription>
+            {error.message}
+            {error.signedOut && signInHref && (
+              <Link
+                href={signInHref}
+                className={buttonVariants({ variant: 'link', size: 'sm' })}
+              >
+                Sign in again
+              </Link>
+            )}
+          </AlertDescription>
         </Alert>
       )}
 

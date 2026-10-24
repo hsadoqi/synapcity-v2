@@ -41,7 +41,7 @@ export function EntityItemCard({
         {/* Two lines, so spaces whose names start alike stay tellable apart. */}
         <h3 className="line-clamp-2 text-sm font-medium wrap-break-word">
           <Link
-            href={`${slug}/${entity.id}`}
+            href={entity.href ?? `${slug}/${entity.id}`}
             className="rounded-sm outline-none after:absolute after:inset-0 after:rounded-lg focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-ring"
           >
             {entity.name}

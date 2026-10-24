@@ -20,6 +20,7 @@ const recent: EntityItem = {
   kind: 'document',
   createdAt: '2026-10-02T12:00:00.000Z',
   updatedAt: '2026-10-15T09:30:00.000Z',
+  href: '/u1/home/spaces/s1/documents/d1',
 };
 
 describe('EntityContent', () => {
