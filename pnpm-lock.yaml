@@ -197,6 +197,9 @@ importers:
 
   apps/docs:
     dependencies:
+      '@synapcity/domain-preferences':
+        specifier: workspace:*
+        version: link:../../packages/domain/preferences
       '@synapcity/frontend-preferences':
         specifier: workspace:*
         version: link:../../packages/frontend/preferences

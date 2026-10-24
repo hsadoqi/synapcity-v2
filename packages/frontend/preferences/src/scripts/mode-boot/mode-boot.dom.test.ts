@@ -50,4 +50,19 @@ describe('mode boot script', () => {
     expect(localStorage.getItem('theme')).toBeNull();
     expect(root().className).toBe('');
   });
+
+  it('rejects the whole cookie when an unrelated look field is invalid', () => {
+    const look = lookOf(settingsDefaults);
+    document.cookie = `${LOOK_COOKIE_NAME}=${encodeURIComponent(
+      JSON.stringify({
+        ...look,
+        theme: { ...look.theme, mode: 'dark', density: 'unknown' },
+      }),
+    )}; Path=/`;
+
+    run();
+
+    expect(localStorage.getItem('theme')).toBeNull();
+    expect(root().className).toBe('');
+  });
 });

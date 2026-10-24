@@ -1,4 +1,4 @@
-import { lookCookieExpression } from '../look-source/look-source';
+import { lookCookieExpression } from '../look-source';
 
 /** The key `next-themes` keeps its choice under (its default). */
 export const MODE_STORAGE_KEY = 'theme';
