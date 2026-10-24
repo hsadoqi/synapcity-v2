@@ -22,6 +22,7 @@ const PURE = [
   'utils/build-schema',
   'utils/async-check',
   'utils/date-value',
+  'utils/group-options',
   'utils/define-form-from-schema',
 ];
 

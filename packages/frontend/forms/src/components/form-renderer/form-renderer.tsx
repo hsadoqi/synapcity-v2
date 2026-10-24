@@ -132,9 +132,14 @@ function FormRendererWith<TSchema extends z.ZodObject>({
   const [checking, setChecking] = useState(false);
   const [refusal, setRefusal] = useState<ActionFormRefusal>();
   const isAction = props.action !== undefined;
-  // Fields lock only for a submit that passed the schema (and while a server
-  // action runs), never while typing.
-  const locked = checking || (isAction && props.pending === true);
+  // Only a form with async fields locks, and only for a submit that passed the
+  // schema (through its checks and the handler or server action), never while
+  // typing. Any other form keeps its fields editable and disables just the
+  // submit button, as before.
+  const lockable = definition.fields.some(
+    (field) => field.asyncValidation !== undefined,
+  );
+  const locked = lockable && (checking || (isAction && props.pending === true));
   /** Where focus was when a locking submit started, so it can come back. */
   const restoreFocus = useRef<HTMLElement | null>(null);
 
@@ -147,6 +152,20 @@ function FormRendererWith<TSchema extends z.ZodObject>({
       definition.groups.map((group) => [group.id, group.defaultOpen !== false]),
     ),
   );
+
+  // The latest field states, for callbacks that must not change identity.
+  const statesRef = useRef(states);
+  useEffect(() => {
+    statesRef.current = states;
+  });
+  /** The form's values without the hidden fields', which the schema ignores too. */
+  const visibleValues = useCallback((): Record<string, unknown> => {
+    const values: Record<string, unknown> = {};
+    for (const [name, value] of Object.entries(form.getValues())) {
+      if (statesRef.current[name]?.visible === true) values[name] = value;
+    }
+    return values;
+  }, [form]);
 
   const onFocusTarget = useCallback(
     (name: string, element: HTMLElement | null) =>
@@ -294,7 +313,7 @@ function FormRendererWith<TSchema extends z.ZodObject>({
         control={form.control}
         registry={registry}
         schema={definition.schema.shape[field.name] as z.ZodType}
-        getValues={form.getValues}
+        getValues={visibleValues}
         showOwnError={!isAction}
         markedBy={
           isAction && shown.error && shown.fields?.includes(field.name)
@@ -312,7 +331,9 @@ function FormRendererWith<TSchema extends z.ZodObject>({
     const element = event.currentTarget;
     const active = document.activeElement;
     restoreFocus.current =
-      active instanceof HTMLElement && element.contains(active) ? active : null;
+      lockable && active instanceof HTMLElement && element.contains(active)
+        ? active
+        : null;
     if (isAction) {
       void form.handleSubmit(
         async () => {

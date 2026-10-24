@@ -2,6 +2,12 @@
 export interface FieldOption {
   readonly value: string;
   readonly label: string;
+  /**
+   * A heading to list the option under. Options are gathered by group, groups
+   * in order of first appearance. In a windowed list the heading is shown but
+   * not announced as a group.
+   */
+  readonly group?: string;
 }
 
 export type ConditionOperator =
@@ -43,7 +49,7 @@ export interface FieldGroup {
 export interface AsyncFieldCheckContext {
   /** Aborted when the value changes, the field unmounts, or the check times out. */
   readonly signal: AbortSignal;
-  /** The form's current values, for checks that read another field. */
+  /** The current values of the visible fields, for checks that read another field. */
   readonly values: Readonly<Record<string, unknown>>;
 }
 
@@ -52,8 +58,8 @@ export interface AsyncFieldCheckContext {
  * handle taken". It runs only once the field's own schema accepts the value
  * and the value is not empty. Results for a value are remembered, and the same
  * value in flight is checked once. While typing it runs in the background and
- * the field stays editable; on submit the form locks until every check has
- * answered.
+ * the field stays editable (unless `disableWhileValidating`); on submit, a form
+ * with async fields locks until every check, and the handler, have finished.
  */
 export interface AsyncFieldValidation {
   /** Resolves to an error message, or `undefined` when the value is accepted. */
@@ -65,6 +71,18 @@ export interface AsyncFieldValidation {
   readonly debounceMs?: number;
   /** A check that takes longer fails with `messages.failed`. Defaults to 8000. */
   readonly timeoutMs?: number;
+  /**
+   * How long a refusal is remembered for the same value. A taken handle can
+   * become free, so a refusal expires; `0` never remembers one. Accepted values
+   * are remembered until the cache is full. Defaults to 30000.
+   */
+  readonly refusalTtlMs?: number;
+  /**
+   * Disable the control while a check runs, including while typing. Off by
+   * default, so a pause in typing never takes the field away; the submit-time
+   * lock is separate and always applies to a form with async fields.
+   */
+  readonly disableWhileValidating?: boolean;
   readonly messages?: {
     /** Announced while the check runs. Defaults to `Validating…`. */
     readonly validating?: string;
@@ -193,7 +211,10 @@ export interface SelectFieldConfig<
     readonly clearable?: boolean;
     /** Type to filter the options. */
     readonly searchable?: boolean;
-    /** Window the option list; applies to a searchable select. */
+    /**
+     * Window the option list. A select that sets this is searchable too: a
+     * long list needs filtering, and the plain select cannot be windowed.
+     */
     readonly virtualize?: VirtualizeOption;
   };
 }

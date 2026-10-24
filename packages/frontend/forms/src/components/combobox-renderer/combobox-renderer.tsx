@@ -22,6 +22,7 @@ import type {
   FieldRendererProps,
   VirtualizeOption,
 } from '../../types';
+import { groupOptions } from '../../utils/group-options';
 
 /** Whether an option list of `count` rows should be windowed. */
 export function shouldVirtualize(
@@ -35,13 +36,16 @@ export function shouldVirtualize(
 
 function useOptions(options: readonly FieldOption[]) {
   return useMemo(() => {
+    const { ordered, groupOf, grouped } = groupOptions(options);
     const labels = new Map(
-      options.map((option) => [option.value, option.label]),
+      ordered.map((option) => [option.value, option.label]),
     );
     return {
-      values: options.map((option) => option.value),
+      // Gathered by group, so the keyboard order is the order drawn.
+      values: ordered.map((option) => option.value),
       has: (value: string) => labels.has(value),
       label: (value: string) => labels.get(value) ?? value,
+      groupBy: grouped ? groupOf : undefined,
     };
   }, [options]);
 }
@@ -113,6 +117,7 @@ function SearchableSelect({
           <ComboboxVirtualList
             virtualizer={virtualizer}
             enabled={windowed}
+            groupBy={options.groupBy}
             aria-labelledby={`${id}-label`}
           >
             {(item: string, index: number) => (
@@ -200,6 +205,7 @@ function MultiSelect({
           <ComboboxVirtualList
             virtualizer={virtualizer}
             enabled={windowed}
+            groupBy={options.groupBy}
             aria-labelledby={`${id}-label`}
           >
             {(item: string, index: number) => (

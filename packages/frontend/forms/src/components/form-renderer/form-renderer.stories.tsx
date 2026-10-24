@@ -525,31 +525,98 @@ export const RequiredAndColour: Story = {
 };
 
 /**
- * Pressing Enter in a field submits and locks the form while the handler runs;
- * focus must come back to the field afterwards, not be left on the page.
+ * Pressing Enter in a field of a form with async checks locks the form while
+ * they run; focus must come back to the field afterwards, not be left on the
+ * page.
  */
 export const KeepsFocusAcrossASubmit: Story = {
   args: {
-    definition: signUp as never,
-    initialValues: {
-      name: 'Ada',
-      email: 'ada@example.com',
-      plan: 'free',
-      frequency: 'daily',
-    } as never,
-    onSubmit: fn(
-      () => new Promise<void>((resolve) => setTimeout(resolve, 300)),
-    ),
+    definition: profile as never,
+    initialValues: { handle: 'grace' } as never,
+    onSubmit: fn(),
   },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
-    const name = canvas.getByRole('textbox', { name: 'Name' });
-    await userEvent.click(name);
+    const handle = canvas.getByRole('textbox', { name: 'Handle' });
+    await userEvent.click(handle);
     await userEvent.keyboard('{Enter}');
-    await waitFor(() => expect(args.onSubmit).toHaveBeenCalledTimes(1));
-    await waitFor(() =>
-      expect(canvas.getByRole('button', { name: 'Save' })).toBeEnabled(),
+    await waitFor(() => expect(handle).toBeDisabled());
+    await waitFor(() => expect(args.onSubmit).toHaveBeenCalledTimes(1), {
+      timeout: 3000,
+    });
+    await waitFor(() => expect(handle).toBeEnabled());
+    await expect(handle).toHaveFocus();
+  },
+};
+
+const grouped = defineForm({
+  schema: z.object({
+    food: z.string().optional(),
+    basket: z.array(z.string()).max(3),
+    place: z.string().optional(),
+  }),
+  fields: [
+    {
+      type: 'select',
+      name: 'food',
+      label: 'Food',
+      options: [
+        { value: 'apple', label: 'Apple', group: 'Fruit' },
+        { value: 'leek', label: 'Leek', group: 'Veg' },
+        { value: 'pear', label: 'Pear', group: 'Fruit' },
+        { value: 'rice', label: 'Rice' },
+      ],
+      props: { placeholder: 'Pick a food' },
+    },
+    {
+      type: 'multiselect',
+      name: 'basket',
+      label: 'Basket',
+      options: [
+        { value: 'apple', label: 'Apple', group: 'Fruit' },
+        { value: 'leek', label: 'Leek', group: 'Veg' },
+        { value: 'pear', label: 'Pear', group: 'Fruit' },
+      ],
+      props: { placeholder: 'Add to basket', maxSelected: 3 },
+    },
+    {
+      type: 'select',
+      name: 'place',
+      label: 'Place',
+      options: Array.from({ length: 2000 }, (_, index) => ({
+        value: `p${index}`,
+        label: `Place ${index + 1}`,
+        group: `Region ${Math.floor(index / 250) + 1}`,
+      })),
+      // Windowing turns the select searchable: a long list needs filtering.
+      props: {
+        virtualize: { threshold: 100 },
+        placeholder: 'Search 2,000 places',
+      },
+    },
+  ],
+});
+
+/**
+ * Options gathered under group headings in a plain select, a multiselect, and
+ * a windowed 2,000-option list (which a `virtualize` threshold made searchable).
+ */
+export const GroupedOptions: Story = {
+  args: { definition: grouped as never, onSubmit: fn() },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('combobox', { name: 'Food' }));
+    await expect(
+      await screen.findByRole('group', { name: 'Fruit' }),
+    ).toBeVisible();
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('listbox')).toBeNull());
+
+    await userEvent.click(canvas.getByRole('combobox', { name: 'Place' }));
+    await expect((await screen.findAllByRole('option')).length).toBeLessThan(
+      60,
     );
-    await expect(name).toHaveFocus();
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('listbox')).toBeNull());
   },
 };

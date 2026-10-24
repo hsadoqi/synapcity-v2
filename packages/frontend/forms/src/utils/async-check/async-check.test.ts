@@ -140,6 +140,43 @@ describe('createAsyncChecker', () => {
     expect(check).toHaveBeenCalledTimes(3);
   });
 
+  it('forgets a refusal once its time is up but keeps an accepted value', async () => {
+    const answers = new Map([
+      ['taken', 'Taken.'],
+      ['free', undefined],
+    ]);
+    const check = vi.fn(async (value: unknown) => answers.get(String(value)));
+    const checker = createAsyncChecker({ check, refusalTtlMs: 1000 });
+
+    await checker.run('taken', {}, live());
+    await checker.run('free', {}, live());
+    await vi.advanceTimersByTimeAsync(999);
+    expect(checker.cached('taken')).toEqual({
+      status: 'invalid',
+      message: 'Taken.',
+    });
+
+    await vi.advanceTimersByTimeAsync(1);
+    expect(checker.cached('taken')).toBeUndefined();
+    expect(checker.cached('free')).toEqual({ status: 'valid' });
+
+    answers.set('taken', undefined);
+    await expect(checker.run('taken', {}, live())).resolves.toEqual({
+      status: 'valid',
+    });
+    expect(check).toHaveBeenCalledTimes(3);
+  });
+
+  it('never remembers a refusal when refusalTtlMs is 0', async () => {
+    const check = vi.fn(async () => 'Taken.');
+    const checker = createAsyncChecker({ check, refusalTtlMs: 0 });
+
+    await checker.run('x', {}, live());
+    await checker.run('x', {}, live());
+
+    expect(check).toHaveBeenCalledTimes(2);
+  });
+
   it('forgets the oldest answer once the cache is full', async () => {
     const check = vi.fn(async () => undefined);
     const checker = createAsyncChecker({ check }, { cacheSize: 2 });

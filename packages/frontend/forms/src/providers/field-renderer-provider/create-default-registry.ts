@@ -8,6 +8,7 @@ import { NumberRenderer } from '../../components/number-renderer';
 import { RadioGroupRenderer } from '../../components/radio-group-renderer';
 import { SelectRenderer } from '../../components/select-renderer';
 import { TagsRenderer } from '../../components/tags-renderer';
+import { TimeRenderer } from '../../components/time-renderer';
 import { ToggleRenderer } from '../../components/toggle-renderer';
 import { FieldRendererRegistry } from './field-renderer-registry';
 
@@ -24,7 +25,7 @@ export function createDefaultRegistry(): FieldRendererRegistry {
     .register('file', FileRenderer)
     .register('date', DatePickerRenderer)
     .register('date-range', DateRangeRenderer)
-    .register('time', InputRenderer)
+    .register('time', TimeRenderer)
     .register('datetime-local', InputRenderer)
     .register('month', InputRenderer)
     .register('week', InputRenderer)

@@ -11,5 +11,7 @@ export * from './number-renderer';
 export * from './radio-group-renderer';
 export * from './select-renderer';
 export * from './tags-renderer';
+export * from './time-renderer';
 export * from './toggle-renderer';
 export * from './form-renderer';
+export * from './entity-form-dialog';

@@ -103,4 +103,58 @@ describe('SelectRenderer', () => {
     );
     expect(screen.getByRole('combobox').tagName).toBe('INPUT');
   });
+
+  const optionsField = (
+    options: { value: string; label: string; group?: string }[],
+    extra: Record<string, unknown> = {},
+  ) =>
+    props({
+      field: { type: 'select', name: 's', label: 'S', options, props: extra },
+    });
+
+  it('lists options under a heading each when they name groups, gathered by group', async () => {
+    const trigger = show(
+      optionsField([
+        { value: 'a', label: 'Apple', group: 'Fruit' },
+        { value: 'c', label: 'Carrot', group: 'Veg' },
+        { value: 'p', label: 'Pear', group: 'Fruit' },
+      ]),
+    );
+    await act(async () => {
+      fireEvent.click(trigger);
+    });
+
+    const groups = await screen.findAllByRole('group');
+    expect(groups.map((group) => group.textContent)).toEqual([
+      'FruitApplePear',
+      'VegCarrot',
+    ]);
+  });
+
+  it('keeps a plain select for a short list even when virtualize has a threshold', () => {
+    const trigger = show(
+      optionsField([{ value: 'a', label: 'Alpha' }], {
+        virtualize: { threshold: 5 },
+      }),
+    );
+    expect(trigger.tagName).toBe('BUTTON');
+  });
+
+  it('becomes a searchable, windowed list once virtualize applies', () => {
+    const options = Array.from({ length: 6 }, (_, index) => ({
+      value: `v${index}`,
+      label: `Item ${index}`,
+    }));
+    const trigger = show(
+      optionsField(options, { virtualize: { threshold: 5 } }),
+    );
+    expect(trigger.tagName).toBe('INPUT');
+  });
+
+  it('becomes searchable for virtualize: true whatever the length', () => {
+    const trigger = show(
+      optionsField([{ value: 'a', label: 'Alpha' }], { virtualize: true }),
+    );
+    expect(trigger.tagName).toBe('INPUT');
+  });
 });

@@ -132,6 +132,103 @@ describe('FormRenderer async validation', () => {
     expect(save.disabled).toBe(false);
   });
 
+  it('disables the field while a check runs, and returns focus, only when disableWhileValidating is set', async () => {
+    vi.useFakeTimers();
+    const { definition, calls } = manual({ disableWhileValidating: true });
+    render(<FormRenderer definition={definition} onSubmit={vi.fn()} />);
+    handle().focus();
+
+    type('Handle', 'ada');
+    await wait(300);
+    expect(status()?.textContent).toBe('Validating…');
+    expect(handle().disabled).toBe(true);
+
+    await act(async () => calls[0]?.answer(undefined));
+
+    expect(handle().disabled).toBe(false);
+    expect(document.activeElement).toBe(handle());
+  });
+
+  it('gives a check only the values of visible fields', async () => {
+    const check = vi.fn(async () => undefined);
+    const definition = defineForm({
+      schema: z.object({
+        custom: z.boolean().optional(),
+        secret: z.string().optional(),
+        handle: z.string().min(3),
+      }),
+      fields: [
+        { type: 'switch', name: 'custom', label: 'Custom' },
+        {
+          type: 'text',
+          name: 'secret',
+          label: 'Secret',
+          dependencies: [
+            {
+              match: 'all',
+              effect: 'show',
+              conditions: [
+                { field: 'custom', operator: 'equals', value: true },
+              ],
+            },
+          ],
+        },
+        {
+          type: 'text',
+          name: 'handle',
+          label: 'Handle',
+          asyncValidation: { check },
+        },
+      ],
+    });
+    render(
+      <FormRenderer
+        definition={definition}
+        onSubmit={vi.fn()}
+        initialValues={{ secret: 'stale' }}
+      />,
+    );
+
+    type('Handle', 'ada');
+    await submit();
+
+    const { values } = (
+      check.mock.calls[0] as unknown as [
+        unknown,
+        { values: Record<string, unknown> },
+      ]
+    )[1];
+    expect(values).toEqual(expect.objectContaining({ handle: 'ada' }));
+    expect('secret' in values).toBe(false);
+  });
+
+  it('keeps the fields of a form without async checks editable while it submits', async () => {
+    const plain = defineForm({
+      schema: z.object({ name: z.string().min(1) }),
+      fields: [{ type: 'text', name: 'name', label: 'Name' }],
+    });
+    let finish: () => void = () => {};
+    const onSubmit = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          finish = resolve;
+        }),
+    );
+    render(<FormRenderer definition={plain} onSubmit={onSubmit} />);
+
+    type('Name', 'Ada');
+    await submit();
+
+    expect((screen.getByLabelText('Name') as HTMLInputElement).disabled).toBe(
+      false,
+    );
+    expect(
+      (screen.getByRole('button', { name: 'Save' }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+    await act(async () => finish());
+  });
+
   it('never locks the form for a submit the schema refuses', async () => {
     const { definition } = manual();
     render(<FormRenderer definition={definition} onSubmit={vi.fn()} />);

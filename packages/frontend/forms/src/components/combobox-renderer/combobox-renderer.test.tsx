@@ -243,3 +243,58 @@ describe('ComboboxRenderer, multiselect', () => {
     error.mockRestore();
   });
 });
+
+describe('ComboboxRenderer, grouped options', () => {
+  const grouped = [
+    { value: 'a', label: 'Apple', group: 'Fruit' },
+    { value: 'c', label: 'Carrot', group: 'Veg' },
+    { value: 'p', label: 'Pear', group: 'Fruit' },
+  ];
+
+  it('lists the options gathered by group, so keyboard order matches what is drawn', async () => {
+    const { input } = show(
+      props({
+        type: 'multiselect',
+        name: 'produce',
+        label: 'Produce',
+        options: grouped,
+      }),
+    );
+    openList(input);
+
+    expect(
+      (await screen.findAllByRole('option')).map((o) => o.textContent),
+    ).toEqual(['Apple', 'Pear', 'Carrot']);
+    const list = screen.getByRole('listbox');
+    expect(
+      [...list.querySelectorAll('[data-slot="combobox-label"]')].map(
+        (label) => label.textContent,
+      ),
+    ).toEqual(['Fruit', 'Veg']);
+  });
+
+  it('draws headings in a windowed list too, and picks still emit the value', async () => {
+    const p = props(
+      {
+        type: 'select',
+        name: 'produce',
+        label: 'Produce',
+        options: grouped,
+        props: { searchable: true, virtualize: true },
+      },
+      {},
+    );
+    const { input } = show(p);
+    openList(input);
+
+    fireEvent.click(await screen.findByRole('option', { name: 'Carrot' }));
+
+    expect(p.onChange).toHaveBeenCalledWith('c');
+    openList(input);
+    expect(
+      [...document.querySelectorAll('[data-slot="combobox-label"]')].map(
+        (label) => label.textContent,
+      ),
+    ).toEqual(['Fruit', 'Veg']);
+  });
+});

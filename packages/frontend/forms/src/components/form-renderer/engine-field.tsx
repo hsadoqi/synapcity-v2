@@ -1,6 +1,6 @@
 'use client';
 
-import { createElement, useCallback, useEffect } from 'react';
+import { createElement, useCallback, useEffect, useRef } from 'react';
 import { useController, type Control, type FieldValues } from 'react-hook-form';
 import type { z } from 'zod';
 
@@ -68,6 +68,7 @@ export function EngineField({
     name: field.name,
   });
   const validation = field.asyncValidation;
+  const hadFocus = useRef(false);
 
   const ready =
     validation !== undefined &&
@@ -81,9 +82,24 @@ export function EngineField({
     value: bound.value,
     ready,
     getValues,
+    onStart: () => {
+      // The control carries the field's id (a radio group holds its focused item).
+      const control = document.getElementById(id);
+      hadFocus.current =
+        control !== null && control.contains(document.activeElement);
+    },
   });
-  // A background check never takes the field away from someone typing.
   const validating = async.status === 'validating';
+  // A background check leaves the field editable unless the field asks otherwise.
+  const lockWhileValidating =
+    validating && validation?.disableWhileValidating === true;
+
+  // Disabling the control drops focus; give it back once the check is done.
+  useEffect(() => {
+    if (validating || !hadFocus.current) return;
+    hadFocus.current = false;
+    document.getElementById(id)?.focus();
+  }, [validating, id]);
 
   const { flush } = async;
   useEffect(() => {
@@ -146,7 +162,7 @@ export function EngineField({
         onChange: bound.onChange,
         onBlur: bound.onBlur,
         invalid,
-        disabled: !state.enabled || locked,
+        disabled: !state.enabled || locked || lockWhileValidating,
         required: state.required,
         describedBy,
         focusRef,

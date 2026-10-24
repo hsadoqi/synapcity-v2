@@ -3,6 +3,7 @@ import type { AsyncFieldValidation } from '../../types';
 export const ASYNC_DEFAULTS = {
   debounceMs: 400,
   timeoutMs: 8000,
+  refusalTtlMs: 30_000,
   validating: 'Validating…',
   failed: 'Could not check this. Try again.',
 } as const;
@@ -103,13 +104,22 @@ export function createAsyncChecker(
     status: 'failed',
     message: validation.messages?.failed ?? ASYNC_DEFAULTS.failed,
   };
-  const cache = new Map<string, AsyncCheckResult>();
+  const refusalTtlMs = validation.refusalTtlMs ?? ASYNC_DEFAULTS.refusalTtlMs;
+  const cache = new Map<
+    string,
+    { readonly result: AsyncCheckResult; readonly expires: number }
+  >();
   const inFlight = new Map<string, InFlight>();
 
   const remember = (key: string, result: AsyncCheckResult) => {
     if (result.status !== 'valid' && result.status !== 'invalid') return;
+    if (result.status === 'invalid' && refusalTtlMs <= 0) return;
     cache.delete(key);
-    cache.set(key, result);
+    cache.set(key, {
+      result,
+      expires:
+        result.status === 'invalid' ? Date.now() + refusalTtlMs : Infinity,
+    });
     if (cache.size > cacheSize) cache.delete(cache.keys().next().value!);
   };
 
@@ -154,16 +164,27 @@ export function createAsyncChecker(
     return { promise, controller, waiters: 0 };
   };
 
+  /** The remembered answer for a key, dropping it if a refusal has expired. */
+  const recall = (key: string): AsyncCheckResult | undefined => {
+    const entry = cache.get(key);
+    if (entry === undefined) return undefined;
+    if (entry.expires <= Date.now()) {
+      cache.delete(key);
+      return undefined;
+    }
+    return entry.result;
+  };
+
   return {
     cached(value) {
       const key = asyncCheckKey(value);
-      return key === undefined ? undefined : cache.get(key);
+      return key === undefined ? undefined : recall(key);
     },
 
     run(value, values, signal) {
       const key = asyncCheckKey(value);
       if (key !== undefined) {
-        const known = cache.get(key);
+        const known = recall(key);
         if (known) return Promise.resolve(known);
       }
       if (signal.aborted) return Promise.resolve(ABORTED);

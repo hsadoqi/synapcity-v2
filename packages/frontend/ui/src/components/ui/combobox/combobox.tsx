@@ -11,6 +11,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from '@synapcity/frontend-ui/core/input-group';
+import { buildComboboxRows } from '@synapcity/frontend-ui/lib/combobox-rows';
 import { useVirtualList } from '@synapcity/frontend-ui/hooks/use-virtual-list';
 import { CheckIcon, ChevronDownIcon, XIcon } from 'lucide-react';
 
@@ -327,16 +328,25 @@ function useComboboxVirtualizer(): ComboboxVirtualizer {
   );
 }
 
+const labelRowClass =
+  'flex min-h-7 pointer-coarse:min-h-11 items-center px-2 py-0 text-xs text-muted-foreground';
+
 /**
  * The option list, rendering only the rows in view (between two spacers) when
  * `enabled`. Rows are the root's filtered items; give each `ComboboxItem` the
  * `index` it is called with. Off, it renders every row like `ComboboxList`.
+ *
+ * `groupBy` names an option's group. Options must be gathered by group already
+ * (so the root's keyboard order matches what is drawn); a heading row, the
+ * height of an option, is drawn before each group. When windowed the heading
+ * is shown but not announced as a group; unwindowed, it is a real group.
  */
 function ComboboxVirtualList<Item>({
   virtualizer,
   enabled = true,
   estimateRowHeight,
   overscan,
+  groupBy,
   children,
   ...props
 }: Omit<ComboboxPrimitive.List.Props, 'children'> & {
@@ -344,24 +354,38 @@ function ComboboxVirtualList<Item>({
   enabled?: boolean;
   estimateRowHeight?: number;
   overscan?: number;
+  groupBy?: (item: Item) => string | undefined;
   children: (item: Item, index: number) => React.ReactNode;
 }) {
   const items = ComboboxPrimitive.useFilteredItems<Item>();
   const list = React.useRef<HTMLDivElement | null>(null);
+  const { rows, rowOfItem } = React.useMemo(
+    () => buildComboboxRows(items, groupBy),
+    [items, groupBy],
+  );
   const virtual = useVirtualList({
-    count: items.length,
+    count: rows.length,
     enabled,
     estimateRowHeight,
     overscan,
   });
   const { viewportRef, measureRow, scrollToIndex, range } = virtual;
 
-  React.useEffect(() => {
-    virtualizer.register(scrollToIndex);
-    return () => virtualizer.register(null);
-  }, [virtualizer, scrollToIndex]);
+  // Keyboard navigation speaks in option indexes; scrolling in rows.
+  const scrollToItem = React.useCallback(
+    (index: number) => {
+      const row = rowOfItem[index];
+      if (row !== undefined) scrollToIndex(row);
+    },
+    [rowOfItem, scrollToIndex],
+  );
 
-  // Rows are one height; measure a rendered one in place of the estimate.
+  React.useEffect(() => {
+    virtualizer.register(scrollToItem);
+    return () => virtualizer.register(null);
+  }, [virtualizer, scrollToItem]);
+
+  // Rows are one height; measure a rendered option in place of the estimate.
   React.useEffect(() => {
     measureRow(
       list.current?.querySelector<HTMLElement>('[data-slot="combobox-item"]') ??
@@ -377,12 +401,55 @@ function ComboboxVirtualList<Item>({
     [viewportRef],
   );
 
-  const rows: React.ReactNode[] = [];
-  for (let index = range.start; index < range.end; index += 1) {
-    rows.push(
-      <React.Fragment key={index}>
-        {children(items[index] as Item, index)}
-      </React.Fragment>,
+  const drawn = rows.slice(range.start, range.end);
+  let body: React.ReactNode;
+  if (!enabled && drawn.some((row) => row.kind === 'label')) {
+    // Unwindowed and grouped: real groups, each named by its heading.
+    type Group = { label: string; key: string; rows: typeof drawn };
+    const groups: Group[] = [];
+    let current: Group | undefined;
+    for (const row of drawn) {
+      if (row.kind === 'label') {
+        current = { label: row.label, key: row.key, rows: [] };
+        groups.push(current);
+      } else {
+        if (current === undefined) {
+          current = { label: '', key: 'ungrouped', rows: [] };
+          groups.push(current);
+        }
+        current.rows.push(row);
+      }
+    }
+    body = groups.map((group) => (
+      <ComboboxGroup key={group.key}>
+        {group.label ? (
+          <ComboboxLabel className={labelRowClass}>{group.label}</ComboboxLabel>
+        ) : null}
+        {group.rows.map((row) =>
+          row.kind === 'item' ? (
+            <React.Fragment key={row.key}>
+              {children(row.item, row.index)}
+            </React.Fragment>
+          ) : null,
+        )}
+      </ComboboxGroup>
+    ));
+  } else {
+    body = drawn.map((row) =>
+      row.kind === 'label' ? (
+        <div
+          key={row.key}
+          role="presentation"
+          data-slot="combobox-label"
+          className={labelRowClass}
+        >
+          {row.label}
+        </div>
+      ) : (
+        <React.Fragment key={row.key}>
+          {children(row.item, row.index)}
+        </React.Fragment>
+      ),
     );
   }
 
@@ -391,7 +458,7 @@ function ComboboxVirtualList<Item>({
       {virtual.paddingTop > 0 ? (
         <div aria-hidden style={{ height: virtual.paddingTop }} />
       ) : null}
-      {rows}
+      {body}
       {virtual.paddingBottom > 0 ? (
         <div aria-hidden style={{ height: virtual.paddingBottom }} />
       ) : null}
