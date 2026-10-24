@@ -464,6 +464,7 @@ export const ListFields: Story = {
       await screen.findByRole('option', { name: 'Design' }),
     );
     await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('listbox')).toBeNull());
     await userEvent.type(
       canvas.getByRole('textbox', { name: 'Topics' }),
       'roadmap{Enter}',
@@ -473,6 +474,7 @@ export const ListFields: Story = {
     const rendered = await screen.findAllByRole('option');
     await expect(rendered.length).toBeLessThan(60);
     await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('listbox')).toBeNull());
 
     await userEvent.click(canvas.getByRole('button', { name: 'Save' }));
     await waitFor(() =>
@@ -480,6 +482,8 @@ export const ListFields: Story = {
         expect.objectContaining({ skills: ['design'], topics: ['roadmap'] }),
       ),
     );
+    // Checked at rest, once every option list has finished closing.
+    await waitFor(() => expect(screen.queryByRole('listbox')).toBeNull());
   },
 };
 
