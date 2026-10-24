@@ -62,6 +62,20 @@ describe('TagsInput', () => {
     expect(screen.getByRole('status').textContent).toBe('Added design');
   });
 
+  it('does not add a tag on the Enter that confirms an IME composition', () => {
+    const onValueChange = vi.fn();
+    render(<TagsInput aria-label="Topics" onValueChange={onValueChange} />);
+
+    type('にほん');
+    fireEvent.keyDown(field(), { key: 'Enter', isComposing: true });
+
+    expect(onValueChange).not.toHaveBeenCalled();
+    expect(field()).toHaveProperty('value', 'にほん');
+
+    fireEvent.keyDown(field(), { key: 'Enter' });
+    expect(onValueChange).toHaveBeenLastCalledWith(['にほん']);
+  });
+
   it('adds a tag when a comma is typed', () => {
     render(<TagsInput aria-label="Topics" />);
 

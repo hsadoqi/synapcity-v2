@@ -579,3 +579,48 @@ describe('FormRenderer list and range fields', () => {
     expect(data.get('trip.to')).toBe('2026-01-05');
   });
 });
+
+describe('FormRenderer focus requests', () => {
+  const definition = defineForm({
+    schema: z.object({
+      frozen: z.boolean().optional(),
+      note: z.string().min(1, 'Enter a note.'),
+    }),
+    fields: [
+      { type: 'switch', name: 'frozen', label: 'Frozen' },
+      {
+        type: 'text',
+        name: 'note',
+        label: 'Note',
+        dependencies: [
+          {
+            match: 'all',
+            effect: 'disable',
+            conditions: [{ field: 'frozen', operator: 'equals', value: true }],
+          },
+        ],
+      },
+    ],
+  });
+
+  it('does not steal focus later for a field that was disabled when its error came up', async () => {
+    render(
+      <FormRenderer
+        definition={definition}
+        onSubmit={vi.fn()}
+        initialValues={{ frozen: true }}
+      />,
+    );
+    await submit();
+    expect(screen.getByText('Enter a note.')).toBeTruthy();
+
+    const toggle = screen.getByRole('switch', { name: 'Frozen' });
+    toggle.focus();
+    await act(async () => fireEvent.click(toggle));
+
+    expect((screen.getByLabelText('Note') as HTMLInputElement).disabled).toBe(
+      false,
+    );
+    expect(document.activeElement).toBe(toggle);
+  });
+});

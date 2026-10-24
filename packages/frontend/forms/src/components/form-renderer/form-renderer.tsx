@@ -132,6 +132,11 @@ function FormRendererWith<TSchema extends z.ZodObject>({
   const [checking, setChecking] = useState(false);
   const [refusal, setRefusal] = useState<ActionFormRefusal>();
   const isAction = props.action !== undefined;
+  // Fields lock only for a submit that passed the schema (and while a server
+  // action runs), never while typing.
+  const locked = checking || (isAction && props.pending === true);
+  /** Where focus was when a locking submit started, so it can come back. */
+  const restoreFocus = useRef<HTMLElement | null>(null);
 
   const groupById = useMemo(
     () => new Map(definition.groups.map((group) => [group.id, group])),
@@ -177,10 +182,31 @@ function FormRendererWith<TSchema extends z.ZodObject>({
       pendingFocus.current = undefined;
       return;
     }
-    if ((target as HTMLInputElement).disabled === true) return;
+    // A locked form unlocks soon, so wait; a field that is disabled for any
+    // other reason cannot take focus, and must not be handed it much later.
+    if ((target as HTMLInputElement).disabled === true) {
+      if (!locked) pendingFocus.current = undefined;
+      return;
+    }
     pendingFocus.current = undefined;
     target.focus();
   });
+
+  // Disabling a focused control drops focus; give it back once the form unlocks,
+  // unless a refused submit has already moved focus to a field.
+  useEffect(() => {
+    if (locked) return;
+    const target = restoreFocus.current;
+    restoreFocus.current = null;
+    const active = document.activeElement;
+    if (
+      target?.isConnected &&
+      pendingFocus.current === undefined &&
+      (active === null || active === document.body)
+    ) {
+      target.focus();
+    }
+  }, [locked]);
 
   /** Unfolds every group holding one of these fields, then focuses the first. */
   const revealAndFocus = (names: readonly string[]) => {
@@ -247,9 +273,6 @@ function FormRendererWith<TSchema extends z.ZodObject>({
   const pending = isAction
     ? props.pending === true
     : form.formState.isSubmitting;
-  // Fields lock only for a submit that passed the schema (and while a server
-  // action runs), never while typing.
-  const locked = checking || (isAction && props.pending === true);
 
   // A server refusal names fields; their groups stay unfolded while it is shown.
   const forcedOpen = new Set(
@@ -287,6 +310,9 @@ function FormRendererWith<TSchema extends z.ZodObject>({
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     const element = event.currentTarget;
+    const active = document.activeElement;
+    restoreFocus.current =
+      active instanceof HTMLElement && element.contains(active) ? active : null;
     if (isAction) {
       void form.handleSubmit(
         async () => {

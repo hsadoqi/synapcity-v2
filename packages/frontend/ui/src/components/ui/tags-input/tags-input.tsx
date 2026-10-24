@@ -192,6 +192,8 @@ function TagsInput({
         onKeyDown={(event) => {
           onKeyDown?.(event);
           if (event.defaultPrevented) return;
+          // The Enter that confirms an IME composition belongs to the IME.
+          if (event.nativeEvent.isComposing) return;
           if (event.key === 'Enter' && draft.trim().length > 0) {
             // Enter in an empty input still submits the form.
             event.preventDefault();

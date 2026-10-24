@@ -523,3 +523,33 @@ export const RequiredAndColour: Story = {
     await expect(canvas.getByText('None chosen')).toBeVisible();
   },
 };
+
+/**
+ * Pressing Enter in a field submits and locks the form while the handler runs;
+ * focus must come back to the field afterwards, not be left on the page.
+ */
+export const KeepsFocusAcrossASubmit: Story = {
+  args: {
+    definition: signUp as never,
+    initialValues: {
+      name: 'Ada',
+      email: 'ada@example.com',
+      plan: 'free',
+      frequency: 'daily',
+    } as never,
+    onSubmit: fn(
+      () => new Promise<void>((resolve) => setTimeout(resolve, 300)),
+    ),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const name = canvas.getByRole('textbox', { name: 'Name' });
+    await userEvent.click(name);
+    await userEvent.keyboard('{Enter}');
+    await waitFor(() => expect(args.onSubmit).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(canvas.getByRole('button', { name: 'Save' })).toBeEnabled(),
+    );
+    await expect(name).toHaveFocus();
+  },
+};
