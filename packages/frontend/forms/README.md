@@ -10,11 +10,13 @@ History: created by Task 1 of the engine plan, ahead of extraction Part A, with 
 
 `@synapcity/frontend-forms` (root entry):
 
-| Export                                             | Meaning                                                                                                                                                                            |
-| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `defineForm`, `FormDefinitionError`                | Checks a definition when it is written and throws one error listing every problem. Call it at module scope so a broken definition fails in a test or build, never while rendering. |
-| `describeSchemaField`                              | Describes one key of an object schema: its kind, whether it accepts `undefined` or `null`, an email format, enum values.                                                           |
-| `FieldConfig` and its parts, `FormDefinition`, ... | The types: the field union, conditions and dependencies, groups, cross-field rules, field state, and the issues `defineForm` reports.                                              |
+| Export                                             | Meaning                                                                                                                                                                                              |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `defineForm`, `FormDefinitionError`                | Checks a definition when it is written and throws one error listing every problem. Call it at module scope so a broken definition fails in a test or build, never while rendering.                   |
+| `describeSchemaField`                              | Describes one key of an object schema: its kind, whether it accepts `undefined` or `null`, an email format, enum values.                                                                             |
+| `resolveFieldStates`, `isEmptyValue`               | Works out whether each field is visible, enabled and required for the current values, in dependency order; a hidden field reads as empty to its dependents. `0` and `false` are values, never empty. |
+| `buildSchema`, `createSchemaBuilder`               | The caller's schema narrowed to the visible fields, with `require` dependencies and cross-field rules applied. The builder caches by which fields are visible and required.                          |
+| `FieldConfig` and its parts, `FormDefinition`, ... | The types: the field union, conditions and dependencies, groups, cross-field rules, field state, and the issues `defineForm` reports.                                                                |
 
 ## Rules
 
@@ -22,6 +24,8 @@ History: created by Task 1 of the engine plan, ahead of extraction Part A, with 
 - `types/` and the pure `utils/` units import neither React nor React Hook Form, so they can move to a domain package if a server consumer appears.
 - A field carries no schema: the caller's schema owns validation. `defineForm` rejects a schema with object-level refinements, because Zod 4.6.7 cannot narrow one; cross-field checks are passed as `rules`.
 - Field names must be schema keys and must not be `type`, `root`, `ref`, `types`, `message` or `form`, which collide with React Hook Form's internal error shapes.
+- The narrowed schema is built from `schema.shape`, never `.pick()`, which throws on a refined schema in Zod 4.6.7. A field required by a `require` dependency starts from `unknown`, because Zod does not validate an optional key that is absent from the input.
+- A key that is nullable but not optional fails when it is absent, so the form must start it as `null`. A cross-field rule runs alongside ordinary field issues, but Zod skips it when a type error exists elsewhere in the object.
 - Errors and messages name fields and types, never values.
 
 ## Scripts
