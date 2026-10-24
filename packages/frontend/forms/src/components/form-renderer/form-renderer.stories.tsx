@@ -346,9 +346,10 @@ export const Groups: Story = {
     await expect(toggle).toHaveAttribute('aria-expanded', 'false');
     await userEvent.click(toggle);
     await expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    await expect(
-      canvas.getByRole('switch', { name: 'Audit log' }),
-    ).toBeVisible();
+    // The panel fades in; wait for it rather than catching it mid-transition.
+    await waitFor(() =>
+      expect(canvas.getByRole('switch', { name: 'Audit log' })).toBeVisible(),
+    );
   },
 };
 
@@ -376,9 +377,9 @@ export const FoldedGroupWithError: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole('button', { name: 'Save' }));
-    await expect(
-      await canvas.findByText('Enter a phone number.'),
-    ).toBeVisible();
+    await waitFor(() =>
+      expect(canvas.getByText('Enter a phone number.')).toBeVisible(),
+    );
     await waitFor(() =>
       expect(canvas.getByRole('textbox', { name: 'Phone' })).toHaveFocus(),
     );

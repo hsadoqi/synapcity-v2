@@ -110,7 +110,11 @@ function SearchableSelect({
         />
         <ComboboxContent>
           <ComboboxEmpty>{NO_MATCHES}</ComboboxEmpty>
-          <ComboboxVirtualList virtualizer={virtualizer} enabled={windowed}>
+          <ComboboxVirtualList
+            virtualizer={virtualizer}
+            enabled={windowed}
+            aria-labelledby={`${id}-label`}
+          >
             {(item: string, index: number) => (
               <ComboboxItem key={item} value={item} index={index}>
                 {options.label(item)}
@@ -193,7 +197,11 @@ function MultiSelect({
         </ComboboxChips>
         <ComboboxContent anchor={anchor}>
           <ComboboxEmpty>{NO_MATCHES}</ComboboxEmpty>
-          <ComboboxVirtualList virtualizer={virtualizer} enabled={windowed}>
+          <ComboboxVirtualList
+            virtualizer={virtualizer}
+            enabled={windowed}
+            aria-labelledby={`${id}-label`}
+          >
             {(item: string, index: number) => (
               <ComboboxItem
                 key={item}
