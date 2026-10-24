@@ -10,8 +10,8 @@ import {
   applyAppearance,
   PREFERENCES_SAVED_EVENT,
   PREFERENCES_STORAGE_KEY,
-} from '../../shared/appearance-attributes';
-import { applyFontPreferences } from '../../shared/font-preferences';
+} from '@synapcity/frontend-preferences';
+import { applyFontPreferences } from '@synapcity/frontend-preferences';
 import { pageLanguage } from '@synapcity/domain-preferences';
 import { settingsDefaults, type Settings } from '@synapcity/domain-preferences';
 

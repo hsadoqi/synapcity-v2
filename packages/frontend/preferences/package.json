@@ -1,0 +1,32 @@
+{
+  "name": "@synapcity/frontend-preferences",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint . --cache --cache-strategy content --max-warnings 0",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest run --watch",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@synapcity/domain-preferences": "workspace:*",
+    "react": "19.3.0"
+  },
+  "devDependencies": {
+    "@synapcity/dev-eslint-config": "workspace:*",
+    "@synapcity/dev-typescript-config": "workspace:*",
+    "@synapcity/dev-vitest-config": "workspace:*",
+    "@types/node": "26.6.5",
+    "@types/react": "19.3.0",
+    "@vitest/coverage-v8": "4.1.12",
+    "eslint": "10.9.1",
+    "jsdom": "30.1.2",
+    "typescript": "7.0.2",
+    "vitest": "4.1.12"
+  }
+}

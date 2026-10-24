@@ -4,11 +4,11 @@ import { useId } from 'react';
 import { PanelLeft, FileText, Plus, ArrowUpRight, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePrefersDark } from '../../../hooks/use-prefers-dark';
-import { previewFontStyle } from '../../../shared/font-preferences';
+import { previewFontStyle } from '@synapcity/frontend-preferences';
 import {
   previewShapeAttributes,
   previewTextScaleStyle,
-} from '../../../shared/theme-shape';
+} from '@synapcity/frontend-preferences';
 import { usePreviewFont } from '../../../hooks/use-preview-font';
 import type { ThemeSettings } from '@synapcity/domain-preferences';
 

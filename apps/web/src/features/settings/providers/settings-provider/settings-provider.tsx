@@ -29,8 +29,8 @@ import {
   touchesAccount,
   type DisplaySettings,
 } from '@synapcity/domain-preferences';
-import { applyFontPreferences } from '../../shared/font-preferences';
-import { applyThemeShape } from '../../shared/theme-shape';
+import { applyFontPreferences } from '@synapcity/frontend-preferences';
+import { applyThemeShape } from '@synapcity/frontend-preferences';
 import { settingsDefaults } from '@synapcity/domain-preferences';
 import type { Settings, SettingsPatch } from '@synapcity/domain-preferences';
 import { themeSchema } from '@synapcity/domain-preferences';
@@ -39,7 +39,7 @@ import {
   applyAppearance,
   PREFERENCES_SAVED_EVENT,
   PREFERENCES_STORAGE_KEY,
-} from '../../shared/appearance-attributes';
+} from '@synapcity/frontend-preferences';
 
 const STORAGE_KEY = PREFERENCES_STORAGE_KEY;
 

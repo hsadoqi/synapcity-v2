@@ -1,8 +1,8 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { previewFontValue } from '../../../shared/font-preferences';
-import { fontPreferenceVariables } from '../../../shared/font-preferences';
+import { previewFontValue } from '@synapcity/frontend-preferences';
+import { fontPreferenceVariables } from '@synapcity/frontend-preferences';
 import {
   googleFonts,
   type FontChoice,

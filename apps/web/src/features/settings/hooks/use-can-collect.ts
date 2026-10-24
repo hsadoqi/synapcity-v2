@@ -5,7 +5,7 @@ import { parseImport } from '@synapcity/domain-preferences';
 import {
   PREFERENCES_SAVED_EVENT,
   PREFERENCES_STORAGE_KEY,
-} from '../shared/appearance-attributes';
+} from '@synapcity/frontend-preferences';
 import { canCollect } from '@synapcity/domain-preferences';
 import type { PrivacyPurpose } from '@synapcity/domain-preferences';
 import { useGlobalPrivacyControl } from './use-global-privacy-control';

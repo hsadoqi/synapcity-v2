@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { type FontChoice } from '@synapcity/domain-preferences';
-import { loadFont } from '../shared/font-preferences';
+import { loadFont } from '@synapcity/frontend-preferences';
 
 /**
  * Fetches the family a preview shows, once, without applying it to the page,

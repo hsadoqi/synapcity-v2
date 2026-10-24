@@ -1,8 +1,8 @@
 import { screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { PREFERENCES_STORAGE_KEY } from '../../../shared/appearance-attributes';
-import { fontBootScript } from '../../../shared/font-preferences';
+import { PREFERENCES_STORAGE_KEY } from '@synapcity/frontend-preferences';
+import { fontBootScript } from '@synapcity/frontend-preferences';
 import { renderWithSettings, stubBrowser } from '../../../test-harness';
 
 beforeEach(stubBrowser);

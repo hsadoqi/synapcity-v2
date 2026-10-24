@@ -2,7 +2,7 @@ import { Button } from '@synapcity/frontend-ui/core/button';
 import { Mode } from '@synapcity/frontend-ui/providers/mode-provider';
 import { SettingRow } from '../../../shared/setting-row/setting-row';
 import { SettingsSelect } from '../../../shared/settings-select/settings-select';
-import { previewTextScaleStyle } from '../../../shared/theme-shape';
+import { previewTextScaleStyle } from '@synapcity/frontend-preferences';
 import {
   textSizeRange,
   type ThemeSettings,
