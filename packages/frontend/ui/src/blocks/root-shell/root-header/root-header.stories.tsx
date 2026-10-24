@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { RootHeader } from '@synapcity/frontend-ui/blocks/root-shell/root-header';
 import { AuthButtons } from '@synapcity/frontend-ui/components/auth-buttons';
 import { UserMenu } from '@synapcity/frontend-ui/components/user-menu';
-import { ModeProvider } from '@synapcity/frontend-ui/providers/mode-provider';
+import { ModeProvider } from '@synapcity/frontend-preferences';
 import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
 import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
 

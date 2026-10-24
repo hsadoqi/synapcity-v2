@@ -2,8 +2,8 @@
 
 import * as React from 'react';
 import { Moon, Sun } from 'lucide-react';
-import type { Mode } from '@synapcity/frontend-ui/providers/mode-provider';
-import { useMode } from '@synapcity/frontend-ui/providers/mode-provider';
+import type { Mode } from '@synapcity/frontend-preferences';
+import { useMode } from '@synapcity/frontend-preferences';
 import {
   DropdownMenu,
   DropdownMenuContent,

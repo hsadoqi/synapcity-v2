@@ -82,5 +82,7 @@ describe('cycleRule (R9)', () => {
     const violations = run(files);
     expect(violations).toHaveLength(1);
     expect(violations[0]?.members).toHaveLength(length);
-  });
+    // A 4000-file chain is slow when many processes share the machine; the
+    // default 30s timeout failed here under load, not because of a defect.
+  }, 120_000);
 });

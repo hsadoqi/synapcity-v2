@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
 import '../styles/globals.css';
 import { fontVariables } from './fonts';
 import RootProviders from '../components/providers/root-providers';
@@ -7,14 +8,27 @@ import { BreadcrumbRootShell } from '@/components/breadcrumbs';
 import { createMetadata } from '@synapcity/frontend-site/metadata';
 import { UserProvider } from '@/features/auth/client';
 import { getCurrentUser } from '@/features/auth/server';
-import { appearanceBootScript } from '@/features/settings/shared/appearance-attributes';
-import { fontBootScript } from '@/features/settings/shared/font-preferences';
-import { themeShapeBootScript } from '@/features/settings/shared/theme-shape';
-import { AccountPreferencesSync } from '@/features/settings/components/account-preferences-sync';
+import {
+  appearanceBootScript,
+  fontBootScript,
+  modeBootScript,
+  themeShapeBootScript,
+  lookHtmlAttributes,
+} from '@synapcity/frontend-preferences';
+import { AccountPreferencesSync } from '@synapcity/features-settings/frontend';
 import { getAccountPreferences } from '@/features/settings/server/account-preferences';
-import { pageLanguage } from '@/features/settings/types/regional';
+import {
+  LOOK_COOKIE_NAME,
+  lookWithAccount,
+  pageLanguage,
+  parseLookCookieValue,
+} from '@synapcity/domain-preferences';
 import { accountLinksFor } from '@/lib/routing/user-paths';
+import { cn } from '@/lib/utils';
+
 export const metadata: Metadata = createMetadata({
+  title: 'Synapcity',
+  description: 'A connected workspace for thinking, planning, and doing.',
   siteUrl: process.env.SITE_URL,
 });
 
@@ -24,17 +38,26 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await getCurrentUser();
+  const requestLook = parseLookCookieValue(
+    (await cookies()).get(LOOK_COOKIE_NAME)?.value,
+  );
   // ADR-0010: the account's preferences follow the person to every page, not
   // only the settings page. A failed read leaves this browser's own copy.
   const stored = user ? await getAccountPreferences(user.id) : undefined;
   const account = stored?.preferences ?? null;
+  const look = lookWithAccount(requestLook, account);
+  const lookAttributes = look ? lookHtmlAttributes(look) : undefined;
   return (
     <html
       lang={pageLanguage(account?.regional.language ?? 'en')}
-      className={fontVariables}
+      {...lookAttributes}
+      className={cn(fontVariables, lookAttributes?.className)}
+      style={lookAttributes?.style}
       suppressHydrationWarning
     >
       <head>
+        {/* Applies the mode chosen on any host before first paint, ahead of next-themes. */}
+        <script dangerouslySetInnerHTML={{ __html: modeBootScript }} />
         {/* Applies saved contrast and motion before first paint. */}
         <script dangerouslySetInnerHTML={{ __html: appearanceBootScript }} />
         {/* Applies saved font choices, and fetches only those, before first paint. */}

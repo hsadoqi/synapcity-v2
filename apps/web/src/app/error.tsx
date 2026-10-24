@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { reportCaughtError } from '@/features/error-reports/client';
+import { reportCaughtError } from '@synapcity/frontend-error-reports';
 import { Button } from '@synapcity/frontend-ui/core/button';
 import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 

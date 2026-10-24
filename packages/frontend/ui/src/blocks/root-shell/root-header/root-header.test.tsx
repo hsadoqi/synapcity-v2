@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { ModeProvider } from '@synapcity/frontend-ui/providers/mode-provider';
+import { ModeProvider } from '@synapcity/frontend-preferences';
 import {
   RootHeader,
   RootHeaderContent,

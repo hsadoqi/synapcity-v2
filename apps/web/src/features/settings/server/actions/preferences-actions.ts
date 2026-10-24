@@ -7,9 +7,10 @@ import {
 } from '@/features/account/server/caller';
 import { createClient } from '@/lib/supabase/server';
 import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
-import type { SavePreferencesResult } from '../../lib/account-sync';
-import { accountPreferencesSchema } from '../../lib/scope';
-import { isSupportedTimezone } from '../../types/regional';
+import type { SavePreferencesResult } from '@synapcity/features-settings/contracts';
+import { accountPreferencesSchema } from '@synapcity/domain-preferences';
+import { isSupportedTimezone } from '@synapcity/domain-preferences';
+import { writeAccountPreferenceRow } from '@synapcity/server-account';
 
 const INVALID = 'Preferences could not be saved. Check the selected values.';
 
@@ -39,22 +40,14 @@ export async function saveAccountPreferences(
     return { ok: false, error: found.failure, signedOut: found.signedOut };
   }
 
-  // `select` returns the written row: an upsert that RLS turns away writes
-  // nothing, and that must not look saved.
-  const { data, error } = await supabase
-    .from('user_preferences')
-    .upsert(
-      {
-        user_id: found.identity.userId,
-        preferences: parsed.data,
-        schema_version: 1,
-        ...(timezone && { device_timezone: timezone }),
-      },
-      { onConflict: 'user_id' },
-    )
-    .select('user_id');
-  if (error || !data?.length) {
-    logFailure('saveAccountPreferences', error ?? { code: 'row_not_written' });
+  const result = await writeAccountPreferenceRow(
+    supabase,
+    found.identity.userId,
+    parsed.data,
+    timezone,
+  );
+  if (!result.ok) {
+    logFailure('saveAccountPreferences', result.failure);
     return { ok: false, error: SAVE_FAILED };
   }
   return { ok: true };

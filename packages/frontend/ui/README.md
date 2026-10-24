@@ -14,10 +14,8 @@ It owns no theme tokens. Tokens live in `@synapcity/frontend-tailwind-config` ([
 | `@synapcity/frontend-ui/components/<name>` | A Synapcity component, for example `.../components/section-heading`                                                                      |
 | `@synapcity/frontend-ui/next/<name>`       | A component that needs Next.js, for example `.../next/link-button` (the only place in this package that imports `next`)                  |
 | `@synapcity/frontend-ui/blocks/<name>`     | A larger composition, for example `.../blocks/root-shell`                                                                                |
-| `@synapcity/frontend-ui/providers/<name>`  | A context provider, for example `.../providers/mode-provider`                                                                            |
 | `@synapcity/frontend-ui/lib/<name>`        | Helpers: `utils` (`cn`, [ADR-0004](../../../docs/architecture/decisions/0004-class-merging-with-cn.md)), `account-links`, `sidebar-data` |
 | `@synapcity/frontend-ui/hooks/<name>`      | Hooks, for example `use-mobile`                                                                                                          |
-| `@synapcity/frontend-ui/utils/<name>`      | Pure utilities, for example `theme`                                                                                                      |
 | `@synapcity/frontend-ui/components`        | A barrel of every `core` and `components` export                                                                                         |
 | `@synapcity/frontend-ui/blocks`            | A barrel of every block                                                                                                                  |
 | `@synapcity/frontend-ui/styles.css`        | The shared theme, imported once by each app                                                                                              |
@@ -34,7 +32,7 @@ src/components/section-heading/
   index.ts                     the folder's public surface: re-exports from ./section-heading
 ```
 
-- `components/ui/<name>/` holds shadcn components (`core/<name>`), `components/<name>/` the Synapcity ones, `blocks/<name>/` compositions and `providers/<name>/` providers. A block's sub-components are nested folders (`blocks/root-shell/root-header/`).
+- `components/ui/<name>/` holds shadcn components (`core/<name>`), `components/<name>/` the Synapcity ones, and `blocks/<name>/` compositions. A block's sub-components are nested folders (`blocks/root-shell/root-header/`).
 - The `exports` map in `package.json` resolves each wildcard entry to `<folder>/index.ts`, so an import names the folder, never a file.
 - Code reaches any other folder through `@synapcity/frontend-ui/*`, including in stories and tests. A relative import may only name a file in the same folder (`./entity-icons`), such as an `index.ts` re-exporting its component or a component using a private helper beside it; never `../` or a path into a subfolder.
 - `src/package-structure.test.ts` enforces all of this: each folder has its component, index, stories and tests; relative imports only to same-folder files; every specifier and `exports` entry resolves.

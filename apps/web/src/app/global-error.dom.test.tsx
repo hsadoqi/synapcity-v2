@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 // The font loaders only run inside Next's build; here they are replaced.
 vi.mock('./fonts', () => ({ fontVariables: 'font-inter-var' }));
 const reportCaughtError = vi.hoisted(() => vi.fn());
-vi.mock('@/features/error-reports/client', () => ({ reportCaughtError }));
+vi.mock('@synapcity/frontend-error-reports', () => ({ reportCaughtError }));
 
 import GlobalError from './global-error';
 

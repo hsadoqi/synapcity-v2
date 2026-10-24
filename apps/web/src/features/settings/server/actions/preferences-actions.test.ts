@@ -17,8 +17,8 @@ vi.mock('@/lib/supabase/server', () => ({
 }));
 
 import { saveAccountPreferences } from './preferences-actions';
-import { accountPart } from '../../lib/scope';
-import { settingsDefaults } from '../../types/settings';
+import { accountPart } from '@synapcity/domain-preferences';
+import { settingsDefaults } from '@synapcity/domain-preferences';
 
 const preferences = accountPart({
   ...settingsDefaults,

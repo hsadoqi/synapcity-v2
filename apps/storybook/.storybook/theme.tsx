@@ -1,5 +1,5 @@
 import { create } from 'storybook/theming';
-import type { ResolvedMode } from '@synapcity/frontend-ui/providers/mode-provider';
+import type { ResolvedMode } from '@synapcity/frontend-preferences';
 
 /*
  * Storybook's manager (sidebar, toolbar, panels) is a separate page that never loads our
