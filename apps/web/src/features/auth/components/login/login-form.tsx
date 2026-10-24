@@ -2,7 +2,7 @@
 
 import { useActionState, useId } from 'react';
 import { Button } from '@synapcity/frontend-ui/core/button';
-import { LinkButton } from '@synapcity/frontend-ui/components/link-button';
+import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 
 import { signInWithPassword } from '@/features/auth/server/actions/actions';
 import type { AuthState } from '@/features/auth/types';
