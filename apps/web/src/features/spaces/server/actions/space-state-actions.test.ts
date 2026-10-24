@@ -1,3 +1,4 @@
+import { AuthRetryableFetchError } from '@supabase/supabase-js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
@@ -157,6 +158,46 @@ describe('recordSpaceView', () => {
 
     await recordSpaceView(ID);
 
+    expect(mocks.update).not.toHaveBeenCalled();
+  });
+});
+
+describe('setSpacePinned caller identity', () => {
+  it('tells the caller to try again when the provider is unreachable', async () => {
+    mocks.getUser.mockResolvedValue({
+      data: { user: null },
+      error: new AuthRetryableFetchError('fetch failed', 0),
+    });
+
+    await expect(setSpacePinned(ID, true)).resolves.toEqual({
+      ok: false,
+      error: 'Could not save your changes. Try again.',
+    });
+    expect(mocks.update).not.toHaveBeenCalled();
+  });
+
+  it('asks a signed-out caller to sign in again and logs it by code only', async () => {
+    mocks.getUser.mockResolvedValue({ data: { user: null }, error: null });
+
+    await expect(setSpacePinned(ID, true)).resolves.toEqual({
+      ok: false,
+      error: 'Sign in again to update your profile.',
+      signedOut: true,
+    });
+    expect(console.warn).toHaveBeenCalledWith('getCallerIdentity failed', {
+      code: undefined,
+      status: undefined,
+    });
+    expect(mocks.update).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['unreachable', new AuthRetryableFetchError('fetch failed', 0)],
+    ['signed out', null],
+  ])('records no view when the provider says %s', async (_case, error) => {
+    mocks.getUser.mockResolvedValue({ data: { user: null }, error });
+
+    await expect(recordSpaceView(ID)).resolves.toBeUndefined();
     expect(mocks.update).not.toHaveBeenCalled();
   });
 });
