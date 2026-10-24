@@ -156,7 +156,7 @@ Proposed: none. If the collection move is split across commits, a temporary re-e
 ## 8. Order of work (proposed sub-milestones, one PR each, Q1)
 
 1. **M5.1 Contracts.** `domain-records` (base, spaces); switch Space schema/type importers; Q3 re-base of `owned-records`; remove `frontend-ui` entity schema. `dev-fixtures` Space factories arrive with the first moved tests that use them (M5.2 or M5.4), so no factory ships unused.
-2. **M5.2 Server.** `SupabaseServerClient` export; `server-data/spaces`; host fixture source; repository, actions and API routes rewired; tests.
+2. **M5.2 Server** ([plan](../plans/2026-10-24-m5-2-server-data.md); it also carries the Q4 loader change, as `get-space` is rewired there). `SupabaseServerClient` export; `server-data/spaces`; host fixture source; repository, actions and API routes rewired; tests.
 3. **M5.3 Collection.** `frontend-collection` with unit folders, stories and the link capability; `frontend-ui/next` for `link-button`; Storybook glob; documents/dashboards/home re-pointed; exceptions removed.
 4. **M5.4 Feature.** `features-spaces` with contracts/frontend/server/testing; app routes thinned.
 5. **M5.5 (only if Q2 = include) Shells.** `frontend-shells` with `RootShell`, sidebar, header, user menu taking host links; docs app consumer.

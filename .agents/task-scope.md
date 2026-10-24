@@ -9,7 +9,9 @@
 - M5.1 not changed: queries, actions, components, fixtures, RLS, persisted shapes, every message; `SetSpacePinnedResult`, `OwnedRecordSummary`, `SetRecordPinnedResult` and the screen-only shapes stay in the app and `frontend-ui`.
 - Environment note: the sandbox creates an empty `packages/.claude/.cc-writes`; `pnpm boundaries` rejects it as an unknown category, so it was removed with `rmdir` before the run. It may reappear.
 - Owner answers 2026-10-24: Q4 replace the Space detail sample documents and dashboards with empty states (implemented in M5.4); Q5 host-supplied link capability with a `./next` binding; Q7 stories as components move. Recorded in the design, section 9.
-- Next: M5.2.
+- M5.2 plan written (2026-10-24): `docs/superpowers/plans/2026-10-24-m5-2-server-data.md` (one create; docs only). It moves the Q4 loader change from M5.4 to M5.2 and adds a seven-method `SpaceSource` port. Awaiting the owner's review before execution.
+- M5.2 plan amended (2026-10-24): the participation tables exist in the hosted project (owner), so the server source reads them; a development seed task for documents, dashboards and participation was added (`supabase/seed.sql`).
+- Next: owner reviews the M5.2 plan; execution is inline, as for M5.1.
 
 ## Active task: Milestone 4 server identity boundary (2026-10-23)
 
