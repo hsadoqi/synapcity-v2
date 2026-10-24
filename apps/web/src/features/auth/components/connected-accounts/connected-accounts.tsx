@@ -23,7 +23,7 @@ import {
   OAUTH_PROVIDERS,
   providerLabel,
   type OAuthProvider,
-} from '@/features/auth/shared/oauth-providers';
+} from '@synapcity/domain-identity';
 import type { ConnectedAccount } from '@/features/auth/shared/connected-accounts';
 import type { AuthState } from '@/features/auth/types';
 import { FormMessage } from '@synapcity/frontend-forms';

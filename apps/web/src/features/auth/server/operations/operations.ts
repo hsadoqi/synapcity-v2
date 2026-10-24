@@ -3,8 +3,8 @@ import {
   isAuthSessionMissingError,
 } from '@supabase/supabase-js';
 
-import { isRateLimited } from '@/features/auth/shared/error-messages';
-import type { OAuthProvider } from '@/features/auth/shared/oauth-providers';
+import { isRateLimited } from '@synapcity/domain-identity';
+import type { OAuthProvider } from '@synapcity/domain-identity';
 import { hasRecentLinkSignIn } from '@/features/auth/shared/recent-link-sign-in';
 import { createClient } from '@/lib/supabase/server';
 

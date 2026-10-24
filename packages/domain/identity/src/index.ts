@@ -29,15 +29,19 @@ export type {
 } from './schemas';
 export {
   NEW_ACCOUNT_DAYS,
+  OAUTH_PROVIDERS,
   PROFILE_CONFIRMED_KEY,
   checkName,
   currentUserFromClaims,
   initialsOf,
   isNewAccount,
+  isOAuthProvider,
   isProfileConfirmed,
+  isRateLimited,
   isUploadedAvatar,
   needsProfileSetup,
   profileFromClaims,
   providerImageFrom,
+  providerLabel,
 } from './utils';
-export type { CurrentUser, DisplayProfile } from './utils';
+export type { CurrentUser, DisplayProfile, OAuthProvider } from './utils';

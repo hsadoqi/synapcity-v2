@@ -4,17 +4,6 @@ import {
 } from '@synapcity/domain-identity';
 
 /**
- * Whether a Supabase Auth error code means "slow down". These say nothing about
- * any account, so they are safe to show even where every other error is
- * answered identically to avoid account discovery.
- */
-export function isRateLimited(code: string | undefined): boolean {
-  return (
-    code === 'over_email_send_rate_limit' || code === 'over_request_rate_limit'
-  );
-}
-
-/**
  * Turns a Supabase Auth error code (`error.code`, for example
  * `invalid_credentials`) into text shown to the user. Never pass `error.message`
  * through: it can reveal whether an account exists.

@@ -23,11 +23,11 @@ import {
   authErrorMessage,
   emailChangeErrorFields,
   emailChangeErrorMessage,
-  isRateLimited,
   LAST_SIGN_IN,
   linkErrorMessage,
 } from '@/features/auth/shared/error-messages';
-import { isOAuthProvider } from '@/features/auth/shared/oauth-providers';
+import { isRateLimited } from '@synapcity/domain-identity';
+import { isOAuthProvider } from '@synapcity/domain-identity';
 import { field } from '@/features/auth/server/form-data';
 import { homePathFor, settingsPathFor } from '@/lib/routing/user-paths';
 import { withNotice } from '@/lib/routing/notices';
