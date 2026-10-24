@@ -25,7 +25,10 @@ import {
 } from '@synapcity/domain-preferences';
 import { accountLinksFor } from '@/lib/routing/user-paths';
 import { cn } from '@/lib/utils';
+
 export const metadata: Metadata = createMetadata({
+  title: 'Synapcity',
+  description: 'A connected workspace for thinking, planning, and doing.',
   siteUrl: process.env.SITE_URL,
 });
 
