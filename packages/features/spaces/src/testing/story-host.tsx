@@ -3,7 +3,7 @@ import { CollectionNavigationProvider } from '@synapcity/frontend-collection';
 import { fn } from 'storybook/test';
 
 /** Story-only. Links and pushes report here instead of leaving the story. */
-export const navigate = fn();
+const navigate = fn();
 
 /** A stub host: the collection's links and navigation, kept inside the story. */
 export const withStubNavigation: Decorator = (Story) => (

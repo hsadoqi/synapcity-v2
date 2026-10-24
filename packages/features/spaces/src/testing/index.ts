@@ -3,4 +3,4 @@ export {
   sampleSpace,
   sampleSummaries,
 } from './sample-spaces';
-export { navigate, withStubNavigation } from './story-host';
+export { withStubNavigation } from './story-host';

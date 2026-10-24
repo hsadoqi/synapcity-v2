@@ -1,1 +1,1 @@
-export { describeContents, toCollectionItem } from './collection-item';
+export { toCollectionItem } from './collection-item';
