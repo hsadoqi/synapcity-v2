@@ -109,7 +109,9 @@ Stories, tests, and explicit development hosts supply fixtures and fake capabili
 
 Existing [web features](../../apps/web/src/features) are migration inputs, not packages in this category. Their interfaces, dependencies, and runtime assumptions must be reviewed before moving them.
 
-[Collection](../frontend/collection/README.md) (moved to `frontend-collection` in M5.3), [Space detail composition](../../apps/web/src/features/spaces/components/space-content.tsx), and [Home composition](../../apps/web/src/features/home/components/home-page/home-page-view.tsx) currently contain overlapping or fixture-specific behavior. Their consolidation must preserve approved behavior and separate demo operations explicitly.
+[Collection](../frontend/collection/README.md) (moved to `frontend-collection` in M5.3) and [Home composition](../../apps/web/src/features/home/components/home-page/home-page-view.tsx) currently contain overlapping or fixture-specific behavior. Their consolidation must preserve approved behavior and separate demo operations explicitly.
+
+[`features-spaces`](spaces/README.md) is the first feature package (M5.4): Space browsing and detail, with `./contracts`, `./frontend` and `./server`, the host supplying the source, the actions and navigation.
 
 ## Package design and verification
 

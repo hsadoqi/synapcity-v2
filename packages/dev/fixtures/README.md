@@ -12,7 +12,7 @@ const people = fx.list(5, fx.person);
 ```
 
 - **Seeded.** Every call to `createFixtures(seed)` builds its own isolated Faker instance and fixes the reference date, so output is identical across runs and across consumers.
-- **Current factories.** The package includes generic primitives (`id`, `person`, `title`, `paragraph`, `recent`, `list`) and workspace/document/dashboard sample shapes. These are implementation fixtures, not authority for product terminology or schemas. Align them with their domain contract owner as those contracts move; presentation-only samples stay explicitly identified.
+- **Current factories.** The package includes generic primitives (`id`, `person`, `title`, `paragraph`, `recent`, `list`) and workspace/document/dashboard sample shapes, plus `createSpaceEntity(overrides)`, a Space record validated with `@synapcity/domain-records`' `spaceSchema` (M5.4). These are implementation fixtures, not authority for product terminology or schemas. Align them with their domain contract owner as those contracts move; presentation-only samples stay explicitly identified.
 - **No credentials in the data.** `person` has no `password`: committed seed JSON with a `password` key trips CI's secret scan (gitleaks `generic-api-key`) however fake the value is. A test that needs one sets it inline, as an override.
 - **Dev-only.** Declare it in `devDependencies`, and import it only from tests, stories, e2e specs and seed scripts, never from shipped production app code. An explicit demo host must isolate synthetic providers from production composition; a demo success is not evidence of persistence.
 - Source is exported as TypeScript (`./src/index.ts`), like the other `dev-*` packages.
