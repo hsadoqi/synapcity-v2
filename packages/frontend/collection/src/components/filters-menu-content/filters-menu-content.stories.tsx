@@ -3,7 +3,6 @@ import { fn } from 'storybook/test';
 import { Button } from '@synapcity/frontend-ui/core/button';
 import {
   DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@synapcity/frontend-ui/core/dropdown-menu';
 
@@ -21,6 +20,7 @@ const meta: Meta<typeof FiltersMenuContent> = {
     grouping: sampleGrouping,
     tags: sampleTags,
   },
+  // The component renders the menu's content itself, so the story gives it only the menu and its trigger.
   decorators: [
     (Story) => (
       <div className="min-h-72 min-w-72 p-8">
@@ -28,9 +28,7 @@ const meta: Meta<typeof FiltersMenuContent> = {
           <DropdownMenuTrigger render={<Button variant="outline" />}>
             Filters
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
-            <Story />
-          </DropdownMenuContent>
+          <Story />
         </DropdownMenu>
       </div>
     ),

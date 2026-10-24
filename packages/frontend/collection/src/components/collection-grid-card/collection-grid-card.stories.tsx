@@ -9,8 +9,16 @@ const meta: Meta<typeof CollectionGridCard> = {
   title: 'Collection/CollectionGridCard',
   component: CollectionGridCard,
   tags: ['autodocs'],
+  // A card is a list item, so the story puts it in the list the grid gives it.
+  decorators: [
+    (Story) => (
+      <ul role="list" className="grid max-w-sm grid-cols-1">
+        <Story />
+      </ul>
+    ),
+  ],
   args: {
-    item: sampleItems[0]!,
+    item: sampleItems[1]!,
     icon: FileText,
     singular: 'document',
     showGroup: true,
@@ -22,6 +30,7 @@ const meta: Meta<typeof CollectionGridCard> = {
 export default meta;
 type Story = StoryObj<typeof CollectionGridCard>;
 
+/** An unpinned item. */
 export const Default: Story = {};
 
 /** A pinned item shows the pin mark. */

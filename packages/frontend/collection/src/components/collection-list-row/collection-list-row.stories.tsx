@@ -9,8 +9,19 @@ const meta: Meta<typeof CollectionListRow> = {
   title: 'Collection/CollectionListRow',
   component: CollectionListRow,
   tags: ['autodocs'],
+  // A row is a list item, so the story puts it in the list the list view gives it.
+  decorators: [
+    (Story) => (
+      <ul
+        role="list"
+        className="flex max-w-xl flex-col rounded-md border border-border bg-card text-card-foreground"
+      >
+        <Story />
+      </ul>
+    ),
+  ],
   args: {
-    item: sampleItems[0]!,
+    item: sampleItems[1]!,
     icon: FileText,
     singular: 'document',
     showGroup: true,
@@ -22,6 +33,7 @@ const meta: Meta<typeof CollectionListRow> = {
 export default meta;
 type Story = StoryObj<typeof CollectionListRow>;
 
+/** An unpinned item. */
 export const Default: Story = {};
 
 /** A pinned item shows the pin mark. */
