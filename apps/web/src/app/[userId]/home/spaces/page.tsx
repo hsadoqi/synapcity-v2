@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 
-import { SpacesCollection } from '@/features/spaces/components/spaces-collection';
+import { SpacesCollection } from '@synapcity/features-spaces/frontend';
 import { COLLECTION_LABELS, SetBreadcrumbs } from '@/components/breadcrumbs';
 import { requireOwner } from '@/lib/access/require-owner';
 import { getSpaceSource } from '@/lib/spaces';
+import { setSpacePinned } from '@/lib/spaces/space-state-actions';
 
 export const metadata: Metadata = { title: 'Spaces' };
 
@@ -19,7 +20,11 @@ export default async function SpacesPage({
   return (
     <>
       <SetBreadcrumbs items={[{ label: COLLECTION_LABELS.spaces }]} />
-      <SpacesCollection spaces={spaces} userId={userId} />
+      <SpacesCollection
+        spaces={spaces}
+        userId={userId}
+        setSpacePinned={setSpacePinned}
+      />
     </>
   );
 }

@@ -5,6 +5,7 @@
 @source '../../../packages/frontend/ui/src/blocks/';
 @source '../../../packages/frontend/ui/src/components/';
 @source '../../../packages/frontend/collection/src/';
+@source '../../../packages/features/spaces/src/';
 @source '../../docs/src/';
 @source '../../web/src/';
 
