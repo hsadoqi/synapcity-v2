@@ -1,3 +1,6 @@
+import type { IdentityResult } from '@synapcity/domain-identity';
+import { verifyIdentity } from '@synapcity/server-auth';
+import { outcomeFromClaims } from '@synapcity/server-supabase';
 import { cache } from 'react';
 
 import { createClient } from '@/lib/supabase/server';
@@ -21,6 +24,19 @@ export const getVerifiedClaims = cache(async () => {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   return data?.claims ?? null;
+});
+
+/**
+ * Who the verified caller is, through the identity boundary, for deciding
+ * access. It reads the same memoized claims as `getVerifiedClaims`, so a
+ * request still verifies its token once. Development fixture mode never
+ * changes it: a fixture is not a verified identity (ADR-0006).
+ */
+export const getVerifiedIdentity = cache(async (): Promise<IdentityResult> => {
+  const verification = await verifyIdentity({
+    claims: async () => outcomeFromClaims(await getVerifiedClaims()),
+  });
+  return verification.result;
 });
 
 /**

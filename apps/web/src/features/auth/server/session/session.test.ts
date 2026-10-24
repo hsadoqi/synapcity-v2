@@ -23,6 +23,7 @@ import {
   getCurrentUser,
   getPendingEmail,
   getVerifiedClaims,
+  getVerifiedIdentity,
 } from './session';
 
 describe('session', () => {
@@ -76,6 +77,50 @@ describe('session', () => {
 
     await expect(getCurrentUser()).resolves.toBeNull();
     expect(mocks.getClaims).toHaveBeenCalled();
+  });
+});
+
+describe('getVerifiedIdentity', () => {
+  beforeEach(() => vi.clearAllMocks());
+  afterEach(() => vi.unstubAllEnvs());
+
+  it('is the verified subject of the session claims', async () => {
+    mocks.getClaims.mockResolvedValue({ data: { claims: { sub: 'u1' } } });
+
+    await expect(getVerifiedIdentity()).resolves.toEqual({
+      status: 'verified',
+      identity: { userId: 'u1' },
+    });
+  });
+
+  it('is signed out without a session', async () => {
+    mocks.getClaims.mockResolvedValue({ data: null });
+
+    await expect(getVerifiedIdentity()).resolves.toEqual({
+      status: 'signed-out',
+    });
+  });
+
+  it('is signed out, not unavailable, when the claims check fails', async () => {
+    mocks.getClaims.mockResolvedValue({
+      data: null,
+      error: { code: 'bad_jwt', status: 401 },
+    });
+
+    await expect(getVerifiedIdentity()).resolves.toEqual({
+      status: 'signed-out',
+    });
+  });
+
+  it('asks the provider in fixture mode and never returns the fixture user', async () => {
+    vi.stubEnv('NODE_ENV', 'development');
+    vi.stubEnv('SYNAPCITY_DEV_AUTH', 'fixture');
+    mocks.getClaims.mockResolvedValue({ data: null });
+
+    await expect(getVerifiedIdentity()).resolves.toEqual({
+      status: 'signed-out',
+    });
+    expect(mocks.getClaims).toHaveBeenCalledOnce();
   });
 });
 
