@@ -32,3 +32,4 @@ export {
   updateWidget,
   widgetsWithStatus,
 } from './utils';
+export { dashboardCompositionSchema } from './schemas';

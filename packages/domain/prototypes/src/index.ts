@@ -12,6 +12,7 @@ export {
   projectSchema,
   prototypeRecordKindSchema,
   prototypeRecordSchemas,
+  prototypeRecordsSchema,
   taskSchema,
 } from './schemas';
 export type {
