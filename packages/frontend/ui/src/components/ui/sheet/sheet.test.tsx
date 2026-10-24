@@ -8,6 +8,7 @@ import {
   SheetDescription,
   SheetFooter,
   SheetHeader,
+  SheetPortal,
   SheetTitle,
   SheetTrigger,
 } from '@synapcity/frontend-ui/core/sheet';
@@ -93,5 +94,26 @@ describe('Sheet', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
     await waitFor(() => expect(onOpenChange).toHaveBeenCalled());
+  });
+
+  it('renders into a custom portal container', async () => {
+    const host = document.createElement('div');
+    document.body.append(host);
+    try {
+      render(
+        <Sheet defaultOpen>
+          <SheetPortal container={host}>
+            <SheetContent>
+              <SheetTitle>Hosted</SheetTitle>
+              <SheetDescription>Custom host.</SheetDescription>
+            </SheetContent>
+          </SheetPortal>
+        </Sheet>,
+      );
+      const dialog = await screen.findByRole('dialog', { name: 'Hosted' });
+      expect(host.contains(dialog)).toBe(true);
+    } finally {
+      host.remove();
+    }
   });
 });

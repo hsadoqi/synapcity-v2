@@ -64,9 +64,12 @@ export const Edit: Story = {
   play: async ({ canvasElement }) => {
     const dialog = await open(canvasElement);
     await expect(dialog).toHaveAccessibleName('Edit time slot');
-    await expect(
-      within(dialog).getByRole('button', { name: 'Save changes' }),
-    ).toBeVisible();
+    // The dialog fades in; wait for it rather than assert mid-animation.
+    await waitFor(() =>
+      expect(
+        within(dialog).getByRole('button', { name: 'Save changes' }),
+      ).toBeVisible(),
+    );
   },
 };
 
@@ -101,9 +104,12 @@ export const SheetWithDelete: Story = {
   args: { presentation: 'sheet', mode: 'edit', onDelete: fn() },
   play: async ({ canvasElement }) => {
     const sheet = await open(canvasElement);
-    await expect(
-      within(sheet).getByRole('button', { name: 'Delete' }),
-    ).toBeVisible();
+    // The sheet fades in; wait for it rather than assert mid-animation.
+    await waitFor(() =>
+      expect(
+        within(sheet).getByRole('button', { name: 'Delete' }),
+      ).toBeVisible(),
+    );
   },
 };
 
