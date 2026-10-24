@@ -269,3 +269,17 @@ export const LockedHeaderVisibility: Story = {
     await waitFor(() => expect(toggle).toHaveFocus());
   },
 };
+
+/** The panel names itself after its content and shows that content's actions and settings. */
+export const WithContentToolbar: Story = {
+  args: {
+    panelTitle: 'Agenda',
+    panel: <p className="text-sm">Agenda content</p>,
+    panelActions: [{ label: 'Refresh' }, { label: 'Help' }],
+    panelSettings: {
+      title: 'Agenda settings',
+      presentation: 'view',
+      content: <p className="text-sm">Week starts on Monday.</p>,
+    },
+  },
+};
