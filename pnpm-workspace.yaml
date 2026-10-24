@@ -11,7 +11,7 @@ allowBuilds:
 # and typescript-eslint's >=4.8.4 <6.1.0 requirement. Remove each extension when its
 # tool supports the project compiler; do not widen upstream peer ranges.
 packageExtensions:
-  'eslint-plugin-storybook@10.6.1':
+  'eslint-plugin-storybook@10.6.3':
     dependencies:
       typescript: 5.9.3
   'vite-tsconfig-paths@5.1.4':
@@ -49,6 +49,3 @@ minimumReleaseAgeExclude:
   - '@next/swc-win32-arm64-msvc@16.4.3'
   - '@next/swc-win32-x64-msvc@16.4.3'
   - next@16.4.3
-
-patchedDependencies:
-  '@storybook/nextjs-vite@10.6.1': patches/@storybook__nextjs-vite@10.6.1.patch
