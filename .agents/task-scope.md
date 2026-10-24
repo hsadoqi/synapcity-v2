@@ -1,6 +1,14 @@
+## Active task: Milestone 5 Collection and Spaces slice design (2026-10-23)
+
+- Goal and mode: Investigating read-only, then writing one Proposed design for owner review. Recording approved by the owner; the design is not accepted. Q1 (sub-milestones 5.1–5.4) and Q2 (defer `frontend-shells`) proceed on their recommendations as defaults; Q3–Q7 open.
+- Branch: `chore/reorganization-m5-spaces-slice` from `main` at `c3cd87a6` (M4 squash-merged as #58).
+- Exact creates (1): `docs/superpowers/specs/2026-10-23-m5-spaces-slice-design.md`. Updates (1): this ledger. Source, packages, manifests, dependencies, config, commits, pushes and external mutations 0.
+- Evidence: read at the M4 branch tip `6f542782`; `git diff` against `c3cd87a6` is empty for every cited path.
+- Next: owner answers Q3–Q7 (or accepts the recommendations), then an implementation plan for M5.1.
+
 ## Active task: Milestone 4 server identity boundary (2026-10-23)
 
-- Goal and mode: design, plan and implement Milestone 4. Design accepted by the owner ("i accept all your recommendations"); implementation requested ("pls implement the plan thoroughly, comprehensively and accurately"), executed natively per `docs/superpowers/plans/2026-10-23-m4-server-identity-boundary.md`. Branch `chore/reorganization-m4-server-identity` from `main` at `3a70a62f` (M3 merged as #55). The owner made the commits during the run; Claude made none.
+- Goal and mode: design, plan and implement Milestone 4. Design accepted by the owner, executed natively per `docs/superpowers/plans/2026-10-23-m4-server-identity-boundary.md`. Branch `chore/reorganization-m4-server-identity` from `main` at `3a70a62f` (M3 merged as #55). The owner made the commits during the run; Claude made none.
 - Sequence decision: the owner chose the roadmap sequence over the M3.1 inventory numbering ("Roadmap (Recommended)", 2026-10-23). M4 is the server identity boundary; domain contracts, fixtures and shells move just in time with the M5 Spaces slice. The roadmap file (`docs/archive/high-level-roadmap.md`) is gitignored, so the sequence is summarized in the workspace conventions.
 - Renumbering updates (documentation and labels only, no behavior): `docs/architecture/workspace-conventions.md` (sequence note, First code column, footnote), `packages/dev/boundaries/src/exceptions/exceptions.ts` (removal labels only; rules, files and members unchanged), `docs/architecture/decisions/0014-multi-app-package-boundaries.md` (base record timing sentence), `docs/architecture/decisions/README.md` (react-server/Storybook timing), renumbering notes on the three M3 design records, this ledger.
 - Exact creates: `packages/domain/identity/**`, `packages/server/auth/**`, `packages/server/supabase/**` (manifests, configs, READMEs, source, tests); `packages/dev/vitest-config/src/server-only.ts` and `server-only-stub.ts`; `apps/web/src/lib/access/require-owner.request-scope.test.ts`; the M4 design and plan.
