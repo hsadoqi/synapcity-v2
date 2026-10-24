@@ -8,6 +8,8 @@ import { parseImport } from '@synapcity/domain-preferences';
 import {
   applyAppearance,
   announcePreferencesSaved,
+  migrateLookToCookie,
+  saveLook,
   readDeviceDisplay,
   readStoredPreferences,
   writeDeviceDisplay,
@@ -45,6 +47,8 @@ export function AccountPreferencesSync({
 }) {
   useEffect(() => {
     const root = document.documentElement;
+    // Carries a look saved before the shared cookie existed over, once.
+    migrateLookToCookie();
     let settings = readLocal();
     if (preferences) {
       const reconciled = reconcile(settings, preferences, readDeviceDisplay());
@@ -55,6 +59,7 @@ export function AccountPreferencesSync({
         // Collectors follow consent through this event (privacy is account
         // scope, so it may just have changed).
         announcePreferencesSaved();
+        saveLook(settings);
       } catch {
         // Still applied for this visit.
       }

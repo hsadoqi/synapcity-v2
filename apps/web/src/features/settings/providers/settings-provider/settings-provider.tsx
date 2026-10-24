@@ -33,6 +33,7 @@ import { pageLanguage } from '@synapcity/domain-preferences';
 import {
   applyAppearance,
   announcePreferencesSaved,
+  saveLook,
   clearStoredPreferences,
   deviceTimezone,
   readDeviceDisplay,
@@ -192,6 +193,7 @@ export function SettingsProvider({
         // Cache it, so the boot scripts paint these values on the next load.
         writeStoredPreferences(JSON.stringify(reconciled.settings));
         announcePreferencesSaved();
+        saveLook(reconciled.settings);
       } catch {
         // Still applied for this visit.
       }
@@ -273,6 +275,7 @@ export function SettingsProvider({
       try {
         writeStoredPreferences(JSON.stringify(next));
         announcePreferencesSaved();
+        saveLook(next);
         setStatus('Saved');
       } catch {
         setStatus('Changes applied. Browser storage is unavailable.');
@@ -310,6 +313,7 @@ export function SettingsProvider({
       try {
         writeStoredPreferences(JSON.stringify(next));
         announcePreferencesSaved();
+        saveLook(next);
         setStatus('Saved');
       } catch {
         setStatus('Changes applied. Browser storage is unavailable.');

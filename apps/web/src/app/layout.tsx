@@ -7,9 +7,12 @@ import { BreadcrumbRootShell } from '@/components/breadcrumbs';
 import { createMetadata } from '@synapcity/frontend-site/metadata';
 import { UserProvider } from '@/features/auth/client';
 import { getCurrentUser } from '@/features/auth/server';
-import { appearanceBootScript } from '@synapcity/frontend-preferences';
-import { fontBootScript } from '@synapcity/frontend-preferences';
-import { themeShapeBootScript } from '@synapcity/frontend-preferences';
+import {
+  appearanceBootScript,
+  fontBootScript,
+  modeBootScript,
+  themeShapeBootScript,
+} from '@synapcity/frontend-preferences';
 import { AccountPreferencesSync } from '@/features/settings/components/account-preferences-sync';
 import { getAccountPreferences } from '@/features/settings/server/account-preferences';
 import { pageLanguage } from '@synapcity/domain-preferences';
@@ -35,6 +38,8 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        {/* Applies the mode chosen on any host before first paint, ahead of next-themes. */}
+        <script dangerouslySetInnerHTML={{ __html: modeBootScript }} />
         {/* Applies saved contrast and motion before first paint. */}
         <script dangerouslySetInnerHTML={{ __html: appearanceBootScript }} />
         {/* Applies saved font choices, and fetches only those, before first paint. */}
