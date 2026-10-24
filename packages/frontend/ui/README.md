@@ -1,5 +1,7 @@
 # @synapcity/frontend-ui
 
+**Reorganization target:** [ADR-0014](../../../docs/architecture/decisions/0014-multi-app-package-boundaries.md) and the [ownership map](../../../docs/architecture/reorganization-ownership-map.md) move cohesive shells to `frontend/shells`, portable product contracts to domain, and product-specific composition to features. The entry points and component-folder rules below describe the current package until their scoped migrations.
+
 Owns: the shared React components (shadcn/ui, style `base-mira`, on Base UI), the `cn` class-merging helper, and the stylesheet entry that applies the shared theme.
 
 It owns no theme tokens. Tokens live in `@synapcity/frontend-tailwind-config` ([ADR-0002](../../../docs/architecture/decisions/0002-styling-foundation.md)).
@@ -48,6 +50,6 @@ This runs the shadcn CLI against `apps/web`, whose `components.json` routes the 
 
 ## Rules
 
-- No Next.js routing, request APIs, Server Actions, or imports from `apps/*`. The package is application-runtime agnostic ([workspace conventions](../../../docs/architecture/workspace-conventions.md)).
+- Target: generic presentation entries do not depend on Next.js routing, request APIs, Server Actions, or `apps/*`. Current source still contains Next.js navigation/link bindings; isolate them through host-provided capabilities during migration. Do not claim the current package is framework-independent. Existing behavior and exports stay in place until the scoped change ([workspace conventions](../../../docs/architecture/workspace-conventions.md)).
 - Colours come from semantic classes (`bg-background`, `text-muted-foreground`), never palette classes or `dark:` colours.
 - Fonts are the roles `font-body`, `font-heading` and `font-code`. A component never declares a font stack ([ADR-0003](../../../docs/architecture/decisions/0003-typography-roles-and-font-preferences.md)).

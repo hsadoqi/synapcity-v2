@@ -1,7 +1,9 @@
 # Dependency and boundary review
 
-1. For a new package, complete `docs/architecture/package-creation-checklist.md` and follow `docs/architecture/workspace-conventions.md`.
-2. Check import direction (apps depend on packages, never the reverse; ADR-0001) and that cross-package imports use only the package `exports`.
-3. No boundary-checking tool exists. Enforce direction by reading the new package's imports and its consumers' imports; a formal rule is an open candidate decision.
-4. For a new dependency, follow `AGENTS.md` section 7a: check the registry version, peer ranges, and current documentation for the declared version, cite them, and get approval when it has architectural or security consequences. Do not upgrade an existing dependency as part of this review.
-5. Run `pnpm deps` for unused dependencies.
+1. For a new package, complete the package creation checklist and follow workspace conventions. ADR-0014 supplies the accepted category/runtime matrix; the ownership map assigns current implementation families.
+2. Trace each changed public entry through its direct and transitive imports. Distinguish feature contracts, frontend presentation, backend orchestration, app browser entries, and app backend entries. A frontend entry must never make server implementations reachable, even through a barrel.
+3. Check same-category dependencies for cohesion and cycles; check type-only, configuration, test, and devDependencies edges as well. Packages never import apps. Consumers use declared public exports, never another package's private source.
+4. Development tooling may be used through tooling configuration. Fixtures and fake capabilities are for tests, stories, seed scripts, and explicitly isolated non-production demo hosts. Production code must not acquire a transitive fixture dependency. Avoid domain tests importing a fixture package that already depends on that domain package.
+5. The accepted direction is no longer an open decision. Its automated enforcement mechanism remains Milestone 3 work. The current web lexical test is partial and cannot establish workspace-wide or transitive isolation; inspect affected imports manually until enforcement exists.
+6. For dependency changes, follow AGENTS.md section 7a: verify declared versions, registry/peer compatibility, and first-party guidance. Obtain approval where required; never upgrade unrelated dependencies as a side effect.
+7. Run checks proportional to the approved change, including `pnpm deps` for dependency changes, and report what was not run. A direct human instruction to skip checks overrides this workflow for that task.

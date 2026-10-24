@@ -1,10 +1,119 @@
-## Active task: clear the CI dependency audit on main (2026-10-23)
+## Active task: Milestone 3.4 boundary checker implementation (2026-10-23)
 
-- Goal and mode: owner asked to fix the failing `security` CI job (`pnpm audit --audit-level=moderate` on main at bd61324a: 4 critical, 5 high, 8 moderate). Implementing a security-only dependency change on `fix/security-audit-2026-10-23`, separate from milestone work.
-- Exact changes: patch-level bumps of existing dependencies only. `next` 16.4.0 to 16.4.3 in `apps/storybook`, `packages/frontend/ui` and `packages/frontend/site` (matching `apps/web` and `apps/docs`); Storybook packages and `eslint-plugin-storybook` 10.6.1 to 10.6.3; `vitest`, `@vitest/browser-playwright` and `@vitest/coverage-v8` 4.1.11 to 4.1.12 (stays on Vitest 4 per ADR-0005); `shadcn` ^4.21.4 to ^4.22.1, which moves its zod to 4.x. Lockfile refresh of transitive `body-parser` 2.4.0, `undici` 7.30.1 and 8.12.3, `fast-uri` 3.1.9; no new overrides. `packageExtensions` key follows `eslint-plugin-storybook` to 10.6.3. ADR-0005 and the vitest-config README pin text updated.
-- Removed: `patches/@storybook__nextjs-vite@10.6.1.patch` and its `patchedDependencies` entry. Storybook 10.6.3 ships the same `parentRenderTree: { data: { bfcacheId: 0 } }` fixture upstream (checked in the published `dist/_browser-chunks`). Recovery: the patch stays in Git history at bd61324a.
-- Not changed: `@next/eslint-plugin-next` stays 16.4.0 (no advisory); Vitest 5 and the open Dependabot branches remain separate changes. No new dependency, override, schema, API or architecture decision.
-- Verification: `pnpm audit --audit-level=moderate` reports no known vulnerabilities; `pnpm peers check` clean; full `pnpm verify` results reported in the handoff.
+- Goal and mode: implement the accepted 3.4 design per `docs/superpowers/plans/2026-10-23-m3-boundary-checker.md`, native execution chosen by the owner ("ill go with ur recs"). Commits not authorized; the owner committed progress during the run.
+- Exact creates: `packages/dev/boundaries/**` (package, README, source, tests). Updates: `pnpm-lock.yaml` (install of `oxc-parser@0.155.0`, `oxc-resolver@11.24.2` only), root `package.json` (`boundaries` script; `pnpm boundaries` in `verify` and `verify:fast`), root `vitest.config.ts` (project), `AGENTS.md` section 6, `docs/engineering/quality-gates.md`, `docs/engineering/setup.md`, `docs/architecture/workspace-conventions.md` (status line, R0 row), `docs/architecture/decisions/README.md` (candidate entry), `packages/dev/README.md`, this ledger. No application source changed; `apps/web/src/architecture.test.ts` untouched.
+- First run: 997 files across 12 workspaces; 16 genuine pre-existing violations (11 R11 Next.js imports in frontend-ui and frontend-site, 5 R9 barrel-induced module cycles), recorded as 15 named exceptions with removal milestones (M6–M9). Every import in the repository resolved (no R0).
+- Gate proof: a planted `import 'next/headers'` in a real client file failed with exactly one R3; the file was restored with no diff.
+- Dependency evidence (npm registry, checked 2026-10-23): `oxc-parser` 0.155.0 (modified 2026-10-19) and `oxc-resolver` 11.24.2 (modified 2026-07-12) are the registry's current versions and are pinned exactly; `server-only` 0.0.1 is the registry's only version. All three are dev-only tooling or build guards.
+- Verification: see the final report of this task.
+
+## Active task: Milestone 3.4 boundary enforcement design (2026-10-23)
+
+- Goal and mode: choose and design the automated boundary checks with the owner; write one Proposed design. Spikes ran only in the session scratchpad (dependency-cruiser 18.7.0 with TypeScript 7.0.2 and `@swc/core` 1.16.20; Oxc parser/resolver from the existing install); no repository file, dependency or lockfile changed.
+- Owner decisions (2026-10-23): custom checker on `oxc-parser` and `oxc-resolver` ("ok sounds good"); both approved as development dependencies of the checker. Pending in the design: checker location (H1), the `pnpm verify` gate change, and the rules.
+- Exact creates (1): `docs/superpowers/specs/2026-10-23-m3-boundary-enforcement-design.md`. Updates (1): this ledger. Dependencies installed, manifests, lockfile, source, config, commits, pushes 0.
+- Verification: Prettier, link check, builder read-through. Not run: application gates (documentation only).
+- Recording (owner approved 2026-10-23, "sure"): `dev-boundaries` placement (H1), the `pnpm verify` gate change and the rules accepted; recorded in `docs/architecture/workspace-conventions.md` (Boundary checks section, inventory row), `docs/architecture/decisions/README.md` (candidate entry), the 3.1 spec dev table and the 3.4 spec. Implementation is not started; it follows a written plan.
+
+## Active task: Milestone 3.3 internal organization design (2026-10-23)
+
+- Goal and mode: design internal file organization for packages with the owner; write one Proposed design.
+- Owner decisions (2026-10-23): keep the folder-per-unit look with `index.ts` ("i prefer the folder look"); feature entry naming delegated and kept as `./contracts`; features never re-export domain contracts (temporary migration bridges excepted).
+- Exact creates (1): `docs/superpowers/specs/2026-10-23-m3-internal-organization-design.md`. Updates (1): this ledger. Source, config, manifests, commits, pushes 0.
+- Verification: Prettier, link check, builder read-through. Not run: application gates (documentation only).
+- Recording (owner approved 2026-10-23, "yup sounds good"): rules recorded in the Internal organization section of `docs/architecture/workspace-conventions.md`, replacing the earlier "no forwarding wrapper for every function" wording that contradicted F1; spec marked Accepted. Additional updates: `docs/architecture/workspace-conventions.md`.
+
+## Active task: Milestone 3.2 public entry points design (2026-10-23)
+
+- Goal and mode: design the public entry-point and runtime-separation conventions for the 3.1 inventory with the owner; write one Proposed design.
+- Owner decisions (2026-10-23): feature packages expose `./contracts`, `./frontend` and `./server` with no root entry ("sure"); `server-only@0.0.1` approved as a dependency of packages with a server entry, added when each package is created ("sure"). Registry and Next.js 16.4.3 bundled docs checked the same day.
+- Exact creates (1): `docs/superpowers/specs/2026-10-23-m3-public-entry-points-design.md`. Updates (1): this ledger. Manifests, dependencies installed, source, config, commits and pushes 0.
+- Verification: Prettier, link check, builder read-through. Not run: application gates (documentation only).
+- Recording (owner approved 2026-10-23, "sure"): rules added to `docs/architecture/workspace-conventions.md` under Entry points; spec marked Accepted. Additional updates: `docs/architecture/workspace-conventions.md`.
+
+## Active task: Milestone 3.1 package grouping and naming design (2026-10-23)
+
+- Goal and mode: owner asked to start Milestone 3 with 3.1 (package grouping and naming). Brainstorming with the owner, then writing one Proposed design for owner review. No package, manifest, source, config or dependency change.
+- Branch: `chore/reorganization-m3-boundary-enforcement`, created from pushed `e85b3bb2`.
+- Owner decisions this session (2026-10-23): one capability may span categories; separate `frontend/preferences` runtime; preferences (data/runtime) versus settings (screen) naming split; profile/account contracts in `domain/identity`; one `domain/records` package; a base record contract for shared attributes (records were never meant to repeat them; the earlier "no universal Entity model" wording was AI-introduced and is corrected in ADR-0014, the domain README and the ownership map); `frontend/shells` widened to composable app shells and page frames, content passed through children/slots.
+- Exact updates: `.agents/task-scope.md`; `docs/architecture/decisions/0014-multi-app-package-boundaries.md`, `docs/architecture/reorganization-ownership-map.md`, `packages/domain/README.md` (entity-base correction only). Exact creates (1): `docs/superpowers/specs/2026-10-23-m3-package-grouping-design.md`, status Proposed. Commits, pushes, issues, project changes 0.
+- Verification: Prettier on changed files, relative-link check, builder read-through of the spec. Not run: application gates (documentation only).
+- Recording (owner confirmed D4, D5 and C1 and approved recording, 2026-10-23): inventory and rules added to `docs/architecture/workspace-conventions.md`; ownership map error-reports and shells rows; ADR-0014 shells row and leaf-name pointer; glossary implementation-naming note (also removes the AI-introduced "universal Entity model" wording); domain and frontend README example lists; spec marked Accepted. Additional updates: `docs/glossary.md`, `docs/architecture/workspace-conventions.md`.
+- Follow-up (owner approved 2026-10-23, "ok"): widened ADR-0014's Frontend-to-Domain condition to contracts and pure rules; updated its diagram, the frontend and domain READMEs, and the spec (O1 resolved). Additional updates: `packages/frontend/README.md`.
+- Inventory amendment (owner approved 2026-10-23, "okay"): no `services` umbrella; vendor SDKs wrapped by adapter packages; `server-supabase` and `frontend-supabase` added, `frontend-editor` noted as future. Additional updates: `docs/architecture/workspace-conventions.md`, `docs/architecture/reorganization-ownership-map.md`, `docs/superpowers/specs/2026-10-23-m3-package-grouping-design.md`, `packages/server/README.md`, `packages/frontend/README.md`.
+
+## Milestone 1 baseline record (2026-10-23)
+
+- Baseline: clean worktree copy of `1390871eaca37c96713c5f7549d3ec6b4ae0764b` on `refactor/reorganization-m1-baseline`, in the named architecture-reorganization worktree.
+- Verification: `pnpm verify` run by the owner on that clean copy and reported passing (owner report, 2026-10-23). Step-level counts were not captured in this ledger; supporting artifact `apps/web/coverage/coverage-final.json` was written 2026-10-23 17:04 local time. Plain `pnpm test`, manual visual review and live-provider acceptance are not part of `pnpm verify` and were not run.
+- Equivalence: between `1390871e` and the Milestone 2 commits, the only non-Markdown change is `.gitignore` (one ignored private notes path), so the baseline applies unchanged to the code on `docs/reorganization-m2-boundaries`.
+- Outcome: Milestone 1 is complete. Later migrations compare against this baseline and rerun the repository gate at their checkpoints.
+
+## Active task: verify and close Milestone 2 (2026-10-23)
+
+- Goal and mode: owner asked to ensure Milestone 2 is complete against the six parts and three results in the private roadmap notes. Reviewing, then reconciling documentation only.
+- Authority: the owner confirmed on 2026-10-23 that one capability can have packages in several categories (for example `frontend/settings` beside `features/settings`, plus domain/server packages), each holding only its category's responsibility.
+- Exact updates (6): `.agents/task-scope.md`; `docs/architecture/decisions/0014-multi-app-package-boundaries.md` (one paragraph in section 4); `docs/architecture/workspace-conventions.md` (one sentence); `packages/frontend/README.md` (two example descriptions, owner list entries kept); `packages/server/README.md` (grouping wording aligned with ADR-0014, one typo); `packages/domain/README.md` (one sentence pointing leaf design to Milestone 3). Creates, source/package/config/dependency changes, commits, pushes and external mutations 0.
+- Verification: `pnpm format:check`; `git diff --check`; relative link and anchor validation over every Markdown file touched by Milestone 2; all 14 Mermaid diagrams parsed and rendered with Mermaid 11.17.2 in headless Chromium (scratch install outside the repository). Not run: `pnpm verify`, lint, types, tests, build; documentation-only change.
+- Outcome: the earlier "unwritten checks" gap from the completion entry below is closed. One pre-existing broken link remains in a historical entry of this ledger (`phase-03-two-layer-navigation-shell-brief.md`, not in this repository); history is not rewritten. Milestone 1 baseline is recorded in the entry above.
+
+## Active task: complete Milestone 2 architecture boundaries (2026-10-23)
+
+- Goal and mode: implement the owner's instruction to finish Milestone 2 completely, documenting the already selected multi-app package architecture. The owner subsequently instructed: "skip all checks/running pnpm verify". No verification commands, formatter, tests, diagram rendering, or link checks are run for this completion change.
+- Authority: direct owner decisions in this conversation select domain/frontend/server/features/dev, one shells package with multiple shell entries, feature composition, reusable server libraries, extended fixtures, and early optimization informed by planned desktop/mobile consumers. This adopts implementation boundaries only; product terminology, schemas, APIs, provider/deployment behavior, and wider open product decisions remain outside scope.
+- Location: named architecture-reorganization worktree on docs/reorganization-m2-boundaries, starting at clean commit 91be9693. Preserve the Milestone 1 baseline branch and prior task history. No source/package/config changes, package creates, dependency changes, schema changes, source moves, commits, pushes, PRs, GitHub mutations, or external planning changes.
+- Milestone 2 delivered scope: category boundaries; dependency/runtime matrix; package grouping/public-interface principles; current-to-target ownership map; migration/preservation/compatibility rules; scoped ADR, conventions, package, glossary, and agent-document reconciliation.
+- Source of record: ADR-0014 owns decisions; workspace conventions and checklist own operating guidance; umbrella READMEs explain their boundaries; ownership map assigns source responsibilities; this existing task ledger owns execution status. No second milestone tracker is created.
+- Exact existing documentation updates (27):
+
+- `README.md`
+- `AGENTS.md`
+- `.agents/task-scope.md`
+- `.agents/workflows/architecture-review.md`
+- `.agents/workflows/dependency-boundary-review.md`
+- `docs/architecture/README.md`
+- `docs/architecture/principles.md`
+- `docs/architecture/workspace-conventions.md`
+- `docs/architecture/package-creation-checklist.md`
+- `docs/architecture/decisions/README.md`
+- `docs/architecture/decisions/0001-workspace-topology-and-toolchain.md`
+- `docs/architecture/decisions/0007-app-local-auth-and-account-ownership.md`
+- `docs/architecture/decisions/0008-auth-actions-and-server-operations.md`
+- `docs/architecture/decisions/0009-caller-owned-auth-navigation.md`
+- `docs/architecture/decisions/0010-preference-persistence.md`
+- `docs/architecture/decisions/0011-collection-browse-feature.md`
+- `docs/architecture/decisions/0011-resizable-global-panel-shell.md`
+- `docs/architecture/decisions/0012-owned-space-records.md`
+- `docs/architecture/decisions/0013-document-and-dashboard-persistence.md`
+- `docs/glossary.md`
+- `packages/frontend/ui/README.md`
+- `packages/dev/fixtures/README.md`
+- `packages/domain/README.md`
+- `packages/frontend/README.md`
+- `packages/server/README.md`
+- `packages/features/README.md`
+- `packages/dev/README.md`
+
+- Exact documentation creates (2):
+
+- `docs/architecture/decisions/0014-multi-app-package-boundaries.md`
+- `docs/architecture/reorganization-ownership-map.md`
+
+- Preservation: retain owner-added example lists, older ADR reasoning with explicit placement amendments, all adopted behavior/security requirements, both existing ADR-0011 filenames, and prior task entries. A temporary backup of the pre-edit documentation is kept under /private/tmp.
+- Outcome: the six Milestone 2 documentation deliverables are written. They remain uncommitted and unverified at the owner's request. Milestone 1 baseline checks remain pending; Milestone 3 implements package conventions and boundary enforcement before source migration. No implementation migration or enforcement success is claimed.
+
+---
+
+## Active task: umbrella boundary READMEs (2026-10-23)
+
+- Goal and mode: implement the owner's direct request to add boundary READMEs under the agreed domain, frontend, server, features, and dev umbrellas, with Mermaid interaction/dependency diagrams. Documentation only; detailed package design and implementation migration remain separate work.
+- Exact updates (6): packages/domain/README.md; packages/frontend/README.md; packages/server/README.md; packages/features/README.md; packages/dev/README.md; this task-scope entry. Preserve the concurrently added umbrella headings and existing introductory content, and all prior task entries.
+- Git scope: create and use docs/reorganization-m2-boundaries from the clean refactor/reorganization-m1-baseline commit 1390871eaca37c96713c5f7549d3ec6b4ae0764b in the named architecture-reorganization worktree. Existing baseline branch remains intact; no commit, push, PR, reset, worktree relocation, or deletion.
+- Authority: direct owner category/composition decisions and README request in this conversation on 2026-10-23. These READMEs record Current direction with explicit implementation/reconciliation gaps. They are the category-boundary notes; existing ADRs remain the decision register and need scoped reconciliation before migration. No second milestone/task/status ledger is created.
+- Budgets and systems: repository documentation updates 5; existing task-scope updates 1; documentation creates 0; local Git branch creates 1; production/package/config/dependency/schema/API/runtime changes 0; source moves/deletes/renames 0; commits/pushes/PRs 0; GitHub/issues/projects/external planning mutations 0. Disposable documentation-validation artifacts under /private/tmp are permitted.
+- Preconditions: the five pre-existing umbrella README stubs are the only working-tree changes, and their headings and existing introductory content are preserved, exact source commit verified, preserve existing package READMEs and historical task entries. Scope excludes wider canonical-doc reconciliation and Milestone 1 baseline execution.
+- Verification: read back all six changed files; check relative links, Markdown fences and diagram/text consistency; run pnpm format:check and focused formatting checks; parse/render each Mermaid diagram where available; git diff --check and exact-file manifest check. Report tool/environment blockers, unrendered diagrams and unrun application gates literally.
+- Recovery: restore only this task's newly prepended scope entry and additions to the five existing README stubs after checking for concurrent changes; retain the original historical ledger and both branches. No history rewrite or external state recovery is required.
 
 Earlier scopes below are retained as history and grant no additional mutation authority.
 

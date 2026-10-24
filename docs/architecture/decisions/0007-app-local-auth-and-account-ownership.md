@@ -1,5 +1,7 @@
 # ADR-0007: Auth responsibility boundaries and package layout evaluation
 
+> **Placement amendment — 2026-10-23:** [ADR-0014](0014-multi-app-package-boundaries.md) supersedes mandatory app-local placement and the earlier package-layout selection. Portable identity contracts belong to domain; auth/account backend operations to server; auth/account experiences to features; routes, request provisioning, and framework response handling to apps. Credential ownership and account/auth responsibility distinctions remain in force. See the [ownership map](../reorganization-ownership-map.md) for the selected destinations. The original sections below preserve the decision history; conflicting placement statements or placement-related unresolved questions are superseded by this amendment. Source migration is not completed by this documentation change.
+
 **Status:** Accepted  
 **Date:** 2026-10-13 (accepted 2026-10-14)  
 **Deciders:** Hanaa Sadoqi (repository owner); accepted by the owner's direct instruction to proceed on recommendations.

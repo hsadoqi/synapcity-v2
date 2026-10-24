@@ -1,53 +1,178 @@
 # Workspace conventions
 
-**Status:** Canonical, defined by ADR-0001
+**Status:** Canonical operating conventions, defined by [ADR-0001](decisions/0001-workspace-topology-and-toolchain.md) and amended for placement/dependency direction by [ADR-0014](decisions/0014-multi-app-package-boundaries.md), 2026-10-23.
 
-How packages and apps are laid out, named and built in the current repository. Creating a package still follows [the checklist](package-creation-checklist.md).
+These conventions describe the selected target architecture and identify the current transition. The [ownership map](reorganization-ownership-map.md) records current locations and target owners; it is not a claim that the code has already moved.
+
+## Layout and categories
+
+Apps live at `apps/<name>` and packages at `packages/<category>/<name>`. The existing workspace globs, `apps/*` and `packages/**/*`, are unchanged.
+
+| Category   | Owns                                                                                  | Boundary reference                            |
+| ---------- | ------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `domain`   | Portable contracts and product rules                                                  | [Domain](../../packages/domain/README.md)     |
+| `frontend` | Presentation, interaction foundations, shells, and explicit frontend platform effects | [Frontend](../../packages/frontend/README.md) |
+| `server`   | Trusted operations, repositories, and backend provider integration                    | [Server](../../packages/server/README.md)     |
+| `features` | Reusable product composition and workflows                                            | [Features](../../packages/features/README.md) |
+| `dev`      | Tooling, fixtures, test/scenario/seed/demo support                                    | [Dev](../../packages/dev/README.md)           |
+
+Current application workspaces are `web`, `docs`, and `storybook`. Current package workspaces still live under frontend/dev. New domain/server/feature packages are not created by the category READMEs. Desktop/mobile are planned consumers; no application scaffold or runtime is selected for them here.
 
 ```mermaid
-flowchart TD
-  root["repository root<br/>pnpm-workspace.yaml + turbo.json"]
-  apps["apps/name<br/>composition roots"]
-  pkgs["packages/category/name"]
-  cats["dev, frontend"]
-
-  root --> apps
-  root --> pkgs
-  pkgs --> cats
+flowchart TB
+    apps["Applications and platform bindings"] --> presentation["Feature presentation"]
+    apps --> backend["Feature backend orchestration"]
+    presentation --> frontend["Frontend foundations"]
+    presentation --> contracts["Portable feature contracts"]
+    backend --> contracts
+    backend --> server["Server operations"]
+    contracts --> domain["Domain contracts"]
+    server --> domain
 ```
 
-## Layout
+## Names and grouping
 
-- Apps live at `apps/<name>`; packages live at `packages/<category>/<name>`. The workspace globs are `apps/*` and `packages/**/*`.
-- Current categories:
-  - `dev` — build-time tooling shared by workspaces: `@synapcity/dev-eslint-config`, `@synapcity/dev-typescript-config`.
-  - `frontend` — shared presentation code: `@synapcity/frontend-ui` (shadcn components, `cn`, hooks) and `@synapcity/frontend-tailwind-config` (theme, tokens, PostCSS config).
-- Current apps: `web` (the product application) and `docs` (the documentation site, port 4000; a placeholder page today).
-- Internal dependencies use `workspace:*`.
-- A package's `exports` is its public API. Other packages import only what `exports` lists.
+Use `@synapcity/<category>-<name>` in lowercase kebab-case; apps remain unscoped. The leaf folder does not repeat the category. For example, `frontend/shells` maps to `@synapcity/frontend-shells`; a `features/settings` example maps to `@synapcity/features-settings`. Examples are not installed-package claims.
 
-## Names
+Group coherent modules within a package: several shells can share one shells package, and several resource repositories can share one data package. Independence, testability, runtime isolation, planned reuse, and change coupling justify early extraction. A second current consumer is not required. One capability may span categories, such as `frontend/settings` presentation beside the `features/settings` experience, provided each package holds only its category's responsibility.
 
-A package is named `@synapcity/<category>-<name>`: the category folder under `packages/`, then the directory name, in lowercase kebab-case. `packages/frontend/ui` is `@synapcity/frontend-ui`; `packages/dev/eslint-config` is `@synapcity/dev-eslint-config`. The leaf directory does not repeat the category, and names are unique across categories. Apps are unscoped and named for their directory (`web`, `docs`). Every package and app has a README that starts with an `Owns:` line.
+Do not infer a new product noun, schema, or durable identifier from a package name. Existing provisional labels retain their approved bounded technical use; follow the [glossary](../glossary.md) before a terminology change.
 
-## Scripts
+Prefer the name the code and durable identifiers already use. Name a package by responsibility, never by technique or vagueness: `containers`, `layouts`, `utils`, `common` and `shared` are not package names.
 
-Turborepo runs `build`, `lint`, `check-types` and `dev` from the root (`turbo.json`). A workspace defines whichever of those apply to it. `build` for an app is its framework build; `check-types` is `tsc --noEmit` (Next apps run `next typegen` first). Outputs cached by `build`: `.next/**` except the cache and dev folders.
+A new package must earn its boundary through at least one of: a different runtime, different dependencies, a different consumer set (planned consumers count), independent testing, or a different rate of change. Folder size alone is not a reason. Grow a package through explicit modules before splitting it. Fields shared by several contracts go in a base contract inside the owning package, not in a separate cross-cutting package. Browser platform effects are frontend packages and backend provider integration is server; there is no separate platform or services category. Each outside vendor SDK is wrapped by an adapter package in the category where it runs, named after the vendor (`server-supabase`); other packages receive the vendor's client or capability from that adapter and never import the SDK. A responsibility-named package is a capability, a vendor-named package is an adapter. A separately deployed backend process would be an app, not a package category.
 
-## Where code runs (client and server)
+### Package inventory
 
-- Server-only code (Node APIs, request handling, secrets) lives in an app.
-- `@synapcity/frontend-ui` and the other `frontend` packages are free of the server runtime: they may use React, JSX and web-platform APIs, and a narrow `"use client"` boundary where a component needs it. They may use `next/link` and the client navigation hooks of `next/navigation` (for example `usePathname`) for links and active state, because every consumer is a Next.js app and a caller-supplied link component would be an abstraction with no second implementation. They must not import request APIs (`next/headers`, `next/server`), Server Actions, application environment variables, or anything from `apps/*`. Where a link points is the app's decision and arrives as a prop (ADR-0009).
-- A package that needs an app-specific capability defines an interface for it and receives the implementation from the app.
+Accepted 2026-10-23 through the [Milestone 3.1 design](../superpowers/specs/2026-10-23-m3-package-grouping-design.md), which records each package's current source inputs and the owner's decisions. A package is created by the migration that first moves code into it, never as an empty skeleton.
 
-## Styling in the workspace
+| Package                               | Owns                                                                                                                                                         | First code    |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------- |
+| `domain-records`                      | Base record contract; Space, Document and Dashboard contracts as separate modules extending it                                                               | M4            |
+| `domain-preferences`                  | Preference schemas, defaults, account/device scope, merging, import/transfer validation, consent policy                                                      | M4            |
+| `domain-identity`                     | Credential, profile, name and avatar contracts; verified-identity contract                                                                                   | M4            |
+| `frontend-ui` (existing)              | Primitives, generic components and form pieces, generic hooks, low-level layout primitives                                                                   | exists        |
+| `frontend-shells`                     | Composable app shells and page frames                                                                                                                        | M6            |
+| `frontend-collection`                 | Browse projections, query mechanics, generic controls and displays, local browse state                                                                       | M7            |
+| `frontend-settings`                   | Settings presentation pieces                                                                                                                                 | M8            |
+| `frontend-preferences`                | Browser preference runtime: device store, apply functions, boot scripts, mode, consent state                                                                 | M8            |
+| `frontend-error-reports`              | Consent-gated browser error reporting and event scrubbing                                                                                                    | M8            |
+| `frontend-auth`                       | Auth presentation pieces                                                                                                                                     | M9            |
+| `frontend-supabase`                   | Browser Supabase client used by auth state listening; the only frontend package importing `@supabase/*`                                                      | M9            |
+| `frontend-editor` (future)            | Document editor runtime (Lexical), nodes and plugins; created only after the editor and document body are approved                                           | not scheduled |
+| `frontend-site` (existing)            | Site metadata and brand presentation                                                                                                                         | exists        |
+| `frontend-tailwind-config` (existing) | Tokens and styling foundation                                                                                                                                | exists        |
+| `server-data`                         | Space, Document and Dashboard repositories, queries and row mapping                                                                                          | M7            |
+| `server-account`                      | Profile, avatar and account-preference operations                                                                                                            | M8            |
+| `server-auth`                         | Verified identity, auth operations, verified-caller helpers                                                                                                  | M9            |
+| `server-supabase`                     | Request-bound server client from host-supplied cookies, session refresh helpers, provider-error translation; the only server package importing `@supabase/*` | M7            |
+| `features-spaces`                     | Space browsing and detail                                                                                                                                    | M7            |
+| `features-settings`                   | The Settings experience: editors, drafts, guard, import/export, account sync                                                                                 | M8            |
+| `features-auth`                       | Sign-in, registration, password, email and session workflows                                                                                                 | M9            |
+| `features-account`                    | Name, avatar and profile workflows                                                                                                                           | M9            |
+| `features-documents`                  | Document browsing                                                                                                                                            | M10           |
+| `features-dashboards`                 | Dashboard browsing                                                                                                                                           | M10           |
+| `features-home`                       | Home, aggregating the resource features                                                                                                                      | M11           |
+| `dev-*` (five existing)               | Tooling, test configuration and fixtures; `dev-fixtures` grows scenarios and sample content                                                                  | exists        |
+| `dev-boundaries`                      | Workspace boundary checker (`pnpm boundaries`) and its violation probes                                                                                      | M3.4          |
 
-Apps and packages never define theme tokens. `@synapcity/frontend-tailwind-config` owns them and an app's `globals.css` contains imports and `@source` lines only (ADR-0002). New shadcn components are added with `pnpm ui:add <name>` from the root, which targets `apps/web` and writes into `@synapcity/frontend-ui`.
+**Preferences and Settings** are different packages on purpose: preferences are the data, rules, persistence and browser runtime; Settings is the screen that edits them.
 
-## Testing
+## Public interfaces and dependencies
 
-Vitest, a Playwright smoke test and Storybook story tests run through the root `test*` scripts and `pnpm verify` (ADR-0005, Proposed). Coverage of the code is thin, and the wider testing strategy is an open candidate decision (`decisions/README.md`). Do not describe a change as tested unless a test exercises it.
+A package's `exports` defines its supported public interface. Consumers do not bypass it with filesystem paths or import private source. Internal dependencies use `workspace:*`. The complete production dependency matrix and non-production exceptions are owned by [ADR-0014](decisions/0014-multi-app-package-boundaries.md#2-dependency-and-runtime-matrix).
 
-## Verified in this repository
+- Packages never import apps. App-to-app source dependencies are not shared-library reuse.
+- Domain has no React, DOM, request, concrete storage, provider-client, frontend, feature, or server dependency.
+- Frontend and feature presentation cannot reach backend implementations, including transitively.
+- Server operations depend on domain and other explicit server interfaces; they do not import the feature composing them.
+- Feature contracts are portable. Feature presentation and feature backend orchestration have separate dependency graphs.
+- Same-category and sibling-feature reuse stays explicit, cohesive, public, and acyclic.
+- Tests, stories, development configuration, seeds, and explicit demo hosts may use dev support; shipped entry points may not.
+- Type-only and development dependencies still have owners and must not conceal graph cycles.
 
-On 2026-10-13: `pnpm lint`, `pnpm check-types` and `pnpm build` passed; `pnpm format:check` and `pnpm deps` reported failures that predate the documentation changes (see `docs/engineering/quality-gates.md`).
+### Entry points
+
+Accepted 2026-10-23 through the [Milestone 3.2 design](../superpowers/specs/2026-10-23-m3-public-entry-points-design.md), which records the evidence and the owner's decisions.
+
+1. A package's `exports` map is its whole public interface; consumers never import by file path. List each entry. A wildcard is allowed only where every match is a deliberate public unit, as in `frontend-ui/core/*`.
+2. Single-runtime packages (domain, server, and frontend other than framework adapters) expose a root `.` entry. Add a module subpath such as `@synapcity/domain-records/spaces` only when consumers need a narrower interface.
+3. Feature packages expose `./contracts` (portable types, validation, view models), `./frontend` (presentation, including Server Components) and `./server` (backend orchestration and loaders), and no root entry. A feature without server work omits `./server`. Do not use `./client`.
+4. A `./frontend` or `./contracts` entry never re-exports from `./server`. Inside a mixed package, files reached from `./frontend` or `./contracts` never import files reached from `./server`, even by relative path.
+5. The file behind every server entry (`server-*` roots and feature `./server`) starts with `import 'server-only'` (`server-only@0.0.1`, added when the package is created). The guard sits in the entry file only.
+6. `'use client'` goes at the start of a client subtree, not on every file.
+7. Framework-specific code has a named entry, such as `./next`; root entries stay framework-neutral.
+8. Test-only code (fakes, fake capabilities, story helpers) has a `./testing` entry that only tests, stories and dev hosts import.
+9. There are no types-only entries. A type needed on both sides lives in domain or a feature's `./contracts`, never in a server entry.
+10. Entries point to TypeScript source; packages have no build step.
+
+`frontend-ui`'s broad `./lib/*`, `./hooks/*`, `./utils/*` and `./types/*` wildcards predate these rules and are narrowed by the migrations that touch them.
+
+Enforcement is `pnpm boundaries` (see [Boundary checks](#boundary-checks)). The existing [web architecture test](../../apps/web/src/architecture.test.ts) checks some direct imports within web; it is not a workspace-wide or transitive proof.
+
+## Runtime and platform integration
+
+App hosts own route/action entry points, cookies/headers, environment selection, navigation, response formatting, framework revalidation, and request-bound provisioning. Server capabilities verify identity/access and return narrow outcomes. A package receives an explicit host capability; it never imports app code to obtain one.
+
+Frontend presentation may render in a backend render pass without becoming a privileged operation. Declare whether an entry is portable logic, React behavior, DOM presentation, or framework-specific integration.
+
+New shared presentation uses host-provided navigation/link capabilities or an explicit platform/framework adapter. Existing Next.js link/navigation imports are a transition item in the ownership map, not a permanent assumption that every consumer is Next.js. Browser storage, DOM attributes, font loading, and permissions stay behind frontend platform entries.
+
+## Data, copy, and state
+
+Domain owns product contracts; repositories own persistence effects; features own drafts, workflow orchestration, product copy, and presentation projections. Frontend components own general interaction state and generic component text. Fixtures own synthetic records and sample content.
+
+Follow existing accepted policies for account/device preference reconciliation, storage keys, auth, and database enforcement. A package move does not alter those policies. A fixture success does not establish a production save.
+
+## Internal organization
+
+Accepted 2026-10-23 through the [Milestone 3.3 design](../superpowers/specs/2026-10-23-m3-internal-organization-design.md). The rules apply as code moves into packages; current `apps/web` folders stay until their migration.
+
+**Units.** Every unit (component, hook, helper, schema, rule) has its own kebab-case folder: `avatar-url/` holds `avatar-url.ts`, its tests and `index.ts`; a component folder also holds `name.stories.tsx`. `index.ts` re-exports the unit's public names. Other folders import the folder (`../avatar-url`), never a file inside it; files inside a folder import their siblings directly. Private helpers stay in the unit's folder until a second unit needs them, then become their own unit. Tests sit beside the code as `name.test.ts(x)` or `name.dom.test.ts(x)`; browser end-to-end tests stay in each app's `e2e/` as `*.e2e.ts`. Small test inputs stay beside the test; shared records and scenarios come from `dev-fixtures`, except in packages `dev-fixtures` depends on.
+
+**Package top level.** Source lives under `src/`, with one entry file per entry: `src/index.ts` for `.`, `src/<entry>/index.ts` for a named entry. Feature packages mirror their entries: `src/contracts/`, `src/frontend/`, `src/server/` and, if needed, `src/testing/`. Nothing under `frontend/` or `contracts/` imports from `server/`, nothing under `contracts/` imports from `frontend/`, and nothing outside `testing/` imports from `testing/`. Single-runtime packages group by module (`domain-records/src/spaces/`); a one-module package puts units directly under `src/`. Group by kind (`components/`, `hooks/`, `providers/`) only when several units of that kind exist.
+
+**Contracts.** If a second feature, the server or fixtures need a shape, it belongs in domain; if only one feature's own halves or its host need it, it belongs in that feature's `contracts/`. Features use domain types but never redefine or re-export them; a temporary migration bridge is the only exception. `shared` is not a folder name; `lib` and `utils` are allowed only when no kind or module name fits. Next.js-specific units sit behind the `./next` entry.
+
+**Composition.** Frontend components compose through `children` and named slots rather than configuration props. A frame owns structure and shared behavior (resizing, collapsing, focus, responsive regions, rail/header/footer layout); its consumer supplies the content. Boolean flags that switch between unrelated layouts are not allowed; a second frame is. `frontend-shells` applies this to app shells and page frames; a frame tied to one product workflow stays in its feature.
+
+**Existing packages.** `frontend-ui` keeps its layout and package-structure test, including cross-folder imports through `@synapcity/frontend-ui/...`; that works because every component folder is a public unit. New packages use relative folder imports, because explicit `exports` hide their private units. `frontend-site`, `frontend-tailwind-config` and the `dev-*` packages keep their layouts until a scoped change aligns them. Enforcement is Milestone 3.4.
+
+## Migration and preservation
+
+The [ownership map](reorganization-ownership-map.md) covers all current source families. Migrate one slice with its real consumers and tests/stories; preserve behavior and public/serialized contracts unless changes are separately approved.
+
+Temporary compatibility exports point to one canonical implementation. Record each bridge's source, target, consumers, owner, and removal condition in the migration task scope. No broad legacy exemption authorizes new violations. Keep explicit production/demo bindings and identify existing fixture/fake-operation gaps.
+
+Record the baseline before code migration. Milestone 1 baseline verification remains separate from documentation checks. Use focused checks during moves, then the repository gate at completed implementation checkpoints; report unrun checks and live-provider limits.
+
+## Boundary checks
+
+Accepted 2026-10-23 through the [Milestone 3.4 design](../superpowers/specs/2026-10-23-m3-boundary-enforcement-design.md); enforced by `pnpm boundaries` (`dev-boundaries`) inside `pnpm verify`. Pre-existing violations are named in `packages/dev/boundaries/src/exceptions/exceptions.ts`, each with its removal milestone.
+
+The checker classifies every file by path into package, category and entry graph (in apps, `'use client'` files and what they reach form the browser graph; `'use server'` files are action boundaries), resolves every import, including `import type`, `require()`, `import x = require()` and type-position `import('x')`, with the importing workspace's tsconfig and `exports`, and enforces:
+
+| #   | Rule                                                                                                                                                                                         |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R0  | Every import resolves to scanned code or an asset, every file parses, and every package folder is one of the five categories, so a scan never passes silently (added by the implementation). |
+| R1  | Packages never import app source.                                                                                                                                                            |
+| R2  | Every edge between categories and entry graphs is allowed by ADR-0014's matrix, including frontend-to-domain only through the root, `./contracts` or `./rules`.                              |
+| R3  | No server code is reachable, directly or transitively, from frontend packages, feature `frontend`/`contracts` graphs or the app browser graph.                                               |
+| R4  | Domain imports only domain packages and allowlisted portable libraries (initially `zod`).                                                                                                    |
+| R5  | Imports into another package go through its `exports`.                                                                                                                                       |
+| R6  | Feature path rules: `frontend/` and `contracts/` never import `server/`; `contracts/` never imports `frontend/`; only `testing/` imports `testing/`.                                         |
+| R7  | In new packages, cross-folder imports target the folder's `index.ts`.                                                                                                                        |
+| R8  | Production files never import `dev-*` packages, `./testing` entries, tests or stories.                                                                                                       |
+| R9  | No package or module cycles. An exception pins the exact cycle members, so a cycle that grows fails again.                                                                                   |
+| R10 | Every server entry file starts with `import 'server-only'`.                                                                                                                                  |
+| R11 | `next` imports in frontend packages occur only behind `./next` (`src/next/`); in a feature, only under `src/frontend/next/`.                                                                 |
+
+**Exceptions.** Existing violations are listed one file or edge at a time, each with its rule, reason and removal milestone. An entry that no longer matches fails the run, so the list only shrinks. Category, package or folder-wide exemptions are not allowed. Every rule has a probe that plants a violation in a temporary workspace and proves the check fails. R3's list of app server-only modules (`APP_SERVER_ONLY`) is checked too: an entry that matches no scanned file fails, so a rename cannot disarm the rule.
+
+## Tooling and verification
+
+Root scripts in [package.json](../../package.json) define what actually runs. Packages expose the applicable scripts to those existing tasks. No new runtime, dependency version, Turbo command, or build strategy is selected here; verify declared versions and matching upstream/bundled guidance before changing them.
+
+Tokens remain owned by `frontend-tailwind-config` under ADR-0002; app CSS remains wiring. Product schemas and copied identity/state do not move into generic UI.
+
+Creating a package follows the [package checklist](package-creation-checklist.md). Testing breadth and thresholds remain governed by Proposed ADR-0005 and the existing Definition of Done. Boundary checks cover only the rules listed under [Boundary checks](#boundary-checks) and the frontend-to-domain condition (frontend imports only the domain package root, `./contracts` or `./rules`). The sibling-feature public-interface condition is covered by R5 (exports only); its acyclic requirement by R9.

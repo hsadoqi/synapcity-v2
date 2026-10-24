@@ -1,5 +1,7 @@
 # ADR-0012: Owned Space records and serializable icon identifiers
 
+> **Placement amendment — 2026-10-23:** [ADR-0014](0014-multi-app-package-boundaries.md) supersedes app-local contract and repository placement. Domain owns the existing portable Space contract, server owns repositories and authorized operations, features own presentation/workflow composition, and apps bind requests. Existing schema, ownership, icon identifiers, and security requirements remain in force. See the [ownership map](../reorganization-ownership-map.md) for the selected destinations. The original sections below preserve the decision history; conflicting placement statements or placement-related unresolved questions are superseded by this amendment. Source migration is not completed by this documentation change.
+
 **Status:** Accepted; amended by [ADR-0013](0013-document-and-dashboard-persistence.md) (standalone Space deletion, which never deletes documents or dashboards)  
 **Date:** 2026-10-17  
 **Deciders:** Hanaa Sadoqi (repository owner), by direct approval to draft the migration and add ownership, selection of Lucide icon names, and explicit selection of account-deletion cascade.
