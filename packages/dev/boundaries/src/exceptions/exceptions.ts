@@ -18,34 +18,6 @@ export const EXCEPTIONS: readonly Exception[] = [
   },
   {
     rule: 'R11',
-    file: 'packages/frontend/ui/src/blocks/entity/entity-item-card/entity-item-card.tsx',
-    specifier: 'next/link',
-    reason: NEXT_IN_SHARED_UI,
-    removal: 'M5 Spaces slice (entity blocks join frontend-collection)',
-  },
-  {
-    rule: 'R11',
-    file: 'packages/frontend/ui/src/blocks/entity/entity-section/entity-section.tsx',
-    specifier: 'next/link',
-    reason: NEXT_IN_SHARED_UI,
-    removal: 'M5 Spaces slice (entity blocks join frontend-collection)',
-  },
-  {
-    rule: 'R11',
-    file: 'packages/frontend/ui/src/blocks/entity/recent-entity/recent-entity-items.tsx',
-    specifier: 'next/link',
-    reason: NEXT_IN_SHARED_UI,
-    removal: 'M5 Spaces slice (entity blocks join frontend-collection)',
-  },
-  {
-    rule: 'R11',
-    file: 'packages/frontend/ui/src/blocks/entity/recent-entity/recent-entity-row.tsx',
-    specifier: 'next/link',
-    reason: NEXT_IN_SHARED_UI,
-    removal: 'M5 Spaces slice (entity blocks join frontend-collection)',
-  },
-  {
-    rule: 'R11',
     file: 'packages/frontend/ui/src/blocks/root-shell/root-header/root-header.tsx',
     specifier: 'next/link',
     reason: NEXT_IN_SHARED_UI,
@@ -66,14 +38,6 @@ export const EXCEPTIONS: readonly Exception[] = [
     specifier: 'next/navigation',
     reason: NEXT_IN_SHARED_UI,
     removal: 'M7 auth migration (frontend-auth, host-supplied navigation)',
-  },
-  {
-    rule: 'R11',
-    file: 'packages/frontend/ui/src/components/link-button/link-button.tsx',
-    specifier: 'next/link',
-    reason: NEXT_IN_SHARED_UI,
-    removal:
-      'M5 Spaces slice frontend foundations (link wrapper moves behind frontend-ui ./next)',
   },
   {
     rule: 'R11',
@@ -151,18 +115,6 @@ export const EXCEPTIONS: readonly Exception[] = [
     reason:
       "Pre-existing barrel-induced module cycle across the settings components' index files.",
     removal: 'M6 settings migration',
-  },
-  {
-    rule: 'R9',
-    file: 'packages/frontend/ui/src/blocks/entity/entity-section/entity-section.tsx',
-    members: [
-      'packages/frontend/ui/src/blocks/entity/entity-section/entity-section.tsx',
-      'packages/frontend/ui/src/blocks/entity/entity-section/index.ts',
-      'packages/frontend/ui/src/blocks/entity/index.ts',
-    ],
-    reason:
-      'Pre-existing module cycle: entity-section imports its own parent barrel @synapcity/frontend-ui/blocks/entity.',
-    removal: 'M5 Spaces slice (collection migration)',
   },
   {
     rule: 'R9',
