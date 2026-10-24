@@ -12,7 +12,9 @@ const meta: Meta<typeof FormMessage> = {
 export default meta;
 type Story = StoryObj<typeof FormMessage>;
 
-export const Error: Story = { args: { state: { error: 'Enter your email.' } } };
+export const WithError: Story = {
+  args: { state: { error: 'Enter your email.' } },
+};
 
 export const Status: Story = {
   args: { state: { message: 'If that account exists, we sent a link.' } },

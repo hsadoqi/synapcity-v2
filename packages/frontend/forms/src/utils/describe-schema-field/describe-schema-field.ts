@@ -34,7 +34,8 @@ function definitionOf(schema: z.ZodType): LooseDef {
   return schema.def as unknown as LooseDef;
 }
 
-function unwrap(schema: z.ZodType): z.ZodType {
+/** The schema a key describes once optional, nullable, default and similar wrappers are removed. */
+export function unwrapSchema(schema: z.ZodType): z.ZodType {
   let current = schema;
   for (;;) {
     const { type, innerType } = definitionOf(current);
@@ -56,7 +57,7 @@ export function describeSchemaField(
     throw new Error(`describeSchemaField: the schema has no key "${key}"`);
   }
   const field = schema.shape[key] as z.ZodType;
-  const inner = unwrap(field);
+  const inner = unwrapSchema(field);
   const { type, format } = definitionOf(inner);
   const base = { optional: field.isOptional(), nullable: field.isNullable() };
 

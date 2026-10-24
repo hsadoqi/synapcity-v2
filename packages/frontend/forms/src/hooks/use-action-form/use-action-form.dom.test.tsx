@@ -233,4 +233,58 @@ describe('useActionForm', () => {
     expect(screen.getByTestId('error').textContent).toBe('');
     expect(action).toHaveBeenCalledTimes(1);
   });
+
+  it('treats a box that was unchecked again as not sent, not as its old value', async () => {
+    const termsSchema = z.object({
+      terms: z.literal('on', { error: 'Accept the terms.' }),
+    });
+    const action = vi.fn();
+    function TermsForm() {
+      const { formProps, state } = useActionForm({
+        schema: termsSchema,
+        action,
+        state: {},
+      });
+      return (
+        <form {...formProps} aria-label="test form">
+          <input aria-label="terms" type="checkbox" name="terms" />
+          <p data-testid="error">{state.error ?? ''}</p>
+        </form>
+      );
+    }
+    render(<TermsForm />);
+    fireEvent.click(screen.getByLabelText('terms'));
+    await submit();
+    expect(action).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByLabelText('terms'));
+    await submit();
+    expect(action).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId('error').textContent).toBe('Accept the terms.');
+  });
+
+  it('gives a list for an array key even when one value is sent', async () => {
+    const listSchema = z.object({
+      tag: z.array(z.string()).min(1, 'Pick a tag.'),
+    });
+    const action = vi.fn();
+    function ListForm() {
+      const { formProps, state } = useActionForm({
+        schema: listSchema,
+        action,
+        state: {},
+      });
+      return (
+        <form {...formProps} aria-label="test form">
+          <input aria-label="a" type="checkbox" name="tag" value="a" />
+          <input aria-label="b" type="checkbox" name="tag" value="b" />
+          <p data-testid="error">{state.error ?? ''}</p>
+        </form>
+      );
+    }
+    render(<ListForm />);
+    fireEvent.click(screen.getByLabelText('a'));
+    await submit();
+    expect(screen.getByTestId('error').textContent).toBe('');
+    expect(action).toHaveBeenCalledTimes(1);
+  });
 });

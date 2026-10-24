@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, userEvent, within } from 'storybook/test';
 import { useState } from 'react';
+import { Button } from '@synapcity/frontend-ui/core/button';
+import { Label } from '@synapcity/frontend-ui/core/label';
+import { Input } from '@synapcity/frontend-ui/core/input';
 import { z } from 'zod';
 
 import { FormField } from '../../components/form-field';
@@ -42,7 +45,7 @@ function ActionForm() {
         id="email-message"
         state={sent ? { message: `Sent to ${sent}.` } : state}
       />
-      <button type="submit">Send reset link</button>
+      <Button type="submit">Send reset link</Button>
     </form>
   );
 }
@@ -110,13 +113,13 @@ function AvatarForm() {
       aria-label="Change your avatar"
       className="flex flex-col gap-4"
     >
-      <label htmlFor="avatar">Avatar</label>
-      <input id="avatar" name="avatar" type="file" />
+      <Label htmlFor="avatar">Avatar</Label>
+      <Input id="avatar" name="avatar" type="file" />
       <FormMessage
         id="avatar-message"
         state={sent ? { message: `Uploaded ${sent}.` } : state}
       />
-      <button type="submit">Upload</button>
+      <Button type="submit">Upload</Button>
     </form>
   );
 }
@@ -130,7 +133,14 @@ export const ValidatesAFileInput: Story = {
       'Choose an image.',
     );
     const file = new File(['x'], 'me.png', { type: 'image/png' });
-    await userEvent.upload(canvas.getByLabelText('Avatar'), file);
+    // `userEvent.upload` overrides the input's `files` property but not the
+    // file list the browser submits, which is what `FormData` reads. A
+    // `DataTransfer` sets the real list, as choosing a file does.
+    const input = canvas.getByLabelText<HTMLInputElement>('Avatar');
+    const transfer = new DataTransfer();
+    transfer.items.add(file);
+    input.files = transfer.files;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
     await userEvent.click(canvas.getByRole('button', { name: 'Upload' }));
     await expect(await canvas.findByRole('status')).toHaveTextContent(
       'Uploaded me.png.',

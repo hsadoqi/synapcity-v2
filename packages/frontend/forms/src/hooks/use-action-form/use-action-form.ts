@@ -8,9 +8,10 @@ import {
   type FieldValues,
   type Resolver,
   type UseFormRegisterReturn,
-  type UseFormReturn,
 } from 'react-hook-form';
 import type { z } from 'zod';
+
+import { unwrapSchema } from '../../utils/describe-schema-field';
 
 /** What a form shows about a refused submit: a message and the fields it is about. */
 export interface FormFeedback {
@@ -45,7 +46,6 @@ export interface UseActionFormResult<
   TSchema extends z.ZodObject,
   TState extends FormFeedback,
 > {
-  readonly form: UseFormReturn<FieldValues>;
   /** Spread onto the `<form>`: the action (so it works before hydration), `noValidate` and the submit handler. */
   readonly formProps: {
     readonly action: (formData: FormData) => void;
@@ -58,18 +58,26 @@ export interface UseActionFormResult<
     FormFeedback;
 }
 
-type FormValue = FormDataEntryValue | FormDataEntryValue[];
+type FormValue = FormDataEntryValue | FormDataEntryValue[] | undefined;
+
+const isArraySchema = (field: z.ZodType): boolean =>
+  unwrapSchema(field).def.type === 'array';
 
 /**
- * What a form holds, the way the schema sees it: a name that appears once is
- * its value (a string, or a `File` from a file input), and a name that appears
- * more than once, such as a group of checkboxes, is the list of its values.
+ * The schema's keys, read from what the form holds. A key the form does not
+ * send (an unchecked box, a field that is not rendered) is `undefined`, so a
+ * value typed earlier cannot linger. An array key is always a list; any other
+ * key is its first value (a string, or a `File` from a file input). Names that
+ * are not schema keys, such as a hidden `next`, are left alone.
  */
-function valuesOf(formData: FormData): Record<string, FormValue> {
+function valuesOf(
+  schema: z.ZodObject,
+  formData: FormData,
+): Record<string, FormValue> {
   const values: Record<string, FormValue> = {};
-  for (const name of new Set(formData.keys())) {
+  for (const [name, field] of Object.entries(schema.shape)) {
     const all = formData.getAll(name);
-    values[name] = all.length === 1 ? (all[0] as FormDataEntryValue) : all;
+    values[name] = isArraySchema(field as z.ZodType) ? all : all[0];
   }
   return values;
 }
@@ -124,7 +132,7 @@ export function useActionForm<
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     const element = event.currentTarget;
     for (const [name, value] of Object.entries(
-      valuesOf(new FormData(element)),
+      valuesOf(schema, new FormData(element)),
     )) {
       form.setValue(name, value);
     }
@@ -138,7 +146,6 @@ export function useActionForm<
   };
 
   return {
-    form,
     formProps: { action, noValidate: true, onSubmit },
     register: (name) => form.register(name),
     state: refusal ?? state,
