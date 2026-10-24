@@ -7,7 +7,8 @@
     "./base": "./src/base.ts",
     "./react": "./src/react.ts",
     "./browser": "./src/browser.ts",
-    "./shared": "./src/shared.ts"
+    "./shared": "./src/shared.ts",
+    "./server-only": "./src/server-only.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit"
