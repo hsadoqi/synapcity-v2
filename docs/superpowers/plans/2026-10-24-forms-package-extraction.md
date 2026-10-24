@@ -33,12 +33,12 @@
 - [ ] Confirm each of the three form units and the hook has tests that pin observable behavior: label and id wiring, hint versus message precedence, `aria-invalid`, `aria-describedby`, password reveal, focus target order (empty marked field, first marked field, form alert). Add missing cases before moving anything.
 - [ ] Decide whether `form-field` is absorbed by the existing `field` component in `frontend-ui` or composes it. Record the answer in the task scope. Do not build a second implementation beside `field`.
 
-### Task A2: Create the package with its first code
+### Task A2: Extend the package with the moved code
 
-- [ ] Create `packages/frontend/forms` following the M3 conventions (manifest, `exports`, tsconfig, eslint config, README, per-unit folders with `index.ts`).
+- [ ] `packages/frontend/forms` already exists: Task 1 of the [forms engine plan](2026-10-24-forms-schema-driven-engine.md) created it with the engine's pure modules as its first code (owner confirmed, 2026-10-24). Add the moved units to it following the M3 conventions (per-unit folders with `index.ts`, kind folders directly under `src/`), and extend its manifest, README and `exports` only as the moved code needs.
 - [ ] Move `form-field`, `form-message`, `form-feedback` and `use-focus-first-error` with their tests, history preserved where git allows.
 - [ ] Declare dependencies on `frontend-ui` and the minimum React peer. No new third-party dependency in Part A.
-- [ ] Register the package where the inventory, the boundary checker, Knip, Turbo and Vitest projects need it, following how M4 added its packages.
+- [ ] Check the registrations the package needs: its Vitest project entry and lockfile importer already exist; the boundary checker and Knip passed for it without extra configuration. Add a registration only if one of them reports a gap.
 
 ### Task A3: Rewire consumers
 
