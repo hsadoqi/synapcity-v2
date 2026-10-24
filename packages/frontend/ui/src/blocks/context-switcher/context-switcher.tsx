@@ -40,7 +40,7 @@ export function ContextSwitcher({
                 {...props}
                 className="data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
               >
-                <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-sm bg-sidebar-primary text-sidebar-primary-foreground">
                   <SynapcityMark className="size-4" />
                 </div>
                 <div className="flex min-w-0 flex-1 items-center leading-none">

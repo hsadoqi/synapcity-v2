@@ -12,7 +12,7 @@
     "test:storybook:watch": "vitest run --watch"
   },
   "dependencies": {
-    "@synapcity/features-dashboards": "workspace:*",
+    "@synapcity/frontend-preferences": "workspace:*",
     "@synapcity/frontend-ui": "workspace:*",
     "next": "16.4.3",
     "react": "19.3.0",

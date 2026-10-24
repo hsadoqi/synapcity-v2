@@ -14,7 +14,7 @@ import {
   SettingsAccordion,
   SettingsAccordionItem,
   SettingsTabShell,
-} from '../../shared';
+} from '@synapcity/features-settings/frontend';
 
 /**
  * The signed-in person's profile. The name and photo belong to the account

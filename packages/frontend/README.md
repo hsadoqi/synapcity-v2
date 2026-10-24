@@ -85,8 +85,8 @@ The host supplies where a link leads and how an action is invoked. A callback ex
 - `auth` ----> Reusable authentication presentation (form pieces, status and confirmation views); auth workflows are `features/auth`
 - `supabase` ----> Browser Supabase client adapter
 - `editor` ----> Future document editor runtime (Lexical), once the editor is approved
-- `preferences` ----> Browser preference runtime: device store, applying theme/mode/fonts, consent state
-- `error-reports` ----> Consent-gated browser error reporting
+- `preferences` ----> Browser preference runtime: device store, applying theme/mode/fonts, consent state. Exists since M6.2 ([README](preferences/README.md))
+- `error-reports` ----> Consent-gated browser error reporting. Exists since M6.5 ([README](error-reports/README.md))
 - `site` ----> Existing site metadata/brand concerns
 - `tailwind-config` ----> Existing styling foundation
 

@@ -12,12 +12,12 @@ A single class on the root element, `<html class="dark">` or `<html class="light
 
 ## The four pieces
 
-| Layer                | Where                                                               | Job                                                                                                                |
-| -------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Colour values        | `packages/frontend/tailwind-config/tokens/utilities.css`            | `theme-light` and `theme-dark` utilities define every colour variable and set `color-scheme`.                      |
-| Selectors and `dark` | `packages/frontend/tailwind-config/tokens/base.css`, `variants.css` | Apply `theme-dark` under `.dark` (or under system-dark when no class is set). Define the Tailwind `dark:` variant. |
-| State                | `packages/frontend/ui/src/providers/mode-provider.tsx`              | Thin wrapper over `next-themes`. Stores the choice, resolves "system", and writes the class onto `<html>`.         |
-| Control              | `packages/frontend/ui/src/components/mode-toggle.tsx`               | A dropdown with Light, Dark and System. Calls `setTheme` from `useTheme()`.                                        |
+| Layer                | Where                                                                         | Job                                                                                                                |
+| -------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Colour values        | `packages/frontend/tailwind-config/tokens/utilities.css`                      | `theme-light` and `theme-dark` utilities define every colour variable and set `color-scheme`.                      |
+| Selectors and `dark` | `packages/frontend/tailwind-config/tokens/base.css`, `variants.css`           | Apply `theme-dark` under `.dark` (or under system-dark when no class is set). Define the Tailwind `dark:` variant. |
+| State                | `packages/frontend/preferences/src/providers/mode-provider/mode-provider.tsx` | Thin wrapper over `next-themes`. Stores the choice, resolves "system", and writes the class onto `<html>`.         |
+| Control              | `packages/frontend/ui/src/components/mode-toggle.tsx`                         | A dropdown with Light, Dark and System. Calls `setTheme` from `useTheme()`.                                        |
 
 ### Colour values and selectors
 

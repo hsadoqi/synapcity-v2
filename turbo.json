@@ -6,7 +6,7 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "env": ["NODE_ENV"],
+      "env": ["NODE_ENV", "NEXT_PUBLIC_PREFERENCES_COOKIE_DOMAIN"],
       "outputs": [
         ".next/**",
         "!.next/cache/**",
@@ -72,7 +72,7 @@
       "outputs": ["playwright-report/**", "test-results/**"]
     },
     "web#test:e2e": {
-      "dependsOn": ["build"],
+      "dependsOn": ["build", "docs#build"],
       "cache": false,
       "outputs": ["playwright-report/**", "test-results/**"]
     },

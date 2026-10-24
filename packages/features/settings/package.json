@@ -1,0 +1,46 @@
+{
+  "name": "@synapcity/features-settings",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./contracts": "./src/contracts/index.ts",
+    "./frontend": "./src/frontend/index.ts",
+    "./server": "./src/server/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint . --cache --cache-strategy content --max-warnings 0",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@synapcity/domain-preferences": "workspace:*",
+    "@synapcity/frontend-preferences": "workspace:*",
+    "@synapcity/frontend-ui": "workspace:*",
+    "@synapcity/server-account": "workspace:*",
+    "@synapcity/server-supabase": "workspace:*",
+    "lucide-react": "^1.55.0",
+    "react": "19.3.0",
+    "server-only": "0.0.1"
+  },
+  "devDependencies": {
+    "@storybook/nextjs-vite": "10.6.3",
+    "@synapcity/dev-eslint-config": "workspace:*",
+    "@synapcity/dev-typescript-config": "workspace:*",
+    "@synapcity/dev-vitest-config": "workspace:*",
+    "@testing-library/dom": "10.4.2",
+    "@testing-library/react": "16.3.3",
+    "@types/node": "26.6.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitest/coverage-v8": "4.1.12",
+    "eslint": "10.9.1",
+    "jsdom": "30.1.2",
+    "react-dom": "19.3.0",
+    "storybook": "10.6.3",
+    "typescript": "7.0.2",
+    "zod": "^4.6.7",
+    "vitest": "4.1.12"
+  }
+}

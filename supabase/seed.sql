@@ -1,7 +1,7 @@
--- Development sample data. Spaces mirror SPACE_FIXTURES in
--- apps/web/src/features/spaces/lib/fixtures/spaces/spaces.ts; documents,
--- dashboards and where they take part (ADR-0013) give those Spaces something
--- to show.
+-- Development sample data. The starter Spaces are three of the fixture-mode
+-- demo Spaces in apps/web/src/lib/demo/space-source/demo-spaces.ts (Writing,
+-- Learning, Personal); documents, dashboards and where they take part
+-- (ADR-0013) give those Spaces something to show.
 --
 -- Everything is owner-scoped (owner_id references auth.users), so this gives
 -- every existing user a starter set. Each part adds nothing for a user who

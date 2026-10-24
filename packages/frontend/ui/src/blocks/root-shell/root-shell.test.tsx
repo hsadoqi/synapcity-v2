@@ -6,7 +6,7 @@ import {
   PublicShell,
   RootShell,
 } from '@synapcity/frontend-ui/blocks/root-shell';
-import { ModeProvider } from '@synapcity/frontend-ui/providers/mode-provider';
+import { ModeProvider } from '@synapcity/frontend-preferences';
 
 vi.mock('next/navigation', () => ({ usePathname: () => '/' }));
 

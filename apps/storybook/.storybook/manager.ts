@@ -11,8 +11,8 @@ import {
   isMode,
   isResolvedMode,
   resolveMode,
-} from '@synapcity/frontend-ui/utils/theme';
-import type { ResolvedMode } from '@synapcity/frontend-ui/providers/mode-provider';
+} from '@synapcity/frontend-preferences';
+import type { ResolvedMode } from '@synapcity/frontend-preferences';
 /** Reads a key without letting blocked or unavailable storage (private windows, sandboxed
  * iframes) throw; the manager must still come up with the default theme. */
 function readStored(key: string): string | null {

@@ -113,6 +113,8 @@ Existing [web features](../../apps/web/src/features) are migration inputs, not p
 
 [`features-spaces`](spaces/README.md) is the first feature package (M5.4): Space browsing and detail, with `./contracts`, `./frontend` and `./server`, the host supplying the source, the actions and navigation.
 
+[`features-settings`](settings/README.md) (M6.4) owns Settings presentation, drafts, workflow composition and its server loader. Web keeps the Profile/Auth Account tab as a lazy host slot, along with request, action and logging policy.
+
 ## Package design and verification
 
 Choose packages by cohesive capability, dependency/runtime isolation, and expected reuse. Flatten unnecessary private wrapper/barrel layers; a component does not automatically need a package. The ownership map assigns existing families. Features own product controllers and orchestration; sibling features use explicit public contracts with an acyclic dependency graph. Exact leaf packages, interface signatures, and platform-specific implementations remain implementation design work.

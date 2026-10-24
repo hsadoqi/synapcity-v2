@@ -15,6 +15,12 @@ pnpm dev:docs     # http://localhost:4000
 
 The shared checks run through the root scripts (`pnpm lint`, `pnpm check-types`, `pnpm build`); `pnpm verify` runs everything. This app has no tests of its own.
 
+## Shared look
+
+Docs shows the look chosen in the web app (mode, text size, density, fonts and the rest) and writes only the mode, through its mode toggle. Both apps read and write one cookie, `synapcity-look`; see the amendment in [ADR-0010](../../docs/architecture/decisions/0010-preference-persistence.md). The root layout validates and server-renders a request cookie, while the proxy renews a valid value through `Set-Cookie`; the boot scripts remain the migration fallback and resolve system mode in the browser.
+
+`NEXT_PUBLIC_PREFERENCES_COOKIE_DOMAIN` sets the parent domain (the same value as in `apps/web`, inlined at build time). Empty keeps it host-only, so local development works across `localhost:8080` and `localhost:4000`. Production sharing additionally requires real sibling custom domains, such as `app.example.com` and `docs.example.com`, attached to the two hosting projects with DNS and TLS verified, and `.example.com` configured in both builds. A `*.vercel.app` preview domain is a public suffix and cannot be used as the shared cookie parent; previews therefore stay host-only. The production domains are not selected in this repository, so provider and DNS setup remains an explicit deployment action rather than an invented value.
+
 ## Structure
 
 | Path                     | Contains                                                             |

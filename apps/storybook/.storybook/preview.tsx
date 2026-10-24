@@ -8,10 +8,7 @@ import localFont from 'next/font/local';
 import { ThemedDocsContainer } from './docs-container';
 import { storyModeAction } from './story-mode';
 import { useEffect } from 'react';
-import {
-  ModeProvider,
-  useMode,
-} from '@synapcity/frontend-ui/providers/mode-provider';
+import { ModeProvider, useMode } from '@synapcity/frontend-preferences';
 import '../styles/globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });

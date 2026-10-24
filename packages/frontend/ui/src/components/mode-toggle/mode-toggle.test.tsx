@@ -11,7 +11,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@synapcity/frontend-ui/core/dropdown-menu';
-import { ModeProvider } from '@synapcity/frontend-ui/providers/mode-provider';
+import { ModeProvider } from '@synapcity/frontend-preferences';
 
 const mockMatchMedia = (dark: boolean) => {
   window.matchMedia = ((query: string) => ({

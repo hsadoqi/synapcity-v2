@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { SidebarShell } from '@synapcity/frontend-ui/blocks/sidebar-shell';
-import { ModeProvider } from '@synapcity/frontend-ui/providers/mode-provider';
+import { ModeProvider } from '@synapcity/frontend-preferences';
 
 const meta: Meta<typeof SidebarShell> = {
   title: 'Blocks/SidebarShell',

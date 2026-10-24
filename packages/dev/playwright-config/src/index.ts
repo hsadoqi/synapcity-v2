@@ -8,6 +8,11 @@ type CreatePlaywrightConfigInput = {
   command: string;
   /** Directory holding the `*.e2e.ts` files. Defaults to `e2e`. */
   testDir?: string;
+  /**
+   * Other apps the tests need running, for a flow that crosses apps. Started
+   * and reused exactly like the main one.
+   */
+  extraServers?: { port: number; command: string }[];
 };
 
 /*
@@ -19,6 +24,7 @@ export function createPlaywrightConfig({
   port,
   command,
   testDir = 'e2e',
+  extraServers = [],
 }: CreatePlaywrightConfigInput): PlaywrightTestConfig {
   const isCI = Boolean(process.env.CI);
   const baseURL = `http://localhost:${port}`;
@@ -32,11 +38,11 @@ export function createPlaywrightConfig({
     reporter: isCI ? [['github'], ['html', { open: 'never' }]] : 'list',
     use: { baseURL, trace: 'on-first-retry' },
     projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
-    webServer: {
-      command,
-      url: baseURL,
+    webServer: [{ command, port }, ...extraServers].map((server) => ({
+      command: server.command,
+      url: `http://localhost:${server.port}`,
       reuseExistingServer: !isCI,
       timeout: 120_000,
-    },
+    })),
   });
 }

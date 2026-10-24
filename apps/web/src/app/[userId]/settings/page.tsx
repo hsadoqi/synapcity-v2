@@ -13,7 +13,7 @@ import { FIXTURE_MESSAGE } from '@/lib/access/dev-fixture';
 import { requireOwner } from '@/lib/access/require-owner';
 import { getAccountPreferences } from '@/features/settings/server/account-preferences';
 import { saveAccountPreferences } from '@/features/settings/server/actions/preferences-actions';
-import { SettingsContent } from '@/features/settings/shared/settings-page/settings-content';
+import { SettingsContent } from '@/features/settings/settings-content';
 
 export const metadata: Metadata = { title: 'Account settings' };
 
@@ -42,6 +42,7 @@ export default async function SettingsPage({
         <SettingsContent
           name={name}
           account={account}
+          draftScope={claims.sub}
           notice={kind === 'fixture' ? FIXTURE_MESSAGE : undefined}
         />
       </ConnectedAccountsProvider>
