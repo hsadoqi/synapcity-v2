@@ -75,11 +75,10 @@ export function updateWidget(
   const widget = c.widgets.find((w) => w.id === widgetId);
   if (!widget) return c;
   const next = { ...widget, ...patch };
-  if (
-    next.title === widget.title &&
-    next.collapsed === widget.collapsed &&
-    next.highlight === widget.highlight
-  ) {
+  // A patch that changes nothing keeps the composition. Compare every field
+  // the patch sets, so a field added to WidgetPatch is never silently dropped.
+  const keys = Object.keys(patch) as (keyof WidgetPatch)[];
+  if (keys.every((key) => next[key] === widget[key])) {
     return c;
   }
   return {

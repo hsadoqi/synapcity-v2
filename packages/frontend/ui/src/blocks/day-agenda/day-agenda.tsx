@@ -18,6 +18,8 @@ import type {
 import { invertedClasses, surfaceClasses } from './day-variants';
 
 export type DayAgendaData = {
+  /** Shown in place of the list when there are no slots. */
+  empty?: ReactNode;
   date: string;
   slots: TimeSlot[];
 };
@@ -112,6 +114,7 @@ export type DayAgendaWithDialog = DayAgendaProps & {
 export function DayAgenda({
   date,
   slots = [],
+  empty,
   surface = 'card',
   frame = true,
   toolbar = true,
@@ -203,14 +206,18 @@ export function DayAgenda({
             {/* Scrolls once the card has a height to fill: a ScrollArea needs a
                 parent of known height, as in a dashboard cell. */}
             <ScrollArea className="min-h-0 flex-1">
-              <ul className="flex flex-col gap-1.5 pr-3">
-                {slots.map((slot, index) => (
-                  <AgendaTimeSlot
-                    key={slot.id ?? `${slot.start}-${slot.label}-${index}`}
-                    {...slot}
-                  />
-                ))}
-              </ul>
+              {slots.length === 0 && empty ? (
+                empty
+              ) : (
+                <ul className="flex flex-col gap-1.5 pr-3">
+                  {slots.map((slot, index) => (
+                    <AgendaTimeSlot
+                      key={slot.id ?? `${slot.start}-${slot.label}-${index}`}
+                      {...slot}
+                    />
+                  ))}
+                </ul>
+              )}
             </ScrollArea>
           </>
         )}

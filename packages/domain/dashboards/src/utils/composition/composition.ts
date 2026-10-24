@@ -108,6 +108,8 @@ export function gridLayoutFor(
       id: w.id,
       collapsed: w.collapsed,
       size: WIDGET_SIZES[w.type][bp],
+      fixed: w.locked,
+      resizable: w.resizable,
     })),
     columnsFor(c.settings.columns, bp),
   );

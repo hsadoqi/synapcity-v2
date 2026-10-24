@@ -56,3 +56,30 @@ describe('DayAgenda date navigation', () => {
     expect(onDateChange).toHaveBeenCalledWith('2026-10-25');
   });
 });
+
+describe('DayAgenda empty state', () => {
+  beforeEach(cleanup);
+
+  test('shows the empty content when there are no slots', () => {
+    render(
+      <DayAgenda
+        date="2026-10-24"
+        slots={[]}
+        empty={<p>Nothing scheduled.</p>}
+      />,
+    );
+    expect(screen.getByText('Nothing scheduled.')).toBeDefined();
+    expect(screen.queryByRole('list')).toBeNull();
+  });
+
+  test('ignores the empty content when there are slots', () => {
+    render(
+      <DayAgenda
+        date="2026-10-24"
+        slots={[{ start: '09:00', label: 'Standup', tone: 'meeting' }]}
+        empty={<p>Nothing scheduled.</p>}
+      />,
+    );
+    expect(screen.queryByText('Nothing scheduled.')).toBeNull();
+  });
+});

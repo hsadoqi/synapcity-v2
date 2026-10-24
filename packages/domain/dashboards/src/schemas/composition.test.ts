@@ -13,6 +13,7 @@ const TYPES: WidgetType[] = [
   'notes',
   'tasks',
   'calendar',
+  'agenda',
   'feed',
 ];
 
@@ -105,5 +106,42 @@ describe('dashboardCompositionSchema', () => {
         dashboardCompositionSchema.safeParse({ ...c, layouts }).success,
       ).toBe(false);
     }
+  });
+
+  it('accepts a widget saved before locked, pinned and resizable existed', () => {
+    const c = fullComposition();
+    for (const w of c.widgets) {
+      expect('locked' in w || 'pinned' in w || 'resizable' in w).toBe(false);
+    }
+    expect(dashboardCompositionSchema.safeParse(c).success).toBe(true);
+  });
+
+  it('accepts locked, pinned and resizable, and rejects them when not boolean', () => {
+    const c = fullComposition();
+    const first = c.widgets[0]!;
+    const ok = {
+      ...c,
+      widgets: [
+        { ...first, pinned: true, resizable: false },
+        ...c.widgets.slice(1),
+      ],
+    };
+    expect(dashboardCompositionSchema.safeParse(ok).success).toBe(true);
+    const bad = {
+      ...c,
+      widgets: [{ ...first, pinned: 'yes' }, ...c.widgets.slice(1)],
+    };
+    expect(dashboardCompositionSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it('rejects an agenda with a range other than day', () => {
+    const c = fullComposition();
+    const agenda = c.widgets.find((w) => w.type === 'agenda')!;
+    const widgets = c.widgets.map((w) =>
+      w.id === agenda.id ? { ...agenda, query: { range: 'week' } } : w,
+    );
+    expect(
+      dashboardCompositionSchema.safeParse({ ...c, widgets }).success,
+    ).toBe(false);
   });
 });

@@ -25,6 +25,11 @@ export const WIDGET_SIZES: Record<WidgetType, BreakpointSizes> = {
     md: { w: 1, h: 5, minW: 1, minH: 3 },
     sm: { w: 1, h: 6, minW: 1, minH: 4 },
   },
+  agenda: {
+    lg: { w: 1, h: 5, minW: 1, minH: 3 },
+    md: { w: 1, h: 5, minW: 1, minH: 3 },
+    sm: { w: 1, h: 6, minW: 1, minH: 4 },
+  },
   notes: {
     lg: { w: 1, h: 4, minW: 1, minH: 2 },
     md: { w: 1, h: 4, minW: 1, minH: 2 },
