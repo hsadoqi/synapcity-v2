@@ -34,6 +34,19 @@ describe('EntityItemCard', () => {
     );
   });
 
+  it('links to the address the item carries, over the slug', () => {
+    render(
+      <EntityItemCard
+        entity={{ ...document, href: '/u1/home/documents/doc-1' }}
+        slug="/u1/home/spaces/s1/documents"
+      />,
+    );
+
+    expect(screen.getByRole('link').getAttribute('href')).toBe(
+      '/u1/home/documents/doc-1',
+    );
+  });
+
   it('shows the name, description and a machine-readable update time', () => {
     const { container } = render(
       <EntityItemCard entity={document} slug="/u1/documents" />,
