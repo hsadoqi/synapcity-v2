@@ -19,6 +19,7 @@ import { AccountPreferencesSync } from '@/features/settings/components/account-p
 import { getAccountPreferences } from '@/features/settings/server/account-preferences';
 import {
   LOOK_COOKIE_NAME,
+  lookWithAccount,
   pageLanguage,
   parseLookCookieValue,
 } from '@synapcity/domain-preferences';
@@ -34,14 +35,15 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await getCurrentUser();
-  const look = parseLookCookieValue(
+  const requestLook = parseLookCookieValue(
     (await cookies()).get(LOOK_COOKIE_NAME)?.value,
   );
-  const lookAttributes = look ? lookHtmlAttributes(look) : undefined;
   // ADR-0010: the account's preferences follow the person to every page, not
   // only the settings page. A failed read leaves this browser's own copy.
   const stored = user ? await getAccountPreferences(user.id) : undefined;
   const account = stored?.preferences ?? null;
+  const look = lookWithAccount(requestLook, account);
+  const lookAttributes = look ? lookHtmlAttributes(look) : undefined;
   return (
     <html
       lang={pageLanguage(account?.regional.language ?? 'en')}

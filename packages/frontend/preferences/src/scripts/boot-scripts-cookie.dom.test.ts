@@ -66,6 +66,23 @@ describe('boot scripts with the shared look cookie', () => {
     expect(root().dataset.density).toBe('compact');
   });
 
+  it('prefers the server-resolved look over cookie and localStorage', () => {
+    root().setAttribute(
+      'data-synapcity-look',
+      JSON.stringify(lookWith({ density: 'compact', textSize: 120 })),
+    );
+    setCookie(lookWith({ density: 'spacious', textSize: 130 }));
+    localStorage.setItem(
+      'synapcity-preferences',
+      JSON.stringify({ theme: { density: 'comfortable', textSize: 90 } }),
+    );
+
+    run();
+
+    expect(root().dataset.density).toBe('compact');
+    expect(root().dataset.textSize).toBe('120');
+  });
+
   it('falls back to localStorage with no cookie', () => {
     localStorage.setItem(
       'synapcity-preferences',

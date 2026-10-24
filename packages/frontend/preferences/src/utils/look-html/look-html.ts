@@ -8,6 +8,7 @@ import {
 type LookStyle = CSSProperties & Record<string, string | number | undefined>;
 
 export type LookHtmlAttributes = {
+  'data-synapcity-look': string;
   className?: 'light' | 'dark';
   'data-animations': string;
   'data-borders': string;
@@ -44,6 +45,7 @@ export function lookHtmlAttributes(look: Look): LookHtmlAttributes {
   if (look.theme.mode !== 'system') style.colorScheme = look.theme.mode;
 
   return {
+    'data-synapcity-look': JSON.stringify(look),
     ...(look.theme.mode === 'system' ? {} : { className: look.theme.mode }),
     'data-animations': String(look.appearance.animationsEnabled),
     'data-borders': String(look.appearance.showBorders),

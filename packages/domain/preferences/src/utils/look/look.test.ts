@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { accountPart } from '../scope';
 import { settingsDefaults, type Settings } from '../../schemas';
-import { lookOf, parseLook } from './look';
+import { lookOf, lookWithAccount, parseLook } from './look';
 
 const withPrivateValues = (): Settings => ({
   ...settingsDefaults,
@@ -46,6 +47,66 @@ describe('look', () => {
   it('round-trips through parseLook', () => {
     const look = lookOf(withPrivateValues());
     expect(parseLook(JSON.parse(JSON.stringify(look)))).toEqual(look);
+  });
+
+  it('keeps device values while account-owned look fields take precedence', () => {
+    const deviceLook = lookOf({
+      ...settingsDefaults,
+      theme: {
+        ...settingsDefaults.theme,
+        mode: 'dark',
+        density: 'compact',
+        textSize: 120,
+        headingFont: 'fraunces',
+      },
+      appearance: {
+        ...settingsDefaults.appearance,
+        contrastMode: 'low',
+      },
+    });
+    const account = accountPart({
+      ...settingsDefaults,
+      theme: {
+        ...settingsDefaults.theme,
+        headingFont: 'inter',
+        radius: 'soft',
+      },
+    });
+
+    const resolved = lookWithAccount(deviceLook, account);
+
+    expect(resolved?.theme).toMatchObject({
+      mode: 'dark',
+      density: 'compact',
+      textSize: 120,
+      headingFont: 'inter',
+      radius: 'soft',
+    });
+    expect(resolved?.appearance.contrastMode).toBe('low');
+  });
+
+  it('leaves a cookie-less visit to the browser storage fallback', () => {
+    const account = accountPart({
+      ...settingsDefaults,
+      theme: { ...settingsDefaults.theme, headingFont: 'fraunces' },
+    });
+
+    expect(lookWithAccount(null, account)).toBeNull();
+  });
+
+  it('lets a global display override take precedence over the device look', () => {
+    const deviceLook = lookOf({
+      ...settingsDefaults,
+      appearance: { ...settingsDefaults.appearance, contrastMode: 'low' },
+    });
+    const account = accountPart(settingsDefaults, {
+      ...settingsDefaults.appearance,
+      contrastMode: 'high',
+    });
+
+    expect(lookWithAccount(deviceLook, account)?.appearance.contrastMode).toBe(
+      'high',
+    );
   });
 
   it('ignores anything invalid or newer', () => {

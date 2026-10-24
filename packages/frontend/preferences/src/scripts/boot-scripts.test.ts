@@ -13,7 +13,9 @@ describe('boot scripts', () => {
       themeShape: themeShapeBootScript,
       font: fontBootScript,
     };
-    if (process.argv.includes('--update')) {
+    // This is set manually only when regenerating the checked-in fixture.
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
+    if (process.env.UPDATE_BOOT_SCRIPTS === '1') {
       writeFileSync(
         join(process.cwd(), 'src/scripts/boot-scripts.expected.json'),
         `${JSON.stringify(current, null, 2)}\n`,

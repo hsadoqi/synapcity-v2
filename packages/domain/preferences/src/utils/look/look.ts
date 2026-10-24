@@ -10,6 +10,10 @@ import {
   themeSchema,
   type Settings,
 } from '../../schemas';
+import { settingsDefaults } from '../../schemas';
+import { mergeSettings } from '../merge-settings';
+import { reconcile } from '../reconcile';
+import type { AccountPreferences } from '../scope';
 import { displaySchema } from '../scope';
 
 /** Light, dark, or follow the system. */
@@ -61,6 +65,19 @@ export function lookOf(settings: Settings): Look {
     theme: { mode, headingFont, bodyFont, codeFont, radius, density, textSize },
     appearance: displaySchema.parse(settings.appearance),
   };
+}
+
+/** Applies account-owned look fields over the device look for server rendering. */
+export function lookWithAccount(
+  look: Look | null,
+  account: AccountPreferences | null,
+): Look | null {
+  if (!look || !account) return look;
+  const local = mergeSettings(settingsDefaults, {
+    theme: look.theme,
+    appearance: { ...look.appearance, colorScheme: look.theme.mode },
+  });
+  return lookOf(reconcile(local, account, null).settings);
 }
 
 /** The look from untrusted input, or null for anything invalid or not version 1. */

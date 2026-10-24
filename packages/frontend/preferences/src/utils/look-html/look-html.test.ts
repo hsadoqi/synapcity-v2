@@ -5,6 +5,7 @@ import { lookHtmlAttributes } from './look-html';
 describe('lookHtmlAttributes', () => {
   it('maps every default look field to safe first-paint HTML attributes', () => {
     expect(lookHtmlAttributes(lookOf(settingsDefaults))).toEqual({
+      'data-synapcity-look': JSON.stringify(lookOf(settingsDefaults)),
       'data-animations': 'true',
       'data-borders': 'false',
       'data-contrast': 'none',
