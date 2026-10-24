@@ -12,6 +12,7 @@ export {
   projectSchema,
   prototypeRecordKindSchema,
   prototypeRecordSchemas,
+  prototypeRecordsSchema,
   taskSchema,
 } from './schemas';
 export type {
@@ -34,6 +35,7 @@ export type {
 export {
   DEFAULT_ICONS,
   addLink,
+  addTask,
   clearSlotAsset,
   createId,
   dayKey,
@@ -55,6 +57,8 @@ export {
   toggleHabitDay,
   toggleTask,
   touchRecord,
+  updateGoal,
+  updateMetricValue,
   updateNoteBody,
   weekDayStarts,
   weekdayIndex,

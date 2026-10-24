@@ -12,6 +12,30 @@ export function tasksForProject(
 }
 
 /**
+ * Adds a task at the end of a project. A blank name or an unknown project
+ * returns `records` unchanged.
+ */
+export function addTask(
+  records: PrototypeRecords,
+  projectId: string,
+  name: string,
+  ctx: RecordContext,
+): PrototypeRecords {
+  const trimmed = name.trim();
+  if (!trimmed || !records.project[projectId]) return records;
+  const order = tasksForProject(records.task, projectId).reduce(
+    (next, t) => Math.max(next, t.order + 1),
+    0,
+  );
+  return putRecord(records, 'task', {
+    ...newRecord('task', trimmed, ctx),
+    projectId,
+    done: false,
+    order,
+  });
+}
+
+/**
  * Flips a task's completion. Completing a task records an activity, so the
  * activity feed comes from real changes rather than widget-local copies.
  */

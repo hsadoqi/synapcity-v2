@@ -122,6 +122,7 @@ interface Finding {
 /** What each rule function needs: where to send findings, and the workspace to read. */
 interface Context {
   workspace: Workspace;
+  publicUnitFiles: ReadonlySet<string>;
   rel: (path: string) => string;
   report: (finding: Finding) => void;
 }
@@ -308,7 +309,7 @@ function samePackageRules(
   { from, record }: Edge,
   to: SourceFile,
   toPath: string,
-  { report }: Context,
+  { publicUnitFiles, report }: Context,
 ) {
   const specifier = record.specifier;
   const finding = (rule: Finding['rule'], message: string): Finding => ({
@@ -347,12 +348,13 @@ function samePackageRules(
     from.pkg.category !== 'app' &&
     isRelative(specifier) &&
     dirname(to.path) !== dirname(from.path) &&
-    !INDEX_FILE.test(basename(to.path))
+    !INDEX_FILE.test(basename(to.path)) &&
+    publicUnitFiles.has(to.path)
   ) {
     report(
       finding(
         'R7',
-        'import another folder through its index.ts, not a file inside it',
+        'import a public unit through its folder index; private helpers may be imported directly',
       ),
     );
   }
@@ -366,8 +368,19 @@ export function edgeRules(
 ): Violation[] {
   const rel = (path: string) => repoPath(workspace.root, path);
   const violations: Violation[] = [];
+  const publicUnitFiles = new Set(
+    edges.flatMap(({ from, record, target }) =>
+      record.kind === 'export' &&
+      INDEX_FILE.test(basename(from.path)) &&
+      target.kind === 'file' &&
+      from.pkg === target.file.pkg
+        ? [target.file.path]
+        : [],
+    ),
+  );
   const context: Context = {
     workspace,
+    publicUnitFiles,
     rel,
     report: ({ rule, file, specifier, target, message }) =>
       violations.push({

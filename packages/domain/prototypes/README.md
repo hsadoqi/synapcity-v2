@@ -30,6 +30,7 @@ Every kind also has the ten base fields: `id`, `ownerId`, `name`, `description?`
 | Export                                                                                          | Meaning                                                                                  |
 | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
 | `metricSchema` … `assetSchema`, `prototypeRecordSchemas`, `PROTOTYPE_RECORD_KINDS`              | One schema per kind, and the kind list. Use them to validate records loaded from storage |
+| `prototypeRecordsSchema`                                                                        | Zod contract for every table saved together; each record must sit under its own id       |
 | `Metric` … `Asset`, `PrototypeRecordKind`, `PrototypeRecordKindMap`                             | The types the schemas produce                                                            |
 | `EntityRef`, `entityRefSchema`                                                                  | `{ kind, id }`; the kind narrows what `getRecord` returns                                |
 | `PrototypeRecords`, `emptyRecords`, `getRecord`, `putRecord`, `removeRecord`, `touchRecord`     | One table per kind keyed by id, and immutable reads and writes on it                     |

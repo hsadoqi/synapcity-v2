@@ -1,0 +1,52 @@
+/*
+ * React Grid Layout's stylesheet and the dashboard grid's skin, written with
+ * the theme's variables. Hosts import this file into their Tailwind entry,
+ * which is what lets `@apply` resolve here.
+ */
+@import 'react-grid-layout/css/styles.css';
+
+.dashboard-grid .react-grid-item {
+  transition-duration: 150ms;
+}
+
+.dashboard-grid .react-grid-item.react-draggable-dragging,
+.dashboard-grid .react-grid-item.resizing {
+  z-index: 30;
+}
+
+.dashboard-grid
+  .react-grid-item.react-draggable-dragging
+  > [data-slot='widget'],
+.dashboard-grid .react-grid-item.resizing > [data-slot='widget'] {
+  @apply shadow-md;
+}
+
+.dashboard-grid .react-grid-item.react-grid-placeholder {
+  background: var(--muted);
+  border-radius: var(--radius-md);
+  opacity: 1;
+  outline: 1px dashed var(--ring);
+  outline-offset: -1px;
+}
+
+.dashboard-grid
+  .react-grid-item
+  > .react-resizable-handle.dashboard-resize-handle {
+  @apply right-0.5 bottom-0.5 size-4;
+  opacity: 1;
+  cursor: nwse-resize;
+  color: var(--muted-foreground);
+}
+
+.dashboard-grid
+  .react-grid-item
+  > .react-resizable-handle.dashboard-resize-handle::after {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-grid,
+  .dashboard-grid .react-grid-item {
+    transition: none;
+  }
+}

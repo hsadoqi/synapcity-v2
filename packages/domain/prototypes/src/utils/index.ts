@@ -9,7 +9,7 @@ export {
 } from './calendar';
 export { createId } from './create-id';
 export { eventsThisWeek } from './events';
-export { goalPercent } from './goals';
+export { goalPercent, updateGoal } from './goals';
 export { habitWeek, toggleHabitDay } from './habits';
 export type { HabitDay } from './habits';
 export { addLink } from './links';
@@ -23,4 +23,5 @@ export {
   removeRecord,
   touchRecord,
 } from './record-tables';
-export { tasksForProject, toggleTask } from './tasks';
+export { addTask, tasksForProject, toggleTask } from './tasks';
+export { updateMetricValue } from './metrics';

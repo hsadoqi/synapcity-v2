@@ -8,4 +8,8 @@ describe('goalPercent', () => {
     expect(goalPercent({ current: 30, target: 24 })).toBe(100);
     expect(goalPercent({ current: 1, target: 0 })).toBe(0);
   });
+
+  it('never goes below zero', () => {
+    expect(goalPercent({ current: -5, target: 10 })).toBe(0);
+  });
 });

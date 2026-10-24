@@ -80,6 +80,11 @@ describe('widget operations', () => {
     expect(Object.keys(records.goal)).toHaveLength(1);
   });
 
+  it('returns the same composition when removing a widget that is not there', () => {
+    const { c } = compositionWith('stat');
+    expect(removeWidget(c, 'missing')).toBe(c);
+  });
+
   it('only patches presentation fields', () => {
     const { c } = compositionWith('stat');
     const id = c.widgets[0]!.id;
@@ -94,5 +99,12 @@ describe('widget operations', () => {
       highlight: 'accent',
     });
     expect(updateWidget(c, 'missing', { title: 'x' })).toBe(c);
+  });
+
+  it('returns the same composition when a patch changes nothing', () => {
+    const { c } = compositionWith('stat');
+    const widget = c.widgets[0]!;
+
+    expect(updateWidget(c, widget.id, { title: widget.title })).toBe(c);
   });
 });
