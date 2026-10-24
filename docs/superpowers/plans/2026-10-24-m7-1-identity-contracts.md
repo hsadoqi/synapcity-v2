@@ -40,7 +40,7 @@
 - Move: `apps/web/src/features/auth/types/schema/schema.ts` and `schema.test.ts` into `packages/domain/identity/src/schemas/credentials/` (`credentials.ts`, `credentials.test.ts`, `index.ts`). Exports to move: `MIN_PASSWORD_LENGTH`, `PASSWORD_TOO_SHORT_MESSAGE`, `PASSWORD_REQUIREMENTS`, `missingCharactersMessage`, `newPasswordSchema`, `ALREADY_YOUR_EMAIL`, `signInSchema`, `signUpSchema`, `emailRequestSchema`, `updatePasswordSchema`, `AuthFieldName`, `firstRefusal`, `everyRefusal`, and any other export the file has (list them from the file; do not guess).
 - Modify: `packages/domain/identity/src/schemas/index.ts` and `src/index.ts` (export the new names); the file imports `nameSchema` from the account feature today, so it imports `./name` instead.
 - Modify: every app file importing these names from `@/features/auth/types` or `.../types/schema` (find with `rg -n "features/auth/types|\.\./schema|\./schema" apps/web/src`, including multi-line imports and tests). `features/auth/types/index.ts` keeps exporting `form-state` only; delete `types/schema/` when empty.
-- Modify: `apps/web/package.json` only if it does not already depend on `@synapcity/domain-identity` (it does not import it directly today; add `workspace:*` and run `pnpm install`).
+- No manifest change: `apps/web/package.json` already depends on `@synapcity/domain-identity` (`workspace:*`).
 
 **Interfaces:**
 
