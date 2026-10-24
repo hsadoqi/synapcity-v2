@@ -15,10 +15,12 @@ import {
 
 import { requestAccountDeletion } from '@/features/auth/server/actions/actions';
 import type { AuthState } from '@/features/auth/types';
-import { FormField } from '@/components/forms/form-field';
-import { FormMessage } from '@/components/forms/form-message';
-import { fieldErrorProps } from '@/components/forms/form-feedback';
-import { useFocusFirstError } from '@/hooks/use-focus-first-error';
+import {
+  FormField,
+  FormMessage,
+  fieldErrorProps,
+  useFocusFirstError,
+} from '@synapcity/frontend-forms';
 import { LINK_SIGN_IN_WINDOW_MINUTES } from '@/features/auth/shared/recent-link-sign-in';
 import { SignInAgain } from '../sign-in-again';
 

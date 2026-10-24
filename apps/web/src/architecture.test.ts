@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { afterAll, describe, expect, it } from 'vitest';
 
 /**
- * Import boundaries for `features/*` and `components/forms` (ADR-0007, the
+ * Import boundaries for `features/*` (ADR-0007, the
  * selected layout: app-local `features/<name>/{shared,server,client,components}`).
  *
  * This is a test rather than an ESLint rule because a failing test is the one
@@ -140,11 +140,6 @@ function buildRules(serverModules: Set<string>): Rule[] {
         /^features\/auth\/client\//,
         /^features\/auth\/components\//,
       ],
-    },
-    {
-      name: 'common form presentation does not depend on a feature',
-      from: /^components\/forms\//,
-      forbid: [/^features\//],
     },
   ];
 }
@@ -319,9 +314,6 @@ describe('import boundaries', () => {
     expect(
       files.filter(({ rel }) => rel.startsWith('features/')).length,
     ).toBeGreaterThan(20);
-    expect(files.some(({ rel }) => rel.startsWith('components/forms/'))).toBe(
-      true,
-    );
     expect(files.some(({ rel }) => FEATURE_SERVER.test(rel))).toBe(true);
     expect(
       files.some(({ rel }) =>

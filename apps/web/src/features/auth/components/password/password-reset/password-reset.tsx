@@ -5,7 +5,7 @@ import { useActionState, useId } from 'react';
 import { requestOwnPasswordReset } from '@/features/auth/server/actions/actions';
 import { useCooldown } from '@/features/auth/client';
 import type { AuthState } from '@/features/auth/types';
-import { FormMessage } from '@/components/forms/form-message';
+import { FormMessage } from '@synapcity/frontend-forms';
 import { ResendButton } from '../../../shared/resend-button';
 import { SignInAgain } from '../../sign-in-again';
 

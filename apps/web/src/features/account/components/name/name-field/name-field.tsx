@@ -1,7 +1,6 @@
 'use client';
 
-import { FormField } from '@/components/forms/form-field';
-import { fieldErrorProps } from '@/components/forms/form-feedback';
+import { FormField, fieldErrorProps } from '@synapcity/frontend-forms';
 import { MAX_NAME_LENGTH } from '@/features/account/types';
 import { useProfileForm } from '../../profile';
 

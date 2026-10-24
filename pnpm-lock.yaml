@@ -373,6 +373,9 @@ importers:
       '@synapcity/frontend-error-reports':
         specifier: workspace:*
         version: link:../../packages/frontend/error-reports
+      '@synapcity/frontend-forms':
+        specifier: workspace:*
+        version: link:../../packages/frontend/forms
       '@synapcity/frontend-preferences':
         specifier: workspace:*
         version: link:../../packages/frontend/preferences
@@ -1209,6 +1212,9 @@ importers:
 
   packages/frontend/forms:
     dependencies:
+      '@synapcity/frontend-ui':
+        specifier: workspace:*
+        version: link:../ui
       react:
         specifier: 19.3.0
         version: 19.3.0

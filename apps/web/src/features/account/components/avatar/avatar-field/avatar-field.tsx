@@ -3,7 +3,7 @@
 import { useId, useState } from 'react';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
-import { FormField, fieldErrorProps } from '@/components/forms';
+import { FormField, fieldErrorProps } from '@synapcity/frontend-forms';
 import {
   AVATAR_ACCEPT,
   MAX_AVATAR_BYTES,
