@@ -23,7 +23,7 @@ import {
 } from '@synapcity/domain-prototypes';
 import { createStore, type StoreApi } from 'zustand/vanilla';
 
-export type DashboardState = {
+type DashboardState = {
   composition: DashboardComposition;
   records: PrototypeRecords;
   /** Which saved layout is shown and edited. View state, not saved. */
@@ -32,7 +32,7 @@ export type DashboardState = {
   editMode: boolean;
 };
 
-export type DashboardActions = {
+type DashboardActions = {
   setBreakpoint(bp: Breakpoint): void;
   toggleEditMode(): void;
   addWidget(type: WidgetType): void;

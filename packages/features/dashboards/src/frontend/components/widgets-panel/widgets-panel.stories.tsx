@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { setWidgetStatus } from '@synapcity/domain-dashboards';
 
-import { seededWorkspace } from '../../../testing/seed';
-import { withDashboardStore } from '../../../testing/with-dashboard-store';
+import { seededWorkspace } from '../../../testing';
+import { withDashboardStore } from '../../../testing';
 import { WidgetsPanel } from './index';
 
 const { composition } = seededWorkspace();

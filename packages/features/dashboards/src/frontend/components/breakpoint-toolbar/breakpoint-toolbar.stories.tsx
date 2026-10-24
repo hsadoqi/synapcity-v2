@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, userEvent, within } from 'storybook/test';
 
-import { withDashboardStore } from '../../../testing/with-dashboard-store';
+import { withDashboardStore } from '../../../testing';
 import { BreakpointToolbar } from './index';
 
 const meta: Meta<typeof BreakpointToolbar> = {

@@ -94,6 +94,7 @@ Expected: PASS.
 **Interfaces:**
 
 - Produces (`./contracts`):
+
   ```ts
   type DashboardSnapshot = {
     composition: DashboardComposition | null;
@@ -113,6 +114,7 @@ Expected: PASS.
     cause: unknown;
   };
   ```
+
 - Produces (utils, internal): `WIDGET_CATALOG: readonly { type: WidgetType; label: string; Icon: LucideIcon }[]`; `WEEKDAY_INITIAL`, `WEEKDAY_SHORT`, `WEEKDAY_NAME` (`readonly string[]` of 7); `relativeTime(fromIso: string, now: number): string`; `DEVICE_FRAME_WIDTH: Record<Breakpoint, number | null>`; `useNow(intervalMs: number): number`.
 
 - [ ] **Step 1: Scaffold the package**

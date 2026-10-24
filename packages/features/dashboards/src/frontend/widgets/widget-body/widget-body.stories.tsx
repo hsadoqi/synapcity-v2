@@ -3,8 +3,8 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { emptyRecords } from '@synapcity/domain-prototypes';
 import { fn } from 'storybook/test';
 
-import { SEED_NOW, seededWorkspace } from '../../../testing/seed';
-import { WidgetFrame } from '../../../testing/widget-frame';
+import { SEED_NOW, seededWorkspace } from '../../../testing';
+import { WidgetFrame } from '../../../testing';
 import { WidgetBody } from './index';
 
 const { composition, records } = seededWorkspace();

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { withDashboardStore } from '../../../testing/with-dashboard-store';
+import { withDashboardStore } from '../../../testing';
 import { ConnectedWidget } from './index';
 
 const meta: Meta<typeof ConnectedWidget> = {

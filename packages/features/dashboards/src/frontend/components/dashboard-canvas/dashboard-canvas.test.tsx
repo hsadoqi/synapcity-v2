@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { renderWithStore } from '../../../testing/render-with-store';
+import { renderWithStore } from '../../../testing';
 
 const width = vi.hoisted(() => ({ value: 1400 as number | null }));
 vi.mock('../../hooks/use-element-width', () => ({

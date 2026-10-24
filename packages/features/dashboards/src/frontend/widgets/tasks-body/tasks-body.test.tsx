@@ -2,7 +2,7 @@ import { tasksForProject } from '@synapcity/domain-prototypes';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { seededWorkspace } from '../../../testing/seed';
+import { seededWorkspace } from '../../../testing';
 import { TasksBody } from './index';
 
 function sample() {

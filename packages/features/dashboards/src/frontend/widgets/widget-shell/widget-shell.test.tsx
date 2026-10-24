@@ -74,6 +74,13 @@ describe('WidgetShell', () => {
     expect(actions.update).not.toHaveBeenCalled();
   });
 
+  it('lets the keyboard reach the body, which scrolls when it overflows', () => {
+    setup({}, { editMode: false });
+    const body = screen.getByRole('group', { name: 'Steps today content' });
+    expect(body.getAttribute('tabindex')).toBe('0');
+    expect(body.textContent).toBe('Body');
+  });
+
   it('collapses and expands, hiding the body when collapsed', () => {
     const actions = setup();
     fireEvent.click(

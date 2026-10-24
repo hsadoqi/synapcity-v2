@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { createComposition } from '@synapcity/domain-dashboards';
 import { emptyRecords } from '@synapcity/domain-prototypes';
 
-import { withDashboardStore } from '../../../testing/with-dashboard-store';
+import { withDashboardStore } from '../../../testing';
 import { DashboardGrid } from './index';
 
 const meta: Meta<typeof DashboardGrid> = {

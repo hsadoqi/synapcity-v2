@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { fn } from 'storybook/test';
 
-import { seededWorkspace } from '../../../testing/seed';
-import { WidgetFrame } from '../../../testing/widget-frame';
+import { seededWorkspace } from '../../../testing';
+import { WidgetFrame } from '../../../testing';
 import { NotesBody } from './index';
 
 const note = Object.values(seededWorkspace().records.note).find(

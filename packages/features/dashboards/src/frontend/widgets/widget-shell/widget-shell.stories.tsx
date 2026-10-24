@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { DEFAULT_SETTINGS } from '@synapcity/domain-dashboards';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { SEED_NOW, seededWorkspace } from '../../../testing/seed';
+import { SEED_NOW, seededWorkspace } from '../../../testing';
 import { WidgetBody } from '../widget-body';
 import { WidgetShell } from './index';
 

@@ -260,7 +260,13 @@ export function WidgetShell({
         {editMode && <WidgetSettings widget={widget} actions={actions} />}
       </header>
       {!widget.collapsed && (
-        <div className="min-h-0 flex-1 overflow-auto border-t border-divider px-3.5 py-3">
+        // Focusable and named, so the keyboard can scroll a body that overflows its cell.
+        <div
+          role="group"
+          aria-label={`${widget.title} content`}
+          tabIndex={0}
+          className="min-h-0 flex-1 overflow-auto border-t border-divider px-3.5 py-3 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
+        >
           {children}
         </div>
       )}

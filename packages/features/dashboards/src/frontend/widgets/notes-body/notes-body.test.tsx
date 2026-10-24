@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { seededWorkspace } from '../../../testing/seed';
+import { seededWorkspace } from '../../../testing';
 import { NotesBody } from './index';
 
 describe('NotesBody', () => {

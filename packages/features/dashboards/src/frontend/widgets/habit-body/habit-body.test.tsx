@@ -2,7 +2,7 @@ import { dayKey } from '@synapcity/domain-prototypes';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { SEED_NOW, seededWorkspace } from '../../../testing/seed';
+import { SEED_NOW, seededWorkspace } from '../../../testing';
 import { HabitBody } from './index';
 
 const habit = () => Object.values(seededWorkspace().records.habit)[0]!;

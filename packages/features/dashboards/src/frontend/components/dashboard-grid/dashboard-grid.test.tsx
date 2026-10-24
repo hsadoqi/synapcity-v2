@@ -3,7 +3,7 @@ import { emptyRecords } from '@synapcity/domain-prototypes';
 import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { renderWithStore } from '../../../testing/render-with-store';
+import { renderWithStore } from '../../../testing';
 import { DashboardGrid, handleLayoutChange } from './index';
 
 describe('DashboardGrid', () => {

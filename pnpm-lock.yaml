@@ -249,6 +249,9 @@ importers:
 
   apps/storybook:
     dependencies:
+      '@synapcity/features-dashboards':
+        specifier: workspace:*
+        version: link:../../packages/features/dashboards
       '@synapcity/frontend-ui':
         specifier: workspace:*
         version: link:../../packages/frontend/ui

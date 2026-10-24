@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { seededWorkspace } from '../../../testing/seed';
-import { WidgetFrame } from '../../../testing/widget-frame';
+import { seededWorkspace } from '../../../testing';
+import { WidgetFrame } from '../../../testing';
 import { StatBody } from './index';
 
 const { records } = seededWorkspace();

@@ -1,7 +1,7 @@
 import { act, fireEvent, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { renderWithStore } from '../../../testing/render-with-store';
+import { renderWithStore } from '../../../testing';
 import { ConnectedWidget } from './index';
 
 describe('ConnectedWidget', () => {

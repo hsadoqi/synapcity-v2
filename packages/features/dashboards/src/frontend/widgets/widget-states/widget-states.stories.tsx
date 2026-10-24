@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { WidgetFrame } from '../../../testing/widget-frame';
+import { WidgetFrame } from '../../../testing';
 import { WidgetEmpty, WidgetUnavailable } from './index';
 
 const meta: Meta<typeof WidgetUnavailable> = {

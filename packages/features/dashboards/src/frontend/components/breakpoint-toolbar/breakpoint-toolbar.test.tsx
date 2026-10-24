@@ -1,7 +1,7 @@
 import { fireEvent, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { renderWithStore } from '../../../testing/render-with-store';
+import { renderWithStore } from '../../../testing';
 import { BreakpointToolbar } from './index';
 
 describe('BreakpointToolbar', () => {
