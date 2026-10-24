@@ -44,6 +44,9 @@ export function unwrapSchema(schema: z.ZodType): z.ZodType {
   }
 }
 
+const isOptional = (schema: z.ZodType) => schema.safeParse(undefined).success;
+const isNullable = (schema: z.ZodType) => schema.safeParse(null).success;
+
 /**
  * Describes one key of an object schema: its kind, whether it accepts
  * `undefined` or `null`, an email format, and enum values. Read from Zod
@@ -59,7 +62,7 @@ export function describeSchemaField(
   const field = schema.shape[key] as z.ZodType;
   const inner = unwrapSchema(field);
   const { type, format } = definitionOf(inner);
-  const base = { optional: field.isOptional(), nullable: field.isNullable() };
+  const base = { optional: isOptional(field), nullable: isNullable(field) };
 
   if (type === 'string') {
     return {
