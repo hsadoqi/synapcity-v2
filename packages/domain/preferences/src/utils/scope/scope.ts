@@ -32,7 +32,6 @@ export const settingScope: {
     analytics: 'account',
     errorReports: 'account',
     sharing: 'account',
-    askAgain: 'account',
   },
   theme: {
     mode: 'device',

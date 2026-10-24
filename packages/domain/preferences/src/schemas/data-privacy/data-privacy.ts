@@ -54,7 +54,6 @@ export const dataPrivacySchema = z.object({
   analytics: consent,
   errorReports: consent,
   sharing: consent,
-  askAgain: z.boolean().default(false),
 });
 
 export type DataPrivacySettings = z.infer<typeof dataPrivacySchema>;
