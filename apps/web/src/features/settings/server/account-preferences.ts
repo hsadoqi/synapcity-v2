@@ -4,7 +4,7 @@ import { logFailure, type Supabase } from '@/features/account/server/caller';
 import { createClient } from '@/lib/supabase/server';
 import { fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import type { StoredAccountPreferences } from '@synapcity/domain-preferences';
-import { readAccountPreferences } from '@synapcity/domain-preferences';
+import { loadSettingsAccountPreferences } from '@synapcity/features-settings/server';
 
 /**
  * Reads the caller's own preferences row. Returns undefined when the read
@@ -14,21 +14,9 @@ export async function loadAccountPreferences(
   supabase: Supabase,
   userId: string,
 ): Promise<StoredAccountPreferences | undefined> {
-  const { data, error } = await supabase
-    .from('user_preferences')
-    .select('preferences, device_timezone')
-    .eq('user_id', userId)
-    .maybeSingle();
-  if (error) {
-    logFailure('loadAccountPreferences', error);
-    return undefined;
-  }
-  if (!data) return { preferences: null, deviceTimezone: null };
-  return {
-    preferences: readAccountPreferences(data.preferences),
-    deviceTimezone:
-      typeof data.device_timezone === 'string' ? data.device_timezone : null,
-  };
+  return loadSettingsAccountPreferences(supabase, userId, (failure) =>
+    logFailure('loadAccountPreferences', failure),
+  );
 }
 
 /**

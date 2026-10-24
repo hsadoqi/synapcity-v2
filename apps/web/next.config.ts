@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next';
 
 // No withSentryConfig: Sentry loads in the browser only after someone turns on
-// error reports (features/error-reports), never at build time or on the server.
+// error reports (@synapcity/frontend-error-reports), never at build time or on the server.
 const nextConfig: NextConfig = {
   agentRules: false,
   experimental: {

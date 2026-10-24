@@ -15,7 +15,7 @@ import {
   themeShapeBootScript,
   lookHtmlAttributes,
 } from '@synapcity/frontend-preferences';
-import { AccountPreferencesSync } from '@/features/settings/components/account-preferences-sync';
+import { AccountPreferencesSync } from '@synapcity/features-settings/frontend';
 import { getAccountPreferences } from '@/features/settings/server/account-preferences';
 import {
   LOOK_COOKIE_NAME,

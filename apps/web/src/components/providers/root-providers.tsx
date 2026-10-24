@@ -8,7 +8,7 @@ import {
 import { Toaster } from '@synapcity/frontend-ui/core/toast';
 
 import { NoticeToast } from '@/components/notices/notice-toast';
-import { ErrorReports } from '@/features/error-reports/client';
+import { ErrorReports } from '@synapcity/frontend-error-reports';
 
 // One parent domain lets web and docs show the same look; unset keeps it host-only.
 configureLookCookie({
@@ -38,7 +38,11 @@ export default function RootProviders({
         <NoticeToast />
       </Suspense>
       {/* Loads nothing unless the person has turned error reports on. */}
-      <ErrorReports />
+      <ErrorReports
+        dsn={process.env.NEXT_PUBLIC_SENTRY_DSN}
+        environment={process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.NODE_ENV}
+        release={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA}
+      />
     </ModeProvider>
   );
 }

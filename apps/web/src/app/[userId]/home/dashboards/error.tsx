@@ -7,7 +7,7 @@ import {
   MESSAGE_HEADING_ID,
   MessagePage,
 } from '@/components/shells/message-page';
-import { reportCaughtError } from '@/features/error-reports/client';
+import { reportCaughtError } from '@synapcity/frontend-error-reports';
 
 /**
  * When the dashboards page fails to load. Sits inside the home layout, so the

@@ -1,4 +1,4 @@
-import { SettingsPageShell } from '@/features/settings/shared';
+import { SettingsPageShell } from '@synapcity/features-settings/frontend';
 
 export default function SettingsLayout({
   children,

@@ -3,7 +3,7 @@
 import '../styles/globals.css';
 
 import { useEffect } from 'react';
-import { reportCaughtError } from '@/features/error-reports/client';
+import { reportCaughtError } from '@synapcity/frontend-error-reports';
 import { Button, buttonVariants } from '@synapcity/frontend-ui/core/button';
 import { ModeProvider } from '@synapcity/frontend-preferences';
 

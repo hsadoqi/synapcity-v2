@@ -9,6 +9,7 @@ const config: StorybookConfig = {
     '../../../packages/frontend/preferences/src/**/*.stories.@(ts|tsx)',
     '../../../packages/frontend/collection/src/**/*.stories.@(ts|tsx)',
     '../../../packages/features/spaces/src/**/*.stories.@(ts|tsx)',
+    '../../../packages/features/settings/src/**/*.stories.@(ts|tsx)',
   ],
   addons: [
     '@storybook/addon-docs',
