@@ -46,35 +46,39 @@ A new package must earn its boundary through at least one of: a different runtim
 
 Accepted 2026-10-23 through the [Milestone 3.1 design](../superpowers/specs/2026-10-23-m3-package-grouping-design.md), which records each package's current source inputs and the owner's decisions. A package is created by the migration that first moves code into it, never as an empty skeleton.
 
+Milestone numbers follow the reorganization roadmap (owner decision, 2026-10-23): M4 server identity boundary, M5 Collection and Spaces pathfinder slice, M6 Preferences and Settings, M7 Authentication and Account, M8 Documents and Dashboards, M9 Home, M10 final verification and sweep. Foundations (domain contracts, fixtures, shells) move with the first slice that needs them, so a package's first code can arrive before the rest of its scope.
+
 | Package                               | Owns                                                                                                                                                         | First code    |
 | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------- |
-| `domain-records`                      | Base record contract; Space, Document and Dashboard contracts as separate modules extending it                                                               | M4            |
-| `domain-preferences`                  | Preference schemas, defaults, account/device scope, merging, import/transfer validation, consent policy                                                      | M4            |
-| `domain-identity`                     | Credential, profile, name and avatar contracts; verified-identity contract                                                                                   | M4            |
+| `domain-records`                      | Base record contract; Space, Document and Dashboard contracts as separate modules extending it                                                               | M5            |
+| `domain-preferences`                  | Preference schemas, defaults, account/device scope, merging, import/transfer validation, consent policy                                                      | M6            |
+| `domain-identity`                     | Credential, profile, name and avatar contracts; verified-identity contract                                                                                   | M4\* / M7     |
 | `frontend-ui` (existing)              | Primitives, generic components and form pieces, generic hooks, low-level layout primitives                                                                   | exists        |
-| `frontend-shells`                     | Composable app shells and page frames                                                                                                                        | M6            |
-| `frontend-collection`                 | Browse projections, query mechanics, generic controls and displays, local browse state                                                                       | M7            |
-| `frontend-settings`                   | Settings presentation pieces                                                                                                                                 | M8            |
-| `frontend-preferences`                | Browser preference runtime: device store, apply functions, boot scripts, mode, consent state                                                                 | M8            |
-| `frontend-error-reports`              | Consent-gated browser error reporting and event scrubbing                                                                                                    | M8            |
-| `frontend-auth`                       | Auth presentation pieces                                                                                                                                     | M9            |
-| `frontend-supabase`                   | Browser Supabase client used by auth state listening; the only frontend package importing `@supabase/*`                                                      | M9            |
+| `frontend-shells`                     | Composable app shells and page frames                                                                                                                        | M5            |
+| `frontend-collection`                 | Browse projections, query mechanics, generic controls and displays, local browse state                                                                       | M5            |
+| `frontend-settings`                   | Settings presentation pieces                                                                                                                                 | M6            |
+| `frontend-preferences`                | Browser preference runtime: device store, apply functions, boot scripts, mode, consent state                                                                 | M6            |
+| `frontend-error-reports`              | Consent-gated browser error reporting and event scrubbing                                                                                                    | M6            |
+| `frontend-auth`                       | Auth presentation pieces                                                                                                                                     | M7            |
+| `frontend-supabase`                   | Browser Supabase client used by auth state listening; the only frontend package importing `@supabase/*`                                                      | M7            |
 | `frontend-editor` (future)            | Document editor runtime (Lexical), nodes and plugins; created only after the editor and document body are approved                                           | not scheduled |
 | `frontend-site` (existing)            | Site metadata and brand presentation                                                                                                                         | exists        |
 | `frontend-tailwind-config` (existing) | Tokens and styling foundation                                                                                                                                | exists        |
-| `server-data`                         | Space, Document and Dashboard repositories, queries and row mapping                                                                                          | M7            |
-| `server-account`                      | Profile, avatar and account-preference operations                                                                                                            | M8            |
-| `server-auth`                         | Verified identity, auth operations, verified-caller helpers                                                                                                  | M9            |
-| `server-supabase`                     | Request-bound server client from host-supplied cookies, session refresh helpers, provider-error translation; the only server package importing `@supabase/*` | M7            |
-| `features-spaces`                     | Space browsing and detail                                                                                                                                    | M7            |
-| `features-settings`                   | The Settings experience: editors, drafts, guard, import/export, account sync                                                                                 | M8            |
-| `features-auth`                       | Sign-in, registration, password, email and session workflows                                                                                                 | M9            |
-| `features-account`                    | Name, avatar and profile workflows                                                                                                                           | M9            |
-| `features-documents`                  | Document browsing                                                                                                                                            | M10           |
-| `features-dashboards`                 | Dashboard browsing                                                                                                                                           | M10           |
-| `features-home`                       | Home, aggregating the resource features                                                                                                                      | M11           |
+| `server-data`                         | Space, Document and Dashboard repositories, queries and row mapping                                                                                          | M5            |
+| `server-account`                      | Profile, avatar and account-preference operations                                                                                                            | M6            |
+| `server-auth`                         | Verified identity, auth operations, verified-caller helpers                                                                                                  | M4\* / M7     |
+| `server-supabase`                     | Request-bound server client from host-supplied cookies, session refresh helpers, provider-error translation; the only server package importing `@supabase/*` | M4\* / M5     |
+| `features-spaces`                     | Space browsing and detail                                                                                                                                    | M5            |
+| `features-settings`                   | The Settings experience: editors, drafts, guard, import/export, account sync                                                                                 | M6            |
+| `features-auth`                       | Sign-in, registration, password, email and session workflows                                                                                                 | M7            |
+| `features-account`                    | Name, avatar and profile workflows                                                                                                                           | M7            |
+| `features-documents`                  | Document browsing                                                                                                                                            | M8            |
+| `features-dashboards`                 | Dashboard browsing                                                                                                                                           | M8            |
+| `features-home`                       | Home, aggregating the resource features                                                                                                                      | M9            |
 | `dev-*` (five existing)               | Tooling, test configuration and fixtures; `dev-fixtures` grows scenarios and sample content                                                                  | exists        |
 | `dev-boundaries`                      | Workspace boundary checker (`pnpm boundaries`) and its violation probes                                                                                      | M3.4          |
+
+\* The M4 design decides which packages hold the server identity contract and its provider adapter. Packages it does not use first receive code in the milestone after the slash.
 
 **Preferences and Settings** are different packages on purpose: preferences are the data, rules, persistence and browser runtime; Settings is the screen that edits them.
 

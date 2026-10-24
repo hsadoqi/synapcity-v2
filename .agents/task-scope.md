@@ -1,3 +1,10 @@
+## Active task: Milestone 4 server identity boundary design (2026-10-23)
+
+- Goal and mode: design Milestone 4 with the owner, then plan and implement after approval. Branch `chore/reorganization-m4-server-identity` from `main` at `3a70a62f` (M3 merged as #55). Commits not yet authorized.
+- Sequence decision: the owner chose the roadmap sequence over the M3.1 inventory numbering ("Roadmap (Recommended)", 2026-10-23). M4 is the server identity boundary; domain contracts, fixtures and shells move just in time with the M5 Spaces slice. The roadmap file (`docs/archive/high-level-roadmap.md`) is gitignored, so the sequence is summarized in the workspace conventions.
+- Renumbering updates (documentation and labels only, no behavior): `docs/architecture/workspace-conventions.md` (sequence note, First code column, footnote), `packages/dev/boundaries/src/exceptions/exceptions.ts` (removal labels only; rules, files and members unchanged), `docs/architecture/decisions/0014-multi-app-package-boundaries.md` (base record timing sentence), `docs/architecture/decisions/README.md` (react-server/Storybook timing), renumbering notes on the three M3 design records, this ledger.
+- Next: M4 design at `docs/superpowers/specs/2026-10-23-m4-server-identity-boundary-design.md` for owner approval. No source moves before approval.
+
 ## Active task: Milestone 3.4 boundary checker implementation (2026-10-23)
 
 - Goal and mode: implement the accepted 3.4 design per `docs/superpowers/plans/2026-10-23-m3-boundary-checker.md`, native execution chosen by the owner ("ill go with ur recs"). Commits not authorized; the owner committed progress during the run.

@@ -52,7 +52,7 @@ Not decided. Each needs an ADR, and the owner's approval, before it is treated a
 - **Boundary enforcement: items carried out of Milestone 3.** Owner decision 2026-10-23 ("go with all ur recommendations"):
   1. _R11 for feature frontend graphs:_ decided and implemented. A feature keeps Next.js imports under `src/frontend/next/`.
   2. _Frontend-to-domain condition:_ decided and implemented. Frontend imports a domain package only through its root, `./contracts` or `./rules` (R2). Whether such an entry holds only pure rules remains a review judgement. The sibling-feature condition is covered by R5 and R9.
-  3. _Vitest `react-server` condition and Storybook discovery of stories in new packages:_ still open by decision. Each is added with the first package that has a server entry (M5) or stories (M6), verified against the installed Vitest and Storybook versions.
+  3. _Vitest `react-server` condition and Storybook discovery of stories in new packages:_ still open by decision. Each is added with the first package that has a server entry (expected in M4, the server identity boundary) or stories (expected in M5, the Spaces slice), verified against the installed Vitest and Storybook versions.
   4. _Approvals given on one-word replies_ (the ADR-0014 frontend-to-domain widening, the base record contract, the glossary amendment, `server-only` 0.0.1): ratified by the owner.
 
 - **Component catalogue governance.** `apps/storybook` exists and exercises stories. Its presence does not resolve the wider catalogue ownership, publishing, and acceptance policy.

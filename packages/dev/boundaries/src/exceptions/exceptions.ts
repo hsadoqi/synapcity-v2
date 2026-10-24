@@ -14,56 +14,58 @@ export const EXCEPTIONS: readonly Exception[] = [
     specifier: 'next',
     reason:
       'Pre-existing Next.js Metadata type in the site package; it keeps its layout until a scoped change gives it a ./next entry.',
-    removal: 'M6 frontend foundations',
+    removal: 'M5 Spaces slice if it needs the site package, else M10 sweep',
   },
   {
     rule: 'R11',
     file: 'packages/frontend/ui/src/blocks/entity/entity-item-card/entity-item-card.tsx',
     specifier: 'next/link',
     reason: NEXT_IN_SHARED_UI,
-    removal: 'M7 collection migration (entity blocks join frontend-collection)',
+    removal: 'M5 Spaces slice (entity blocks join frontend-collection)',
   },
   {
     rule: 'R11',
     file: 'packages/frontend/ui/src/blocks/entity/entity-section/entity-section.tsx',
     specifier: 'next/link',
     reason: NEXT_IN_SHARED_UI,
-    removal: 'M7 collection migration (entity blocks join frontend-collection)',
+    removal: 'M5 Spaces slice (entity blocks join frontend-collection)',
   },
   {
     rule: 'R11',
     file: 'packages/frontend/ui/src/blocks/entity/recent-entity/recent-entity-items.tsx',
     specifier: 'next/link',
     reason: NEXT_IN_SHARED_UI,
-    removal: 'M7 collection migration (entity blocks join frontend-collection)',
+    removal: 'M5 Spaces slice (entity blocks join frontend-collection)',
   },
   {
     rule: 'R11',
     file: 'packages/frontend/ui/src/blocks/entity/recent-entity/recent-entity-row.tsx',
     specifier: 'next/link',
     reason: NEXT_IN_SHARED_UI,
-    removal: 'M7 collection migration (entity blocks join frontend-collection)',
+    removal: 'M5 Spaces slice (entity blocks join frontend-collection)',
   },
   {
     rule: 'R11',
     file: 'packages/frontend/ui/src/blocks/root-shell/root-header/root-header.tsx',
     specifier: 'next/link',
     reason: NEXT_IN_SHARED_UI,
-    removal: 'M6 shells migration (frontend-shells, host-supplied links)',
+    removal:
+      'M5 Spaces slice or the later slice that needs this shell (frontend-shells, host-supplied links)',
   },
   {
     rule: 'R11',
     file: 'packages/frontend/ui/src/blocks/sidebar-shell/root-sidebar/root-sidebar.tsx',
     specifier: 'next/link',
     reason: NEXT_IN_SHARED_UI,
-    removal: 'M6 shells migration (frontend-shells, host-supplied links)',
+    removal:
+      'M5 Spaces slice or the later slice that needs this shell (frontend-shells, host-supplied links)',
   },
   {
     rule: 'R11',
     file: 'packages/frontend/ui/src/components/auth-buttons/auth-buttons.tsx',
     specifier: 'next/navigation',
     reason: NEXT_IN_SHARED_UI,
-    removal: 'M9 auth migration (frontend-auth, host-supplied navigation)',
+    removal: 'M7 auth migration (frontend-auth, host-supplied navigation)',
   },
   {
     rule: 'R11',
@@ -71,14 +73,15 @@ export const EXCEPTIONS: readonly Exception[] = [
     specifier: 'next/link',
     reason: NEXT_IN_SHARED_UI,
     removal:
-      'M6 frontend foundations (link wrapper moves behind frontend-ui ./next)',
+      'M5 Spaces slice frontend foundations (link wrapper moves behind frontend-ui ./next)',
   },
   {
     rule: 'R11',
     file: 'packages/frontend/ui/src/components/user-menu/user-menu.tsx',
     specifier: 'next/link',
     reason: NEXT_IN_SHARED_UI,
-    removal: 'M6 shells migration (frontend-shells, host-supplied links)',
+    removal:
+      'M5 Spaces slice or the later slice that needs this shell (frontend-shells, host-supplied links)',
   },
   {
     rule: 'R9',
@@ -102,7 +105,7 @@ export const EXCEPTIONS: readonly Exception[] = [
     ],
     reason:
       "Pre-existing barrel-induced module cycle across the account components' index files.",
-    removal: 'M9 account migration',
+    removal: 'M7 account migration',
   },
   {
     rule: 'R9',
@@ -114,7 +117,7 @@ export const EXCEPTIONS: readonly Exception[] = [
     ],
     reason:
       'Pre-existing barrel-induced module cycle: the auth client barrel and the user provider import each other.',
-    removal: 'M9 auth migration',
+    removal: 'M7 auth migration',
   },
   {
     rule: 'R9',
@@ -147,7 +150,7 @@ export const EXCEPTIONS: readonly Exception[] = [
     ],
     reason:
       "Pre-existing barrel-induced module cycle across the settings components' index files.",
-    removal: 'M8 settings migration',
+    removal: 'M6 settings migration',
   },
   {
     rule: 'R9',
@@ -159,7 +162,7 @@ export const EXCEPTIONS: readonly Exception[] = [
     ],
     reason:
       'Pre-existing module cycle: entity-section imports its own parent barrel @synapcity/frontend-ui/blocks/entity.',
-    removal: 'M7 collection migration',
+    removal: 'M5 Spaces slice (collection migration)',
   },
   {
     rule: 'R9',
@@ -171,7 +174,7 @@ export const EXCEPTIONS: readonly Exception[] = [
     ],
     reason:
       'Pre-existing module cycle: mode-provider and utils/theme import each other.',
-    removal: 'M8 preferences migration (frontend-preferences)',
+    removal: 'M6 preferences migration (frontend-preferences)',
   },
 ];
 
