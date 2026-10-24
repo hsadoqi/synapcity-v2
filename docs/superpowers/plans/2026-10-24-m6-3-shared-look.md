@@ -212,3 +212,12 @@
 - Server rendering of the look from the cookie (C3).
 - The Settings provider, tabs and screen contracts (M6.4), and error reports (M6.5).
 - Whether a person should be able to clear the shared look from Settings (a reset control); out of M6 scope.
+
+## Deviations recorded during execution
+
+- **Task 1:** the `look` unit lives in `packages/domain/preferences/src/utils/look/`, not `schemas/look/`, because `displaySchema` is defined in `utils/scope` and schemas never import utils.
+- **Tasks 4 and 5:** `saveLook`, `migrateLookToCookie`, `currentLook` and `shareMode` live in a `store/shared-look/` unit of their own, not in `device-store`, so the device store stays the only owner of the raw keys.
+- **Task 3:** the three boot scripts check the cookie's shape and validate values field by field, rather than running the full `look` schema; see the frontend-preferences README.
+- **Task 4:** `ModeProvider` gained `shareLook` (default off), so Storybook cannot write the cookie.
+- **Task 7:** `theme-shape.e2e.ts` clears cookies between simulated visits, and `web#test:e2e` also depends on `docs#build` in `turbo.json`, because the new test serves the docs production build.
+- **Task 2 addition (review):** `configureLookCookie` accepts only a plain host name.

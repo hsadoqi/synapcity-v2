@@ -22,7 +22,13 @@ let configuredDomain: string | undefined;
  * and preview builds working. Hosts call this once at startup.
  */
 export function configureLookCookie(config: { domain?: string }): void {
-  configuredDomain = config.domain ? config.domain : undefined;
+  const domain = config.domain?.trim().toLowerCase();
+  // The value is written into a cookie string, so only a plain host name is
+  // accepted: anything with `;`, spaces or a scheme could add attributes.
+  configuredDomain =
+    domain && /^\.?[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(domain)
+      ? domain
+      : undefined;
 }
 
 export function serializeLookCookie(

@@ -61,6 +61,27 @@ describe('look cookie', () => {
     expect(readLookCookie()).toEqual(look);
   });
 
+  it('ignores a configured domain that is not a plain host name', () => {
+    for (const bad of [
+      'a.com; Secure',
+      'a.com;SameSite=None',
+      'a b.com',
+      'http://a.com',
+      '.',
+    ]) {
+      const set = vi.spyOn(document, 'cookie', 'set');
+      configureLookCookie({ domain: bad });
+      writeLookCookie(look);
+      expect(set.mock.calls[0]?.[0], bad).not.toContain('Domain=');
+      expect(set.mock.calls[0]?.[0], bad).not.toContain(bad);
+      set.mockRestore();
+    }
+    const set = vi.spyOn(document, 'cookie', 'set');
+    configureLookCookie({ domain: '.Example.com' });
+    writeLookCookie(look);
+    expect(set.mock.calls[0]?.[0]).toContain('Domain=.example.com');
+  });
+
   it('does not throw when the browser refuses the write', () => {
     vi.spyOn(document, 'cookie', 'set').mockImplementation(() => {
       throw new Error('blocked');
