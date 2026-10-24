@@ -34,6 +34,19 @@ export type DayAgendaDateDisplay = {
 };
 
 export type DayAgendaStyleProps = {
+  /**
+   * Draw the agenda's own card (surface, border, padding, shadow). Turn it off
+   * inside a host that draws its own frame, such as a dashboard widget or the
+   * global panel, so there is no card inside a card.
+   * @default true
+   */
+  frame?: boolean;
+  /**
+   * Show the agenda's own toolbar. Turn it off when the host shows the
+   * agenda's actions in its own toolbar.
+   * @default true
+   */
+  toolbar?: boolean;
   surface?: Surface;
   bordered?: boolean;
   inverted?: boolean;
@@ -100,6 +113,8 @@ export function DayAgenda({
   date,
   slots = [],
   surface = 'card',
+  frame = true,
+  toolbar = true,
   bordered = false,
   inverted = false,
   className,
@@ -127,7 +142,8 @@ export function DayAgenda({
       className={cn(
         // No vertical centring: the card fills the height it is given, so the
         // slot list can scroll inside it.
-        'flex size-full justify-center p-4',
+        'flex size-full justify-center',
+        frame && 'p-4',
         inverted && invertedClasses,
         className,
       )}
@@ -135,11 +151,11 @@ export function DayAgenda({
       <div
         ref={card}
         className={cn(
-          // `@container/agenda` sizes the toolbar to this card, not the window.
-          '@container/agenda relative flex w-full flex-1 flex-col gap-2 rounded-xl p-3 shadow-sm',
+          'relative flex w-full flex-1 flex-col gap-2',
+          frame && 'rounded-xl p-3 shadow-sm',
           dialogContainer === 'card' && 'contain-layout',
-          surfaceClasses[surface],
-          bordered && 'border border-border/15',
+          frame && surfaceClasses[surface],
+          frame && bordered && 'border border-border/15',
         )}
       >
         <div className="flex min-h-6 items-center justify-between gap-2">
@@ -155,20 +171,22 @@ export function DayAgenda({
               <AgendaDate date={date} locale={locale} format={dateFormat} />
             )
           )}
-          <AgendaActionsMenu
-            title={settings?.title ?? 'Settings'}
-            description={
-              settings?.description ?? 'Manage your agenda preferences'
-            }
-            trigger={settings?.trigger}
-            menuItems={menuItems}
-            settingsPresentation={settingsPresentation}
-            onOpenSettingsView={() => setShowingSettings(true)}
-            modal={modal}
-            container={container}
-          >
-            {settings?.content}
-          </AgendaActionsMenu>
+          {toolbar && (
+            <AgendaActionsMenu
+              title={settings?.title ?? 'Settings'}
+              description={
+                settings?.description ?? 'Manage your agenda preferences'
+              }
+              trigger={settings?.trigger}
+              menuItems={menuItems}
+              settingsPresentation={settingsPresentation}
+              onOpenSettingsView={() => setShowingSettings(true)}
+              modal={modal}
+              container={container}
+            >
+              {settings?.content}
+            </AgendaActionsMenu>
+          )}
         </div>
         {showingSettings ? (
           <AgendaSettingsView

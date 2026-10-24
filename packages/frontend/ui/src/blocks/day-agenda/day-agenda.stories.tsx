@@ -288,3 +288,23 @@ export const SettingsByWidth: Story = {
     await expect(await screen.findByRole('dialog')).toBeDefined();
   },
 };
+
+/** Inside a host that draws its own frame: no card, no toolbar, just the content. */
+export const InHost: Story = {
+  args: { frame: false, toolbar: false },
+  render: (args) => (
+    <section
+      aria-label="Host panel"
+      className="flex h-80 w-sm flex-col rounded-lg border border-border bg-card p-3 text-card-foreground"
+    >
+      <DayAgenda {...args} />
+    </section>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.queryByRole('button', { name: 'Agenda settings' }),
+    ).toBeNull();
+    await expect(canvas.getByText('API refactor')).toBeVisible();
+  },
+};
