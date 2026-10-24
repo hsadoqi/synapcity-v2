@@ -136,9 +136,16 @@ export function createDashboardStore({
       },
       updateWidget: (id, patch) => compose((c) => updateWidget(c, id, patch)),
       duplicateWidget: (id) => compose((c) => duplicateWidget(c, id)),
-      setWidgetStatus: (id, status) =>
-        compose((c) => setWidgetStatus(c, id, status)),
-      removeWidget: (id) => compose((c) => removeWidget(c, id)),
+      setWidgetStatus: (id, status) => {
+        compose((c) => setWidgetStatus(c, id, status));
+        if (status !== 'active' && get().selectedWidgetId === id) {
+          set({ selectedWidgetId: null });
+        }
+      },
+      removeWidget: (id) => {
+        compose((c) => removeWidget(c, id));
+        if (get().selectedWidgetId === id) set({ selectedWidgetId: null });
+      },
       applyLayoutChange: (bp, items) =>
         compose((c) => applyLayoutChange(c, bp, items)),
       updateSettings: (patch) => compose((c) => updateSettings(c, patch)),

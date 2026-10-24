@@ -16,8 +16,11 @@ import ReactGridLayout, {
 
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 
-import { useDashboardStore, type DashboardStore } from '../../store';
-import { keyboardDelta } from '../../store/keyboard-move';
+import {
+  keyboardDelta,
+  useDashboardStore,
+  type DashboardStore,
+} from '../../store';
 import { ConnectedWidget } from '../connected-widget';
 import { DashboardEmptyState } from '../dashboard-empty-state';
 

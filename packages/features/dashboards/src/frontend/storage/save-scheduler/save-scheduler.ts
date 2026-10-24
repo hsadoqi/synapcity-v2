@@ -13,7 +13,7 @@ export type SaveTarget = {
 /**
  * Saves a canvas's composition and records 400 ms after its last change,
  * and at once when the page is hidden or closed. View state (breakpoint,
- * edit mode) is never saved. Returns a disconnect that flushes first.
+ * edit mode) is never saved. A failed write gets one automatic retry.
  */
 export function connectSaves(
   store: StoreApi<DashboardStore>,
@@ -29,7 +29,6 @@ export function connectSaves(
   let timer: ReturnType<typeof setTimeout> | undefined;
   let flushing: Promise<void> | undefined;
   let automaticRetryAvailable = true;
-  let disconnected = false;
 
   const report = (cause: unknown) =>
     console.error('Saving the dashboard failed.', cause);
@@ -73,7 +72,7 @@ export function connectSaves(
         report(cause);
       } finally {
         flushing = undefined;
-        if (!disconnected && !timer && hasDirtyState()) {
+        if (!timer && hasDirtyState()) {
           const changedWhileSaving =
             compositionVersion > compositionToSave ||
             recordsVersion > recordsToSave;
@@ -105,7 +104,6 @@ export function connectSaves(
   doc.addEventListener('visibilitychange', onHidden);
 
   return () => {
-    disconnected = true;
     flush();
     unsubscribe();
     win.removeEventListener('pagehide', flush);

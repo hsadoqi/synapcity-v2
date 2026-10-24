@@ -33,7 +33,6 @@ describe('DashboardGrid', () => {
     act(() => state.toggleEditMode());
     const group = screen.getByRole('group', {
       name: widget.title,
-      exact: true,
     });
     fireEvent.keyDown(group, { key: ' ', repeat: true });
     expect(store().getState().selectedWidgetId).toBeNull();

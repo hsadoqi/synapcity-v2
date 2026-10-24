@@ -71,11 +71,11 @@ function mergeRecords(
 }
 
 /**
- * Saves dashboards in the browser, one copy per owner. Storage that throws
- * (private mode, quota, blocked) never throws into React; saved data is
- * validated on load, and a value that fails is copied to `<key>.invalid` and
- * treated as not saved. If that copy fails, loading rejects, so the only copy
- * is never overwritten. Records are merged by id on save (see `mergeRecords`).
+ * Saves dashboards in the browser, one copy per owner. Storage errors are
+ * reported; failed writes reject so the scheduler can retry. Saved data is
+ * validated on load, and a value that fails is copied to `<key>.invalid` only
+ * when that backup slot is free; otherwise loading rejects without overwriting
+ * either copy. Records merge by id on save (see `mergeRecords`).
  */
 export function browserDashboardStorage({
   ownerId,
@@ -140,8 +140,7 @@ export function browserDashboardStorage({
       write(compositionKey(ownerId, dashboardId), JSON.stringify(composition));
     },
     saveRecords: async (records) => {
-      let saved: PrototypeRecords | null;
-      saved = read(recordsKey(ownerId), prototypeRecordsSchema);
+      const saved = read(recordsKey(ownerId), prototypeRecordsSchema);
       write(recordsKey(ownerId), JSON.stringify(mergeRecords(saved, records)));
     },
   };

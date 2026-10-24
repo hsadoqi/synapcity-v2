@@ -129,6 +129,22 @@ describe('connectSaves', () => {
     expect(storage.saveComposition).toHaveBeenCalledTimes(1);
   });
 
+  it('retries a write that fails during disconnect', async () => {
+    const { store, storage, disconnect } = setup();
+    storage.saveComposition.mockRejectedValueOnce(
+      new Error('temporary failure'),
+    );
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    store.getState().addWidget('notes');
+
+    disconnect();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(storage.saveComposition).toHaveBeenCalledTimes(1);
+
+    await vi.advanceTimersByTimeAsync(400);
+    expect(storage.saveComposition).toHaveBeenCalledTimes(2);
+  });
+
   it('saves an edit at one breakpoint and loads the others unchanged', async () => {
     const { composition, records } = seededWorkspace();
     const storage = memoryDashboardStorage(SEED_OWNER);
