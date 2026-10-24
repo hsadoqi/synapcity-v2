@@ -2,7 +2,8 @@
 
 - Goal and mode: implementation of the remaining tasks of `docs/superpowers/plans/2026-10-24-forms-schema-driven-engine.md`, starting with Task 5 (built-in renderers and the default registry). The owner asked for the remaining tasks to be implemented after the extraction Part B pull request was opened (2026-10-24). Branch `feat/frontend-forms-renderers`, created from `feat/frontend-forms-react-hook-form` (pull request #67; retarget to `main` once it merges).
 - Exact creates: units under `packages/frontend/forms/src/` named in each task's Files line. Exact updates: the forms package's indexes, README and manifest as each task needs; the engine plan's checkboxes; this ledger.
-- Not changed: `apps/**`, other packages, dependency versions, ADRs (D1, whether the engine gets its own ADR, is still the owner's).
+- Not changed: `apps/**`, ADRs (D1, whether the engine gets its own ADR, is still the owner's).
+- Added scope (2026-10-24): the owner added five shadcn components to `packages/frontend/ui` (`calendar`, `date-picker`, `nl-date-picker`, `radio-group`, `time-picker`) with three new dependencies there (`react-day-picker` 10.0.2, `date-fns` 4.4.0, `chrono-node` 2.10.3), and handed their completion to Claude. Exact updates: those five folders (controlled props, stories, tests, imports through `@synapcity/frontend-ui/*`), `packages/frontend/ui/package.json` and `pnpm-lock.yaml` as the owner left them, and `apps/web/package.json` only to drop the `cn` entry the shadcn CLI added there. The dependencies were chosen by the owner; they were not chosen here.
 - Decision points that stop for the owner: D1; the Task 6a choice of building `FormRenderer` on `useActionForm` versus React Hook Form's `handleSubmit` alone.
 - Verification per task: the package's tests, type check and lint; `pnpm boundaries` and `pnpm deps`; Storybook for tasks that add stories. Commits and pushes: authorized by the owner. Merging is not authorized.
 
