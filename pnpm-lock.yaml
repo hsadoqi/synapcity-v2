@@ -343,12 +343,18 @@ importers:
       '@supabase/supabase-js':
         specifier: 2.117.3
         version: 2.117.3(@opentelemetry/api@1.9.1)
+      '@synapcity/domain-identity':
+        specifier: workspace:*
+        version: link:../../packages/domain/identity
       '@synapcity/frontend-site':
         specifier: workspace:*
         version: link:../../packages/frontend/site
       '@synapcity/frontend-ui':
         specifier: workspace:*
         version: link:../../packages/frontend/ui
+      '@synapcity/server-auth':
+        specifier: workspace:*
+        version: link:../../packages/server/auth
       '@synapcity/server-supabase':
         specifier: workspace:*
         version: link:../../packages/server/supabase
