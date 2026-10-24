@@ -1,1 +1,5 @@
-export { createRequestClient, type RequestCookies } from './request-client';
+export {
+  createRequestClient,
+  type RequestCookies,
+  type SupabaseServerClient,
+} from './request-client';

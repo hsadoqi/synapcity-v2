@@ -1,11 +1,11 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 const createServerClient = vi.hoisted(() =>
   vi.fn((_url: string, _key: string, _options: unknown) => ({ client: true })),
 );
 vi.mock('@supabase/ssr', () => ({ createServerClient }));
 
-import { createRequestClient } from './index';
+import { createRequestClient, type SupabaseServerClient } from './index';
 
 type CookieMethods = {
   getAll: () => { name: string; value: string }[];
@@ -82,5 +82,13 @@ describe('createRequestClient', () => {
     expect(() =>
       cookieMethods().setAll([{ name: 'a', value: '1', options: {} }]),
     ).not.toThrow();
+  });
+});
+
+describe('SupabaseServerClient', () => {
+  it('is the type of the client a request builds', () => {
+    expectTypeOf<SupabaseServerClient>().toEqualTypeOf<
+      ReturnType<typeof createRequestClient>
+    >();
   });
 });
