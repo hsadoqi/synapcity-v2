@@ -1,5 +1,5 @@
 import { Switch } from '@synapcity/frontend-ui/core/switch';
-import type { PrivacyPurpose } from '../../types/data-privacy';
+import type { PrivacyPurpose } from '@synapcity/domain-preferences';
 import { SettingRow } from '../../shared/setting-row/setting-row';
 
 // Say what each purpose collects and who receives it, matching the privacy

@@ -2,7 +2,7 @@ import {
   appearanceDefaults,
   contrastModes,
   type AppearanceSettings,
-} from '../../types/appearance';
+} from '@synapcity/domain-preferences';
 
 /** Where the browser keeps every preference, appearance included. */
 export const PREFERENCES_STORAGE_KEY = 'synapcity-preferences';

@@ -14,11 +14,11 @@ import {
   mergeSettings,
   parseImport,
   withoutStoredAccount,
-} from '../../lib/settings';
+} from '@synapcity/domain-preferences';
+import { reconcile } from '@synapcity/domain-preferences';
 import {
   deviceTimezone,
   readDeviceDisplay,
-  reconcile,
   writeDeviceDisplay,
   type AccountSync,
 } from '../../lib/account-sync';
@@ -28,13 +28,13 @@ import {
   isDefaultAccount,
   touchesAccount,
   type DisplaySettings,
-} from '../../lib/scope';
+} from '@synapcity/domain-preferences';
 import { applyFontPreferences } from '../../shared/font-preferences';
 import { applyThemeShape } from '../../shared/theme-shape';
-import { settingsDefaults } from '../../types/settings';
-import type { Settings, SettingsPatch } from '../../types';
-import { themeSchema } from '../../types/theme';
-import { pageLanguage } from '../../types/regional';
+import { settingsDefaults } from '@synapcity/domain-preferences';
+import type { Settings, SettingsPatch } from '@synapcity/domain-preferences';
+import { themeSchema } from '@synapcity/domain-preferences';
+import { pageLanguage } from '@synapcity/domain-preferences';
 import {
   applyAppearance,
   PREFERENCES_SAVED_EVENT,

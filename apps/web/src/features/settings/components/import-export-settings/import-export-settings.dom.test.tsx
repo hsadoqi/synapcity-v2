@@ -16,10 +16,10 @@ import {
   SettingsProvider,
 } from '../../providers/settings-provider/settings-provider';
 import { useSettings } from '../../hooks/use-settings';
-import { settingsDefaults, type Settings } from '../../types/settings';
-import { toTransferFile } from '../../lib/scope';
-import { parseImport } from '../../lib/settings';
-import { transferSchema } from '../../types/import-export';
+import { settingsDefaults, type Settings } from '@synapcity/domain-preferences';
+import { toTransferFile } from '@synapcity/domain-preferences';
+import { parseImport } from '@synapcity/domain-preferences';
+import { transferSchema } from '@synapcity/domain-preferences';
 import { download } from '../../utils/download';
 import { importFile } from '../../utils/import';
 

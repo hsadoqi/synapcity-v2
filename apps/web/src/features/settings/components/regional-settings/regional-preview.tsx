@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import type { RegionalSettings } from '../../types/regional';
+import type { RegionalSettings } from '@synapcity/domain-preferences';
 import { formatDate, formatNumber, formatTime } from './regional-rows';
 
 const week = [

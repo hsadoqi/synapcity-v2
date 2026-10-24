@@ -9,7 +9,7 @@ import { useSettingsDraft } from '../../hooks/use-settings-draft';
 import {
   notificationKinds,
   type NotificationKind,
-} from '../../types/notifications';
+} from '@synapcity/domain-preferences';
 import { SettingsTabShell } from '../../shared/settings-tabs';
 import { NotificationRow } from './notification-row';
 

@@ -2,7 +2,10 @@ import { render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { stubBrowser } from '../../../test-harness';
-import { themeDefaults, type ThemeSettings } from '../../../types/theme';
+import {
+  themeDefaults,
+  type ThemeSettings,
+} from '@synapcity/domain-preferences';
 import { ThemeLivePreview } from '../theme-live-preview';
 
 beforeEach(stubBrowser);

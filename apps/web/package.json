@@ -20,6 +20,7 @@
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.117.3",
     "@synapcity/domain-identity": "workspace:*",
+    "@synapcity/domain-preferences": "workspace:*",
     "@synapcity/domain-records": "workspace:*",
     "@synapcity/features-spaces": "workspace:*",
     "@synapcity/frontend-collection": "workspace:*",

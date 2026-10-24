@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { PREFERENCES_STORAGE_KEY } from '../appearance-attributes';
-import { fontStack, fontStylesheetUrl } from '../../types/fonts';
+import { fontStack, fontStylesheetUrl } from './font-loading';
 import { applyFontPreferences, fontBootScript } from './font-preferences';
 
 const root = () => document.documentElement;

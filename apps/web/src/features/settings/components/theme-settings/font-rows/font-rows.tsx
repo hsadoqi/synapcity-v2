@@ -7,7 +7,7 @@ import {
   headingFonts,
   type FontChoice,
   type FontRole,
-} from '../../../types/fonts';
+} from '@synapcity/domain-preferences';
 import { FontPreview } from './font-preview';
 
 type FontRowProps<T extends FontChoice> = {

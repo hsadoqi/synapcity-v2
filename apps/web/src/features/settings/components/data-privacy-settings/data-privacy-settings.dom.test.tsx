@@ -7,7 +7,7 @@ import {
   saveTab,
   stubBrowser,
 } from '../../test-harness';
-import { PRIVACY_POLICY_VERSIONS } from '../../types/data-privacy';
+import { PRIVACY_POLICY_VERSIONS } from '@synapcity/domain-preferences';
 import { DataPrivacySettings } from './index';
 
 beforeEach(stubBrowser);

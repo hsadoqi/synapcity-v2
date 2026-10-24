@@ -1,13 +1,13 @@
 'use client';
 
 import { useMemo, useSyncExternalStore } from 'react';
-import { parseImport } from '../lib/settings';
+import { parseImport } from '@synapcity/domain-preferences';
 import {
   PREFERENCES_SAVED_EVENT,
   PREFERENCES_STORAGE_KEY,
 } from '../shared/appearance-attributes';
-import { canCollect } from '../shared/privacy-consent';
-import type { PrivacyPurpose } from '../types/data-privacy';
+import { canCollect } from '@synapcity/domain-preferences';
+import type { PrivacyPurpose } from '@synapcity/domain-preferences';
 import { useGlobalPrivacyControl } from './use-global-privacy-control';
 
 function subscribe(onChange: () => void) {

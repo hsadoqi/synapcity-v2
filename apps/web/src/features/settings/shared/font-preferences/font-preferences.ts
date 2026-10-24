@@ -2,12 +2,14 @@ import {
   fontPreferenceVariables,
   fontStack,
   fontStylesheetUrl,
+} from './font-loading';
+import {
   googleFonts,
   type FontChoice,
   type FontRole,
   type GoogleFontId,
-} from '../../types/fonts';
-import type { ThemeSettings } from '../../types/theme';
+} from '@synapcity/domain-preferences';
+import type { ThemeSettings } from '@synapcity/domain-preferences';
 import { PREFERENCES_STORAGE_KEY } from '../appearance-attributes';
 
 const GOOGLE_STYLES = 'https://fonts.googleapis.com';

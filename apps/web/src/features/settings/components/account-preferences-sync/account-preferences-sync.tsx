@@ -2,21 +2,18 @@
 
 import { useEffect } from 'react';
 
-import {
-  readDeviceDisplay,
-  reconcile,
-  writeDeviceDisplay,
-} from '../../lib/account-sync';
-import type { AccountPreferences } from '../../lib/scope';
-import { parseImport } from '../../lib/settings';
+import { reconcile } from '@synapcity/domain-preferences';
+import { readDeviceDisplay, writeDeviceDisplay } from '../../lib/account-sync';
+import type { AccountPreferences } from '@synapcity/domain-preferences';
+import { parseImport } from '@synapcity/domain-preferences';
 import {
   applyAppearance,
   PREFERENCES_SAVED_EVENT,
   PREFERENCES_STORAGE_KEY,
 } from '../../shared/appearance-attributes';
 import { applyFontPreferences } from '../../shared/font-preferences';
-import { pageLanguage } from '../../types/regional';
-import { settingsDefaults, type Settings } from '../../types/settings';
+import { pageLanguage } from '@synapcity/domain-preferences';
+import { settingsDefaults, type Settings } from '@synapcity/domain-preferences';
 
 function readLocal(): Settings {
   try {

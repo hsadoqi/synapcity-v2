@@ -12,7 +12,7 @@ import { fontBootScript } from '@/features/settings/shared/font-preferences';
 import { themeShapeBootScript } from '@/features/settings/shared/theme-shape';
 import { AccountPreferencesSync } from '@/features/settings/components/account-preferences-sync';
 import { getAccountPreferences } from '@/features/settings/server/account-preferences';
-import { pageLanguage } from '@/features/settings/types/regional';
+import { pageLanguage } from '@synapcity/domain-preferences';
 import { accountLinksFor } from '@/lib/routing/user-paths';
 export const metadata: Metadata = createMetadata({
   siteUrl: process.env.SITE_URL,

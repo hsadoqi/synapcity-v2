@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { DataPrivacySettings } from '../components/data-privacy-settings';
 import { renderWithSettings, stubBrowser, saveTab } from '../test-harness';
-import { PRIVACY_POLICY_VERSIONS } from '../types/data-privacy';
+import { PRIVACY_POLICY_VERSIONS } from '@synapcity/domain-preferences';
 import { useCanCollect } from './use-can-collect';
 
 const KEY = 'synapcity-preferences';

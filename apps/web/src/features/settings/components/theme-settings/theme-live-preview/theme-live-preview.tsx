@@ -10,7 +10,7 @@ import {
   previewTextScaleStyle,
 } from '../../../shared/theme-shape';
 import { usePreviewFont } from '../../../hooks/use-preview-font';
-import type { ThemeSettings } from '../../../types/theme';
+import type { ThemeSettings } from '@synapcity/domain-preferences';
 
 /**
  * A sample workspace in the theme being chosen, before it is saved. The page

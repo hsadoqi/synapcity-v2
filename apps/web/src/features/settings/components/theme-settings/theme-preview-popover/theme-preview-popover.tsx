@@ -9,7 +9,7 @@ import {
   PopoverTrigger,
 } from '@synapcity/frontend-ui/core/popover';
 import { useSettingsTabActive } from '../../../shared/settings-tabs/settings-tab-active';
-import type { ThemeSettings } from '../../../types/theme';
+import type { ThemeSettings } from '@synapcity/domain-preferences';
 import { ThemeLivePreview } from '../theme-live-preview';
 
 /**

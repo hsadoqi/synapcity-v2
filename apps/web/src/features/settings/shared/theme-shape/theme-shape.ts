@@ -7,7 +7,7 @@ import {
   textSizeRange,
   themeDefaults,
   type ThemeSettings,
-} from '../../types/theme';
+} from '@synapcity/domain-preferences';
 
 type ThemeShape = Pick<ThemeSettings, 'radius' | 'density' | 'textSize'>;
 

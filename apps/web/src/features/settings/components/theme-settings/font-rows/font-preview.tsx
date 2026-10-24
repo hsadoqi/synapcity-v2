@@ -2,12 +2,12 @@
 
 import { cn } from '@/lib/utils';
 import { previewFontValue } from '../../../shared/font-preferences';
+import { fontPreferenceVariables } from '../../../shared/font-preferences';
 import {
-  fontPreferenceVariables,
   googleFonts,
   type FontChoice,
   type FontRole,
-} from '../../../types/fonts';
+} from '@synapcity/domain-preferences';
 import { usePreviewFont } from '../../../hooks/use-preview-font';
 import { PreviewFigure } from '../preview-figure';
 

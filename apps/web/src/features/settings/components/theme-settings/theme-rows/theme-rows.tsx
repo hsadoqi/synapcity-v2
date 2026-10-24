@@ -3,7 +3,10 @@ import { Mode } from '@synapcity/frontend-ui/providers/mode-provider';
 import { SettingRow } from '../../../shared/setting-row/setting-row';
 import { SettingsSelect } from '../../../shared/settings-select/settings-select';
 import { previewTextScaleStyle } from '../../../shared/theme-shape';
-import { textSizeRange, type ThemeSettings } from '../../../types/theme';
+import {
+  textSizeRange,
+  type ThemeSettings,
+} from '@synapcity/domain-preferences';
 import { PreviewFigure } from '../preview-figure';
 import { Sun, Moon, Monitor, Minus, Plus } from 'lucide-react';
 

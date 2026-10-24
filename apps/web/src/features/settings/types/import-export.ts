@@ -1,18 +1,6 @@
-import type { z } from 'zod';
-import { settingsSchema, type SettingsPatch } from './settings';
+import type { TransferSettingsPatch } from '@synapcity/domain-preferences';
 
-// Transfers include browser preferences, never account credentials.
-export const transferSchema = settingsSchema.pick({
-  regional: true,
-  appearance: true,
-  notifications: true,
-  privacy: true,
-  theme: true,
-});
-
-export type TransferSettings = z.infer<typeof transferSchema>;
-export type TransferSettingsPatch = Pick<SettingsPatch, keyof TransferSettings>;
-
+/** What the import and export controls report back. Settings screen only (moves with features-settings in M6.4). */
 export type TransferFeedback = {
   type: 'success' | 'error';
   message: string;

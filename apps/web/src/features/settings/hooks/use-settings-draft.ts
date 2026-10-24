@@ -3,13 +3,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 import type { z } from 'zod';
-import type { Settings } from '../types';
-import { appearanceSchema } from '../types/appearance';
-import { dataPrivacySchema } from '../types/data-privacy';
-import { notificationsSchema } from '../types/notifications';
-import { regionalSchema } from '../types/regional';
-import { settingsDefaults } from '../types/settings';
-import { themeSchema } from '../types/theme';
+import type { Settings } from '@synapcity/domain-preferences';
+import { appearanceSchema } from '@synapcity/domain-preferences';
+import { dataPrivacySchema } from '@synapcity/domain-preferences';
+import { notificationsSchema } from '@synapcity/domain-preferences';
+import { regionalSchema } from '@synapcity/domain-preferences';
+import { settingsDefaults } from '@synapcity/domain-preferences';
+import { themeSchema } from '@synapcity/domain-preferences';
 import { useRegisterSettingsDraft } from '../shared/settings-drafts';
 import { useSettings } from './use-settings';
 

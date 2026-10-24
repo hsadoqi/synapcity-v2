@@ -2,7 +2,7 @@ import { Info } from 'lucide-react';
 import {
   privacyPurposes,
   type DataPrivacySettings,
-} from '../../types/data-privacy';
+} from '@synapcity/domain-preferences';
 import { purposeCopy } from './data-privacy-rows';
 
 /** Says which choices were turned off because what they cover changed. */

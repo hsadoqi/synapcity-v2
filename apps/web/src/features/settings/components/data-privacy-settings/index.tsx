@@ -3,12 +3,12 @@
 import { FieldGroup } from '@synapcity/frontend-ui/core/field';
 import { Separator } from '@synapcity/frontend-ui/core/separator';
 import { SettingsTabShell } from '../../shared/settings-tabs';
-import { canCollect, isBlockedBySignals } from '../../shared/privacy-consent';
+import { canCollect, isBlockedBySignals } from '@synapcity/domain-preferences';
 import {
   choose,
   privacyPurposes,
   type Consent,
-} from '../../types/data-privacy';
+} from '@synapcity/domain-preferences';
 import { PrivacyConsentRow } from './data-privacy-rows';
 import { DataPrivacyAskAgain } from './data-privacy-ask-again';
 import { DataPrivacyDisclaimer } from './data-privacy-disclaimer';

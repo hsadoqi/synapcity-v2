@@ -8,8 +8,8 @@ import {
 import { createClient } from '@/lib/supabase/server';
 import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import type { SavePreferencesResult } from '../../lib/account-sync';
-import { accountPreferencesSchema } from '../../lib/scope';
-import { isSupportedTimezone } from '../../types/regional';
+import { accountPreferencesSchema } from '@synapcity/domain-preferences';
+import { isSupportedTimezone } from '@synapcity/domain-preferences';
 
 const INVALID = 'Preferences could not be saved. Check the selected values.';
 

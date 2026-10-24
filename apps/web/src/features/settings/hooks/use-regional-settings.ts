@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import type { RegionalSettingsPatch } from '../types/regional';
+import type { RegionalSettingsPatch } from '@synapcity/domain-preferences';
 import { useSettings } from './use-settings';
 
 export function useRegionalSettings() {

@@ -9,7 +9,7 @@ import {
   loadAccountPreferences,
 } from './account-preferences';
 import type { Supabase } from '@/features/account/server/caller';
-import { settingsDefaults } from '../types/settings';
+import { settingsDefaults } from '@synapcity/domain-preferences';
 
 const maybeSingle = vi.fn();
 const eq = vi.fn(() => ({ maybeSingle }));

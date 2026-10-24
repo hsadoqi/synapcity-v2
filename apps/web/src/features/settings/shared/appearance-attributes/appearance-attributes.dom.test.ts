@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { appearanceDefaults } from '../../types/appearance';
+import { appearanceDefaults } from '@synapcity/domain-preferences';
 import {
   appearanceBootScript,
   applyAppearance,

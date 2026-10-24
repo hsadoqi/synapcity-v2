@@ -10,7 +10,7 @@ vi.mock('../utils/import', () => ({ importFile: mocks.importFile }));
 
 import { stubBrowser } from '../test-harness';
 import { SettingsProvider } from '../providers/settings-provider/settings-provider';
-import { settingsDefaults } from '../types/settings';
+import { settingsDefaults } from '@synapcity/domain-preferences';
 import { useImportExportSettings } from './use-import-export-settings';
 import { useSettings } from './use-settings';
 

@@ -10,14 +10,17 @@ import { ModeProvider } from '@synapcity/frontend-ui/providers/mode-provider';
 
 import { AppearanceSettings } from '../../../components/appearance-settings';
 import { useSettings } from '../../../hooks/use-settings';
+import type { StoredAccountPreferences } from '@synapcity/domain-preferences';
 import type {
   AccountSync,
   SavePreferencesResult,
-  StoredAccountPreferences,
 } from '../../../lib/account-sync';
-import { accountPart, type DisplaySettings } from '../../../lib/scope';
+import {
+  accountPart,
+  type DisplaySettings,
+} from '@synapcity/domain-preferences';
 import { currentSettings, saveTab, stubBrowser } from '../../../test-harness';
-import { settingsDefaults, type Settings } from '../../../types/settings';
+import { settingsDefaults, type Settings } from '@synapcity/domain-preferences';
 import { SettingsProvider } from '../settings-provider';
 
 const KEY = 'synapcity-preferences';

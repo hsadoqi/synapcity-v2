@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSettings } from './use-settings';
-import { transferSchema, type TransferFeedback } from '../types/import-export';
-import { settingsDefaults } from '../types/settings';
+import { transferSchema } from '@synapcity/domain-preferences';
+import { type TransferFeedback } from '../types/import-export';
+import { settingsDefaults } from '@synapcity/domain-preferences';
 import { download } from '../utils/download';
 import { importFile } from '../utils/import';
 

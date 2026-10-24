@@ -8,7 +8,7 @@ import {
   resolveTimezone,
   SYSTEM_TIMEZONE,
   type RegionalSettings,
-} from '../../types/regional';
+} from '@synapcity/domain-preferences';
 
 type RowProps<Key extends keyof RegionalSettings> = {
   value: RegionalSettings[Key];

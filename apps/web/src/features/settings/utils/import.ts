@@ -1,5 +1,8 @@
-import { fromTransferFile, TRANSFER_FILE_VERSION } from '../lib/scope';
-import { parseImportPatch } from '../lib/settings';
+import {
+  fromTransferFile,
+  TRANSFER_FILE_VERSION,
+} from '@synapcity/domain-preferences';
+import { parseImportPatch } from '@synapcity/domain-preferences';
 import type { ImportResult } from '../types/import-export';
 
 function isRecord(value: unknown): value is Record<string, unknown> {

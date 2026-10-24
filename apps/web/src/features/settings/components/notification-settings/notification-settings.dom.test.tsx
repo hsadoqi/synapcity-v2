@@ -10,7 +10,7 @@ import {
 import {
   notificationKinds,
   notificationsDefaults,
-} from '../../types/notifications';
+} from '@synapcity/domain-preferences';
 import { NotificationSettings } from './index';
 
 /** A browser whose notification permission starts at `permission` and becomes `answer` when asked. */

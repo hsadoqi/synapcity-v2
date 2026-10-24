@@ -1,9 +1,9 @@
-import { toTransferFile } from '../lib/scope';
+import { toTransferFile } from '@synapcity/domain-preferences';
+import { type TransferFeedback } from '../types/import-export';
 import {
-  type TransferFeedback,
   type TransferSettings,
   transferSchema,
-} from '../types/import-export';
+} from '@synapcity/domain-preferences';
 
 export function download(value: TransferSettings): TransferFeedback {
   let url: string | undefined;

@@ -1,9 +1,9 @@
 import { render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { accountPart } from '../../lib/scope';
+import { accountPart } from '@synapcity/domain-preferences';
 import { stubBrowser } from '../../test-harness';
-import { settingsDefaults, type Settings } from '../../types/settings';
+import { settingsDefaults, type Settings } from '@synapcity/domain-preferences';
 import { AccountPreferencesSync } from './account-preferences-sync';
 
 const KEY = 'synapcity-preferences';

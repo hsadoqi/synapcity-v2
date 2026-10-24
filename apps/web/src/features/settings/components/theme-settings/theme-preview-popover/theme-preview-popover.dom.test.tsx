@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { SettingsTabActive } from '../../../shared/settings-tabs/settings-tab-active';
-import { themeDefaults } from '../../../types/theme';
+import { themeDefaults } from '@synapcity/domain-preferences';
 import { ThemePreviewPopover } from './theme-preview-popover';
 
 const preview = (active: boolean) => (

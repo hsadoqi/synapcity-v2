@@ -3,8 +3,8 @@ import { cache } from 'react';
 import { logFailure, type Supabase } from '@/features/account/server/caller';
 import { createClient } from '@/lib/supabase/server';
 import { fixtureModeEnabled } from '@/lib/access/dev-fixture';
-import type { StoredAccountPreferences } from '../lib/account-sync';
-import { readAccountPreferences } from '../lib/scope';
+import type { StoredAccountPreferences } from '@synapcity/domain-preferences';
+import { readAccountPreferences } from '@synapcity/domain-preferences';
 
 /**
  * Reads the caller's own preferences row. Returns undefined when the read

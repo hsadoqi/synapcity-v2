@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { type FontChoice } from '../types/fonts';
+import { type FontChoice } from '@synapcity/domain-preferences';
 import { loadFont } from '../shared/font-preferences';
 
 /**

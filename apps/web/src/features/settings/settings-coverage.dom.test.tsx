@@ -7,12 +7,12 @@ import { NotificationSettings } from './components/notification-settings';
 import { RegionalSettings } from './components/regional-settings';
 import { ThemeSettings } from './components/theme-settings';
 import { renderWithSettings, stubBrowser } from './test-harness';
-import { appearanceSchema } from './types/appearance';
-import { dataPrivacySchema } from './types/data-privacy';
-import { transferSchema } from './types/import-export';
-import { notificationsSchema } from './types/notifications';
-import { regionalSchema } from './types/regional';
-import { themeSchema } from './types/theme';
+import { appearanceSchema } from '@synapcity/domain-preferences';
+import { dataPrivacySchema } from '@synapcity/domain-preferences';
+import { transferSchema } from '@synapcity/domain-preferences';
+import { notificationsSchema } from '@synapcity/domain-preferences';
+import { regionalSchema } from '@synapcity/domain-preferences';
+import { themeSchema } from '@synapcity/domain-preferences';
 
 beforeEach(stubBrowser);
 afterEach(() => vi.unstubAllGlobals());

@@ -18,8 +18,8 @@ import {
   SettingsProvider,
 } from '../../providers/settings-provider/settings-provider';
 import { useSettings } from '../../hooks/use-settings';
-import { settingsDefaults } from '../../types/settings';
-import type { RegionalSettings as RegionalSettingsType } from '../../types/regional';
+import { settingsDefaults } from '@synapcity/domain-preferences';
+import type { RegionalSettings as RegionalSettingsType } from '@synapcity/domain-preferences';
 import { RegionalSettings } from './index';
 import { AppearanceSettings } from '../appearance-settings';
 
