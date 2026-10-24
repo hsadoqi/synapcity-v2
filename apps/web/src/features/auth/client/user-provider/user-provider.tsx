@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { shouldRefreshOnAuthEvent } from '@/features/auth/client';
-import type { CurrentUser } from '@/features/auth/shared/current-user';
+import type { CurrentUser } from '@synapcity/domain-identity';
 import { createClient } from '@/lib/supabase/client';
 
 // `undefined` means "no provider above", which is a bug; `null` means signed out.

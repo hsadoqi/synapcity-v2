@@ -27,3 +27,17 @@ export type {
   NameInput,
   ProfileInput,
 } from './schemas';
+export {
+  NEW_ACCOUNT_DAYS,
+  PROFILE_CONFIRMED_KEY,
+  checkName,
+  currentUserFromClaims,
+  initialsOf,
+  isNewAccount,
+  isProfileConfirmed,
+  isUploadedAvatar,
+  needsProfileSetup,
+  profileFromClaims,
+  providerImageFrom,
+} from './utils';
+export type { CurrentUser, DisplayProfile } from './utils';

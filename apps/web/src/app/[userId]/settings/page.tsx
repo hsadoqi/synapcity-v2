@@ -8,7 +8,7 @@ import {
   getConnectedAccounts,
   getPendingEmail,
 } from '@/features/auth/server/session';
-import { profileFromClaims } from '@/features/auth/shared';
+import { profileFromClaims } from '@synapcity/domain-identity';
 import { FIXTURE_MESSAGE } from '@/lib/access/dev-fixture';
 import { requireOwner } from '@/lib/access/require-owner';
 import { getAccountPreferences } from '@/features/settings/server/account-preferences';

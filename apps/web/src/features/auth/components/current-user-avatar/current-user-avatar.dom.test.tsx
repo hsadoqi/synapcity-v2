@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { CurrentUser } from '@/features/auth/shared/current-user';
+import type { CurrentUser } from '@synapcity/domain-identity';
 
 const mocks = vi.hoisted(() => ({ user: null as CurrentUser | null }));
 vi.mock('@/features/auth/client/user-provider', () => ({

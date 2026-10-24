@@ -1,5 +1,5 @@
 import { avatarFileSchema } from '@synapcity/domain-identity';
-import { providerImageFrom } from '@/features/account/shared/provider-image';
+import { providerImageFrom } from '@synapcity/domain-identity';
 import { detectImageType, extensionFor } from './image-type';
 import { withAvatarUrl } from './profile-metadata';
 import {

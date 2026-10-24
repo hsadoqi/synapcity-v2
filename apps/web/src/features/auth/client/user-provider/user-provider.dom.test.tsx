@@ -2,7 +2,7 @@ import { act, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { UserProvider, useCurrentUser } from '@/features/auth/client';
-import type { CurrentUser } from '@/features/auth/shared/current-user';
+import type { CurrentUser } from '@synapcity/domain-identity';
 
 const mocks = vi.hoisted(() => ({
   refresh: vi.fn(),
