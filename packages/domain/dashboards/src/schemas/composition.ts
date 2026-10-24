@@ -53,21 +53,61 @@ const widgetSchema = z.discriminatedUnion('type', [
  * A saved dashboard composition: its settings, its widgets and a layout for
  * each breakpoint. Use it to validate a composition read back from storage.
  */
-export const dashboardCompositionSchema = z.object({
-  settings: z.object({
-    columns: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
-    cardRadius: z.union([
-      z.literal(4),
-      z.literal(8),
-      z.literal(12),
-      z.literal(16),
-    ]),
-    showWidgetTitles: z.boolean(),
-  }),
-  widgets: z.array(widgetSchema),
-  layouts: z.strictObject({
-    lg: z.array(layoutItemSchema),
-    md: z.array(layoutItemSchema),
-    sm: z.array(layoutItemSchema),
-  }),
-}) satisfies z.ZodType<DashboardComposition>;
+export const dashboardCompositionSchema = z
+  .object({
+    settings: z.object({
+      columns: z.union([
+        z.literal(1),
+        z.literal(2),
+        z.literal(3),
+        z.literal(4),
+      ]),
+      cardRadius: z.union([
+        z.literal(4),
+        z.literal(8),
+        z.literal(12),
+        z.literal(16),
+      ]),
+      showWidgetTitles: z.boolean(),
+    }),
+    widgets: z.array(widgetSchema),
+    layouts: z.strictObject({
+      lg: z.array(layoutItemSchema),
+      md: z.array(layoutItemSchema),
+      sm: z.array(layoutItemSchema),
+    }),
+  })
+  .superRefine((composition, ctx) => {
+    const widgetIds = new Set<string>();
+    for (const [index, widget] of composition.widgets.entries()) {
+      if (widgetIds.has(widget.id)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['widgets', index, 'id'],
+          message: 'Widget IDs must be unique.',
+        });
+      }
+      widgetIds.add(widget.id);
+    }
+
+    for (const breakpoint of ['lg', 'md', 'sm'] as const) {
+      const layoutIds = new Set<string>();
+      for (const [index, item] of composition.layouts[breakpoint].entries()) {
+        if (!widgetIds.has(item.i)) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['layouts', breakpoint, index, 'i'],
+            message: 'Layout items must reference a widget in the composition.',
+          });
+        }
+        if (layoutIds.has(item.i)) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['layouts', breakpoint, index, 'i'],
+            message: 'A widget may appear only once in a breakpoint layout.',
+          });
+        }
+        layoutIds.add(item.i);
+      }
+    }
+  }) satisfies z.ZodType<DashboardComposition>;

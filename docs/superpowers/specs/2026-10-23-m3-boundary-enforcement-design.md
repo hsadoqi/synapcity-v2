@@ -71,6 +71,8 @@ The boundary rules fail the build instead of living only in documents. A forbidd
 | R10 | The file behind every server entry starts with `import 'server-only'`; no other file imports it.                                                                                                                                                                | 3.2 rule 5              |
 | R11 | Framework-specific imports (`next`, `next/*`) in frontend packages occur only under the `./next` entry's folder.                                                                                                                                                | 3.2 rule 7              |
 
+**R7 amendment (owner approval, 2026-10-24):** require folder-index imports for public units, but allow direct same-package imports of private helpers not re-exported by the target folder's index. R5 still requires package-to-package imports to use package `exports`.
+
 ### Existing exceptions
 
 Current source predates these rules. Known cases (to be confirmed by the first run):

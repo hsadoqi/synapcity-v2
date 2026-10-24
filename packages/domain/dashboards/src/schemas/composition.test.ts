@@ -62,6 +62,38 @@ describe('dashboardCompositionSchema', () => {
     ).toBe(false);
   });
 
+  it('rejects duplicate widget IDs', () => {
+    const c = fullComposition();
+    const first = c.widgets[0]!;
+    const widgets = [...c.widgets, { ...first, title: `${first.title} copy` }];
+
+    expect(
+      dashboardCompositionSchema.safeParse({ ...c, widgets }).success,
+    ).toBe(false);
+  });
+
+  it('rejects layout IDs that do not reference a widget', () => {
+    const c = fullComposition();
+    const layouts = {
+      ...c.layouts,
+      md: [...c.layouts.md, { i: 'missing', x: 0, y: 0, w: 1, h: 1 }],
+    };
+
+    expect(
+      dashboardCompositionSchema.safeParse({ ...c, layouts }).success,
+    ).toBe(false);
+  });
+
+  it('rejects duplicate widget placements within one breakpoint', () => {
+    const c = fullComposition();
+    const first = c.layouts.lg[0]!;
+    const layouts = { ...c.layouts, lg: [...c.layouts.lg, { ...first }] };
+
+    expect(
+      dashboardCompositionSchema.safeParse({ ...c, layouts }).success,
+    ).toBe(false);
+  });
+
   it('rejects negative or non-integer placements', () => {
     const c = fullComposition();
     for (const item of [
