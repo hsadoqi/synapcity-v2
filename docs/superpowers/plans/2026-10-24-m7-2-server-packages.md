@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Approved for planning (owner decision, 2026-10-24: design Q1 to Q5 accepted; "whatever you suggest" for call C5). Task A is implemented on `refactor/m7-2-server-packages` (local commits, not pushed); Tasks B and C are not started. Call C1 below amends the M7 design.
+**Status:** Approved for planning (owner decision, 2026-10-24: design Q1 to Q5 accepted; "whatever you suggest" for call C5). Task A is implemented on `refactor/m7-2-server-packages` (local commits, not pushed); Task B is blocked on a verification (see its Blocker); Task C is not started. Call C1 below amends the M7 design.
 
 **Goal:** The provider-facing auth operations, the session refresh helper and the profile operations leave `apps/web` for the server packages, behind typed outcomes, with no change in behavior. Server Actions, redirects, fixture mode and logging stay in the web app.
 
@@ -56,6 +56,8 @@
 - [x] **Step 5: Checkpoint commit** (local only): `refactor(server-supabase): move the provider auth operations into the package`.
 
 ### Task B: Session refresh helper
+
+**Blocker (open, 2026-10-24):** `server-supabase`'s root entry starts with `import 'server-only'` (rule R10), and `proxy.ts` would then import it. Nothing imported by the proxy does that today, and the installed Next.js 16.4.3 docs say the proxy runs on the Node.js runtime but do not say whether `server-only` is safe there. NOT VERIFIED. If it throws at module load, every request fails. Do not implement until one of these is shown by running it: (a) `next start` with the proxy importing the package answers a request, or (b) a dedicated proxy-safe entry is agreed, which needs an owner decision because R10 requires the guard on every server entry. The end-to-end suite (`pnpm test:e2e`) would exercise (a); it was not run here because of machine load.
 
 **Files:** `lib/supabase/middleware.ts` keeps the Next.js response handling (`NextResponse`, cache headers, the protected and guest-only redirects). The portable part, creating the cookie-bound client and reading the claims, moves to `packages/server/supabase/src/session-refresh/` as a function taking a host-supplied cookie adapter (`getAll`, `setAll(cookies, headers)`) and the environment values, returning `{ claims }`. The host adapter keeps `request.cookies` and `supabaseResponse` updates. Modify `middleware.test.ts` so the same cases hold. After this task `@supabase/ssr` is imported only by `server-supabase` in server code.
 
