@@ -1,4 +1,4 @@
-import { useState, type ComponentProps } from 'react';
+import { type ComponentProps } from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { FileIcon, FolderIcon, SearchIcon } from 'lucide-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
@@ -13,6 +13,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@synapcity/frontend-ui/core/empty';
+import React from 'react';
 
 const meta = {
   title: 'Components/Empty',
@@ -164,7 +165,7 @@ export const TitleOnly: Story = {
 };
 
 function SearchExample(props: ComponentProps<typeof Empty>) {
-  const [cleared, setCleared] = useState(false);
+  const [cleared, setCleared] = React.useState(false);
   if (cleared)
     return <p role="status">Filters cleared. Showing all documents.</p>;
   return (
