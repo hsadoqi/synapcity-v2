@@ -1,5 +1,5 @@
 import { isAuthRetryableFetchError } from '@supabase/supabase-js';
-import type { VerifiedIdentity } from '@synapcity/domain-identity';
+import type { VerifiedIdentity } from '@synapcity/domain-identity/types';
 import { verifyIdentityWithProvider } from '@synapcity/server-auth';
 import { supabaseIdentityProvider } from '@synapcity/server-supabase';
 

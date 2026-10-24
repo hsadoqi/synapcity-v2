@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./types": "./src/types/index.ts",
+    "./schemas": "./src/schemas/index.ts"
   },
   "scripts": {
     "lint": "eslint . --cache --cache-strategy content --max-warnings 0",

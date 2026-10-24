@@ -1,1 +1,1 @@
-export type { IdentityResult, VerifiedIdentity } from './identity-result';
+export type { IdentityResult, VerifiedIdentity } from './types';

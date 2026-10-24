@@ -1,4 +1,4 @@
-import type { IdentityResult } from '@synapcity/domain-identity';
+import type { IdentityResult } from '@synapcity/domain-identity/types';
 import { verifyIdentity } from '@synapcity/server-auth';
 import { outcomeFromClaims } from '@synapcity/server-supabase';
 import { cache } from 'react';
