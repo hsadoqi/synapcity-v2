@@ -102,34 +102,88 @@ export const ResetRow = ({
   onReset: () => void;
   disabled: boolean;
 }) => {
-  const [open, setOpen] = useState(false);
   return (
-    <SettingRow
+    <ResetConfirmationRow
       id="reset"
       label="Reset to defaults"
       description="Restore the original settings. Your notes won’t be affected."
-    >
+      trigger="Reset to defaults"
+      title="Start with a clean slate?"
+      dialogDescription="This resets your theme, display, regional and notification preferences, and turns off any data you agreed to share. Your notes stay right where they are."
+      cancel="Keep my settings"
+      action="Reset preferences"
+      onReset={onReset}
+      disabled={disabled}
+    />
+  );
+};
+
+export const ResetSharedLookRow = ({
+  onReset,
+  disabled,
+}: {
+  onReset: () => void;
+  disabled: boolean;
+}) => {
+  return (
+    <ResetConfirmationRow
+      id="reset-shared-look"
+      label="Reset shared look"
+      description="Restore the default mode, fonts and display choices on web and docs."
+      trigger="Reset shared look"
+      title="Reset the shared look?"
+      dialogDescription="This restores the default mode, fonts, text size, spacing, corners, contrast, motion and borders everywhere the look is shared. Regional, notification and privacy preferences won’t change."
+      cancel="Keep my look"
+      action="Reset shared look everywhere"
+      onReset={onReset}
+      disabled={disabled}
+    />
+  );
+};
+
+function ResetConfirmationRow({
+  id,
+  label,
+  description,
+  trigger,
+  title,
+  dialogDescription,
+  cancel,
+  action,
+  onReset,
+  disabled,
+}: {
+  id: string;
+  label: string;
+  description: string;
+  trigger: string;
+  title: string;
+  dialogDescription: string;
+  cancel: string;
+  action: string;
+  onReset: () => void;
+  disabled: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <SettingRow id={id} label={label} description={description}>
       <AlertDialog open={open} onOpenChange={setOpen}>
         <AlertDialogTrigger
-          id="reset"
+          id={id}
           disabled={disabled}
-          aria-describedby="reset-description"
+          aria-describedby={`${id}-description`}
           render={<Button variant="outline" />}
         >
           <RotateCcw data-icon="inline-start" />
-          Reset to defaults
+          {trigger}
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Start with a clean slate?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This resets your theme, display, regional and notification
-              preferences, and turns off any data you agreed to share. Your
-              notes stay right where they are.
-            </AlertDialogDescription>
+            <AlertDialogTitle>{title}</AlertDialogTitle>
+            <AlertDialogDescription>{dialogDescription}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Keep my settings</AlertDialogCancel>
+            <AlertDialogCancel>{cancel}</AlertDialogCancel>
             <AlertDialogAction
               disabled={disabled}
               onClick={() => {
@@ -137,11 +191,11 @@ export const ResetRow = ({
                 setOpen(false);
               }}
             >
-              Reset preferences
+              {action}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </SettingRow>
   );
-};
+}

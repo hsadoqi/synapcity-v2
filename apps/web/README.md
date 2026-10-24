@@ -23,15 +23,21 @@ These tests replace the Supabase client, so they do not prove live email deliver
 
 Set these in `apps/web/.env.local` (git-ignored) and, for deployments, in the hosting provider. Authentication is governed by [ADR-0006](../../docs/architecture/decisions/0006-authentication-with-supabase.md).
 
-| Variable                                | Exposed to the browser | Purpose                                                                                                                                                               |
-| --------------------------------------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_SUPABASE_URL`              | yes                    | Supabase project URL                                                                                                                                                  |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`  | yes                    | Supabase publishable key. Never put the secret or service-role key in this app                                                                                        |
-| `SITE_URL`                              | no                     | Public origin of this app. Used to build email and OAuth redirect URLs; it must be on Supabase's redirect allow-list (see below)                                      |
-| `NEXT_PUBLIC_SENTRY_DSN`                | yes                    | Optional. Sentry DSN for error reports, sent only after someone turns them on (see below)                                                                             |
-| `NEXT_PUBLIC_PREFERENCES_COOKIE_DOMAIN` | yes                    | Optional. Parent domain for the shared look cookie (for example `.example.com`) so web and docs show the same look. Empty means host-only. Set the same value in docs |
+| Variable                                | Exposed to the browser | Purpose                                                                                                                                                                    |
+| --------------------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`              | yes                    | Supabase project URL                                                                                                                                                       |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`  | yes                    | Supabase publishable key. Never put the secret or service-role key in this app                                                                                             |
+| `SITE_URL`                              | no                     | Public origin of this app. Used to build email and OAuth redirect URLs; it must be on Supabase's redirect allow-list (see below)                                           |
+| `NEXT_PUBLIC_SENTRY_DSN`                | yes                    | Optional. Sentry DSN for error reports, sent only after someone turns them on (see below)                                                                                  |
+| `NEXT_PUBLIC_PREFERENCES_COOKIE_DOMAIN` | yes                    | Optional. Valid parent DNS domain for the shared look cookie (for example `.example.com`). Empty means host-only. Set the same value in the web and docs production builds |
 
 The app throws on the first sign-up, reset or OAuth call if `SITE_URL` is missing.
+
+### Shared-look production domains
+
+Localhost works across ports without a `Domain` attribute. Production requires two real sibling hosts under one selected parent—for example `app.example.com` for this project and `docs.example.com` for the docs project—and `NEXT_PUBLIC_PREFERENCES_COOKIE_DOMAIN=.example.com` in both production builds. Attach each exact host to its hosting project, apply the DNS records the provider reports, wait for verification/TLS, deploy both apps with the same setting, then verify that a look changed on one host appears on the other and that an HTML response renews `synapcity-look` with `Domain=.example.com`, `Secure`, `SameSite=Lax` and a one-year `Max-Age`.
+
+Preview deployments remain host-only: `vercel.app` is a public suffix, so a browser will reject `Domain=.vercel.app`. The production domain is still an open deployment-topology decision; do not replace the example above with a guessed domain or mutate DNS/provider state without the owner's exact targets.
 
 ### Development fixture mode
 

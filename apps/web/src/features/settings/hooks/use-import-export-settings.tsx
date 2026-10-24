@@ -70,8 +70,32 @@ export function useImportExportSettings() {
     }
   }, [isReady, updateSettings]);
 
+  const resetSharedLook = useCallback(() => {
+    if (!isReady || importing.current) return;
+    try {
+      updateSettings({
+        theme: settingsDefaults.theme,
+        appearance: settingsDefaults.appearance,
+      });
+      setFeedback({
+        type: 'success',
+        message: 'Your shared look is back to its defaults.',
+      });
+    } catch {
+      setFeedback({
+        type: 'error',
+        message: 'Unable to reset your shared look. Please try again.',
+      });
+    }
+  }, [isReady, updateSettings]);
+
   return {
-    importExport: { importSettings, exportSettings, resetSettings },
+    importExport: {
+      importSettings,
+      exportSettings,
+      resetSettings,
+      resetSharedLook,
+    },
     feedback,
     clearFeedback,
     isImporting,

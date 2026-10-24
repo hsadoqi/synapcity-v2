@@ -7,7 +7,12 @@ import {
   SettingsTabShell,
 } from '../../shared';
 import { useImportExportSettings } from '../../hooks/use-import-export-settings';
-import { ExportRow, ImportRow, ResetRow } from './import-export-rows';
+import {
+  ExportRow,
+  ImportRow,
+  ResetRow,
+  ResetSharedLookRow,
+} from './import-export-rows';
 import { ImportExportFeedbackAlert } from './import-export-feedback-dialog';
 
 export function ImportExportSettings() {
@@ -36,6 +41,10 @@ export function ImportExportSettings() {
         </SettingsAccordionItem>
         <SettingsAccordionItem value="reset" title="Reset">
           <FieldGroup>
+            <ResetSharedLookRow
+              onReset={importExport.resetSharedLook}
+              disabled={disabled}
+            />
             <ResetRow
               onReset={importExport.resetSettings}
               disabled={disabled}

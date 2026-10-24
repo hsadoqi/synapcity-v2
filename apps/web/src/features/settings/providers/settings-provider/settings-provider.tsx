@@ -183,14 +183,20 @@ export function SettingsProvider({
         if (!isDefaultAccount(accountPart(local))) persist(local);
         return;
       }
-      const reconciled = reconcile(local, stored, readDeviceDisplay());
-      writeDeviceDisplay(reconciled.setAside);
+      let deviceDisplay: ReturnType<typeof readDeviceDisplay> = null;
+      try {
+        deviceDisplay = readDeviceDisplay();
+      } catch {
+        // Account reconciliation and the cookie do not depend on storage.
+      }
+      const reconciled = reconcile(local, stored, deviceDisplay);
       override.current = stored.appearanceOverride ?? null;
       setDisplayOverride(override.current);
       current.current = reconciled.settings;
       setStoredSettings(reconciled.settings);
       saveLook(reconciled.settings);
       try {
+        writeDeviceDisplay(reconciled.setAside);
         // Cache it, so the boot scripts paint these values on the next load.
         writeStoredPreferences(JSON.stringify(reconciled.settings));
         announcePreferencesSaved();
@@ -301,11 +307,20 @@ export function SettingsProvider({
       let next = now;
       if (on) {
         // Keep this device's own values, to restore when this is turned off.
-        writeDeviceDisplay(displayOf(now));
+        try {
+          writeDeviceDisplay(displayOf(now));
+        } catch {
+          // The override can still apply and save to the account/cookie.
+        }
         override.current = displayOf(now);
       } else {
-        const own = readDeviceDisplay();
-        writeDeviceDisplay(null);
+        let own: ReturnType<typeof readDeviceDisplay> = null;
+        try {
+          own = readDeviceDisplay();
+          writeDeviceDisplay(null);
+        } catch {
+          // Remove the account override even when this device is unreadable.
+        }
         override.current = null;
         if (own) next = mergeSettings(now, { appearance: own });
       }

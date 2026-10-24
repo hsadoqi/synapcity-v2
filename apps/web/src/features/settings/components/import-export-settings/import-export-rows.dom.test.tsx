@@ -1,7 +1,12 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { ExportRow, ImportRow, ResetRow } from './import-export-rows';
+import {
+  ExportRow,
+  ImportRow,
+  ResetRow,
+  ResetSharedLookRow,
+} from './import-export-rows';
 
 const file = (name = 'prefs.json') =>
   new File(['{}'], name, { type: 'application/json' });
@@ -155,5 +160,37 @@ describe('ResetRow', () => {
         .getByRole('button', { name: 'Reset to defaults' })
         .hasAttribute('disabled'),
     ).toBe(true);
+  });
+});
+
+describe('ResetSharedLookRow', () => {
+  it('describes its exact scope and requires confirmation', async () => {
+    const onReset = vi.fn();
+    render(<ResetSharedLookRow onReset={onReset} disabled={false} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Reset shared look' }));
+
+    const dialog = await screen.findByRole('alertdialog', {
+      name: 'Reset the shared look?',
+    });
+    expect(dialog.textContent).toContain(
+      'Regional, notification and privacy preferences won’t change.',
+    );
+    expect(onReset).not.toHaveBeenCalled();
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Reset shared look everywhere' }),
+    );
+    expect(onReset).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+  });
+
+  it('is described by its row and disabled while preferences load', () => {
+    render(<ResetSharedLookRow onReset={() => {}} disabled />);
+    const button = screen.getByRole('button', { name: 'Reset shared look' });
+    expect(button.getAttribute('aria-describedby')).toBe(
+      'reset-shared-look-description',
+    );
+    expect(button.hasAttribute('disabled')).toBe(true);
   });
 });

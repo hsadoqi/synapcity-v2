@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
 import '../styles/globals.css';
 import { fontVariables } from './fonts';
 import RootProviders from '../components/providers/root-providers';
@@ -12,11 +13,17 @@ import {
   fontBootScript,
   modeBootScript,
   themeShapeBootScript,
+  lookHtmlAttributes,
 } from '@synapcity/frontend-preferences';
 import { AccountPreferencesSync } from '@/features/settings/components/account-preferences-sync';
 import { getAccountPreferences } from '@/features/settings/server/account-preferences';
-import { pageLanguage } from '@synapcity/domain-preferences';
+import {
+  LOOK_COOKIE_NAME,
+  pageLanguage,
+  parseLookCookieValue,
+} from '@synapcity/domain-preferences';
 import { accountLinksFor } from '@/lib/routing/user-paths';
+import { cn } from '@/lib/utils';
 export const metadata: Metadata = createMetadata({
   siteUrl: process.env.SITE_URL,
 });
@@ -27,6 +34,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await getCurrentUser();
+  const look = parseLookCookieValue(
+    (await cookies()).get(LOOK_COOKIE_NAME)?.value,
+  );
+  const lookAttributes = look ? lookHtmlAttributes(look) : undefined;
   // ADR-0010: the account's preferences follow the person to every page, not
   // only the settings page. A failed read leaves this browser's own copy.
   const stored = user ? await getAccountPreferences(user.id) : undefined;
@@ -34,7 +45,9 @@ export default async function RootLayout({
   return (
     <html
       lang={pageLanguage(account?.regional.language ?? 'en')}
-      className={fontVariables}
+      {...lookAttributes}
+      className={cn(fontVariables, lookAttributes?.className)}
+      style={lookAttributes?.style}
       suppressHydrationWarning
     >
       <head>

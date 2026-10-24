@@ -51,13 +51,19 @@ export function AccountPreferencesSync({
     migrateLookToCookie();
     let settings = readLocal();
     if (preferences) {
-      const reconciled = reconcile(settings, preferences, readDeviceDisplay());
-      writeDeviceDisplay(reconciled.setAside);
+      let deviceDisplay: ReturnType<typeof readDeviceDisplay> = null;
+      try {
+        deviceDisplay = readDeviceDisplay();
+      } catch {
+        // The account look can still apply and reach the cookie.
+      }
+      const reconciled = reconcile(settings, preferences, deviceDisplay);
       settings = reconciled.settings;
       // Cookie persistence is independent of localStorage. A browser may
       // block one while still accepting the other.
       saveLook(settings);
       try {
+        writeDeviceDisplay(reconciled.setAside);
         writeStoredPreferences(JSON.stringify(settings));
         // Collectors follow consent through this event (privacy is account
         // scope, so it may just have changed).

@@ -5,13 +5,17 @@ import { accountPart } from '@synapcity/domain-preferences';
 import { stubBrowser } from '../../test-harness';
 import { settingsDefaults, type Settings } from '@synapcity/domain-preferences';
 import { AccountPreferencesSync } from './account-preferences-sync';
+import { readLookCookie } from '@synapcity/frontend-preferences';
 
 const KEY = 'synapcity-preferences';
 const SET_ASIDE_KEY = 'synapcity-device-display';
 const html = document.documentElement;
 
 beforeEach(stubBrowser);
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
 
 const cached = () => JSON.parse(localStorage.getItem(KEY)!) as Settings;
 
@@ -76,6 +80,23 @@ describe('AccountPreferencesSync (ADR-0010, every page)', () => {
     window.removeEventListener('synapcity-preferences-saved', heard);
 
     expect(heard).toHaveBeenCalledOnce();
+  });
+
+  it('still applies and shares the account look when localStorage is blocked', () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+
+    expect(() =>
+      render(<AccountPreferencesSync preferences={accountPart(account)} />),
+    ).not.toThrow();
+    expect(readLookCookie()?.theme.headingFont).toBe('fraunces');
+    expect(html.style.getPropertyValue('--font-preference-heading')).toContain(
+      'Fraunces',
+    );
   });
 
   it("uses this browser's own language when there is no account copy", () => {

@@ -1,16 +1,34 @@
 import { expect, test, type Page } from '@playwright/test';
+import { lookOf, settingsDefaults } from '@synapcity/domain-preferences';
 
 /*
  * Guards the shared look across the two apps. Web and docs run on different ports of
  * localhost, and cookies ignore the port, so a look written by one is read by the other, the
  * same way two hosts under one parent domain share it. Each page is read right after the
- * document is parsed, before React hydrates, so only the boot scripts have run: a flash of
- * the wrong look would show here.
+ * document is parsed, before React hydrates, so the server-rendered attributes and the
+ * no-cookie/system-mode boot fallback are what can prevent a flash here.
  */
 const WEB = 'http://localhost:8080';
 const DOCS = 'http://localhost:4000';
 const STORAGE_KEY = 'synapcity-preferences';
 const COOKIE = 'synapcity-look';
+
+const serverLook = lookOf({
+  ...settingsDefaults,
+  theme: {
+    ...settingsDefaults.theme,
+    mode: 'dark',
+    density: 'compact',
+    textSize: 120,
+  },
+  appearance: {
+    ...settingsDefaults.appearance,
+    contrastMode: 'high',
+    showBorders: true,
+  },
+});
+const cookieHeader = (value: unknown) =>
+  `${COOKIE}=${encodeURIComponent(JSON.stringify(value))}`;
 
 type Parsed = { mode: boolean; textSize?: string; density?: string };
 
@@ -54,6 +72,51 @@ test('a look saved in web shows in docs with no flash', async ({ page }) => {
   expect(
     await page.evaluate(() => document.documentElement.dataset.textSize),
   ).toBe('120');
+});
+
+test('both servers render and renew a valid shared look', async ({
+  request,
+}) => {
+  for (const url of [`${WEB}/auth/register`, DOCS]) {
+    const response = await request.get(url, {
+      headers: { Cookie: cookieHeader(serverLook) },
+    });
+    expect(response.ok(), url).toBe(true);
+    const htmlTag = (await response.text()).match(/<html[^>]*>/)?.[0];
+    expect(htmlTag, url).toMatch(/class="[^"]*\bdark\b/);
+    expect(htmlTag, url).toContain('data-density="compact"');
+    expect(htmlTag, url).toContain('data-text-size="120"');
+    expect(htmlTag, url).toContain('data-contrast="high"');
+    expect(htmlTag, url).toContain('data-borders="true"');
+    expect(htmlTag, url).toContain('--text-scale:1.2');
+
+    const renewed = response.headers()['set-cookie'];
+    expect(renewed, url).toContain(`${COOKIE}=`);
+    expect(renewed, url).toContain('Max-Age=31536000');
+    expect(renewed, url).toContain('SameSite=Lax');
+    expect(renewed, url).not.toContain('HttpOnly');
+  }
+});
+
+test('servers neither render nor renew an invalid shared look', async ({
+  request,
+}) => {
+  for (const url of [`${WEB}/auth/register`, DOCS]) {
+    const response = await request.get(url, {
+      headers: {
+        Cookie: cookieHeader({
+          ...serverLook,
+          theme: { ...serverLook.theme, density: 'unknown' },
+        }),
+      },
+    });
+    expect(response.ok(), url).toBe(true);
+    const htmlTag = (await response.text()).match(/<html[^>]*>/)?.[0];
+    expect(htmlTag, url).not.toContain('data-density=');
+    expect(response.headers()['set-cookie'] ?? '', url).not.toContain(
+      `${COOKIE}=`,
+    );
+  }
 });
 
 test('a mode chosen in docs shows in web', async ({ page }) => {

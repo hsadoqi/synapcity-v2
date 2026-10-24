@@ -190,6 +190,44 @@ describe('useImportExportSettings', () => {
   });
 
   describe('reset', () => {
+    it('resets only the shared look and preserves unrelated preferences', async () => {
+      const { result } = await mount();
+      act(() =>
+        result.current.settings.updateSettings({
+          regional: { language: 'fr' },
+          notifications: { push: true },
+          privacy: {
+            analytics: {
+              granted: true,
+              updatedAt: null,
+              version: 1,
+              askAgain: false,
+            },
+          },
+          theme: { mode: 'dark', density: 'compact' },
+          appearance: { contrastMode: 'high', showBorders: true },
+        }),
+      );
+
+      act(() => result.current.transfer.importExport.resetSharedLook());
+
+      expect(result.current.settings.settings.theme).toEqual(
+        settingsDefaults.theme,
+      );
+      expect(result.current.settings.settings.appearance).toEqual(
+        settingsDefaults.appearance,
+      );
+      expect(result.current.settings.settings.regional.language).toBe('fr');
+      expect(result.current.settings.settings.notifications.push).toBe(true);
+      expect(result.current.settings.settings.privacy.analytics.granted).toBe(
+        true,
+      );
+      expect(result.current.transfer.feedback).toEqual({
+        type: 'success',
+        message: 'Your shared look is back to its defaults.',
+      });
+    });
+
     it('restores the defaults and says so', async () => {
       const { result } = await mount();
       act(() =>
