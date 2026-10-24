@@ -5,31 +5,27 @@ const { recordSpaceView } = vi.hoisted(() => ({
   recordSpaceView: vi.fn(() => Promise.resolve()),
 }));
 
-vi.mock('@/lib/spaces/space-state-actions', () => ({
-  recordSpaceView,
-}));
-
 import { RecordSpaceView } from './record-space-view';
 
 beforeEach(() => vi.clearAllMocks());
 
 describe('RecordSpaceView', () => {
   it('records the view once the page is on screen', () => {
-    render(<RecordSpaceView spaceId="space-1" />);
+    render(<RecordSpaceView spaceId="space-1" recordSpaceView={recordSpaceView} />);
 
     expect(recordSpaceView).toHaveBeenCalledTimes(1);
     expect(recordSpaceView).toHaveBeenCalledWith('space-1');
   });
 
   it('renders nothing', () => {
-    const { container } = render(<RecordSpaceView spaceId="space-1" />);
+    const { container } = render(<RecordSpaceView spaceId="space-1" recordSpaceView={recordSpaceView} />);
 
     expect(container.firstChild).toBeNull();
   });
 
   it('records again for a different space', () => {
-    const { rerender } = render(<RecordSpaceView spaceId="space-1" />);
-    rerender(<RecordSpaceView spaceId="space-2" />);
+    const { rerender } = render(<RecordSpaceView spaceId="space-1" recordSpaceView={recordSpaceView} />);
+    rerender(<RecordSpaceView spaceId="space-2" recordSpaceView={recordSpaceView} />);
 
     expect(recordSpaceView).toHaveBeenLastCalledWith('space-2');
   });
