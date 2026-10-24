@@ -370,9 +370,15 @@ importers:
       '@synapcity/frontend-collection':
         specifier: workspace:*
         version: link:../../packages/frontend/collection
+      '@synapcity/frontend-error-reports':
+        specifier: workspace:*
+        version: link:../../packages/frontend/error-reports
       '@synapcity/frontend-forms':
         specifier: workspace:*
         version: link:../../packages/frontend/forms
+      '@synapcity/frontend-preferences':
+        specifier: workspace:*
+        version: link:../../packages/frontend/preferences
       '@synapcity/frontend-site':
         specifier: workspace:*
         version: link:../../packages/frontend/site
