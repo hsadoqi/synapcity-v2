@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { SpaceSummary } from '../../shared/types';
+import type { SpaceSummary } from '@synapcity/domain-records';
 import { describeContents, toCollectionItem } from './collection-item';
 
 const space: SpaceSummary = {

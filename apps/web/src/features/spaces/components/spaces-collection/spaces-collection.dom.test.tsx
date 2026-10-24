@@ -18,7 +18,7 @@ vi.mock('../../server/actions/space-state-actions', () => ({
 }));
 
 import { SPACE_FIXTURES } from '../../lib/fixtures';
-import type { SpaceSummary } from '../../shared/types';
+import type { SpaceSummary } from '@synapcity/domain-records';
 import { SpacesCollection } from './spaces-collection';
 import { SpacesCollectionSkeleton } from './spaces-collection-skeleton';
 

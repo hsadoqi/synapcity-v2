@@ -1,7 +1,7 @@
 import { itemFromRecord } from '@/features/collection/shared';
 import type { CollectionItem } from '@/features/collection/shared';
 
-import type { SpaceSummary } from '../../shared/types';
+import type { SpaceSummary } from '@synapcity/domain-records';
 
 const count = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 

@@ -14,7 +14,7 @@ import type {
 
 import { toCollectionItem } from '../../lib/collection-item';
 import { setSpacePinned } from '../../server/actions/space-state-actions';
-import type { SpaceSummary } from '../../shared/types';
+import type { SpaceSummary } from '@synapcity/domain-records';
 import { SpacePreview } from './space-preview';
 
 interface SpacesIndexProps {

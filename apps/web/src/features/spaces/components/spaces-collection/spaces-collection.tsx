@@ -1,6 +1,6 @@
 import { CollectionPage } from '@/features/collection/components/collection-page';
 
-import type { SpaceSummary } from '../../shared/types';
+import type { SpaceSummary } from '@synapcity/domain-records';
 import { SPACES_INTRO, SPACES_TITLE } from './spaces-copy';
 import { SpacesIndex } from './spaces-index';
 
