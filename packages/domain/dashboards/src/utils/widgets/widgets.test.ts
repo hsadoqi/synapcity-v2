@@ -100,4 +100,11 @@ describe('widget operations', () => {
     });
     expect(updateWidget(c, 'missing', { title: 'x' })).toBe(c);
   });
+
+  it('returns the same composition when a patch changes nothing', () => {
+    const { c } = compositionWith('stat');
+    const widget = c.widgets[0]!;
+
+    expect(updateWidget(c, widget.id, { title: widget.title })).toBe(c);
+  });
 });

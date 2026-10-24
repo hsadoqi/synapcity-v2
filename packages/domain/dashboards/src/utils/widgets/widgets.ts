@@ -72,10 +72,19 @@ export function updateWidget(
   widgetId: string,
   patch: WidgetPatch,
 ): DashboardComposition {
-  if (!c.widgets.some((w) => w.id === widgetId)) return c;
+  const widget = c.widgets.find((w) => w.id === widgetId);
+  if (!widget) return c;
+  const next = { ...widget, ...patch };
+  if (
+    next.title === widget.title &&
+    next.collapsed === widget.collapsed &&
+    next.highlight === widget.highlight
+  ) {
+    return c;
+  }
   return {
     ...c,
-    widgets: c.widgets.map((w) => (w.id === widgetId ? { ...w, ...patch } : w)),
+    widgets: c.widgets.map((w) => (w.id === widgetId ? next : w)),
   };
 }
 

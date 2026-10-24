@@ -144,6 +144,10 @@ describe('browserDashboardStorage', () => {
     expect(onError).toHaveBeenCalledWith(
       expect.objectContaining({ kind: 'write', key: COMPOSITION_KEY }),
     );
+    await expect(adapter.saveRecords(emptyRecords())).rejects.toThrow();
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({ kind: 'write', key: RECORDS_KEY }),
+    );
   });
 
   it('preserves an existing invalid-data backup', async () => {
