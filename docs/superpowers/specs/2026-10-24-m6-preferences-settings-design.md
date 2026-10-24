@@ -1,6 +1,6 @@
 # Milestone 6: Preferences and Settings
 
-**Status:** Accepted (owner decision, 2026-10-24). Q1–Q4 answered with the recommendations (section 9); the calls in section 10 stand. Implementation follows a plan per sub-milestone. M6.1 (preference rules) is implemented as of 2026-10-24 ([plan](../plans/2026-10-24-m6-1-domain-preferences.md)).
+**Status:** Accepted (owner decision, 2026-10-24). Q1–Q4 answered with the recommendations (section 9); the calls in section 10 stand. Implementation follows a plan per sub-milestone. M6.1 (preference rules) and M6.2 (browser runtime) are implemented as of 2026-10-24 ([M6.1 plan](../plans/2026-10-24-m6-1-domain-preferences.md), [M6.2 plan](../plans/2026-10-24-m6-2-frontend-preferences.md)).
 **Date:** 2026-10-24
 **Branch:** `chore/reorganization-m6-preferences-settings` from `main` at `38547c72` (M5 squash-merged as #59).
 **Governing decisions:** [ADR-0014](../../architecture/decisions/0014-multi-app-package-boundaries.md) (categories, matrix), [ADR-0010](../../architecture/decisions/0010-preference-persistence.md) (account and device preferences; amended by section 4.3 if Q1 is accepted), [ADR-0003](../../architecture/decisions/0003-typography-roles-and-font-preferences.md) (font roles and preferences), the [workspace conventions](../../architecture/workspace-conventions.md) (inventory, entry points, organization, boundary checks R0–R11), the [M5 design](2026-10-23-m5-spaces-slice-design.md) (the feature-package pattern this copies).

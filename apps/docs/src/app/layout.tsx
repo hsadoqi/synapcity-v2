@@ -6,6 +6,11 @@ import { cn } from '@/lib/utils';
 import RootProviders from './providers';
 import { RootShell } from '@synapcity/frontend-ui/blocks/root-shell';
 import { createMetadata } from '@synapcity/frontend-site/metadata';
+import {
+  appearanceBootScript,
+  fontBootScript,
+  themeShapeBootScript,
+} from '@synapcity/frontend-preferences';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -33,6 +38,14 @@ export default function RootLayout({
       className={cn(inter.variable, geistSans.variable, geistMono.variable)}
       suppressHydrationWarning
     >
+      <head>
+        {/* Applies saved contrast and motion before first paint. */}
+        <script dangerouslySetInnerHTML={{ __html: appearanceBootScript }} />
+        {/* Applies saved font choices, and fetches only those, before first paint. */}
+        <script dangerouslySetInnerHTML={{ __html: fontBootScript }} />
+        {/* Applies the saved text size, corner radius and density before first paint. */}
+        <script dangerouslySetInnerHTML={{ __html: themeShapeBootScript }} />
+      </head>
       <body>
         <RootProviders>
           <RootShell>{children}</RootShell>
