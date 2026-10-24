@@ -6,7 +6,7 @@ import type { SpaceSummary } from '@synapcity/domain-records';
 const count = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
 /** What a space holds, in a few words: "8 documents · 1 dashboard", or "Nothing in it yet". */
-function describeContents(documents: number, dashboards: number) {
+export function describeContents(documents: number, dashboards: number) {
   if (documents === 0 && dashboards === 0) return 'Nothing in it yet';
   return [
     documents > 0 ? count(documents, 'document') : null,
