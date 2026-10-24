@@ -1,10 +1,10 @@
 ## Active task: Milestone 5 Collection and Spaces slice design (2026-10-23)
 
-- Goal and mode: Investigating read-only, then writing one Proposed design for owner review. Recording approved by the owner; the design is not accepted. Q1 (sub-milestones 5.1–5.4) and Q2 (defer `frontend-shells`) proceed on their recommendations as defaults; Q3–Q7 open.
+- Goal and mode: Investigating read-only, then writing one Proposed design for owner review. Recording approved by the owner; the design is not accepted. Q1 (sub-milestones 5.1–5.4) and Q2 (defer `frontend-shells`) proceed on their recommendations as defaults. Q3 (re-base `owned-records` on the base contract) and Q6 (fixture-mode data in an app-owned demo source) answered by the owner on 2026-10-23 with the recommendations; Q4, Q5, Q7 open.
 - Branch: `chore/reorganization-m5-spaces-slice` from `main` at `c3cd87a6` (M4 squash-merged as #58).
-- Exact creates (1): `docs/superpowers/specs/2026-10-23-m5-spaces-slice-design.md`. Updates (1): this ledger. Source, packages, manifests, dependencies, config, commits, pushes and external mutations 0.
+- Exact creates (2): `docs/superpowers/specs/2026-10-23-m5-spaces-slice-design.md`; `docs/superpowers/plans/2026-10-23-m5-1-record-contracts.md` (M5.1 plan). Updates (1): this ledger. Design amended after the answers (status, `SetSpacePinnedResult` stays out of domain, field order, fixture factories timing). Source, packages, manifests, dependencies, config, commits, pushes and external mutations 0.
 - Evidence: read at the M4 branch tip `6f542782`; `git diff` against `c3cd87a6` is empty for every cited path.
-- Next: owner answers Q3–Q7 (or accepts the recommendations), then an implementation plan for M5.1.
+- Next: owner reviews the M5.1 plan and chooses an execution method; Q4, Q5, Q7 are asked before M5.2 and M5.3.
 
 ## Active task: Milestone 4 server identity boundary (2026-10-23)
 

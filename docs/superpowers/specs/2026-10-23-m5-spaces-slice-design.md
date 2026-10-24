@@ -1,6 +1,6 @@
 # Milestone 5: Collection and Spaces pathfinder slice
 
-**Status:** Proposed. The owner approved recording this design on 2026-10-23 without answering section 9, so Q1 (sub-milestones) and Q2 (defer shells) proceed on their recommendations as the stated defaults; Q3–Q7 remain open. The design itself is not accepted.
+**Status:** Proposed. The owner approved recording this design on 2026-10-23 without answering section 9, so Q1 (sub-milestones) and Q2 (defer shells) proceed on their recommendations as the stated defaults. Q3 and Q6 were answered on 2026-10-23 with the recommendations; Q4, Q5 and Q7 remain open and are asked before M5.2 and M5.3. The design itself is not accepted. M5.1 plan: [2026-10-23-m5-1-record-contracts.md](../plans/2026-10-23-m5-1-record-contracts.md).
 **Date:** 2026-10-23
 **Branch:** to be created from `main` at `c3cd87a6` (M4 squash-merged as #58; identical to the M4 branch in every path cited here). Proposed name `chore/reorganization-m5-spaces-slice`.
 **Governing decisions:** [ADR-0014](../../architecture/decisions/0014-multi-app-package-boundaries.md) (categories, matrix, base record contract timing in section 4), ADR-0012 (Space persistence), ADR-0013 (Documents and Dashboards persistence, participation tables), [ADR-0006](../../architecture/decisions/0006-authentication-with-supabase.md) (fixture mode never verified), [ADR-0008](../../architecture/decisions/0008-auth-actions-and-server-operations.md) (request-bound clients, no forwarding wrappers), the [workspace conventions](../../architecture/workspace-conventions.md) (inventory, entry points, organization, boundary checks R0–R11), the [M4 design](2026-10-23-m4-server-identity-boundary-design.md) (identity boundary M5 builds on).
@@ -67,7 +67,8 @@ Observations that shape the design:
 Root `.` plus module subpaths only if a consumer needs a narrower interface. Runtime dependency `zod` (already allowlisted by R4).
 
 - `src/base/`: `baseRecordSchema` with the ten fields (`id`, `ownerId`, `name`, `description?`, `icon` as a Lucide identifier, `tags`, `createdAt`, `updatedAt`, `pinnedAt` nullable default null, `lastViewedAt` nullable default null) and `BaseRecord`. No messages. Proposed: also the pure rule `isPinned(record)` only if a consumer needs it (today `itemFromRecord` inlines `pinnedAt !== null`).
-- `src/spaces/`: `createSpaceSchema` (messages preserved verbatim; see C3), `updateSpaceSchema`, `spaceSchema` as `baseRecordSchema` refined with Space's messages, `SpaceEntity`, `CreateSpaceInput`, `UpdateSpaceInput`, `SetSpacePinnedResult`, `SpaceSummary` (record plus derived counts).
+- `src/spaces/`: `createSpaceSchema` (messages preserved verbatim; see C3), `updateSpaceSchema`, `spaceSchema` as `baseRecordSchema` refined with Space's messages, `SpaceEntity`, `CreateSpaceInput`, `UpdateSpaceInput`, `SpaceSummary` (record plus derived counts; `server-data` returns it in M5.2). `SetSpacePinnedResult` is not a domain contract: it carries user-facing messages and only the feature and its host use it, so it moves to `features-spaces/contracts` in M5.4.
+- Field order follows today's Space schema (editable fields, then saved-record metadata), so the `api/spaces` JSON key order is unchanged.
 - Parse results must equal today's for every fixture and every repository test row (a characterization test copies today's schema tests and runs them against the new schema first).
 - `frontend-ui/src/types/entity-schema.ts` is deleted once nothing imports it; the canonical half of `types/entity.ts` goes with it. Screen-only shapes go to `frontend-collection` or `features-spaces/contracts` (4.3, 4.4). This narrows the `./types/*` wildcard as the conventions require.
 - If Q3 is accepted: `lib/owned-records` defines `ownedRecordSchema = baseRecordSchema` (import from `@synapcity/domain-records`) and keeps its queries until M8. No bridge: the app imports the canonical contract directly.
@@ -154,14 +155,14 @@ Proposed: none. If the collection move is split across commits, a temporary re-e
 
 ## 8. Order of work (proposed sub-milestones, one PR each, Q1)
 
-1. **M5.1 Contracts.** `domain-records` (base, spaces); switch Space schema/type importers; Q3 re-base of `owned-records`; remove `frontend-ui` entity schema. `dev-fixtures` Space factories.
+1. **M5.1 Contracts.** `domain-records` (base, spaces); switch Space schema/type importers; Q3 re-base of `owned-records`; remove `frontend-ui` entity schema. `dev-fixtures` Space factories arrive with the first moved tests that use them (M5.2 or M5.4), so no factory ships unused.
 2. **M5.2 Server.** `SupabaseServerClient` export; `server-data/spaces`; host fixture source; repository, actions and API routes rewired; tests.
 3. **M5.3 Collection.** `frontend-collection` with unit folders, stories and the link capability; `frontend-ui/next` for `link-button`; Storybook glob; documents/dashboards/home re-pointed; exceptions removed.
 4. **M5.4 Feature.** `features-spaces` with contracts/frontend/server/testing; app routes thinned.
 5. **M5.5 (only if Q2 = include) Shells.** `frontend-shells` with `RootShell`, sidebar, header, user menu taking host links; docs app consumer.
 6. **Close-out.** Ownership map rows, inventory "exists" notes, ADR-0014 section 7 note, decisions index (Storybook item), task-scope ledger; `pnpm verify`; owner manual checks.
 
-## 9. Owner questions (open)
+## 9. Owner questions (Q3 and Q6 answered 2026-10-23 with the recommendation; Q1 and Q2 on their defaults; Q4, Q5, Q7 open)
 
 | #   | Question                                                                                                                                     | Recommendation                                                                                                                                                                                                                                                   |
 | --- | -------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
