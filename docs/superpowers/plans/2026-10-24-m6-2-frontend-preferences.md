@@ -186,7 +186,7 @@ Every direct `localStorage` call for preferences goes behind one device-store un
 
   Record both, and confirm the R9 mode-provider exception is gone and none was added.
 
-- [ ] **Step 3: Repository gate.** `pnpm verify` with nothing else running. Expected: every stage passes.
+- [x] **Step 3: Repository gate.** `pnpm verify` with nothing else running. Expected: every stage passes. Passed in CI on PR #64 (2026-10-24); the manual browser checks in Step 4 were not run.
 - [ ] **Step 4: Report** per AGENTS.md section 9: what moved, what stayed for M6.4 (provider, tabs, `AccountSync`), checks run and not run. Manual: open web Settings, change mode, text size and a font, reload, and see no flash; open docs and see it boot with defaults. Next: the M6.3 plan (shared-look cookie).
 - [ ] **Step 5: Checkpoint commit** (if authorized): `docs: record milestone 6.2 browser preference runtime`.
 
