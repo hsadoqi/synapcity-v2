@@ -78,7 +78,7 @@
   - `it('does not throw when the browser refuses the write')`: stub the `document.cookie` setter to throw.
   - `it('stays well under the cookie size limit')`: serialized length of a look with the longest allowed values is under 1000 characters.
 - [ ] **Step 2: Run them.** Expected: FAIL (module not found).
-- [ ] **Step 3: Implement** the four functions. `readLookCookie` splits `document.cookie` on `; ` and decodes with `decodeURIComponent` inside a `try`.
+- [ ] **Step 3: Implement** the four functions. `readLookCookie` splits `document.cookie` on `;` and decodes with `decodeURIComponent` inside a `try`.
 - [ ] **Step 4: Run the checks** as in Task 1 for this package. Expected: pass.
 - [ ] **Step 5: Checkpoint commit** (if authorized): `feat(frontend-preferences): read and write the shared look cookie`.
 

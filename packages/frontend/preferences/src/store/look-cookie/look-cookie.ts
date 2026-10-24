@@ -1,62 +1,35 @@
 import {
-  LOOK_COOKIE_NAME,
-  parseLook,
+  lookFromCookieHeader,
+  sanitizeCookieDomain,
+  serializeLookCookie,
   type Look,
 } from '@synapcity/domain-preferences';
 
 /*
  * The shared look (ADR-0010, amendment): one cookie, so a person's look shows
- * on every host under one parent domain. The browser writes it, so it is not
- * HttpOnly; that is acceptable only because it holds display choices (see
- * `lookSchema`). Reading and writing never throw: a browser that blocks
- * cookies simply has no shared look.
+ * on every host under one parent domain. The cookie's format, size cap and
+ * validation live in `@synapcity/domain-preferences`, shared with the server.
+ * The browser writes it, so it is not HttpOnly; that is acceptable only
+ * because it holds display choices (see `lookSchema`). Reading and writing
+ * never throw: a browser that blocks cookies simply has no shared look.
  */
-
-const ONE_YEAR_SECONDS = 31_536_000;
 
 let configuredDomain: string | undefined;
 
 /**
  * The parent domain the cookie is shared on, from the host's own setting.
- * Unset (or empty) writes a host-only cookie, which keeps local development
- * and preview builds working. Hosts call this once at startup.
+ * Unset, empty or anything but a plain host name writes a host-only cookie,
+ * which keeps local development and preview builds working. Hosts call this
+ * once at startup.
  */
 export function configureLookCookie(config: { domain?: string }): void {
-  const domain = config.domain?.trim().toLowerCase();
-  // The value is written into a cookie string, so only a plain host name is
-  // accepted: anything with `;`, spaces or a scheme could add attributes.
-  configuredDomain =
-    domain && /^\.?[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(domain)
-      ? domain
-      : undefined;
-}
-
-export function serializeLookCookie(
-  look: Look,
-  options: { domain?: string; secure: boolean },
-): string {
-  const parts = [
-    `${LOOK_COOKIE_NAME}=${encodeURIComponent(JSON.stringify(look))}`,
-    'Path=/',
-    'SameSite=Lax',
-    `Max-Age=${ONE_YEAR_SECONDS}`,
-  ];
-  if (options.domain) parts.push(`Domain=${options.domain}`);
-  if (options.secure) parts.push('Secure');
-  return parts.join('; ');
+  configuredDomain = sanitizeCookieDomain(config.domain);
 }
 
 /** The look in the cookie, or null when it is missing, invalid or newer. */
 export function readLookCookie(): Look | null {
   try {
-    const prefix = `${LOOK_COOKIE_NAME}=`;
-    const entry = document.cookie
-      .split('; ')
-      .find((part) => part.startsWith(prefix));
-    if (!entry) return null;
-    return parseLook(
-      JSON.parse(decodeURIComponent(entry.slice(prefix.length))),
-    );
+    return lookFromCookieHeader(document.cookie);
   } catch {
     return null;
   }
@@ -64,10 +37,20 @@ export function readLookCookie(): Look | null {
 
 export function writeLookCookie(look: Look): void {
   try {
+    const secure = location.protocol === 'https:';
     document.cookie = serializeLookCookie(look, {
       domain: configuredDomain,
-      secure: location.protocol === 'https:',
+      secure,
     });
+    // A browser silently refuses a domain it does not accept (a public suffix
+    // such as vercel.app, or a host outside it). Without this check the look
+    // would be lost; fall back to a cookie for this host alone.
+    if (
+      configuredDomain &&
+      JSON.stringify(readLookCookie()) !== JSON.stringify(look)
+    ) {
+      document.cookie = serializeLookCookie(look, { secure });
+    }
   } catch {
     // Without cookies the look still applies on this host.
   }

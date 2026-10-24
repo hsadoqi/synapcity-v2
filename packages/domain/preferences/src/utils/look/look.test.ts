@@ -63,4 +63,22 @@ describe('look', () => {
     ];
     for (const value of bad) expect(parseLook(value)).toBeNull();
   });
+
+  it('requires every field, so a cookie is never completed with defaults', () => {
+    const good = lookOf(settingsDefaults);
+    const dropped = (group: 'theme' | 'appearance', key: string) => {
+      const copy = structuredClone(good) as Record<string, any>;
+      delete copy[group][key];
+      return copy;
+    };
+    for (const key of Object.keys(good.theme))
+      expect(parseLook(dropped('theme', key)), key).toBeNull();
+    for (const key of Object.keys(good.appearance))
+      expect(parseLook(dropped('appearance', key)), key).toBeNull();
+  });
+
+  it('ignores keys it does not know', () => {
+    const good = lookOf(settingsDefaults);
+    expect(parseLook({ ...good, extra: 1 })).toEqual(good);
+  });
 });

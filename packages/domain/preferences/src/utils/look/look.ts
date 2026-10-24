@@ -1,6 +1,19 @@
 import { z } from 'zod';
-import { themeSchema, type Settings } from '../../schemas';
+import {
+  bodyFonts,
+  codeFonts,
+  contrastModes,
+  densities,
+  headingFonts,
+  radii,
+  textSizeRange,
+  themeSchema,
+  type Settings,
+} from '../../schemas';
 import { displaySchema } from '../scope';
+
+/** Light, dark, or follow the system. */
+export const lookModes = themeSchema.shape.mode.options;
 
 export const LOOK_VERSION = 1;
 
@@ -13,16 +26,29 @@ export const LOOK_COOKIE_NAME = 'synapcity-look';
  */
 export const lookSchema = z.object({
   v: z.literal(LOOK_VERSION),
-  theme: themeSchema.pick({
-    mode: true,
-    headingFont: true,
-    bodyFont: true,
-    codeFont: true,
-    radius: true,
-    density: true,
-    textSize: true,
+  // Every field is required, with no defaults: a cookie that is missing one is
+  // rejected, never completed. The boot scripts apply the same rule from the
+  // same lists, so the browser, React and the server accept the same cookies.
+  theme: z.object({
+    mode: z.enum(lookModes),
+    headingFont: z.enum(headingFonts),
+    bodyFont: z.enum(bodyFonts),
+    codeFont: z.enum(codeFonts),
+    radius: z.enum(radii),
+    density: z.enum(densities),
+    textSize: z
+      .number()
+      .int()
+      .min(textSizeRange.min)
+      .max(textSizeRange.max)
+      .multipleOf(textSizeRange.step),
   }),
-  appearance: displaySchema,
+  appearance: z.object({
+    animationsEnabled: z.boolean(),
+    reducedMotion: z.boolean(),
+    contrastMode: z.enum(contrastModes),
+    showBorders: z.boolean(),
+  }),
 });
 export type Look = z.infer<typeof lookSchema>;
 
