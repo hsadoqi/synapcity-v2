@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { fakeIdentityProvider } from '../testing';
+import { fakeIdentityProvider } from '../../testing';
 import { verifyIdentity, verifyIdentityWithProvider } from './index';
 
 const verified = { status: 'verified', identity: { userId: 'u1' } } as const;

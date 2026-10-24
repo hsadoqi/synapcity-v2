@@ -5,7 +5,7 @@ import type {
   IdentityVerification,
   ProviderFailure,
   ProviderOutcome,
-} from '../identity-provider';
+} from '../../identity-provider';
 
 const SIGNED_OUT: IdentityResult = { status: 'signed-out' };
 

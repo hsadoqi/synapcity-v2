@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./testing": "./src/testing/index.ts"
+    "./testing": "./src/testing/index.ts",
+    "./utils": "./src/utils/index.ts"
   },
   "scripts": {
     "lint": "eslint . --cache --cache-strategy content --max-warnings 0",
