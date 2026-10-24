@@ -1,5 +1,5 @@
-import { itemFromRecord } from '@/features/collection/shared';
-import type { CollectionItem } from '@/features/collection/shared';
+import { itemFromRecord } from '@synapcity/frontend-collection';
+import type { CollectionItem } from '@synapcity/frontend-collection';
 
 import type { SpaceSummary } from '@synapcity/domain-records';
 

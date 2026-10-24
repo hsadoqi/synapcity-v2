@@ -6,11 +6,11 @@ import { LayoutDashboard } from 'lucide-react';
 import {
   CollectionIndex,
   type SetPinnedResult,
-} from '@/features/collection/components/collection-index';
+} from '@synapcity/frontend-collection';
 import type {
   CollectionItem,
   CollectionItemAction,
-} from '@/features/collection/shared';
+} from '@synapcity/frontend-collection';
 import type { OwnedRecordSummary } from '@/lib/owned-records';
 
 import { toCollectionItem } from '../../lib/collection-item';

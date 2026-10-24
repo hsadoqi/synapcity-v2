@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { findEntityIcon } from '@synapcity/frontend-ui/blocks/entity/entity-icon';
+import { findEntityIcon } from '@synapcity/frontend-collection';
 
 import { ownedRecordSchema } from '@/lib/owned-records';
 

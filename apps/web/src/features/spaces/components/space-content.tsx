@@ -1,8 +1,7 @@
-import { EntityContent } from '@synapcity/frontend-ui/blocks/entity/entity-content';
+import { EntityContent, EntityItemCard } from '@synapcity/frontend-collection';
 import { EntityItem, Space } from '../shared/types';
 import { SpaceCollections } from './space-collections';
 import { createSpaceFixture } from '../lib/fixtures';
-import { EntityItemCard } from '@synapcity/frontend-ui/blocks';
 
 function getRecentSpaceItems(entity: Space, limit = 3): EntityItem[] {
   const space = entity as Partial<Space>;

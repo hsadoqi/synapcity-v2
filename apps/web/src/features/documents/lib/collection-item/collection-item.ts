@@ -1,5 +1,5 @@
-import { itemFromRecord } from '@/features/collection/shared';
-import type { CollectionItem } from '@/features/collection/shared';
+import { itemFromRecord } from '@synapcity/frontend-collection';
+import type { CollectionItem } from '@synapcity/frontend-collection';
 import type { OwnedRecordSummary } from '@/lib/owned-records';
 
 /** Which spaces a document is in, in a few words: "In 2 spaces", or "Not in a space". */

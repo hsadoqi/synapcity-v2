@@ -1,4 +1,4 @@
-export * from '@synapcity/frontend-ui/types/entity';
+export * from '@synapcity/frontend-collection';
 
 /** What pinning a space reports back; `pinnedAt` is the server's own time. */
 export type SetSpacePinnedResult =

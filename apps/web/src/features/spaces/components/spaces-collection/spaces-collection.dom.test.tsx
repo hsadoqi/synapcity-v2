@@ -1,6 +1,6 @@
 import {
   fireEvent,
-  render,
+  render as renderInto,
   screen,
   waitFor,
   within,
@@ -12,15 +12,29 @@ const mocks = vi.hoisted(() => ({
   setSpacePinned: vi.fn(),
 }));
 
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: mocks.push }) }));
 vi.mock('../../server/actions/space-state-actions', () => ({
   setSpacePinned: mocks.setSpacePinned,
 }));
 
+import { CollectionNavigationProvider } from '@synapcity/frontend-collection';
 import { SPACE_FIXTURES } from '../../lib/fixtures';
 import type { SpaceSummary } from '@synapcity/domain-records';
 import { SpacesCollection } from './spaces-collection';
 import { SpacesCollectionSkeleton } from './spaces-collection-skeleton';
+
+/** The host's navigation: plain links, and a `push` this test can watch. */
+function HostNavigation({ children }: { children: React.ReactNode }) {
+  return (
+    <CollectionNavigationProvider
+      value={{ Link: (props) => <a {...props} />, push: mocks.push }}
+    >
+      {children}
+    </CollectionNavigationProvider>
+  );
+}
+
+const render = (ui: React.ReactElement) =>
+  renderInto(ui, { wrapper: HostNavigation });
 
 const summarise = (index: number, extra: Partial<SpaceSummary> = {}) => ({
   ...SPACE_FIXTURES[index]!,

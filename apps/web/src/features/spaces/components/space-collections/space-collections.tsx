@@ -1,7 +1,7 @@
 'use client';
 
 import type { Space } from '../../shared/types';
-import { EntitySection } from '@synapcity/frontend-ui/blocks/entity/entity-section';
+import { EntitySection } from '@synapcity/frontend-collection';
 
 interface SpaceOverviewProps {
   entity: Space;

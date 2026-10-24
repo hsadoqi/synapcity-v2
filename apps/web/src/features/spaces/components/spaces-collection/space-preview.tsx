@@ -1,6 +1,6 @@
 import { Badge } from '@synapcity/frontend-ui/core/badge';
 
-import type { CollectionItem } from '@/features/collection/shared';
+import type { CollectionItem } from '@synapcity/frontend-collection';
 
 /** What the hover card shows for a space: the same facts as its row, a little roomier. */
 export function SpacePreview({ item }: { item: CollectionItem }) {

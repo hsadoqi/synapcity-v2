@@ -1,6 +1,6 @@
 import {
   fireEvent,
-  render,
+  render as renderInto,
   screen,
   waitFor,
   within,
@@ -12,16 +12,30 @@ const mocks = vi.hoisted(() => ({
   setDashboardPinned: vi.fn(),
 }));
 
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: mocks.push }) }));
 vi.mock('../../server/actions/dashboard-state-actions', () => ({
   setDashboardPinned: mocks.setDashboardPinned,
 }));
 
 import type { OwnedRecordSummary } from '@/lib/owned-records';
 
+import { CollectionNavigationProvider } from '@synapcity/frontend-collection';
 import { DASHBOARD_FIXTURES } from '../../lib/fixtures';
 import { DashboardsCollection } from './dashboards-collection';
 import { DashboardsCollectionSkeleton } from './dashboards-collection-skeleton';
+
+/** The host's navigation: plain links, and a `push` this test can watch. */
+function HostNavigation({ children }: { children: React.ReactNode }) {
+  return (
+    <CollectionNavigationProvider
+      value={{ Link: (props) => <a {...props} />, push: mocks.push }}
+    >
+      {children}
+    </CollectionNavigationProvider>
+  );
+}
+
+const render = (ui: React.ReactElement) =>
+  renderInto(ui, { wrapper: HostNavigation });
 
 const MANY: OwnedRecordSummary[] = [...DASHBOARD_FIXTURES];
 // Three of them: the first two pinned (see the fixtures), the third not.

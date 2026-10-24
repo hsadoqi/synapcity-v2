@@ -1,4 +1,4 @@
-import { CollectionPage } from '@/features/collection/components/collection-page';
+import { CollectionPage } from '@synapcity/frontend-collection';
 
 import type { SpaceSummary } from '@synapcity/domain-records';
 import { SPACES_INTRO, SPACES_TITLE } from './spaces-copy';
