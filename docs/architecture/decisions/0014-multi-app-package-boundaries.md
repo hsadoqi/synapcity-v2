@@ -44,7 +44,7 @@ This is the normative production-source matrix. **Yes** means public imports are
 Conditions:
 
 - Same-category and sibling-feature imports use explicit public interfaces, have a named responsibility, and remain acyclic. A shared contract or app-level composition is preferred over importing another feature's private implementation.
-- Frontend may consume a portable domain type needed by its public presentation contract. Canonical schemas and product workflows remain outside frontend; generic controls should prefer presentation props.
+- Frontend may import domain contracts and pure rules (types, schemas, validation, pure functions) through domain's public interface (owner decision, 2026-10-23). Frontend still may not own canonical schemas, redefine product rules, or hold product workflows; those stay in domain and features. Generic controls should prefer presentation props.
 - Feature contracts contain portable types/validation or view-model contracts, never React, DOM, SDK clients, or a server implementation. They may reuse explicit sibling feature contracts without creating a reverse domain dependency.
 - Feature server entries are backend orchestration/loaders. Presentation remains in the presentation entry; an app backend may compose that presentation after loading safe data.
 - Development configuration and dedicated tests/stories/seed/demo hosts may consume development utilities and the public interfaces they exercise. This is a non-production exception, not permission for a shipped entry to reach fixtures.
@@ -60,7 +60,7 @@ flowchart TB
     serverEntry --> services["Server operations"]
     contracts --> domain["Domain contracts and rules"]
     services --> domain
-    foundations -.->|narrow presentation type only| domain
+    foundations -->|contracts and pure rules| domain
 ```
 
 An allowed import does not require an app to consume every category. Docs can use presentation without account operations; Storybook uses public presentation with fixtures; native clients reuse only compatible contracts, behavior, and rendering implementations.
@@ -103,20 +103,20 @@ Group related modules by cohesive responsibility, dependencies, runtime isolatio
 
 The selected grouping families are:
 
-| Family                        | Grouping rule                                                                                                                                                                                                             |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| UI foundations                | General primitives/components stay together; product workflows move to features                                                                                                                                           |
-| Shells                        | One `frontend/shells` package supports multiple cohesive shells                                                                                                                                                           |
-| Collection                    | General browse projections, query mechanics, controls, displays, and local browse state form a reusable frontend family; resource mapping, product copy, navigation, and persistence commands belong to resource features |
-| Preferences                   | Portable policy/contracts in domain; browser application/runtime in frontend; persisted account preference operations with server account; settings editing/composition in the feature                                    |
-| Identity/account              | Portable validation/contracts in domain; trusted identity and auth operations with server auth; profile/preference operations with server account; product experiences in features                                        |
-| Resource persistence          | A cohesive server data family may contain separate Space/Document/Dashboard repository modules; no universal persisted Entity model is introduced                                                                         |
-| Resource experiences and Home | Feature groups preserve capability semantics; Home aggregates them rather than owning their records                                                                                                                       |
-| Fixtures                      | Extend the existing dev fixtures package with contract-aligned factories, scenarios, and sample content                                                                                                                   |
+| Family                        | Grouping rule                                                                                                                                                                                                                                                    |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| UI foundations                | General primitives/components stay together; product workflows move to features                                                                                                                                                                                  |
+| Shells                        | One `frontend/shells` package holds composable app shells and page frames                                                                                                                                                                                        |
+| Collection                    | General browse projections, query mechanics, controls, displays, and local browse state form a reusable frontend family; resource mapping, product copy, navigation, and persistence commands belong to resource features                                        |
+| Preferences                   | Portable policy/contracts in domain; browser application/runtime in frontend; persisted account preference operations with server account; settings editing/composition in the feature                                                                           |
+| Identity/account              | Portable validation/contracts in domain; trusted identity and auth operations with server auth; profile/preference operations with server account; product experiences in features                                                                               |
+| Resource persistence          | A cohesive server data family may contain separate Space/Document/Dashboard repository modules. Domain record contracts share a base contract for common fields (owner decision, 2026-10-23); a universal entity table remains excluded by the product non-goals |
+| Resource experiences and Home | Feature groups preserve capability semantics; Home aggregates them rather than owning their records                                                                                                                                                              |
+| Fixtures                      | Extend the existing dev fixtures package with contract-aligned factories, scenarios, and sample content                                                                                                                                                          |
 
 One capability may have packages in several categories when each package holds only its own category's responsibility. For example, a `frontend/settings` package can hold reusable settings presentation while `features/settings` composes the Settings experience; `frontend/auth` beside `features/auth`, and domain or server packages for the same capability, follow the same rule. A shared capability name does not move workflows, product copy, or data access into frontend, nor presentation into domain or server.
 
-Keep domain record contracts distinct by kind even where common fields are factored into a shared internal helper. Exact leaf-package names, manifest/export syntax, and private file templates are Milestone 3 implementation design; the owner/responsibility assignments above are settled here.
+**Base record contract (owner decision, 2026-10-23).** The owner wants one base contract for the attributes records share, so they are not repeated in every record schema. Each kind (Space, Document, Dashboard) extends it and keeps its own contract and semantics (PRODUCT.md). This is a portable contract, not a universal entity table or relationship framework (non-goals). Its exact fields are set when the contracts move in Milestone 4, preserving current shapes. Leaf packages and names are set by the [package inventory](../workspace-conventions.md#package-inventory) (Milestone 3.1); manifest/export syntax and private file templates remain Milestone 3 design.
 
 Public interfaces expose supported capabilities and entry points, not every internal file. Mixed-runtime packages need separate portable, presentation, and backend entries; a default barrel must not make server implementation reachable through frontend code. Concrete interface signatures are specified and checked with all consumers during the relevant migration.
 

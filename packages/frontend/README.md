@@ -40,7 +40,7 @@ Multiple shells do not require multiple packages or one component with a growing
 
 ## Dependency boundaries
 
-Arrows mean source dependencies. Dashed arrows mark narrowly justified type/contract dependencies.
+Arrows mean source dependencies.
 
 ```mermaid
 flowchart TB
@@ -50,10 +50,10 @@ flowchart TB
     shells --> ui
     ui --> tokens["Shared styling tokens"]
     features --> domain["Domain contracts"]
-    ui -.-> domain
+    ui -->|contracts and pure rules| domain
 ```
 
-Frontend production modules do not import application source, feature implementations, server packages, development fixtures, or secrets. A public domain type may be used where necessary, but canonical schemas and product orchestration remain with their owners. Styles have one token owner.
+Frontend production modules do not import application source, feature implementations, server packages, development fixtures, or secrets. Frontend may import domain contracts and pure rules through domain's public interface, but canonical schemas and product orchestration remain with their owners. Styles have one token owner.
 
 Framework-specific integration must have an explicit entry point or host adapter so it cannot leak into a purportedly portable component. Existing Next.js imports are migration evidence, not proof that every future consumer uses Next.js.
 
@@ -79,10 +79,14 @@ The host supplies where a link leads and how an action is invoked. A callback ex
 ### Example Packages
 
 - `ui` ----> Reusable DOM primitives and visual components
-- `shells` ----> Shell layout and shell interaction
+- `shells` ----> Composable app shells and page frames; content arrives through slots
 - `collection` ----> Browse behavior and DOM collection views
 - `settings` ----> Reusable settings presentation (rows, sections, editor controls); the editing workflow is `features/settings`
 - `auth` ----> Reusable authentication presentation (form pieces, status and confirmation views); auth workflows are `features/auth`
+- `supabase` ----> Browser Supabase client adapter
+- `editor` ----> Future document editor runtime (Lexical), once the editor is approved
+- `preferences` ----> Browser preference runtime: device store, applying theme/mode/fonts, consent state
+- `error-reports` ----> Consent-gated browser error reporting
 - `site` ----> Existing site metadata/brand concerns
 - `tailwind-config` ----> Existing styling foundation
 

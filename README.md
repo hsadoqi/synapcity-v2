@@ -1,6 +1,6 @@
 # Synapcity
 
-Architecture reorganization: the selected multi-app boundaries are recorded in [ADR-0014](docs/architecture/decisions/0014-multi-app-package-boundaries.md), with a [current-to-target ownership map](docs/architecture/reorganization-ownership-map.md). These are the target direction; source migrations and automated enforcement follow in later milestones.
+Architecture reorganization: the selected multi-app boundaries are recorded in [ADR-0014](docs/architecture/decisions/0014-multi-app-package-boundaries.md), with a [current-to-target ownership map](docs/architecture/reorganization-ownership-map.md). These are the target direction. `pnpm boundaries` enforces the workspace import rules (Milestone 3); source migrations follow in later milestones.
 
 **A connected workspace for thinking, planning, and doing.**
 

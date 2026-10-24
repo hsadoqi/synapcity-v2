@@ -23,6 +23,7 @@ Development packages provide tools and evidence. Fake data, a passing test, or a
 | [typescript-config](typescript-config/README.md) | Shared TypeScript configuration                 |
 | [vitest-config](vitest-config/README.md)         | Shared unit/component test configuration        |
 | [playwright-config](playwright-config/README.md) | Shared end-to-end browser configuration         |
+| [boundaries](boundaries/README.md)               | Workspace boundary checker (`pnpm boundaries`)  |
 | [fixtures](fixtures/README.md)                   | Seeded fake data and checked-in seed generation |
 
 A development package is consumed through tooling configuration, development dependencies, or dedicated test/story/seed entry points. Those build-time uses are legitimate. Production application logic and shipped feature entry points do not import fixture generators or test infrastructure.

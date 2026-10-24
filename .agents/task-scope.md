@@ -1,3 +1,47 @@
+## Active task: Milestone 3.4 boundary checker implementation (2026-10-23)
+
+- Goal and mode: implement the accepted 3.4 design per `docs/superpowers/plans/2026-10-23-m3-boundary-checker.md`, native execution chosen by the owner ("ill go with ur recs"). Commits not authorized; the owner committed progress during the run.
+- Exact creates: `packages/dev/boundaries/**` (package, README, source, tests). Updates: `pnpm-lock.yaml` (install of `oxc-parser@0.155.0`, `oxc-resolver@11.24.2` only), root `package.json` (`boundaries` script; `pnpm boundaries` in `verify` and `verify:fast`), root `vitest.config.ts` (project), `AGENTS.md` section 6, `docs/engineering/quality-gates.md`, `docs/engineering/setup.md`, `docs/architecture/workspace-conventions.md` (status line, R0 row), `docs/architecture/decisions/README.md` (candidate entry), `packages/dev/README.md`, this ledger. No application source changed; `apps/web/src/architecture.test.ts` untouched.
+- First run: 997 files across 12 workspaces; 16 genuine pre-existing violations (11 R11 Next.js imports in frontend-ui and frontend-site, 5 R9 barrel-induced module cycles), recorded as 15 named exceptions with removal milestones (M6–M9). Every import in the repository resolved (no R0).
+- Gate proof: a planted `import 'next/headers'` in a real client file failed with exactly one R3; the file was restored with no diff.
+- Dependency evidence (npm registry, checked 2026-10-23): `oxc-parser` 0.155.0 (modified 2026-10-19) and `oxc-resolver` 11.24.2 (modified 2026-07-12) are the registry's current versions and are pinned exactly; `server-only` 0.0.1 is the registry's only version. All three are dev-only tooling or build guards.
+- Verification: see the final report of this task.
+
+## Active task: Milestone 3.4 boundary enforcement design (2026-10-23)
+
+- Goal and mode: choose and design the automated boundary checks with the owner; write one Proposed design. Spikes ran only in the session scratchpad (dependency-cruiser 18.7.0 with TypeScript 7.0.2 and `@swc/core` 1.16.20; Oxc parser/resolver from the existing install); no repository file, dependency or lockfile changed.
+- Owner decisions (2026-10-23): custom checker on `oxc-parser` and `oxc-resolver` ("ok sounds good"); both approved as development dependencies of the checker. Pending in the design: checker location (H1), the `pnpm verify` gate change, and the rules.
+- Exact creates (1): `docs/superpowers/specs/2026-10-23-m3-boundary-enforcement-design.md`. Updates (1): this ledger. Dependencies installed, manifests, lockfile, source, config, commits, pushes 0.
+- Verification: Prettier, link check, builder read-through. Not run: application gates (documentation only).
+- Recording (owner approved 2026-10-23, "sure"): `dev-boundaries` placement (H1), the `pnpm verify` gate change and the rules accepted; recorded in `docs/architecture/workspace-conventions.md` (Boundary checks section, inventory row), `docs/architecture/decisions/README.md` (candidate entry), the 3.1 spec dev table and the 3.4 spec. Implementation is not started; it follows a written plan.
+
+## Active task: Milestone 3.3 internal organization design (2026-10-23)
+
+- Goal and mode: design internal file organization for packages with the owner; write one Proposed design.
+- Owner decisions (2026-10-23): keep the folder-per-unit look with `index.ts` ("i prefer the folder look"); feature entry naming delegated and kept as `./contracts`; features never re-export domain contracts (temporary migration bridges excepted).
+- Exact creates (1): `docs/superpowers/specs/2026-10-23-m3-internal-organization-design.md`. Updates (1): this ledger. Source, config, manifests, commits, pushes 0.
+- Verification: Prettier, link check, builder read-through. Not run: application gates (documentation only).
+- Recording (owner approved 2026-10-23, "yup sounds good"): rules recorded in the Internal organization section of `docs/architecture/workspace-conventions.md`, replacing the earlier "no forwarding wrapper for every function" wording that contradicted F1; spec marked Accepted. Additional updates: `docs/architecture/workspace-conventions.md`.
+
+## Active task: Milestone 3.2 public entry points design (2026-10-23)
+
+- Goal and mode: design the public entry-point and runtime-separation conventions for the 3.1 inventory with the owner; write one Proposed design.
+- Owner decisions (2026-10-23): feature packages expose `./contracts`, `./frontend` and `./server` with no root entry ("sure"); `server-only@0.0.1` approved as a dependency of packages with a server entry, added when each package is created ("sure"). Registry and Next.js 16.4.3 bundled docs checked the same day.
+- Exact creates (1): `docs/superpowers/specs/2026-10-23-m3-public-entry-points-design.md`. Updates (1): this ledger. Manifests, dependencies installed, source, config, commits and pushes 0.
+- Verification: Prettier, link check, builder read-through. Not run: application gates (documentation only).
+- Recording (owner approved 2026-10-23, "sure"): rules added to `docs/architecture/workspace-conventions.md` under Entry points; spec marked Accepted. Additional updates: `docs/architecture/workspace-conventions.md`.
+
+## Active task: Milestone 3.1 package grouping and naming design (2026-10-23)
+
+- Goal and mode: owner asked to start Milestone 3 with 3.1 (package grouping and naming). Brainstorming with the owner, then writing one Proposed design for owner review. No package, manifest, source, config or dependency change.
+- Branch: `chore/reorganization-m3-boundary-enforcement`, created from pushed `e85b3bb2`.
+- Owner decisions this session (2026-10-23): one capability may span categories; separate `frontend/preferences` runtime; preferences (data/runtime) versus settings (screen) naming split; profile/account contracts in `domain/identity`; one `domain/records` package; a base record contract for shared attributes (records were never meant to repeat them; the earlier "no universal Entity model" wording was AI-introduced and is corrected in ADR-0014, the domain README and the ownership map); `frontend/shells` widened to composable app shells and page frames, content passed through children/slots.
+- Exact updates: `.agents/task-scope.md`; `docs/architecture/decisions/0014-multi-app-package-boundaries.md`, `docs/architecture/reorganization-ownership-map.md`, `packages/domain/README.md` (entity-base correction only). Exact creates (1): `docs/superpowers/specs/2026-10-23-m3-package-grouping-design.md`, status Proposed. Commits, pushes, issues, project changes 0.
+- Verification: Prettier on changed files, relative-link check, builder read-through of the spec. Not run: application gates (documentation only).
+- Recording (owner confirmed D4, D5 and C1 and approved recording, 2026-10-23): inventory and rules added to `docs/architecture/workspace-conventions.md`; ownership map error-reports and shells rows; ADR-0014 shells row and leaf-name pointer; glossary implementation-naming note (also removes the AI-introduced "universal Entity model" wording); domain and frontend README example lists; spec marked Accepted. Additional updates: `docs/glossary.md`, `docs/architecture/workspace-conventions.md`.
+- Follow-up (owner approved 2026-10-23, "ok"): widened ADR-0014's Frontend-to-Domain condition to contracts and pure rules; updated its diagram, the frontend and domain READMEs, and the spec (O1 resolved). Additional updates: `packages/frontend/README.md`.
+- Inventory amendment (owner approved 2026-10-23, "okay"): no `services` umbrella; vendor SDKs wrapped by adapter packages; `server-supabase` and `frontend-supabase` added, `frontend-editor` noted as future. Additional updates: `docs/architecture/workspace-conventions.md`, `docs/architecture/reorganization-ownership-map.md`, `docs/superpowers/specs/2026-10-23-m3-package-grouping-design.md`, `packages/server/README.md`, `packages/frontend/README.md`.
+
 ## Milestone 1 baseline record (2026-10-23)
 
 - Baseline: clean worktree copy of `1390871eaca37c96713c5f7549d3ec6b4ae0764b` on `refactor/reorganization-m1-baseline`, in the named architecture-reorganization worktree.

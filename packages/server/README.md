@@ -102,7 +102,8 @@ Current inputs include [auth operations](../../apps/web/src/features/auth/server
 
 - `auth` ----> Verified identity, auth operations, verified caller helpers, identity/provider translation, session-related backend behavior
 - `account` ----> Account/profile/preference operations, metadata updates and persistence
-- `data` ----> Resource repositories, database row mapping, participation queries, shared persistence infrastructure and provider adapters for Spaces/Documents/Dashboards
+- `data` ----> Resource repositories, database row mapping, participation queries, shared persistence infrastructure for Spaces/Documents/Dashboards, using the client from `supabase`
+- `supabase` ----> Supabase adapter: request-bound server client, session refresh, provider-error translation; the only server package importing the SDK
 
 ## Verification and undecided details
 

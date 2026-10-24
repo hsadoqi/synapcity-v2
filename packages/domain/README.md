@@ -27,7 +27,7 @@ A schema has one owner. Frontend components, server adapters, feature compositio
 
 React components and hooks, Next.js APIs, DOM effects, browser storage, cookies, SDK clients, network calls, database row mapping, secrets, and concrete repositories belong to other owners. Database constraints and RLS still enforce their own durable security invariants; sharing a validator does not replace them.
 
-A capability's meaning is independent of where it renders. Route containment does not establish ownership. Do not introduce a universal Entity model or an identical package for every product noun merely to complete a diagram.
+A capability's meaning is independent of where it renders. Route containment does not establish ownership. Record kinds extend one base contract for their shared attributes (owner decision, 2026-10-23) and keep their own semantics. Do not create an identical package for every product noun merely to complete a diagram.
 
 ## Dependency boundaries
 
@@ -39,7 +39,7 @@ flowchart TB
     server["Server operations and repositories"] --> domain
     fixtures["Development fixture factories"] --> domain
     host["Application composition"] --> domain
-    frontend["Frontend component, when its public contract requires a domain type"] -.-> domain
+    frontend["Frontend packages, for contracts and pure rules"] --> domain
 ```
 
 Domain production modules may depend on other portable domain modules through explicit, acyclic public interfaces and on approved platform-independent libraries. They do not import applications, frontend, server, features, or development fixtures.
@@ -73,11 +73,11 @@ The [Space schema currently lives in UI](../frontend/ui/src/types/entity-schema.
 
 ### Example Packages
 
-- spaces
-- documents
-- dashboards
-- preferences
-- identity
+- `records` ----> Base record contract, with `spaces`, `documents` and `dashboards` modules extending it
+- `preferences` ----> Preference data, rules, scope and consent policy
+- `identity` ----> Credential, profile and verified-identity contracts
+
+The full list is the [package inventory](../../docs/architecture/workspace-conventions.md#package-inventory).
 
 ## Package design and verification
 

@@ -17,6 +17,7 @@ import { sharedConfig } from './packages/dev/vitest-config/src/shared';
  */
 const projects = [
   'apps/web',
+  'packages/dev/boundaries',
   'packages/dev/fixtures',
   'packages/frontend/site',
   'packages/frontend/ui',
