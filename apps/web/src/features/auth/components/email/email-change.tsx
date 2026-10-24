@@ -8,10 +8,12 @@ import { Button } from '@synapcity/frontend-ui/core/button';
 import { requestEmailChange } from '@/features/auth/server/actions/actions';
 import { usePendingEmail } from '@/features/auth/client';
 import type { AuthState } from '@/features/auth/types';
-import { FormField } from '@/components/forms/form-field';
-import { FormMessage } from '@/components/forms/form-message';
-import { fieldErrorProps } from '@/components/forms/form-feedback';
-import { useFocusFirstError } from '@/hooks/use-focus-first-error';
+import {
+  FormField,
+  FormMessage,
+  fieldErrorProps,
+  useFocusFirstError,
+} from '@synapcity/frontend-forms';
 import { createClient } from '@/lib/supabase/client';
 import { SignInAgain } from '../sign-in-again';
 import { ResendEmailChange } from './resend-email-change';

@@ -26,7 +26,7 @@ import {
 } from '@/features/auth/shared/oauth-providers';
 import type { ConnectedAccount } from '@/features/auth/shared/connected-accounts';
 import type { AuthState } from '@/features/auth/types';
-import { FormMessage } from '@/components/forms/form-message';
+import { FormMessage } from '@synapcity/frontend-forms';
 import { SignInAgain } from '../sign-in-again';
 
 const initialState: AuthState = {};

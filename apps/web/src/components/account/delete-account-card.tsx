@@ -9,7 +9,7 @@ import {
   confirmAccountDeletion,
   type DeleteAccountState,
 } from '@/app/auth/delete-account/actions';
-import { FormMessage } from '@/components/forms/form-message';
+import { FormMessage } from '@synapcity/frontend-forms';
 import { AuthShell } from '@/features/auth/shared/auth-shell';
 
 const initialState: DeleteAccountState = {};

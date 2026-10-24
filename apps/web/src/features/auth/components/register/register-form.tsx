@@ -9,10 +9,12 @@ import {
   type AuthState,
 } from '@/features/auth/types';
 import { MAX_NAME_LENGTH } from '@/features/account/types';
-import { FormField } from '@/components/forms/form-field';
-import { useFocusFirstError } from '@/hooks/use-focus-first-error';
-import { FormMessage } from '@/components/forms/form-message';
-import { fieldErrorProps } from '@/components/forms/form-feedback';
+import {
+  FormField,
+  useFocusFirstError,
+  FormMessage,
+  fieldErrorProps,
+} from '@synapcity/frontend-forms';
 
 export function RegisterForm({
   next,

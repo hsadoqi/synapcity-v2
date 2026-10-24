@@ -8,7 +8,7 @@
 
 The owner expects forms to be a large part of the product. Today the form layer is small and app-local:
 
-- [`apps/web/src/components/forms`](../../../apps/web/src/components/forms) holds three units: `form-field` (label, input, hint, invalid wiring), `form-message` (form-level error or status) and `form-feedback` (`fieldErrorProps` and the `FieldFeedbackState` shape). [`apps/web/src/hooks/use-focus-first-error`](../../../apps/web/src/hooks/use-focus-first-error) moves focus after a failed submit. About 280 lines in total; 15 components and one architecture test import the form units.
+- `apps/web/src/components/forms` held three units (they moved to [`packages/frontend/forms`](../../../packages/frontend/forms) in extraction Part A): `form-field` (label, input, hint, invalid wiring), `form-message` (form-level error or status) and `form-feedback` (`fieldErrorProps` and the `FieldFeedbackState` shape). `apps/web/src/hooks/use-focus-first-error` moves focus after a failed submit. About 280 lines in total; 15 components and one architecture test import the form units.
 - Forms are native HTML forms with `noValidate`, submitted to server actions through React's `useActionState`. A failed action returns an `error` message and the `fields` it concerns; the form marks those fields invalid and focuses the first one.
 - Validation is Zod 4 (`zod` 4.6.7 in `apps/web`, `frontend-ui` and `domain-identity`). Portable schemas such as `nameSchema` and `profileSchema` live in `domain-identity`.
 - No form-state library is installed.

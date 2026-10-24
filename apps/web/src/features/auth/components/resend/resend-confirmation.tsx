@@ -4,7 +4,7 @@ import { useActionState, useId } from 'react';
 
 import { resendConfirmation } from '@/features/auth/server/actions/actions';
 import type { AuthState } from '@/features/auth/types';
-import { FormMessage } from '@/components/forms/form-message';
+import { FormMessage } from '@synapcity/frontend-forms';
 import { ResendButton } from '../../shared/resend-button';
 import { useCooldown } from '@/features/auth/client';
 

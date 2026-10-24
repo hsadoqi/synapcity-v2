@@ -15,8 +15,7 @@ import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 import { toast } from '@synapcity/frontend-ui/core/toast';
 
 import type { ProfileState } from '@/features/account/types';
-import { FormMessage } from '@/components/forms/form-message';
-import { useFocusFirstError } from '@/hooks/use-focus-first-error';
+import { FormMessage, useFocusFirstError } from '@synapcity/frontend-forms';
 
 type ProfileFormContextValue = {
   state: ProfileState;

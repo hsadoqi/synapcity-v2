@@ -22,32 +22,32 @@
 - [x] Owner accepts ADR-0015 (2026-10-24).
 - [x] Package name confirmed by the owner (2026-10-24).
 - [x] Milestone slot chosen: after M5, before M6 (2026-10-24).
-- [ ] Storybook discovery of stories in new packages is settled (decisions index, expected by M5). If it is not, the package ships with unit tests and its stories wait.
-- [ ] Task scope written for the extraction, naming exact creates and updates.
+- [x] Storybook discovery of stories in new packages is settled (decisions index, expected by M5). If it is not, the package ships with unit tests and its stories wait. _(Settled on `main` since M5.3: the decisions index records that `apps/storybook` lists each package's stories by glob. This package has no stories yet; the engine plan adds them in Task 8.)_
+- [x] Task scope written for the extraction, naming exact creates and updates. _(Written 2026-10-24 in `.agents/task-scope.md`.)_
 
 ## Part A: Extraction, no behavior change
 
 ### Task A1: Inventory and characterization
 
-- [ ] List every importer of `@/components/forms/*` and `@/hooks/use-focus-first-error`. At the time of writing: `form-field` and `form-message` and `form-feedback` are imported by 15 components (auth, account, `components/account/delete-account-card.tsx`) and referenced by `apps/web/src/architecture.test.ts`.
-- [ ] Confirm each of the three form units and the hook has tests that pin observable behavior: label and id wiring, hint versus message precedence, `aria-invalid`, `aria-describedby`, password reveal, focus target order (empty marked field, first marked field, form alert). Add missing cases before moving anything.
-- [ ] Decide whether `form-field` is absorbed by the existing `field` component in `frontend-ui` or composes it. Record the answer in the task scope. Do not build a second implementation beside `field`.
+- [x] List every importer of `@/components/forms/*` and `@/hooks/use-focus-first-error`. At the time of writing: `form-field` and `form-message` and `form-feedback` are imported by 15 components (auth, account, `components/account/delete-account-card.tsx`) and referenced by `apps/web/src/architecture.test.ts`. _(Done 2026-10-24: 15 components and the architecture test, 16 files.)_
+- [x] Confirm each of the three form units and the hook has tests that pin observable behavior: label and id wiring, hint versus message precedence, `aria-invalid`, `aria-describedby`, password reveal, focus target order (empty marked field, first marked field, form alert). Add missing cases before moving anything. _(Done 2026-10-24: the existing tests already pin every listed behavior, so none was added.)_
+- [x] Decide whether `form-field` is absorbed by the existing `field` component in `frontend-ui` or composes it. Record the answer in the task scope. Do not build a second implementation beside `field`. _(Decided 2026-10-24: not in Part A. `FormField` moved unchanged; reconcile it with the engine's field frame later.)_
 
 ### Task A2: Extend the package with the moved code
 
-- [ ] `packages/frontend/forms` already exists: Task 1 of the [forms engine plan](2026-10-24-forms-schema-driven-engine.md) created it with the engine's pure modules as its first code (owner confirmed, 2026-10-24). Add the moved units to it following the M3 conventions (per-unit folders with `index.ts`, kind folders directly under `src/`), and extend its manifest, README and `exports` only as the moved code needs.
-- [ ] Move `form-field`, `form-message`, `form-feedback` and `use-focus-first-error` with their tests, history preserved where git allows.
-- [ ] Declare dependencies on `frontend-ui` and the minimum React peer. No new third-party dependency in Part A.
-- [ ] Check the registrations the package needs: its Vitest project entry and lockfile importer already exist; the boundary checker and Knip passed for it without extra configuration. Add a registration only if one of them reports a gap.
+- [x] `packages/frontend/forms` already exists: Task 1 of the [forms engine plan](2026-10-24-forms-schema-driven-engine.md) created it with the engine's pure modules as its first code (owner confirmed, 2026-10-24). Add the moved units to it following the M3 conventions (per-unit folders with `index.ts`, kind folders directly under `src/`), and extend its manifest, README and `exports` only as the moved code needs.
+- [x] Move `form-field`, `form-message`, `form-feedback` and `use-focus-first-error` with their tests, history preserved where git allows. _(Done: `git mv`, history kept.)_
+- [x] Declare dependencies on `frontend-ui` and the minimum React peer. No new third-party dependency in Part A. _(Done: `@synapcity/frontend-ui` added; no third-party dependency.)_
+- [x] Check the registrations the package needs: its Vitest project entry and lockfile importer already exist; the boundary checker and Knip passed for it without extra configuration. Add a registration only if one of them reports a gap. _(Done: `apps/web` gained the workspace dependency and a Tailwind `@source` line.)_
 
 ### Task A3: Rewire consumers
 
-- [ ] Point the 15 components and the architecture test at the package entries. Delete the app-local copies. Leave no re-export shim.
-- [ ] Update the ownership map and the package inventory rows for the forms units in the same change.
+- [x] Point the 15 components and the architecture test at the package entries. Delete the app-local copies. Leave no re-export shim. _(Done: 15 components rewired; the architecture test's `components/forms` rule and guard were removed because `pnpm boundaries` enforces the same constraint for a package. No shim.)_
+- [x] Update the ownership map and the package inventory rows for the forms units in the same change.
 
 ### Task A4: Verify
 
-- [ ] `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm deps`, `pnpm boundaries`, `pnpm test`, `pnpm test:coverage`, `pnpm test:e2e`, `pnpm test:storybook`, `pnpm build`, or `pnpm verify` for the chain.
+- [x] `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm deps`, `pnpm boundaries`, `pnpm test`, `pnpm test:coverage`, `pnpm test:e2e`, `pnpm test:storybook`, `pnpm build`, or `pnpm verify` for the chain. _(Ran locally 2026-10-24 and passed: `format:check`, `lint`, `typecheck`, `deps`, `boundaries`, the package's 108 tests and the web app's 1613. `test:e2e`, `test:storybook` and `build` run in the pre-push `pnpm verify`; the pull request records the result.)_
 - [ ] Manual check of one auth form and one account form: keyboard order, focus after a failed submit, screen-reader announcement of the message.
 - [ ] Report what ran, what did not and what the tests do not cover.
 
