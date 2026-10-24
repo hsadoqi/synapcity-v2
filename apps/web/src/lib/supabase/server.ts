@@ -1,4 +1,4 @@
-import { createServerClient } from '@supabase/ssr';
+import { createRequestClient } from '@synapcity/server-supabase';
 import { cookies } from 'next/headers';
 
 import { getSupabaseEnv } from './env';
@@ -6,27 +6,20 @@ import { getSupabaseEnv } from './env';
 /**
  * If using Fluid compute: Don't put this client in a global variable. Always create a new client within each
  * function when using it.
+ *
+ * The host binding for this request: Next.js cookies and the project's
+ * environment. The client itself is built by `@synapcity/server-supabase`.
  */
 export async function createClient() {
   const cookieStore = await cookies();
   const { url, publishableKey } = getSupabaseEnv();
 
-  return createServerClient(url, publishableKey, {
+  return createRequestClient({
+    url,
+    publishableKey,
     cookies: {
-      getAll() {
-        return cookieStore.getAll();
-      },
-      setAll(cookiesToSet) {
-        try {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options),
-          );
-        } catch {
-          // The `setAll` method was called from a Server Component.
-          // This can be ignored if you have middleware refreshing
-          // user sessions.
-        }
-      },
+      getAll: () => cookieStore.getAll(),
+      set: (name, value, options) => cookieStore.set(name, value, options),
     },
   });
 }
