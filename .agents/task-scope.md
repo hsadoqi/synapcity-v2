@@ -2,7 +2,7 @@
 
 - Goal and mode: documentation only. Write one Proposed design for moving `apps/web/src/features/auth` and `features/account` into packages, with owner questions, so a plan can follow after approval.
 - Branch: `docs/m7-auth-account-design` from `main` at `ba00942c`.
-- Exact create (1): `docs/superpowers/specs/2026-10-24-m7-auth-account-design.md`. Exact update (1): this ledger.
+- Exact creates (2): `docs/superpowers/specs/2026-10-24-m7-auth-account-design.md` and `docs/superpowers/plans/2026-10-24-m7-1-identity-contracts.md`. Exact update (1): this ledger. The owner accepted design questions Q1 to Q5 on 2026-10-24; the M7.1 plan is written but not executed.
 - Not changed: source, packages, manifests, dependencies, lockfile, config, ADRs, the inventory and the ownership map (they are updated by the approved plans, not by this design).
 - Evidence: files and import counts read from the repository at `ba00942c` and the open pull request for React Hook Form (#67, file list only). Not verified: what the recent-sign-in check should become, the inputs each moved unit needs from `lib/`, and any live provider behavior.
 - Open for the owner: Q1 to Q5 in the design, in particular holding M7.4 and M7.5 until #67 merges.

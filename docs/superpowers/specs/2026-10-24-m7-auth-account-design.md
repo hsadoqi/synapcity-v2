@@ -1,6 +1,6 @@
 # Milestone 7: Auth and Account
 
-**Status:** Proposed (not approved). Written for owner review; nothing in it is implemented. The owner questions in section 9 need answers before any plan is written or any code moves.
+**Status:** Accepted (owner decision, 2026-10-24). Q1 to Q5 answered with the recommendations (section 9); the calls in section 10 stand. Nothing in it is implemented yet. Plans follow per sub-milestone.
 **Date:** 2026-10-24
 **Branch:** `docs/m7-auth-account-design` from `main` at `ba00942c` (M6 merged as #64, forms extraction Part A merged as #65).
 **Governing decisions:** [ADR-0014](../../architecture/decisions/0014-multi-app-package-boundaries.md) (categories, matrix), [ADR-0006](../../architecture/decisions/0006-authentication-with-supabase.md) (Supabase Auth, cookie sessions, `getClaims`), [ADR-0007](../../architecture/decisions/0007-app-local-auth-and-account-ownership.md) (responsibilities, placement superseded by ADR-0014), [ADR-0008](../../architecture/decisions/0008-auth-actions-and-server-operations.md) (Server Actions and operations), [ADR-0009](../../architecture/decisions/0009-caller-owned-auth-navigation.md) (caller-supplied navigation), [ADR-0015](../../architecture/decisions/0015-forms-package-and-form-state.md) (forms), the [M4 design](2026-10-23-m4-server-identity-boundary-design.md) (what it deferred to M7), the [workspace conventions](../../architecture/workspace-conventions.md).
@@ -144,6 +144,8 @@ One pull request per sub-milestone or one sectioned pull request: the owner chos
 | Q3  | Keep every Server Action and its `redirect` and `revalidatePath` calls in `apps/web`, with packages exposing operations and typed results?                                          | Yes. It matches ADR-0008 and M6, keeps `next` out of server packages, and avoids moving a `use server` file across a package boundary.                                                    |
 | Q4  | Start M7.1 to M7.3 now and hold M7.4 and M7.5 until the React Hook Form pull request (#67) merges?                                                                                  | Yes. The first three touch no auth components; the last two move the files that pull request edits.                                                                                       |
 | Q5  | Decide the recent-sign-in contract question (M4 deferred it to M7) when the delete-account flow moves, keeping it a `features-auth` server helper unless a second consumer appears? | Yes. Widening `VerifiedIdentity` was an M4 anti-goal; a helper reading claims through the provider keeps the contract small. Revisit if another feature needs it.                         |
+
+**Answers, 2026-10-24 (owner decisions).** Q1: yes, `frontend-auth` is deferred and the generic auth pieces stay in `features-auth`. Q2: yes, the dependency is one-way, auth to account. Q3: yes, Server Actions stay in `apps/web`. Q4: yes, M7.1 to M7.3 start now and M7.4 and M7.5 wait for the React Hook Form pull request (#67) to merge. Q5: yes, the recent-sign-in decision is made when the delete-account flow moves.
 
 ## 10. Calls made by Claude (owner to check)
 
