@@ -1,46 +1,30 @@
-import { EntityContent, EntityItemCard } from '@synapcity/frontend-collection';
+import { EntityContent } from '@synapcity/frontend-collection';
 import type { EntityItem } from '@synapcity/frontend-collection';
-import type { Space } from '@synapcity/features-spaces/contracts';
-import { SpaceCollections } from './space-collections';
-import { createSpaceFixture } from '../lib/fixtures';
 
-function getRecentSpaceItems(entity: Space, limit = 3): EntityItem[] {
-  const space = entity as Partial<Space>;
-  return [...(space.documents ?? []), ...(space.dashboards ?? [])]
+import type { Space } from '../../../contracts';
+import { SpaceCollections } from '../space-collections';
+
+/** The most recently changed documents and dashboards in the space. */
+function getRecentSpaceItems(space: Space, limit = 3): EntityItem[] {
+  return [...space.documents, ...space.dashboards]
     .sort(
-      (a: EntityItem, b: EntityItem) =>
+      (a, b) =>
         new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
     )
     .slice(0, limit);
 }
 
+/** One space's page: its header, what changed last, and what takes part in it. */
 export function SpaceContent({
   userId,
-  spaceItem,
+  space,
 }: {
   userId: string;
-  spaceItem?: Space;
+  space: Space;
 }) {
-  const entityItem = createSpaceFixture({ ownerId: userId });
   return (
-    <EntityContent
-      userId={userId}
-      getRecentItems={getRecentSpaceItems}
-      createFixture={spaceItem ? () => spaceItem : createSpaceFixture}
-    >
-      <>
-        {spaceItem ? (
-          <SpaceCollections entity={spaceItem} userId={userId} />
-        ) : (
-          <div className="flex flex-col gap-12">
-            <EntityItemCard
-              key={entityItem.id}
-              entity={entityItem}
-              slug={`/${userId}/home/spaces`}
-            />
-          </div>
-        )}
-      </>
+    <EntityContent entity={space} getRecentItems={getRecentSpaceItems}>
+      <SpaceCollections entity={space} userId={userId} />
     </EntityContent>
   );
 }

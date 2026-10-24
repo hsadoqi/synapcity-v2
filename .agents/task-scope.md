@@ -22,7 +22,8 @@
 - M5.3 changed on purpose: links and navigation in collection and entity components come from a host capability (`CollectionNavigationProvider`; `NextCollectionNavigation` in the owner layout); without a provider they are plain anchors. The secondary Button's hover and pressed fills now mix toward the page instead of the ink (owner decision, 2026-10-24): in the dark theme the pressed state was 3.78:1 under its label, below AA, and now passes the Storybook a11y check; in the light theme the states lighten instead of darken, which raises label contrast there too.
 - M5.3 not changed: component markup, class names, copy, aria wiring, query, filter, sort and layout behavior; every existing test assertion.
 - M5.3 exceptions: six named exceptions removed (R11 for `entity-item-card`, `entity-section`, `recent-entity-items`, `recent-entity-row` and `link-button`; R9 for the `entity-section` cycle); none added.
-- Next: M5.4 (`features-spaces`) needs a plan; Q2 (`frontend-shells`) stays deferred.
+- M5.4 plan written (2026-10-24): `docs/superpowers/plans/2026-10-24-m5-4-features-spaces.md` (one create; docs only). Four tasks: package and Space view model contracts with a structural `EntityItem` in `frontend-collection`, `./server` with the host's source, demo source and actions, `./frontend` with stories and thin pages, records and gate. Awaiting the owner's review before execution.
+- Next: owner reviews the M5.4 plan; Q2 (`frontend-shells`) stays deferred.
 
 ## Active task: Milestone 4 server identity boundary (2026-10-23)
 
