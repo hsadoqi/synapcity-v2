@@ -39,6 +39,16 @@ describe('readAccountPreferenceRow', () => {
     });
   });
 
+  it('treats a non-string device timezone as absent', async () => {
+    maybeSingle.mockResolvedValue({
+      data: { preferences: {}, device_timezone: 42 },
+      error: null,
+    });
+    await expect(
+      readAccountPreferenceRow(client, 'user-1'),
+    ).resolves.toMatchObject({ ok: true, value: { deviceTimezone: null } });
+  });
+
   it('returns the empty account state when the row is missing', async () => {
     maybeSingle.mockResolvedValue({ data: null, error: null });
     await expect(readAccountPreferenceRow(client, 'user-1')).resolves.toEqual({
@@ -92,13 +102,17 @@ describe('writeAccountPreferenceRow', () => {
   });
 
   it.each([
-    ['provider error', { data: null, error: { code: '42501' } }],
-    ['row not written', { data: [], error: null }],
-  ])('reports %s', async (_name, response) => {
+    [
+      'provider error',
+      { data: null, error: { code: '42501' } },
+      { code: '42501' },
+    ],
+    ['row not written', { data: [], error: null }, { code: 'row_not_written' }],
+  ])('reports %s with its failure', async (_name, response, failure) => {
     writeSelect.mockResolvedValue(response);
 
     await expect(
       writeAccountPreferenceRow(client, 'user-1', {}),
-    ).resolves.toMatchObject({ ok: false });
+    ).resolves.toEqual({ ok: false, failure });
   });
 });

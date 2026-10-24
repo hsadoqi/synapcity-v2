@@ -1,6 +1,6 @@
 # Milestone 6.4 Settings and server-account Implementation Plan
 
-**Status:** Approved for execution (owner decision, 2026-10-24).
+**Status:** Implemented in PR #64 (2026-10-24). CI `verify` passed on that PR; live-provider checks were not run. This plan has no per-step checkboxes, so completion is recorded here and in the commit history.
 **Design:** [Milestone 6 Preferences and Settings](../specs/2026-10-24-m6-preferences-settings-design.md), sections 4.4-4.5, 4.7-4.8, and 8-10.
 **Governing:** [ADR-0010](../../architecture/decisions/0010-preference-persistence.md), [ADR-0014](../../architecture/decisions/0014-multi-app-package-boundaries.md), [workspace conventions](../../architecture/workspace-conventions.md), and the [package creation checklist](../../architecture/package-creation-checklist.md).
 

@@ -1,5 +1,7 @@
 # Milestone 6.2 browser preference runtime Implementation Plan
 
+**Status:** Implemented in PR #64 (2026-10-24); the step checkboxes below were not maintained during execution and are not evidence of what remains. The commit history and the PR checks are the record. Manual browser checks listed in the report steps were not run.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** The browser half of preferences lives in `@synapcity/frontend-preferences`, and web, docs and Storybook use it, with no visible change. That covers the device store, the boot scripts and apply functions, font loading, the consent and system-signal hooks, and mode.
