@@ -29,6 +29,7 @@ const projects = [
   'packages/features/spaces',
   'packages/frontend/site',
   'packages/frontend/collection',
+  'packages/frontend/forms',
   'packages/frontend/tokens',
   'packages/frontend/ui',
   'packages/server/auth',
