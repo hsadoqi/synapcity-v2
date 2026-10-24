@@ -1,6 +1,6 @@
 # Milestone 4: server identity boundary
 
-**Status:** Proposed. Awaiting owner approval; nothing below is implemented.
+**Status:** Accepted by the owner on 2026-10-23 ("i accept all your recommendations": Q1–Q3 as recommended and calls C1–C6). Implementation plan: [2026-10-23-m4-server-identity-boundary.md](../plans/2026-10-23-m4-server-identity-boundary.md). The builder check's findings are folded in (section 12).
 **Date:** 2026-10-23
 **Branch:** `chore/reorganization-m4-server-identity`
 **Governing decisions:** [ADR-0014](../../architecture/decisions/0014-multi-app-package-boundaries.md) (categories, matrix, host bindings), [ADR-0006](../../architecture/decisions/0006-authentication-with-supabase.md) (Supabase Auth, `getClaims`/`getUser`, development fixture mode), [ADR-0008](../../architecture/decisions/0008-auth-actions-and-server-operations.md) (request-bound clients, no forwarding wrappers), the [workspace conventions](../../architecture/workspace-conventions.md) (inventory, entry points, organization, boundary checks).
@@ -50,7 +50,7 @@ What callers read from the result:
 - Session facts: `claims.amr` for recent link sign-in (delete-account page and operation).
 - Provider user data: `user_metadata` and `identities` for profile metadata writes (account actions).
 
-Development fixture mode (`lib/access/dev-fixture.ts`) is checked by the host at about 40 call sites before any client is built. No portable identity contract exists; "verified" currently means Supabase claims or a Supabase user object.
+Development fixture mode (`lib/access/dev-fixture.ts`) is checked by the host at 37 call sites before any client is built. No portable identity contract exists; "verified" currently means Supabase claims or a Supabase user object.
 
 `lib/data/user.ts` has no importers and is not an identity contract (a sample object and a `console.log`). It is outside M4; see section 11.
 
@@ -103,14 +103,16 @@ Both packages get their first code, as the inventory assigns ("verified identity
   - `verifyIdentity(provider)`: the claims path. Any outcome other than a user with a non-empty ID is `signed-out`, exactly as `getVerifiedClaims()` behaves today.
   - `verifyIdentityWithProvider(provider)`: the fresh path (ADR-0006 "`getUser()` where fresh user data is required"). `unreachable` becomes `unavailable`; `none` and `refused` become `signed-out`.
 - An ownership rule: `isOwner(result, userId)` is true only for a verified identity whose `userId` equals the supplied ID. The supplied ID is compared, never trusted.
-- Failure detail for logging (`code`, `status`) is returned to the caller alongside the result, so the host keeps logging by code only, as `logFailure` does today. The package does not log.
+- Both functions return `IdentityVerification = { result: IdentityResult; failure?: ProviderFailure }`, where `ProviderFailure = { code?: string; status?: number }` is the provider error's detail. The host keeps logging by code and status only, as `logFailure` does today. The package does not log.
+- `userId` is not checked against a UUID pattern. Today's callers accept any non-empty `sub`; adding a format rule would be a policy change outside M4.
 - A `./testing` entry with a controlled provider (`fakeIdentityProvider({ claims, user })`) for tests in any package or app.
 
 **`server-supabase`** (root entry `.`, starts with `import 'server-only'`)
 
 - `createRequestClient({ url, publishableKey, cookies })`: wraps `createServerClient` from `@supabase/ssr`. `cookies` is a host-supplied `{ getAll, setAll }` adapter; the package never imports `next/headers`. The swallow-on-`setAll` behavior for Server Components moves with it unchanged.
 - `supabaseIdentityProvider(client)`: implements `IdentityProvider` with `client.auth.getClaims()` and `client.auth.getUser()`, translating `isAuthRetryableFetchError` into `unreachable` and other errors into `refused`. This is the one place that knows Supabase's identity shapes.
-- `SupabaseServerClient`: the exported client type, replacing `Awaited<ReturnType<typeof createClient>>` aliases as code migrates.
+- `outcomeFromClaims(claims)`: the translation of already-verified Supabase claims (or `null`) into a `ProviderOutcome`, used by `supabaseIdentityProvider` and by the host's memoized claims path (section 4.3).
+- A client type export (`SupabaseServerClient`) is added when the first consumer needs it (M5), not in M4, so no export is unused.
 
 **Direction:** `server-supabase` → `server-auth` (implements its port) → `domain-identity`. Acyclic and allowed by the matrix (server to server, server to domain).
 
@@ -119,24 +121,26 @@ Both packages get their first code, as the inventory assigns ("verified identity
 The app keeps cookies, environment, React `cache`, Next.js navigation, fixture mode and every user-facing message.
 
 - `lib/supabase/server.ts` `createClient()` keeps its name and callers; it reads `cookies()` and `getSupabaseEnv()` and calls `createRequestClient`. All existing `createClient()` consumers (auth operations, repositories) are unaffected.
-- A new memoized host function `getVerifiedIdentity()` in `features/auth/server/session` returns `verifyIdentity(supabaseIdentityProvider(await createClient()))`. It never returns a fixture.
+- A new memoized host function `getVerifiedIdentity()` in `features/auth/server/session` returns `(await verifyIdentity({ claims: async () => outcomeFromClaims(await getVerifiedClaims()) })).result`. It reuses the memoized claims read, never consults fixture mode and never returns a fixture.
 - `getVerifiedClaims()` stays, unchanged, for the readers that need provider claims for display or session facts (settings and welcome pages via `profileFromClaims`, the delete-account page via `amr`, `getCurrentUser`).
 - **Requirement:** a request still makes at most one `getClaims()` call, however many of `getVerifiedClaims`, `getVerifiedIdentity` and `requireOwner` it uses. `getClaims()` can fall back to a network call, so a second call would be a performance regression. The plan chooses the mechanism (for example, the host's claims-path provider reading the memoized `getVerifiedClaims()` result through a `server-supabase` translation function) and a test proves the single call.
 - **Rewired in M4** (they need only "verified, and who"):
   - `requireOwner`: decides access from `getVerifiedIdentity()` and `isOwner`; still redirects and 404s exactly as today, and still returns `claims` alongside, so the settings page keeps working until M7 moves display projection. Fixture branch unchanged.
   - `app/api/spaces/route.ts` and `app/api/spaces/[spaceId]/route.ts`: the signed-in check uses `getVerifiedIdentity()`.
-  - Spaces (`setSpacePinned`, `recordSpaceView`), Documents and Dashboards state actions, and `preferences-actions.ts`: replace `getCaller` with `verifyIdentityWithProvider(supabaseIdentityProvider(supabase))` on the same request client, then map `signed-out` and `unavailable` to the exact messages and `signedOut` flag `getCaller` produces today, through a host helper beside `caller.ts`. `preferences-actions.ts` reads `identity.userId` where it read `caller.id`.
+  - Spaces (`setSpacePinned`, `recordSpaceView`), Documents and Dashboards state actions, and `preferences-actions.ts`: replace `getCaller` with `verifyIdentityWithProvider(supabaseIdentityProvider(supabase))` on the same request client, then map `signed-out` and `unavailable` to the exact messages and `signedOut` flag `getCaller` produces today, through a host helper `getCallerIdentity(supabase)` in `caller.ts`. The helper logs every non-verified result exactly as `getCaller` does (operation label `getCallerIdentity`, code and status only, including the no-error case). `preferences-actions.ts` reads `identity.userId` where it read `caller.id`.
 - **Not rewired in M4** (named for later):
   - Account name/setup/avatar actions keep `getCaller`: they need the provider user's `user_metadata` and `identities`. M7.
   - `features/auth/server/operations` (`getUser`, `getClaims`), `app/auth/update-password/page.tsx`, the delete-account page and action: M7.
   - Session refresh in `lib/supabase/middleware.ts` and `proxy.ts`: M7 (`server-supabase` "session refresh helpers").
   - `getCurrentUser` and `CurrentUser`: M7 (display projection to `features-auth`).
+  - `getProviderUser` in `session.ts` (`getUser()` for `getPendingEmail` and `getConnectedAccounts`): M7 display data.
   - Repository fixture branches (`space-repository`, `get-documents`, `get-dashboards`): M5 and M8 replace them with host-bound fixture adapters.
 
 ### 4.4 Tests and verification
 
 - `domain-identity`: type-level tests only if a runtime export appears; otherwise covered by its consumers.
-- `server-auth`: unit tests of both boundary functions and `isOwner` against the fake provider, covering every outcome kind, including an empty `userId` and a fixture-shaped claim never yielding `verified`.
+- `server-auth`: unit tests of both boundary functions and `isOwner` against the fake provider, covering every outcome kind, including an empty `userId`.
+- Fixture safety is proven at the host: `getVerifiedIdentity()` in fixture mode still asks the provider and returns only what it verified (signed out when the provider has no session), and `requireOwner`'s fixture branch never calls the boundary.
 - `server-supabase`: unit tests of `supabaseIdentityProvider` with a stub client covering claims present/absent/error and `getUser` success, retryable error and other error; `createRequestClient` passes cookies through and swallows `setAll` failures.
 - App: existing tests for `requireOwner`, the API routes and every rewired action keep their assertions on observable results (messages, `signedOut`, redirects, 404s); only their mocks move from the SDK and `getCaller` to the boundary or the fake provider. Each rewired action gets a test for each of the three results.
 - Repository gate: `pnpm verify` (format, lint, typecheck, Knip, boundaries, brand, coverage tests, e2e smoke, Storybook tests, build).
@@ -144,9 +148,11 @@ The app keeps cookies, environment, React `cache`, Next.js navigation, fixture m
 
 ### 4.5 Tooling the first server entries need
 
-`server-auth` and `server-supabase` are the first packages whose entry starts with `import 'server-only'`. Importing that guard under plain Vitest throws, so their tests need the `react-server` resolve condition, which the decisions index leaves to "the first package that has a server entry". M4 resolves it by reading the installed Vitest version's documentation and the `server-only` package, then configuring the narrowest option for these two packages' test projects. If upstream guidance conflicts with ADR-0005 or the workspace conventions, work stops for an owner decision.
+`server-auth` and `server-supabase` are the first packages whose entry starts with `import 'server-only'`. `server-only@0.0.1` (registry tarball read 2026-10-23) exports `./empty.js` under the `react-server` condition and `./index.js`, which throws, by default. Plain Vitest uses the default, so any test that loads these entries throws: the two packages' own tests and, once rewired, the `apps/web` tests of `requireOwner`, the API routes and the actions (both its `node` and `dom` projects).
 
-New dependencies, all already approved or already in the lockfile: `server-only@0.0.1` (approved in M3.2), `@supabase/ssr` and `@supabase/supabase-js` at the exact versions `apps/web` pins (moved, not upgraded), `zod` only if a runtime schema is added.
+Turning on the `react-server` condition would also switch `react` to its server build for every test in the project, which breaks hooks and component tests. M4 therefore maps only the specifier: `@synapcity/dev-vitest-config` gains a `./server-only` export with `serverOnlyAlias`, a Vite `resolve.alias` entry that sends exactly `server-only` to an empty stub module, applied in the two packages' configs and both `apps/web` projects. Production is unaffected: Next.js resolves the guard itself, and the boundary checker (R3, R10) and the Next build keep enforcing it. This settles the decisions-index item for server entries; Storybook discovery stays with M5.
+
+Dependencies: `server-only@0.0.1` (approved in M3.2) in both server packages. `@supabase/ssr@0.12.7` and `@supabase/supabase-js@2.117.3` are added to `server-supabase` at exactly the versions `apps/web` pins; they stay in `apps/web`, which still imports them directly (browser client, proxy, auth operations, auth events, `caller.ts`). No version changes.
 
 ## 5. Package creation
 
@@ -194,3 +200,17 @@ None planned. Every rewired caller imports the new packages directly. `getVerifi
 
 - `apps/web/src/lib/data/user.ts`: unused sample user with a fake password and a `console.log`. Removing it needs owner approval (preservation policy); not part of M4.
 - The base record contract, record-schema messages and preference contracts: M5 and M6 designs, from the evidence gathered on 2026-10-23 (the Space and document/dashboard schemas share all ten fields; identity schemas embed form copy).
+
+## 12. Builder check (2026-10-23)
+
+A fresh reviewer read the proposed design against the repository. Resolved:
+
+- Test loading of the `server-only` guard in `apps/web` as well as the packages: section 4.5 (alias, not the `react-server` condition).
+- The fixture-claim test: no UUID rule (section 4.2); fixture safety is proven at the host (section 4.4).
+- Logging after the rewire: same shape and cases, new operation label (section 4.3, C7).
+- The Supabase packages are added to `server-supabase` and kept in `apps/web` (section 4.5).
+- `getProviderUser` is named for M7 (section 4.3).
+- `getVerifiedIdentity` reuses the memoized claims read through `outcomeFromClaims` (section 4.3).
+- The fixture-check count is 37.
+
+Additional call: **C7** the rewired actions log under `getCallerIdentity` instead of `getCaller`; the logged fields (`code`, `status`) and the cases that log are unchanged.
