@@ -23,4 +23,6 @@ export type GridItem = LayoutItem & {
   maxW: number;
   /** Set only to opt out; otherwise the grid-level resize setting applies. */
   isResizable?: false;
+  /** Fixed in place: not dragged or resized, and other items move around it. */
+  static?: true;
 };

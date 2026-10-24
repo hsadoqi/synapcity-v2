@@ -13,12 +13,20 @@ export const COLLAPSED_ROWS = 2;
  */
 export function toGridLayout(
   stored: readonly LayoutItem[],
-  items: readonly { id: string; collapsed: boolean; size: ItemSize }[],
+  items: readonly {
+    id: string;
+    collapsed: boolean;
+    size: ItemSize;
+    /** Fixed in place: not dragged or resized, and others move around it. */
+    fixed?: boolean;
+    /** `false` keeps its size; it can still move. @default true */
+    resizable?: boolean;
+  }[],
   cols: number,
 ): GridItem[] {
   const byId = new Map(stored.map((l) => [l.i, l]));
   let bottom = bottomOf(stored);
-  return items.map(({ id, collapsed, size }) => {
+  return items.map(({ id, collapsed, size, fixed, resizable = true }) => {
     let item = byId.get(id);
     if (!item) {
       item = { i: id, x: 0, y: bottom, w: size.w, h: size.h };
@@ -36,7 +44,8 @@ export function toGridLayout(
       minW,
       minH: collapsed ? COLLAPSED_ROWS : size.minH,
       maxW: cols,
-      ...(collapsed ? { isResizable: false as const } : {}),
+      ...(collapsed || !resizable ? { isResizable: false as const } : {}),
+      ...(fixed ? { static: true as const } : {}),
     };
   });
 }
