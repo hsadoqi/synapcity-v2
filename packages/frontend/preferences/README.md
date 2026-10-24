@@ -12,6 +12,8 @@ Runtime: browser and React, framework-neutral. It imports no `next` and no serve
 
 The device store (`readStoredPreferences`, `writeStoredPreferences`, `clearStoredPreferences`, `announcePreferencesSaved`, `onStoredPreferencesChange`, `readDeviceDisplay`, `writeDeviceDisplay`, `deviceTimezone`) is the one place preferences are read from or written to browser storage. Each function behaves like the `localStorage` call it replaces, including throwing where `localStorage` throws, so callers keep their own `try`/`catch`. The hooks are `useCanCollect` (consent for a collector, following other tabs and this tab's saves), `useGlobalPrivacyControl` and `usePrefersDark`.
 
+The shared look (M6.3): `readLookCookie`, `writeLookCookie`, `serializeLookCookie` and `configureLookCookie` (the host sets the parent domain once), `saveLook`, `migrateLookToCookie`, `currentLook` and `shareMode`. The boot scripts read the cookie first, and `modeBootScript` seeds `next-themes` from it; `ModeProvider` writes it only when given `shareLook`, so Storybook never does.
+
 The three `*BootScript` strings are inlined in the document head before first paint so saved preferences apply with no flash. Their text is pinned by `src/scripts/boot-scripts.expected.json`: change a script only on purpose, and regenerate the fixture in the same change.
 
 ## Rules

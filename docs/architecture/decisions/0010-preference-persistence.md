@@ -138,3 +138,20 @@ The owner approves this ADR before the migration is written or run, as the proje
 ## Implementation note, 2026-10-24: Milestone 6.1
 
 The schemas (`settingsSchema` and its sections), `settingScope`, the account document schema, merging, reconciliation, the export file format and the consent policy now live in [`@synapcity/domain-preferences`](../../../packages/domain/preferences/README.md), unchanged in shape and behavior. Milestone 6.2 (2026-10-24) moved the browser side to [`@synapcity/frontend-preferences`](../../../packages/frontend/preferences/README.md): the boot scripts, the apply functions, font loading, the device store that is now the one place the `synapcity-preferences` and `synapcity-device-display` entries are read and written, the consent and system-signal hooks, and the mode provider. Stored keys, the saved event and every attribute are unchanged, and docs now inlines the same boot scripts as web (it finds no saved choices until the shared look in M6.3). The shared-look cookie that amends this record's device storage arrives with Milestone 6.3. Design: [M6 design](../../superpowers/specs/2026-10-24-m6-preferences-settings-design.md).
+
+## Amendment, 2026-10-24: the shared look (Milestone 6.3)
+
+Owner decision, 2026-10-24: the web and docs apps show the same look, so the look travels in one cookie on the parent domain. This amends where the **device** fields of section 1 are stored for browser hosts; it changes no scope, no precedence and no account behavior. The original text above stays as history.
+
+- **What the cookie holds**, and nothing else: `theme.mode`, `theme.density`, `theme.textSize`, `theme.radius`, `theme.headingFont`, `theme.bodyFont`, `theme.codeFont`, and the display fields `appearance.animationsEnabled`, `appearance.reducedMotion`, `appearance.contrastMode`, `appearance.showBorders`. No regional, notification or privacy values, no ids, no tokens. The account fields (fonts, radius) are cached in it, not owned by it: the account value still wins when it arrives, and the cookie is rewritten from the result.
+- **Format and attributes:** `synapcity-look`, URL-encoded JSON `{ "v": 1, "theme": ..., "appearance": ... }`, validated with the `look` schema in `@synapcity/domain-preferences` on read. An invalid cookie, or any version other than 1, is ignored as if absent. `Path=/`, `SameSite=Lax`, `Secure` on https, `Max-Age` one year. It is **not `HttpOnly`**, because the browser writes it; that is acceptable only because it holds display choices.
+- **Domain:** from one host setting, `NEXT_PUBLIC_PREFERENCES_COOKIE_DOMAIN`, inlined at build. Unset or empty makes a host-only cookie, which keeps local development and preview builds working; cookies ignore the port, so `localhost:8080` (web) and `localhost:4000` (docs) already share the look. Deployed apps share it only when both sit under one parent domain and the setting names it.
+- **Precedence is unchanged:** account override, then the device value (now the cookie), then the default.
+- **Mode:** the cookie is authoritative. A boot script seeds `next-themes`' own entry from it before hydration, so the mode a person last chose shows on both hosts. This settles which of the two stored copies of `theme.mode` leads.
+- **Reading:** the boot scripts read the cookie first and fall back to the `localStorage` document, then to defaults, so nobody loses their look or sees a flash. Each script still accepts only schema-allowed values, field by field.
+- **Writing:** every place that changes a look field writes the cookie: Settings saves and account sync (web), and the mode toggle (web and docs, through `ModeProvider`'s `shareLook`). Docs writes mode only. Storybook neither reads nor writes it.
+- **Migration:** on the first web load after the change, with no cookie yet, the look is copied once from the `localStorage` document.
+- **The rest of the document stays in `localStorage`:** the account cache for regional, notification and privacy values is unchanged.
+- **Not done:** rendering the look on the server from the cookie.
+
+Implementation: [M6.3 plan](../../superpowers/plans/2026-10-24-m6-3-shared-look.md).
