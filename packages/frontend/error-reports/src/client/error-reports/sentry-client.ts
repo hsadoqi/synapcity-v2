@@ -2,6 +2,12 @@ import { scrubEvent } from '../../shared/scrub-event';
 
 type Sentry = typeof import('@sentry/browser');
 
+export type ErrorReportsConfig = {
+  dsn?: string;
+  environment?: string;
+  release?: string;
+};
+
 // The SDK is downloaded only once someone allows error reports, never before.
 let sdk: Promise<Sentry> | null = null;
 // Cleared the moment consent is withdrawn. `close()` flushes before it stops
@@ -31,18 +37,16 @@ function enqueue(step: (sentry: Sentry) => unknown) {
  * `NEXT_PUBLIC_SENTRY_DSN`. Only errors: no tracing, replay, sessions,
  * breadcrumbs or user data, and every event is scrubbed before it is sent.
  */
-export function startErrorReports() {
-  const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
+export function startErrorReports(config: ErrorReportsConfig) {
+  const { dsn } = config;
   if (!dsn || allowed) return;
   allowed = true;
   enqueue((Sentry) => {
     if (!allowed || Sentry.getClient()) return;
     Sentry.init({
       dsn,
-      // Without these Sentry files every report under "production", local
-      // development included. Vercel sets both on its builds.
-      environment: process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.NODE_ENV,
-      release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
+      environment: config.environment,
+      release: config.release,
       defaultIntegrations: false,
       integrations: [
         Sentry.globalHandlersIntegration(),

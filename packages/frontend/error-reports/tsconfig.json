@@ -1,0 +1,11 @@
+{
+  "extends": "@synapcity/dev-typescript-config/react-library.json",
+  "compilerOptions": {
+    "strictNullChecks": true,
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "noEmit": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", ".turbo", "./vitest.config.ts"]
+}

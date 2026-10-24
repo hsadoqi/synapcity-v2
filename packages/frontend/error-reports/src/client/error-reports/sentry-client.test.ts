@@ -12,12 +12,16 @@ vi.mock('@sentry/browser', async () =>
 
 let sentry: FakeSentry;
 let client: typeof import('./sentry-client');
+const config = {
+  dsn: 'https://key@o1.ingest.sentry.io/1',
+  environment: 'test',
+  release: 'abc123',
+};
 
 beforeEach(async () => {
   vi.resetModules();
   sentry = createFakeSentry();
   fake.current = sentry;
-  vi.stubEnv('NEXT_PUBLIC_SENTRY_DSN', 'https://key@o1.ingest.sentry.io/1');
   client = await import('./sentry-client');
 });
 afterEach(() => vi.unstubAllEnvs());
@@ -38,19 +42,18 @@ describe('error reports client', () => {
   });
 
   it('does nothing without a DSN', async () => {
-    vi.stubEnv('NEXT_PUBLIC_SENTRY_DSN', '');
-    client.startErrorReports();
+    client.startErrorReports({ ...config, dsn: '' });
     await new Promise((resolve) => setTimeout(resolve));
     expect(sentry.imported).toBe(0);
     expect(sentry.init).not.toHaveBeenCalled();
   });
 
   it('starts with errors only and nothing that identifies the person', async () => {
-    client.startErrorReports();
+    client.startErrorReports(config);
     await vi.waitFor(() => expect(sentry.init).toHaveBeenCalledOnce());
 
     expect(sentry.options).toMatchObject({
-      dsn: 'https://key@o1.ingest.sentry.io/1',
+      dsn: config.dsn,
       defaultIntegrations: false,
       maxBreadcrumbs: 0,
       sendClientReports: false,
@@ -66,9 +69,7 @@ describe('error reports client', () => {
   });
 
   it('labels reports with the Vercel environment and commit, or NODE_ENV', async () => {
-    vi.stubEnv('NEXT_PUBLIC_VERCEL_ENV', 'preview');
-    vi.stubEnv('NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA', 'abc123');
-    client.startErrorReports();
+    client.startErrorReports({ ...config, environment: 'preview' });
     await vi.waitFor(() => expect(sentry.init).toHaveBeenCalledOnce());
     expect(sentry.options).toMatchObject({
       environment: 'preview',
@@ -77,15 +78,13 @@ describe('error reports client', () => {
   });
 
   it('falls back to NODE_ENV outside Vercel', async () => {
-    vi.stubEnv('NEXT_PUBLIC_VERCEL_ENV', undefined);
-    vi.stubEnv('NODE_ENV', 'development');
-    client.startErrorReports();
+    client.startErrorReports({ ...config, environment: 'development' });
     await vi.waitFor(() => expect(sentry.init).toHaveBeenCalledOnce());
     expect(sentry.options!.environment).toBe('development');
   });
 
   it('drops events at once when stopped, then closes the client', async () => {
-    client.startErrorReports();
+    client.startErrorReports(config);
     await vi.waitFor(() => expect(sentry.init).toHaveBeenCalled());
 
     client.stopErrorReports();
@@ -96,9 +95,9 @@ describe('error reports client', () => {
   });
 
   it('ends up running after off and on again in quick succession', async () => {
-    client.startErrorReports();
+    client.startErrorReports(config);
     client.stopErrorReports();
-    client.startErrorReports();
+    client.startErrorReports(config);
 
     await vi.waitFor(() => expect(sentry.init).toHaveBeenCalledTimes(2));
     expect(sentry.close).toHaveBeenCalledOnce();
@@ -108,7 +107,7 @@ describe('error reports client', () => {
   it('reports caught errors only while running', async () => {
     const first = new Error('before');
     client.reportCaughtError(first);
-    client.startErrorReports();
+    client.startErrorReports(config);
     const second = new Error('while on');
     client.reportCaughtError(second);
 
