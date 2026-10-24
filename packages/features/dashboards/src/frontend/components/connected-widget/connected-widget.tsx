@@ -62,6 +62,9 @@ export function ConnectedWidget({ widgetId }: { widgetId: string }) {
   const toggleTask = useDashboardStore((s) => s.toggleTask);
   const toggleHabitDay = useDashboardStore((s) => s.toggleHabitDay);
   const updateNoteBody = useDashboardStore((s) => s.updateNoteBody);
+  const updateMetricValue = useDashboardStore((s) => s.updateMetricValue);
+  const updateGoal = useDashboardStore((s) => s.updateGoal);
+  const addTask = useDashboardStore((s) => s.addTask);
   const now = useNow(widget && TIME_WIDGETS.has(widget.type) ? 30_000 : null);
 
   if (!widget) return null;
@@ -82,7 +85,14 @@ export function ConnectedWidget({ widgetId }: { widgetId: string }) {
         widget={widget}
         records={{ ...EMPTY_RECORDS, ...tables }}
         now={now}
-        actions={{ toggleTask, toggleHabitDay, updateNoteBody }}
+        actions={{
+          toggleTask,
+          toggleHabitDay,
+          updateNoteBody,
+          updateMetricValue,
+          updateGoal,
+          addTask,
+        }}
       />
     </WidgetShell>
   );

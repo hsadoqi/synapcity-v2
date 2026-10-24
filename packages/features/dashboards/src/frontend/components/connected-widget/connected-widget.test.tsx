@@ -68,6 +68,8 @@ describe('ConnectedWidget', () => {
       })),
     );
     expect(statRenders).toBeGreaterThan(before);
-    expect(screen.getByText('99')).toBeDefined();
+    expect(
+      screen.getByRole('spinbutton', { name: `${metric.name} value` }),
+    ).toHaveProperty('value', '99');
   });
 });

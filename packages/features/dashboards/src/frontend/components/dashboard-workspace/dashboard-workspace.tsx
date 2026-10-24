@@ -11,7 +11,7 @@ import {
 import { Button } from '@synapcity/frontend-ui/core/button';
 import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
 import { PencilRulerIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import type { DashboardSnapshot, DashboardStorage } from '../../../contracts';
 import { ClockProvider } from '../../hooks/use-now';
@@ -24,8 +24,21 @@ import { DashboardWorkspaceSkeleton } from './dashboard-workspace-skeleton';
 
 /** The outcome of reading one dashboard; a result for another dashboard id means still loading. */
 type Loaded =
-  | { dashboardId: string; state: 'ready'; snapshot: DashboardSnapshot }
-  | { dashboardId: string; state: 'failed' };
+  | {
+      dashboardId: string;
+      requestId: number;
+      state: 'ready';
+      storage: DashboardStorage;
+      snapshot: DashboardSnapshot;
+    }
+  | {
+      dashboardId: string;
+      requestId: number;
+      state: 'failed';
+      storage: DashboardStorage;
+    };
+
+const DEFAULT_NOW = () => Date.now();
 
 /** The toolbar, the canvas and, in edit mode, the widgets panel beside it. */
 export function WorkspaceLayout() {
@@ -80,20 +93,40 @@ export function DashboardWorkspace({
   breakpoint?: Breakpoint;
 }) {
   const [loaded, setLoaded] = useState<Loaded | null>(null);
+  const loadRequest = useRef(0);
 
   useEffect(() => {
     let current = true;
+    const requestId = ++loadRequest.current;
     storage.load(dashboardId).then(
       (snapshot) =>
-        current && setLoaded({ dashboardId, state: 'ready', snapshot }),
-      () => current && setLoaded({ dashboardId, state: 'failed' }),
+        current &&
+        setLoaded({
+          dashboardId,
+          requestId,
+          state: 'ready',
+          storage,
+          snapshot,
+        }),
+      () =>
+        current &&
+        setLoaded({
+          dashboardId,
+          requestId,
+          state: 'failed',
+          storage,
+        }),
     );
     return () => {
       current = false;
     };
   }, [storage, dashboardId]);
 
-  if (!loaded || loaded.dashboardId !== dashboardId)
+  if (
+    !loaded ||
+    loaded.dashboardId !== dashboardId ||
+    loaded.storage !== storage
+  )
     return <DashboardWorkspaceSkeleton />;
   if (loaded.state === 'failed') {
     return (
@@ -109,7 +142,7 @@ export function DashboardWorkspace({
   return (
     <TooltipProvider>
       <DashboardStoreProvider
-        key={dashboardId}
+        key={`${dashboardId}:${loaded.requestId}`}
         init={{
           composition: loaded.snapshot.composition ?? createComposition(),
           records: loaded.snapshot.records ?? emptyRecords(),
@@ -119,7 +152,7 @@ export function DashboardWorkspace({
         }}
         onStore={(store) => connectSaves(store, storage, dashboardId)}
       >
-        <ClockProvider now={now ?? (() => Date.now())}>
+        <ClockProvider now={now ?? DEFAULT_NOW}>
           <WorkspaceLayout />
         </ClockProvider>
       </DashboardStoreProvider>

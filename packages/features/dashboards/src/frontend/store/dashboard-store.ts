@@ -3,6 +3,7 @@ import {
   applyLayoutChange,
   createWidget,
   duplicateWidget,
+  gridLayoutFor,
   removeWidget,
   setWidgetStatus,
   updateSettings,
@@ -13,15 +14,25 @@ import {
   type WidgetStatus,
   type WidgetType,
 } from '@synapcity/domain-dashboards';
-import type { Breakpoint, LayoutItem } from '@synapcity/domain-grids';
 import {
+  columnsFor,
+  layoutsEqual,
+  type Breakpoint,
+  type LayoutItem,
+} from '@synapcity/domain-grids';
+import {
+  addTask,
   toggleHabitDay,
   toggleTask,
+  updateGoal,
+  updateMetricValue,
   updateNoteBody,
   type PrototypeRecords,
   type RecordContext,
 } from '@synapcity/domain-prototypes';
 import { createStore, type StoreApi } from 'zustand/vanilla';
+
+import { nudgeLayoutItem, type LayoutDelta } from './keyboard-move';
 
 type DashboardState = {
   composition: DashboardComposition;
@@ -30,11 +41,17 @@ type DashboardState = {
   breakpoint: Breakpoint;
   /** Whether widgets can be dragged, resized and configured. View state, not saved. */
   editMode: boolean;
+  /** The widget selected for keyboard move or resize. View state, not saved. */
+  selectedWidgetId: string | null;
 };
+
+type GoalPatch = { current?: number; target?: number };
 
 type DashboardActions = {
   setBreakpoint(bp: Breakpoint): void;
   toggleEditMode(): void;
+  selectWidget(id: string | null): void;
+  nudgeWidget(id: string, delta: LayoutDelta): void;
   addWidget(type: WidgetType): void;
   updateWidget(id: string, patch: WidgetPatch): void;
   duplicateWidget(id: string): void;
@@ -43,8 +60,11 @@ type DashboardActions = {
   applyLayoutChange(bp: Breakpoint, items: LayoutItem[]): void;
   updateSettings(patch: Partial<DashboardSettings>): void;
   toggleTask(taskId: string): void;
+  addTask(projectId: string, name: string): void;
   toggleHabitDay(habitId: string, day: string): void;
   updateNoteBody(noteId: string, body: string): void;
+  updateMetricValue(metricId: string, value: number): void;
+  updateGoal(goalId: string, patch: GoalPatch): void;
 };
 
 export type DashboardStore = DashboardState & DashboardActions;
@@ -86,8 +106,27 @@ export function createDashboardStore({
       records,
       breakpoint,
       editMode: false,
+      selectedWidgetId: null,
       setBreakpoint: (bp) => set({ breakpoint: bp }),
-      toggleEditMode: () => set((s) => ({ editMode: !s.editMode })),
+      toggleEditMode: () =>
+        set((s) => ({
+          editMode: !s.editMode,
+          selectedWidgetId: null,
+        })),
+      selectWidget: (id) => set({ selectedWidgetId: id }),
+      nudgeWidget: (id, delta) =>
+        compose((c) => {
+          const bp = get().breakpoint;
+          const current = gridLayoutFor(c, bp);
+          if (!current.some((item) => item.i === id)) return c;
+          const cols = columnsFor(c.settings.columns, bp);
+          const next = nudgeLayoutItem(current, id, delta, cols);
+          const unchanged = layoutsEqual(
+            next,
+            current.map(({ i, x, y, w, h }) => ({ i, x, y, w, h })),
+          );
+          return unchanged ? c : applyLayoutChange(c, bp, next);
+        }),
       addWidget: (type) => {
         const created = createWidget(type, get().records, context());
         set({
@@ -104,6 +143,12 @@ export function createDashboardStore({
         compose((c) => applyLayoutChange(c, bp, items)),
       updateSettings: (patch) => compose((c) => updateSettings(c, patch)),
       toggleTask: (taskId) => record((r) => toggleTask(r, taskId, context())),
+      addTask: (projectId, name) =>
+        record((r) => addTask(r, projectId, name, context())),
+      updateMetricValue: (metricId, value) =>
+        record((r) => updateMetricValue(r, metricId, value, now())),
+      updateGoal: (goalId, patch) =>
+        record((r) => updateGoal(r, goalId, patch, now())),
       toggleHabitDay: (habitId, day) =>
         record((r) => toggleHabitDay(r, habitId, day, now())),
       updateNoteBody: (noteId, body) =>

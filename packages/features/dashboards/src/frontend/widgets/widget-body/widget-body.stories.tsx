@@ -25,7 +25,14 @@ const meta: Meta<typeof WidgetBody> = {
     widget: byType('tasks'),
     records,
     now: SEED_NOW,
-    actions: { toggleTask: fn(), toggleHabitDay: fn(), updateNoteBody: fn() },
+    actions: {
+      toggleTask: fn(),
+      toggleHabitDay: fn(),
+      updateNoteBody: fn(),
+      updateMetricValue: fn(),
+      updateGoal: fn(),
+      addTask: fn(),
+    },
   },
 };
 

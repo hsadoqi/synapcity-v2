@@ -46,7 +46,7 @@
 
 - Produces: `dashboardCompositionSchema: z.ZodType<DashboardComposition>` from `@synapcity/domain-dashboards`; `prototypeRecordsSchema: z.ZodType<PrototypeRecords>` from `@synapcity/domain-prototypes`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `composition.test.ts`:
 
@@ -62,21 +62,21 @@
 - `it('rejects a table with an invalid record')`: a `habit` table holding `{ completedDays: ['monday'] }` plus base fields fails.
 - `it('rejects a record stored under another id')`: table key `'a'` holding a record with `id: 'b'` fails.
 
-- [ ] **Step 2: Run them to see them fail**
+- [x] **Step 2: Run them to see them fail**
 
 Run: `pnpm --filter @synapcity/domain-dashboards --filter @synapcity/domain-prototypes test`
 Expected: FAIL, the schemas are not exported.
 
-- [ ] **Step 3: Implement the schemas**
+- [x] **Step 3: Implement the schemas**
 
 `dashboardCompositionSchema` mirrors `types/composition.ts` and `types/widget.ts`: settings `columns` literal union 1–4, `cardRadius` 4 | 8 | 12 | 16, `showWidgetTitles` boolean; widgets a discriminated union on `type` whose `source` uses `entityRefSchema` narrowed to the kind in `widget.ts` (`stat`→`metric`, `progress`→`goal`, `habit`→`habit`, `notes`→`note`, `tasks`→`project`), `calendar` `query: { range: 'week' }`, `feed` `query: { limit: int 1–50 }`; `layouts` a strict object with `lg`, `md`, `sm`, each an array of `{ i: string min 1, x, y: int ≥ 0, w, h: int ≥ 1 }`. Annotate it `satisfies z.ZodType<DashboardComposition>` so it cannot drift from the types. `prototypeRecordsSchema` is a strict object with one key per `PROTOTYPE_RECORD_KINDS` entry, each `z.record(z.string(), prototypeRecordSchemas[kind])` refined so every key equals its record's `id`.
 
-- [ ] **Step 4: Run the tests and the package checks**
+- [x] **Step 4: Run the tests and the package checks**
 
 Run: `pnpm --filter @synapcity/domain-dashboards --filter @synapcity/domain-prototypes run --parallel test && pnpm turbo run lint check-types --filter=@synapcity/domain-dashboards --filter=@synapcity/domain-prototypes`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 `git commit -m "feat: add saved-data schemas for dashboard compositions and prototype records"`
 
@@ -117,11 +117,11 @@ Expected: PASS.
 
 - Produces (utils, internal): `WIDGET_CATALOG: readonly { type: WidgetType; label: string; Icon: LucideIcon }[]`; `WEEKDAY_INITIAL`, `WEEKDAY_SHORT`, `WEEKDAY_NAME` (`readonly string[]` of 7); `relativeTime(fromIso: string, now: number): string`; `DEVICE_FRAME_WIDTH: Record<Breakpoint, number | null>`; `useNow(intervalMs: number): number`.
 
-- [ ] **Step 1: Scaffold the package**
+- [x] **Step 1: Scaffold the package**
 
 Copy `packages/features/spaces`' `tsconfig.json`, `eslint.config.mjs`, `vitest.config.mts` (drop the `server-only` alias) and `vitest.setup.ts` (keep the `matchMedia` stub; add a `ResizeObserver` stub with no-op `observe`, `unobserve`, `disconnect` when `window.ResizeObserver` is missing). `package.json`: name `@synapcity/features-dashboards`, `exports` `{"./contracts": "./src/contracts/index.ts", "./frontend": "./src/frontend/index.ts", "./styles.css": "./src/styles.css"}`, `sideEffects: ["*.css"]`, scripts as in `features-spaces`; dependencies `@synapcity/domain-dashboards`, `@synapcity/domain-grids`, `@synapcity/domain-prototypes`, `@synapcity/frontend-ui` (all `workspace:*`), `lucide-react` `^1.55.0`, `react` `19.3.0`, `react-grid-layout` `2.3.0`, `zod` `^4.6.7`, `zustand` `5.0.16`; devDependencies as `features-spaces` (minus server ones) plus `@synapcity/dev-fixtures`, `@testing-library/user-event` at the version `apps/web` pins. Create an empty `src/styles.css` (filled in Task 8). Run `pnpm install`.
 
-- [ ] **Step 2: Write the failing utility tests**
+- [x] **Step 2: Write the failing utility tests**
 
 - `widget-catalog.test.ts`: labels in order equal `['Stat card', 'Task list', 'Recent activity', 'Schedule', 'Notes', 'Habit tracker', 'Goal tracker']`; types cover every `WidgetType` exactly once.
 - `weekdays.test.ts`: `WEEKDAY_INITIAL` equals `['M','T','W','T','F','S','S']`; `WEEKDAY_SHORT[0]` is `'Mon'`; `WEEKDAY_NAME[6]` is `'Sunday'`.
@@ -129,25 +129,25 @@ Copy `packages/features/spaces`' `tsconfig.json`, `eslint.config.mjs`, `vitest.c
 - `device-frame.test.ts`: equals `{ lg: null, md: 834, sm: 390 }`.
 - `use-now.test.ts` with fake timers: returns `Date.now()` initially, updates after `intervalMs`, clears its interval on unmount.
 
-- [ ] **Step 3: Run them to see them fail**
+- [x] **Step 3: Run them to see them fail**
 
 Run: `pnpm --filter @synapcity/features-dashboards test`
 Expected: FAIL, modules missing.
 
-- [ ] **Step 4: Implement the utilities and the contracts types**
+- [x] **Step 4: Implement the utilities and the contracts types**
 
 Icons: `FlameIcon` stat, `ListChecksIcon` tasks, `ActivityIcon` feed, `CalendarIcon` calendar, `FileTextIcon` notes, `RepeatIcon` habit, `TargetIcon` progress. `relativeTime` ports the prototype's rule (minutes rounded; `< 60` minutes, hours rounded `< 24`, else days rounded) on `Date.parse(fromIso)`. `src/frontend/index.ts` exports nothing yet beyond what later tasks add.
 
-- [ ] **Step 5: Write the README**
+- [x] **Step 5: Write the README**
 
 Follow `features-spaces/README.md`'s sections: Owns (the dashboard canvas; provisional), entries table, What the host supplies (`ownerId`, `dashboardId`, a `DashboardStorage`, the stylesheet import), Rules (the widgets-folder rule from Global Constraints; no `next`; stories use in-memory storage), Scripts. Link the spec.
 
-- [ ] **Step 6: Run tests, lint, types, Knip and boundaries**
+- [x] **Step 6: Run tests, lint, types, Knip and boundaries**
 
 Run: `pnpm --filter @synapcity/features-dashboards test && pnpm turbo run lint check-types --filter=@synapcity/features-dashboards && pnpm deps && pnpm boundaries`
 Expected: PASS (Knip may report unused exports until Task 10 wires them; if so, finish Task 2's commit and expect them cleared by Task 10).
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 `git commit -m "feat: scaffold features-dashboards with the storage contract and display utilities"`
 
@@ -204,7 +204,7 @@ Expected: PASS (Knip may report unused exports until Task 10 wires them; if so, 
   function useDashboardStore<T>(selector: (s: DashboardStore) => T): T;
   ```
 
-- [ ] **Step 1: Write the failing store tests**
+- [x] **Step 1: Write the failing store tests**
 
 With `now = () => Date.parse('2026-10-24T09:00:00Z')` and owner `'11111111-1111-4111-8111-111111111111'`:
 
@@ -218,21 +218,21 @@ With `now = () => Date.parse('2026-10-24T09:00:00Z')` and owner `'11111111-1111-
 
 Provider test: `useDashboardStore` outside the provider throws `'useDashboardStore must be used within DashboardStoreProvider'`; inside, a selector reads `editMode`; `onStore` receives the store once across re-renders.
 
-- [ ] **Step 2: Run to see them fail**
+- [x] **Step 2: Run to see them fail**
 
 Run: `pnpm --filter @synapcity/features-dashboards test -- store`
 Expected: FAIL.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `createStore` from `zustand/vanilla`; `RecordContext` is `{ ownerId, now: now() }` per action. Provider per the zustand Next.js guide: `const [store] = useState(() => createDashboardStore(init))`, context, `useStore(store, selector)`; `onStore` called in an effect once.
 
-- [ ] **Step 4: Run tests and checks**
+- [x] **Step 4: Run tests and checks**
 
 Run: `pnpm --filter @synapcity/features-dashboards test && pnpm turbo run lint check-types --filter=@synapcity/features-dashboards`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 `git commit -m "feat: add the per-canvas dashboard store"`
 
@@ -275,7 +275,7 @@ Expected: PASS.
   ): DashboardStorage & { raw: Map<string, string> };
   ```
 
-- [ ] **Step 1: Write the failing adapter tests** (a fake `Storage` backed by a `Map`, and one whose `setItem`/`getItem` throw)
+- [x] **Step 1: Write the failing adapter tests** (a fake `Storage` backed by a `Map`, and one whose `setItem`/`getItem` throw)
 
 - `it('round-trips a composition and records under owner-scoped keys')`: after saves, the map holds exactly `synapcity.dashboard.<owner>.<dash>.v1` and `synapcity.records.<owner>.v1`, and `load` returns equal values.
 - `it('returns nulls when nothing is saved')`.
@@ -284,7 +284,7 @@ Expected: PASS.
 - `it('treats unparseable JSON as invalid')`: seed `'{'`; same outcome.
 - `it('reports a throwing storage without throwing')`: `load` resolves nulls with `onError` `kind: 'read'`; `saveComposition` resolves with `kind: 'write'`.
 
-- [ ] **Step 2: Write the failing scheduler tests** (fake timers, an in-memory storage spy, a fake event target)
+- [x] **Step 2: Write the failing scheduler tests** (fake timers, an in-memory storage spy, a fake event target)
 
 - Several store changes within 400 ms produce one `saveComposition` and one `saveRecords`, 400 ms after the last change.
 - A view-state change (`setBreakpoint`, `toggleEditMode`) schedules nothing.
@@ -292,21 +292,21 @@ Expected: PASS.
 - Dispatching `pagehide`, or `visibilitychange` with `visibilityState` `'hidden'`, saves the pending change at once.
 - The returned disconnect flushes a pending change and removes its listeners.
 
-- [ ] **Step 3: Run to see them fail**
+- [x] **Step 3: Run to see them fail**
 
 Run: `pnpm --filter @synapcity/features-dashboards test -- storage`
 Expected: FAIL.
 
-- [ ] **Step 4: Implement**
+- [x] **Step 4: Implement**
 
 The adapter wraps every `Storage` call in try/catch (the prototype's `persistence.ts` wrapper) and validates with `safeParse`. `connectSaves` uses `store.subscribe((s, prev) => …)` comparing `s.composition !== prev.composition` and `s.records !== prev.records`, so the domain functions' immutability decides what changed. Defaults: `delayMs` 400, `target` `{ window, document }`.
 
-- [ ] **Step 5: Run tests and checks**
+- [x] **Step 5: Run tests and checks**
 
 Run: `pnpm --filter @synapcity/features-dashboards test && pnpm turbo run lint check-types --filter=@synapcity/features-dashboards`
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 `git commit -m "feat: save dashboards to validated, owner-scoped browser storage"`
 
@@ -322,20 +322,20 @@ Expected: PASS.
 
 - Produces: `Checkbox` from `@synapcity/frontend-ui/core/checkbox`, shadcn's `base-mira` checkbox on Base UI (`checked`, `onCheckedChange`, `disabled`, `aria-label`).
 
-- [ ] **Step 1: Add it with the shadcn CLI**
+- [x] **Step 1: Add it with the shadcn CLI**
 
 Run from the repository root: `pnpm ui:add checkbox`. Move the flat file into `checkbox/checkbox.tsx` with an `index.ts`, as the design system rules require. Remove anything the CLI wrote into `apps/web/src/styles/globals.css`.
 
-- [ ] **Step 2: Write the test and story**
+- [x] **Step 2: Write the test and story**
 
 Test: renders a `checkbox` role with its label; clicking calls `onCheckedChange(true)`; `disabled` blocks it. Story: unchecked, checked, disabled, with a `Label`.
 
-- [ ] **Step 3: Run the UI package checks**
+- [x] **Step 3: Run the UI package checks**
 
 Run: `pnpm --filter @synapcity/frontend-ui test && pnpm turbo run lint check-types --filter=@synapcity/frontend-ui`
 Expected: PASS, including `package-structure.test.ts`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 `git commit -m "feat: add the checkbox component"`
 
@@ -368,7 +368,7 @@ Expected: PASS, including `package-structure.test.ts`.
 
   Each body takes the records it needs plus `now` and the relevant action; `WidgetBody` picks the body by `widget.type` and renders `WidgetUnavailable` when `getRecord(records, widget.source)` is undefined.
 
-- [ ] **Step 1: Write the failing tests** (one file per body)
+- [x] **Step 1: Write the failing tests** (one file per body)
 
 - Stat: shows `value`, `unit`, `note`. Progress: shows `14 of 24 books` and a progressbar with `aria-valuenow` 58.
 - Habit: seven buttons named by `WEEKDAY_NAME` with today suffixed `(today)`, `aria-pressed` for done days, future days disabled, clicking a past day calls `toggleHabitDay(id, dayKey)`; the visible letters are `WEEKDAY_INITIAL` and `aria-hidden`.
@@ -378,15 +378,15 @@ Expected: PASS, including `package-structure.test.ts`.
 - Feed: up to `query.limit` activities with `relativeTime` inside `<time dateTime>`; none → `WidgetEmpty` "No activity yet."
 - `WidgetBody`: a `stat` widget whose metric is missing renders `WidgetUnavailable` with text "This metric is no longer available."
 
-- [ ] **Step 2: Run to see them fail**, then **Step 3: Implement**, porting each prototype body (`widgets/*.tsx`) with semantic classes (done day `bg-primary`, not done `bg-muted`, today `outline outline-ring`).
+- [x] **Step 2: Run to see them fail**, then **Step 3: Implement**, porting each prototype body (`widgets/*.tsx`) with semantic classes (done day `bg-primary`, not done `bg-muted`, today `outline outline-ring`).
 
-- [ ] **Step 4: Write the stories**
+- [x] **Step 4: Write the stories**
 
 Each body with the seeded data from `createPrototypeWorkspace(Date.parse('2026-10-23T09:00:00'))` (`@synapcity/dev-fixtures/prototype-workspace`) and a fixed `now`; plus empty and unavailable states.
 
-- [ ] **Step 5: Run tests and checks** (`pnpm --filter @synapcity/features-dashboards test`, lint, types). Expected: PASS.
+- [x] **Step 5: Run tests and checks** (`pnpm --filter @synapcity/features-dashboards test`, lint, types). Expected: PASS.
 
-- [ ] **Step 6: Commit** `git commit -m "feat: add the dashboard widget bodies"`
+- [x] **Step 6: Commit** `git commit -m "feat: add the dashboard widget bodies"`
 
 ---
 
@@ -419,16 +419,16 @@ Each body with the seeded data from `createPrototypeWorkspace(Date.parse('2026-1
 
   Root carries `data-slot="widget"` (the grid stylesheet targets it).
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 - Title shows when `settings.showWidgetTitles`; double-click (or the rename item) opens an input labelled "Widget title"; Enter commits a trimmed, changed title through `update({ title })`; Escape cancels; an empty title does not commit.
 - The collapse button is named "Collapse widget"/"Expand widget" and calls `update({ collapsed })`; collapsed hides `children`.
 - The settings popover (button "Widget settings") offers the three highlights as a radio group ("Accent highlight", "Neutral highlight", "No highlight") and Duplicate, Hide, Archive, Remove; each calls its action.
 - `editMode` false hides the settings button.
 
-- [ ] **Step 2: Run to see them fail**, **Step 3: Implement** from `widget-shell.tsx` in the prototype with the installed `Popover`, `Button` variants and `ToggleGroup`; highlight bar `bg-primary` (accent), `bg-muted-foreground` (neutral), none; card radius from `settings.cardRadius` mapped to `rounded-sm` (4), `rounded-md` (8), `rounded-lg` (12), `rounded-xl` (16).
+- [x] **Step 2: Run to see them fail**, **Step 3: Implement** from `widget-shell.tsx` in the prototype with the installed `Popover`, `Button` variants and `ToggleGroup`; highlight bar `bg-primary` (accent), `bg-muted-foreground` (neutral), none; card radius from `settings.cardRadius` mapped to `rounded-sm` (4), `rounded-md` (8), `rounded-lg` (12), `rounded-xl` (16).
 
-- [ ] **Step 4: Stories**: view, edit, collapsed, each highlight, untitled. **Step 5: Run tests and checks.** **Step 6: Commit** `git commit -m "feat: add the widget shell"`
+- [x] **Step 4: Stories**: view, edit, collapsed, each highlight, untitled. **Step 5: Run tests and checks.** **Step 6: Commit** `git commit -m "feat: add the widget shell"`
 
 ---
 
@@ -444,7 +444,7 @@ Each body with the seeded data from `createPrototypeWorkspace(Date.parse('2026-1
 - Consumes: store (Task 3), widgets (Tasks 6–7), `DEVICE_FRAME_WIDTH` (Task 2), `gridLayoutFor`, `layoutsEqual`, `columnsFor`, `GRID`, `minGridWidth`.
 - Produces: `DashboardGrid()`, `DashboardCanvas()`, `BreakpointToolbar()`, `DashboardEmptyState()`, `ConnectedWidget({ widgetId })`, all reading the store through `useDashboardStore`.
 
-- [ ] **Step 1: Write the failing tests** (rendered inside `DashboardStoreProvider` seeded from `createPrototypeWorkspace`)
+- [x] **Step 1: Write the failing tests** (rendered inside `DashboardStoreProvider` seeded from `createPrototypeWorkspace`)
 
 - Grid renders one `[data-slot="widget"]` per active widget; none → `DashboardEmptyState`.
 - Grid: calling its `onLayoutChange` with the layout it was given leaves the store's `composition` reference unchanged; with a moved item, only the shown breakpoint's layout changes (assert `lg` and `sm` references unchanged when the store's breakpoint is `md`). Expose the handler for the test through a `handleLayoutChange(store, bp, given, reported)` function exported from the grid folder and covered directly.
@@ -452,15 +452,15 @@ Each body with the seeded data from `createPrototypeWorkspace(Date.parse('2026-1
 - Toolbar: a group named "Layout breakpoint" with "Desktop layout", "Tablet layout", "Mobile layout"; choosing one calls `setBreakpoint`.
 - `ConnectedWidget`: Hide from the shell removes it from the grid; toggling a task updates the store's records.
 
-- [ ] **Step 2: Run to see them fail**
+- [x] **Step 2: Run to see them fail**
 
-- [ ] **Step 3: Implement** from `dashboard-grid.tsx` and `dashboard-canvas.tsx`: `ReactGridLayout` with `useContainerWidth({ measureBeforeMount: true })`, `gridConfig { cols, rowHeight: GRID.rowHeight, margin: [GRID.margin, GRID.margin], containerPadding: [0, 0] }`, drag and resize enabled only in edit mode, the drag-cancel selector `"button, input, textarea, select, a, label, [role='checkbox'], [data-no-drag]"`, the `se` resize handle as a plain `<span>` (react-draggable must receive the DOM element). Grid key `${breakpoint}` so it remounts per breakpoint. The device frame's width is the one inline style, `style={{ maxWidth: frameWidth }}`.
+- [x] **Step 3: Implement** from `dashboard-grid.tsx` and `dashboard-canvas.tsx`: `ReactGridLayout` with `useContainerWidth({ measureBeforeMount: true })`, `gridConfig { cols, rowHeight: GRID.rowHeight, margin: [GRID.margin, GRID.margin], containerPadding: [0, 0] }`, drag and resize enabled only in edit mode, the drag-cancel selector `"button, input, textarea, select, a, label, [role='checkbox'], [data-no-drag]"`, the `se` resize handle as a plain `<span>` (react-draggable must receive the DOM element). Grid key `${breakpoint}` so it remounts per breakpoint. The device frame's width is the one inline style, `style={{ maxWidth: frameWidth }}`.
 
 `src/styles.css`: `@import 'react-grid-layout/css/styles.css';` then the prototype's skin from `dashboard-grid.css`, rewritten with existing variables: placeholder `background: var(--muted)`, `outline: 1px dashed var(--ring)`, `border-radius: var(--radius-md)`; drag and resize shadow `@apply shadow-md;` (the theme defines no shadow tokens; `@apply` works because hosts import this file into their Tailwind entry); handle colour `var(--muted-foreground)`; the reduced-motion block.
 
-- [ ] **Step 4: Stories**: grid in view and edit mode, each breakpoint in the canvas, empty dashboard.
-- [ ] **Step 5: Run tests and checks.** Expected: PASS.
-- [ ] **Step 6: Commit** `git commit -m "feat: add the dashboard grid and canvas"`
+- [x] **Step 4: Stories**: grid in view and edit mode, each breakpoint in the canvas, empty dashboard.
+- [x] **Step 5: Run tests and checks.** Expected: PASS.
+- [x] **Step 6: Commit** `git commit -m "feat: add the dashboard grid and canvas"`
 
 ---
 
@@ -474,15 +474,15 @@ Each body with the seeded data from `createPrototypeWorkspace(Date.parse('2026-1
 
 - Produces: `WidgetsPanel()` reading the store.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 - A heading "Add to dashboard" and one button per `WIDGET_CATALOG` entry, in order, named by its label; clicking "Task list" adds a `tasks` widget.
 - "Hidden" and "Archived" sections list those widgets by title with "Restore"; restoring returns it to the grid.
 - Archived widgets also offer "Remove", which opens an `AlertDialog` ("Remove this widget?", description that its record stays); confirming removes it, cancelling does not.
 - Empty hidden or archived sections are not rendered.
 
-- [ ] **Step 2: Run to see them fail**, **Step 3: Implement** from the prototype's `widgets-panel.tsx` with the installed `Button` and `AlertDialog`.
-- [ ] **Step 4: Stories**: default, with hidden and archived widgets. **Step 5: Run tests and checks.** **Step 6: Commit** `git commit -m "feat: add the widgets panel"`
+- [x] **Step 2: Run to see them fail**, **Step 3: Implement** from the prototype's `widgets-panel.tsx` with the installed `Button` and `AlertDialog`.
+- [x] **Step 4: Stories**: default, with hidden and archived widgets. **Step 5: Run tests and checks.** **Step 6: Commit** `git commit -m "feat: add the widgets panel"`
 
 ---
 
@@ -498,7 +498,7 @@ Each body with the seeded data from `createPrototypeWorkspace(Date.parse('2026-1
 - Consumes: everything above.
 - Produces (exported from `./frontend`): `DashboardWorkspace(props: { dashboardId: string; ownerId: string; storage: DashboardStorage; now?: () => number; breakpoint?: Breakpoint })`, `DashboardWorkspaceSkeleton()`, `browserDashboardStorage`.
 
-- [ ] **Step 1: Write the failing tests** (with `memoryDashboardStorage`)
+- [x] **Step 1: Write the failing tests** (with `memoryDashboardStorage`)
 
 - Shows the skeleton (`aria-busy="true"`, "Loading dashboard…") until `load` resolves, then the canvas.
 - Nothing saved → the empty state and the palette; saved data → its widgets.
@@ -506,18 +506,18 @@ Each body with the seeded data from `createPrototypeWorkspace(Date.parse('2026-1
 - The edit toggle is a button "Edit layout" with `aria-pressed`.
 - The initial breakpoint is `resolveBreakpoint(window.innerWidth)` unless the `breakpoint` prop is given.
 
-- [ ] **Step 2: Run to see them fail**
+- [x] **Step 2: Run to see them fail**
 
-- [ ] **Step 3: Implement**: load in an effect, then `DashboardStoreProvider` with `onStore={(s) => connectSaves(s, storage, dashboardId)}` and its disconnect on unmount; header row with the dashboard toolbar (edit toggle, `BreakpointToolbar`), `DashboardCanvas` beside `WidgetsPanel` (panel shown in edit mode; a `TooltipProvider` at the root). Skeleton uses the installed `Skeleton`.
+- [x] **Step 3: Implement**: load in an effect, then `DashboardStoreProvider` with `onStore={(s) => connectSaves(s, storage, dashboardId)}` and its disconnect on unmount; header row with the dashboard toolbar (edit toggle, `BreakpointToolbar`), `DashboardCanvas` beside `WidgetsPanel` (panel shown in edit mode; a `TooltipProvider` at the root). Skeleton uses the installed `Skeleton`.
 
-- [ ] **Step 4: Stories** (in-memory storage seeded from `createPrototypeWorkspace`): seeded in view and in edit mode, empty dashboard, and live data where a `useEffect` calls `simulateTick` every 1500 ms against the story's store.
+- [x] **Step 4: Stories** (in-memory storage seeded from `createPrototypeWorkspace`): seeded in view and in edit mode, empty dashboard, and live data where a `useEffect` calls `simulateTick` every 1500 ms against the story's store.
 
-- [ ] **Step 5: Run the full checks**
+- [x] **Step 5: Run the full checks**
 
 Run: `pnpm format:check && pnpm turbo run lint check-types && pnpm deps && pnpm boundaries && pnpm test:coverage && pnpm test:storybook && pnpm build`
 Expected: PASS. Then open Storybook (`pnpm --filter storybook dev`), drag and resize a widget at each breakpoint in edit mode, and report what was checked by hand.
 
-- [ ] **Step 6: Commit** `git commit -m "feat: add the dashboard workspace and its stories"`
+- [x] **Step 6: Commit** `git commit -m "feat: add the dashboard workspace and its stories"`
 
 ---
 

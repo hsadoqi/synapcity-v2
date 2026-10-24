@@ -37,14 +37,14 @@ describe('connectSaves', () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
 
-  it('saves once, 400 ms after the last of several changes', () => {
+  it('saves once, 400 ms after the last of several changes', async () => {
     const { store, storage } = setup();
     store.getState().addWidget('stat');
     vi.advanceTimersByTime(300);
     store.getState().addWidget('notes');
     vi.advanceTimersByTime(399);
     expect(storage.saveComposition).not.toHaveBeenCalled();
-    vi.advanceTimersByTime(1);
+    await vi.advanceTimersByTimeAsync(1);
     expect(storage.saveComposition).toHaveBeenCalledTimes(1);
     expect(storage.saveComposition).toHaveBeenCalledWith(
       'dash-1',
@@ -70,21 +70,24 @@ describe('connectSaves', () => {
     expect(storage.saveRecords).not.toHaveBeenCalled();
   });
 
-  it('saves at once when the page is hidden or closed', () => {
+  it('saves at once when the page is hidden or closed', async () => {
     const { store, storage, win, doc } = setup();
     store.getState().addWidget('stat');
     win.dispatchEvent(new Event('pagehide'));
+    await vi.advanceTimersByTimeAsync(0);
     expect(storage.saveComposition).toHaveBeenCalledTimes(1);
     store.getState().addWidget('notes');
     doc.visibilityState = 'hidden';
     doc.dispatchEvent(new Event('visibilitychange'));
+    await vi.advanceTimersByTimeAsync(0);
     expect(storage.saveComposition).toHaveBeenCalledTimes(2);
   });
 
-  it('flushes on disconnect and stops listening', () => {
+  it('flushes on disconnect and stops listening', async () => {
     const { store, storage, win, disconnect } = setup();
     store.getState().addWidget('stat');
     disconnect();
+    await Promise.resolve();
     expect(storage.saveComposition).toHaveBeenCalledTimes(1);
     store.getState().addWidget('notes');
     win.dispatchEvent(new Event('pagehide'));
@@ -92,7 +95,7 @@ describe('connectSaves', () => {
     expect(storage.saveComposition).toHaveBeenCalledTimes(1);
   });
 
-  it('saves records before the composition, so a widget is never saved without its record', () => {
+  it('saves records before the composition, so a widget is never saved without its record', async () => {
     const { store, storage } = setup();
     const order: string[] = [];
     storage.saveRecords.mockImplementation(
@@ -102,8 +105,28 @@ describe('connectSaves', () => {
       async () => void order.push('composition'),
     );
     store.getState().addWidget('stat');
-    vi.advanceTimersByTime(400);
+    await vi.advanceTimersByTimeAsync(400);
     expect(order).toEqual(['records', 'composition']);
+  });
+
+  it('keeps failed writes dirty and retries them once without another edit', async () => {
+    const { store, storage } = setup();
+    storage.saveRecords.mockRejectedValueOnce(new Error('quota exceeded'));
+    const report = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    store.getState().addWidget('stat');
+    await vi.advanceTimersByTimeAsync(400);
+
+    expect(storage.saveRecords).toHaveBeenCalledTimes(1);
+    expect(storage.saveComposition).not.toHaveBeenCalled();
+    expect(report).toHaveBeenCalledWith(
+      'Saving the dashboard failed.',
+      expect.any(Error),
+    );
+
+    await vi.advanceTimersByTimeAsync(400);
+    expect(storage.saveRecords).toHaveBeenCalledTimes(2);
+    expect(storage.saveComposition).toHaveBeenCalledTimes(1);
   });
 
   it('saves an edit at one breakpoint and loads the others unchanged', async () => {

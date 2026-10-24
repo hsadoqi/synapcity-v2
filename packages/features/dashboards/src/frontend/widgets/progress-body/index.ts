@@ -1,1 +1,1 @@
-export { ProgressBody } from './progress-body';
+export { ProgressBody, type GoalChange } from './progress-body';

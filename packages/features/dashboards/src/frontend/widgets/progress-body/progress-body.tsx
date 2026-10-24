@@ -1,6 +1,16 @@
 import { goalPercent, type Goal } from '@synapcity/domain-prototypes';
+import { Input } from '@synapcity/frontend-ui/core/input';
 
-export function ProgressBody({ goal }: { goal: Goal }) {
+export type GoalChange = { current?: number; target?: number };
+
+/** Edits commit on blur or Enter; an empty or non-numeric entry is ignored. */
+export function ProgressBody({
+  goal,
+  onChange,
+}: {
+  goal: Goal;
+  onChange?: (patch: GoalChange) => void;
+}) {
   const percent = goalPercent(goal);
   return (
     <div className="flex flex-col gap-1.5">
@@ -12,6 +22,42 @@ export function ProgressBody({ goal }: { goal: Goal }) {
           {percent}%
         </span>
       </div>
+      {onChange && (
+        <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+          <label className="flex items-center gap-1.5">
+            Current
+            <Input
+              key={goal.current}
+              type="number"
+              defaultValue={goal.current}
+              className="w-20"
+              onBlur={(event) => {
+                const value = event.currentTarget.valueAsNumber;
+                if (Number.isFinite(value)) onChange({ current: value });
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') event.currentTarget.blur();
+              }}
+            />
+          </label>
+          <label className="flex items-center gap-1.5">
+            Target
+            <Input
+              key={goal.target}
+              type="number"
+              defaultValue={goal.target}
+              className="w-20"
+              onBlur={(event) => {
+                const value = event.currentTarget.valueAsNumber;
+                if (Number.isFinite(value)) onChange({ target: value });
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') event.currentTarget.blur();
+              }}
+            />
+          </label>
+        </div>
+      )}
       <div
         role="progressbar"
         aria-label={goal.name}

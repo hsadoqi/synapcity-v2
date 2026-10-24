@@ -9,7 +9,7 @@ import { CalendarBody } from '../calendar-body';
 import { FeedBody } from '../feed-body';
 import { HabitBody } from '../habit-body';
 import { NotesBody } from '../notes-body';
-import { ProgressBody } from '../progress-body';
+import { ProgressBody, type GoalChange } from '../progress-body';
 import { StatBody } from '../stat-body';
 import { TasksBody } from '../tasks-body';
 import { WidgetUnavailable } from '../widget-states';
@@ -18,6 +18,9 @@ export type WidgetBodyActions = {
   toggleTask(taskId: string): void;
   toggleHabitDay(habitId: string, day: string): void;
   updateNoteBody(noteId: string, body: string): void;
+  updateMetricValue(metricId: string, value: number): void;
+  updateGoal(goalId: string, patch: GoalChange): void;
+  addTask(projectId: string, name: string): void;
 };
 
 /** The body for a widget's type, or a notice when its source record is missing. */
@@ -36,7 +39,10 @@ export function WidgetBody({
     case 'stat': {
       const metric = getRecord(records, widget.source);
       return metric ? (
-        <StatBody metric={metric} />
+        <StatBody
+          metric={metric}
+          onValueChange={(value) => actions.updateMetricValue(metric.id, value)}
+        />
       ) : (
         <WidgetUnavailable kind="metric" />
       );
@@ -44,7 +50,10 @@ export function WidgetBody({
     case 'progress': {
       const goal = getRecord(records, widget.source);
       return goal ? (
-        <ProgressBody goal={goal} />
+        <ProgressBody
+          goal={goal}
+          onChange={(patch) => actions.updateGoal(goal.id, patch)}
+        />
       ) : (
         <WidgetUnavailable kind="goal" />
       );
@@ -80,6 +89,7 @@ export function WidgetBody({
           project={project}
           tasks={tasksForProject(records.task, project.id)}
           onToggleTask={actions.toggleTask}
+          onAddTask={(name) => actions.addTask(project.id, name)}
         />
       ) : (
         <WidgetUnavailable kind="task list" />

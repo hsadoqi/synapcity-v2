@@ -124,4 +124,51 @@ describe('DashboardWorkspace', () => {
     expect(await screen.findByText('Morning run')).toBeDefined();
     expect(screen.queryByText('Nothing scheduled this week.')).toBeNull();
   });
+
+  it('reloads the canvas when the host replaces its storage adapter', async () => {
+    const firstStorage = await seededStorage();
+    const secondStorage = memoryDashboardStorage(SEED_OWNER);
+    const result = renderWorkspace(firstStorage, 'lg');
+    await screen.findAllByRole('region');
+
+    result.rerender(
+      <DashboardWorkspace
+        dashboardId={DASH}
+        ownerId={SEED_OWNER}
+        storage={secondStorage}
+        now={() => SEED_NOW}
+        breakpoint="lg"
+      />,
+    );
+
+    expect(await screen.findByText('No widgets yet')).toBeDefined();
+    expect(screen.queryByRole('region', { name: 'Steps today' })).toBeNull();
+  });
+
+  it('does not restart clocks when rerendered with the default clock', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const setIntervalSpy = vi.spyOn(globalThis, 'setInterval');
+    const storage = await seededStorage();
+    const result = render(
+      <DashboardWorkspace
+        dashboardId={DASH}
+        ownerId={SEED_OWNER}
+        storage={storage}
+        breakpoint="lg"
+      />,
+    );
+    await screen.findAllByRole('region');
+    const initialCalls = setIntervalSpy.mock.calls.length;
+
+    result.rerender(
+      <DashboardWorkspace
+        dashboardId={DASH}
+        ownerId={SEED_OWNER}
+        storage={storage}
+        breakpoint="lg"
+      />,
+    );
+
+    expect(setIntervalSpy).toHaveBeenCalledTimes(initialCalls);
+  });
 });

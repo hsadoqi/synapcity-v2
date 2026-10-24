@@ -8,7 +8,7 @@ import {
   minGridWidth,
   type LayoutItem,
 } from '@synapcity/domain-grids';
-import type { Ref } from 'react';
+import { useMemo, type KeyboardEvent, type Ref } from 'react';
 import ReactGridLayout, {
   useContainerWidth,
   type Layout,
@@ -17,6 +17,7 @@ import ReactGridLayout, {
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 
 import { useDashboardStore, type DashboardStore } from '../../store';
+import { keyboardDelta } from '../../store/keyboard-move';
 import { ConnectedWidget } from '../connected-widget';
 import { DashboardEmptyState } from '../dashboard-empty-state';
 
@@ -75,16 +76,50 @@ export function DashboardGrid() {
   const composition = useDashboardStore((s) => s.composition);
   const breakpoint = useDashboardStore((s) => s.breakpoint);
   const editMode = useDashboardStore((s) => s.editMode);
+  const selectedWidgetId = useDashboardStore((s) => s.selectedWidgetId);
+  const selectWidget = useDashboardStore((s) => s.selectWidget);
+  const nudgeWidget = useDashboardStore((s) => s.nudgeWidget);
   const applyLayoutChange = useDashboardStore((s) => s.applyLayoutChange);
   const { width, containerRef, mounted } = useContainerWidth({
     measureBeforeMount: true,
   });
 
   const cols = columnsFor(composition.settings.columns, breakpoint);
-  const layout = gridLayoutFor(composition, breakpoint);
+  // react-grid-layout relies on stable layout identity between unrelated renders.
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization -- The compiler cannot prove this third-party identity requirement.
+  const layout = useMemo(
+    () => gridLayoutFor(composition, breakpoint),
+    [composition, breakpoint],
+  );
   const minWidth = minGridWidth(cols);
 
   if (layout.length === 0) return <DashboardEmptyState />;
+
+  /**
+   * Keyboard select and move, edit mode only. Acts only when the wrapper
+   * itself has focus, so keys typed in a widget's inputs are left alone.
+   */
+  const handleWidgetKeyDown = (
+    event: KeyboardEvent<HTMLDivElement>,
+    id: string,
+  ) => {
+    if (!editMode || event.target !== event.currentTarget) return;
+    if (event.key === ' ') {
+      event.preventDefault();
+      selectWidget(selectedWidgetId === id ? null : id);
+      return;
+    }
+    if (event.key === 'Escape' && selectedWidgetId === id) {
+      event.preventDefault();
+      selectWidget(null);
+      return;
+    }
+    if (selectedWidgetId !== id) return;
+    const delta = keyboardDelta(event.key, event.shiftKey);
+    if (!delta) return;
+    event.preventDefault();
+    nudgeWidget(id, delta);
+  };
 
   return (
     <div ref={containerRef} className="w-full">
@@ -109,11 +144,34 @@ export function DashboardGrid() {
             handleLayoutChange({ breakpoint, applyLayoutChange }, layout, next)
           }
         >
-          {layout.map((item) => (
-            <div key={item.i} className="flex">
-              <ConnectedWidget widgetId={item.i} />
-            </div>
-          ))}
+          {layout.map((item) => {
+            const title = composition.widgets.find(
+              (w) => w.id === item.i,
+            )?.title;
+            const selected = editMode && selectedWidgetId === item.i;
+            return (
+              <div
+                key={item.i}
+                role="group"
+                tabIndex={editMode ? 0 : undefined}
+                aria-label={
+                  title ? `${title}${selected ? ', selected' : ''}` : undefined
+                }
+                aria-keyshortcuts={
+                  editMode
+                    ? 'Space Escape ArrowLeft ArrowRight ArrowUp ArrowDown Shift+ArrowLeft Shift+ArrowRight Shift+ArrowUp Shift+ArrowDown'
+                    : undefined
+                }
+                onKeyDown={(event) => handleWidgetKeyDown(event, item.i)}
+                className={cn(
+                  'flex rounded-xl',
+                  selected && 'outline-2 outline-offset-2 outline-ring',
+                )}
+              >
+                <ConnectedWidget widgetId={item.i} />
+              </div>
+            );
+          })}
         </ReactGridLayout>
       )}
     </div>

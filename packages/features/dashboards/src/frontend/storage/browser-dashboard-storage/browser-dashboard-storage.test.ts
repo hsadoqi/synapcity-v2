@@ -115,7 +115,7 @@ describe('browserDashboardStorage', () => {
     );
   });
 
-  it('reports a throwing storage without throwing', async () => {
+  it('reports read failures and rejects writes that could not be saved', async () => {
     const failing = {
       ...mapStorage().storage,
       getItem: () => {
@@ -140,10 +140,25 @@ describe('browserDashboardStorage', () => {
     );
     await expect(
       adapter.saveComposition(DASH, sample().composition),
-    ).resolves.toBeUndefined();
+    ).rejects.toThrow();
     expect(onError).toHaveBeenCalledWith(
       expect.objectContaining({ kind: 'write', key: COMPOSITION_KEY }),
     );
+  });
+
+  it('preserves an existing invalid-data backup', async () => {
+    const bad = '{"settings":{}}';
+    const previous = '{"settings":null}';
+    const backupKey = `${COMPOSITION_KEY}.invalid`;
+    const { map, storage } = mapStorage({
+      [COMPOSITION_KEY]: bad,
+      [backupKey]: previous,
+    });
+    const adapter = browserDashboardStorage({ ownerId: OWNER, storage });
+
+    await expect(adapter.load(DASH)).rejects.toThrow();
+    expect(map.get(COMPOSITION_KEY)).toBe(bad);
+    expect(map.get(backupKey)).toBe(previous);
   });
 
   it('keeps records another tab saved when this tab saves its older copy', async () => {

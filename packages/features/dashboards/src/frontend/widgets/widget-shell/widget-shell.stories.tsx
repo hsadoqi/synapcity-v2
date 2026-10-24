@@ -12,6 +12,9 @@ const bodyActions = {
   toggleTask: fn(),
   toggleHabitDay: fn(),
   updateNoteBody: fn(),
+  updateMetricValue: fn(),
+  updateGoal: fn(),
+  addTask: fn(),
 };
 
 const meta: Meta<typeof WidgetShell> = {

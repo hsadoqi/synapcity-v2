@@ -84,13 +84,12 @@ export function browserDashboardStorage({
 }: BrowserDashboardStorageOptions): DashboardStorage {
   const store = () => storage ?? window.localStorage;
 
-  function write(key: string, value: string): boolean {
+  function write(key: string, value: string): void {
     try {
       store().setItem(key, value);
-      return true;
     } catch (cause) {
       onError({ kind: 'write', key, cause });
-      return false;
+      throw cause;
     }
   }
 
@@ -112,7 +111,20 @@ export function browserDashboardStorage({
       cause = error;
     }
     onError({ kind: 'invalid', key, cause });
-    if (!write(`${key}.invalid`, raw)) throw new UnsafeToOverwrite(key);
+    const invalidKey = `${key}.invalid`;
+    let existingBackup: string | null;
+    try {
+      existingBackup = store().getItem(invalidKey);
+    } catch (backupCause) {
+      onError({ kind: 'read', key: invalidKey, cause: backupCause });
+      throw new UnsafeToOverwrite(key);
+    }
+    if (existingBackup !== null) throw new UnsafeToOverwrite(key);
+    try {
+      write(invalidKey, raw);
+    } catch {
+      throw new UnsafeToOverwrite(key);
+    }
     return null;
   }
 
@@ -129,11 +141,7 @@ export function browserDashboardStorage({
     },
     saveRecords: async (records) => {
       let saved: PrototypeRecords | null;
-      try {
-        saved = read(recordsKey(ownerId), prototypeRecordsSchema);
-      } catch {
-        return; // The saved records are invalid and could not be set aside: leave them.
-      }
+      saved = read(recordsKey(ownerId), prototypeRecordsSchema);
       write(recordsKey(ownerId), JSON.stringify(mergeRecords(saved, records)));
     },
   };

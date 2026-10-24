@@ -22,33 +22,80 @@ export function connectSaves(
   { delayMs = 400, target }: { delayMs?: number; target?: SaveTarget } = {},
 ): () => void {
   const { window: win, document: doc } = target ?? { window, document };
-  let compositionDirty = false;
-  let recordsDirty = false;
+  let compositionVersion = 0;
+  let savedCompositionVersion = 0;
+  let recordsVersion = 0;
+  let savedRecordsVersion = 0;
   let timer: ReturnType<typeof setTimeout> | undefined;
+  let flushing: Promise<void> | undefined;
+  let automaticRetryAvailable = true;
+  let disconnected = false;
 
   const report = (cause: unknown) =>
     console.error('Saving the dashboard failed.', cause);
 
+  const hasDirtyState = () =>
+    compositionVersion > savedCompositionVersion ||
+    recordsVersion > savedRecordsVersion;
+
+  function schedule() {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      timer = undefined;
+      flush();
+    }, delayMs);
+  }
+
   function flush() {
+    if (flushing) return;
     clearTimeout(timer);
     timer = undefined;
+    if (!hasDirtyState()) return;
+
     const { composition, records } = store.getState();
-    // Records first: a widget saved before its record could point at nothing.
-    if (recordsDirty) void storage.saveRecords(records).catch(report);
-    if (compositionDirty)
-      void storage.saveComposition(dashboardId, composition).catch(report);
-    compositionDirty = false;
-    recordsDirty = false;
+    const compositionToSave = compositionVersion;
+    const recordsToSave = recordsVersion;
+    let failed = false;
+
+    flushing = (async () => {
+      try {
+        // Records first: a widget saved before its record could point at nothing.
+        if (recordsToSave > savedRecordsVersion) {
+          await storage.saveRecords(records);
+          savedRecordsVersion = recordsToSave;
+        }
+        if (compositionToSave > savedCompositionVersion) {
+          await storage.saveComposition(dashboardId, composition);
+          savedCompositionVersion = compositionToSave;
+        }
+      } catch (cause) {
+        failed = true;
+        report(cause);
+      } finally {
+        flushing = undefined;
+        if (!disconnected && !timer && hasDirtyState()) {
+          const changedWhileSaving =
+            compositionVersion > compositionToSave ||
+            recordsVersion > recordsToSave;
+          if (changedWhileSaving) {
+            schedule();
+          } else if (failed && automaticRetryAvailable) {
+            automaticRetryAvailable = false;
+            schedule();
+          }
+        }
+      }
+    })();
   }
 
   const unsubscribe = store.subscribe((state, prev) => {
     const composition = state.composition !== prev.composition;
     const records = state.records !== prev.records;
     if (!composition && !records) return;
-    compositionDirty ||= composition;
-    recordsDirty ||= records;
-    clearTimeout(timer);
-    timer = setTimeout(flush, delayMs);
+    if (composition) compositionVersion += 1;
+    if (records) recordsVersion += 1;
+    automaticRetryAvailable = true;
+    schedule();
   });
 
   const onHidden = () => {
@@ -58,6 +105,7 @@ export function connectSaves(
   doc.addEventListener('visibilitychange', onHidden);
 
   return () => {
+    disconnected = true;
     flush();
     unsubscribe();
     win.removeEventListener('pagehide', flush);

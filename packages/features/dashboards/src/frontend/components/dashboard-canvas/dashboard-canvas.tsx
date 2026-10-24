@@ -1,5 +1,7 @@
 'use client';
 
+import { cn } from '@synapcity/frontend-ui/lib/utils';
+
 import { useElementWidth } from '../../hooks/use-element-width';
 import { useDashboardStore } from '../../store';
 import { DEVICE_FRAME_WIDTH } from '../../utils/device-frame';
@@ -21,29 +23,32 @@ export function DashboardCanvas() {
   const frameWidth = DEVICE_FRAME_WIDTH[breakpoint];
   const framed =
     frameWidth !== null && width !== null && width > frameWidth + FRAME_CHROME;
-  const grid = <DashboardGrid key={breakpoint} />;
 
   return (
     <div
       ref={ref}
       className="flex min-w-0 flex-1 flex-col overflow-auto bg-muted px-5 pt-7 pb-16"
     >
-      {framed ? (
+      <div
+        className="mx-auto flex w-full flex-col gap-2"
         // The frame's width is the one dynamic value: the device's width.
-        <div
-          className="mx-auto flex w-full flex-col gap-2"
-          style={{ maxWidth: frameWidth }}
-        >
+        style={{ maxWidth: framed ? frameWidth : undefined }}
+      >
+        {framed && (
           <p className="m-0 text-xs text-muted-foreground tabular-nums">
             {FRAME_LABEL[breakpoint]} · {frameWidth}px
           </p>
-          <div className="rounded-xl border border-border bg-background px-5 pt-7 pb-10">
-            {grid}
-          </div>
+        )}
+        <div
+          className={cn(
+            'w-full',
+            framed &&
+              'rounded-xl border border-border bg-background px-5 pt-7 pb-10',
+          )}
+        >
+          <DashboardGrid key={breakpoint} />
         </div>
-      ) : (
-        grid
-      )}
+      </div>
     </div>
   );
 }
