@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import type { DocumentItem } from '../../types';
+import type { EntityItem } from '../../types';
 import { RecentEntityItems } from './recent-entity-items';
 
-const items: DocumentItem[] = [1, 2, 3].map((n) => ({
+const items: EntityItem[] = [1, 2, 3].map((n) => ({
   id: `doc-${n}`,
   name: `Document ${n}`,
   icon: 'file-text',

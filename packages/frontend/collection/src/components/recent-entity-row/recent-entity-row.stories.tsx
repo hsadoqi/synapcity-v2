@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import type { DocumentItem } from '../../types';
+import type { EntityItem } from '../../types';
 import { RecentEntityRow } from './recent-entity-row';
 
-const entity: DocumentItem = {
+const entity: EntityItem = {
   id: 'doc-1',
   name: 'Launch plan',
   icon: 'file-text',

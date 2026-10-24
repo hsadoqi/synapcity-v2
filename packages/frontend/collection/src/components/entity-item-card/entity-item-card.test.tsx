@@ -6,7 +6,7 @@ import {
   CollectionNavigationProvider,
   type CollectionLink,
 } from '../../providers';
-import type { DocumentItem } from '../../types';
+import type { EntityItem } from '../../types';
 
 const HostLink: CollectionLink = (props) => <a {...props} data-host-link />;
 const inHost = (ui: React.ReactElement) => (
@@ -15,7 +15,7 @@ const inHost = (ui: React.ReactElement) => (
   </CollectionNavigationProvider>
 );
 
-const document: DocumentItem = {
+const document: EntityItem = {
   id: 'doc-1',
   name: 'Launch plan',
   description: 'Milestones and owners.',

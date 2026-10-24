@@ -1,35 +1,16 @@
-import type { SpaceEntity } from '@synapcity/domain-records';
-
 export type EntityKind = 'space' | 'document' | 'dashboard';
-export type SpaceEntityItemKind = Exclude<EntityKind, 'space'>;
 
-export type Space = SpaceEntity & {
+/**
+ * What the entity blocks show of a record: the fields they read and nothing
+ * else. Resource features own their full shapes (a Space with what takes part
+ * in it lives in `features-spaces`) and pass them here as they are.
+ */
+export type EntityItem = {
+  id: string;
+  name: string;
+  description?: string;
+  icon: string;
   kind: EntityKind;
-  documents: DocumentItem[];
-  dashboards: DashboardItem[];
-  documentsTotal: number;
-  dashboardsTotal: number;
-};
-
-export type DashboardItem = {
-  id: string;
-  name: string;
-  description?: string;
-  updatedAt: string;
   createdAt: string;
-  icon: string;
-  kind: SpaceEntityItemKind;
-};
-
-export type DocumentItem = {
-  id: string;
-  name: string;
-  description?: string;
   updatedAt: string;
-  createdAt: string;
-  icon: string;
-  kind: SpaceEntityItemKind;
 };
-
-export type SpaceItem = DocumentItem | DashboardItem;
-export type EntityItem = Space | SpaceItem;

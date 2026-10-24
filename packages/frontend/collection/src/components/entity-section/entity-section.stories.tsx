@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { EntitySection } from './entity-section';
-import type { DocumentItem } from '../../types';
+import type { EntityItem } from '../../types';
 
-const items: DocumentItem[] = [1, 2, 3].map((n) => ({
+const items: EntityItem[] = [1, 2, 3].map((n) => ({
   id: `doc-${n}`,
   name: `Document ${n}`,
   description: 'A short description of the document.',

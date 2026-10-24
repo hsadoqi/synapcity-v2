@@ -2,9 +2,9 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { EntityDetails } from './entity-details';
-import type { DocumentItem } from '../../types';
+import type { EntityItem } from '../../types';
 
-const document: DocumentItem = {
+const document: EntityItem = {
   id: 'doc-1',
   name: 'Launch plan',
   description: 'Milestones and owners.',

@@ -1,15 +1,15 @@
-import { EntityItem, Space } from '../../types';
+import type { EntityItem } from '../../types';
 import { EntityShell } from '../entity-shell';
 
-export function EntityContent({
+export function EntityContent<T extends EntityItem>({
   userId,
   createFixture,
   getRecentItems,
   children,
 }: {
   userId: string;
-  createFixture?: ({ ownerId }: { ownerId?: string }) => Space;
-  getRecentItems: (entity: Space) => EntityItem[];
+  createFixture?: ({ ownerId }: { ownerId?: string }) => T;
+  getRecentItems: (entity: T) => EntityItem[];
   children?: React.ReactNode;
 }) {
   const entityItem = createFixture?.({ ownerId: userId });

@@ -2,23 +2,15 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { EntityContent } from './entity-content';
-import type { Space } from '../../types';
+import type { EntityItem } from '../../types';
 
-const createFixture = ({ ownerId }: { ownerId?: string }): Space => ({
+const createFixture = (): EntityItem => ({
   id: 's1',
-  ownerId: ownerId ?? 'u1',
   name: 'Research',
   icon: 'folder',
-  tags: [],
   kind: 'space',
-  documents: [],
-  dashboards: [],
-  documentsTotal: 0,
-  dashboardsTotal: 0,
   createdAt: '2026-10-01T12:00:00.000Z',
   updatedAt: '2026-10-16T09:30:00.000Z',
-  pinnedAt: null,
-  lastViewedAt: null,
 });
 
 describe('EntityContent', () => {
@@ -44,7 +36,7 @@ describe('EntityContent', () => {
         userId="u9"
         createFixture={(args) => {
           owners.push(args.ownerId);
-          return createFixture(args);
+          return createFixture();
         }}
         getRecentItems={() => []}
       />,

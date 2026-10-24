@@ -1,30 +1,21 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { EntityShell } from './entity-shell';
-import type { Space } from '../../types';
+import type { EntityItem } from '../../types';
 
-const space: Space = {
+const space: EntityItem = {
   id: 's1',
-  ownerId: 'u1',
   name: 'Research',
   description: 'Everything for the research workstream.',
   icon: 'folder',
-  tags: [],
   kind: 'space',
-  documents: [],
-  dashboards: [],
-  documentsTotal: 0,
-  dashboardsTotal: 0,
   createdAt: '2026-10-01T12:00:00.000Z',
   updatedAt: '2026-10-16T09:30:00.000Z',
-  pinnedAt: null,
-  lastViewedAt: null,
 };
 
 const meta: Meta<typeof EntityShell> = {
   title: 'Blocks/Entity/EntityShell',
   component: EntityShell,
-  tags: ['autodocs'],
   args: {
     entity: space,
     children: <p className="text-muted-foreground">Page content</p>,
