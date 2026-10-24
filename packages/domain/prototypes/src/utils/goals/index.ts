@@ -1,0 +1,1 @@
+export { goalPercent } from './goals';

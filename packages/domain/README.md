@@ -69,11 +69,12 @@ Validation establishes the shape and applicable semantic rules. The server indep
 
 Candidate responsibilities include the existing Space saved-record contract, document/dashboard contracts, and portable preference rules. Names here describe the current code and do not finalize provisional product terminology.
 
-The Space and base record contracts live in [`domain-records`](records/README.md) (M5.1). The [document/dashboard query helper](../../apps/web/src/lib/owned-records/owned-records.ts) still combines persistence implementation with its schema, which is now the base contract; the queries move to server data in M8. Extracting a contract must preserve its existing shape unless a separately approved change alters it.
+The base record contract lives in [`domain-records`](records/README.md) (M5.1). The Space contract, created there in M5.1, lives in [`domain-spaces`](spaces/README.md) since 2026-10-24 (owner decision). The [document/dashboard query helper](../../apps/web/src/lib/owned-records/owned-records.ts) still combines persistence implementation with its schema, which is now the base contract; the queries move to server data in M8. Extracting a contract must preserve its existing shape unless a separately approved change alters it.
 
 ### Example Packages
 
-- `records` ----> Base record contract, with `spaces`, `documents` and `dashboards` modules extending it. Exists since M5.1 with the base and Space modules ([README](records/README.md))
+- `records` ----> Base record contract that every record kind extends. Exists since M5.1 ([README](records/README.md))
+- `spaces` ----> Space create, update and saved contracts. Moved out of `records` on 2026-10-24 ([README](spaces/README.md))
 - `preferences` ----> Preference data, rules, scope and consent policy. Exists since M6.1 ([README](preferences/README.md))
 - `identity` ----> Credential, profile and verified-identity contracts. Exists since M4 with the verified-identity result ([README](identity/README.md))
 

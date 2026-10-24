@@ -14,7 +14,7 @@ const mocks = vi.hoisted(() => ({
 
 import { CollectionNavigationProvider } from '@synapcity/frontend-collection';
 import { createSpaceEntity } from '@synapcity/dev-fixtures';
-import type { SpaceSummary } from '@synapcity/domain-records';
+import type { SpaceSummary } from '@synapcity/domain-spaces';
 import {
   SpacesCollection,
   SpacesCollectionSkeleton,

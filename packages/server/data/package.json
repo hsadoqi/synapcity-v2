@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@synapcity/domain-records": "workspace:*",
+    "@synapcity/domain-spaces": "workspace:*",
     "@synapcity/server-supabase": "workspace:*",
     "server-only": "0.0.1",
     "zod": "^4.6.7"

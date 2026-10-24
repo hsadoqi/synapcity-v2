@@ -1,5 +1,7 @@
-import { baseRecordSchema, spaceSchema } from '@synapcity/domain-records';
-import type { BaseRecord, SpaceEntity } from '@synapcity/domain-records';
+import { baseRecordSchema } from '@synapcity/domain-records';
+import type { BaseRecord } from '@synapcity/domain-records';
+import { spaceSchema } from '@synapcity/domain-spaces';
+import type { SpaceEntity } from '@synapcity/domain-spaces';
 
 export const COLUMNS =
   'id, owner_id, name, description, icon, tags, created_at, updated_at, pinned_at, last_viewed_at';

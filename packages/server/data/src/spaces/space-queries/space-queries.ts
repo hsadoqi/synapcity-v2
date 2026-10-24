@@ -1,4 +1,4 @@
-import type { SpaceEntity, SpaceSummary } from '@synapcity/domain-records';
+import type { SpaceEntity, SpaceSummary } from '@synapcity/domain-spaces';
 import type { SupabaseServerClient } from '@synapcity/server-supabase';
 import { z } from 'zod';
 

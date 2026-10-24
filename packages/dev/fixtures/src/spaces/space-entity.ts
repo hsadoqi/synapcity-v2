@@ -1,5 +1,5 @@
-import { spaceSchema } from '@synapcity/domain-records';
-import type { SpaceEntity } from '@synapcity/domain-records';
+import { spaceSchema } from '@synapcity/domain-spaces';
+import type { SpaceEntity } from '@synapcity/domain-spaces';
 
 /**
  * A Space record for tests and stories: a fresh, deterministic copy on each

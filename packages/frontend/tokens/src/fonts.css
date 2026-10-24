@@ -1,0 +1,23 @@
+/* Self-hosted variable font files (Google Fonts OFL binaries), latin subset. */
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src:
+    url('../assets/fonts/Inter-Variable.woff2') format('woff2-variations'),
+    url('../assets/fonts/Inter-Variable.woff2') format('woff2');
+}
+
+/* The export's code face; ADR-0003 names Geist Mono, so this waits on the merge decision. */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src:
+    url('../assets/fonts/JetBrainsMono-Variable.woff2')
+      format('woff2-variations'),
+    url('../assets/fonts/JetBrainsMono-Variable.woff2') format('woff2');
+}

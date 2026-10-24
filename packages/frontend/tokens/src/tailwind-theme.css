@@ -1,0 +1,182 @@
+/*
+ * Tailwind v4 theme bridge. Maps Tailwind namespaces onto the Synapcity
+ * tokens in ./index.css; it defines no values of its own except the small
+ * "dashboard additions" block at the bottom.
+ *
+ * `inline reference`: utilities inline `var(--token)` and no duplicate
+ * variables are emitted, so names shared with the token files (e.g.
+ * --radius-sm, --font-sans) never become self-referencing.
+ */
+
+/* Drop Tailwind's default palettes and scales — only tokens are available. */
+@theme {
+  --color-*: initial;
+  --text-*: initial;
+  --shadow-*: initial;
+  --radius-*: initial;
+}
+
+@theme inline reference {
+  /* Neutral + accent scales */
+  --color-neutral-0: var(--neutral-0);
+  --color-neutral-50: var(--neutral-50);
+  --color-neutral-100: var(--neutral-100);
+  --color-neutral-200: var(--neutral-200);
+  --color-neutral-300: var(--neutral-300);
+  --color-neutral-400: var(--neutral-400);
+  --color-neutral-500: var(--neutral-500);
+  --color-neutral-600: var(--neutral-600);
+  --color-neutral-700: var(--neutral-700);
+  --color-neutral-750: var(--neutral-750);
+  --color-neutral-800: var(--neutral-800);
+  --color-neutral-825: var(--neutral-825);
+  --color-neutral-850: var(--neutral-850);
+  --color-neutral-875: var(--neutral-875);
+  --color-neutral-900: var(--neutral-900);
+  --color-neutral-925: var(--neutral-925);
+  --color-neutral-950: var(--neutral-950);
+  --color-neutral-975: var(--neutral-975);
+  --color-neutral-1000: var(--neutral-1000);
+  --color-accent-0: var(--accent-0);
+  --color-accent-50: var(--accent-50);
+  --color-accent-100: var(--accent-100);
+  --color-accent-200: var(--accent-200);
+  --color-accent-300: var(--accent-300);
+  --color-accent-400: var(--accent-400);
+  --color-accent-500: var(--accent-500);
+  --color-accent-600: var(--accent-600);
+  --color-accent-700: var(--accent-700);
+  --color-accent-800: var(--accent-800);
+  --color-accent-900: var(--accent-900);
+  --color-accent-950: var(--accent-950);
+  --color-accent-1000: var(--accent-1000);
+  --color-primary-0: var(--primary-0);
+  --color-primary-50: var(--primary-50);
+  --color-primary-100: var(--primary-100);
+  --color-primary-200: var(--primary-200);
+  --color-primary-300: var(--primary-300);
+  --color-primary-400: var(--primary-400);
+  --color-primary-500: var(--primary-500);
+  --color-primary-600: var(--primary-600);
+  --color-primary-700: var(--primary-700);
+  --color-primary-800: var(--primary-800);
+  --color-primary-900: var(--primary-900);
+  --color-primary-950: var(--primary-950);
+  --color-primary-1000: var(--primary-1000);
+  /* Structural planes */
+  --color-background: var(--background);
+  --color-canvas: var(--canvas);
+  --color-shell: var(--shell);
+  --color-sidebar: var(--sidebar);
+  --color-panel: var(--panel);
+  --color-rail: var(--rail);
+
+  /* Surfaces */
+  --color-surface-inset: var(--surface-inset);
+  --color-surface-default: var(--surface-default);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-floating: var(--surface-floating);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-active: var(--surface-active);
+  --color-surface-selected: var(--surface-selected);
+
+  /* Foreground */
+  --color-foreground-strong: var(--foreground-strong);
+  --color-foreground: var(--foreground);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-foreground-subtle: var(--foreground-subtle);
+  --color-foreground-disabled: var(--foreground-disabled);
+  --color-foreground-inverse: var(--foreground-inverse);
+
+  /* Borders */
+  --color-border-subtle: var(--border-subtle);
+  --color-border-default: var(--border-default);
+  --color-border-strong: var(--border-strong);
+  --color-divider: var(--divider);
+
+  /* Accent semantics */
+  --color-interactive: var(--interactive);
+  --color-interactive-hover: var(--interactive-hover);
+  --color-interactive-active: var(--interactive-active);
+  --color-interactive-muted: var(--interactive-muted);
+  --color-focus-ring: var(--focus-ring);
+  --color-selection-outline: var(--selection-outline);
+  --color-selection-background: var(--selection-background);
+  --color-link: var(--link);
+  --color-link-hover: var(--link-hover);
+
+  /* Semantic status */
+  --color-success-foreground: var(--success-foreground);
+  --color-success-background: var(--success-background);
+  --color-success-border: var(--success-border);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-background: var(--warning-background);
+  --color-warning-border: var(--warning-border);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-danger-background: var(--danger-background);
+  --color-danger-border: var(--danger-border);
+  --color-info-foreground: var(--info-foreground);
+  --color-info-background: var(--info-background);
+  --color-info-border: var(--info-border);
+
+  /* Families */
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
+  /* Utility (chrome) type scale */
+  --text-ui-xs: var(--text-ui-xs-size);
+  --text-ui-xs--line-height: var(--text-ui-xs-line);
+  --text-ui-sm: var(--text-ui-sm-size);
+  --text-ui-sm--line-height: var(--text-ui-sm-line);
+  --text-ui-md: var(--text-ui-md-size);
+  --text-ui-md--line-height: var(--text-ui-md-line);
+  --text-ui-control: var(--text-ui-control-size);
+  --text-ui-control--line-height: var(--text-ui-control-line);
+  --text-ui-lg: var(--text-ui-lg-size);
+  --text-ui-lg--line-height: var(--text-ui-lg-line);
+
+  /* Editorial type scale */
+  --text-doc-caption: var(--text-doc-caption-size);
+  --text-doc-caption--line-height: var(--text-doc-caption-line);
+  --text-doc-sm: var(--text-doc-sm-size);
+  --text-doc-sm--line-height: var(--text-doc-sm-line);
+  --text-doc-body: var(--text-doc-body-size);
+  --text-doc-body--line-height: var(--text-doc-body-line);
+  --text-doc-lead: var(--text-doc-lead-size);
+  --text-doc-lead--line-height: var(--text-doc-lead-line);
+  --text-doc-h3: var(--text-doc-h3-size);
+  --text-doc-h3--line-height: var(--text-doc-h3-line);
+  --text-doc-h2: var(--text-doc-h2-size);
+  --text-doc-h2--line-height: var(--text-doc-h2-line);
+  --text-doc-h1: var(--text-doc-h1-size);
+  --text-doc-h1--line-height: var(--text-doc-h1-line);
+
+  /* Radius (role-based) */
+  --radius-none: var(--radius-none);
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  /* Elevation — temporary layers only */
+  --shadow-toolbar: var(--shadow-toolbar);
+  --shadow-popover: var(--shadow-popover);
+  --shadow-dialog: var(--shadow-dialog);
+
+  /* Motion */
+  --ease-standard: var(--ease-standard);
+  --ease-enter: var(--ease-enter);
+  --ease-exit: var(--ease-exit);
+}
+
+/*
+ * Dashboard additions — sizes the Dashboard.dc.html prototype uses that the
+ * token kit does not name. Values come from the prototype, not invented.
+ */
+@theme {
+  --text-ui-2xs: 10px;
+  --text-ui-2xs--line-height: 14px;
+  --text-metric: 32px;
+  --text-metric--line-height: 38px;
+}

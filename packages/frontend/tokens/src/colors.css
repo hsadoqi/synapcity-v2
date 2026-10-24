@@ -1,0 +1,189 @@
+:root {
+  color-scheme: light dark;
+
+  /* Achromatic neutral scale */
+  --neutral-0: #ffffff;
+  --neutral-50: #f7f7f7;
+  --neutral-100: #ededed;
+  --neutral-200: #d6d6d6;
+  --neutral-300: #b8b8b8;
+  --neutral-400: #969696;
+  --neutral-500: #747474;
+  --neutral-600: #575757;
+  --neutral-700: #3a3a3a;
+  --neutral-750: #303030;
+  --neutral-800: #262626;
+  --neutral-825: #222222;
+  --neutral-850: #1e1e1e;
+  --neutral-875: #1a1a1a;
+  --neutral-900: #171717;
+  --neutral-925: #141414;
+  --neutral-950: #101010;
+  --neutral-975: #0c0c0c;
+  --neutral-1000: #080808;
+
+  --primary-0: #ffffff;
+  --primary-50: #f7f7f7;
+  --primary-100: #ededed;
+  --primary-200: #d6d6d6;
+  --primary-300: #b8b8b8;
+  --primary-400: #969696;
+  --primary-500: #747474;
+  --primary-600: #575757;
+  --primary-700: #3a3a3a;
+  --primary-800: #262626;
+  --primary-900: #171717;
+  --primary-950: #101010;
+  --primary-1000: #080808;
+
+  /* Default configurable accent (muted violet) */
+  --accent-0: #f1f0ff;
+  --accent-50: #f4f1ff;
+  --accent-100: #e7e0ff;
+  --accent-200: #d1c3ff;
+  --accent-300: #b7a2ff;
+  --accent-400: #9d82ff;
+  --accent-500: #8668f2;
+  --accent-600: #7254db;
+  --accent-700: #5b42b5;
+  --accent-800: #46348a;
+  --accent-900: #31265f;
+  --accent-950: #211a3f;
+  --accent-1000: #211a21;
+  /* --primary: var(--primary-500); */
+  /* --primary-foreground: var(--primary-50); */
+  /* --accent: var(--accent-500); */
+  /* --accent-foreground: var(--accent-50); */
+  /* --muted: color-mix(in srgb, var(--primary-500) 10%, var(--primary-950) 90%); */
+  /* --muted-foreground: var(--primary-400); */
+}
+
+.light {
+  /* Structural planes — darkest at the canvas, lighter moving outward */
+  --background: var(--primary-50);
+  --canvas: var(--primary-100);
+  --sidebar: var(--primary-200);
+  --panel: var(--primary-100);
+  --rail: var(--primary-50);
+
+  /* Nested surfaces */
+
+  --surface-inset: var(--primary-0);
+  --surface-default: var(--primary-100);
+  --surface-raised: var(--primary-200);
+  --surface-floating: var(--primary-300);
+  --surface-hover: rgb(255 255 255 / 0.045);
+  --surface-active: rgb(255 255 255 / 0.07);
+  --surface-selected: rgb(134 104 242 / 0.12);
+
+  /* Foreground */
+
+  --foreground-strong: var(--neutral-1000);
+  --foreground: var(--primary-950);
+  --foreground-muted: var(--neutral-600);
+  --foreground-subtle: var(--primary-600);
+  --foreground-disabled: var(--neutral-400);
+  --foreground-inverse: var(--primary-0);
+
+  /* Borders */
+
+  /* Same value as --surface-active by design: a border role and a surface role that may diverge. */
+  --border-subtle: rgb(255 255 255 / 0.07);
+  --border-default: rgb(255 255 255 / 0.11);
+  --border-strong: color-mix(in srgb, var(--primary-0) 18%, transparent);
+  --divider: color-mix(in srgb, var(--primary-0) 6.5%, transparent);
+
+  /* Accent semantics — notation only: focus, selection, links, relationships */
+  --interactive: var(--accent-500);
+  --interactive-hover: var(--accent-600);
+  --interactive-active: var(--accent-400);
+  --interactive-muted: rgb(134 104 242 / 0.18);
+  --focus-ring: var(--accent-600);
+  --selection-outline: var(--accent-500);
+  --selection-background: rgb(134 104 242 / 0.16);
+  --link: var(--accent-700);
+  --link-hover: var(--accent-800);
+  --relationship-line: var(--accent-600);
+  --relationship-node: var(--accent-500);
+
+  /* Semantic statuses — reserved strictly for semantic feedback */
+  --success-foreground: #74d7a5;
+  --success-background: rgb(55 180 116 / 0.12);
+  --success-border: rgb(55 180 116 / 0.28);
+  --warning-foreground: #efbd68;
+  --warning-background: rgb(220 150 45 / 0.12);
+  --warning-border: rgb(220 150 45 / 0.28);
+  --danger-foreground: #f18791;
+  --danger-background: rgb(220 75 90 / 0.12);
+  --danger-border: rgb(220 75 90 / 0.28);
+  --info-foreground: #78b8f4;
+  --info-background: rgb(70 145 220 / 0.12);
+  --info-border: rgb(70 145 220 / 0.28);
+
+  --selection-background-text: rgb(134 104 242 / 0.16); /* @kind color */
+}
+
+.dark {
+  /* Structural planes — darkest at the canvas, lighter moving outward */
+  --background: var(--primary-950);
+  --canvas: var(--primary-1000);
+  --sidebar: var(--primary-900);
+  --panel: var(--primary-900);
+  --rail: var(--primary-950);
+
+  /* Nested surfaces */
+
+  --surface-inset: var(--primary-1000);
+  --surface-default: var(--primary-950);
+  --surface-raised: var(--primary-900);
+  --surface-floating: var(--primary-800);
+  --surface-hover: rgb(255 255 255 / 0.045);
+  --surface-active: rgb(255 255 255 / 0.07);
+  --surface-selected: rgb(134 104 242 / 0.12);
+
+  /* Foreground */
+
+  --foreground-strong: var(--neutral-0);
+  --foreground: var(--primary-50);
+  --foreground-muted: var(--neutral-400);
+  --foreground-subtle: var(--primary-400);
+  --foreground-disabled: var(--neutral-600);
+  --foreground-inverse: var(--primary-1000);
+
+  /* Borders */
+
+  /* Same value as --surface-active by design: a border role and a surface role that may diverge. */
+  --border-subtle: rgb(255 255 255 / 0.07);
+  --border-default: rgb(255 255 255 / 0.11);
+  --border-strong: color-mix(in srgb, var(--primary-1000) 18%, transparent);
+  --divider: color-mix(in srgb, var(--primary-1000) 6.5%, transparent);
+
+  /* Accent semantics — notation only: focus, selection, links, relationships */
+  --interactive: var(--accent-500);
+  --interactive-hover: var(--accent-400);
+  --interactive-active: var(--accent-600);
+  --interactive-muted: rgb(134 104 242 / 0.18);
+  --focus-ring: var(--accent-400);
+  --selection-outline: var(--accent-500);
+  --selection-background: rgb(134 104 242 / 0.16);
+  --link: var(--accent-300);
+  --link-hover: var(--accent-200);
+  --relationship-line: var(--accent-400);
+  --relationship-node: var(--accent-500);
+
+  /* Semantic statuses — reserved strictly for semantic feedback */
+  --success-foreground: #74d7a5;
+  --success-background: rgb(55 180 116 / 0.12);
+  --success-border: rgb(55 180 116 / 0.28);
+  --warning-foreground: #efbd68;
+  --warning-background: rgb(220 150 45 / 0.12);
+  --warning-border: rgb(220 150 45 / 0.28);
+  --danger-foreground: #f18791;
+  --danger-background: rgb(220 75 90 / 0.12);
+  --danger-border: rgb(220 75 90 / 0.28);
+  --info-foreground: #78b8f4;
+  --info-background: rgb(70 145 220 / 0.12);
+  --info-border: rgb(70 145 220 / 0.28);
+
+  --selection-background-text: rgb(134 104 242 / 0.16); /* @kind color */
+}

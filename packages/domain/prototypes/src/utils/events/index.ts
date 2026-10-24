@@ -1,0 +1,1 @@
+export { eventsThisWeek } from './events';
