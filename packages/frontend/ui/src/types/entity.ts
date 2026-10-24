@@ -1,14 +1,4 @@
-import type { z } from 'zod';
-
-import type {
-  createSpaceSchema,
-  spaceSchema,
-  updateSpaceSchema,
-} from '@synapcity/frontend-ui/types/entity-schema';
-
-export type SpaceEntity = z.infer<typeof spaceSchema>;
-export type CreateSpaceInput = z.infer<typeof createSpaceSchema>;
-export type UpdateSpaceInput = z.infer<typeof updateSpaceSchema>;
+import type { SpaceEntity } from '@synapcity/domain-records';
 
 export type EntityKind = 'space' | 'document' | 'dashboard';
 export type SpaceEntityItemKind = Exclude<EntityKind, 'space'>;

@@ -47,6 +47,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
+    "@synapcity/domain-records": "workspace:*",
     "@synapcity/frontend-tailwind-config": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",
