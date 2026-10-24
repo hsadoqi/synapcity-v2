@@ -2,7 +2,7 @@
 
 Owns: the shared Playwright end-to-end config that an app builds on.
 
-`createPlaywrightConfig({ port, command, testDir? })` returns a config that starts the app through `webServer`, matches `**/*.e2e.ts` under `e2e/`, and sets retries, reporter and tracing for local versus CI runs.
+`createPlaywrightConfig({ port, command, testDir?, extraServers? })` returns a config that starts the app through `webServer`, matches `**/*.e2e.ts` under `e2e/`, and sets retries, reporter and tracing for local versus CI runs. `extraServers` (`{ port, command }[]`) starts other apps the same way, for a test that crosses apps; `apps/web` uses it to serve docs for the shared-look test.
 
 An app adds a `playwright.config.ts`:
 

@@ -10,6 +10,9 @@ import { expect, test, type Page } from '@playwright/test';
 const STORAGE_KEY = 'synapcity-preferences';
 
 async function load(page: Page, theme?: Record<string, unknown>) {
+  // Each call stands for a separate visit with only localStorage saved. The shared look cookie
+  // (which wins over localStorage once it exists) would carry the previous visit's look over.
+  await page.context().clearCookies();
   if (theme) {
     await page.addInitScript(
       ([key, value]) => localStorage.setItem(key, value),

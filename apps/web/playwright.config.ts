@@ -5,4 +5,8 @@ import { createPlaywrightConfig } from '@synapcity/dev-playwright-config';
 export default createPlaywrightConfig({
   port: 8080,
   command: 'pnpm exec next start --port 8080',
+  // Docs, for the shared-look test: both apps must be built first.
+  extraServers: [
+    { port: 4000, command: 'pnpm --dir ../docs exec next start --port 4000' },
+  ],
 });
