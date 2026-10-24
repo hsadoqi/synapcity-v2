@@ -97,6 +97,7 @@ The look travels in one cookie on the parent domain.
 - **Record:** ADR-0010 gains an amendment recording the cookie, its contents and its attributes.
 - **Constraint for mode:** the mode a person last chose shows on both sites.
 - **Development:** cookies ignore the port, so `localhost:8080` (web) and `localhost:4000` (docs) already share the look.
+- **Post-review expansion (owner decision, 2026-10-24):** both hosts server-render a fully valid request cookie and renew it through an HTTP `Set-Cookie` response; `system` remains browser-resolved. The Settings recovery surface can reset only the shared look while preserving regional, notification and privacy preferences. Production still requires exact sibling custom domains and one shared parent setting; selecting or attaching those domains remains deployment work, not an inferred repository value.
 
 ### 4.4 `server-account` (preferences only in M6, Q2)
 

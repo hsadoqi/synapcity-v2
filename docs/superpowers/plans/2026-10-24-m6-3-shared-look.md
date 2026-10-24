@@ -209,15 +209,15 @@
 
 ## Left open on purpose
 
-- Server rendering of the look from the cookie (C3).
 - The Settings provider, tabs and screen contracts (M6.4), and error reports (M6.5).
-- Whether a person should be able to clear the shared look from Settings (a reset control); out of M6 scope.
+- Selecting and attaching exact production web/docs domains, their DNS records and hosting environment values; the repository now records and tests the required sibling-host contract, but the deployment topology remains an open decision.
 
 ## Deviations recorded during execution
 
 - **Task 1:** the `look` unit lives in `packages/domain/preferences/src/utils/look/`, not `schemas/look/`, because `displaySchema` is defined in `utils/scope` and schemas never import utils.
 - **Tasks 4 and 5:** `saveLook`, `migrateLookToCookie`, `currentLook` and `shareMode` live in a `store/shared-look/` unit of their own, not in `device-store`, so the device store stays the only owner of the raw keys.
-- **Task 3:** the three boot scripts check the cookie's shape and validate values field by field, rather than running the full `look` schema; see the frontend-preferences README.
+- **Task 3 follow-up:** boot, React and server reads now reject the same complete cookie. The inline validator is generated from the same domain constants as `lookSchema`, with an exhaustive parity suite; this avoids shipping Zod in the document while removing partial first-paint repair.
 - **Task 4:** `ModeProvider` gained `shareLook` (default off), so Storybook cannot write the cookie.
 - **Task 7:** `theme-shape.e2e.ts` clears cookies between simulated visits, and `web#test:e2e` also depends on `docs#build` in `turbo.json`, because the new test serves the docs production build.
 - **Task 2 addition (review):** `configureLookCookie` accepts only a plain host name.
+- **Post-review owner expansion:** web and docs server-render a valid request cookie; their proxies renew it through `Set-Cookie`; Settings has a confirmed shared-look-only reset; cookie and local-storage writes have independent failure boundaries. Explicit light/dark renders on the server, while `system` remains browser-resolved. This intentionally expands beyond the original M6.3 exclusions.
