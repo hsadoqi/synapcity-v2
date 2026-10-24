@@ -9,7 +9,7 @@
 
 Synapcity adopts meaningful history as a product direction. This design proposes a way to inspect earlier committed states of durable information while preserving the distinction between canonical information, its representations, provenance, activity and synchronization. It does not create history UI, a schema, API, package, migration or storage key.
 
-The product foundation explicitly does not adopt one universal event log. ADR-0013 leaves history outside its scope. The dashboard canvas stores current compositions behind `DashboardStorage`; that port is replaceable, but it is not currently a revision contract. The current app-local Documents feature lists owned records and pins them; it does not persist document body content in this worktree. The editor persistence envelope described by the Synapcity Lexical guidance is a format/migration version, not user-visible revision history.
+The product foundation explicitly does not adopt one universal event log. ADR-0013 leaves history outside its scope. The dashboard canvas stores current compositions behind `DashboardStorage`; that port is replaceable, but it is not currently a revision contract. The current app-local Documents feature lists owned records and pins them; it does not persist document body content in this worktree. The Lexical guidance available to this workspace describes an editor envelope version as a format/migration mechanism, not user-visible revision history; its owning editor module is external to this checkout and must be verified before implementation.
 
 ## 2. Goals and Non-goals
 
@@ -32,7 +32,7 @@ The product foundation explicitly does not adopt one universal event log. ADR-00
 
 **Revision** is a proposed term for an immutable, inspectable state of one durable resource at a meaningful commit boundary. It is distinct from:
 
-- **Format/schema version:** identifies how to decode and migrate a payload. The Lexical envelope's version belongs here.
+- **Format/schema version:** identifies how to decode and migrate a payload. An editor envelope's version belongs here.
 - **Activity:** describes an action or event that occurred; it need not contain a restorable state.
 - **Provenance:** describes where information came from or how it was derived.
 - **Synchronization history:** describes delivery or conflict resolution among devices or writers.
