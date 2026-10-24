@@ -23,12 +23,13 @@ These tests replace the Supabase client, so they do not prove live email deliver
 
 Set these in `apps/web/.env.local` (git-ignored) and, for deployments, in the hosting provider. Authentication is governed by [ADR-0006](../../docs/architecture/decisions/0006-authentication-with-supabase.md).
 
-| Variable                               | Exposed to the browser | Purpose                                                                                                                          |
-| -------------------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_SUPABASE_URL`             | yes                    | Supabase project URL                                                                                                             |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | yes                    | Supabase publishable key. Never put the secret or service-role key in this app                                                   |
-| `SITE_URL`                             | no                     | Public origin of this app. Used to build email and OAuth redirect URLs; it must be on Supabase's redirect allow-list (see below) |
-| `NEXT_PUBLIC_SENTRY_DSN`               | yes                    | Optional. Sentry DSN for error reports, sent only after someone turns them on (see below)                                        |
+| Variable                                | Exposed to the browser | Purpose                                                                                                                                                               |
+| --------------------------------------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`              | yes                    | Supabase project URL                                                                                                                                                  |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`  | yes                    | Supabase publishable key. Never put the secret or service-role key in this app                                                                                        |
+| `SITE_URL`                              | no                     | Public origin of this app. Used to build email and OAuth redirect URLs; it must be on Supabase's redirect allow-list (see below)                                      |
+| `NEXT_PUBLIC_SENTRY_DSN`                | yes                    | Optional. Sentry DSN for error reports, sent only after someone turns them on (see below)                                                                             |
+| `NEXT_PUBLIC_PREFERENCES_COOKIE_DOMAIN` | yes                    | Optional. Parent domain for the shared look cookie (for example `.example.com`) so web and docs show the same look. Empty means host-only. Set the same value in docs |
 
 The app throws on the first sign-up, reset or OAuth call if `SITE_URL` is missing.
 

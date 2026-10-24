@@ -15,6 +15,10 @@ pnpm dev:docs     # http://localhost:4000
 
 The shared checks run through the root scripts (`pnpm lint`, `pnpm check-types`, `pnpm build`); `pnpm verify` runs everything. This app has no tests of its own.
 
+## Shared look
+
+Docs shows the look chosen in the web app (mode, text size, density, fonts and the rest) and writes only the mode, through its mode toggle. Both apps read and write one cookie, `synapcity-look`; see the amendment in [ADR-0010](../../docs/architecture/decisions/0010-preference-persistence.md). `NEXT_PUBLIC_PREFERENCES_COOKIE_DOMAIN` sets the parent domain it is shared on (the same value as in `apps/web`, inlined at build time); empty keeps it host-only, so local development works across `localhost:8080` and `localhost:4000`.
+
 ## Structure
 
 | Path                     | Contains                                                             |
