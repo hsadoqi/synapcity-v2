@@ -1,1 +1,1 @@
-export { tasksForProject, toggleTask } from './tasks';
+export { addTask, tasksForProject, toggleTask } from './tasks';

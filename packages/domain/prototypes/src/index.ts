@@ -35,6 +35,7 @@ export type {
 export {
   DEFAULT_ICONS,
   addLink,
+  addTask,
   clearSlotAsset,
   createId,
   dayKey,
@@ -56,6 +57,8 @@ export {
   toggleHabitDay,
   toggleTask,
   touchRecord,
+  updateGoal,
+  updateMetricValue,
   updateNoteBody,
   weekDayStarts,
   weekdayIndex,

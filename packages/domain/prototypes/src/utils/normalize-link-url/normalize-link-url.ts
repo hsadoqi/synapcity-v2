@@ -2,10 +2,15 @@
  * Normalizes user input into an http(s) URL. Returns null for anything that
  * is not a web address, so links can never carry other schemes.
  */
+// `host:port` (a colon before a digit) is an address, not a scheme.
+const EXPLICIT_SCHEME = /^[a-z][a-z\d+.-]*:\/\//i;
+const OTHER_SCHEME = /^[a-z][a-z\d+.-]*:(?!\d)/i;
+
 export function normalizeLinkUrl(input: string): string | null {
   const trimmed = input.trim();
   if (!trimmed) return null;
-  const candidate = /^[a-z][a-z\d+.-]*:/i.test(trimmed)
+  if (!EXPLICIT_SCHEME.test(trimmed) && OTHER_SCHEME.test(trimmed)) return null;
+  const candidate = EXPLICIT_SCHEME.test(trimmed)
     ? trimmed
     : `https://${trimmed}`;
   try {
