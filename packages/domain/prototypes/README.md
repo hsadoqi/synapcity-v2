@@ -38,7 +38,7 @@ Every kind also has the ten base fields: `id`, `ownerId`, `name`, `description?`
 | `toggleTask`, `tasksForProject`                                                                 | Completing a task also records an activity about it                                      |
 | `toggleHabitDay`, `habitWeek`, `HabitDay`                                                       | Habit days, and the Monday-first current week (day labels are the feature's copy)        |
 | `updateNoteBody`, `ensureNote`, `addLink`, `normalizeLinkUrl`, `setSlotAsset`, `clearSlotAsset` | Notes, links (http and https only) and one image per vision-board slot                   |
-| `eventsThisWeek`, `recentActivity`, `goalPercent`                                               | Reads used by the calendar, feed and progress widgets                                    |
+| `eventsThisWeek`, `eventsOnDay`, `recentActivity`, `goalPercent`                                | Reads used by the calendar, agenda, feed and progress widgets                            |
 | `dayKey`, `startOfWeek`, `weekDayStarts`, `weekdayIndex`, `isSameWeek`                          | Local-time calendar helpers; weeks start on Monday                                       |
 
 ## Scripts

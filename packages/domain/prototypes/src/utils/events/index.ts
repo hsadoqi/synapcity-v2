@@ -1,1 +1,1 @@
-export { eventsThisWeek } from './events';
+export { eventsOnDay, eventsThisWeek } from './events';

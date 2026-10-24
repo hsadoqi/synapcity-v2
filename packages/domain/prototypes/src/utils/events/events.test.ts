@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { newRecord } from '../new-record';
 import { emptyRecords, putRecord } from '../record-tables';
-import { eventsThisWeek } from './index';
+import { eventsOnDay, eventsThisWeek } from './index';
 
 const NOW = new Date(2026, 9, 21, 12).getTime(); // Wednesday
 const ctx = { ownerId: '11111111-1111-4111-8111-111111111111', now: NOW };
@@ -21,5 +21,24 @@ describe('eventsThisWeek', () => {
       'Earlier',
       'Later',
     ]);
+  });
+});
+
+describe('eventsOnDay', () => {
+  it('keeps the given local day only, earliest first', () => {
+    let r = emptyRecords();
+    r = putRecord(r, 'event', event('Late', new Date(2026, 9, 21, 23, 30)));
+    r = putRecord(r, 'event', event('Early', new Date(2026, 9, 21, 8)));
+    r = putRecord(r, 'event', event('Next day', new Date(2026, 9, 22, 0, 15)));
+    expect(eventsOnDay(r.event, '2026-10-21').map((e) => e.name)).toEqual([
+      'Early',
+      'Late',
+    ]);
+  });
+
+  it('matches nothing for an invalid day', () => {
+    let r = emptyRecords();
+    r = putRecord(r, 'event', event('Any', new Date(2026, 9, 21, 9)));
+    expect(eventsOnDay(r.event, 'someday')).toEqual([]);
   });
 });

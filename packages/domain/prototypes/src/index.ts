@@ -41,6 +41,7 @@ export {
   dayKey,
   emptyRecords,
   ensureNote,
+  eventsOnDay,
   eventsThisWeek,
   getRecord,
   goalPercent,

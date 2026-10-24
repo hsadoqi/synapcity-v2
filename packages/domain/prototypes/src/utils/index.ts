@@ -8,7 +8,7 @@ export {
   weekdayIndex,
 } from './calendar';
 export { createId } from './create-id';
-export { eventsThisWeek } from './events';
+export { eventsOnDay, eventsThisWeek } from './events';
 export { goalPercent, updateGoal } from './goals';
 export { habitWeek, toggleHabitDay } from './habits';
 export type { HabitDay } from './habits';
