@@ -12,16 +12,21 @@ import type {
   CollectionItemAction,
 } from '@synapcity/frontend-collection';
 
-import { toCollectionItem } from '../../lib/collection-item';
-import { setSpacePinned } from '@/lib/spaces/space-state-actions';
 import type { SpaceSummary } from '@synapcity/domain-records';
-import { SpacePreview } from './space-preview';
+
+import type { SetSpacePinnedResult } from '../../../contracts';
+import { toCollectionItem } from '../../utils';
+import { SpacePreview } from '../space-preview';
 
 interface SpacesIndexProps {
   spaces: SpaceSummary[];
   userId: string;
   /** The moment the page was rendered, so server and browser label dates alike. */
   now: string;
+  setSpacePinned: (
+    spaceId: string,
+    pinned: boolean,
+  ) => Promise<SetSpacePinnedResult>;
 }
 
 const LABELS = { singular: 'space', plural: 'Spaces' };
@@ -35,16 +40,13 @@ const EMPTY_STATE = {
     'A space is a quiet room for one idea, project, or season. Start with whatever is on your mind today.',
 };
 
-async function saveSpacePinned(
-  id: string,
-  pinned: boolean,
-): Promise<SetPinnedResult> {
-  const result = await setSpacePinned(id, pinned);
-  return result.ok ? { ok: true } : { ok: false, error: result.error };
-}
-
 /** The spaces index: the shared browse page, filled with spaces. */
-export function SpacesIndex({ spaces, userId, now }: SpacesIndexProps) {
+export function SpacesIndex({
+  spaces,
+  userId,
+  now,
+  setSpacePinned,
+}: SpacesIndexProps) {
   const items = useMemo<CollectionItem[]>(
     () => spaces.map((space) => toCollectionItem(space, userId)),
     [spaces, userId],
@@ -63,7 +65,10 @@ export function SpacesIndex({ spaces, userId, now }: SpacesIndexProps) {
       emptyState={EMPTY_STATE}
       actions={SPACE_ACTIONS}
       renderPreview={(item) => <SpacePreview item={item} />}
-      onSetPinned={saveSpacePinned}
+      onSetPinned={async (id, pinned): Promise<SetPinnedResult> => {
+        const result = await setSpacePinned(id, pinned);
+        return result.ok ? { ok: true } : { ok: false, error: result.error };
+      }}
     />
   );
 }

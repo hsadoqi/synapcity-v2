@@ -36,12 +36,7 @@ describe('EntityContent', () => {
 
   it('chooses the recent items from the entity and lists them', () => {
     const getRecentItems = vi.fn(() => [recent]);
-    render(
-      <EntityContent
-        entity={entity}
-        getRecentItems={getRecentItems}
-      />,
-    );
+    render(<EntityContent entity={entity} getRecentItems={getRecentItems} />);
 
     expect(getRecentItems).toHaveBeenCalledWith(entity);
     expect(screen.getByRole('link', { name: /Launch plan/ })).toBeTruthy();
