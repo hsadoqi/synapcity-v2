@@ -12,7 +12,7 @@ import {
 import { PrivacyConsentRow } from './data-privacy-rows';
 import { DataPrivacyAskAgain } from './data-privacy-ask-again';
 import { DataPrivacyDisclaimer } from './data-privacy-disclaimer';
-import { useGlobalPrivacyControl } from '../../hooks/use-global-privacy-control';
+import { useGlobalPrivacyControl } from '@synapcity/frontend-preferences';
 import { useSettingsDraft } from '../../hooks/use-settings-draft';
 
 // Each choice records when it was made, so two records mean the same choice

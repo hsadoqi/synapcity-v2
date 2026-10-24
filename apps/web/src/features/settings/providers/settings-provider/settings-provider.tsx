@@ -16,12 +16,7 @@ import {
   withoutStoredAccount,
 } from '@synapcity/domain-preferences';
 import { reconcile } from '@synapcity/domain-preferences';
-import {
-  deviceTimezone,
-  readDeviceDisplay,
-  writeDeviceDisplay,
-  type AccountSync,
-} from '../../lib/account-sync';
+import type { AccountSync } from '../../lib/account-sync';
 import {
   accountPart,
   displayOf,
@@ -37,15 +32,15 @@ import { themeSchema } from '@synapcity/domain-preferences';
 import { pageLanguage } from '@synapcity/domain-preferences';
 import {
   applyAppearance,
-  PREFERENCES_SAVED_EVENT,
-  PREFERENCES_STORAGE_KEY,
+  announcePreferencesSaved,
+  clearStoredPreferences,
+  deviceTimezone,
+  readDeviceDisplay,
+  readStoredPreferences,
+  writeDeviceDisplay,
+  writeStoredPreferences,
 } from '@synapcity/frontend-preferences';
 
-const STORAGE_KEY = PREFERENCES_STORAGE_KEY;
-
-// Collectors outside the settings page follow consent through this event.
-const announceSaved = () =>
-  window.dispatchEvent(new Event(PREFERENCES_SAVED_EVENT));
 const NOT_SAVED_TO_ACCOUNT =
   'Changes apply on this device, but could not be saved to your account.';
 
@@ -140,14 +135,14 @@ export function SettingsProvider({
     queueMicrotask(() => {
       if (cancelled) return;
       try {
-        let saved = localStorage.getItem(STORAGE_KEY);
+        let saved = readStoredPreferences();
         if (saved) {
           // Remove the account entry an earlier version stored here.
           const cleaned = withoutStoredAccount(saved);
           if (cleaned !== undefined) {
             try {
-              if (cleaned === null) localStorage.removeItem(STORAGE_KEY);
-              else localStorage.setItem(STORAGE_KEY, cleaned);
+              if (cleaned === null) clearStoredPreferences();
+              else writeStoredPreferences(cleaned);
             } catch {
               // Still read the rest below; the entry is ignored either way.
             }
@@ -195,8 +190,8 @@ export function SettingsProvider({
       setStoredSettings(reconciled.settings);
       try {
         // Cache it, so the boot scripts paint these values on the next load.
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(reconciled.settings));
-        announceSaved();
+        writeStoredPreferences(JSON.stringify(reconciled.settings));
+        announcePreferencesSaved();
       } catch {
         // Still applied for this visit.
       }
@@ -276,8 +271,8 @@ export function SettingsProvider({
       setStoredSettings(next);
       if (next.theme.mode !== mode) setMode(next.theme.mode);
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-        announceSaved();
+        writeStoredPreferences(JSON.stringify(next));
+        announcePreferencesSaved();
         setStatus('Saved');
       } catch {
         setStatus('Changes applied. Browser storage is unavailable.');
@@ -313,8 +308,8 @@ export function SettingsProvider({
       current.current = next;
       setStoredSettings(next);
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-        announceSaved();
+        writeStoredPreferences(JSON.stringify(next));
+        announcePreferencesSaved();
         setStatus('Saved');
       } catch {
         setStatus('Changes applied. Browser storage is unavailable.');

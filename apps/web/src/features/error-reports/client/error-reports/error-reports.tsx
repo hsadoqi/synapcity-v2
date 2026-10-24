@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 
-import { useCanCollect } from '@/features/settings/hooks/use-can-collect';
+import { useCanCollect } from '@synapcity/frontend-preferences';
 import { startErrorReports, stopErrorReports } from './sentry-client';
 
 /**

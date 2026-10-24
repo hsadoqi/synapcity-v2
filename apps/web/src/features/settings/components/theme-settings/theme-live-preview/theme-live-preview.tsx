@@ -3,7 +3,7 @@
 import { useId } from 'react';
 import { PanelLeft, FileText, Plus, ArrowUpRight, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { usePrefersDark } from '../../../hooks/use-prefers-dark';
+import { usePrefersDark } from '@synapcity/frontend-preferences';
 import { previewFontStyle } from '@synapcity/frontend-preferences';
 import {
   previewShapeAttributes,

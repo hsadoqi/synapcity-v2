@@ -1,27 +1,17 @@
 'use client';
 
 import { useMemo, useSyncExternalStore } from 'react';
-import { parseImport } from '@synapcity/domain-preferences';
 import {
-  PREFERENCES_SAVED_EVENT,
-  PREFERENCES_STORAGE_KEY,
-} from '@synapcity/frontend-preferences';
-import { canCollect } from '@synapcity/domain-preferences';
-import type { PrivacyPurpose } from '@synapcity/domain-preferences';
-import { useGlobalPrivacyControl } from './use-global-privacy-control';
-
-function subscribe(onChange: () => void) {
-  window.addEventListener('storage', onChange);
-  window.addEventListener(PREFERENCES_SAVED_EVENT, onChange);
-  return () => {
-    window.removeEventListener('storage', onChange);
-    window.removeEventListener(PREFERENCES_SAVED_EVENT, onChange);
-  };
-}
+  canCollect,
+  parseImport,
+  type PrivacyPurpose,
+} from '@synapcity/domain-preferences';
+import { onStoredPreferencesChange, readStoredPreferences } from '../../store';
+import { useGlobalPrivacyControl } from '../use-global-privacy-control';
 
 function readStored() {
   try {
-    return localStorage.getItem(PREFERENCES_STORAGE_KEY);
+    return readStoredPreferences();
   } catch {
     return null;
   }
@@ -34,7 +24,11 @@ function readStored() {
  * missing or unreadable counts as not granted.
  */
 export function useCanCollect(purpose: PrivacyPurpose) {
-  const stored = useSyncExternalStore(subscribe, readStored, () => null);
+  const stored = useSyncExternalStore(
+    onStoredPreferencesChange,
+    readStored,
+    () => null,
+  );
   const globalPrivacyControl = useGlobalPrivacyControl();
   return useMemo(() => {
     if (!stored) return false;

@@ -3,13 +3,15 @@
 import { useEffect } from 'react';
 
 import { reconcile } from '@synapcity/domain-preferences';
-import { readDeviceDisplay, writeDeviceDisplay } from '../../lib/account-sync';
 import type { AccountPreferences } from '@synapcity/domain-preferences';
 import { parseImport } from '@synapcity/domain-preferences';
 import {
   applyAppearance,
-  PREFERENCES_SAVED_EVENT,
-  PREFERENCES_STORAGE_KEY,
+  announcePreferencesSaved,
+  readDeviceDisplay,
+  readStoredPreferences,
+  writeDeviceDisplay,
+  writeStoredPreferences,
 } from '@synapcity/frontend-preferences';
 import { applyFontPreferences } from '@synapcity/frontend-preferences';
 import { pageLanguage } from '@synapcity/domain-preferences';
@@ -17,7 +19,7 @@ import { settingsDefaults, type Settings } from '@synapcity/domain-preferences';
 
 function readLocal(): Settings {
   try {
-    const saved = localStorage.getItem(PREFERENCES_STORAGE_KEY);
+    const saved = readStoredPreferences();
     return saved ? parseImport(JSON.parse(saved)).settings : settingsDefaults;
   } catch {
     return settingsDefaults;
@@ -49,10 +51,10 @@ export function AccountPreferencesSync({
       writeDeviceDisplay(reconciled.setAside);
       settings = reconciled.settings;
       try {
-        localStorage.setItem(PREFERENCES_STORAGE_KEY, JSON.stringify(settings));
+        writeStoredPreferences(JSON.stringify(settings));
         // Collectors follow consent through this event (privacy is account
         // scope, so it may just have changed).
-        window.dispatchEvent(new Event(PREFERENCES_SAVED_EVENT));
+        announcePreferencesSaved();
       } catch {
         // Still applied for this visit.
       }

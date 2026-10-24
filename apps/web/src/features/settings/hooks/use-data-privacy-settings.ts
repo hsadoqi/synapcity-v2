@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import { useGlobalPrivacyControl } from './use-global-privacy-control';
+import { useGlobalPrivacyControl } from '@synapcity/frontend-preferences';
 import {
   choose,
   type DataPrivacySettingsPatch,
