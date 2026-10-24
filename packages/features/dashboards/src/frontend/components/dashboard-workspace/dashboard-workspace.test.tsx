@@ -116,4 +116,12 @@ describe('DashboardWorkspace', () => {
     expect(screen.queryByRole('button', { name: 'Edit layout' })).toBeNull();
     expect(saveComposition).not.toHaveBeenCalled();
   });
+
+  it("shows time-based widgets at the workspace's clock, not the wall clock", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.setSystemTime(Date.parse('2027-03-01T12:00:00Z'));
+    renderWorkspace(await seededStorage(), 'lg');
+    expect(await screen.findByText('Morning run')).toBeDefined();
+    expect(screen.queryByText('Nothing scheduled this week.')).toBeNull();
+  });
 });

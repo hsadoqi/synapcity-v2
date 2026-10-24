@@ -1,1 +1,1 @@
-export { useNow } from './use-now';
+export { ClockProvider, useNow } from './use-now';

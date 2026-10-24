@@ -8,6 +8,7 @@ import {
   type DashboardStore,
   type DashboardStoreInit,
 } from '../frontend/store';
+import { ClockProvider } from '../frontend/hooks/use-now';
 import { SEED_NOW, SEED_OWNER, seededWorkspace } from './seed';
 
 /** Renders `ui` inside a store seeded with the prototype's sample dashboard. */
@@ -31,7 +32,7 @@ export function renderWithStore(
         store = s;
       }}
     >
-      {ui}
+      <ClockProvider now={() => SEED_NOW}>{ui}</ClockProvider>
     </DashboardStoreProvider>,
   );
   return { ...result, store: () => store! };

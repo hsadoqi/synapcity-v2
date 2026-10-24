@@ -14,6 +14,7 @@ import { PencilRulerIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import type { DashboardSnapshot, DashboardStorage } from '../../../contracts';
+import { ClockProvider } from '../../hooks/use-now';
 import { connectSaves } from '../../storage';
 import { DashboardStoreProvider, useDashboardStore } from '../../store';
 import { BreakpointToolbar } from '../breakpoint-toolbar';
@@ -118,7 +119,9 @@ export function DashboardWorkspace({
         }}
         onStore={(store) => connectSaves(store, storage, dashboardId)}
       >
-        <WorkspaceLayout />
+        <ClockProvider now={now ?? (() => Date.now())}>
+          <WorkspaceLayout />
+        </ClockProvider>
       </DashboardStoreProvider>
     </TooltipProvider>
   );

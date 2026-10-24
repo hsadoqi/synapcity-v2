@@ -5,6 +5,7 @@ import {
   DashboardStoreProvider,
   type DashboardStoreInit,
 } from '../frontend/store';
+import { ClockProvider } from '../frontend/hooks/use-now';
 import { SEED_NOW, SEED_OWNER, seededWorkspace } from './seed';
 
 /** A story decorator that serves a store seeded with the prototype's sample dashboard. */
@@ -30,7 +31,9 @@ export function withDashboardStore(
               store.getState().toggleEditMode();
           }}
         >
-          <Story />
+          <ClockProvider now={() => SEED_NOW}>
+            <Story />
+          </ClockProvider>
         </DashboardStoreProvider>
       </TooltipProvider>
     );
