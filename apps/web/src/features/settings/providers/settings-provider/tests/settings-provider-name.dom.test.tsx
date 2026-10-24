@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ModeProvider } from '@synapcity/frontend-ui/providers/mode-provider';
+import { ModeProvider } from '@synapcity/frontend-preferences';
 
 import { SettingsProvider } from '../settings-provider';
 import { SettingsHeader } from '../../../shared';

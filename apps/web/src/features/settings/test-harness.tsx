@@ -7,7 +7,7 @@ import {
   type RenderResult,
 } from '@testing-library/react';
 import { expect, vi } from 'vitest';
-import { ModeProvider } from '@synapcity/frontend-ui/providers/mode-provider';
+import { ModeProvider } from '@synapcity/frontend-preferences';
 
 import { useSettings } from './hooks/use-settings';
 import { SettingsProvider } from './providers/settings-provider';

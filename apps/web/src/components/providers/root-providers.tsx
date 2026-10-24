@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense } from 'react';
-import { ModeProvider } from '@synapcity/frontend-ui/providers/mode-provider';
+import { ModeProvider } from '@synapcity/frontend-preferences';
 import { Toaster } from '@synapcity/frontend-ui/core/toast';
 
 import { NoticeToast } from '@/components/notices/notice-toast';

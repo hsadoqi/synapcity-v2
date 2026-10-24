@@ -9,7 +9,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { useMode } from '@synapcity/frontend-ui/providers/mode-provider';
+import { useMode } from '@synapcity/frontend-preferences';
 import {
   mergeSettings,
   parseImport,

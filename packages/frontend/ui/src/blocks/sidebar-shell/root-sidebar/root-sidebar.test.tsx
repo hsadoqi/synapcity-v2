@@ -5,7 +5,7 @@ import { RootSidebar } from '@synapcity/frontend-ui/blocks/sidebar-shell/root-si
 import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
 import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
 import { data } from '@synapcity/frontend-ui/lib/sidebar-data';
-import { ModeProvider } from '@synapcity/frontend-ui/providers/mode-provider';
+import { ModeProvider } from '@synapcity/frontend-preferences';
 
 const renderSidebar = (props = {}) =>
   render(

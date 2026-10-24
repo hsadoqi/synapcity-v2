@@ -6,12 +6,10 @@
     "./styles.css": "./src/styles/globals.css",
     "./lib/*": "./src/lib/*.ts",
     "./hooks/*": "./src/hooks/*.ts",
-    "./utils/*": "./src/utils/*.ts",
     "./core/*": "./src/components/ui/*/index.ts",
     "./components": "./src/components/index.ts",
     "./components/*": "./src/components/*/index.ts",
     "./next/*": "./src/next/*/index.ts",
-    "./providers/*": "./src/providers/*/index.ts",
     "./blocks": "./src/blocks/index.ts",
     "./blocks/*": "./src/blocks/*/index.ts"
   },
@@ -47,13 +45,13 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
+    "@synapcity/frontend-preferences": "workspace:*",
     "@synapcity/frontend-tailwind-config": "workspace:*",
     "@synapcity/frontend-tokens": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",
     "lucide-react": "^1.55.0",
     "next": "16.4.3",
-    "next-themes": "^0.4.6",
     "react": "19.3.0",
     "react-resizable-panels": "4.14.5",
     "shadcn": "^4.22.1"

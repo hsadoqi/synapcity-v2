@@ -1,6 +1,6 @@
 'use client';
 
-import { ModeProvider } from '@synapcity/frontend-ui/providers/mode-provider';
+import { ModeProvider } from '@synapcity/frontend-preferences';
 
 export default function RootProviders({
   children,

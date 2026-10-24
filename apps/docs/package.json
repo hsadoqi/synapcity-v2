@@ -11,14 +11,15 @@
     "check-types": "next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@synapcity/frontend-preferences": "workspace:*",
     "@synapcity/frontend-site": "workspace:*",
     "@synapcity/frontend-ui": "workspace:*",
+    "@tailwindcss/postcss": "^4.3.3",
     "next": "16.4.3",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "shadcn": "^4.22.1",
-    "tailwindcss": "^4.3.3",
-    "@tailwindcss/postcss": "^4.3.3"
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "@synapcity/dev-eslint-config": "workspace:*",

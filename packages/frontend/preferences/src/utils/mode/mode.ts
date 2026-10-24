@@ -1,7 +1,4 @@
-import type {
-  Mode,
-  ResolvedMode,
-} from '@synapcity/frontend-ui/providers/mode-provider';
+import type { Mode, ResolvedMode } from '../../types';
 
 export const isMode = (value: unknown): value is Mode =>
   value === 'light' || value === 'dark' || value === 'system';

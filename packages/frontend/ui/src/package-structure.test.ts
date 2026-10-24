@@ -25,7 +25,6 @@ const COMPONENT_ROOTS = [
   'components',
   'components/ui',
   'blocks',
-  'providers',
   'next',
 ] as const;
 
@@ -192,7 +191,6 @@ describe('package.json exports', () => {
       components: './components/',
       'components/ui': './core/',
       blocks: './blocks/',
-      providers: './providers/',
       next: './next/',
     };
 
@@ -212,7 +210,6 @@ describe('package.json exports', () => {
     for (const [dir, key] of [
       ['lib', 'lib'],
       ['hooks', 'hooks'],
-      ['utils', 'utils'],
     ] as const) {
       for (const file of list(join(src, dir))) {
         if (!file.endsWith('.ts')) continue;

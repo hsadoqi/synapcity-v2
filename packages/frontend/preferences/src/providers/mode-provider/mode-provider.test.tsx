@@ -1,10 +1,7 @@
 import { act, render, renderHook, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import {
-  ModeProvider,
-  useMode,
-} from '@synapcity/frontend-ui/providers/mode-provider';
+import { ModeProvider, useMode } from './mode-provider';
 
 const mockSystemDark = (dark: boolean) => {
   window.matchMedia = ((query: string) => ({

@@ -116,18 +116,6 @@ export const EXCEPTIONS: readonly Exception[] = [
       "Pre-existing barrel-induced module cycle across the settings components' index files.",
     removal: 'M6 settings migration',
   },
-  {
-    rule: 'R9',
-    file: 'packages/frontend/ui/src/providers/mode-provider/index.ts',
-    members: [
-      'packages/frontend/ui/src/providers/mode-provider/index.ts',
-      'packages/frontend/ui/src/providers/mode-provider/mode-provider.tsx',
-      'packages/frontend/ui/src/utils/theme.ts',
-    ],
-    reason:
-      'Pre-existing module cycle: mode-provider and utils/theme import each other.',
-    removal: 'M6 preferences migration (frontend-preferences)',
-  },
 ];
 
 const sameMembers = (a: string[] | undefined, b: string[] | undefined) =>

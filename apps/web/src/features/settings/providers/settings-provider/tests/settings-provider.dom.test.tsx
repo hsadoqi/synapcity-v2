@@ -7,10 +7,7 @@ import {
   waitFor,
 } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  ModeProvider,
-  useMode,
-} from '@synapcity/frontend-ui/providers/mode-provider';
+import { ModeProvider, useMode } from '@synapcity/frontend-preferences';
 import { SettingsProvider } from '../settings-provider';
 import { useSettings } from '../../../hooks/use-settings';
 import { useRegionalSettings } from '../../../hooks/use-regional-settings';

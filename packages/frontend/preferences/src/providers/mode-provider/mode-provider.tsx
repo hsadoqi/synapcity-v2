@@ -2,10 +2,8 @@
 
 import * as React from 'react';
 import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes';
-import { resolveMode } from '@synapcity/frontend-ui/utils/theme';
-
-export type Mode = 'light' | 'dark' | 'system';
-export type ResolvedMode = Exclude<Mode, 'system'>;
+import type { Mode, ResolvedMode } from '../../types';
+import { resolveMode } from '../../utils';
 
 export function ModeProvider({
   children,

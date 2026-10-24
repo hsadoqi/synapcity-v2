@@ -10,7 +10,7 @@ import type { ReactNode } from 'react';
 import { renderToString } from 'react-dom/server';
 import { hydrateRoot } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ModeProvider } from '@synapcity/frontend-ui/providers/mode-provider';
+import { ModeProvider } from '@synapcity/frontend-preferences';
 
 import { DateFormatRow, NumberFormatRow, TimeFormatRow } from './regional-rows';
 import {

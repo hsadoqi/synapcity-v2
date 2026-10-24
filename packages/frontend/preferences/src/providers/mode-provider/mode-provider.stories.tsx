@@ -1,18 +1,35 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, waitFor, within } from 'storybook/test';
 
-import { ModeToggle } from '@synapcity/frontend-ui/components/mode-toggle';
-import {
-  ModeProvider,
-  useMode,
-} from '@synapcity/frontend-ui/providers/mode-provider';
+import type { Mode } from '../../types';
+import { ModeProvider, useMode } from './mode-provider';
 
-const Readout = () => {
-  const { mode, nativeMode } = useMode();
+const MODES: ReadonlyArray<Mode> = ['light', 'dark', 'system'];
+
+/*
+ * Switching is not exercised here: in Storybook the toolbar owns the mode (see preview.tsx), so a
+ * click in a story cannot change it. The unit tests cover switching.
+ * Plain buttons: this package never depends on frontend-ui, so the story cannot use ModeToggle. */
+const Picker = () => {
+  const { mode, nativeMode, setMode } = useMode();
   return (
-    <p className="text-xs">
-      Choice: <strong>{nativeMode}</strong>, applied: <strong>{mode}</strong>
-    </p>
+    <div className="flex flex-col items-start gap-3">
+      <p className="text-xs">
+        Choice: <strong>{nativeMode}</strong>, applied: <strong>{mode}</strong>
+      </p>
+      <div className="flex gap-2">
+        {MODES.map((value) => (
+          <button
+            key={value}
+            type="button"
+            className="rounded-md border border-border px-2 py-1 text-xs"
+            onClick={() => setMode(value)}
+          >
+            {value}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 };
 
@@ -23,10 +40,7 @@ const meta: Meta<typeof ModeProvider> = {
   args: { attribute: 'class', initialMode: 'system' },
   render: (args) => (
     <ModeProvider {...args}>
-      <div className="flex flex-col items-start gap-3">
-        <Readout />
-        <ModeToggle variant="outline" />
-      </div>
+      <Picker />
     </ModeProvider>
   ),
 };
