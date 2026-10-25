@@ -141,6 +141,14 @@ describe('RootHeader', () => {
   });
 
   it('places the panel action in the account navigation when hosted by the panel shell', () => {
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      },
+    );
     render(
       <ModeProvider>
         <TooltipProvider>

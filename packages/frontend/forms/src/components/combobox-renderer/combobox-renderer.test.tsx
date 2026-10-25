@@ -287,15 +287,14 @@ describe('ComboboxRenderer, grouped options', () => {
     const { input } = show(p);
     openList(input);
 
-    const option = await screen.findByRole('option', { name: 'Carrot' });
+    fireEvent.click(await screen.findByRole('option', { name: 'Carrot' }));
+
+    expect(p.onChange).toHaveBeenCalledWith('c');
+    openList(input);
     expect(
       [...document.querySelectorAll('[data-slot="combobox-label"]')].map(
         (label) => label.textContent,
       ),
     ).toEqual(['Fruit', 'Veg']);
-
-    fireEvent.click(option);
-
-    expect(p.onChange).toHaveBeenCalledWith('c');
   });
 });
