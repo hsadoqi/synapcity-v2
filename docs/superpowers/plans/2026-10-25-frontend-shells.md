@@ -60,7 +60,7 @@ The original Task 2 (four leaf components first) could not work: `root-shell` an
 ### Task 3: Make the global panel's content a slot
 
 - [ ] **Step 1:** Write the characterization test first if the existing tests do not pin: resize, lock, pin, hide, keyboard, `aria` names (the panel's behavior is the ADR-0011 contract).
-- [ ] **Step 2:** (Already moved in Task 2.) Make its content a slot (it imports `SettingsView` from `blocks/settings-view` today; the host or `features-settings` passes `SettingsView` in, per C3). `react-resizable-panels` moves to the shells manifest only if no `frontend-ui` file still imports it (C2).
+- [ ] **Step 2:** (Already moved in Task 2.) Make its content a slot (it imports `SettingsView` from `blocks/settings-view` today; the host or `features-settings` passes `SettingsView` in, per C3). `react-resizable-panels` is already declared by shells (Task 2: `global-panel` imports its types directly) and stays declared by `frontend-ui` for `components/ui/resizable` (C2), both at 4.14.5.
 - [ ] **Step 3:** Run panel tests, Storybook global-panel stories, the 3 global-panel e2e tests that already fail on `main` (record before and after; do not fix them here).
 - [ ] **Step 4:** Checkpoint commit.
 

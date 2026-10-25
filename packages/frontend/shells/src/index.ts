@@ -1,5 +1,7 @@
-// The portable entry. The same names `frontend-ui`'s `blocks` entries exported
-// for these components before they moved here.
+// The portable entry: the names consumers imported from `frontend-ui`'s
+// `blocks` entries before these components moved here. Internal pieces
+// (`RootSidebar`, `SidebarProviders`, `RootHeaderContent`) are not exported;
+// nothing outside the shell used them.
 export {
   RootShell,
   AuthenticatedShell,

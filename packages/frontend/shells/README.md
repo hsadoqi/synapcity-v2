@@ -4,14 +4,14 @@ Owns: the composable frames around product content, at two levels. **App shells:
 
 Runtime: browser and server rendering, framework-neutral at the root entry. Links and navigation come from the host; `next` is imported only under `src/next/`. Category rules: [frontend README](../README.md) and [ADR-0014](../../../docs/architecture/decisions/0014-multi-app-package-boundaries.md). Panel behavior: [ADR-0011](../../../docs/architecture/decisions/0011-resizable-global-panel-shell.md).
 
-**Status:** created 2026-10-25 by Task 1 of the [frontend-shells plan](../../../docs/superpowers/plans/2026-10-25-frontend-shells.md). It holds no components yet; Tasks 2 to 5 move them in from `frontend-ui/src/blocks` and `apps/web/src/components`.
+**Status:** created 2026-10-25 by Task 1 of the [frontend-shells plan](../../../docs/superpowers/plans/2026-10-25-frontend-shells.md). Task 2 moved the app shell family in unchanged from `frontend-ui/src/blocks`; later tasks convert it to slots and move the page frames from `apps/web/src/components`.
 
 ## Public interface
 
-| Entry                             | Exports                                                                                     |
-| --------------------------------- | ------------------------------------------------------------------------------------------- |
-| `@synapcity/frontend-shells`      | The shells and page frames (none yet)                                                       |
-| `@synapcity/frontend-shells/next` | The Next.js binding for the shells' links and navigation, mounted once by a host (none yet) |
+| Entry                             | Exports                                                                                                                                                                                                              |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@synapcity/frontend-shells`      | `RootShell`, `AuthenticatedShell`, `PublicShell`, `RootHeader`, `RootFooter`, `RootContent`, `GlobalPanelShell`, `GlobalPanelToggle`, `SidebarShell`, `ContextSwitcher`, `SearchForm`, and the `RootBreadcrumb` type |
+| `@synapcity/frontend-shells/next` | The Next.js binding for the shells' links and navigation, mounted once by a host (none yet)                                                                                                                          |
 
 ## Not here
 
