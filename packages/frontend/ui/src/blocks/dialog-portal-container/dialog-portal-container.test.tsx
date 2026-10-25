@@ -117,4 +117,111 @@ describe('DialogPortalContainer', () => {
     // The owner did not update `open`, so the dialog stays.
     expect(screen.getByRole('dialog')).toBeDefined();
   });
+
+  describe('size', () => {
+    const open = async (props: Record<string, unknown> = {}) => {
+      render(
+        <DialogPortalContainer defaultOpen title="Sized" {...props}>
+          <p>Body</p>
+        </DialogPortalContainer>,
+      );
+      return screen.findByRole('dialog');
+    };
+
+    it('is as tall as its content by default: no height cap, no height class', async () => {
+      const dialog = await open();
+      expect(dialog.className).not.toMatch(/max-h-/);
+      expect(dialog.className).not.toMatch(/(^|\s)h-/);
+      expect(dialog.style.maxHeight).toBe('');
+    });
+
+    it.each([
+      ['sm', 'sm:max-h-96'],
+      ['md', 'sm:max-h-112'],
+      ['lg', 'sm:max-h-128'],
+    ] as const)(
+      'caps the height at the %s preset and scrolls',
+      async (height, cls) => {
+        const dialog = await open({ height });
+        expect(dialog.classList.contains(cls)).toBe(true);
+        expect(dialog.classList.contains('overflow-y-auto')).toBe(true);
+      },
+    );
+
+    it.each([
+      ['sm', 'sm:max-w-sm'],
+      ['md', 'sm:max-w-md'],
+      ['lg', 'sm:max-w-lg'],
+    ] as const)('caps the width at the %s preset', async (width, cls) => {
+      const dialog = await open({ width });
+      expect(dialog.classList.contains(cls)).toBe(true);
+    });
+
+    it('fills its container with full: no cap at any width, a height of its own, a flex column', async () => {
+      const dialog = await open({ width: 'full', height: 'full' });
+      for (const cls of [
+        'max-w-full',
+        'sm:max-w-full',
+        'h-full',
+        'max-h-full',
+        'sm:max-h-full',
+        'flex',
+        'flex-col',
+      ]) {
+        expect(dialog.classList.contains(cls), cls).toBe(true);
+      }
+      // The base dialog's own caps are replaced, not left beside it.
+      expect(dialog.classList.contains('sm:max-w-sm')).toBe(false);
+      expect(dialog.className).not.toContain('max-w-[calc(100%-2rem)]');
+    });
+
+    it('gives a full-height body the flex-1 child, not the popup', async () => {
+      const dialog = await open({ height: 'full' });
+      const body = screen.getByText('Body').parentElement!;
+      expect(body.className).toContain('flex-1');
+      expect(body.className).toContain('min-h-0');
+      expect(dialog.classList.contains('flex-1')).toBe(false);
+    });
+
+    it('lets full height win over the scrollable height', async () => {
+      const dialog = await open({ height: 'full', scrollable: true });
+      expect(dialog.classList.contains('h-full')).toBe(true);
+      expect(dialog.classList.contains('h-4/5')).toBe(false);
+    });
+
+    it('keeps the scrollable height when only scrollable is set', async () => {
+      const dialog = await open({ scrollable: true });
+      expect(dialog.classList.contains('h-4/5')).toBe(true);
+      expect(dialog.classList.contains('flex')).toBe(true);
+    });
+
+    it('takes a number as a percentage of the container, with no preset class', async () => {
+      const dialog = await open({ width: 60, height: 50 });
+      expect(dialog.style.maxWidth).toBe('60%');
+      expect(dialog.style.maxHeight).toBe('50%');
+      // No preset height class. (The base dialog's own `sm:max-w-sm` stays in
+      // the list; the inline max-width overrides it, which a browser story checks.)
+      expect(dialog.className).not.toMatch(/sm:max-h-/);
+    });
+
+    it('gives a scrollable numeric height as the height itself', async () => {
+      const dialog = await open({ height: 70, scrollable: true });
+      expect(dialog.style.height).toBe('70%');
+      expect(dialog.style.maxHeight).toBe('70%');
+    });
+
+    it.each([0, -5, Number.NaN, Number.POSITIVE_INFINITY])(
+      'ignores %s',
+      async (value) => {
+        const dialog = await open({ width: value, height: value });
+        expect(dialog.style.maxWidth).toBe('');
+        expect(dialog.style.maxHeight).toBe('');
+      },
+    );
+
+    it('clamps a number over 100 to the container', async () => {
+      const dialog = await open({ width: 250 });
+      expect(dialog.style.maxWidth).toBe('100%');
+    });
+  });
 });

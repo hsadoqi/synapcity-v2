@@ -21,7 +21,7 @@ const meta: Meta<typeof EntityDialog> = {
   tags: ['autodocs'],
   args: {
     mode: 'create',
-    entityName: 'time slot',
+    entityName: 'event',
     trigger: <Button variant="outline">Open</Button>,
     onSubmit: fn(),
     onOpenChange: fn(),
@@ -50,7 +50,7 @@ const open = async (canvasElement: HTMLElement) => {
 export const Create: Story = {
   play: async ({ canvasElement, args }) => {
     const dialog = await open(canvasElement);
-    await expect(dialog).toHaveAccessibleName('New time slot');
+    await expect(dialog).toHaveAccessibleName('New event');
     await userEvent.click(
       within(dialog).getByRole('button', { name: 'Create' }),
     );
@@ -63,7 +63,7 @@ export const Edit: Story = {
   args: { mode: 'edit' },
   play: async ({ canvasElement }) => {
     const dialog = await open(canvasElement);
-    await expect(dialog).toHaveAccessibleName('Edit time slot');
+    await expect(dialog).toHaveAccessibleName('Edit event');
     // The dialog fades in; wait for it rather than assert mid-animation.
     await waitFor(() =>
       expect(
@@ -123,7 +123,7 @@ export const Inline: Story = {
   ),
   play: async ({ canvasElement, args }) => {
     const region = within(canvasElement).getByRole('region', {
-      name: 'Edit time slot',
+      name: 'Edit event',
     });
     await userEvent.click(
       within(region).getByRole('button', { name: 'Cancel' }),

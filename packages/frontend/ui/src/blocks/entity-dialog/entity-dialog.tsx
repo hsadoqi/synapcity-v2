@@ -48,7 +48,7 @@ export interface EntityDialogMessages {
 
 export interface EntityDialogProps {
   mode: EntityMode;
-  /** The kind of thing, lower case. Titles read "New time slot" and "Edit time slot". @default 'item' */
+  /** The kind of thing, lower case. Titles read "New event" and "Edit event". @default 'item' */
   entityName?: string;
   /** This entity's own name, for the delete confirmation. @default entityName */
   entityLabel?: string;

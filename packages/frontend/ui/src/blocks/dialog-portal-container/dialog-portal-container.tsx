@@ -2,6 +2,7 @@
 
 import {
   useState,
+  type CSSProperties,
   type ComponentProps,
   type ReactElement,
   type ReactNode,
@@ -32,22 +33,68 @@ type PortalContainer = ComponentProps<typeof DialogPortal>['container'];
  */
 type DialogContainerTarget = 'inline' | 'body' | NonNullable<PortalContainer>;
 
-type DialogContainerWidth = 'sm' | 'md' | 'lg' | 'full';
-type DialogContainerHeight = 'sm' | 'md' | 'lg' | 'full';
+type DialogSizePreset = 'sm' | 'md' | 'lg' | 'full';
 
-const widthClasses: Record<DialogContainerWidth, string> = {
+/**
+ * A preset, or a number: a percentage of the dialog's containing block. A
+ * dialog is `position: fixed`, so that is the viewport (the number reads as
+ * vw or vh) unless an ancestor has a `transform`, `filter` or `contain: layout`,
+ * as a card does when the dialog renders inside it; then the number is a share
+ * of that card, which is what keeps a card-scoped dialog inside the card.
+ */
+type DialogContainerWidth = DialogSizePreset | number;
+type DialogContainerHeight = DialogSizePreset | number;
+
+/*
+ * sm, md and lg are 24, 28 and 32rem, the sizes `max-w-sm/md/lg` name. Tailwind
+ * has no `max-h-sm`: its named container sizes exist for `max-w` only, so the
+ * heights use the spacing scale (96, 112 and 128 are those same rems).
+ *
+ * `full` fills the dialog's containing block (the viewport, or the card it
+ * renders in) instead of being capped: it lifts the maximum at every width, not
+ * only from `sm`, and takes a height of its own. The popup becomes a flex column
+ * and the body is its `flex-1` child (below), because `flex-1` only means
+ * something on a flex child.
+ */
+const widthClasses: Record<DialogSizePreset, string> = {
   sm: 'sm:max-w-sm',
   md: 'sm:max-w-md',
   lg: 'sm:max-w-lg',
-  full: 'flex-1',
+  full: 'max-w-full sm:max-w-full',
 };
 
-const heightClasses: Record<DialogContainerHeight, string> = {
-  sm: 'sm:max-h-sm',
-  md: 'sm:max-h-md',
-  lg: 'sm:max-h-lg',
-  full: 'flex-1',
+const heightClasses: Record<DialogSizePreset, string> = {
+  sm: 'sm:max-h-96',
+  md: 'sm:max-h-112',
+  lg: 'sm:max-h-128',
+  full: 'h-full max-h-full sm:max-h-full',
 };
+
+/** A usable percentage, or `undefined` for NaN, zero, negative and infinite values. */
+const percent = (value: number) =>
+  Number.isFinite(value) && value > 0 ? Math.min(value, 100) : undefined;
+
+/**
+ * Inline size for a numeric `width` or `height`: the value is a runtime prop,
+ * which a class cannot carry. A number is exactly that share of the containing
+ * block (100 fills it, with no gutter); a `scrollable` dialog also takes the
+ * height itself, because its ScrollArea needs a definite height to scroll in.
+ */
+function numericSize(
+  width: DialogContainerWidth,
+  height: DialogContainerHeight | undefined,
+  scrollable: boolean,
+): CSSProperties | undefined {
+  const style: CSSProperties = {};
+  const w = typeof width === 'number' ? percent(width) : undefined;
+  const h = typeof height === 'number' ? percent(height) : undefined;
+  if (w !== undefined) style.maxWidth = `${w}%`;
+  if (h !== undefined) {
+    style.maxHeight = `${h}%`;
+    if (scrollable) style.height = `${h}%`;
+  }
+  return Object.keys(style).length > 0 ? style : undefined;
+}
 
 export interface DialogPortalContainerProps extends Pick<
   DialogRootProps,
@@ -73,9 +120,13 @@ export interface DialogPortalContainerProps extends Pick<
    * @default false
    */
   scrollable?: boolean;
-  /** Maximum width from the `sm` breakpoint up. @default 'sm' */
+  /** Maximum width from the `sm` breakpoint up; `'full'` fills the container; or a number: see `DialogContainerWidth`. @default 'sm' */
   width?: DialogContainerWidth;
-  /** Maximum height from the `sm` breakpoint up. @default 'sm' */
+  /**
+   * Maximum height from the `sm` breakpoint up; `'full'` fills the container;
+   * or a number: see `DialogContainerHeight`. Left unset, the dialog is as tall
+   * as its content. A dialog that is capped and not `scrollable` scrolls.
+   */
   height?: DialogContainerHeight;
   /** Layout classes for the dialog popup. */
   className?: string;
@@ -102,7 +153,7 @@ export function DialogPortalContainer({
   showCloseButton = true,
   scrollable = false,
   width = 'sm',
-  height = 'sm',
+  height,
   className,
   ...rootProps
 }: DialogPortalContainerProps) {
@@ -125,10 +176,15 @@ export function DialogPortalContainer({
           <DialogContent
             showOverlay={overlay}
             showCloseButton={showCloseButton}
+            style={numericSize(width, height, scrollable)}
             className={cn(
-              widthClasses[width],
-              heightClasses[height],
-              scrollable && 'flex h-4/5 flex-col',
+              typeof width === 'number' ? undefined : widthClasses[width],
+              (scrollable || height === 'full') && 'flex flex-col',
+              scrollable && 'h-4/5',
+              // After `scrollable`, so `full`'s `h-full` wins over its `h-4/5`.
+              typeof height === 'string' && heightClasses[height],
+              // Capped but not scrollable: scroll rather than spill out of the box.
+              height !== undefined && !scrollable && 'overflow-y-auto',
               className,
             )}
           >
@@ -140,6 +196,8 @@ export function DialogPortalContainer({
             </DialogHeader>
             {scrollable ? (
               <ScrollArea className="min-h-0 flex-1">{children}</ScrollArea>
+            ) : height === 'full' ? (
+              <div className="min-h-0 flex-1">{children}</div>
             ) : (
               children
             )}

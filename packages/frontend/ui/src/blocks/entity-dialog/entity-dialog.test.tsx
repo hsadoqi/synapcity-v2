@@ -25,7 +25,7 @@ function setup(props: Partial<EntityDialogProps> = {}) {
   render(
     <EntityDialog
       mode="create"
-      entityName="time slot"
+      entityName="event"
       trigger={<Button>Open</Button>}
       onSubmit={onSubmit}
       {...props}
@@ -44,7 +44,7 @@ describe('EntityDialog', () => {
   it('names a create dialog from its entity and offers Create', async () => {
     setup();
     const dialog = await openIt();
-    expect(screen.getByRole('dialog', { name: 'New time slot' })).toBe(dialog);
+    expect(screen.getByRole('dialog', { name: 'New event' })).toBe(dialog);
     expect(
       within(dialog).getByRole('button', { name: 'Create' }),
     ).toBeDefined();
@@ -56,7 +56,7 @@ describe('EntityDialog', () => {
   it('names an edit dialog and offers Save changes', async () => {
     setup({ mode: 'edit' });
     const dialog = await openIt();
-    expect(screen.getByRole('dialog', { name: 'Edit time slot' })).toBe(dialog);
+    expect(screen.getByRole('dialog', { name: 'Edit event' })).toBe(dialog);
     expect(
       within(dialog).getByRole('button', { name: 'Save changes' }),
     ).toBeDefined();
@@ -232,7 +232,7 @@ describe('EntityDialog', () => {
     render(
       <EntityDialog
         mode="edit"
-        entityName="time slot"
+        entityName="event"
         presentation="inline"
         onOpenChange={onOpenChange}
         onSubmit={vi.fn()}
@@ -240,7 +240,7 @@ describe('EntityDialog', () => {
         {fields}
       </EntityDialog>,
     );
-    const region = screen.getByRole('region', { name: 'Edit time slot' });
+    const region = screen.getByRole('region', { name: 'Edit event' });
     expect(screen.queryByRole('dialog')).toBeNull();
     fireEvent.click(within(region).getByRole('button', { name: 'Cancel' }));
     expect(onOpenChange).toHaveBeenCalledWith(false);

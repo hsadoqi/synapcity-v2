@@ -24,7 +24,7 @@ const meta: Meta<typeof EntityFormDialog> = {
   parameters: { layout: 'centered' },
   args: {
     mode: 'create',
-    entityName: 'time slot',
+    entityName: 'event',
     trigger: <Button variant="outline">Open</Button>,
     definition,
     onSubmit: fn(),

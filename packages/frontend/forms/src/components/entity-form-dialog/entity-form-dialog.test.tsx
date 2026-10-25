@@ -26,7 +26,7 @@ function setup(props: Partial<Props> = {}) {
   render(
     <EntityFormDialog
       mode="create"
-      entityName="time slot"
+      entityName="event"
       trigger={<Button>Open</Button>}
       definition={definition}
       onSubmit={onSubmit}
@@ -54,7 +54,7 @@ describe('EntityFormDialog', () => {
   it('names the dialog from the mode and labels the form from it', async () => {
     setup({ mode: 'edit' });
     const dialog = await openIt();
-    expect(screen.getByRole('dialog', { name: 'Edit time slot' })).toBe(dialog);
+    expect(screen.getByRole('dialog', { name: 'Edit event' })).toBe(dialog);
     expect(
       within(dialog).getByRole('button', { name: 'Save changes' }),
     ).toBeDefined();

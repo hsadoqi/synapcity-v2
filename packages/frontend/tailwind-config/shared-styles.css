@@ -135,4 +135,9 @@
   --radius-2xl: calc(var(--radius-base) * 1.8);
   --radius-3xl: calc(var(--radius-base) * 2.2);
   --radius-4xl: calc(var(--radius-base) * 2.6);
+  /* Container sizes name how much room a thing has, not a screen. Tailwind's smallest, @3xs
+     (16rem), is wider than a widget header leaves its toolbar, which folded icon buttons into
+     the menu with room to spare. This is the room four ghost icon buttons and their gaps need;
+     ActionsToolbar's `@toolbar-icons`. */
+  --container-toolbar-icons: 8rem;
 }
