@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
-import { ForgotPasswordCard } from '@/features/auth/components/password/forgot-password/forgot-password-card';
+import { ForgotPasswordCard } from '@synapcity/features-auth/frontend';
+import { requestPasswordReset } from '@/features/auth/server/actions/actions';
 
 export const metadata: Metadata = { title: 'Reset your password' };
 
@@ -12,5 +13,10 @@ export default async function ForgotPasswordPage({
   // Set by /auth/update-password when someone arrives without a valid reset link.
   const expired = (await searchParams).expired === '1';
 
-  return <ForgotPasswordCard expired={expired} />;
+  return (
+    <ForgotPasswordCard
+      expired={expired}
+      requestPasswordReset={requestPasswordReset}
+    />
+  );
 }

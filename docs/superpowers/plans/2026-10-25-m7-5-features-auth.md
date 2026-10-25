@@ -56,8 +56,8 @@ What the non-test code needs from the app:
 
 ### Task 3: Components with actions as props
 
-- [ ] **Step 1: Move the components in groups** (login and OAuth; register and resend; password flow; email and connected accounts; delete account and sign out; the two cards), each taking its actions as props; `sign-in-again`, `email-change` and `AuthButtons` go under `frontend/next`.
-- [ ] **Step 2: Re-point the pages and compositions,** which now import the Server Actions and pass them in. One commit per group.
+- [x] **Step 1: Move the components in groups** (login and OAuth; register and resend; password flow; email and connected accounts; delete account and sign out). Done in one slice with flat action props (each component takes the actions it and its children use under their own names) and `signInHref`/`createClient` props where needed. The two cards and `AuthButtons` move in Task 4., each taking its actions as props; `sign-in-again`, `email-change` and `AuthButtons` go under `frontend/next`.
+- [x] **Step 2: Re-point the pages and compositions,** which now import the Server Actions and pass them in. One commit per group.
 
 ### Task 4: Boundaries and records
 

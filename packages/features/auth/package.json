@@ -15,8 +15,11 @@
   },
   "dependencies": {
     "@synapcity/domain-identity": "workspace:*",
+    "@synapcity/features-account": "workspace:*",
+    "@synapcity/frontend-forms": "workspace:*",
     "@synapcity/frontend-supabase": "workspace:*",
     "@synapcity/frontend-ui": "workspace:*",
+    "lucide-react": "^1.55.0",
     "next": "16.4.3",
     "react": "19.3.0"
   },

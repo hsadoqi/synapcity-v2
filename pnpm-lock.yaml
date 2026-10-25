@@ -920,12 +920,21 @@ importers:
       '@synapcity/domain-identity':
         specifier: workspace:*
         version: link:../../domain/identity
+      '@synapcity/features-account':
+        specifier: workspace:*
+        version: link:../account
+      '@synapcity/frontend-forms':
+        specifier: workspace:*
+        version: link:../../frontend/forms
       '@synapcity/frontend-supabase':
         specifier: workspace:*
         version: link:../../frontend/supabase
       '@synapcity/frontend-ui':
         specifier: workspace:*
         version: link:../../frontend/ui
+      lucide-react:
+        specifier: ^1.55.0
+        version: 1.55.0(@types/react@19.3.0)(react@19.3.0)
       next:
         specifier: 16.4.3
         version: 16.4.3(@babel/core@8.0.1)(@opentelemetry/api@1.9.1)(@playwright/test@1.64.0)(@types/node@26.6.5)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)

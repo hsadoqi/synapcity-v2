@@ -16,9 +16,6 @@ vi.mock('@synapcity/features-auth/frontend', async (importOriginal) => ({
     typeof import('@synapcity/features-auth/frontend')
   >()),
   useCurrentUser: () => mocks.user,
-  usePendingEmail: () => mocks.pending,
-  useConnectedAccounts: () => mocks.accounts,
-  useCooldown: () => 0,
 }));
 vi.mock('@/features/auth/server/actions/actions', () => ({
   requestEmailChange: vi.fn(),
@@ -42,7 +39,21 @@ vi.mock('@/features/account/server/actions/avatar-actions', () => ({
   updateAvatar: mocks.updateAvatar,
 }));
 
+import {
+  ConnectedAccountsProvider,
+  PendingEmailProvider,
+} from '@synapcity/features-auth/frontend';
 import { AccountSettings } from './index';
+
+/** The page reads these two from providers; the rest of the auth feature runs for real. */
+const show = () =>
+  render(
+    <PendingEmailProvider pendingEmail={mocks.pending}>
+      <ConnectedAccountsProvider accounts={mocks.accounts}>
+        <AccountSettings />
+      </ConnectedAccountsProvider>
+    </PendingEmailProvider>,
+  );
 
 describe('AccountSettings', () => {
   beforeEach(() => {
@@ -58,7 +69,7 @@ describe('AccountSettings', () => {
   });
 
   it('shows the signed-in profile and email, each editable only where it can be', () => {
-    render(<AccountSettings />);
+    show();
 
     expect(screen.getByText('Ada Lovelace')).toBeTruthy();
     expect(screen.getByText('ada@example.com')).toBeTruthy();
@@ -68,7 +79,7 @@ describe('AccountSettings', () => {
   });
 
   it('changes the email through the auth form, which asks for a confirmation', () => {
-    render(<AccountSettings />);
+    show();
 
     fireEvent.click(screen.getByRole('button', { name: 'Change email' }));
 
@@ -82,7 +93,7 @@ describe('AccountSettings', () => {
 
   it('shows a change that is waiting for confirmation, and not a second way to start one', () => {
     mocks.pending = 'grace@example.com';
-    render(<AccountSettings />);
+    show();
 
     expect(screen.getByRole('status').textContent).toContain(
       'Waiting for you to confirm grace@example.com',
@@ -91,13 +102,13 @@ describe('AccountSettings', () => {
   });
 
   it('keeps the password out of the browser: no password field is rendered', () => {
-    render(<AccountSettings />);
+    show();
 
     expect(screen.queryByLabelText(/password/i)).toBeNull();
   });
 
   it('resets the password by email, from the sign-in details', () => {
-    render(<AccountSettings />);
+    show();
 
     expect(screen.getByText('Password')).toBeTruthy();
     expect(
@@ -106,7 +117,7 @@ describe('AccountSettings', () => {
   });
 
   it('edits the name through the account form, with just that field', () => {
-    render(<AccountSettings />);
+    show();
 
     fireEvent.click(screen.getByRole('button', { name: 'Edit name' }));
 
@@ -117,7 +128,7 @@ describe('AccountSettings', () => {
 
   it('copes with an account that has no name or email', () => {
     mocks.user = { id: 'user-1', name: null, email: null, imageUrl: null };
-    render(<AccountSettings />);
+    show();
 
     expect(screen.getByText('No name yet')).toBeTruthy();
     expect(screen.getByText('No email on this account')).toBeTruthy();
@@ -125,7 +136,7 @@ describe('AccountSettings', () => {
 
   it('asks to sign in when there is no user', () => {
     mocks.user = null;
-    render(<AccountSettings />);
+    show();
 
     expect(screen.getByText('Sign in to manage your account.')).toBeTruthy();
     expect(screen.queryByRole('button', { name: /edit/i })).toBeNull();
@@ -133,7 +144,7 @@ describe('AccountSettings', () => {
 
   it('shows which Google and GitHub accounts are connected, beside the other sign-in details', () => {
     mocks.accounts = [{ provider: 'github', detail: 'ada-l' }];
-    render(<AccountSettings />);
+    show();
 
     expect(
       screen.getByRole('group', { name: 'Connected accounts' }),
@@ -143,13 +154,13 @@ describe('AccountSettings', () => {
   });
 
   it('puts account deletion last, and offers it only to an account with an address to confirm by', () => {
-    const { unmount } = render(<AccountSettings />);
+    const { unmount } = show();
     const buttons = screen.getAllByRole('button').map((b) => b.textContent);
     expect(buttons.at(-1)).toBe('Delete account');
     unmount();
 
     mocks.user = { id: 'user-1', name: 'Ada', email: null, imageUrl: null };
-    render(<AccountSettings />);
+    show();
     expect(screen.queryByRole('button', { name: 'Delete account' })).toBeNull();
     expect(screen.getByText(/no email address/i)).toBeTruthy();
   });

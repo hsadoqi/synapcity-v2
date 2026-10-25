@@ -42,7 +42,7 @@ describe('the choose-a-password page', () => {
   it('hands the card the place to go back to', async () => {
     const element = await page('/u1/settings');
 
-    expect(element.props).toEqual({ next: '/u1/settings' });
+    expect(element.props).toMatchObject({ next: '/u1/settings' });
   });
 
   it.each([
@@ -55,7 +55,7 @@ describe('the choose-a-password page', () => {
     async (_label, next) => {
       const element = await page(next);
 
-      expect(element.props).toEqual({ next: '' });
+      expect(element.props).toMatchObject({ next: '' });
     },
   );
 

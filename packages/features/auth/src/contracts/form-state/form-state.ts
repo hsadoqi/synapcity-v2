@@ -49,3 +49,16 @@ export function authFailure(
 export function authSuccess(message: string, user: UserData): AuthState {
   return { success: true, message, data: { user } };
 }
+
+/**
+ * A save or submit action as the host supplies it: a Server Action in the web
+ * app. A package cannot import app code, so components receive their actions
+ * as props (ADR-0014 section 3).
+ */
+export type AuthAction = (
+  previous: AuthState,
+  formData: FormData,
+) => Promise<AuthState>;
+
+/** An action used directly as a form's `action`, such as sign-in with a provider or sign-out. */
+export type AuthFormAction = (formData: FormData) => void | Promise<void>;
