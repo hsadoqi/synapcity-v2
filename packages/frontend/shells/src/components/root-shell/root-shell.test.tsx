@@ -87,6 +87,43 @@ describe('RootShell', () => {
     expect(screen.getByRole('button', { name: 'Open sidebar' })).toBeTruthy();
   });
 
+  it('fills the sidebar with the content the host gives it', () => {
+    renderShell({
+      account,
+      sidebar: {
+        header: <p>Context and search</p>,
+        groups: [
+          {
+            title: 'Main',
+            items: [{ title: 'Inbox', href: '#' }],
+          },
+        ],
+      },
+    });
+    const sidebar = document.querySelector('[data-slot="sidebar"]')!;
+
+    expect(sidebar.textContent).toContain('Context and search');
+    expect(sidebar.textContent).toContain('Main');
+    expect(
+      sidebar.querySelector('a[data-slot="sidebar-menu-button"][href="#"]'),
+    ).not.toBeNull();
+  });
+
+  it('keeps the settings link in the sidebar footer', () => {
+    renderShell({ account });
+    const footer = document.querySelector('[data-slot="sidebar-footer"]')!;
+
+    expect(footer.querySelector('a[href="/u/settings"]')).not.toBeNull();
+  });
+
+  it('shows no template navigation when the host gives no sidebar content', () => {
+    renderShell({ account });
+    const content = document.querySelector('[data-slot="sidebar-content"]')!;
+
+    expect(content.textContent).toBe('');
+    expect(screen.queryByText('Getting Started')).toBeNull();
+  });
+
   it('renders header actions', () => {
     renderShell({ headerActions: <button type="button">Action</button> });
 

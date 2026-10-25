@@ -1,128 +1,139 @@
-export const data = {
-  versions: ['1.0.1', '1.1.0-alpha', '2.0.0-beta1'],
-  navMain: [
+import type { RootSidebarContent } from '@synapcity/frontend-shells';
+import { ContextSwitcher, SearchForm } from '@synapcity/frontend-shells';
+
+// Stand-in until the frontend-shells plan's Task 6 gives the signed-in sidebar
+// its real sections (core links, then the active context's sections). This is
+// the shadcn documentation template the sidebar has shown so far, now passed in
+// by the app instead of hard-wired in the shell, so the move changes nothing
+// a user sees. Delete it in Task 6.
+const versions = ['1.0.1', '1.1.0-alpha', '2.0.0-beta1'];
+
+export const STAND_IN_SIDEBAR: RootSidebarContent = {
+  header: (
+    <>
+      <ContextSwitcher versions={versions} defaultVersion={versions[0]!} />
+      <SearchForm />
+    </>
+  ),
+  groups: [
     {
       title: 'Getting Started',
-      url: '#',
       items: [
         {
           title: 'Installation',
-          url: '#',
+          href: '#',
         },
         {
           title: 'Project Structure',
-          url: '#',
+          href: '#',
         },
       ],
     },
     {
       title: 'Build Your Application',
-      url: '#',
       items: [
         {
           title: 'Routing',
-          url: '#',
+          href: '#',
         },
         {
           title: 'Data Fetching',
-          url: '#',
+          href: '#',
           isActive: true,
         },
         {
           title: 'Rendering',
-          url: '#',
+          href: '#',
         },
         {
           title: 'Caching',
-          url: '#',
+          href: '#',
         },
         {
           title: 'Styling',
-          url: '#',
+          href: '#',
         },
         {
           title: 'Optimizing',
-          url: '#',
+          href: '#',
         },
         {
           title: 'Configuring',
-          url: '#',
+          href: '#',
         },
         {
           title: 'Testing',
-          url: '#',
+          href: '#',
         },
         {
           title: 'Authentication',
-          url: '#',
+          href: '#',
         },
         {
           title: 'Deploying',
-          url: '#',
+          href: '#',
         },
         {
           title: 'Upgrading',
-          url: '#',
+          href: '#',
         },
         {
           title: 'Examples',
-          url: '#',
+          href: '#',
         },
       ],
     },
     {
       title: 'API Reference',
-      url: '#',
       items: [
         {
           title: 'Components',
-          url: '#',
+          href: '#',
         },
         {
           title: 'File Conventions',
-          url: '#',
+          href: '#',
         },
         {
           title: 'Functions',
-          url: '#',
+          href: '#',
         },
         {
           title: 'next.config.js Options',
-          url: '#',
+          href: '#',
         },
         {
           title: 'CLI',
-          url: '#',
+          href: '#',
         },
         {
           title: 'Edge Runtime',
-          url: '#',
+          href: '#',
         },
       ],
     },
     {
       title: 'Architecture',
-      url: '#',
       items: [
         {
           title: 'Accessibility',
-          url: '#',
+          href: '#',
         },
         {
           title: 'Fast Refresh',
-          url: '#',
+          href: '#',
         },
         {
           title: 'Next.js Compiler',
-          url: '#',
+          href: '#',
         },
         {
           title: 'Supported Browsers',
-          url: '#',
+          href: '#',
         },
         {
           title: 'Turbopack',
-          url: '#',
+          href: '#',
         },
       ],
     },

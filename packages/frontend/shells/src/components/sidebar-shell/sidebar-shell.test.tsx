@@ -2,9 +2,10 @@ import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SidebarShell } from '.';
+import { RootSidebar } from './root-sidebar';
+import { useSidebar } from '@synapcity/frontend-ui/core/sidebar';
 import { ModeProvider } from '@synapcity/frontend-preferences';
-
-const account = { homeHref: '/u/home', settingsHref: '/u/settings' };
+import { sampleSidebarGroups } from '../../testing/sidebar-sample';
 
 beforeEach(() => {
   vi.stubGlobal(
@@ -17,14 +18,26 @@ beforeEach(() => {
   );
 });
 
-const renderShell = (header: React.ReactNode = <div>Header</div>) =>
+const sidebar = (
+  <RootSidebar settingsHref="/u/settings" groups={sampleSidebarGroups} />
+);
+
+const renderShell = (
+  header: React.ReactNode = <div>Header</div>,
+  page: React.ReactNode = <p>Page</p>,
+) =>
   render(
     <ModeProvider>
-      <SidebarShell header={header} account={account}>
-        <p>Page</p>
+      <SidebarShell header={header} sidebar={sidebar}>
+        {page}
       </SidebarShell>
     </ModeProvider>,
   );
+
+const SidebarStateProbe = () => {
+  const { state, open } = useSidebar();
+  return <output data-testid="probe">{`${state}:${open}`}</output>;
+};
 
 describe('SidebarShell', () => {
   it('renders the header above the page inside the inset', () => {
@@ -45,18 +58,25 @@ describe('SidebarShell', () => {
     expect(screen.getByText('Page')).toBeTruthy();
   });
 
-  it('renders the sidebar, collapsed to start', () => {
+  it('renders the sidebar it is given, collapsed to start', () => {
     renderShell();
-    const sidebar = document.querySelector('[data-slot="sidebar"]')!;
+    const element = document.querySelector('[data-slot="sidebar"]')!;
 
-    expect(sidebar.getAttribute('data-state')).toBe('collapsed');
+    expect(element.getAttribute('data-state')).toBe('collapsed');
+    expect(element.textContent).toContain('Training log');
   });
 
-  it('hands the settings link to the sidebar', () => {
-    renderShell();
-    const footer = document.querySelector('[data-slot="sidebar-footer"]')!;
+  it('provides sidebar context to the page, collapsed to start', () => {
+    renderShell(<div>Header</div>, <SidebarStateProbe />);
 
-    expect(footer.querySelector('a[href="/u/settings"]')).not.toBeNull();
+    expect(screen.getByTestId('probe').textContent).toBe('collapsed:false');
+  });
+
+  it('wraps the page in a full-height sidebar wrapper', () => {
+    renderShell();
+    const wrapper = document.querySelector('[data-slot="sidebar-wrapper"]')!;
+
+    expect(wrapper.className).toContain('h-svh');
   });
 
   it('lets wide content shrink instead of pushing past the viewport', () => {

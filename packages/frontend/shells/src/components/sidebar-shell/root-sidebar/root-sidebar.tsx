@@ -1,8 +1,6 @@
 'use client';
 import * as React from 'react';
 
-import { SearchForm } from '../../search-form';
-import { ContextSwitcher } from '../../context-switcher';
 import {
   Sidebar,
   SidebarContent,
@@ -16,40 +14,57 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from '@synapcity/frontend-ui/core/sidebar';
-import Link from 'next/link';
 import { Cog } from 'lucide-react';
 import { ModeToggle } from '@synapcity/frontend-ui/components/mode-toggle';
-import { data } from '@synapcity/frontend-ui/lib/sidebar-data';
+import { ShellLink } from '../../../providers/shell-navigation';
+
+/** One destination in a sidebar section. */
+export type RootSidebarItem = {
+  title: string;
+  /** Where it leads. `#` for a destination that is not built yet. */
+  href: string;
+  /** Marks the current page. */
+  isActive?: boolean;
+};
+
+/** One labelled section of sidebar destinations. */
+export type RootSidebarGroup = {
+  title: string;
+  items: RootSidebarItem[];
+};
+
+/** The content a host gives the signed-in sidebar. */
+export type RootSidebarContent = {
+  /** Shown above the sections, such as a context switcher and search. */
+  header?: React.ReactNode;
+  groups: RootSidebarGroup[];
+};
 
 export function RootSidebar({
   settingsHref,
+  header,
+  groups,
   ...props
-}: React.ComponentProps<typeof Sidebar> & { settingsHref: string }) {
+}: React.ComponentProps<typeof Sidebar> &
+  RootSidebarContent & { settingsHref: string }) {
   return (
     <Sidebar {...props}>
-      <SidebarHeader>
-        <ContextSwitcher
-          versions={data.versions}
-          defaultVersion={data.versions[0]!}
-        />
-        <SearchForm />
-      </SidebarHeader>
+      {header && <SidebarHeader>{header}</SidebarHeader>}
       <SidebarContent>
-        {/* We create a SidebarGroup for each parent. */}
-        {data.navMain.map((item) => (
-          <SidebarGroup key={item.title}>
-            <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
+        {groups.map((group) => (
+          <SidebarGroup key={group.title}>
+            <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {item.items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
+                {group.items.map((item) => (
+                  <SidebarMenuItem key={`${item.title}${item.href}`}>
                     <SidebarMenuButton
                       isActive={item.isActive}
                       render={(props) => {
                         return (
-                          <Link href={item.url} {...props}>
+                          <ShellLink href={item.href} {...props}>
                             {item.title}
-                          </Link>
+                          </ShellLink>
                         );
                       }}
                     />
@@ -69,10 +84,10 @@ export function RootSidebar({
               className="flex-1"
               render={(props) => {
                 return (
-                  <Link href={settingsHref} {...props}>
+                  <ShellLink href={settingsHref} {...props}>
                     <Cog />
                     Settings
-                  </Link>
+                  </ShellLink>
                 );
               }}
             />

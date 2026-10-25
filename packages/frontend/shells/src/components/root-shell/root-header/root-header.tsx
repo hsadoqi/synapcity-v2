@@ -5,13 +5,13 @@ import {
   SynapcityMark,
 } from '@synapcity/frontend-ui/components/logo-mark';
 import { ModeToggle } from '@synapcity/frontend-ui/components/mode-toggle';
-import Link from 'next/link';
 import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 import { Cog } from 'lucide-react';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';
 import { Separator } from '@synapcity/frontend-ui/core/separator';
 import { GlobalPanelToggle } from '../global-panel';
+import { ShellLink } from '../../../providers/shell-navigation';
 import { SidebarTrigger } from '@synapcity/frontend-ui/core/sidebar';
 import { IconButton } from '@synapcity/frontend-ui/components/icon-button';
 import {
@@ -131,7 +131,7 @@ const RootBreadcrumbs = ({ items }: { items?: RootBreadcrumb[] }) => {
                 ) : (
                   <BreadcrumbLink
                     className="truncate"
-                    render={<Link href={item.href} />}
+                    render={<ShellLink href={item.href} />}
                   >
                     {item.label}
                   </BreadcrumbLink>
@@ -154,7 +154,7 @@ const RootLogoLink = ({
   className?: string;
 }) => {
   return (
-    <Link
+    <ShellLink
       href={homeHref}
       aria-label="Synapcity home"
       className={cn(
@@ -172,7 +172,7 @@ const RootLogoLink = ({
         title={null}
         className="hidden text-foreground sm:block"
       />
-    </Link>
+    </ShellLink>
   );
 };
 

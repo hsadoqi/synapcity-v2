@@ -4,8 +4,6 @@ import type { Exception, Violation } from '../model/index.ts';
  * Existing violations, one file or edge each, with the milestone that removes it
  * (workspace conventions, Boundary checks). An entry that stops matching fails the run.
  */
-const NEXT_IN_SHELLS =
-  'Pre-existing Next.js import moved unchanged from shared UI into frontend-shells (frontend-shells plan, Task 2).';
 const NEXT_IN_SHARED_UI =
   'Pre-existing Next.js import in shared UI (ownership map: framework-coupled presentation).';
 
@@ -17,22 +15,6 @@ export const EXCEPTIONS: readonly Exception[] = [
     reason:
       'Pre-existing Next.js Metadata type in the site package; it keeps its layout until a scoped change gives it a ./next entry.',
     removal: 'M5 Spaces slice if it needs the site package, else M10 sweep',
-  },
-  {
-    rule: 'R11',
-    file: 'packages/frontend/shells/src/components/root-shell/root-header/root-header.tsx',
-    specifier: 'next/link',
-    reason: NEXT_IN_SHELLS,
-    removal:
-      'frontend-shells plan Task 4 (host-supplied links through the ./next binding)',
-  },
-  {
-    rule: 'R11',
-    file: 'packages/frontend/shells/src/components/sidebar-shell/root-sidebar/root-sidebar.tsx',
-    specifier: 'next/link',
-    reason: NEXT_IN_SHELLS,
-    removal:
-      'frontend-shells plan Task 4 (host-supplied links through the ./next binding)',
   },
   {
     rule: 'R11',

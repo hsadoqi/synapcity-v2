@@ -3,6 +3,10 @@ import { RootHeader } from './root-header';
 import { RootFooter } from './root-footer';
 import { RootContent } from './root-content';
 import { SidebarShell } from '../sidebar-shell';
+import {
+  RootSidebar,
+  type RootSidebarContent,
+} from '../sidebar-shell/root-sidebar';
 import React from 'react';
 import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';
 import type { RootBreadcrumb } from './root-header';
@@ -14,51 +18,15 @@ type ShellProps = {
   globalPanel?: React.ReactNode;
   /** The path to the current page, shown in the header once someone is signed in. */
   breadcrumbs?: RootBreadcrumb[];
+  /**
+   * What the signed-in sidebar lists: its header (such as a context switcher
+   * and search) and its sections. The shell adds the Settings link and theme
+   * toggle for small screens. Without it the sidebar has no sections.
+   */
+  sidebar?: RootSidebarContent;
 };
 
-// export default function RootShell({
-//   children,
-//   headerActions,
-//   account,
-// }: {
-//   children: React.ReactNode;
-//   headerActions?: React.ReactNode;
-//   /** Present when someone is signed in; the app supplies where they lead. */
-//   account?: AccountLinks | null;
-// }) {
-//   const content = (
-//     <>
-//       <RootContent>{children}</RootContent>
-//       <RootFooter />
-//     </>
-//   );
-
-//   // The skip link comes first in the DOM so it is the first Tab stop, ahead
-//   // of the header and sidebar. It is position: fixed, so this costs no layout.
-//   if (account) {
-//     return (
-//       <>
-//         <SkipLinkButton />
-//         <SidebarShell
-//           header={<RootHeader account={account} actions={headerActions} />}
-//           account={account}
-//         >
-//           {content}
-//         </SidebarShell>
-//       </>
-//     );
-//   }
-
-//   // Pages position themselves (the home page centers, auth sits near the top),
-//   // so this column only stacks header, content and footer.
-//   return (
-//     <div className="flex flex-col flex-1">
-//       <SkipLinkButton />
-//       <RootHeader account={account} actions={headerActions} />
-//       <div className="flex flex-1 flex-col">{content}</div>
-//     </div>
-//   );
-// }
+const NO_SIDEBAR_CONTENT: RootSidebarContent = { groups: [] };
 
 const ShellContent = ({ children }: { children: React.ReactNode }) => (
   <>
@@ -88,6 +56,7 @@ export function AuthenticatedShell({
   account,
   globalPanel,
   breadcrumbs,
+  sidebar = NO_SIDEBAR_CONTENT,
 }: ShellProps & { account: AccountLinks }) {
   return (
     <div
@@ -103,7 +72,13 @@ export function AuthenticatedShell({
             breadcrumbs={breadcrumbs}
           />
         }
-        account={account}
+        sidebar={
+          <RootSidebar
+            settingsHref={account.settingsHref}
+            header={sidebar.header}
+            groups={sidebar.groups}
+          />
+        }
         globalPanel={globalPanel}
       >
         <ShellContent>{children}</ShellContent>
@@ -118,6 +93,7 @@ export default function RootShell({
   account,
   globalPanel,
   breadcrumbs,
+  sidebar,
 }: ShellProps & {
   /** Present when someone is signed in; the app supplies where they lead. */
   account?: AccountLinks | null;
@@ -128,6 +104,7 @@ export default function RootShell({
       headerActions={headerActions}
       globalPanel={globalPanel}
       breadcrumbs={breadcrumbs}
+      sidebar={sidebar}
     >
       {children}
     </AuthenticatedShell>

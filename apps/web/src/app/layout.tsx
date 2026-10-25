@@ -5,6 +5,8 @@ import { fontVariables } from './fonts';
 import RootProviders from '../components/providers/root-providers';
 import { AuthStatus } from '@/features/auth/components/auth-status';
 import { BreadcrumbRootShell } from '@/components/breadcrumbs';
+import { STAND_IN_SIDEBAR } from '@/components/stand-in-sidebar';
+import { NextShellNavigation } from '@synapcity/frontend-shells/next';
 import { createMetadata } from '@synapcity/frontend-site/metadata';
 import { UserProvider } from '@/components/user-provider/user-provider';
 import { getCurrentUser } from '@/features/auth/server';
@@ -69,12 +71,15 @@ export default async function RootLayout({
         <AccountPreferencesSync preferences={account} />
         <RootProviders>
           <UserProvider user={user}>
-            <BreadcrumbRootShell
-              account={user ? accountLinksFor(user.id) : null}
-              headerActions={<AuthStatus variant="header" />}
-            >
-              {children}
-            </BreadcrumbRootShell>
+            <NextShellNavigation>
+              <BreadcrumbRootShell
+                account={user ? accountLinksFor(user.id) : null}
+                headerActions={<AuthStatus variant="header" />}
+                sidebar={STAND_IN_SIDEBAR}
+              >
+                {children}
+              </BreadcrumbRootShell>
+            </NextShellNavigation>
           </UserProvider>
         </RootProviders>
       </body>
