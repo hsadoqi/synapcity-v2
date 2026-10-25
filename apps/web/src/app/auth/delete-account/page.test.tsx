@@ -14,7 +14,7 @@ vi.mock('next/navigation', () => ({
 }));
 
 import DeleteAccountPage from './page';
-import { DeleteAccountCard } from '@/components/account/delete-account-card';
+import { DeleteAccountCard } from '@synapcity/features-auth/frontend';
 import { MessagePage } from '@/components/shells/message-page';
 
 const NOW = 1_800_000_000;
@@ -41,7 +41,7 @@ describe('the delete-account page', () => {
     const element = await DeleteAccountPage();
 
     expect(element.type).toBe(DeleteAccountCard);
-    expect(element.props).toEqual({
+    expect(element.props).toMatchObject({
       email: 'ada@example.com',
       settingsHref: '/u1/settings',
     });

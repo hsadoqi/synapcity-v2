@@ -83,7 +83,7 @@ The host supplies where a link leads and how an action is invoked. A callback ex
 - `collection` ----> Browse behavior and DOM collection views
 - `settings` ----> Reusable settings presentation (rows, sections, editor controls); the editing workflow is `features/settings`
 - `auth` ----> Reusable authentication presentation (form pieces, status and confirmation views); auth workflows are `features/auth`
-- `supabase` ----> Browser Supabase client adapter
+- `supabase` ----> Browser Supabase client adapter: the browser client factory and the auth-event rule. Exists since M7.3 ([README](supabase/README.md))
 - `editor` ----> Future document editor runtime (Lexical), once the editor is approved
 - `preferences` ----> Browser preference runtime: device store, applying theme/mode/fonts, consent state. Exists since M6.2 ([README](preferences/README.md))
 - `error-reports` ----> Consent-gated browser error reporting. Exists since M6.5 ([README](error-reports/README.md))

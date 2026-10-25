@@ -6,7 +6,7 @@ import RootProviders from '../components/providers/root-providers';
 import { AuthStatus } from '@/features/auth/components/auth-status';
 import { BreadcrumbRootShell } from '@/components/breadcrumbs';
 import { createMetadata } from '@synapcity/frontend-site/metadata';
-import { UserProvider } from '@/features/auth/client';
+import { UserProvider } from '@/components/user-provider/user-provider';
 import { getCurrentUser } from '@/features/auth/server';
 import {
   appearanceBootScript,

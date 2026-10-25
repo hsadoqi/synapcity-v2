@@ -3,16 +3,11 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
+import type { DeleteAccountState } from '@synapcity/features-auth/contracts';
 import { removeOldAvatars } from '@/features/account/server/save-avatar';
 import { deleteOwnAccount } from '@/features/auth/server/operations';
 import { withNotice } from '@/lib/routing/notices';
 import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
-
-export type DeleteAccountState = {
-  error?: string;
-  /** The emailed link is too old or was not used: the way forward is a new link. */
-  linkRequired?: boolean;
-};
 
 /**
  * The last step of deleting an account, and the one that cannot be undone. It

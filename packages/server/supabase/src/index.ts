@@ -10,3 +10,4 @@ export {
   supabaseIdentityProvider,
 } from './supabase-identity-provider';
 export * from './auth-operations';
+export * from './provider-user';

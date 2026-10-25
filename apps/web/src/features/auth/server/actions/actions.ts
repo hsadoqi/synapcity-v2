@@ -8,7 +8,7 @@ import {
   authFailure,
   authSuccess,
   type AuthState,
-} from '@/features/auth/types';
+} from '@synapcity/features-auth/contracts';
 import {
   ALREADY_YOUR_EMAIL,
   emailRequestSchema,
@@ -25,7 +25,7 @@ import {
   emailChangeErrorMessage,
   LAST_SIGN_IN,
   linkErrorMessage,
-} from '@/features/auth/shared/error-messages';
+} from '@synapcity/features-auth/contracts';
 import { isRateLimited } from '@synapcity/domain-identity';
 import { isOAuthProvider } from '@synapcity/domain-identity';
 import { field } from '@/features/auth/server/form-data';

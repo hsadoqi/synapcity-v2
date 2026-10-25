@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { RootHeader } from '@synapcity/frontend-ui/blocks/root-shell/root-header';
-import { AuthButtons } from '@synapcity/frontend-ui/components/auth-buttons';
+import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 import { UserMenu } from '@synapcity/frontend-ui/components/user-menu';
 import { ModeProvider } from '@synapcity/frontend-preferences';
 import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
@@ -31,11 +31,14 @@ export const Default: Story = {
 export const SignedOut: Story = {
   args: {
     actions: (
-      <AuthButtons
-        signInHref="/sign-in"
-        signUpHref="/sign-up"
-        variant="header"
-      />
+      <>
+        <LinkButton href="/sign-in" variant="ghost" size="sm">
+          Sign in
+        </LinkButton>
+        <LinkButton href="/sign-up" size="sm">
+          Sign up
+        </LinkButton>
+      </>
     ),
   },
 };

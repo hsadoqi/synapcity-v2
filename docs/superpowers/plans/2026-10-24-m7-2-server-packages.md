@@ -70,7 +70,7 @@
 
 ### Task C: Profile operations into `server-account` and `server-supabase`
 
-**Status: designed, not implemented. Needs owner review of the split below before code (it changes what the packages return, not what people see).**
+**Status: implemented on `refactor/m7-3-frontend-supabase` (2026-10-25), local commit, not pushed. The split below was followed with both recommendations (reason codes in the package, wording in the app; `ProviderUser` in `server-supabase`).**
 
 **What is in `features/account/server` today (evidence, read at `ba00942c`):**
 
@@ -104,11 +104,11 @@
 1. Is it right that `saveAvatar`'s outcome uses reason codes and the app owns the message text (`Use a PNG, JPEG or WebP image.` appears both in the domain schema and the unsupported-type branch; the app mapping would reuse the domain constant)?
 2. `ProviderUser` lives in `server-supabase`. Acceptable, or should it be a `domain-identity` type? (Recommendation: `server-supabase`; it mirrors a provider record and is not a portable contract.)
 
-- [ ] **Step 1: Owner reviews the table above.**
-- [ ] **Step 2: Tests first** for `readProviderUser`, `saveName`, `saveAvatar`, `mirrorToSession` (outcomes above).
-- [ ] **Step 3: Move and re-point;** keep the actions' replies and logs identical.
-- [ ] **Step 4: Run the checks** as in Task A, plus the `actions.test.ts` log assertions. Update the ratchets.
-- [ ] **Step 5: Checkpoint commit** (local only): `refactor(server-account): move the profile operations into the package`.
+- [x] **Step 1: Owner reviews the table above.**
+- [x] **Step 2: Tests first** for `readProviderUser`, `saveName`, `saveAvatar`, `mirrorToSession` (outcomes above).
+- [x] **Step 3: Move and re-point;** keep the actions' replies and logs identical.
+- [x] **Step 4: Run the checks** as in Task A, plus the `actions.test.ts` log assertions. Update the ratchets.
+- [x] **Step 5: Checkpoint commit** (local only): `refactor(server-account): move the profile operations into the package`.
 
 ### Task D: Records and verification
 

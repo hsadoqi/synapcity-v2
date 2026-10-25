@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 
-import { AuthLinkButton } from '@/features/auth/shared';
-import { AuthShell } from '@/features/auth/shared';
+import { AuthLinkButton, AuthShell } from '@synapcity/features-auth/frontend';
 import { parseAuthFlow, type AuthFlow } from '@/lib/routing/auth-flow';
 
 export const metadata: Metadata = { title: 'Sign-in problem' };

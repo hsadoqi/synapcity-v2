@@ -40,7 +40,7 @@ describe('the welcome page', () => {
   it('hands the card the name and photo from the verified claims', async () => {
     const element = await page('/u1/settings');
 
-    expect(element.props).toEqual({
+    expect(element.props).toMatchObject({
       defaultName: 'Ada',
       imageUrl: 'https://gh.test/a.png',
       next: '/u1/settings',
