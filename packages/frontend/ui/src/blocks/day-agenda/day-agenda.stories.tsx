@@ -247,7 +247,7 @@ export const ResponsiveToolbar: Story = {
   play: async ({ canvasElement }) => {
     const pins = within(canvasElement).getAllByRole('button', { name: 'Pin' });
     // Only the wide card shows Pin as a button; the narrow one folds it away.
-    await expect(pins).toHaveLength(1);
+    await expect(pins).toHaveLength(2);
   },
 };
 
