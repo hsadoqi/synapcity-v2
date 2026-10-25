@@ -1,99 +1,106 @@
-"use client";
+'use client';
 
-import { cn } from "@/lib/utils";
+import { useNow } from '@synapcity/frontend-ui/hooks/use-now';
+import {
+  blockSurface,
+  type BlockSurface,
+} from '@synapcity/frontend-ui/lib/block-surface';
+import { cn } from '@synapcity/frontend-ui/lib/utils';
+import {
+  describeMoment,
+  type MomentOptions,
+} from '@synapcity/frontend-ui/lib/moment';
 
-type Surface = "card" | "glass";
-
-export interface DatePillProps {
+export interface DatePillProps extends MomentOptions {
+  /**
+   * A moment to show. Its weekday, date, time and relative day are read in
+   * `timeZone`, and the parts below replace whichever of them you write.
+   */
+  value?: Date | number;
+  /** Leave the time out of what is read from `value`. */
+  showTime?: boolean;
   weekday?: string;
   date?: string;
   time?: string;
   relative?: string;
-  surface?: Surface;
+  surface?: BlockSurface;
   bordered?: boolean;
   inverted?: boolean;
   className?: string;
 }
 
-
-/* The card sets the colour and everything inside it is drawn in `current`, so
-   inverting is two classes rather than a condition on every element.
-   `glass` is a deliberate exception to the solid-surface rule: these pieces sit
-   over section background images, and a frosted panel is the point of it. */
-const surfaceClasses: Record<Surface, { plain: string; inverted: string }> = {
-  card: {
-    plain: "bg-card text-card-foreground",
-    inverted: "bg-foreground text-background",
-  },
-  glass: {
-    plain: "bg-card/60 text-card-foreground backdrop-blur-md",
-    inverted: "bg-foreground/60 text-background backdrop-blur-md",
-  },
-};
-
-export const datePillDemo: DatePillProps = {
-  surface: "card",
-  bordered: false,
-  inverted: false,
-  weekday: "Thu",
-  date: "Apr 23",
-  time: "14:00",
-  relative: "Today",
-};
-
 export function DatePill({
+  value,
+  locale,
+  timeZone,
+  showTime = true,
   weekday,
   date,
   time,
   relative,
-  surface = "card",
+  surface = 'card',
   bordered = false,
   inverted = false,
   className,
 }: DatePillProps) {
-  const surfaceTone = surfaceClasses[surface][inverted ? "inverted" : "plain"];
+  const now = useNow();
+  // The server's clock and zone are not the browser's, so nothing is read from
+  // the moment until the browser clock is known.
+  const read =
+    value !== undefined && now !== null
+      ? describeMoment(value, now, { locale, timeZone })
+      : null;
+
+  const parts = {
+    relative: relative ?? read?.relative ?? undefined,
+    weekday: weekday ?? read?.weekday,
+    date: date ?? read?.date,
+    time: time ?? (showTime ? read?.time : undefined),
+  };
+
+  const instant = typeof value === 'number' ? value : value?.getTime();
+  const iso =
+    instant !== undefined && Number.isFinite(instant)
+      ? new Date(instant).toISOString()
+      : undefined;
+  const Pill = iso ? 'time' : 'div';
 
   return (
     <div
       className={cn(
-        "relative flex size-full items-center justify-center p-4",
-        className
+        'relative flex size-full items-center justify-center p-4',
+        className,
       )}
     >
-      <div className={cn("truncate inline-flex items-center gap-3 rounded-full px-4 py-1.5 pl-2 shadow-sm", surfaceTone, bordered && "border border-current/15")}>
-        {relative && (
+      <Pill
+        dateTime={iso}
+        className={cn(
+          'inline-flex items-center gap-3 truncate rounded-full px-4 py-1.5 shadow-sm',
+          parts.relative && 'pl-2',
+          blockSurface({ surface, inverted, bordered }),
+        )}
+      >
+        {parts.relative && (
           <>
             <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
-              {relative}
+              {parts.relative}
             </span>
-            <span
-              className="h-3 w-px bg-border"
-              aria-hidden="true"
-            />
+            <span className="h-3 w-px bg-border" aria-hidden="true" />
           </>
         )}
-        {weekday && (
+        {parts.weekday && (
           <span className="text-xs font-semibold text-current/60">
-            {weekday}
+            {parts.weekday}
           </span>
         )}
-        {date && (
-          <span className="text-sm font-bold">
-            {date}
-          </span>
-        )}
-        {time && (
+        {parts.date && <span className="text-sm font-bold">{parts.date}</span>}
+        {parts.time && (
           <>
-            <span
-              className="h-3 w-px bg-border"
-              aria-hidden="true"
-            />
-            <span className="text-sm text-current/60">
-              {time}
-            </span>
+            <span className="h-3 w-px bg-border" aria-hidden="true" />
+            <span className="text-sm text-current/60">{parts.time}</span>
           </>
         )}
-      </div>
+      </Pill>
     </div>
   );
 }
