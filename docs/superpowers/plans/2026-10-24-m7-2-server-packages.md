@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Approved for planning (owner decision, 2026-10-24: design Q1 to Q5 accepted; "whatever you suggest" for call C5). Task A is implemented on `refactor/m7-2-server-packages` (local commits, not pushed); Task B is deliberately not done (see its Decision); Task C is designed and waits for owner review. Call C1 below amends the M7 design.
+**Status:** Tasks A and C are merged (#69 and #71). Task B is deliberately not done (see its Decision). The full repository gate and manual checks remain open. Call C1 below amends the M7 design.
 
 **Goal:** The provider-facing auth operations, the session refresh helper and the profile operations leave `apps/web` for the server packages, behind typed outcomes, with no change in behavior. Server Actions, redirects, fixture mode and logging stay in the web app.
 
@@ -70,7 +70,7 @@
 
 ### Task C: Profile operations into `server-account` and `server-supabase`
 
-**Status: implemented on `refactor/m7-3-frontend-supabase` (2026-10-25), local commit, not pushed. The split below was followed with both recommendations (reason codes in the package, wording in the app; `ProviderUser` in `server-supabase`).**
+**Status: implemented and merged in #71 (2026-10-25). The split below was followed with both recommendations (reason codes in the package, wording in the app; `ProviderUser` in `server-supabase`).**
 
 **What is in `features/account/server` today (evidence, read at `ba00942c`):**
 

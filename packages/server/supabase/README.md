@@ -1,6 +1,6 @@
 # @synapcity/server-supabase
 
-Owns: the server-side Supabase adapter. It builds request-bound clients from host-supplied cookies and implements the identity boundary's `IdentityProvider` port for Supabase Auth. It is the only server package that imports `@supabase/*` (workspace conventions, vendor adapters). M7.2 added the provider auth operations (registration, recovery, email change and resend, own password reset, account linking and unlinking). Session-refresh helpers and profile-metadata translation join it as their code migrates (M7.2 Tasks B and C).
+Owns: the server-side Supabase adapter. It builds request-bound clients from host-supplied cookies and implements the identity boundary's `IdentityProvider` port for Supabase Auth. It is the only server package that imports `@supabase/*` (workspace conventions, vendor adapters). M7.2 added the provider auth operations (registration, recovery, email change and resend, own password reset, account linking and unlinking) and the provider-user translation used by profile operations. Session refresh deliberately remains in the web host because the portable extraction was too small to justify an unverified `server-only` import from the proxy.
 
 Runtime: server only. The root entry starts with `import 'server-only'`. Category rules: [server README](../README.md) and [ADR-0014](../../../docs/architecture/decisions/0014-multi-app-package-boundaries.md); auth rules: [ADR-0006](../../../docs/architecture/decisions/0006-authentication-with-supabase.md).
 

@@ -21,4 +21,4 @@ The host validates browser input, checks the caller, and decides how failures ar
 
 ## Scripts
 
-`lint`, `check-types`, `test`, and `test:coverage`. Tests use a stub request client; they do not connect to a database
+`lint`, `check-types`, `test`, and `test:coverage`. Tests use a stub request client; they do not connect to a database.
