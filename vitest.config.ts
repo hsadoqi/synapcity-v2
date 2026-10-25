@@ -34,6 +34,7 @@ const projects = [
   'packages/frontend/error-reports',
   'packages/frontend/preferences',
   'packages/frontend/forms',
+  'packages/frontend/shells',
   'packages/frontend/tokens',
   'packages/frontend/ui',
   'packages/server/auth',

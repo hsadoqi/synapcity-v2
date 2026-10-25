@@ -42,11 +42,11 @@
 
 ### Task 1: Create the package (no code moved)
 
-- [ ] **Step 1: Failing test first.** `packages/frontend/shells/src/package-structure.test.ts` (copy the pattern from `frontend-ui`/`frontend-collection`): every component folder has a story, a test and an `index.ts`. Expected: fails until the package exists, passes with zero components.
-- [ ] **Step 2: Scaffold:** manifest, tsconfig, eslint and vitest configs, `README.md` with `Owns:` and the entry-point table, `src/index.ts`, `src/next/index.ts`. Dependencies as `frontend-collection` declares them plus `@synapcity/frontend-ui` (workspace). Add the Vitest project to the root config, the package's `src` to the Storybook `stories` globs, and an `@source` line to `apps/web` and `apps/docs` global CSS. `pnpm install`.
-- [ ] **Step 3: Inventory:** workspace-conventions row `frontend-shells` First code `M7.4-prereq (exists)` (fixing the M5/M6 drift), ownership map rows updated, `package-creation-checklist.md` ticked.
-- [ ] **Step 4: Checks,** one script at a time: package `test`, `lint`, `check-types`; `pnpm boundaries`; `pnpm deps`. Expected pass.
-- [ ] **Step 5: Checkpoint commit** (if authorized): `feat(frontend-shells): add the package`.
+- [x] **Step 1: Failing test first.** `packages/frontend/shells/src/package-structure.test.ts` (copy the pattern from `frontend-ui`/`frontend-collection`): every component folder has a story, a test and an `index.ts`. Expected: fails until the package exists, passes with zero components. _(Done 2026-10-25. Also checks no loose component files, `next/*` only under `src/next/`, and that `exports` is exactly `.` and `./next` and resolves. Probe: a planted loose `components/probe.tsx` importing `next/link` failed both rules, then was removed.)_
+- [x] **Step 2: Scaffold:** manifest, tsconfig, eslint and vitest configs, `README.md` with `Owns:` and the entry-point table, `src/index.ts`, `src/next/index.ts`. Add the Vitest project to the root config. `pnpm install`. _(Done. Changed on purpose: dependencies are dev tooling only, because Knip rejects declared dependencies nothing imports; `@synapcity/frontend-ui`, `react`, `next` and the React test tooling arrive in Task 2 with the first component, as do the Storybook `stories` glob and the `@source` lines (an empty glob makes Storybook warn), and the vitest config switches from the node `base` preset to `react` then. `tsconfig` sets `"types": ["node"]` like `frontend-forms`, for the structure test.)_
+- [x] **Step 3: Inventory:** workspace-conventions row `frontend-shells` First code `2026-10-25 (exists, empty)` with a note in the milestone paragraph about the M5/M6 drift. _(Ownership map rows and the package checklist are updated as code moves, in Tasks 2 to 5 and 7.)_
+- [x] **Step 4: Checks,** one script at a time: package `test` (5 passed), `lint`, `check-types`; root Vitest picks the project up; `pnpm boundaries` (1751 files, 32 workspaces, no violations); `pnpm deps` (clean); `pnpm format:check` (clean).
+- [x] **Step 5: Checkpoint commit:** `feat(frontend-shells): add the package`.
 
 ### Task 2: Move the parts with no host coupling
 
