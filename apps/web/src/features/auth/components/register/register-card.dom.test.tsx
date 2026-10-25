@@ -13,7 +13,7 @@ vi.mock('@/features/auth/server/actions/actions', () => ({
   signInWithOAuth: mocks.signInWithOAuth,
 }));
 
-import { firstRefusal, signUpSchema } from '@/features/auth/types';
+import { firstRefusal, signUpSchema } from '@synapcity/domain-identity';
 import { RegisterCard } from './register-card';
 
 type Typed = { name: string; email: string; password: string };

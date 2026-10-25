@@ -6,9 +6,9 @@ import { Button } from '@synapcity/frontend-ui/core/button';
 import {
   MIN_PASSWORD_LENGTH,
   PASSWORD_REQUIREMENTS,
-  signUpSchema,
   type AuthState,
 } from '@/features/auth/types';
+import { signUpSchema } from '@synapcity/domain-identity';
 import { MAX_NAME_LENGTH } from '@/features/account/types';
 import {
   FormField,
