@@ -9,6 +9,7 @@ describe('@synapcity/server-supabase root entry', () => {
       'createRequestClient',
       'disconnectAccount',
       'outcomeFromClaims',
+      'readProviderUser',
       'registerWithPassword',
       'requestRecoveryEmail',
       'resendEmailChange',

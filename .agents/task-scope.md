@@ -1,3 +1,10 @@
+## Active task: Milestone 7.2 Task C profile operations (2026-10-25)
+
+- Goal and mode: implementation of Task C of `docs/superpowers/plans/2026-10-24-m7-2-server-packages.md`. The owner asked on 2026-10-25 to start it and not to open another pull request until the end of M7, so the work is on `refactor/m7-3-frontend-supabase` (pull request #71) as local commits. The two decisions the plan listed were taken as the plan recommended, with no objection.
+- Exact creates: `packages/server/supabase/src/provider-user/**`; `packages/server/account/src/profile/**` (save-name, save-avatar, mirror-to-session, with the image-type and profile-metadata helpers moved from `apps/web/src/features/account/server/`). Exact updates: the two packages' indexes, READMEs and tests, `packages/server/account/package.json` (adds `@synapcity/domain-identity`) and `pnpm-lock.yaml`; in `apps/web/src/features/account/server/`: `caller.ts`, `save-name.ts`, `save-avatar.ts` (now thin wrappers that log and map reasons to the same messages) and `actions/setup-actions.ts` (one import); `apps/web/src/identity-boundary.test.ts` (the `caller.ts` ratchet entry removed); the M7.2 plan; this ledger.
+- Not changed: the actions' replies and log lines, `actions.test.ts`, routes, messages, dependencies other than the workspace link, ADRs.
+- Verification: the two packages' tests, type check and lint; the web account, auth, settings, lib and architecture tests (431, with `actions.test.ts` unchanged); `pnpm boundaries`, `pnpm deps`, `pnpm format:check`. Not run: the full `pnpm verify` and the manual profile checks (change the name, upload and remove a picture, check the header refreshes).
+
 ## Active task: Milestone 7.3 browser Supabase client (2026-10-25)
 
 - Goal and mode: implementation of `docs/superpowers/plans/2026-10-24-m7-3-frontend-supabase.md`. The owner approved creating the package as designed (option a of the thin-package question) and asked for the work to continue on 2026-10-25. Branch `refactor/m7-3-frontend-supabase`, from `main` after pull requests #69 and #70.

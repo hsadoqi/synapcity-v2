@@ -25,11 +25,6 @@ const ALLOWED: Record<string, { calls: number; reason: string }> = {
     reason:
       'The account-deletion operations (provider user record and claims) stay until the delete-account flow moves (M7.5). The other operations moved to server-supabase in M7.2.',
   },
-  'features/account/server/caller.ts': {
-    calls: 1,
-    reason:
-      'getCaller returns the provider user record for profile actions (M7).',
-  },
   'app/auth/update-password/page.tsx': {
     calls: 1,
     reason: 'Reads session claims for the password flow (M7).',
