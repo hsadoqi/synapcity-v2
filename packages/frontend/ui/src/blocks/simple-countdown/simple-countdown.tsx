@@ -1,49 +1,33 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
+import { useCountdown } from '@synapcity/frontend-ui/hooks/use-countdown';
+import { padTwo } from '@synapcity/frontend-ui/lib/duration';
+import { cn } from '@synapcity/frontend-ui/lib/utils';
 
-interface SimpleCountdownProps {
+export interface SimpleCountdownProps {
   label?: string;
-  targetDate?: string | Date;
+  /** The moment to count down to. Without one the time shows as dashes. */
+  target?: Date | number;
   className?: string;
 }
 
-function pad(n: number): string {
-  return String(Math.max(0, Math.floor(n))).padStart(2, "0");
-}
-
-export const SimpleCountdownDemo: SimpleCountdownProps = {
-  label: "Launches in",
-};
-
+/** Hours, minutes and seconds left to `target`, ticking once a second. */
 export function SimpleCountdown({
   label,
-  targetDate,
+  target,
   className,
 }: SimpleCountdownProps) {
-  const [target] = useState(() =>
-    targetDate
-      ? new Date(targetDate)
-      : new Date(Date.now() + 3 * 60 * 60 * 1000)
-  );
-  const [now, setNow] = useState(() => new Date());
-
-  useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(id);
-  }, []);
-
-  const diff = Math.max(0, target.getTime() - now.getTime());
-  const hours = Math.floor(diff / 3_600_000);
-  const minutes = Math.floor((diff % 3_600_000) / 60_000);
-  const seconds = Math.floor((diff % 60_000) / 1000);
+  const { hours, minutes, seconds, ready } = useCountdown(target ?? Number.NaN);
+  const parts =
+    ready && target !== undefined
+      ? [hours, minutes, seconds].map(padTwo)
+      : ['--', '--', '--'];
 
   return (
     <div
       className={cn(
-        "relative flex size-full items-center justify-center p-4",
-        className
+        'relative flex size-full items-center justify-center p-4',
+        className,
       )}
     >
       <div className="flex flex-col items-center gap-1">
@@ -52,15 +36,20 @@ export function SimpleCountdown({
             {label}
           </span>
         )}
+        {/* A timer is not announced as it changes: a live region would read every second. */}
         <div
+          role="timer"
+          aria-label={label}
           className="text-3xl font-bold tabular-nums text-card-foreground"
-          aria-live="polite"
         >
-          {pad(hours)}
-          <span className="mx-1 text-muted-foreground">:</span>
-          {pad(minutes)}
-          <span className="mx-1 text-muted-foreground">:</span>
-          {pad(seconds)}
+          {parts.map((part, index) => (
+            <span key={index}>
+              {index > 0 && (
+                <span className="mx-1 text-muted-foreground">:</span>
+              )}
+              {part}
+            </span>
+          ))}
         </div>
       </div>
     </div>

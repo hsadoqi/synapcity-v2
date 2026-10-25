@@ -1,1 +1,1 @@
-export * from "./simple-countdown"
+export * from './simple-countdown';
