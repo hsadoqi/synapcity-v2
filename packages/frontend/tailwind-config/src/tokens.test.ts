@@ -322,8 +322,12 @@ describe('the token source', () => {
       '--base-background: var(--base-950);',
       '--base-foreground: var(--base-950);',
       '--base-foreground: var(--base-50);',
+      '--primary-foreground: var(--primary-50);',
+      '--primary-foreground: var(--primary-950);',
+      '--primary-background: var(--primary-950);',
+      '--primary-background: var(--primary-50);',
       '--primary: var(--primary-400);',
-      '--primary: var(--primary-500);',
+      '--primary: var(--primary-600);',
     ]) {
       expect(source.split(decl).length - 1, decl).toBe(1);
     }
