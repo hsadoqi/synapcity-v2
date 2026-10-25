@@ -26,7 +26,7 @@
 - `RootSidebar` renders `lib/sidebar-data.ts`, the shadcn documentation template ("Getting Started", "Installation", "Build Your Application", versions `1.0.1`, `1.1.0-alpha`). It shows only in the signed-in shell of `apps/web`: the sidebar renders only when `RootShell` receives `account` (`AuthenticatedShell`), and `apps/docs` passes none, so docs renders the sidebar-less `PublicShell`. The app's real navigation (home, spaces, documents, dashboards, settings) is not in the sidebar at all.
 - `SidebarShell` and `RootShell` hard-wire `RootSidebar`, `RootHeader`, `RootFooter` and `AccountLinks`; only `GlobalPanelShell` already takes slots.
 - `RootHeader` and `RootSidebar` import `next/link` and carry the only two R11 exceptions among the shell blocks.
-- `GlobalPanelShell` imports `SettingsView` from another block, tying the shell to one panel's content.
+- ~~`GlobalPanelShell` imports `SettingsView` from another block, tying the shell to one panel's content.~~ Wrong on review: `SettingsView` frames the settings the caller passes; the panel's content is already a slot (see Task 3).
 
 ## Global Constraints
 
@@ -57,12 +57,9 @@ The original Task 2 (four leaf components first) could not work: `root-shell` an
 - [x] **Step 3: Checks.** Baseline before the move: `frontend-ui` 78 files, 635 tests (the family 10 files, 63 tests). After: `frontend-ui` 68 files, 562 tests (635 − 63 family tests − 10 per-folder structure checks); `frontend-shells` 11 files, 68 tests (63 + 5 structure). Type check and lint clean for both packages and for web, docs and Storybook. Web `src/app` and `src/components` tests 23 files, 142 tests, run from `apps/web` (running them from the repository root does not apply the web app's `@/` alias, a pre-existing quirk, not a regression). Storybook in Chromium with axe: the 10 moved story files, 24 tests. `pnpm boundaries` 1754 files, no violations; Prettier clean; Knip clean for this change (its only findings were three untracked `frontend-ui/src/blocks/countdown` files from another session, outside this task). Not run: full `pnpm verify`, e2e, build.
 - [x] **Step 4:** Checkpoint commit.
 
-### Task 3: Make the global panel's content a slot
+### Task 3: Cancelled (2026-10-25)
 
-- [ ] **Step 1:** Write the characterization test first if the existing tests do not pin: resize, lock, pin, hide, keyboard, `aria` names (the panel's behavior is the ADR-0011 contract).
-- [ ] **Step 2:** (Already moved in Task 2.) Make its content a slot (it imports `SettingsView` from `blocks/settings-view` today; the host or `features-settings` passes `SettingsView` in, per C3). `react-resizable-panels` is already declared by shells (Task 2: `global-panel` imports its types directly) and stays declared by `frontend-ui` for `components/ui/resizable` (C2), both at 4.14.5.
-- [ ] **Step 3:** Run panel tests, Storybook global-panel stories, the 3 global-panel e2e tests that already fail on `main` (record before and after; do not fix them here).
-- [ ] **Step 4:** Checkpoint commit.
+Not needed, and the global panel is out of this plan's scope from here on (owner decision, 2026-10-25: no change to the panel's functionality or capability). The premise was wrong: `GlobalPanelShell` already takes its content through `panel`, its header actions through `actions` and its settings through `settings`; `SettingsView` is only the frame it uses to show the caller's settings in place, not hard-wired content. Task 2 moved the file with no line changed. Later tasks must not edit `global-panel`.
 
 ### Task 4: Convert the shell to slots and deduplicate the sidebar (the behavior-risky one)
 
@@ -118,7 +115,7 @@ Everything in this task is owner direction (2026-10-25), not a fixed decision; t
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | C1  | Scope is the app shell family plus breadcrumbs and the two centred page frames. Settings frames and feature content wrappers stay where they are.                  | The census shows one app shell and several look-alikes that wrap product content. Folding them in would turn a move into a redesign.                                 |
 | C2  | `components/ui/resizable` stays in `frontend-ui` for now, and `GlobalPanelShell` keeps using it.                                                                   | The design docs suggested this; the owner did not decide it, so it stays open. If the panel is the only user, moving the primitive's dependency later is cheap.      |
-| C3  | The global panel takes its content as a slot instead of importing `SettingsView`.                                                                                  | The shell must not know which panel content it hosts (ADR-0011 keeps the behavior; content is the caller's).                                                         |
+| C3  | Withdrawn. The global panel already takes its content, actions and settings as props; it is not changed.                                                           | Review of the moved file (Task 3).                                                                                                                                   |
 | C4  | `sidebar-data.ts` (shadcn template content) is deleted, not moved: docs renders no sidebar, so nothing needs it. `AccountLinks` becomes a type exported by shells. | `frontend-ui` stops carrying template content. Until Task 6, web's signed-in sidebar passes an explicit stand-in so Task 4 changes no pixels.                        |
 | C8  | The sidebar stack is deduplicated to the `ui` primitive plus one `SidebarShell` with a `sidebar` slot; `SidebarProviders` and `RootSidebar` as content owners go.  | `SidebarProviders` has one caller and no logic of its own; `RootSidebar` is template content plus one mobile footer, and a shell that owns content cannot be reused. |
 | C5  | Web's sidebar content (Task 6) is a separate, explicitly approved step.                                                                                            | It is the one visible change, and what the app's navigation should be is a product decision, not a refactor decision.                                                |
