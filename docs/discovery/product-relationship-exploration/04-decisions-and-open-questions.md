@@ -31,6 +31,20 @@
 - Treat Home global aggregation and Home Library membership as different features.
 - Manage Space deletion via explicit operations; do not cascade shared resources accidentally.
 
+## Decisions recorded after discussion (2026-10-25)
+
+Owner decisions made in conversation. They are not ADRs; the persistence items bind only until the owner changes them.
+
+- **Terminology.** "Library" is the user-facing term and `Document` stays internal. The glossary has the entry.
+- **Tables for now.** Keep `spaces`, `documents` and `dashboards` as they are. Do not add a `libraries` table: a Library is the Space's participation list until it has data of its own. Do not add dashboard layout or placement tables yet.
+- **Labels, routes and page layouts** are unchanged for now. Renaming them is cheap and can wait. The owner chose not to spend time on page layouts until it is clearer which pages will exist and what needs presenting.
+
+Discussed but **not decided**:
+
+- **Dashboard layout storage.** One versioned JSON column on `dashboards` was offered as a later option; ADR-0013 still leaves widget and layout storage open, and the dashboards canvas spec currently keeps layouts in the browser.
+- **Tabs for opened items.** An idea that opened documents and dashboards appear as tabs inside a Space, with nothing shown by default and the sidebar keeping global navigation. Whether it uses intercepting routes or nested routes, and what a refresh does, are parked.
+- **Home and the Spaces index.** An idea to combine them. Not decided or scheduled.
+
 ## Open product questions (priority order)
 
 1. **Authoritative ownership:** Is a resource (document, file, link) owned by an account/workspace, by one Space, or another authority? How does this interact with membership and future multi-user permissions?
@@ -65,7 +79,7 @@ This section records how the packet's words stand against the glossary. It does 
 - **Existing code** already uses entity-named UI pieces (for example `entity-content` and `entity-date` in `packages/frontend/collection/src/components`). Their status is governed by the glossary and ADR-0011, not by this packet.
 - **Adopted terms the packet relies on:** Space, Dashboard and Widget (Adopted); Home ("Adopted need; detailed model unresolved"); Copy, and Fork / detach ("Adopted semantic outcome"). The packet's "independent copy" and "make independent" are the behaviors those two entries describe; the glossary terms can be used for them.
 - **`View`:** the glossary says not to promote `View` into a domain type without an accepted decision. This packet uses "view" for the reusable configuration behind a widget (03) as a working label only.
-- **`Library`** does not appear in the glossary. It is used here as the user-facing preference expressed in discussion; adopting it needs the glossary's naming process.
+- **`Library`** was added to the glossary on 2026-10-25 as an accepted user-facing label (owner decision). `Document` stays the internal name of the document type.
 - **`Placement`** also does not appear in the glossary and is a working label.
 
 ## Unreconciled with accepted decisions (flagged, not resolved)
