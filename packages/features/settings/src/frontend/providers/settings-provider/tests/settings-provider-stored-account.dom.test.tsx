@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { ModeProvider } from '@synapcity/frontend-preferences';
 
 import { SettingsProvider } from '..';
@@ -31,19 +31,6 @@ const ready = () =>
 
 beforeEach(() => {
   localStorage.clear();
-  vi.stubGlobal(
-    'matchMedia',
-    vi.fn(() => ({
-      matches: false,
-      media: '(prefers-color-scheme: dark)',
-      onchange: null,
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    })),
-  );
 });
 
 describe('SettingsProvider and a stored account entry', () => {

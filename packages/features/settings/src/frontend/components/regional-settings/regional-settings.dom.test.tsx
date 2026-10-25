@@ -53,14 +53,6 @@ beforeEach(() => {
       removeEventListener: vi.fn(),
     })),
   );
-  vi.stubGlobal(
-    'ResizeObserver',
-    class {
-      observe() {}
-      unobserve() {}
-      disconnect() {}
-    },
-  );
 });
 
 afterEach(() => {

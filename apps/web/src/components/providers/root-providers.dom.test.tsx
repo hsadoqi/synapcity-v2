@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(''),
@@ -8,19 +8,6 @@ vi.mock('next/navigation', () => ({
 }));
 
 import RootProviders from './root-providers';
-
-beforeEach(() => {
-  vi.stubGlobal(
-    'matchMedia',
-    vi.fn(() => ({
-      matches: false,
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    })),
-  );
-});
 
 describe('RootProviders', () => {
   it('renders the app inside it', () => {

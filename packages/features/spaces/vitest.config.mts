@@ -4,8 +4,5 @@ import { defineConfig, mergeConfig } from 'vitest/config';
 
 export default mergeConfig(
   reactConfig,
-  defineConfig({
-    resolve: { alias: [serverOnlyAlias] },
-    test: { setupFiles: ['./vitest.setup.ts'] },
-  }),
+  defineConfig({ resolve: { alias: [serverOnlyAlias] } }),
 );

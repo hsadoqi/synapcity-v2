@@ -1,14 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { mockViewport } from '@synapcity/dev-vitest-config/viewport';
 import { isMode, isResolvedMode, resolveMode, resolveSystemMode } from './mode';
-
-const systemPrefersDark = (dark: boolean) =>
-  vi.stubGlobal(
-    'matchMedia',
-    vi.fn((query: string) => ({
-      matches: query.includes('dark') ? dark : !dark,
-      media: query,
-    })),
-  );
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -31,18 +23,18 @@ describe('mode helpers', () => {
   });
 
   it('follows the system for system and for nothing', () => {
-    systemPrefersDark(true);
+    mockViewport({ dark: true });
     expect(resolveMode('system')).toBe('dark');
     expect(resolveMode(undefined)).toBe('dark');
-    systemPrefersDark(false);
+    mockViewport();
     expect(resolveMode('system')).toBe('light');
     expect(resolveMode(undefined)).toBe('light');
   });
 
   it('reads the operating system preference', () => {
-    systemPrefersDark(true);
+    mockViewport({ dark: true });
     expect(resolveSystemMode()).toBe('dark');
-    systemPrefersDark(false);
+    mockViewport();
     expect(resolveSystemMode()).toBe('light');
   });
 });

@@ -8,7 +8,8 @@
     "./react": "./src/react.ts",
     "./browser": "./src/browser.ts",
     "./shared": "./src/shared.ts",
-    "./server-only": "./src/server-only.ts"
+    "./server-only": "./src/server-only.ts",
+    "./viewport": "./src/viewport.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit"

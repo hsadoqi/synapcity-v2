@@ -6,13 +6,13 @@ import {
   waitFor,
   type RenderResult,
 } from '@testing-library/react';
-import { expect, vi } from 'vitest';
+import { expect } from 'vitest';
 import { ModeProvider } from '@synapcity/frontend-preferences';
 
 import { useSettings } from '../hooks/use-settings';
 import { SettingsProvider } from '../providers/settings-provider';
 
-/** jsdom has no matchMedia, ResizeObserver or getAnimations, which the providers and Base UI read. */
+/** Resets the browser state the settings providers share between tests. */
 export function stubBrowser() {
   localStorage.clear();
   // The Theme tab keeps its unsaved draft here.
@@ -25,27 +25,6 @@ export function stubBrowser() {
   document.documentElement.removeAttribute('style');
   document.documentElement.removeAttribute('lang');
   document.head.innerHTML = '';
-  vi.stubGlobal(
-    'matchMedia',
-    vi.fn(() => ({
-      matches: false,
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    })),
-  );
-  if (!Element.prototype.getAnimations) {
-    Element.prototype.getAnimations = () => [];
-  }
-  vi.stubGlobal(
-    'ResizeObserver',
-    class {
-      observe() {}
-      unobserve() {}
-      disconnect() {}
-    },
-  );
 }
 
 function ReadSettings() {
