@@ -7,6 +7,6 @@ export type {
   TimeSlot,
 } from '@synapcity/frontend-ui/blocks/day-agenda/agenda-time-slot';
 
-export type Surface = 'card' | 'glass';
+export type { BlockSurface as Surface } from '@synapcity/frontend-ui/lib/block-surface';
 export type DayAgendaDialogContainer =
   'card' | 'window' | DialogContainerTarget;
