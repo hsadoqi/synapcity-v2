@@ -5,6 +5,7 @@
 @import './typography.css';
 @import './variants.css';
 @import './utilities.css';
+@import './motion.css';
 @import './components.css';
 
 @layer base {

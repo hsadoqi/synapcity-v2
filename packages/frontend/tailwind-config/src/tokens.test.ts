@@ -34,6 +34,9 @@ const CANDIDATES = [
   'font-ui',
   'font-heading',
   'font-code',
+  'animate-flip-top',
+  'animate-flip-bottom',
+  'perspective-flip',
 ];
 
 const entry = `
@@ -305,6 +308,45 @@ describe('radius and density', () => {
         (d) => d.prop === '--density-factor',
       )?.value,
     ).toBe('1');
+  });
+});
+
+describe('the flip digit motion', () => {
+  it('generates the animations, their keyframes and the perspective', () => {
+    expect(declsFor('.animate-flip-top').map((d) => d.value)).toContain(
+      'var(--animate-flip-top)',
+    );
+    expect(declsFor('.animate-flip-bottom').map((d) => d.value)).toContain(
+      'var(--animate-flip-bottom)',
+    );
+    expect(props(declsFor('.perspective-flip'))).toContain('perspective');
+    const keyframes: string[] = [];
+    tree.walkAtRules('keyframes', (rule) => {
+      keyframes.push(rule.params);
+    });
+    expect(keyframes).toEqual(
+      expect.arrayContaining(['flip-top', 'flip-bottom']),
+    );
+  });
+
+  it('lands the fold at once, not never, when motion is reduced', () => {
+    // Removing the animation would stop animationend, and the digit settles on that event.
+    const inReducedMotion = (parent: AtRule | Root) =>
+      parent.type === 'atrule' &&
+      (parent as AtRule).params.includes('prefers-reduced-motion: reduce');
+    const flip = (decls: Declaration[]) =>
+      decls.filter((d) => d.prop.startsWith('--animate-flip'));
+
+    for (const decls of [
+      flip(declsFor(':root', inReducedMotion)),
+      flip(declsFor(":root[data-reduced-motion='true']")),
+    ]) {
+      expect(props(decls).sort()).toEqual([
+        '--animate-flip-bottom',
+        '--animate-flip-top',
+      ]);
+      expect(decls.every((d) => d.value.includes('0.01ms'))).toBe(true);
+    }
   });
 });
 

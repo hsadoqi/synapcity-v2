@@ -1,0 +1,40 @@
+/* A flip-clock digit: the top half folds down, then the bottom half folds up. */
+@theme {
+  --perspective-flip: 8rem;
+  --animate-flip-top: flip-top 280ms ease-in forwards;
+  --animate-flip-bottom: flip-bottom 280ms ease-out 280ms both;
+
+  @keyframes flip-top {
+    from {
+      transform: rotateX(0);
+    }
+    to {
+      transform: rotateX(-90deg);
+    }
+  }
+
+  @keyframes flip-bottom {
+    from {
+      transform: rotateX(90deg);
+    }
+    to {
+      transform: rotateX(0);
+    }
+  }
+}
+
+/* A fold is travel, so reduced motion lands it at once: the same 0.01ms the Animations setting
+ * uses (preferences.css). The animation still runs and still ends, so a component that waits
+ * for animationend to settle (the flip digit) does not hang the way it would if the animation
+ * were removed. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --animate-flip-top: flip-top 0.01ms linear forwards;
+    --animate-flip-bottom: flip-bottom 0.01ms linear both;
+  }
+}
+
+:root[data-reduced-motion='true'] {
+  --animate-flip-top: flip-top 0.01ms linear forwards;
+  --animate-flip-bottom: flip-bottom 0.01ms linear both;
+}
