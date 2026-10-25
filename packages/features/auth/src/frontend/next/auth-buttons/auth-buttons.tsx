@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { cn } from 'cn';
+import { cn } from '@synapcity/frontend-ui/lib/utils';
 
 import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 import type { LinkButtonProps } from '@synapcity/frontend-ui/next/link-button';

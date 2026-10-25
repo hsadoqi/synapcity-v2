@@ -13,7 +13,6 @@ export * from '@synapcity/frontend-ui/core/textarea';
 export * from '@synapcity/frontend-ui/core/toggle';
 export * from '@synapcity/frontend-ui/core/toggle-group';
 export * from '@synapcity/frontend-ui/core/tooltip';
-export * from '@synapcity/frontend-ui/components/auth-buttons';
 export * from '@synapcity/frontend-ui/components/confirm-dialog';
 export * from '@synapcity/frontend-ui/components/empty-note';
 export * from '@synapcity/frontend-ui/components/icon-button';

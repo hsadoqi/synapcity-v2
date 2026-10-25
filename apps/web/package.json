@@ -28,7 +28,6 @@
     "@synapcity/features-spaces": "workspace:*",
     "@synapcity/frontend-collection": "workspace:*",
     "@synapcity/frontend-error-reports": "workspace:*",
-    "@synapcity/frontend-forms": "workspace:*",
     "@synapcity/frontend-preferences": "workspace:*",
     "@synapcity/frontend-site": "workspace:*",
     "@synapcity/frontend-supabase": "workspace:*",

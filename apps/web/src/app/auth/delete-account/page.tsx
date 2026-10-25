@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { buttonVariants } from '@synapcity/frontend-ui/core/button';
 
-import { DeleteAccountCard } from '@/components/account/delete-account-card';
+import { DeleteAccountCard } from '@synapcity/features-auth/frontend';
+import { confirmAccountDeletion } from './actions';
 import { MessagePage } from '@/components/shells/message-page';
 import { getVerifiedClaims } from '@/features/auth/server';
 import { hasRecentLinkSignInNow } from '@synapcity/features-auth/contracts';
@@ -45,6 +46,7 @@ export default async function DeleteAccountPage() {
 
   return (
     <DeleteAccountCard
+      confirmAccountDeletion={confirmAccountDeletion}
       email={typeof claims.email === 'string' ? claims.email : null}
       settingsHref={settingsHref}
     />

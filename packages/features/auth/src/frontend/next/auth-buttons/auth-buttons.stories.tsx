@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { AuthButtons } from '@synapcity/frontend-ui/components/auth-buttons';
+import { AuthButtons } from './auth-buttons';
 
 // No `nextjs.appDirectory`: the app-router mock in @storybook/nextjs-vite 10.6 does not
 // provide the layout cache node that next 16.4's useRouter reads, so every story crashed.

@@ -62,3 +62,10 @@ export type AuthAction = (
 
 /** An action used directly as a form's `action`, such as sign-in with a provider or sign-out. */
 export type AuthFormAction = (formData: FormData) => void | Promise<void>;
+
+/** What the final account-deletion step returns. */
+export type DeleteAccountState = {
+  error?: string;
+  /** The emailed link is too old or was not used: the way forward is a new link. */
+  linkRequired?: boolean;
+};

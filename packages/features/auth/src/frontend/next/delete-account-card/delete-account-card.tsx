@@ -5,12 +5,9 @@ import { useActionState, useId } from 'react';
 import Link from 'next/link';
 import { Button, buttonVariants } from '@synapcity/frontend-ui/core/button';
 
-import {
-  confirmAccountDeletion,
-  type DeleteAccountState,
-} from '@/app/auth/delete-account/actions';
+import type { DeleteAccountState } from '../../../contracts';
 import { FormMessage } from '@synapcity/frontend-forms';
-import { AuthShell } from '@synapcity/features-auth/frontend';
+import { AuthShell } from '../../auth-shell';
 
 const initialState: DeleteAccountState = {};
 
@@ -22,9 +19,15 @@ const initialState: DeleteAccountState = {};
 export function DeleteAccountCard({
   email,
   settingsHref,
+  confirmAccountDeletion,
 }: {
   email: string | null;
   settingsHref: string;
+  /** The host's action for the final, irreversible step. */
+  confirmAccountDeletion: (
+    previous: DeleteAccountState,
+    formData: FormData,
+  ) => Promise<DeleteAccountState>;
 }) {
   const [state, formAction, deleting] = useActionState(
     confirmAccountDeletion,

@@ -5,12 +5,8 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
 import { ProfileSetupForm } from '@synapcity/features-account/frontend';
-import {
-  completeProfile,
-  skipProfileSetup,
-} from '@/features/account/server/actions/setup-actions';
-import { signInHref } from '@/lib/routing/sign-in-href';
-import { AuthShell } from '@synapcity/features-auth/frontend';
+import type { ProfileAction } from '@synapcity/features-account/contracts';
+import { AuthShell } from '../../auth-shell';
 
 /**
  * The step after a sign-up: confirm the name and photo, or skip. It composes
@@ -22,10 +18,17 @@ export function ProfileSetupCard({
   defaultName,
   imageUrl,
   next,
+  completeProfile,
+  skipProfileSetup,
+  signInHref,
 }: {
   defaultName: string;
   imageUrl: string | null;
   next: string;
+  /** The host's actions: complete the profile, or skip the step. */
+  completeProfile: ProfileAction;
+  skipProfileSetup: () => Promise<unknown>;
+  signInHref: (returnTo: string) => string;
 }) {
   const router = useRouter();
   const [skipping, startSkip] = useTransition();

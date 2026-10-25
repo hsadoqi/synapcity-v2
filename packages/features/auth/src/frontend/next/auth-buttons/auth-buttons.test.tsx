@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { AuthButtons } from '@synapcity/frontend-ui/components/auth-buttons';
+import { AuthButtons } from './auth-buttons';
 
 let pathname = '/';
 vi.mock('next/navigation', () => ({ usePathname: () => pathname }));

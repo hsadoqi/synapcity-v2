@@ -34,13 +34,6 @@ export const EXCEPTIONS: readonly Exception[] = [
   },
   {
     rule: 'R11',
-    file: 'packages/frontend/ui/src/components/auth-buttons/auth-buttons.tsx',
-    specifier: 'next/navigation',
-    reason: NEXT_IN_SHARED_UI,
-    removal: 'M7 auth migration (frontend-auth, host-supplied navigation)',
-  },
-  {
-    rule: 'R11',
     file: 'packages/frontend/ui/src/components/user-menu/user-menu.tsx',
     specifier: 'next/link',
     reason: NEXT_IN_SHARED_UI,

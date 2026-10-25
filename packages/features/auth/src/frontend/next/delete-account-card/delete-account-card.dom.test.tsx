@@ -3,9 +3,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({ confirm: vi.fn() }));
 
-vi.mock('@/app/auth/delete-account/actions', () => ({
-  confirmAccountDeletion: mocks.confirm,
-}));
 vi.mock('next/navigation', () => ({
   usePathname: () => '/auth/delete-account',
 }));
@@ -13,7 +10,13 @@ vi.mock('next/navigation', () => ({
 import { DeleteAccountCard } from './delete-account-card';
 
 const show = (email: string | null = 'ada@example.com') =>
-  render(<DeleteAccountCard email={email} settingsHref="/u1/settings" />);
+  render(
+    <DeleteAccountCard
+      email={email}
+      settingsHref="/u1/settings"
+      confirmAccountDeletion={mocks.confirm}
+    />,
+  );
 
 describe('DeleteAccountCard', () => {
   beforeEach(() => {

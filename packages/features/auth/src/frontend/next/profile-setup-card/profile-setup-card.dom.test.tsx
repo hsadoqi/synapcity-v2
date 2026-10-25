@@ -15,16 +15,17 @@ vi.mock('next/navigation', () => ({
 vi.mock('@synapcity/frontend-ui/core/toast', () => ({
   toast: { add: mocks.toast },
 }));
-vi.mock('@/features/account/server/actions/setup-actions', () => ({
-  completeProfile: mocks.complete,
-  skipProfileSetup: mocks.skip,
-}));
 
 import { ProfileSetupCard } from './profile-setup-card';
+
+const signInHref = (to: string) => `/auth/login?next=${encodeURIComponent(to)}`;
 
 const show = () =>
   render(
     <ProfileSetupCard
+      completeProfile={mocks.complete}
+      skipProfileSetup={mocks.skip}
+      signInHref={signInHref}
       defaultName="Ada Lovelace"
       imageUrl={null}
       next="/u1/home"

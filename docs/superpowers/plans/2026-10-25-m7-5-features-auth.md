@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Started 2026-10-25 on `refactor/m7-3-frontend-supabase` (local commits, no new pull request until M7 ends). The owner asked to start M7.5; the calls below are Claude's, to be checked (as the design's section 10 was).
+**Status:** Implemented 2026-10-25 on `refactor/m7-3-frontend-supabase` (local commits, no new pull request until M7 ends). The owner asked to start M7.5; the calls below are Claude's, to be checked (as the design's section 10 was). Open: the boundary probes (step 3), the repository gate (step 4) and the manual checks (step 5).
 
 **Goal:** The auth experience leaves `apps/web/src/features/auth` for a new `@synapcity/features-auth` package laid out like `features-settings` (`./contracts`, `./frontend`, `./server` only if needed). `AuthButtons` leaves `frontend-ui`, the two cards in `apps/web/src/components` join it, and the routes shrink to composition. No behavior changes. The auth R9 barrel-cycle exception and the R11 `AuthButtons` exception are removed.
 
@@ -61,9 +61,9 @@ What the non-test code needs from the app:
 
 ### Task 4: Boundaries and records
 
-- [ ] **Step 1: Remove the auth R9 and `AuthButtons` R11 exceptions;** `pnpm boundaries` shows none left tagged M7.
-- [ ] **Step 2: Update the records:** the package README, the inventory (including `frontend-auth` marked deferred per Q1), the ownership map, ADR-0014 section 7, the M7 design, `.agents/task-scope.md`.
-- [ ] **Step 3: Boundary probes** (planted, then removed).
+- [x] **Step 1: Remove the auth R9 and `AuthButtons` R11 exceptions;** `pnpm boundaries` shows none left tagged M7. (The auth R9 was reported stale and removed in M7.3; the R11 one went with `AuthButtons`.)
+- [x] **Step 2: Update the records:** the package README, the inventory (including `frontend-auth` marked deferred per Q1), the ownership map, ADR-0014 section 7, the M7 design, `.agents/task-scope.md`.
+- [x] **Step 3: Boundary probes** (planted, then removed). Result (2026-10-25): `next/link` outside `frontend/next/` was reported as R11 and allowed inside it; a server import was reported as R0 (import does not resolve) because the package declares no server dependency.
 - [ ] **Step 4: Repository gate:** `pnpm verify` before the single pull request at the end of M7.
 - [ ] **Step 5: Report** per AGENTS.md section 9. Manual: register, sign in, recover, change email, link and unlink a provider, sign out, delete account, and the setup step.
 

@@ -19,3 +19,6 @@ export * from './next/email';
 export * from './next/sign-in-again';
 export * from './next/user-provider';
 export * from './resend-button';
+export * from './next/auth-buttons';
+export * from './next/delete-account-card';
+export * from './next/profile-setup-card';
