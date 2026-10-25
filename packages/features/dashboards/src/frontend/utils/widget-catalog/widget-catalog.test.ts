@@ -10,6 +10,7 @@ const ALL_TYPES: WidgetType[] = [
   'notes',
   'tasks',
   'calendar',
+  'agenda',
   'feed',
 ];
 
@@ -20,6 +21,7 @@ describe('WIDGET_CATALOG', () => {
       'Task list',
       'Recent activity',
       'Schedule',
+      'Agenda',
       'Notes',
       'Habit tracker',
       'Goal tracker',

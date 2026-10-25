@@ -18,7 +18,7 @@ const base = (title: string) => ({
 
 /**
  * Creates a widget of `type` plus the record it shows. Query widgets
- * (calendar, feed) select existing records and create none.
+ * (calendar, agenda, feed) select existing records and create none.
  */
 export function createWidget(
   type: WidgetType,
@@ -104,6 +104,11 @@ export function createWidget(
         ),
       };
     }
+    case 'agenda':
+      return {
+        widget: { ...base('Agenda'), type, query: { range: 'day' } },
+        records,
+      };
     case 'calendar':
       return {
         widget: { ...base('Schedule'), type, query: { range: 'week' } },

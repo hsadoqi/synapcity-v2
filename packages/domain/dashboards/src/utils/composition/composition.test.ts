@@ -76,4 +76,26 @@ describe('composition', () => {
     c = setWidgetStatus(c, stat!.id, 'hidden');
     expect(gridLayoutFor(c, 'lg').map((g) => g.i)).toEqual([feed!.id]);
   });
+
+  it('fixes a locked widget in place and keeps a non-resizable one at its size', () => {
+    let c = createComposition();
+    let records = emptyRecords();
+    for (const type of ['stat', 'notes', 'tasks'] as const) {
+      const created = createWidget(type, records, ctx);
+      records = created.records;
+      c = addWidget(c, created.widget);
+    }
+    const [locked, fixedSize, pinnedOnly] = c.widgets;
+    c = updateWidget(c, locked!.id, { locked: true });
+    c = updateWidget(c, fixedSize!.id, { resizable: false });
+    c = updateWidget(c, pinnedOnly!.id, { pinned: true });
+
+    const grid = gridLayoutFor(c, 'lg');
+    const item = (id: string) => grid.find((g) => g.i === id)!;
+    expect(item(locked!.id)).toMatchObject({ static: true });
+    expect(item(fixedSize!.id)).toMatchObject({ isResizable: false });
+    // Pinning surfaces a widget elsewhere; it does not touch layout.
+    expect(item(pinnedOnly!.id)).not.toHaveProperty('static');
+    expect(item(pinnedOnly!.id)).not.toHaveProperty('isResizable');
+  });
 });

@@ -1,5 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { mockViewport } from '@synapcity/dev-vitest-config/viewport';
 
 // The font loaders only run inside Next's build; here they are replaced.
 vi.mock('./fonts', () => ({ fontVariables: 'font-inter-var font-geist-var' }));
@@ -16,16 +17,8 @@ const render = (message = 'db password is hunter2') =>
 
 describe('the global error page', () => {
   beforeEach(() => {
-    // jsdom has no matchMedia, which the theme provider asks about.
-    vi.stubGlobal(
-      'matchMedia',
-      vi.fn(() => ({
-        matches: false,
-        media: '(prefers-color-scheme: dark)',
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-      })),
-    );
+    // This project runs in Node, where there is no matchMedia for the theme provider to ask.
+    mockViewport();
   });
 
   it('is a whole document, since it replaces the root layout', () => {

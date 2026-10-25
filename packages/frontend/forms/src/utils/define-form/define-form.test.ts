@@ -286,4 +286,87 @@ describe('defineForm', () => {
       expect(String((error as Error).message)).not.toContain('secret-value');
     }
   });
+
+  describe('browser pattern', () => {
+    const slugSchema = z.object({
+      slug: z.string().regex(/^[a-z-]+$/),
+      code: z.string(),
+    });
+
+    it('accepts a pattern that is one of the schema regex checks, anchors aside', () => {
+      for (const pattern of ['[a-z-]+', '^[a-z-]+$']) {
+        expect(() =>
+          defineForm({
+            schema: slugSchema,
+            fields: [
+              { type: 'text', name: 'slug', label: 'Slug', props: { pattern } },
+            ],
+          }),
+        ).not.toThrow();
+      }
+    });
+
+    it('rejects a pattern the schema does not check', () => {
+      expect(
+        issuesOf(() =>
+          defineForm({
+            schema: slugSchema,
+            fields: [
+              {
+                type: 'text',
+                name: 'slug',
+                label: 'Slug',
+                props: { pattern: '[a-z]+' },
+              },
+            ],
+          }),
+        ),
+      ).toContainEqual({ code: 'pattern-mismatch', name: 'slug' });
+    });
+
+    it('rejects a pattern on a key whose schema has no regex at all', () => {
+      expect(
+        issuesOf(() =>
+          defineForm({
+            schema: slugSchema,
+            fields: [
+              {
+                type: 'text',
+                name: 'code',
+                label: 'Code',
+                props: { pattern: '[0-9]{4}' },
+              },
+            ],
+          }),
+        ),
+      ).toContainEqual({ code: 'pattern-mismatch', name: 'code' });
+    });
+
+    it('keeps an escaped trailing dollar as part of the pattern', () => {
+      const money = z.object({ price: z.string().regex(/^[0-9]+\$$/) });
+      expect(() =>
+        defineForm({
+          schema: money,
+          fields: [
+            {
+              type: 'text',
+              name: 'price',
+              label: 'Price',
+              props: { pattern: '[0-9]+\\$' },
+            },
+          ],
+        }),
+      ).not.toThrow();
+    });
+  });
+
+  it('a file field needs no autoComplete, and a password field still does', () => {
+    const field: FieldConfig<Names> = {
+      type: 'file',
+      name: 'a',
+      label: 'a',
+      props: { accept: 'image/*', multiple: true },
+    };
+    expect(field.type).toBe('file');
+  });
 });

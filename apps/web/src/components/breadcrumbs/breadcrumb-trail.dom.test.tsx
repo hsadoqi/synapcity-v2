@@ -16,16 +16,6 @@ beforeEach(() => {
       disconnect() {}
     },
   );
-  vi.stubGlobal(
-    'matchMedia',
-    vi.fn(() => ({
-      matches: false,
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    })),
-  );
 });
 
 const account = { homeHref: '/u/home', settingsHref: '/u/settings' };

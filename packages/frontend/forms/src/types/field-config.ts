@@ -2,6 +2,12 @@
 export interface FieldOption {
   readonly value: string;
   readonly label: string;
+  /**
+   * A heading to list the option under. Options are gathered by group, groups
+   * in order of first appearance. In a windowed list the heading is shown but
+   * not announced as a group.
+   */
+  readonly group?: string;
 }
 
 export type ConditionOperator =
@@ -29,6 +35,60 @@ export interface FieldGroup {
   readonly id: string;
   readonly title: string;
   readonly description?: string;
+  /**
+   * The group can be folded away behind its title. Its fields stay mounted
+   * while folded, so their values are kept and submitted, and a failed submit
+   * unfolds every group that holds an error before moving focus.
+   */
+  readonly collapsible?: boolean;
+  /** Whether a collapsible group starts unfolded. Defaults to `true`. */
+  readonly defaultOpen?: boolean;
+}
+
+/** What an async check is given besides the value. */
+export interface AsyncFieldCheckContext {
+  /** Aborted when the value changes, the field unmounts, or the check times out. */
+  readonly signal: AbortSignal;
+  /** The current values of the visible fields, for checks that read another field. */
+  readonly values: Readonly<Record<string, unknown>>;
+}
+
+/**
+ * A check that needs the network or another slow source, such as "is this
+ * handle taken". It runs only once the field's own schema accepts the value
+ * and the value is not empty. Results for a value are remembered, and the same
+ * value in flight is checked once. While typing it runs in the background and
+ * the field stays editable (unless `disableWhileValidating`); on submit, a form
+ * with async fields locks until every check, and the handler, have finished.
+ */
+export interface AsyncFieldValidation {
+  /** Resolves to an error message, or `undefined` when the value is accepted. */
+  check(
+    value: unknown,
+    context: AsyncFieldCheckContext,
+  ): Promise<string | undefined>;
+  /** Quiet time after the last change before the check starts. Defaults to 400. */
+  readonly debounceMs?: number;
+  /** A check that takes longer fails with `messages.failed`. Defaults to 8000. */
+  readonly timeoutMs?: number;
+  /**
+   * How long a refusal is remembered for the same value. A taken handle can
+   * become free, so a refusal expires; `0` never remembers one. Accepted values
+   * are remembered until the cache is full. Defaults to 30000.
+   */
+  readonly refusalTtlMs?: number;
+  /**
+   * Disable the control while a check runs, including while typing. Off by
+   * default, so a pause in typing never takes the field away; the submit-time
+   * lock is separate and always applies to a form with async fields.
+   */
+  readonly disableWhileValidating?: boolean;
+  readonly messages?: {
+    /** Announced while the check runs. Defaults to `Validating…`. */
+    readonly validating?: string;
+    /** Shown when the check throws or times out. Never the thrown error's text. */
+    readonly failed?: string;
+  };
 }
 
 /**
@@ -48,16 +108,36 @@ interface FieldBase<TName extends string> {
   readonly description?: string;
   readonly group?: string;
   readonly dependencies?: readonly FieldDependency<TName>[];
+  readonly asyncValidation?: AsyncFieldValidation;
 }
 
+/**
+ * Opt-in windowing for a long option list: only the rows in view are
+ * rendered. `true` windows any list; `{ threshold }` windows only lists longer
+ * than the threshold.
+ */
+export type VirtualizeOption = boolean | { readonly threshold: number };
+
+export type InputMode =
+  'text' | 'email' | 'tel' | 'url' | 'search' | 'numeric' | 'decimal' | 'none';
+
+/** A single-line text entry (or a textarea). `inputMode` overrides the keyboard the type implies. */
 export interface TextFieldConfig<
   TName extends string = string,
 > extends FieldBase<TName> {
-  readonly type: 'text' | 'email' | 'textarea';
+  readonly type: 'text' | 'email' | 'tel' | 'url' | 'search' | 'textarea';
   readonly props?: {
     readonly placeholder?: string;
+    readonly minLength?: number;
     readonly maxLength?: number;
     readonly autoComplete?: string;
+    readonly inputMode?: InputMode;
+    /**
+     * The browser's `pattern`, for the keyboard hint and assistive tech; the
+     * schema decides. `defineForm` rejects a pattern that is not one of the
+     * schema's own `regex` checks (an optional `^` and `$` aside).
+     */
+    readonly pattern?: string;
   };
 }
 
@@ -68,13 +148,51 @@ export interface PasswordFieldConfig<
   readonly props: {
     readonly autoComplete: 'current-password' | 'new-password';
     readonly placeholder?: string;
+    readonly minLength?: number;
+    readonly maxLength?: number;
+  };
+}
+
+/**
+ * A date, time, month, week or colour picker. The value is the normalized
+ * string the control gives (`2026-05-04`, `09:30`, or `#rrggbb` for a colour);
+ * nothing chosen is `''`. Date fields use the calendar-backed date picker;
+ * the remaining types use native inputs.
+ */
+export interface DateTimeFieldConfig<
+  TName extends string = string,
+> extends FieldBase<TName> {
+  readonly type:
+    'date' | 'time' | 'datetime-local' | 'month' | 'week' | 'color';
+  readonly props?: {
+    /** In the input's own format, such as `2026-01-01` for a date. */
+    readonly min?: string;
+    readonly max?: string;
+    readonly step?: number;
+    readonly autoComplete?: string;
+  };
+}
+
+/**
+ * A file chooser. The value is a `File` (or a list of them when `multiple`);
+ * nothing chosen is `undefined` (or an empty list). Pair it with `z.file()`.
+ */
+export interface FileFieldConfig<
+  TName extends string = string,
+> extends FieldBase<TName> {
+  readonly type: 'file';
+  readonly props?: {
+    /** The file types offered, as in the HTML `accept` attribute, such as `image/*`. */
+    readonly accept?: string;
+    readonly multiple?: boolean;
   };
 }
 
 export interface NumberFieldConfig<
   TName extends string = string,
 > extends FieldBase<TName> {
-  readonly type: 'number';
+  /** `range` is a slider over the same values. */
+  readonly type: 'number' | 'range';
   readonly props?: {
     readonly min?: number;
     readonly max?: number;
@@ -87,7 +205,81 @@ export interface SelectFieldConfig<
 > extends FieldBase<TName> {
   readonly type: 'select';
   readonly options: readonly FieldOption[];
-  readonly props?: { readonly placeholder?: string };
+  readonly props?: {
+    readonly placeholder?: string;
+    /** Offer a control that empties the choice (the value becomes `undefined`). */
+    readonly clearable?: boolean;
+    /** Type to filter the options. */
+    readonly searchable?: boolean;
+    /**
+     * Window the option list. A select that sets this is searchable too: a
+     * long list needs filtering, and the plain select cannot be windowed.
+     */
+    readonly virtualize?: VirtualizeOption;
+  };
+}
+
+/**
+ * Several values chosen from declared options, shown as removable chips with a
+ * filter input. The value is a list of option values in the order chosen;
+ * nothing chosen is `[]`. Pair it with `z.array(z.enum([...]))`.
+ */
+export interface MultiSelectFieldConfig<
+  TName extends string = string,
+> extends FieldBase<TName> {
+  readonly type: 'multiselect';
+  readonly options: readonly FieldOption[];
+  readonly props?: {
+    readonly placeholder?: string;
+    /** Offer a control that removes every chosen value. */
+    readonly clearable?: boolean;
+    /** Stop offering options once this many are chosen. */
+    readonly maxSelected?: number;
+    readonly virtualize?: VirtualizeOption;
+  };
+}
+
+/**
+ * Free text entered as a list of tags: Enter or a comma adds one, Backspace in
+ * the empty input removes the last. Values are trimmed; empty text is never a
+ * tag. The value is the list of tags; nothing entered is `[]`. Pair it with
+ * `z.array(z.string())`.
+ */
+export interface TagsFieldConfig<
+  TName extends string = string,
+> extends FieldBase<TName> {
+  readonly type: 'tags';
+  readonly props?: {
+    readonly placeholder?: string;
+    readonly maxTags?: number;
+    /** The longest tag accepted; longer text is not added. */
+    readonly maxLength?: number;
+    /** Keep a tag that repeats an existing one (compared case-insensitively). Defaults to `false`. */
+    readonly allowDuplicates?: boolean;
+  };
+}
+
+/**
+ * A start and end day. The value is `{ from, to }` as local `yyyy-MM-dd`
+ * strings, with `to` absent while only the start is picked; nothing chosen is
+ * `undefined`. Posted to a server action as `<name>.from` and `<name>.to`.
+ */
+export interface DateRangeFieldConfig<
+  TName extends string = string,
+> extends FieldBase<TName> {
+  readonly type: 'date-range';
+  readonly props?: {
+    readonly min?: string;
+    readonly max?: string;
+    readonly numberOfMonths?: number;
+  };
+}
+
+export interface RadioFieldConfig<
+  TName extends string = string,
+> extends FieldBase<TName> {
+  readonly type: 'radio';
+  readonly options: readonly FieldOption[];
 }
 
 export interface ToggleFieldConfig<
@@ -110,7 +302,13 @@ export interface CustomFieldConfig<
 export type FieldConfig<TName extends string = string> =
   | TextFieldConfig<TName>
   | PasswordFieldConfig<TName>
+  | FileFieldConfig<TName>
+  | DateTimeFieldConfig<TName>
   | NumberFieldConfig<TName>
   | SelectFieldConfig<TName>
+  | MultiSelectFieldConfig<TName>
+  | TagsFieldConfig<TName>
+  | DateRangeFieldConfig<TName>
+  | RadioFieldConfig<TName>
   | ToggleFieldConfig<TName>
   | CustomFieldConfig<TName>;

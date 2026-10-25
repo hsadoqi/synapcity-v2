@@ -43,6 +43,30 @@ describe('toGridLayout', () => {
     expect(grid[0]).toMatchObject({ h: COLLAPSED_ROWS, isResizable: false });
     expect(stored[0]?.h).toBe(5);
   });
+
+  it('marks a fixed item static and leaves the others free', () => {
+    const grid = toGridLayout(
+      [],
+      [
+        { id: 'a', collapsed: false, size: stat, fixed: true },
+        { id: 'b', collapsed: false, size: stat },
+      ],
+      3,
+    );
+    expect(grid[0]).toMatchObject({ static: true });
+    expect(grid[1]).not.toHaveProperty('static');
+    expect(grid[1]).not.toHaveProperty('isResizable');
+  });
+
+  it('stops resizing an item that is not resizable', () => {
+    const grid = toGridLayout(
+      [],
+      [{ id: 'a', collapsed: false, size: stat, resizable: false }],
+      3,
+    );
+    expect(grid[0]).toMatchObject({ isResizable: false });
+    expect(grid[0]).not.toHaveProperty('static');
+  });
 });
 
 describe('mergeLayoutChange', () => {

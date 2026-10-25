@@ -57,8 +57,10 @@
   --base-background: var(--base-50);
   --primary-foreground: var(--primary-950);
   --primary-background: var(--primary-50);
-  /* The 500 step under 950 text is 4.18:1 on the neutral ramp, just under AA. Light fills sit
-     one step lighter, at 400 (about 7.6:1). Dark keeps 500 (4.53:1 under 50 text). */
+  /* Fills must reach AA (4.5:1) under their text on every ramp, including the rethemed ramps
+     from @synapcity/frontend-tokens. Light fills sit at 400 under 950 text (primary 6.43:1,
+     accent 5.51:1 on those ramps). Dark fills sit at 600 under 50 text (primary 6.75:1,
+     accent 4.71:1); at 500 they were 4.36:1 and 3.58:1, under AA. */
   --primary: var(--primary-400);
   --accent: var(--accent-400);
   --secondary: var(--secondary-400);
@@ -101,9 +103,9 @@
   --base-background: var(--base-950);
   --primary-foreground: var(--primary-50);
   --primary-background: var(--primary-950);
-  --primary: var(--primary-500);
-  --accent: var(--accent-500);
-  --secondary: var(--secondary-500);
+  --primary: var(--primary-600);
+  --accent: var(--accent-600);
+  --secondary: var(--secondary-600);
   --accent-foreground: var(--accent-50);
   --accent-background: var(--accent-950);
   --secondary-foreground: var(--secondary-50);

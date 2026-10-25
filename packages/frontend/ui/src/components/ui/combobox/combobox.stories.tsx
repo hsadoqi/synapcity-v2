@@ -8,6 +8,8 @@ import {
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
+  ComboboxVirtualList,
+  useComboboxVirtualizer,
 } from '@synapcity/frontend-ui/components/ui/combobox';
 
 const meta: Meta<typeof Combobox> = {
@@ -74,5 +76,76 @@ export const Filtering: Story = {
     await waitFor(() =>
       expect(screen.queryAllByRole('option')).toHaveLength(0),
     );
+  },
+};
+
+const countries = Array.from(
+  { length: 5000 },
+  (_, index) => `Place ${index + 1}`,
+);
+
+/** Opt-in windowing: 5,000 options, only the rows in view are rendered. */
+function VirtualizedDemo() {
+  const virtualizer = useComboboxVirtualizer();
+  return (
+    <Combobox
+      items={countries}
+      virtualized
+      onItemHighlighted={virtualizer.onItemHighlighted}
+    >
+      <ComboboxInput aria-label="Place" placeholder="Search 5,000 places" />
+      <ComboboxContent>
+        <ComboboxEmpty>No matches.</ComboboxEmpty>
+        <ComboboxVirtualList virtualizer={virtualizer} aria-label="Places">
+          {(item: string, index: number) => (
+            <ComboboxItem key={item} value={item} index={index}>
+              {item}
+            </ComboboxItem>
+          )}
+        </ComboboxVirtualList>
+      </ComboboxContent>
+    </Combobox>
+  );
+}
+
+/** A clear button and the dropdown button stay clickable but out of the tab order while open. */
+export const OpenWithClear: Story = {
+  render: () => (
+    <Combobox items={zones} defaultValue="UTC">
+      <ComboboxInput aria-label="Timezone" showClear />
+      <ComboboxContent>
+        <ComboboxList>
+          {(zone: string) => (
+            <ComboboxItem key={zone} value={zone}>
+              {zone}
+            </ComboboxItem>
+          )}
+        </ComboboxList>
+      </ComboboxContent>
+    </Combobox>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.getByRole('button', { name: 'Clear selection' }),
+    ).toHaveAttribute('tabindex', '-1');
+    await userEvent.click(canvas.getByRole('combobox', { name: 'Timezone' }));
+    await waitFor(() => expect(screen.getByRole('listbox')).toBeVisible());
+  },
+};
+
+export const Virtualized: Story = {
+  render: () => <VirtualizedDemo />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('combobox', { name: 'Place' }));
+    await userEvent.keyboard('{ArrowDown}');
+    const options = await screen.findAllByRole('option');
+    await expect(options.length).toBeLessThan(60);
+    await userEvent.keyboard('{ArrowDown>30/}');
+    // Keyboard navigation scrolls the window so the highlighted row is rendered.
+    await waitFor(() => expect(screen.getByRole('listbox')).toBeVisible());
+    // Left open with a row highlighted, so the accessibility check covers the
+    // open state: highlight contrast, and nothing focusable hidden behind it.
   },
 };

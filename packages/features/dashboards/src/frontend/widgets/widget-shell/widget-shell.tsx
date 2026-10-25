@@ -6,6 +6,12 @@ import type {
   WidgetHighlight,
   WidgetPatch,
 } from '@synapcity/domain-dashboards';
+import {
+  ActionsToolbar,
+  type ToolbarAction,
+  type ToolbarSettings,
+} from '@synapcity/frontend-ui/blocks/actions-toolbar';
+import { SettingsView } from '@synapcity/frontend-ui/blocks/settings-view';
 import { Button } from '@synapcity/frontend-ui/core/button';
 import {
   Popover,
@@ -14,8 +20,27 @@ import {
   PopoverTrigger,
 } from '@synapcity/frontend-ui/core/popover';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
-import { ChevronDownIcon, ChevronUpIcon, Settings2Icon } from 'lucide-react';
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  GripVerticalIcon,
+  LockIcon,
+  LockOpenIcon,
+  PinIcon,
+  PinOffIcon,
+  Settings2Icon,
+} from 'lucide-react';
 import { useId, useState, type ReactNode } from 'react';
+
+/**
+ * What the widget's content offers the shell's toolbar: its own actions and
+ * settings. The content stays host-agnostic; the shell decides where they go.
+ * The shell supplies `onOpenView` and shows settings in place itself.
+ */
+export type WidgetShellToolbar = {
+  actions?: readonly ToolbarAction[];
+  settings?: Omit<ToolbarSettings, 'onOpenView'>;
+};
 
 export type WidgetShellActions = {
   update(patch: WidgetPatch): void;
@@ -209,15 +234,54 @@ export function WidgetShell({
   settings,
   editMode,
   actions,
+  toolbar,
   children,
 }: {
   widget: Widget;
   settings: DashboardSettings;
   editMode: boolean;
   actions: WidgetShellActions;
+  /** The content's actions and settings, shown in the header. Optional. */
+  toolbar?: WidgetShellToolbar;
   children: ReactNode;
 }) {
   const titleId = useId();
+  const [showingSettings, setShowingSettings] = useState(false);
+  /*
+   * The shell's own actions, after the content's. Pin surfaces the widget
+   * elsewhere and is always offered; lock and size are layout, so edit mode
+   * only. Show is not here: a hidden widget is not on the dashboard, so it is
+   * shown again from the widgets panel.
+   */
+  const shellActions: ToolbarAction[] = [
+    {
+      label: widget.pinned ? 'Unpin' : 'Pin',
+      icon: widget.pinned ? <PinOffIcon /> : <PinIcon />,
+      onSelect: () => actions.update({ pinned: !widget.pinned }),
+    },
+    ...(editMode
+      ? [
+          {
+            label: widget.locked ? 'Unlock position' : 'Lock position',
+            icon: widget.locked ? <LockOpenIcon /> : <LockIcon />,
+            onSelect: () => actions.update({ locked: !widget.locked }),
+          },
+          {
+            label: widget.resizable === false ? 'Allow resizing' : 'Keep size',
+            onSelect: () =>
+              actions.update({ resizable: widget.resizable === false }),
+          },
+        ]
+      : []),
+    { label: 'Hide', onSelect: actions.hide },
+    { label: 'Archive', onSelect: actions.archive },
+  ];
+  const toolbarActions = [...(toolbar?.actions ?? []), ...shellActions];
+  const movable = editMode && !widget.locked;
+  const toolbarSettings = toolbar?.settings && {
+    ...toolbar.settings,
+    onOpenView: () => setShowingSettings(true),
+  };
   const CollapseIcon = widget.collapsed ? ChevronDownIcon : ChevronUpIcon;
 
   return (
@@ -225,10 +289,11 @@ export function WidgetShell({
       data-slot="widget"
       aria-labelledby={titleId}
       className={cn(
-        'relative flex w-full min-w-0 flex-col overflow-hidden border border-border bg-card text-card-foreground',
+        'group/widget relative flex w-full min-w-0 flex-col overflow-hidden border border-border bg-card text-card-foreground',
         CARD_RADIUS[settings.cardRadius],
         widget.collapsed ? 'h-auto self-start' : 'h-full',
-        editMode && 'cursor-grab outline outline-ring active:cursor-grabbing',
+        editMode && 'outline outline-ring',
+        movable && 'cursor-grab active:cursor-grabbing',
       )}
     >
       <header className="relative flex h-12 w-full shrink-0 items-center gap-2 px-3.5">
@@ -239,6 +304,16 @@ export function WidgetShell({
             HIGHLIGHT_BAR[widget.highlight],
           )}
         />
+        {movable && (
+          // A cue only: the whole widget drags in edit mode, and the keyboard
+          // moves it with the arrow keys. Hidden until hover or focus where
+          // the pointer can hover; always shown on touch, which cannot.
+          <GripVerticalIcon
+            aria-hidden="true"
+            data-slot="widget-drag-handle"
+            className="size-4 shrink-0 text-muted-foreground transition-opacity pointer-fine:opacity-0 pointer-fine:group-hover/widget:opacity-100 pointer-fine:group-focus-within/widget:opacity-100"
+          />
+        )}
         <div className="min-w-0 flex-1">
           <WidgetTitle
             title={widget.title}
@@ -248,6 +323,11 @@ export function WidgetShell({
             onRename={(title) => actions.update({ title })}
           />
         </div>
+        <ActionsToolbar
+          className="flex-1"
+          actions={toolbarActions}
+          settings={toolbarSettings}
+        />
         <Button
           variant="ghost"
           size="icon-sm"
@@ -263,7 +343,18 @@ export function WidgetShell({
         </Button>
         {editMode && <WidgetSettings widget={widget} actions={actions} />}
       </header>
-      {!widget.collapsed && (
+      {!widget.collapsed && showingSettings && toolbar?.settings && (
+        <div className="flex min-h-0 flex-1 flex-col border-t border-divider px-3.5 py-3">
+          <SettingsView
+            title={toolbar.settings.title}
+            description={toolbar.settings.description}
+            onDone={() => setShowingSettings(false)}
+          >
+            {toolbar.settings.content}
+          </SettingsView>
+        </div>
+      )}
+      {!widget.collapsed && !showingSettings && (
         // Focusable and named, so the keyboard can scroll a body that overflows its cell.
         <div
           role="group"

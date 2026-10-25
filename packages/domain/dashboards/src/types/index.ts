@@ -1,5 +1,6 @@
 export type { DashboardComposition, DashboardSettings } from './composition';
 export type {
+  AgendaWidget,
   CalendarWidget,
   FeedWidget,
   HabitWidget,

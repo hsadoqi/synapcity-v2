@@ -13,16 +13,6 @@ afterEach(() => vi.unstubAllGlobals());
 describe('the global error page, mounted', () => {
   it('hands the error to error reports, which send it only with consent', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
-    vi.stubGlobal(
-      'matchMedia',
-      vi.fn(() => ({
-        matches: false,
-        addListener: vi.fn(),
-        removeListener: vi.fn(),
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-      })),
-    );
     const error = Object.assign(new Error('boom'), { digest: 'abc123' });
 
     // It renders a whole document, so it is mounted on the document itself.

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import * as React from 'react';
+import { fn } from 'storybook/test';
+import { useArgs } from 'storybook/preview-api';
 
 import { ConfirmDialog } from '@synapcity/frontend-ui/components/confirm-dialog';
 import { Button } from '@synapcity/frontend-ui/core/button';
@@ -14,6 +15,9 @@ const meta: Meta<typeof ConfirmDialog> = {
       'This document will be gone for good. There’s no undo, so take a breath first.',
     confirmText: 'Delete document',
     cancelText: 'Keep it',
+    open: false,
+    onOpenChange: fn(),
+    onConfirm: fn(),
   },
 };
 
@@ -27,17 +31,18 @@ type Story = StoryObj<typeof ConfirmDialog>;
 export const Destructive: Story = {
   args: { variant: 'destructive' },
   render: function Render(args) {
-    const [open, setOpen] = React.useState(false);
+    const [, updateArgs] = useArgs();
     return (
       <>
-        <Button variant="outline" onClick={() => setOpen(true)}>
+        <Button variant="outline" onClick={() => updateArgs({ open: true })}>
           Delete…
         </Button>
         <ConfirmDialog
           {...args}
-          open={open}
-          onOpenChange={setOpen}
-          onConfirm={() => {}}
+          onOpenChange={(open) => {
+            updateArgs({ open });
+            args.onOpenChange(open);
+          }}
         />
       </>
     );

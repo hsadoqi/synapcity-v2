@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { ModeProvider } from '@synapcity/frontend-preferences';
 import {
@@ -12,19 +12,6 @@ import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
 import { GlobalPanelShell } from '@synapcity/frontend-ui/blocks/root-shell/global-panel';
 
 vi.mock('next/navigation', () => ({ usePathname: () => '/' }));
-
-// jsdom has no matchMedia, which the theme provider reads while rendering.
-beforeAll(() => {
-  vi.stubGlobal('matchMedia', (media: string) => ({
-    matches: false,
-    media,
-    addEventListener: () => {},
-    removeEventListener: () => {},
-    addListener: () => {},
-    removeListener: () => {},
-    dispatchEvent: () => false,
-  }));
-});
 
 /**
  * Server render on purpose: the first HTML a visitor gets is what search

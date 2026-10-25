@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { startTransition, useState, type FormEvent } from 'react';
 import {
   useForm,
-  type FieldErrors,
   type FieldValues,
   type Resolver,
   type UseFormRegisterReturn,
@@ -12,17 +11,15 @@ import {
 import type { z } from 'zod';
 
 import { unwrapSchema } from '../../utils/describe-schema-field';
+import {
+  firstRefusal,
+  type ActionFormRefusal,
+} from '../../utils/first-refusal';
 
 /** What a form shows about a refused submit: a message and the fields it is about. */
 export interface FormFeedback {
   readonly error?: string;
   readonly fields?: readonly string[];
-}
-
-/** A refusal found in the browser, shaped like the one a server action returns. */
-export interface ActionFormRefusal<Field extends string> {
-  readonly error: string;
-  readonly fields: readonly Field[];
 }
 
 export interface UseActionFormOptions<
@@ -80,20 +77,6 @@ function valuesOf(
     values[name] = isArraySchema(field as z.ZodType) ? all : all[0];
   }
   return values;
-}
-
-/**
- * The first refusal only, like the server: React Hook Form lists errors in the
- * order the schema reported them, so the first one is the schema's first issue.
- */
-function firstRefusal<Field extends string>(
-  errors: FieldErrors,
-): ActionFormRefusal<Field> {
-  const [name, error] = Object.entries(errors)[0] ?? [];
-  return {
-    error: typeof error?.message === 'string' ? error.message : '',
-    fields: name === undefined ? [] : [name as Field],
-  };
 }
 
 /**

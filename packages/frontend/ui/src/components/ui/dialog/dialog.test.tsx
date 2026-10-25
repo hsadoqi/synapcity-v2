@@ -206,6 +206,17 @@ describe('Dialog', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
+  it('can omit the overlay', async () => {
+    render(
+      <Example
+        rootProps={{ defaultOpen: true }}
+        contentProps={{ showOverlay: false }}
+      />,
+    );
+    await screen.findByRole('dialog');
+    expect(document.querySelector('[data-slot="dialog-overlay"]')).toBeNull();
+  });
+
   it('can add a footer close button independently of the corner button', async () => {
     render(
       <Example

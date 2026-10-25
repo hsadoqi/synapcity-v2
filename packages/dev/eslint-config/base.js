@@ -82,6 +82,26 @@ export const config = [
     rules: typescriptCoveredByTheCompiler,
   },
   {
+    /*
+     * Stories describe a component through args, so Controls and the docs page stay in sync. State
+     * held in a hook is invisible to both. A controlled story uses `useArgs` from
+     * `storybook/preview-api`; an effect or a ref is a sign the story is building a second
+     * component and should drive the real one from a `play` function instead.
+     */
+    files: ['**/*.stories.{ts,tsx}'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            "CallExpression[callee.name=/^(useState|useReducer|useRef|useEffect|useLayoutEffect)$/], CallExpression[callee.object.name='React'][callee.property.name=/^(useState|useReducer|useRef|useEffect|useLayoutEffect)$/]",
+          message:
+            'Do not hold state in a story. Put it in args and update it with useArgs, or drive the component from a play function.',
+        },
+      ],
+    },
+  },
+  {
     plugins: {
       onlyWarn,
     },

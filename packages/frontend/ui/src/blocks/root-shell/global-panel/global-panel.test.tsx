@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   GlobalPanelShell,
@@ -291,5 +291,48 @@ describe('GlobalPanelShell', () => {
         .getByRole('button', { name: 'Lock global panel open' })
         .getAttribute('aria-pressed'),
     ).toBe('false');
+  });
+
+  it('shows no content toolbar without content actions or settings', async () => {
+    await setup(<p>Panel content</p>);
+    await openPanel();
+    expect(document.querySelector('[data-slot="actions-toolbar"]')).toBeNull();
+  });
+
+  it("names itself after its content and shows the content's actions and settings", async () => {
+    const onSelect = vi.fn();
+    render(
+      <GlobalPanelShell
+        header={<GlobalPanelToggle />}
+        panel={<p>Agenda content</p>}
+        panelTitle="Agenda"
+        panelActions={[{ label: 'Refresh', onSelect }]}
+        panelSettings={{
+          title: 'Agenda settings',
+          presentation: 'view',
+          content: <p>Week starts on Monday</p>,
+        }}
+      >
+        <button>Page action</button>
+      </GlobalPanelShell>,
+    );
+    await layout();
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Toggle global panel' }),
+    );
+    await layout();
+    const region = screen.getByRole('region', { name: 'Agenda' });
+    expect(
+      within(region).getAllByRole('button', { name: 'More actions' }).length,
+    ).toBeGreaterThan(0);
+
+    fireEvent.click(within(region).getByRole('button', { name: 'Settings' }));
+    expect(
+      within(region).getByRole('region', { name: 'Agenda settings' })
+        .textContent,
+    ).toContain('Week starts on Monday');
+    expect(within(region).queryByText('Agenda content')).toBeNull();
+    fireEvent.click(within(region).getByRole('button', { name: 'Done' }));
+    expect(within(region).getByText('Agenda content')).toBeDefined();
   });
 });

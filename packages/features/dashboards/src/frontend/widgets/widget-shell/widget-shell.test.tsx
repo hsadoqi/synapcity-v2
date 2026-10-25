@@ -2,7 +2,7 @@ import { DEFAULT_SETTINGS, type Widget } from '@synapcity/domain-dashboards';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { WidgetShell } from './index';
+import { WidgetShell, type WidgetShellToolbar } from './index';
 
 const widget: Widget = {
   id: 'wgt_1',
@@ -16,7 +16,15 @@ const widget: Widget = {
 
 function setup(
   overrides: Partial<Widget> = {},
-  { editMode = true, showWidgetTitles = true } = {},
+  {
+    editMode = true,
+    showWidgetTitles = true,
+    toolbar,
+  }: {
+    editMode?: boolean;
+    showWidgetTitles?: boolean;
+    toolbar?: WidgetShellToolbar;
+  } = {},
 ) {
   const actions = {
     update: vi.fn(),
@@ -31,6 +39,7 @@ function setup(
       settings={{ ...DEFAULT_SETTINGS, showWidgetTitles }}
       editMode={editMode}
       actions={actions}
+      toolbar={toolbar}
     >
       <p>Body</p>
     </WidgetShell>,
@@ -141,5 +150,99 @@ describe('WidgetShell', () => {
     setup();
     fireEvent.click(screen.getByRole('button', { name: 'Rename Steps today' }));
     expect(screen.getByRole('region', { name: 'Steps today' })).toBeDefined();
+  });
+
+  it('shows a drag cue only in edit mode', () => {
+    setup({}, { editMode: false });
+    expect(
+      document.querySelector('[data-slot="widget-drag-handle"]'),
+    ).toBeNull();
+  });
+
+  it('reveals the drag cue on hover or focus where the pointer can hover', () => {
+    setup();
+    const grip = document.querySelector('[data-slot="widget-drag-handle"]')!;
+    expect(grip.getAttribute('aria-hidden')).toBe('true');
+    const classes = grip.getAttribute('class')!;
+    expect(classes).toContain('pointer-fine:opacity-0');
+    expect(classes).toContain('pointer-fine:group-hover/widget:opacity-100');
+    expect(classes).toContain(
+      'pointer-fine:group-focus-within/widget:opacity-100',
+    );
+  });
+
+  it('offers pin, hide and archive in view mode, and the layout actions only in edit mode', async () => {
+    const actions = setup({}, { editMode: false });
+    expect(screen.getByRole('button', { name: 'Pin' })).toBeDefined();
+    expect(screen.queryByRole('button', { name: 'Lock position' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Pin' }));
+    expect(actions.update).toHaveBeenCalledWith({ pinned: true });
+
+    const [compact] = screen.getAllByRole('button', { name: 'More actions' });
+    fireEvent.click(compact!);
+    const menu = await screen.findByRole('menu');
+    expect(menu.textContent).toContain('Hide');
+    expect(menu.textContent).toContain('Archive');
+    expect(menu.textContent).not.toContain('Keep size');
+  });
+
+  it('locks, unpins and stops resizing through update', async () => {
+    const actions = setup({ pinned: true, locked: false });
+    fireEvent.click(screen.getByRole('button', { name: 'Unpin' }));
+    expect(actions.update).toHaveBeenCalledWith({ pinned: false });
+    fireEvent.click(screen.getByRole('button', { name: 'Lock position' }));
+    expect(actions.update).toHaveBeenCalledWith({ locked: true });
+    const [compact] = screen.getAllByRole('button', { name: 'More actions' });
+    fireEvent.click(compact!);
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Keep size' }));
+    expect(actions.update).toHaveBeenCalledWith({ resizable: false });
+  });
+
+  it('hides and archives from the toolbar', async () => {
+    const actions = setup({}, { editMode: false });
+    const [compact] = screen.getAllByRole('button', { name: 'More actions' });
+    fireEvent.click(compact!);
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Hide' }));
+    expect(actions.hide).toHaveBeenCalledTimes(1);
+  });
+
+  it('drops the drag cue of a locked widget', () => {
+    setup({ locked: true });
+    expect(
+      document.querySelector('[data-slot="widget-drag-handle"]'),
+    ).toBeNull();
+  });
+
+  it("shows the content's actions in the header", () => {
+    const onSelect = vi.fn();
+    setup({}, { toolbar: { actions: [{ label: 'Refresh', onSelect }] } });
+    expect(
+      document.querySelector('[data-slot="actions-toolbar"]'),
+    ).not.toBeNull();
+    expect(
+      screen.getAllByRole('button', { name: 'More actions' }).length,
+    ).toBeGreaterThan(0);
+  });
+
+  it("swaps the body for the content's settings in place, and back", () => {
+    setup(
+      {},
+      {
+        toolbar: {
+          settings: {
+            title: 'Steps settings',
+            presentation: 'view',
+            content: <p>Daily goal</p>,
+          },
+        },
+      },
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Settings' }));
+    expect(
+      screen.getByRole('region', { name: 'Steps settings' }).textContent,
+    ).toContain('Daily goal');
+    expect(screen.queryByText('Body')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Done' }));
+    expect(screen.getByText('Body')).toBeDefined();
   });
 });

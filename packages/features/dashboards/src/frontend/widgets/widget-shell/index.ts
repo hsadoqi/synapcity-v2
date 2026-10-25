@@ -1,1 +1,1 @@
-export { WidgetShell } from './widget-shell';
+export { WidgetShell, type WidgetShellToolbar } from './widget-shell';

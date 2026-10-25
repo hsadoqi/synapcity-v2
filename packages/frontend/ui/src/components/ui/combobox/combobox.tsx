@@ -11,6 +11,8 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from '@synapcity/frontend-ui/core/input-group';
+import { buildComboboxRows } from '@synapcity/frontend-ui/lib/combobox-rows';
+import { useVirtualList } from '@synapcity/frontend-ui/hooks/use-virtual-list';
 import { CheckIcon, ChevronDownIcon, XIcon } from 'lucide-react';
 
 const Combobox = ComboboxPrimitive.Root;
@@ -42,6 +44,10 @@ function ComboboxClear({ className, ...props }: ComboboxPrimitive.Clear.Props) {
       data-slot="combobox-clear"
       render={<InputGroupButton variant="ghost" size="icon-xs" />}
       aria-label="Clear selection"
+      // Out of the tab order, as in the WAI-ARIA combobox pattern: the input
+      // is the one keyboard stop (deleting its text clears it), and while the
+      // list is open Base UI hides everything outside it, this button included.
+      tabIndex={-1}
       className={cn(className)}
       {...props}
     >
@@ -75,6 +81,9 @@ function ComboboxInput({
             render={<ComboboxTrigger />}
             data-slot="input-group-button"
             aria-label="Show options"
+            // Out of the tab order, as in the WAI-ARIA combobox pattern: the
+            // keyboard opens the list from the input (ArrowDown, Alt+ArrowDown).
+            tabIndex={-1}
             className="group-has-data-[slot=combobox-clear]/input-group:hidden data-pressed:bg-transparent"
             disabled={disabled}
           />
@@ -124,11 +133,14 @@ function ComboboxContent({
 }
 
 function ComboboxList({ className, ...props }: ComboboxPrimitive.List.Props) {
+  // While the popup fades out it is inert, so it stops scrolling too: a
+  // scrollable region nobody can reach is an accessibility error (axe
+  // scrollable-region-focusable), even for the 100ms of the exit animation.
   return (
     <ComboboxPrimitive.List
       data-slot="combobox-list"
       className={cn(
-        'scrollbar-hidden max-h-[min(calc(--spacing(72)---spacing(9)),calc(var(--available-height)---spacing(9)))] scroll-py-1 overflow-y-auto overscroll-contain p-1 data-empty:p-0',
+        'group-data-closed/combobox-content:overflow-hidden scrollbar-hidden max-h-[min(calc(--spacing(72)---spacing(9)),calc(var(--available-height)---spacing(9)))] scroll-py-1 overflow-y-auto overscroll-contain p-1 data-empty:p-0',
         className,
       )}
       {...props}
@@ -238,9 +250,12 @@ function ComboboxChip({
   className,
   children,
   showRemove = true,
+  removeLabel = 'Remove',
   ...props
 }: ComboboxPrimitive.Chip.Props & {
   showRemove?: boolean;
+  /** The remove button's accessible name, such as `Remove Design`. */
+  removeLabel?: string;
 }) {
   return (
     <ComboboxPrimitive.Chip
@@ -257,6 +272,7 @@ function ComboboxChip({
           render={<Button variant="ghost" size="icon-xs" />}
           className="-ml-1 opacity-50 hover:opacity-100"
           data-slot="combobox-chip-remove"
+          aria-label={removeLabel}
         >
           <XIcon className="pointer-events-none" />
         </ComboboxPrimitive.ChipRemove>
@@ -282,6 +298,174 @@ function useComboboxAnchor() {
   return React.useRef<HTMLDivElement | null>(null);
 }
 
+/**
+ * Connects a `Combobox` root to its `ComboboxVirtualList`, so moving through
+ * the options with the keyboard scrolls a row that is not rendered into view.
+ * Pass `onItemHighlighted` to the root, set `virtualized` on the root while the
+ * list is windowed, and pass the virtualizer to the list.
+ */
+interface ComboboxVirtualizer {
+  /** Called by the list with how to scroll a row into view, or `null` when it unmounts. */
+  readonly register: (scrollToIndex: ((index: number) => void) | null) => void;
+  readonly onItemHighlighted: (
+    value: unknown,
+    details: { readonly reason: string; readonly index: number },
+  ) => void;
+}
+
+function useComboboxVirtualizer(): ComboboxVirtualizer {
+  const scrollToIndex = React.useRef<((index: number) => void) | null>(null);
+  return React.useMemo<ComboboxVirtualizer>(
+    () => ({
+      register: (scroll) => {
+        scrollToIndex.current = scroll;
+      },
+      onItemHighlighted: (_value, { reason, index }) => {
+        if (reason === 'keyboard' && index >= 0) scrollToIndex.current?.(index);
+      },
+    }),
+    [],
+  );
+}
+
+const labelRowClass =
+  'flex min-h-7 pointer-coarse:min-h-11 items-center px-2 py-0 text-xs text-muted-foreground';
+
+/**
+ * The option list, rendering only the rows in view (between two spacers) when
+ * `enabled`. Rows are the root's filtered items; give each `ComboboxItem` the
+ * `index` it is called with. Off, it renders every row like `ComboboxList`.
+ *
+ * `groupBy` names an option's group. Options must be gathered by group already
+ * (so the root's keyboard order matches what is drawn); a heading row, the
+ * height of an option, is drawn before each group. When windowed the heading
+ * is shown but not announced as a group; unwindowed, it is a real group.
+ */
+function ComboboxVirtualList<Item>({
+  virtualizer,
+  enabled = true,
+  estimateRowHeight,
+  overscan,
+  groupBy,
+  children,
+  ...props
+}: Omit<ComboboxPrimitive.List.Props, 'children'> & {
+  virtualizer: ComboboxVirtualizer;
+  enabled?: boolean;
+  estimateRowHeight?: number;
+  overscan?: number;
+  groupBy?: (item: Item) => string | undefined;
+  children: (item: Item, index: number) => React.ReactNode;
+}) {
+  const items = ComboboxPrimitive.useFilteredItems<Item>();
+  const list = React.useRef<HTMLDivElement | null>(null);
+  const { rows, rowOfItem } = React.useMemo(
+    () => buildComboboxRows(items, groupBy),
+    [items, groupBy],
+  );
+  const virtual = useVirtualList({
+    count: rows.length,
+    enabled,
+    estimateRowHeight,
+    overscan,
+  });
+  const { viewportRef, measureRow, scrollToIndex, range } = virtual;
+
+  // Keyboard navigation speaks in option indexes; scrolling in rows.
+  const scrollToItem = React.useCallback(
+    (index: number) => {
+      const row = rowOfItem[index];
+      if (row !== undefined) scrollToIndex(row);
+    },
+    [rowOfItem, scrollToIndex],
+  );
+
+  React.useEffect(() => {
+    virtualizer.register(scrollToItem);
+    return () => virtualizer.register(null);
+  }, [virtualizer, scrollToItem]);
+
+  // Rows are one height; measure a rendered option in place of the estimate.
+  React.useEffect(() => {
+    measureRow(
+      list.current?.querySelector<HTMLElement>('[data-slot="combobox-item"]') ??
+        null,
+    );
+  }, [measureRow, range.start, range.end]);
+
+  const setList = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      list.current = node;
+      viewportRef(node);
+    },
+    [viewportRef],
+  );
+
+  const drawn = rows.slice(range.start, range.end);
+  let body: React.ReactNode;
+  if (!enabled && drawn.some((row) => row.kind === 'label')) {
+    // Unwindowed and grouped: real groups, each named by its heading.
+    type Group = { label: string; key: string; rows: typeof drawn };
+    const groups: Group[] = [];
+    let current: Group | undefined;
+    for (const row of drawn) {
+      if (row.kind === 'label') {
+        current = { label: row.label, key: row.key, rows: [] };
+        groups.push(current);
+      } else {
+        if (current === undefined) {
+          current = { label: '', key: 'ungrouped', rows: [] };
+          groups.push(current);
+        }
+        current.rows.push(row);
+      }
+    }
+    body = groups.map((group) => (
+      <ComboboxGroup key={group.key}>
+        {group.label ? (
+          <ComboboxLabel className={labelRowClass}>{group.label}</ComboboxLabel>
+        ) : null}
+        {group.rows.map((row) =>
+          row.kind === 'item' ? (
+            <React.Fragment key={row.key}>
+              {children(row.item, row.index)}
+            </React.Fragment>
+          ) : null,
+        )}
+      </ComboboxGroup>
+    ));
+  } else {
+    body = drawn.map((row) =>
+      row.kind === 'label' ? (
+        <div
+          key={row.key}
+          role="presentation"
+          data-slot="combobox-label"
+          className={labelRowClass}
+        >
+          {row.label}
+        </div>
+      ) : (
+        <React.Fragment key={row.key}>
+          {children(row.item, row.index)}
+        </React.Fragment>
+      ),
+    );
+  }
+
+  return (
+    <ComboboxList ref={setList} onScroll={virtual.onScroll} {...props}>
+      {virtual.paddingTop > 0 ? (
+        <div aria-hidden style={{ height: virtual.paddingTop }} />
+      ) : null}
+      {body}
+      {virtual.paddingBottom > 0 ? (
+        <div aria-hidden style={{ height: virtual.paddingBottom }} />
+      ) : null}
+    </ComboboxList>
+  );
+}
+
 export {
   Combobox,
   ComboboxInput,
@@ -299,4 +483,7 @@ export {
   ComboboxTrigger,
   ComboboxValue,
   useComboboxAnchor,
+  ComboboxVirtualList,
+  useComboboxVirtualizer,
 };
+export type { ComboboxVirtualizer };

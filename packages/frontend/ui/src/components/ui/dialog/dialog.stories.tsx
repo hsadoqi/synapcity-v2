@@ -1,4 +1,4 @@
-import React, { type ComponentProps } from 'react';
+import { type ComponentProps } from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, fn, screen, userEvent, waitFor, within } from 'storybook/test';
 
@@ -235,90 +235,70 @@ export const PointerDismissalDisabled: Story = {
   },
 };
 
-function ControlledExample(props: ComponentProps<typeof Dialog>) {
-  const [open, setOpen] = React.useState(false);
-  return (
-    <Example
-      {...props}
-      open={open}
-      onOpenChange={(next, details) => {
-        props.onOpenChange?.(next, details);
-        setOpen(next);
-      }}
-    />
-  );
-}
-
+/**
+ * The owner decides whether the dialog is open. Cancel asks to close, and the dialog stays open
+ * until `open` changes, which the Controls panel does here.
+ */
 export const Controlled: Story = {
-  render: (args) => <ControlledExample {...args} />,
-  play: async ({ canvasElement }) => {
-    const trigger = within(canvasElement).getByRole('button', {
-      name: 'Open dialog',
-    });
-    await userEvent.click(trigger);
+  args: { open: true },
+  play: async ({ args }) => {
     const dialog = await waitForDialog();
     await userEvent.click(
       within(dialog).getByRole('button', { name: 'Cancel' }),
     );
-    await waitFor(() =>
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+    await expect(args.onOpenChange).toHaveBeenCalledWith(
+      false,
+      expect.anything(),
     );
-    await userEvent.click(trigger);
-    await waitForDialog();
+    await expect(dialog).toBeVisible();
   },
 };
 
-function FormExample(props: ComponentProps<typeof Dialog>) {
-  const [open, setOpen] = React.useState(false);
-  const [savedName, setSavedName] = React.useState('');
-  const input = React.useRef<HTMLInputElement>(null);
-  return (
-    <>
-      <Dialog {...props} open={open} onOpenChange={setOpen}>
-        <DialogTrigger render={<Button variant="outline" />}>
-          Rename document
-        </DialogTrigger>
-        <DialogContent initialFocus={input}>
-          <DialogHeader>
-            <DialogTitle>Rename document</DialogTitle>
-            <DialogDescription>
-              Choose a name for this document.
-            </DialogDescription>
-          </DialogHeader>
-          <form
-            onSubmit={(event) => {
-              event.preventDefault();
-              setSavedName(input.current?.value ?? '');
-              setOpen(false);
-            }}
-          >
-            <div className="grid gap-2">
-              <Label htmlFor="dialog-document-name">Document name</Label>
-              <Input
-                ref={input}
-                id="dialog-document-name"
-                name="name"
-                defaultValue="Untitled"
-                required
-              />
-            </div>
-            <DialogFooter className="mt-4">
-              <DialogClose render={<Button variant="outline" />}>
-                Cancel
-              </DialogClose>
-              <Button type="submit">Save changes</Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-      {savedName && <p role="status">Document renamed to {savedName}.</p>}
-    </>
-  );
-}
+const onRename = fn();
 
-/** Form submission updates story-local state only. */
+/** Submitting the form reports the new name and closes the dialog. */
 export const FormSubmission: Story = {
-  render: (args) => <FormExample {...args} />,
+  render: (args) => (
+    <Dialog {...args}>
+      <DialogTrigger render={<Button variant="outline" />}>
+        Rename document
+      </DialogTrigger>
+      <DialogContent
+        initialFocus={() => document.getElementById('dialog-document-name')}
+      >
+        <DialogHeader>
+          <DialogTitle>Rename document</DialogTitle>
+          <DialogDescription>
+            Choose a name for this document.
+          </DialogDescription>
+        </DialogHeader>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            onRename(new FormData(event.currentTarget).get('name'));
+          }}
+        >
+          <div className="grid gap-2">
+            <Label htmlFor="dialog-document-name">Document name</Label>
+            <Input
+              id="dialog-document-name"
+              name="name"
+              defaultValue="Untitled"
+              required
+            />
+          </div>
+          <DialogFooter className="mt-4">
+            <DialogClose render={<Button variant="outline" />}>
+              Cancel
+            </DialogClose>
+            <DialogClose render={<Button type="submit" />}>
+              Save changes
+            </DialogClose>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(
@@ -337,9 +317,7 @@ export const FormSubmission: Story = {
     await waitFor(() =>
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
     );
-    await expect(canvas.getByRole('status')).toHaveTextContent(
-      'Document renamed to Research notes.',
-    );
+    await expect(onRename).toHaveBeenLastCalledWith('Research notes');
   },
 };
 

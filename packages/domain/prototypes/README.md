@@ -27,19 +27,20 @@ Every kind also has the ten base fields: `id`, `ownerId`, `name`, `description?`
 
 `@synapcity/domain-prototypes` (root entry):
 
-| Export                                                                                          | Meaning                                                                                  |
-| ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `metricSchema` … `assetSchema`, `prototypeRecordSchemas`, `PROTOTYPE_RECORD_KINDS`              | One schema per kind, and the kind list. Use them to validate records loaded from storage |
-| `prototypeRecordsSchema`                                                                        | Zod contract for every table saved together; each record must sit under its own id       |
-| `Metric` … `Asset`, `PrototypeRecordKind`, `PrototypeRecordKindMap`                             | The types the schemas produce                                                            |
-| `EntityRef`, `entityRefSchema`                                                                  | `{ kind, id }`; the kind narrows what `getRecord` returns                                |
-| `PrototypeRecords`, `emptyRecords`, `getRecord`, `putRecord`, `removeRecord`, `touchRecord`     | One table per kind keyed by id, and immutable reads and writes on it                     |
-| `RecordContext`, `newRecord`, `DEFAULT_ICONS`, `createId`                                       | Base fields for a new record: prefixed id, owner, ISO timestamps, a Lucide icon per kind |
-| `toggleTask`, `tasksForProject`                                                                 | Completing a task also records an activity about it                                      |
-| `toggleHabitDay`, `habitWeek`, `HabitDay`                                                       | Habit days, and the Monday-first current week (day labels are the feature's copy)        |
-| `updateNoteBody`, `ensureNote`, `addLink`, `normalizeLinkUrl`, `setSlotAsset`, `clearSlotAsset` | Notes, links (http and https only) and one image per vision-board slot                   |
-| `eventsThisWeek`, `recentActivity`, `goalPercent`                                               | Reads used by the calendar, feed and progress widgets                                    |
-| `dayKey`, `startOfWeek`, `weekDayStarts`, `weekdayIndex`, `isSameWeek`                          | Local-time calendar helpers; weeks start on Monday                                       |
+| Export                                                                                          | Meaning                                                                                                                                           |
+| ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `metricSchema` … `assetSchema`, `prototypeRecordSchemas`, `PROTOTYPE_RECORD_KINDS`              | One schema per kind, and the kind list. Use them to validate records loaded from storage                                                          |
+| `prototypeRecordsSchema`                                                                        | Zod contract for every table saved together; each record must sit under its own id                                                                |
+| `Metric` … `Asset`, `PrototypeRecordKind`, `PrototypeRecordKindMap`                             | The types the schemas produce                                                                                                                     |
+| `EntityRef`, `entityRefSchema`                                                                  | `{ kind, id }`; the kind narrows what `getRecord` returns                                                                                         |
+| `PrototypeRecords`, `emptyRecords`, `getRecord`, `putRecord`, `removeRecord`, `touchRecord`     | One table per kind keyed by id, and immutable reads and writes on it                                                                              |
+| `RecordContext`, `newRecord`, `DEFAULT_ICONS`, `createId`                                       | Base fields for a new record: prefixed id, owner, ISO timestamps, a Lucide icon per kind                                                          |
+| `toggleTask`, `tasksForProject`                                                                 | Completing a task also records an activity about it                                                                                               |
+| `toggleHabitDay`, `habitWeek`, `HabitDay`                                                       | Habit days, and the Monday-first current week (day labels are the feature's copy)                                                                 |
+| `updateNoteBody`, `ensureNote`, `addLink`, `normalizeLinkUrl`, `setSlotAsset`, `clearSlotAsset` | Notes, links (http and https only) and one image per vision-board slot                                                                            |
+| `eventsThisWeek`, `eventsOnDay`, `recentActivity`, `goalPercent`                                | Reads used by the calendar, agenda, feed and progress widgets                                                                                     |
+| `addEvent`, `localStartsAt`                                                                     | Add an event (a blank name or a bad timestamp changes nothing); a local day and time as a timestamp, or `null` for a day or time that is not real |
+| `dayKey`, `startOfWeek`, `weekDayStarts`, `weekdayIndex`, `isSameWeek`                          | Local-time calendar helpers; weeks start on Monday                                                                                                |
 
 ## Scripts
 

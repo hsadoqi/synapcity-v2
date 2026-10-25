@@ -132,6 +132,7 @@ export {
   SheetContent,
   SheetHeader,
   SheetFooter,
+  SheetPortal,
   SheetTitle,
   SheetDescription,
 };

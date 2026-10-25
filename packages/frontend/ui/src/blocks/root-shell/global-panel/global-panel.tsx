@@ -19,6 +19,12 @@ import {
   PanelTop,
   X,
 } from 'lucide-react';
+import {
+  ActionsToolbar,
+  type ToolbarAction,
+  type ToolbarSettings,
+} from '@synapcity/frontend-ui/blocks/actions-toolbar';
+import { SettingsView } from '@synapcity/frontend-ui/blocks/settings-view';
 import { Button } from '@synapcity/frontend-ui/core/button';
 import {
   ResizableHandle,
@@ -73,12 +79,29 @@ export function GlobalPanelToggle() {
 export function GlobalPanelShell({
   header,
   panel,
+  panelTitle = 'Global panel',
+  panelActions,
+  panelSettings,
   children,
 }: {
   header: ReactNode;
   panel?: ReactNode;
+  /** Names the panel and its heading, such as the content it shows. @default 'Global panel' */
+  panelTitle?: string;
+  /**
+   * The panel content's own actions, shown in the panel header beside its
+   * controls. The content stays host-agnostic; the panel decides where they go.
+   */
+  panelActions?: readonly ToolbarAction[];
+  /** Settings for the panel content; shown as a dialog or in place of it. */
+  panelSettings?: Omit<ToolbarSettings, 'onOpenView'>;
   children: ReactNode;
 }) {
+  const [showingSettings, setShowingSettings] = useState(false);
+  const toolbarSettings = panelSettings && {
+    ...panelSettings,
+    onOpenView: () => setShowingSettings(true),
+  };
   const id = useId();
   const panelId = `${id}-global-panel`;
   const headerId = `${id}-app-header`;
@@ -264,8 +287,15 @@ export function GlobalPanelShell({
           >
             <div className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-border bg-background px-4">
               <h2 id={`${id}-title`} className="truncate text-sm font-medium">
-                Global panel
+                {panelTitle}
               </h2>
+              {(panelActions?.length || toolbarSettings) && (
+                <ActionsToolbar
+                  className="flex-1"
+                  actions={panelActions}
+                  settings={toolbarSettings}
+                />
+              )}
               <div className="flex items-center gap-1">
                 {locked && header != null && (
                   <Button
@@ -322,10 +352,20 @@ export function GlobalPanelShell({
               tabIndex={0}
               className="min-h-0 flex-1 overflow-auto p-4 outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
             >
-              {panel ?? (
-                <p className="text-sm text-muted-foreground">
-                  Nothing here yet. Utilities will live in this panel.
-                </p>
+              {showingSettings && panelSettings ? (
+                <SettingsView
+                  title={panelSettings.title}
+                  description={panelSettings.description}
+                  onDone={() => setShowingSettings(false)}
+                >
+                  {panelSettings.content}
+                </SettingsView>
+              ) : (
+                (panel ?? (
+                  <p className="text-sm text-muted-foreground">
+                    Nothing here yet. Utilities will live in this panel.
+                  </p>
+                ))
               )}
             </div>
           </section>

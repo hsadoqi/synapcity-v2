@@ -95,19 +95,6 @@ const ready = () =>
 beforeEach(() => {
   localStorage.clear();
   vi.restoreAllMocks();
-  vi.stubGlobal(
-    'matchMedia',
-    vi.fn(() => ({
-      matches: false,
-      media: '(prefers-color-scheme: dark)',
-      onchange: null,
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    })),
-  );
 });
 
 describe('shared SettingsProvider', () => {

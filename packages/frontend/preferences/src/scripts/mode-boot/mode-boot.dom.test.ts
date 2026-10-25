@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { mockViewport } from '@synapcity/dev-vitest-config/viewport';
 import {
   LOOK_COOKIE_NAME,
   lookOf,
@@ -34,7 +35,7 @@ describe('mode boot script', () => {
   );
 
   it('resolves system from the operating system', () => {
-    vi.stubGlobal('matchMedia', () => ({ matches: true }));
+    mockViewport({ dark: true });
     setMode('system');
     run();
     expect(localStorage.getItem('theme')).toBe('system');

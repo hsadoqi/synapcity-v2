@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { DEFAULT_SETTINGS } from '@synapcity/domain-dashboards';
+import { Pin, RefreshCw } from 'lucide-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { SEED_NOW, seededWorkspace } from '../../../testing';
@@ -79,4 +80,42 @@ export const NeutralHighlight: Story = {
 
 export const Untitled: Story = {
   args: { settings: { ...DEFAULT_SETTINGS, showWidgetTitles: false } },
+};
+
+/** The content's own actions and settings in the shell's header. */
+export const WithContentToolbar: Story = {
+  decorators: [
+    (Story) => (
+      <div className="h-64 w-lg">
+        <Story />
+      </div>
+    ),
+  ],
+  args: {
+    toolbar: {
+      actions: [
+        { label: 'Refresh', icon: <RefreshCw />, onSelect: fn() },
+        { label: 'Pin', icon: <Pin />, onSelect: fn() },
+        { label: 'Help', onSelect: fn() },
+      ],
+      settings: {
+        title: 'Progress settings',
+        presentation: 'auto',
+        content: <p className="text-sm">Show the target line.</p>,
+      },
+    },
+  },
+};
+
+/** Edit mode: the drag cue and resize corner appear on hover or focus. */
+export const EditCues: Story = {
+  args: { editMode: true },
+  play: async ({ canvasElement }) => {
+    const grip = canvasElement.querySelector(
+      '[data-slot="widget-drag-handle"]',
+    )!;
+    await expect(grip).not.toBeNull();
+    // Hidden until hover where the pointer can hover (the test browser can).
+    await expect(getComputedStyle(grip).opacity).toBe('0');
+  },
 };

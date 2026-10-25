@@ -16,6 +16,7 @@ describe('WidgetsPanel', () => {
       'Task list',
       'Recent activity',
       'Schedule',
+      'Agenda',
       'Notes',
       'Habit tracker',
       'Goal tracker',

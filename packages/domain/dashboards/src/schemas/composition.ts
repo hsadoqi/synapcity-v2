@@ -20,6 +20,10 @@ const widgetBase = {
   collapsed: z.boolean(),
   highlight: z.enum(['accent', 'neutral', 'none']),
   status: z.enum(['active', 'hidden', 'archived']),
+  // Optional: compositions saved before these existed must still parse.
+  locked: z.boolean().optional(),
+  pinned: z.boolean().optional(),
+  resizable: z.boolean().optional(),
 };
 
 /** A record-backed widget whose source must be a record of `kind`. */
@@ -41,6 +45,11 @@ const widgetSchema = z.discriminatedUnion('type', [
     ...widgetBase,
     type: z.literal('calendar'),
     query: z.object({ range: z.literal('week') }),
+  }),
+  z.object({
+    ...widgetBase,
+    type: z.literal('agenda'),
+    query: z.object({ range: z.literal('day') }),
   }),
   z.object({
     ...widgetBase,

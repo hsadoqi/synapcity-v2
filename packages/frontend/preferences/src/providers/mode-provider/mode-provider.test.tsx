@@ -1,20 +1,10 @@
 import { act, render, renderHook, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { mockViewport } from '@synapcity/dev-vitest-config/viewport';
 import { LOOK_COOKIE_NAME } from '@synapcity/domain-preferences';
 import { readLookCookie } from '../../store';
 
 import { ModeProvider, useMode } from './mode-provider';
-
-const mockSystemDark = (dark: boolean) => {
-  window.matchMedia = ((query: string) => ({
-    matches: query.includes('dark') ? dark : !dark,
-    media: query,
-    addEventListener: () => {},
-    removeEventListener: () => {},
-    addListener: () => {},
-    removeListener: () => {},
-  })) as unknown as typeof window.matchMedia;
-};
 
 const wrapper =
   (initialMode?: 'light' | 'dark' | 'system') =>
@@ -27,7 +17,7 @@ const wrapper =
 beforeEach(() => {
   localStorage.clear();
   document.documentElement.className = '';
-  mockSystemDark(false);
+  mockViewport();
 });
 
 describe('ModeProvider', () => {
@@ -57,7 +47,7 @@ describe('ModeProvider', () => {
 
 describe('useMode', () => {
   it('resolves the system mode against the OS preference', () => {
-    mockSystemDark(true);
+    mockViewport({ dark: true });
     const { result } = renderHook(() => useMode(), {
       wrapper: wrapper('system'),
     });

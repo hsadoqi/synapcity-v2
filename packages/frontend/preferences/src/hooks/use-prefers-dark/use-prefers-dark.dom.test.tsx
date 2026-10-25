@@ -1,23 +1,14 @@
 import { renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { mockViewport } from '@synapcity/dev-vitest-config/viewport';
 
 import { usePrefersDark } from './use-prefers-dark';
 
 afterEach(() => vi.unstubAllGlobals());
 
-const device = (dark: boolean) =>
-  vi.stubGlobal(
-    'matchMedia',
-    vi.fn(() => ({
-      matches: dark,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    })),
-  );
-
 describe('usePrefersDark', () => {
   it.each([true, false])('reports a device that asks for dark: %s', (dark) => {
-    device(dark);
+    mockViewport({ dark });
 
     expect(renderHook(() => usePrefersDark()).result.current).toBe(dark);
   });

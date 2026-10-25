@@ -1,6 +1,5 @@
 export { useActionForm } from './use-action-form';
 export type {
-  ActionFormRefusal,
   FormFeedback,
   UseActionFormOptions,
   UseActionFormResult,

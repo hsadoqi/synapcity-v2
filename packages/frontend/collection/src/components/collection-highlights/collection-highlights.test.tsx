@@ -113,7 +113,6 @@ describe('CollectionHighlights', () => {
     renderHighlights();
     const track = screen.getByRole('list', { name: 'Recently cooked' });
     track.scrollBy = vi.fn();
-    window.matchMedia ??= (() => ({ matches: false })) as never;
 
     expect(track.getAttribute('tabindex')).toBe('0');
     fireEvent.click(
