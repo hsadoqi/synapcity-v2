@@ -21,8 +21,9 @@ const ALLOWED: Record<string, { calls: number; reason: string }> = {
       'Canonical claims read (getVerifiedClaims, reused by the boundary) and the provider record for display (M7).',
   },
   'features/auth/server/operations/operations.ts': {
-    calls: 5,
-    reason: 'Auth operations need the provider user record (M7).',
+    calls: 2,
+    reason:
+      'The account-deletion operations (provider user record and claims) stay until the delete-account flow moves (M7.5). The other operations moved to server-supabase in M7.2.',
   },
   'features/account/server/caller.ts': {
     calls: 1,

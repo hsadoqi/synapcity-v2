@@ -13,7 +13,7 @@ import {
   signInSchema,
   signUpSchema,
   updatePasswordSchema,
-} from './schema';
+} from './credentials';
 
 /** Meets the whole rule. */
 const STRONG = 'Str0ng-Passw0rd!';

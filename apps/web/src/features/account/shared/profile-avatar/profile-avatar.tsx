@@ -7,7 +7,7 @@ import {
   AvatarImage,
 } from '@synapcity/frontend-ui/core/avatar';
 
-import { initialsOf } from '../initials';
+import { initialsOf } from '@synapcity/domain-identity';
 
 /**
  * A person's picture. With no image it shows their initials, and with no name

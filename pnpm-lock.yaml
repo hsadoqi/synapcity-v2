@@ -1642,6 +1642,9 @@ importers:
       '@supabase/supabase-js':
         specifier: 2.117.3
         version: 2.117.3(@opentelemetry/api@1.9.1)
+      '@synapcity/domain-identity':
+        specifier: workspace:*
+        version: link:../../domain/identity
       '@synapcity/server-auth':
         specifier: workspace:*
         version: link:../auth

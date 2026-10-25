@@ -3,7 +3,9 @@
 import { useId } from 'react';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
-import { emailRequestSchema, type AuthState } from '@/features/auth/types';
+import { emailRequestSchema } from '@synapcity/domain-identity';
+
+import type { AuthState } from '@/features/auth/types';
 import {
   FormField,
   useActionForm,

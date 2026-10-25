@@ -1,11 +1,11 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { type AuthState } from '@/features/auth/types';
 import {
   MIN_PASSWORD_LENGTH,
   PASSWORD_REQUIREMENTS,
-  type AuthState,
-} from '@/features/auth/types';
+} from '@synapcity/domain-identity';
 
 const mocks = vi.hoisted(() => ({ updatePassword: vi.fn() }));
 vi.mock('@/features/auth/server/actions/actions', () => ({

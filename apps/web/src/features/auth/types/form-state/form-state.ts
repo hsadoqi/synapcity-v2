@@ -1,4 +1,4 @@
-import type { AuthFieldName } from '../schema';
+import type { AuthFieldName } from '@synapcity/domain-identity';
 
 /**
  * `email` echoes the submitted address so a failed submit can refill the field:

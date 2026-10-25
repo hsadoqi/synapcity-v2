@@ -1,4 +1,7 @@
-import { OAUTH_PROVIDERS, type OAuthProvider } from '../oauth-providers';
+import {
+  OAUTH_PROVIDERS,
+  type OAuthProvider,
+} from '@synapcity/domain-identity';
 
 /** The part of a Supabase identity this reads. */
 type IdentityLike = {

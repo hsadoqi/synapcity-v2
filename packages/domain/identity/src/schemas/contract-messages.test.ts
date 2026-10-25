@@ -2,17 +2,19 @@ import { describe, expect, it } from 'vitest';
 
 import {
   AVATAR_ACCEPT,
-  AVATAR_TYPES,
+  AVATAR_FILE_TYPES,
   MAX_AVATAR_BYTES,
   MAX_NAME_LENGTH,
   avatarFileSchema,
   nameSchema,
   profileSchema,
-} from './schema';
+} from '../index';
 
 const file = (size: number, type: string, name = 'me.png') =>
   new File([new Uint8Array(size)], name, { type });
 
+// Messages and limits the web app asserted before the contracts moved here (M7.1).
+// They pin that the package produces the same words and numbers.
 describe('limits match the database and the storage bucket', () => {
   it('uses the profiles.display_name length and the avatars bucket size', () => {
     expect(MAX_NAME_LENGTH).toBe(80);
@@ -20,7 +22,7 @@ describe('limits match the database and the storage bucket', () => {
   });
 
   it('accepts exactly the types the bucket allows', () => {
-    expect(Object.keys(AVATAR_TYPES)).toEqual([
+    expect(Object.keys(AVATAR_FILE_TYPES)).toEqual([
       'image/png',
       'image/jpeg',
       'image/webp',
@@ -58,14 +60,19 @@ describe('nameSchema', () => {
 });
 
 describe('profileSchema', () => {
-  it('holds just the name; the photo has its own form', () => {
-    expect(Object.keys(profileSchema.shape)).toEqual(['name']);
+  it('requires a name and treats the photo as optional', () => {
+    expect(Object.keys(profileSchema.shape)).toEqual(['name', 'avatar']);
+    expect(profileSchema.safeParse({ name: ' Ada ' })).toMatchObject({
+      success: true,
+      data: { name: 'Ada' },
+    });
+    expect(profileSchema.safeParse({}).success).toBe(false);
   });
 });
 
 describe('avatarFileSchema', () => {
   it('accepts each allowed type at the size limit', () => {
-    for (const type of Object.keys(AVATAR_TYPES)) {
+    for (const type of Object.keys(AVATAR_FILE_TYPES)) {
       expect(
         avatarFileSchema.safeParse(file(MAX_AVATAR_BYTES, type)).success,
       ).toBe(true);

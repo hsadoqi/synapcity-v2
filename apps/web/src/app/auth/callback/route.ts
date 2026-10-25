@@ -5,7 +5,7 @@ import {
   parseAuthFlow,
   welcomePath,
 } from '@/lib/routing/auth-flow';
-import { needsProfileSetup } from '@/features/account/shared/profile-confirmed';
+import { needsProfileSetup } from '@synapcity/domain-identity';
 import { homePathFor } from '@/lib/routing/user-paths';
 import { safeNextPath } from '@/lib/routing/safe-next';
 import { withNotice } from '@/lib/routing/notices';

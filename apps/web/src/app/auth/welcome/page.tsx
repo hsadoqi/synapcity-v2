@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 
 import { ProfileSetupCard } from '@/components/profile/profile-setup-card';
 import { getVerifiedClaims } from '@/features/auth/server';
-import { profileFromClaims } from '@/features/auth/shared';
+import { profileFromClaims } from '@synapcity/domain-identity';
 import { welcomePath } from '@/lib/routing/auth-flow';
 import { safeNextPath } from '@/lib/routing/safe-next';
 import { homePathFor } from '@/lib/routing/user-paths';

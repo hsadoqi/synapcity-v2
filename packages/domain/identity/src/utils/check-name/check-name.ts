@@ -1,4 +1,4 @@
-import { nameSchema } from '../../types';
+import { nameSchema } from '../../schemas';
 
 /**
  * Validates a display name against `nameSchema` and returns the trimmed name

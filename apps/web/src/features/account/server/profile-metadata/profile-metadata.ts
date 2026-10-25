@@ -1,4 +1,4 @@
-import { PROFILE_CONFIRMED_KEY } from '@/features/account/shared/profile-confirmed';
+import { PROFILE_CONFIRMED_KEY } from '@synapcity/domain-identity';
 
 /**
  * Metadata to send to `auth.updateUser({ data })` when the name changes. It

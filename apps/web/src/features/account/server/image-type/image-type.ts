@@ -1,4 +1,4 @@
-import { AVATAR_TYPES, type AvatarType } from '../../types';
+import { AVATAR_FILE_TYPES, type AvatarType } from '@synapcity/domain-identity';
 
 const startsWith = (bytes: Uint8Array, signature: number[], offset = 0) =>
   signature.every((byte, index) => bytes[offset + index] === byte);
@@ -23,4 +23,4 @@ export function detectImageType(bytes: Uint8Array): AvatarType | null {
   return null;
 }
 
-export const extensionFor = (type: AvatarType) => AVATAR_TYPES[type];
+export const extensionFor = (type: AvatarType) => AVATAR_FILE_TYPES[type];

@@ -13,7 +13,7 @@ import {
 import {
   currentUserFromClaims,
   type CurrentUser,
-} from '@/features/auth/shared/current-user';
+} from '@synapcity/domain-identity';
 
 /**
  * Verified JWT claims for this request, or null when signed out. `cache`

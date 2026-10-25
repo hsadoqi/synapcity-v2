@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { nameSchema } from '@/features/account/types';
+import { nameSchema } from './name';
 
 /** The shortest password the forms accept; the weak-password reply states it. */
 export const MIN_PASSWORD_LENGTH = 8;

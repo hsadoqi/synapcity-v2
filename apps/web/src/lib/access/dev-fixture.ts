@@ -1,7 +1,7 @@
 import {
   currentUserFromClaims,
   type CurrentUser,
-} from '@/features/auth/shared/current-user';
+} from '@synapcity/domain-identity';
 
 /**
  * Development-only fixture identity (ADR-0006, development amendment). It lets

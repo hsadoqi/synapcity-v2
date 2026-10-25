@@ -15,6 +15,7 @@
   "dependencies": {
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.117.3",
+    "@synapcity/domain-identity": "workspace:*",
     "@synapcity/server-auth": "workspace:*",
     "server-only": "0.0.1"
   },

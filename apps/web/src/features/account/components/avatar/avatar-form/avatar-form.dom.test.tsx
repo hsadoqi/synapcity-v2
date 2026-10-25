@@ -7,7 +7,8 @@ vi.mock('@synapcity/frontend-ui/core/toast', () => ({
   toast: { add: toasts.add },
 }));
 
-import { MAX_AVATAR_BYTES, type ProfileState } from '@/features/account/types';
+import { type ProfileState } from '@/features/account/types';
+import { MAX_AVATAR_BYTES } from '@synapcity/domain-identity';
 
 /** Only the Server Action boundary is replaced; React runs the real form. */
 const mocks = vi.hoisted(() => ({ updateAvatar: vi.fn() }));

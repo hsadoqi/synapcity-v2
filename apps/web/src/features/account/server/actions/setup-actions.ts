@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 
-import { checkName } from '@/features/account/shared/name';
+import { checkName } from '@synapcity/domain-identity';
 import type { ProfileState } from '@/features/account/types';
 import {
   getCaller,
