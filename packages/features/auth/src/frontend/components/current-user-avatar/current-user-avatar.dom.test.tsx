@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { CurrentUser } from '@synapcity/domain-identity';
 
 const mocks = vi.hoisted(() => ({ user: null as CurrentUser | null }));
-vi.mock('../../next/user-provider', () => ({
+vi.mock('../../next/providers/user-provider', () => ({
   useCurrentUser: () => mocks.user,
 }));
 

@@ -14,7 +14,7 @@ import {
   AlertDialogTrigger,
 } from '@synapcity/frontend-ui/core/alert-dialog';
 
-import { useConnectedAccounts } from '../../client/connected-accounts';
+import { useConnectedAccounts } from '../../providers/connected-accounts';
 import {
   OAUTH_PROVIDERS,
   providerLabel,
@@ -26,7 +26,7 @@ import type {
   AuthState,
 } from '../../../contracts';
 import { FormMessage } from '@synapcity/frontend-forms';
-import { SignInAgain } from '../../next/sign-in-again';
+import { SignInAgain } from '../../next/components/sign-in-again';
 
 const initialState: AuthState = {};
 

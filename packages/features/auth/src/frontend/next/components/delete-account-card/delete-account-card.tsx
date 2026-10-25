@@ -5,9 +5,9 @@ import { useActionState, useId } from 'react';
 import Link from 'next/link';
 import { Button, buttonVariants } from '@synapcity/frontend-ui/core/button';
 
-import type { DeleteAccountState } from '../../../contracts';
+import type { DeleteAccountState } from '../../../../contracts';
 import { FormMessage } from '@synapcity/frontend-forms';
-import { AuthShell } from '../../auth-shell';
+import { AuthShell } from '../../../components/auth-shell';
 
 const initialState: DeleteAccountState = {};
 

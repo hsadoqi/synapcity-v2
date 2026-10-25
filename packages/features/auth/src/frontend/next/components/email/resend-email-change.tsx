@@ -2,10 +2,10 @@
 
 import { useActionState, useId } from 'react';
 
-import type { AuthState, AuthAction } from '../../../contracts';
+import type { AuthState, AuthAction } from '../../../../contracts';
 import { FormMessage } from '@synapcity/frontend-forms';
-import { useCooldown } from '../../client/use-cooldown';
-import { ResendButton } from '../../resend-button';
+import { ResendButton } from '../../../components/resend-button';
+import { useCooldown } from '../../../hooks/use-cooldown';
 import { SignInAgain } from '../sign-in-again';
 
 const initialState: AuthState = {};

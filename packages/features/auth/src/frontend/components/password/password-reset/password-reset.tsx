@@ -2,11 +2,11 @@
 
 import { useActionState, useId } from 'react';
 
-import { useCooldown } from '../../../client/use-cooldown';
+import { useCooldown } from '../../../hooks/use-cooldown';
 import type { AuthState, AuthAction } from '../../../../contracts';
 import { FormMessage } from '@synapcity/frontend-forms';
-import { ResendButton } from '../../../resend-button';
-import { SignInAgain } from '../../../next/sign-in-again';
+import { SignInAgain } from '../../../next/components/sign-in-again';
+import { ResendButton } from '../../resend-button';
 
 const initialState: AuthState = {};
 

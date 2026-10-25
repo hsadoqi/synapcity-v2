@@ -2,10 +2,10 @@
 
 import { useActionState } from 'react';
 import type { AuthState, AuthAction } from '../../../../contracts';
-import { AuthLinkButton } from '../../../auth-link-button';
-import { AuthConfirmation } from '../../../auth-confirmation';
-import { AuthShell } from '../../../auth-shell';
-import { useConfirmation } from '../../../client/use-confirmation';
+import { useConfirmation } from '../../../hooks/use-confirmation';
+import { AuthLinkButton } from '../../../next/components/auth-link-button';
+import { AuthConfirmation } from '../../auth-confirmation';
+import { AuthShell } from '../../auth-shell';
 import { ForgotPasswordForm } from './forgot-password-form';
 import { ResendResetLink } from '../../resend';
 

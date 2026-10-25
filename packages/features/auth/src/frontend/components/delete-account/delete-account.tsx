@@ -21,7 +21,7 @@ import {
   useFocusFirstError,
 } from '@synapcity/frontend-forms';
 import { LINK_SIGN_IN_WINDOW_MINUTES } from '../../../contracts';
-import { SignInAgain } from '../../next/sign-in-again';
+import { SignInAgain } from '../../next/components/sign-in-again';
 
 const initialState: AuthState = {};
 

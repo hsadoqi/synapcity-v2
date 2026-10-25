@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
-**Status:** Implemented on `refactor/m7-3-frontend-supabase` (2026-10-25), local commits, not pushed. The owner accepted questions A, B and C as recommended. The repository gate (Task 3 step 3) and the manual checks (step 4) are open.
+**Status:** Implemented and merged in #71 (2026-10-25). The owner accepted questions A, B and C as recommended. The repository gate (Task 3 step 3) and the manual checks (step 4) are open.
 
 **Goal:** The account and profile experience (the name and photo forms, the profile summary and setup form, `ProfileAvatar`, `ProfileState`) leaves `apps/web` for a new `@synapcity/features-account` package laid out like `features-settings` (`./contracts`, `./frontend`). No behavior changes. The account R9 barrel-cycle exception is removed.
 

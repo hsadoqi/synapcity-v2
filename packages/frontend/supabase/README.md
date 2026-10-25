@@ -14,7 +14,7 @@ Runtime: browser, framework-neutral. It imports no `next` and no server code, an
 
 ## What stays in the host
 
-`apps/web` keeps `lib/supabase/env.ts` (the `NEXT_PUBLIC_*` values), `lib/supabase/client.ts` (a one-line `createClient()` that passes them in) and `user-provider`, which is React and uses `next/navigation`. `user-provider` moves with `features-auth` in M7.5.
+`apps/web` keeps `lib/supabase/env.ts` (the `NEXT_PUBLIC_*` values), `lib/supabase/client.ts` (a one-line `createClient()` that passes them in), and a small client wrapper that binds that factory to `features-auth`'s Next.js user provider. The provider and its routing behavior live in `@synapcity/features-auth`.
 
 ## Verification
 
