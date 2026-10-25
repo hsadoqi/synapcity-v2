@@ -4,14 +4,14 @@ import { useActionState, useId } from 'react';
 import { Button } from '@synapcity/frontend-ui/core/button';
 import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 
-import type { AuthState, AuthAction } from '../../../contracts';
+import type { AuthState, AuthAction } from '../../../../contracts';
 import {
   FormField,
   useFocusFirstError,
   FormMessage,
   fieldErrorProps,
 } from '@synapcity/frontend-forms';
-import { ResendConfirmation } from '../resend';
+import { ResendConfirmation } from '../../../components/resend';
 
 const initialState: AuthState = {};
 

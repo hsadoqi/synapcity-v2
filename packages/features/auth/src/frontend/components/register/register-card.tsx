@@ -3,12 +3,12 @@
 import { useActionState } from 'react';
 
 import type { AuthState, AuthAction, AuthFormAction } from '../../../contracts';
-import { AuthLinkButton } from '../../auth-link-button';
+import { AuthLinkButton } from '../../next/components/auth-link-button';
 import { OAuthButtons } from '../oauth-buttons';
-import { AuthConfirmation } from '../../auth-confirmation';
-import { AuthShell } from '../../auth-shell';
-import { useConfirmation } from '../../client/use-confirmation';
-import { AuthDivider } from '../../auth-divider';
+import { useConfirmation } from '../../hooks/use-confirmation';
+import { AuthConfirmation } from '../auth-confirmation';
+import { AuthDivider } from '../auth-divider';
+import { AuthShell } from '../auth-shell';
 import { RegisterForm } from './register-form';
 import { ResendConfirmation } from '../resend';
 

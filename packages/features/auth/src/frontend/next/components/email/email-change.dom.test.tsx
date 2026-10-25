@@ -2,8 +2,8 @@ import type { ComponentProps } from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { AuthState } from '../../../contracts';
-import { PendingEmailProvider } from '../../client/pending-email';
+import type { AuthState } from '../../../../contracts';
+import { PendingEmailProvider } from '../../../providers/pending-email';
 
 const mocks = vi.hoisted(() => ({
   requestEmailChange: vi.fn(),

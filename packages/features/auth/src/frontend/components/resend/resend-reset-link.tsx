@@ -4,8 +4,8 @@ import { useActionState, useId } from 'react';
 
 import type { AuthState, AuthAction } from '../../../contracts';
 import { FormMessage } from '@synapcity/frontend-forms';
-import { ResendButton } from '../../resend-button';
-import { useCooldown } from '../../client/use-cooldown';
+import { useCooldown } from '../../hooks/use-cooldown';
+import { ResendButton } from '../resend-button';
 
 const initialState: AuthState = {};
 

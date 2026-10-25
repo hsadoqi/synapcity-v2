@@ -4,7 +4,7 @@ import { Button } from '@synapcity/frontend-ui/core/button';
 
 import type { ProfileAction, ProfileState } from '../../../../contracts';
 import { NameField } from '../name-field';
-import { ProfileFormShell } from '../../../next/profile-form-shell';
+import { ProfileFormShell } from '../../../next/components/profile-form-shell';
 
 /** Edits just the display name. */
 export function NameForm({

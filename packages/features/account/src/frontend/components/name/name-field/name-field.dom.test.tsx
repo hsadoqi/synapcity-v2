@@ -8,7 +8,7 @@ vi.mock('@synapcity/frontend-ui/core/toast', () => ({
 
 import { type ProfileState } from '../../../../contracts';
 import { MAX_NAME_LENGTH } from '@synapcity/domain-identity';
-import { ProfileFormShell } from '../../../next/profile-form-shell';
+import { ProfileFormShell } from '../../../next/components/profile-form-shell';
 import { NameField } from './name-field';
 
 const show = (

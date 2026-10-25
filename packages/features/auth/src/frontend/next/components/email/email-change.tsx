@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
-import { usePendingEmail } from '../../client/pending-email';
-import type { AuthState, AuthAction } from '../../../contracts';
+import { usePendingEmail } from '../../../providers/pending-email';
+import type { AuthState, AuthAction } from '../../../../contracts';
 import {
   FormField,
   FormMessage,

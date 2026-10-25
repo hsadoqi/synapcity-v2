@@ -3,7 +3,7 @@
 import type { ProfileAction } from '../../../../contracts';
 import { AvatarField } from '../../avatar';
 import { NameField } from '../../name';
-import { ProfileFormShell } from '../../../next/profile-form-shell';
+import { ProfileFormShell } from '../../../next/components/profile-form-shell';
 
 /**
  * Lets a new account confirm its name and photo. Both usually arrive from

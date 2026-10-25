@@ -6,7 +6,7 @@ import { Button } from '@synapcity/frontend-ui/core/button';
 
 import { ProfileSetupForm } from '@synapcity/features-account/frontend';
 import type { ProfileAction } from '@synapcity/features-account/contracts';
-import { AuthShell } from '../../auth-shell';
+import { AuthShell } from '../../../components/auth-shell';
 
 /**
  * The step after a sign-up: confirm the name and photo, or skip. It composes

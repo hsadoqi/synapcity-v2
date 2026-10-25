@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { AuthState } from '../../../contracts';
+import type { AuthState } from '../../../../contracts';
 
 const mocks = vi.hoisted(() => ({ resendEmailChange: vi.fn() }));
 vi.mock('next/navigation', () => ({ usePathname: () => '/u1/settings' }));
