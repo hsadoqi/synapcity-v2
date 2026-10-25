@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
-import type { ProfileState } from '@/features/account/types';
+import type { ProfileState } from '@synapcity/features-account/contracts';
 import { AvatarForm } from '../../avatar';
-import { ProfileAvatar } from '@/features/account/shared/profile-avatar';
+import { ProfileAvatar } from '@synapcity/features-account/frontend';
 import { NameForm } from '../../name';
 
 type Editing = 'name' | 'avatar' | null;

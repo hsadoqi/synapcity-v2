@@ -6,7 +6,7 @@ import {
   PASSWORD_REQUIREMENTS,
   type AuthState,
 } from '@/features/auth/types';
-import { MAX_NAME_LENGTH } from '@/features/account/types';
+import { MAX_NAME_LENGTH } from '@synapcity/domain-identity';
 import { RegisterForm } from './register-form';
 
 const show = (state: AuthState = {}, pending = false, action = vi.fn()) =>

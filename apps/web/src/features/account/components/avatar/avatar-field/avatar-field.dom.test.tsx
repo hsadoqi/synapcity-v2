@@ -6,7 +6,7 @@ vi.mock('@synapcity/frontend-ui/core/toast', () => ({
   toast: { add: vi.fn() },
 }));
 
-import { type ProfileState } from '@/features/account/types';
+import { type ProfileState } from '@synapcity/features-account/contracts';
 import { MAX_AVATAR_BYTES } from '@synapcity/domain-identity';
 import { ProfileFormShell } from '../../profile';
 import { AvatarField } from './avatar-field';

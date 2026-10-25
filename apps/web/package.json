@@ -22,6 +22,7 @@
     "@synapcity/domain-preferences": "workspace:*",
     "@synapcity/domain-records": "workspace:*",
     "@synapcity/domain-spaces": "workspace:*",
+    "@synapcity/features-account": "workspace:*",
     "@synapcity/features-settings": "workspace:*",
     "@synapcity/features-spaces": "workspace:*",
     "@synapcity/frontend-collection": "workspace:*",

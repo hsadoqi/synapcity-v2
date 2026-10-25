@@ -3,7 +3,7 @@
 import { Button } from '@synapcity/frontend-ui/core/button';
 
 import { updateAvatar } from '@/features/account/server/actions/avatar-actions';
-import type { ProfileState } from '@/features/account/types';
+import type { ProfileState } from '@synapcity/features-account/contracts';
 import { AvatarField } from '../avatar-field';
 import { ProfileFormShell } from '../../profile';
 

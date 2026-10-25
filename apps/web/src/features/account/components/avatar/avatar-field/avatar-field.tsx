@@ -9,7 +9,7 @@ import {
   MAX_AVATAR_BYTES,
   avatarFileSchema,
 } from '@synapcity/domain-identity';
-import { ProfileAvatar } from '@/features/account/shared';
+import { ProfileAvatar } from '@synapcity/features-account/frontend';
 import { isUploadedAvatar } from '@synapcity/domain-identity';
 import { useProfileForm } from '../../profile';
 

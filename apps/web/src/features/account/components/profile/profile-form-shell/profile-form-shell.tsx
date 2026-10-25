@@ -14,7 +14,7 @@ import { Button } from '@synapcity/frontend-ui/core/button';
 import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 import { toast } from '@synapcity/frontend-ui/core/toast';
 
-import type { ProfileState } from '@/features/account/types';
+import type { ProfileState } from '@synapcity/features-account/contracts';
 import { FormMessage, useFocusFirstError } from '@synapcity/frontend-forms';
 
 type ProfileFormContextValue = {

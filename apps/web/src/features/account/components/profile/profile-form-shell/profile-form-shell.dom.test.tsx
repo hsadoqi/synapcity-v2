@@ -11,7 +11,7 @@ vi.mock('@synapcity/frontend-ui/core/toast', () => ({
   toast: { add: toasts.add },
 }));
 
-import type { ProfileState } from '@/features/account/types';
+import type { ProfileState } from '@synapcity/features-account/contracts';
 import { ProfileFormShell, useProfileForm } from './profile-form-shell';
 
 /** A field that shows what the shell hands its children. */

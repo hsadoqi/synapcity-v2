@@ -1,3 +1,10 @@
+## Active task: Milestone 7.4 account experience (2026-10-25)
+
+- Goal and mode: implementation of `docs/superpowers/plans/2026-10-25-m7-4-features-account.md`. The owner accepted the plan's questions A, B and C as recommended and asked for no pull request until M7 ends, so the work is local commits on `refactor/m7-3-frontend-supabase` (pull request #71).
+- Task 1 (done): creates `packages/features/account/**` (`./contracts` and `./frontend`); moves `ProfileState` and `ProfileAvatar` into it; re-points their importers; deletes `apps/web/src/features/account/{types,shared}`; `register-form.tsx` and its test import `MAX_NAME_LENGTH` from `@synapcity/domain-identity`, which removes the temporary re-export. Exact updates: `apps/web/package.json`, `pnpm-lock.yaml`, the root `vitest.config.ts` project list, and one `@source` line each in the web and Storybook global styles.
+- Next (Task 2): the forms move with their Server Actions passed in as props; `ProfileFormShell` moves under `frontend/next/` and takes the sign-in href. Not changed: the actions, `caller.ts`, the two cards in `apps/web/src/components` (they move to `features-auth` in M7.5), messages, routes.
+- Verification so far: the package's tests, type check and lint; web type check, lint and 546 tests in account and auth plus the architecture and identity ratchets; `pnpm boundaries`, `pnpm deps`, `pnpm format:check`. Not run: the full `pnpm verify`, the manual profile checks.
+
 ## Active task: Milestone 7.2 Task C profile operations (2026-10-25)
 
 - Goal and mode: implementation of Task C of `docs/superpowers/plans/2026-10-24-m7-2-server-packages.md`. The owner asked on 2026-10-25 to start it and not to open another pull request until the end of M7, so the work is on `refactor/m7-3-frontend-supabase` (pull request #71) as local commits. The two decisions the plan listed were taken as the plan recommended, with no objection.

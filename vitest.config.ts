@@ -26,6 +26,7 @@ const projects = [
   'packages/domain/spaces',
   'packages/dev/boundaries',
   'packages/dev/fixtures',
+  'packages/features/account',
   'packages/features/dashboards',
   'packages/features/spaces',
   'packages/features/settings',

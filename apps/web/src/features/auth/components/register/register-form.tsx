@@ -9,7 +9,7 @@ import {
   type AuthState,
 } from '@/features/auth/types';
 import { signUpSchema } from '@synapcity/domain-identity';
-import { MAX_NAME_LENGTH } from '@/features/account/types';
+import { MAX_NAME_LENGTH } from '@synapcity/domain-identity';
 import {
   FormField,
   useActionForm,

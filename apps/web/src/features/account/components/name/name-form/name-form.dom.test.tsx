@@ -7,7 +7,7 @@ vi.mock('@synapcity/frontend-ui/core/toast', () => ({
   toast: { add: toasts.add },
 }));
 
-import type { ProfileState } from '@/features/account/types';
+import type { ProfileState } from '@synapcity/features-account/contracts';
 
 /** Only the Server Action boundary is replaced; React runs the real form. */
 const mocks = vi.hoisted(() => ({ updateName: vi.fn() }));

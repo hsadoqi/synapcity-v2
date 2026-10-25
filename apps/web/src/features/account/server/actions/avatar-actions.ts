@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 
-import type { ProfileState } from '@/features/account/types';
+import type { ProfileState } from '@synapcity/features-account/contracts';
 import { getCaller, mirrorToSession, SHOWS_LATER } from '../caller';
 import { saveAvatar } from '../save-avatar';
 import { createClient } from '@/lib/supabase/server';
