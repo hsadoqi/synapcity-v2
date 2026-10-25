@@ -6,9 +6,9 @@ vi.mock('@synapcity/frontend-ui/core/toast', () => ({
   toast: { add: vi.fn() },
 }));
 
-import { type ProfileState } from '@synapcity/features-account/contracts';
+import { type ProfileState } from '../../../../contracts';
 import { MAX_AVATAR_BYTES } from '@synapcity/domain-identity';
-import { ProfileFormShell } from '../../profile';
+import { ProfileFormShell } from '../../../next/profile-form-shell';
 import { AvatarField } from './avatar-field';
 
 const UPLOADED =
@@ -24,6 +24,7 @@ const show = (
 ) =>
   render(
     <ProfileFormShell
+      signInHref={signInHref}
       action={action}
       initialState={initialState}
       submitLabel="Save photo"
@@ -37,6 +38,8 @@ const pick = (file: File) =>
   fireEvent.change(input(), { target: { files: [file] } });
 const image = (type = 'image/png', size = 100) =>
   new File([new Uint8Array(size)], 'me.png', { type });
+
+const signInHref = (to: string) => `/auth/login?next=${encodeURIComponent(to)}`;
 
 describe('AvatarField', () => {
   it('shows initials when there is no photo', () => {

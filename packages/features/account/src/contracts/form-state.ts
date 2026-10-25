@@ -29,3 +29,12 @@ export type ProfileState = {
    */
   signedOut?: boolean;
 };
+
+/**
+ * A profile save action: a Server Action in the web app, passed in by the host
+ * because a package cannot import app code.
+ */
+export type ProfileAction = (
+  previous: ProfileState,
+  formData: FormData,
+) => Promise<ProfileState>;

@@ -14,7 +14,7 @@ import { Button } from '@synapcity/frontend-ui/core/button';
 import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 import { toast } from '@synapcity/frontend-ui/core/toast';
 
-import type { ProfileState } from '@synapcity/features-account/contracts';
+import type { ProfileState } from '../../../contracts';
 import { FormMessage, useFocusFirstError } from '@synapcity/frontend-forms';
 
 type ProfileFormContextValue = {
@@ -45,6 +45,7 @@ export function ProfileFormShell({
   action,
   initialState,
   submitLabel,
+  signInHref,
   onSaved,
   secondaryAction,
   children,
@@ -52,6 +53,8 @@ export function ProfileFormShell({
   action: (previous: ProfileState, formData: FormData) => Promise<ProfileState>;
   initialState: ProfileState;
   submitLabel: string;
+  /** Where "Sign in again" goes, given the page to come back to. The host owns the route. */
+  signInHref: (returnTo: string) => string;
   /** Called once a submit was saved, with the result. */
   onSaved?: (state: ProfileState) => void;
   /** Shown beside the submit button, such as a cancel button. */
@@ -86,7 +89,7 @@ export function ProfileFormShell({
         <FormMessage id={messageId} state={{ error: state.error }} />
         {state.signedOut ? (
           <LinkButton
-            href={`/auth/login?next=${encodeURIComponent(here)}`}
+            href={signInHref(here)}
             variant="link"
             size="sm"
             className="self-start"

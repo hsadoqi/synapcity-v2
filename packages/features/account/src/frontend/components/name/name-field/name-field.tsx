@@ -2,7 +2,7 @@
 
 import { FormField, fieldErrorProps } from '@synapcity/frontend-forms';
 import { MAX_NAME_LENGTH } from '@synapcity/domain-identity';
-import { useProfileForm } from '../../profile';
+import { useProfileForm } from '../../../next/profile-form-shell';
 
 /** The display-name input. Place it inside a `ProfileFormShell`. */
 export function NameField({

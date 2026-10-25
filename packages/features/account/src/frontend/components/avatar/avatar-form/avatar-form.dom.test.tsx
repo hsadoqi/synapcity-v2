@@ -7,15 +7,11 @@ vi.mock('@synapcity/frontend-ui/core/toast', () => ({
   toast: { add: toasts.add },
 }));
 
-import { type ProfileState } from '@synapcity/features-account/contracts';
+import { type ProfileState } from '../../../../contracts';
 import { MAX_AVATAR_BYTES } from '@synapcity/domain-identity';
 
 /** Only the Server Action boundary is replaced; React runs the real form. */
 const mocks = vi.hoisted(() => ({ updateAvatar: vi.fn() }));
-
-vi.mock('@/features/account/server/actions/avatar-actions', () => ({
-  updateAvatar: mocks.updateAvatar,
-}));
 
 import { AvatarForm } from './avatar-form';
 
@@ -26,13 +22,22 @@ const submit = (button?: HTMLElement) =>
     else fireEvent.submit(photoInput().form!);
   });
 
+const signInHref = (to: string) => `/auth/login?next=${encodeURIComponent(to)}`;
+
 describe('AvatarForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('labels the file input, limits its types and describes the rules', () => {
-    render(<AvatarForm name="Ada Lovelace" imageUrl={null} />);
+    render(
+      <AvatarForm
+        action={mocks.updateAvatar}
+        signInHref={signInHref}
+        name="Ada Lovelace"
+        imageUrl={null}
+      />,
+    );
 
     expect(photoInput().type).toBe('file');
     expect(photoInput().accept).toBe('image/png,image/jpeg,image/webp');
@@ -43,7 +48,14 @@ describe('AvatarForm', () => {
   });
 
   it('shows initials and no default-photo button when there is no photo', () => {
-    render(<AvatarForm name="Ada Lovelace" imageUrl={null} />);
+    render(
+      <AvatarForm
+        action={mocks.updateAvatar}
+        signInHref={signInHref}
+        name="Ada Lovelace"
+        imageUrl={null}
+      />,
+    );
 
     expect(screen.getByText('AL')).toBeTruthy();
     expect(
@@ -59,6 +71,8 @@ describe('AvatarForm', () => {
     } satisfies ProfileState);
     render(
       <AvatarForm
+        action={mocks.updateAvatar}
+        signInHref={signInHref}
         name="Ada"
         imageUrl="https://x.supabase.co/storage/v1/object/public/avatars/u/a.png"
       />,
@@ -81,6 +95,8 @@ describe('AvatarForm', () => {
   it('words the button as what it does, whether the default is a provider picture or the icon', () => {
     render(
       <AvatarForm
+        action={mocks.updateAvatar}
+        signInHref={signInHref}
         name="Ada"
         imageUrl="https://x.supabase.co/storage/v1/object/public/avatars/u/a.png"
       />,
@@ -95,6 +111,8 @@ describe('AvatarForm', () => {
   it('cannot remove a provider picture, only replace it', () => {
     render(
       <AvatarForm
+        action={mocks.updateAvatar}
+        signInHref={signInHref}
         name="Ada"
         imageUrl="https://avatars.githubusercontent.com/u/1"
       />,
@@ -106,7 +124,14 @@ describe('AvatarForm', () => {
   });
 
   it('shows the default person icon when there is no name and no picture', () => {
-    render(<AvatarForm name={null} imageUrl={null} />);
+    render(
+      <AvatarForm
+        action={mocks.updateAvatar}
+        signInHref={signInHref}
+        name={null}
+        imageUrl={null}
+      />,
+    );
 
     expect(screen.getByText('Default photo')).toBeTruthy();
   });
@@ -117,7 +142,14 @@ describe('AvatarForm', () => {
       fields: ['avatar'],
       avatarUrl: null,
     } satisfies ProfileState);
-    render(<AvatarForm name="Ada" imageUrl={null} />);
+    render(
+      <AvatarForm
+        action={mocks.updateAvatar}
+        signInHref={signInHref}
+        name="Ada"
+        imageUrl={null}
+      />,
+    );
     await submit();
 
     const alert = screen.getByRole('alert');
@@ -135,6 +167,8 @@ describe('AvatarForm', () => {
     } satisfies ProfileState);
     render(
       <AvatarForm
+        action={mocks.updateAvatar}
+        signInHref={signInHref}
         name="Ada"
         imageUrl="https://x.supabase.co/storage/v1/object/public/avatars/u/a.png"
       />,
@@ -163,7 +197,14 @@ describe('AvatarForm', () => {
       new File([new Uint8Array(bytes)], name, { type });
 
     it('refuses a file over the size limit before anything is sent', () => {
-      render(<AvatarForm name="Ada" imageUrl={null} />);
+      render(
+        <AvatarForm
+          action={mocks.updateAvatar}
+          signInHref={signInHref}
+          name="Ada"
+          imageUrl={null}
+        />,
+      );
 
       choose(png(MAX_AVATAR_BYTES + 1));
 
@@ -176,7 +217,14 @@ describe('AvatarForm', () => {
     });
 
     it('refuses a type that is not allowed, such as SVG', () => {
-      render(<AvatarForm name="Ada" imageUrl={null} />);
+      render(
+        <AvatarForm
+          action={mocks.updateAvatar}
+          signInHref={signInHref}
+          name="Ada"
+          imageUrl={null}
+        />,
+      );
 
       choose(png(10, 'logo.svg', 'image/svg+xml'));
 
@@ -187,7 +235,14 @@ describe('AvatarForm', () => {
     });
 
     it('accepts a file at the limit and clears an earlier complaint', () => {
-      render(<AvatarForm name="Ada" imageUrl={null} />);
+      render(
+        <AvatarForm
+          action={mocks.updateAvatar}
+          signInHref={signInHref}
+          name="Ada"
+          imageUrl={null}
+        />,
+      );
       choose(png(MAX_AVATAR_BYTES + 1));
       expect(screen.getByRole('alert')).toBeTruthy();
       cleared.mockClear();

@@ -2,10 +2,9 @@
 
 import { Button } from '@synapcity/frontend-ui/core/button';
 
-import { updateName } from '@/features/account/server/actions/name-actions';
-import type { ProfileState } from '@synapcity/features-account/contracts';
-import { NameField } from '../name-field/name-field';
-import { ProfileFormShell } from '../../profile';
+import type { ProfileAction, ProfileState } from '../../../../contracts';
+import { NameField } from '../name-field';
+import { ProfileFormShell } from '../../../next/profile-form-shell';
 
 /** Edits just the display name. */
 export function NameForm({
@@ -13,15 +12,21 @@ export function NameForm({
   onSaved,
   onCancel,
   autoFocus,
+  action,
+  signInHref,
 }: {
   defaultName: string;
   onSaved?: (state: ProfileState) => void;
   onCancel?: () => void;
   autoFocus?: boolean;
+  /** The save action the host supplies (a Server Action in the web app). */
+  action: ProfileAction;
+  signInHref: (returnTo: string) => string;
 }) {
   return (
     <ProfileFormShell
-      action={updateName}
+      action={action}
+      signInHref={signInHref}
       initialState={{ name: defaultName }}
       submitLabel="Save changes"
       onSaved={onSaved}

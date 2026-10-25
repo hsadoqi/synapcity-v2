@@ -9,9 +9,9 @@ import {
   MAX_AVATAR_BYTES,
   avatarFileSchema,
 } from '@synapcity/domain-identity';
-import { ProfileAvatar } from '@synapcity/features-account/frontend';
+import { ProfileAvatar } from '../../profile-avatar';
 import { isUploadedAvatar } from '@synapcity/domain-identity';
-import { useProfileForm } from '../../profile';
+import { useProfileForm } from '../../../next/profile-form-shell';
 
 const MAX_MB = MAX_AVATAR_BYTES / 1024 / 1024;
 

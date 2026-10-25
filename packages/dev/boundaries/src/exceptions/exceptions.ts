@@ -47,30 +47,6 @@ export const EXCEPTIONS: readonly Exception[] = [
     removal:
       'M5 Spaces slice or the later slice that needs this shell (frontend-shells, host-supplied links)',
   },
-  {
-    rule: 'R9',
-    file: 'apps/web/src/features/account/components/avatar/avatar-field/avatar-field.tsx',
-    members: [
-      'apps/web/src/features/account/components/avatar/avatar-field/avatar-field.tsx',
-      'apps/web/src/features/account/components/avatar/avatar-field/index.ts',
-      'apps/web/src/features/account/components/avatar/avatar-form/avatar-form.tsx',
-      'apps/web/src/features/account/components/avatar/avatar-form/index.ts',
-      'apps/web/src/features/account/components/avatar/index.ts',
-      'apps/web/src/features/account/components/name/index.ts',
-      'apps/web/src/features/account/components/name/name-field/index.ts',
-      'apps/web/src/features/account/components/name/name-field/name-field.tsx',
-      'apps/web/src/features/account/components/name/name-form/index.ts',
-      'apps/web/src/features/account/components/name/name-form/name-form.tsx',
-      'apps/web/src/features/account/components/profile/index.ts',
-      'apps/web/src/features/account/components/profile/profile-setup-form/index.ts',
-      'apps/web/src/features/account/components/profile/profile-setup-form/profile-setup-form.tsx',
-      'apps/web/src/features/account/components/profile/profile-summary/index.ts',
-      'apps/web/src/features/account/components/profile/profile-summary/profile-summary.tsx',
-    ],
-    reason:
-      "Pre-existing barrel-induced module cycle across the account components' index files.",
-    removal: 'M7 account migration',
-  },
 ];
 
 const sameMembers = (a: string[] | undefined, b: string[] | undefined) =>

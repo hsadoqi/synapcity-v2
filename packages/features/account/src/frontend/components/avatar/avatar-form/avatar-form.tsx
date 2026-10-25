@@ -2,10 +2,9 @@
 
 import { Button } from '@synapcity/frontend-ui/core/button';
 
-import { updateAvatar } from '@/features/account/server/actions/avatar-actions';
-import type { ProfileState } from '@synapcity/features-account/contracts';
+import type { ProfileAction, ProfileState } from '../../../../contracts';
 import { AvatarField } from '../avatar-field';
-import { ProfileFormShell } from '../../profile';
+import { ProfileFormShell } from '../../../next/profile-form-shell';
 
 /** Edits just the photo. */
 export function AvatarForm({
@@ -14,16 +13,22 @@ export function AvatarForm({
   onSaved,
   onCancel,
   autoFocus,
+  action,
+  signInHref,
 }: {
   name: string | null;
   imageUrl: string | null;
   onSaved?: (state: ProfileState) => void;
   onCancel?: () => void;
   autoFocus?: boolean;
+  /** The save action the host supplies (a Server Action in the web app). */
+  action: ProfileAction;
+  signInHref: (returnTo: string) => string;
 }) {
   return (
     <ProfileFormShell
-      action={updateAvatar}
+      action={action}
+      signInHref={signInHref}
       initialState={{ avatarUrl: imageUrl }}
       submitLabel="Upload photo"
       onSaved={onSaved}

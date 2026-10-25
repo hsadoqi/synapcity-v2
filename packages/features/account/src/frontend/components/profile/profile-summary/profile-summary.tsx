@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
-import type { ProfileState } from '@synapcity/features-account/contracts';
+import type { ProfileAction, ProfileState } from '../../../../contracts';
 import { AvatarForm } from '../../avatar';
-import { ProfileAvatar } from '@synapcity/features-account/frontend';
+import { ProfileAvatar } from '../../profile-avatar';
 import { NameForm } from '../../name';
 
 type Editing = 'name' | 'avatar' | null;
@@ -17,9 +17,14 @@ type Editing = 'name' | 'avatar' | null;
 export function ProfileSummary({
   name,
   imageUrl,
+  actions,
+  signInHref,
 }: {
   name: string;
   imageUrl: string | null;
+  /** The save actions the host supplies for the two forms. */
+  actions: { updateName: ProfileAction; updateAvatar: ProfileAction };
+  signInHref: (returnTo: string) => string;
 }) {
   const [current, setCurrent] = useState({ name, imageUrl });
   const [editing, setEditing] = useState<Editing>(null);
@@ -56,6 +61,8 @@ export function ProfileSummary({
     <div className="flex flex-col gap-6">
       {editing === 'avatar' ? (
         <AvatarForm
+          action={actions.updateAvatar}
+          signInHref={signInHref}
           name={current.name}
           imageUrl={current.imageUrl}
           onSaved={saved}
@@ -87,6 +94,8 @@ export function ProfileSummary({
 
       {editing === 'name' ? (
         <NameForm
+          action={actions.updateName}
+          signInHref={signInHref}
           defaultName={current.name}
           onSaved={saved}
           onCancel={close}

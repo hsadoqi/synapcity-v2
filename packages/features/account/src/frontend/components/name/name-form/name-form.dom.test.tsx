@@ -7,14 +7,10 @@ vi.mock('@synapcity/frontend-ui/core/toast', () => ({
   toast: { add: toasts.add },
 }));
 
-import type { ProfileState } from '@synapcity/features-account/contracts';
+import type { ProfileState } from '../../../../contracts';
 
 /** Only the Server Action boundary is replaced; React runs the real form. */
 const mocks = vi.hoisted(() => ({ updateName: vi.fn() }));
-
-vi.mock('@/features/account/server/actions/name-actions', () => ({
-  updateName: mocks.updateName,
-}));
 
 import { NameForm } from './name-form';
 
@@ -33,6 +29,8 @@ const submit = () =>
     fireEvent.submit(nameInput().form!);
   });
 
+const signInHref = (to: string) => `/auth/login?next=${encodeURIComponent(to)}`;
+
 describe('NameForm submit', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -44,7 +42,13 @@ describe('NameForm submit', () => {
       message: 'Saved',
       saved: true,
     });
-    render(<NameForm defaultName="Ada" />);
+    render(
+      <NameForm
+        action={mocks.updateName}
+        signInHref={signInHref}
+        defaultName="Ada"
+      />,
+    );
     fireEvent.change(nameInput(), { target: { value: 'Grace' } });
     await submit();
 
@@ -56,7 +60,13 @@ describe('NameForm submit', () => {
   it('disables the button while saving and shows the status afterwards', async () => {
     const pending = deferred();
     mocks.updateName.mockReturnValue(pending.promise);
-    render(<NameForm defaultName="Ada" />);
+    render(
+      <NameForm
+        action={mocks.updateName}
+        signInHref={signInHref}
+        defaultName="Ada"
+      />,
+    );
     await submit();
 
     const button = screen.getByRole('button', { name: 'Saving…' });
@@ -81,7 +91,13 @@ describe('NameForm submit', () => {
       fields: ['name'],
       name: '',
     });
-    render(<NameForm defaultName="Ada" />);
+    render(
+      <NameForm
+        action={mocks.updateName}
+        signInHref={signInHref}
+        defaultName="Ada"
+      />,
+    );
     await submit();
 
     const alert = screen.getByRole('alert');
@@ -96,7 +112,13 @@ describe('NameForm submit', () => {
       error: 'Sign in again to update your profile.',
       name: 'Ada',
     });
-    render(<NameForm defaultName="Ada" />);
+    render(
+      <NameForm
+        action={mocks.updateName}
+        signInHref={signInHref}
+        defaultName="Ada"
+      />,
+    );
     await submit();
 
     expect(nameInput().getAttribute('aria-invalid')).toBeNull();

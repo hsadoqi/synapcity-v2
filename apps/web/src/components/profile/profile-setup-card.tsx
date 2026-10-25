@@ -4,8 +4,12 @@ import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
-import { ProfileSetupForm } from '@/features/account/components/profile/profile-setup-form';
-import { skipProfileSetup } from '@/features/account/server/actions/setup-actions';
+import { ProfileSetupForm } from '@synapcity/features-account/frontend';
+import {
+  completeProfile,
+  skipProfileSetup,
+} from '@/features/account/server/actions/setup-actions';
+import { signInHref } from '@/lib/routing/sign-in-href';
 import { AuthShell } from '@/features/auth/shared/auth-shell';
 
 /**
@@ -59,6 +63,8 @@ export function ProfileSetupCard({
         defaultName={defaultName}
         imageUrl={imageUrl}
         onComplete={goOn}
+        action={completeProfile}
+        signInHref={signInHref}
       />
     </AuthShell>
   );

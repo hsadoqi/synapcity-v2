@@ -2,7 +2,10 @@
 
 import { FieldGroup } from '@synapcity/frontend-ui/core/field';
 
-import { ProfileSummary } from '@/features/account/components/profile';
+import { ProfileSummary } from '@synapcity/features-account/frontend';
+import { updateAvatar } from '@/features/account/server/actions/avatar-actions';
+import { updateName } from '@/features/account/server/actions/name-actions';
+import { signInHref } from '@/lib/routing/sign-in-href';
 import { useCurrentUser } from '@/features/auth/client';
 import {
   ConnectedAccounts,
@@ -37,7 +40,12 @@ export const AccountSettings = () => {
         <SettingsAccordion>
           <SettingsAccordionItem value="profile" title="Profile">
             <FieldGroup className="max-w-3xl">
-              <ProfileSummary name={user.name ?? ''} imageUrl={user.imageUrl} />
+              <ProfileSummary
+                name={user.name ?? ''}
+                imageUrl={user.imageUrl}
+                actions={{ updateName, updateAvatar }}
+                signInHref={signInHref}
+              />
             </FieldGroup>
           </SettingsAccordionItem>
           {/* Sign-in details belong to the auth feature. */}

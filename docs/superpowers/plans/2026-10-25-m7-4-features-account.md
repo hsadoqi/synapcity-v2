@@ -1,8 +1,8 @@
 # Milestone 7.4 account experience Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
-**Status:** Approved (owner, 2026-10-25: questions A, B and C accepted as recommended). Implementation starts on `refactor/m7-3-frontend-supabase`.
+**Status:** Implemented on `refactor/m7-3-frontend-supabase` (2026-10-25), local commits, not pushed. The owner accepted questions A, B and C as recommended. The repository gate (Task 3 step 3) and the manual checks (step 4) are open.
 
 **Goal:** The account and profile experience (the name and photo forms, the profile summary and setup form, `ProfileAvatar`, `ProfileState`) leaves `apps/web` for a new `@synapcity/features-account` package laid out like `features-settings` (`./contracts`, `./frontend`). No behavior changes. The account R9 barrel-cycle exception is removed.
 
@@ -39,23 +39,24 @@ Facts that shape the move:
 
 ### Task 1: Contracts and the shared avatar
 
-- [ ] **Step 1: Tests first** for `ProfileAvatar` (existing tests move unchanged) and a contract import test for `ProfileState`.
-- [ ] **Step 2: Create the package** (manifest, tsconfig, eslint and vitest configs, README with `Owns:`, indexes); add the Vitest project to the root config and the Tailwind `@source` line if the host needs it; `pnpm install`.
-- [ ] **Step 3: Move `types/form-state.ts` to `contracts` and `shared/profile-avatar` to `frontend`** with `git mv`; re-point importers including `auth/components/current-user-avatar`.
-- [ ] **Step 4: Fix the temporary `MAX_NAME_LENGTH` re-export** as above.
-- [ ] **Step 5: Run the package and web checks;** commit locally.
+- [x] **Step 1: Tests first** for `ProfileAvatar` (existing tests move unchanged) and a contract import test for `ProfileState`.
+- [x] **Step 2: Create the package** (manifest, tsconfig, eslint and vitest configs, README with `Owns:`, indexes); add the Vitest project to the root config and the Tailwind `@source` line if the host needs it; `pnpm install`.
+- [x] **Step 3: Move `types/form-state.ts` to `contracts` and `shared/profile-avatar` to `frontend`** with `git mv`; re-point importers including `auth/components/current-user-avatar`.
+- [x] **Step 4: Fix the temporary `MAX_NAME_LENGTH` re-export** as above.
+- [x] **Step 5: Run the package and web checks;** commit locally.
 
 ### Task 2: The forms, with their actions as props
 
-- [ ] **Step 1: Tests first:** existing form and field tests move with the components; add one case per form showing the supplied action is the one called.
-- [ ] **Step 2: Move the components** (`avatar`, `name`, `profile`) to `frontend`. `ProfileFormShell` moves to `frontend/next/` and gains `signInHref`. `NameForm`, `AvatarForm` and `ProfileSetupForm` gain an `action` prop; `ProfileSummary` gains `actions: { updateName, updateAvatar }`.
-- [ ] **Step 3: Re-point the host.** `settings/components/account-settings` passes `updateName` and `updateAvatar`; `components/profile/profile-setup-card` passes `completeProfile`; the app builds `signInHref` beside `lib/routing`.
-- [ ] **Step 4: Run the checks;** `pnpm boundaries` should now report the account R9 exception stale; remove it. Commit locally.
+- [x] **Step 1: Tests first:** existing form and field tests move with the components; add one case per form showing the supplied action is the one called.
+- [x] **Step 2: Move the components** (`avatar`, `name`, `profile`) to `frontend`. `ProfileFormShell` moves to `frontend/next/` and gains `signInHref`. `NameForm`, `AvatarForm` and `ProfileSetupForm` gain an `action` prop; `ProfileSummary` gains `actions: { updateName, updateAvatar }`.
+- [x] **Step 3: Re-point the host.** `settings/components/account-settings` passes `updateName` and `updateAvatar`; `components/profile/profile-setup-card` passes `completeProfile`; the app builds `signInHref` beside `lib/routing`.
+- [x] **Step 4: Run the checks;** `pnpm boundaries` should now report the account R9 exception stale; remove it. Commit locally.
 
 ### Task 3: Records and verification
 
-- [ ] **Step 1: Update the records:** the package README, the inventory row, the ownership map account rows, the M7 design status, this plan, `.agents/task-scope.md`. No owner quotes.
-- [ ] **Step 2: Boundary probes** (planted, then removed): a server import, and `next/link` in `frontend` outside `frontend/next/`.
+- [x] **Step 1: Update the records:** the package README, the inventory row, the ownership map account rows, the M7 design status, this plan, `.agents/task-scope.md`. No owner quotes.
+- [x] **Step 2: Boundary probes** (planted, then removed): a server import, and `next/link` in `frontend` outside `frontend/next/`.
+  - Result (2026-10-25): `next/link` outside `frontend/next/` was reported as R11 and allowed inside it; the server import was reported as R0 (import does not resolve) because the package declares no server dependency.
 - [ ] **Step 3: Repository gate:** `pnpm verify` before the single pull request at the end of M7.
 - [ ] **Step 4: Report** per AGENTS.md section 9. Manual: edit the name and photo in Settings; run the post-sign-up step with and without skipping; check the header refreshes; sign out in another tab and see "Sign in again".
 

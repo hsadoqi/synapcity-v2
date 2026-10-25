@@ -12,17 +12,12 @@ const mocks = vi.hoisted(() => ({
   updateAvatar: vi.fn(),
 }));
 
-vi.mock('@/features/account/server/actions/name-actions', () => ({
-  updateName: mocks.updateName,
-}));
-vi.mock('@/features/account/server/actions/avatar-actions', () => ({
-  updateAvatar: mocks.updateAvatar,
-}));
-
 import { ProfileSummary } from './profile-summary';
 
 const edit = (item: 'name' | 'photo') =>
   screen.getByRole('button', { name: `Edit ${item}` });
+
+const signInHref = (to: string) => `/auth/login?next=${encodeURIComponent(to)}`;
 
 describe('ProfileSummary', () => {
   beforeEach(() => {
@@ -30,7 +25,17 @@ describe('ProfileSummary', () => {
   });
 
   it('shows the name and the photo with an edit button for each', () => {
-    render(<ProfileSummary name="Ada Lovelace" imageUrl={null} />);
+    render(
+      <ProfileSummary
+        actions={{
+          updateName: mocks.updateName,
+          updateAvatar: mocks.updateAvatar,
+        }}
+        signInHref={signInHref}
+        name="Ada Lovelace"
+        imageUrl={null}
+      />,
+    );
 
     expect(screen.getByText('Ada Lovelace')).toBeTruthy();
     expect(edit('name')).toBeTruthy();
@@ -39,7 +44,17 @@ describe('ProfileSummary', () => {
   });
 
   it('edits only the name: the form has just that field and focuses it', () => {
-    render(<ProfileSummary name="Ada" imageUrl={null} />);
+    render(
+      <ProfileSummary
+        actions={{
+          updateName: mocks.updateName,
+          updateAvatar: mocks.updateAvatar,
+        }}
+        signInHref={signInHref}
+        name="Ada"
+        imageUrl={null}
+      />,
+    );
 
     fireEvent.click(edit('name'));
 
@@ -50,7 +65,17 @@ describe('ProfileSummary', () => {
   });
 
   it('edits only the photo: the form has just that field', () => {
-    render(<ProfileSummary name="Ada" imageUrl={null} />);
+    render(
+      <ProfileSummary
+        actions={{
+          updateName: mocks.updateName,
+          updateAvatar: mocks.updateAvatar,
+        }}
+        signInHref={signInHref}
+        name="Ada"
+        imageUrl={null}
+      />,
+    );
 
     fireEvent.click(edit('photo'));
 
@@ -60,7 +85,17 @@ describe('ProfileSummary', () => {
   });
 
   it('cancels back to the display and returns focus to the button that opened it', () => {
-    render(<ProfileSummary name="Ada" imageUrl={null} />);
+    render(
+      <ProfileSummary
+        actions={{
+          updateName: mocks.updateName,
+          updateAvatar: mocks.updateAvatar,
+        }}
+        signInHref={signInHref}
+        name="Ada"
+        imageUrl={null}
+      />,
+    );
     fireEvent.click(edit('name'));
 
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
@@ -75,7 +110,17 @@ describe('ProfileSummary', () => {
       name: 'Grace Hopper',
       message: 'Name updated.',
     });
-    render(<ProfileSummary name="Ada" imageUrl={null} />);
+    render(
+      <ProfileSummary
+        actions={{
+          updateName: mocks.updateName,
+          updateAvatar: mocks.updateAvatar,
+        }}
+        signInHref={signInHref}
+        name="Ada"
+        imageUrl={null}
+      />,
+    );
     fireEvent.click(edit('name'));
     fireEvent.change(screen.getByLabelText('Name'), {
       target: { value: 'Grace Hopper' },
@@ -99,7 +144,17 @@ describe('ProfileSummary', () => {
       fields: ['name'],
       name: '',
     });
-    render(<ProfileSummary name="Ada" imageUrl={null} />);
+    render(
+      <ProfileSummary
+        actions={{
+          updateName: mocks.updateName,
+          updateAvatar: mocks.updateAvatar,
+        }}
+        signInHref={signInHref}
+        name="Ada"
+        imageUrl={null}
+      />,
+    );
     fireEvent.click(edit('name'));
 
     await act(async () => {

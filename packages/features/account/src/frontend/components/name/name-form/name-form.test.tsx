@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { ProfileState } from '@synapcity/features-account/contracts';
+import type { ProfileState } from '../../../../contracts';
 import { MAX_NAME_LENGTH } from '@synapcity/domain-identity';
 
 /**
@@ -14,9 +14,6 @@ const result = vi.hoisted(() => ({ state: {} as ProfileState }));
 vi.mock('react', async (original) => ({
   ...(await original<typeof import('react')>()),
   useActionState: () => [result.state, () => {}, false],
-}));
-vi.mock('@/features/account/server/actions/name-actions', () => ({
-  updateName: async () => ({}),
 }));
 
 import { NameForm } from './name-form';
@@ -39,8 +36,16 @@ const ALERT = /<p[^>]*\brole="alert"[^>]*>/;
 
 function render(state: ProfileState): string {
   result.state = state;
-  return renderToStaticMarkup(<NameForm defaultName="Ada" />);
+  return renderToStaticMarkup(
+    <NameForm
+      action={async () => ({})}
+      signInHref={signInHref}
+      defaultName="Ada"
+    />,
+  );
 }
+
+const signInHref = (to: string) => `/auth/login?next=${encodeURIComponent(to)}`;
 
 describe('NameForm', () => {
   it('marks the name invalid and points it at the error that explains why', () => {

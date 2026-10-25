@@ -11,7 +11,7 @@ vi.mock('@synapcity/frontend-ui/core/toast', () => ({
   toast: { add: toasts.add },
 }));
 
-import type { ProfileState } from '@synapcity/features-account/contracts';
+import type { ProfileState } from '../../../contracts';
 import { ProfileFormShell, useProfileForm } from './profile-form-shell';
 
 /** A field that shows what the shell hands its children. */
@@ -40,6 +40,8 @@ const submit = () =>
     fireEvent.submit(screen.getByLabelText('Thing').closest('form')!);
   });
 
+const signInHref = (to: string) => `/auth/login?next=${encodeURIComponent(to)}`;
+
 describe('ProfileFormShell', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -48,6 +50,7 @@ describe('ProfileFormShell', () => {
   it('renders whatever fields it is given inside one form with a submit button', () => {
     render(
       <ProfileFormShell
+        signInHref={signInHref}
         action={action}
         initialState={{ name: 'Ada' }}
         submitLabel="Save it"
@@ -68,7 +71,12 @@ describe('ProfileFormShell', () => {
   it('passes the submitted form to the action', async () => {
     action.mockResolvedValue({ name: 'Ada' });
     render(
-      <ProfileFormShell action={action} initialState={{}} submitLabel="Save">
+      <ProfileFormShell
+        signInHref={signInHref}
+        action={action}
+        initialState={{}}
+        submitLabel="Save"
+      >
         <Probe />
       </ProfileFormShell>,
     );
@@ -86,6 +94,7 @@ describe('ProfileFormShell', () => {
     action.mockResolvedValue({ saved: true, name: 'Ada', message: 'Done.' });
     render(
       <ProfileFormShell
+        signInHref={signInHref}
         action={action}
         initialState={{}}
         submitLabel="Save"
@@ -114,6 +123,7 @@ describe('ProfileFormShell', () => {
     action.mockResolvedValue({ error: 'Nope.' });
     render(
       <ProfileFormShell
+        signInHref={signInHref}
         action={action}
         initialState={{}}
         submitLabel="Save"
@@ -134,6 +144,7 @@ describe('ProfileFormShell', () => {
     const onSaved = vi.fn();
     render(
       <ProfileFormShell
+        signInHref={signInHref}
         action={action}
         initialState={{}}
         submitLabel="Save"
@@ -155,7 +166,12 @@ describe('ProfileFormShell', () => {
   describe('when the session has gone', () => {
     const run = async () => {
       render(
-        <ProfileFormShell action={action} initialState={{}} submitLabel="Save">
+        <ProfileFormShell
+          signInHref={signInHref}
+          action={action}
+          initialState={{}}
+          submitLabel="Save"
+        >
           <Probe />
         </ProfileFormShell>,
       );
@@ -209,6 +225,7 @@ describe('ProfileFormShell', () => {
   it('shows a secondary action beside the submit button', () => {
     render(
       <ProfileFormShell
+        signInHref={signInHref}
         action={action}
         initialState={{}}
         submitLabel="Save"

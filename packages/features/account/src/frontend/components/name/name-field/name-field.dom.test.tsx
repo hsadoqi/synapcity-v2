@@ -6,9 +6,9 @@ vi.mock('@synapcity/frontend-ui/core/toast', () => ({
   toast: { add: vi.fn() },
 }));
 
-import { type ProfileState } from '@synapcity/features-account/contracts';
+import { type ProfileState } from '../../../../contracts';
 import { MAX_NAME_LENGTH } from '@synapcity/domain-identity';
-import { ProfileFormShell } from '../../profile';
+import { ProfileFormShell } from '../../../next/profile-form-shell';
 import { NameField } from './name-field';
 
 const show = (
@@ -17,6 +17,7 @@ const show = (
 ) =>
   render(
     <ProfileFormShell
+      signInHref={signInHref}
       action={async () => ({})}
       initialState={initialState}
       submitLabel="Save"
@@ -26,6 +27,8 @@ const show = (
   );
 
 const input = () => screen.getByLabelText('Name') as HTMLInputElement;
+
+const signInHref = (to: string) => `/auth/login?next=${encodeURIComponent(to)}`;
 
 describe('NameField', () => {
   it('is a required name input that autocompletes the person’s name', () => {

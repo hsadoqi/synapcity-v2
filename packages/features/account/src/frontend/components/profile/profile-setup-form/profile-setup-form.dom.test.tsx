@@ -9,13 +9,11 @@ vi.mock('@synapcity/frontend-ui/core/toast', () => ({
 
 const mocks = vi.hoisted(() => ({ completeProfile: vi.fn() }));
 
-vi.mock('@/features/account/server/actions/setup-actions', () => ({
-  completeProfile: mocks.completeProfile,
-}));
-
 import { ProfileSetupForm } from './profile-setup-form';
 
 const nameInput = () => screen.getByLabelText('Name') as HTMLInputElement;
+
+const signInHref = (to: string) => `/auth/login?next=${encodeURIComponent(to)}`;
 
 describe('ProfileSetupForm', () => {
   beforeEach(() => {
@@ -25,6 +23,8 @@ describe('ProfileSetupForm', () => {
   it('prefills the name and shows the provider photo, with both fields labelled', () => {
     render(
       <ProfileSetupForm
+        action={mocks.completeProfile}
+        signInHref={signInHref}
         defaultName="Ada Lovelace"
         imageUrl="https://avatars.githubusercontent.com/u/1"
         onComplete={() => {}}
@@ -41,6 +41,8 @@ describe('ProfileSetupForm', () => {
   it('offers no way to remove a photo while confirming', () => {
     render(
       <ProfileSetupForm
+        action={mocks.completeProfile}
+        signInHref={signInHref}
         defaultName="Ada"
         imageUrl="https://x.supabase.co/storage/v1/object/public/avatars/u/a.png"
         onComplete={() => {}}
@@ -61,6 +63,8 @@ describe('ProfileSetupForm', () => {
     });
     render(
       <ProfileSetupForm
+        action={mocks.completeProfile}
+        signInHref={signInHref}
         defaultName="Ada"
         imageUrl={null}
         onComplete={onComplete}
@@ -90,6 +94,8 @@ describe('ProfileSetupForm', () => {
     });
     render(
       <ProfileSetupForm
+        action={mocks.completeProfile}
+        signInHref={signInHref}
         defaultName="Ada"
         imageUrl={null}
         onComplete={onComplete}
