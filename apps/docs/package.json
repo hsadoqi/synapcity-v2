@@ -13,6 +13,7 @@
   "dependencies": {
     "@synapcity/domain-preferences": "workspace:*",
     "@synapcity/frontend-preferences": "workspace:*",
+    "@synapcity/frontend-shells": "workspace:*",
     "@synapcity/frontend-site": "workspace:*",
     "@synapcity/frontend-ui": "workspace:*",
     "@tailwindcss/postcss": "^4.3.3",

@@ -6,6 +6,7 @@
 @source '../../../packages/frontend/ui/src/blocks/';
 @source '../../../packages/frontend/ui/src/components/';
 @source '../../../packages/frontend/collection/src/';
+@source '../../../packages/frontend/shells/src/';
 @source '../../../packages/features/account/src/';
 @source '../../../packages/features/auth/src/';
 @source '../../../packages/features/dashboards/src/';

@@ -1,3 +1,12 @@
+## Active task: `frontend-shells` package (2026-10-25)
+
+- Goal and mode: implementation of `docs/superpowers/plans/2026-10-25-frontend-shells.md`, approved by the owner on 2026-10-25 with calls C1 to C8 and the Task 6 direction. Create `@synapcity/frontend-shells`, move the app shell family out of `frontend-ui` and `apps/web`, deduplicate the sidebar stack, then give web's sidebar real content.
+- Branch: `refactor/frontend-shells` (renamed from `docs/frontend-shells-plan`), from `main` at `f285d062`; `main` merged in after #71 (M7) landed. Pull request #72 covers Tasks 1 and 2; Task 3 is cancelled; Tasks 4 to 7 follow in later pull requests on top of M7.
+- Exact creates (Task 1): `packages/frontend/shells/**` (manifest, tsconfig, eslint and vitest configs, README, `src/index.ts`, `src/next/index.ts`, `src/package-structure.test.ts`). Exact updates (Task 1): root `vitest.config.ts` (one project line), `apps/storybook/.storybook/main.ts` (one stories glob), the `@source` lines in `apps/web/src/styles/globals.css` and `apps/storybook/styles/globals.css`, `pnpm-lock.yaml` (workspace entry only, no version changes), `docs/architecture/workspace-conventions.md` (inventory row), this ledger, the plan's checkboxes.
+- Later tasks' moves are named in the plan; each is a checkpoint commit.
+- Not changed: dependencies' versions, ADRs (until Task 7's records), `components/ui/sidebar`, the settings frames and feature wrappers (C1), the `Resizable` primitive's location (C2, open).
+- Commits: checkpoint commits per task. The owner authorized pushing and opening #72, and merging it once CI is green (2026-10-25).
+
 ## Active task: Milestone 7.5 auth experience (2026-10-25)
 
 - Goal and mode: implementation of `docs/superpowers/plans/2026-10-25-m7-5-features-auth.md`. The owner asked on 2026-10-25 to start M7.5; the plan's calls C1 to C7 are Claude's, for the owner to check. No new pull request until M7 ends, so the work is local commits on `refactor/m7-3-frontend-supabase` (pull request #71).

@@ -37,6 +37,7 @@ const projects = [
   'packages/frontend/preferences',
   'packages/frontend/supabase',
   'packages/frontend/forms',
+  'packages/frontend/shells',
   'packages/frontend/tokens',
   'packages/frontend/ui',
   'packages/server/auth',
