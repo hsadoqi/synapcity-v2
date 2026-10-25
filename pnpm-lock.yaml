@@ -1690,6 +1690,9 @@ importers:
       '@base-ui/react':
         specifier: ^1.9.0
         version: 1.9.0(@date-fns/tz@1.5.0)(@types/react@19.3.0)(date-fns@4.4.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@synapcity/domain-preferences':
+        specifier: workspace:*
+        version: link:../../domain/preferences
       '@synapcity/frontend-preferences':
         specifier: workspace:*
         version: link:../preferences

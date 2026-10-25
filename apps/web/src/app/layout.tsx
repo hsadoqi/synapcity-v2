@@ -14,6 +14,7 @@ import {
   modeBootScript,
   themeShapeBootScript,
   lookHtmlAttributes,
+  RegionalProvider,
 } from '@synapcity/frontend-preferences';
 import { AccountPreferencesSync } from '@synapcity/features-settings/frontend';
 import { getAccountPreferences } from '@/features/settings/server/account-preferences';
@@ -67,16 +68,23 @@ export default async function RootLayout({
       </head>
       <body>
         <AccountPreferencesSync preferences={account} />
-        <RootProviders>
-          <UserProvider user={user}>
-            <BreadcrumbRootShell
-              account={user ? accountLinksFor(user.id) : null}
-              headerActions={<AuthStatus variant="header" />}
-            >
-              {children}
-            </BreadcrumbRootShell>
-          </UserProvider>
-        </RootProviders>
+        {/* Dates written on the server use the account's settings and its last
+            device zone, so they match the browser's first render. */}
+        <RegionalProvider
+          regional={account?.regional ?? null}
+          deviceTimeZone={stored?.deviceTimezone ?? null}
+        >
+          <RootProviders>
+            <UserProvider user={user}>
+              <BreadcrumbRootShell
+                account={user ? accountLinksFor(user.id) : null}
+                headerActions={<AuthStatus variant="header" />}
+              >
+                {children}
+              </BreadcrumbRootShell>
+            </UserProvider>
+          </RootProviders>
+        </RegionalProvider>
       </body>
     </html>
   );

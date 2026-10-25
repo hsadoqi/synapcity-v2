@@ -39,7 +39,7 @@ describe('DatePickerRenderer', () => {
     const p = renderPicker();
     const trigger = screen.getByRole('button', { name: 'Due date' });
 
-    expect(trigger.textContent).toContain('May 4th, 2026');
+    expect(trigger.textContent).toContain('May 4, 2026');
     expect(
       document.querySelector<HTMLInputElement>('input[name="due"]')?.value,
     ).toBe('2026-05-04');
