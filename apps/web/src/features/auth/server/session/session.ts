@@ -8,7 +8,7 @@ import { fixtureModeEnabled, fixtureUser } from '@/lib/access/dev-fixture';
 import {
   connectedAccountsFrom,
   type ConnectedAccount,
-} from '@/features/auth/shared/connected-accounts';
+} from '@synapcity/features-auth/contracts';
 
 import {
   currentUserFromClaims,

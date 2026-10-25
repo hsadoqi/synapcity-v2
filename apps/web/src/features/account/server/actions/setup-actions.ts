@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 
 import { checkName } from '@synapcity/domain-identity';
-import type { ProfileState } from '@/features/account/types';
+import type { ProfileState } from '@synapcity/features-account/contracts';
 import {
   getCaller,
   mirrorToSession,
@@ -13,7 +13,7 @@ import {
 } from '../caller';
 import { saveAvatar } from '../save-avatar';
 import { saveName } from '../save-name';
-import { withProfileConfirmed } from '../profile-metadata';
+import { withProfileConfirmed } from '@synapcity/server-account';
 import { createClient } from '@/lib/supabase/server';
 import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 

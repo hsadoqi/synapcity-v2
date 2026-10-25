@@ -36,54 +36,11 @@ export const EXCEPTIONS: readonly Exception[] = [
   },
   {
     rule: 'R11',
-    file: 'packages/frontend/ui/src/components/auth-buttons/auth-buttons.tsx',
-    specifier: 'next/navigation',
-    reason: NEXT_IN_SHARED_UI,
-    removal: 'M7 auth migration (frontend-auth, host-supplied navigation)',
-  },
-  {
-    rule: 'R11',
     file: 'packages/frontend/ui/src/components/user-menu/user-menu.tsx',
     specifier: 'next/link',
     reason: NEXT_IN_SHARED_UI,
     removal:
       'M5 Spaces slice or the later slice that needs this shell (frontend-shells, host-supplied links)',
-  },
-  {
-    rule: 'R9',
-    file: 'apps/web/src/features/account/components/avatar/avatar-field/avatar-field.tsx',
-    members: [
-      'apps/web/src/features/account/components/avatar/avatar-field/avatar-field.tsx',
-      'apps/web/src/features/account/components/avatar/avatar-field/index.ts',
-      'apps/web/src/features/account/components/avatar/avatar-form/avatar-form.tsx',
-      'apps/web/src/features/account/components/avatar/avatar-form/index.ts',
-      'apps/web/src/features/account/components/avatar/index.ts',
-      'apps/web/src/features/account/components/name/index.ts',
-      'apps/web/src/features/account/components/name/name-field/index.ts',
-      'apps/web/src/features/account/components/name/name-field/name-field.tsx',
-      'apps/web/src/features/account/components/name/name-form/index.ts',
-      'apps/web/src/features/account/components/name/name-form/name-form.tsx',
-      'apps/web/src/features/account/components/profile/index.ts',
-      'apps/web/src/features/account/components/profile/profile-setup-form/index.ts',
-      'apps/web/src/features/account/components/profile/profile-setup-form/profile-setup-form.tsx',
-      'apps/web/src/features/account/components/profile/profile-summary/index.ts',
-      'apps/web/src/features/account/components/profile/profile-summary/profile-summary.tsx',
-    ],
-    reason:
-      "Pre-existing barrel-induced module cycle across the account components' index files.",
-    removal: 'M7 account migration',
-  },
-  {
-    rule: 'R9',
-    file: 'apps/web/src/features/auth/client/index.ts',
-    members: [
-      'apps/web/src/features/auth/client/index.ts',
-      'apps/web/src/features/auth/client/user-provider/index.ts',
-      'apps/web/src/features/auth/client/user-provider/user-provider.tsx',
-    ],
-    reason:
-      'Pre-existing barrel-induced module cycle: the auth client barrel and the user provider import each other.',
-    removal: 'M7 auth migration',
   },
 ];
 

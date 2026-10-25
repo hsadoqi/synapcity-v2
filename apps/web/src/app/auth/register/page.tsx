@@ -1,7 +1,12 @@
 import type { Metadata } from 'next';
 
 import { safeNextPath } from '@/lib/routing/safe-next';
-import { RegisterCard } from '@/features/auth/components/register/register-card';
+import { RegisterCard } from '@synapcity/features-auth/frontend';
+import {
+  resendConfirmation,
+  signInWithOAuth,
+  signUp,
+} from '@/features/auth/server/actions/actions';
 
 export const metadata: Metadata = { title: 'Sign up' };
 
@@ -13,5 +18,12 @@ export default async function RegisterPage({
   // Empty when absent: the server action then picks the user's own home.
   const next = safeNextPath((await searchParams).next, '');
 
-  return <RegisterCard next={next} />;
+  return (
+    <RegisterCard
+      next={next}
+      signUp={signUp}
+      resendConfirmation={resendConfirmation}
+      signInWithOAuth={signInWithOAuth}
+    />
+  );
 }

@@ -1,6 +1,6 @@
 # Milestone 7: Auth and Account
 
-**Status:** Accepted (owner decision, 2026-10-24). Q1 to Q5 answered with the recommendations (section 9); the calls in section 10 stand. M7.1 is implemented on `refactor/m7-1-identity-contracts` (not yet merged); the rest is not implemented. Plans follow per sub-milestone.
+**Status:** Accepted (owner decision, 2026-10-24). Q1 to Q5 answered with the recommendations (section 9); the calls in section 10 stand. M7.1 and M7.2 Task A are merged (#69). M7.3, M7.2 Task C, M7.4 and M7.5 are implemented on `refactor/m7-3-frontend-supabase` (pull request #71, M7.4 and M7.5 not yet pushed); the close-out (full `pnpm verify`, the manual checks, the single pull request) is not done. M7.2 Task B (session refresh in the proxy) was deliberately not done. Plans follow per sub-milestone.
 **Date:** 2026-10-24
 **Branch:** `docs/m7-auth-account-design` from `main` at `ba00942c` (M6 merged as #64, forms extraction Part A merged as #65).
 **Governing decisions:** [ADR-0014](../../architecture/decisions/0014-multi-app-package-boundaries.md) (categories, matrix), [ADR-0006](../../architecture/decisions/0006-authentication-with-supabase.md) (Supabase Auth, cookie sessions, `getClaims`), [ADR-0007](../../architecture/decisions/0007-app-local-auth-and-account-ownership.md) (responsibilities, placement superseded by ADR-0014), [ADR-0008](../../architecture/decisions/0008-auth-actions-and-server-operations.md) (Server Actions and operations), [ADR-0009](../../architecture/decisions/0009-caller-owned-auth-navigation.md) (caller-supplied navigation), [ADR-0015](../../architecture/decisions/0015-forms-package-and-form-state.md) (forms), the [M4 design](2026-10-23-m4-server-identity-boundary-design.md) (what it deferred to M7), the [workspace conventions](../../architecture/workspace-conventions.md).
@@ -162,6 +162,6 @@ One pull request per sub-milestone or one sectioned pull request: the owner chos
 
 - The duplicated profile contracts (section 3) mean today's web code does not yet use the M4 `domain-identity` schemas; M7.1 closes that.
 - Recent-link sign-in and the display-user fields (`amr`, issued-at) remain a contract question (Q5).
-- `components/account` and `components/profile` are two-file app folders that compose account features; M7.4 decides whether they stay as host composition or move into `features-account`.
+- `components/account` and `components/profile` are two-file app folders that compose account features. Decided by the owner on 2026-10-25: they move into `features-account` with the rest of the account and profile content in M7.4. Components that call a Server Action take it as a host-supplied prop, because a package cannot import app code (ADR-0014 section 3).
 - Storybook coverage for auth and account components does not exist and is not added by a move alone; adding stories is a separate decision.
 - Live provider checks (Supabase Auth, OAuth providers, email delivery) have no automated coverage and are not part of this design's verification.

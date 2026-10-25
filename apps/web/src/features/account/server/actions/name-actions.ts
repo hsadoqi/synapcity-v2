@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 
 import { checkName } from '@synapcity/domain-identity';
-import type { ProfileState } from '@/features/account/types';
+import type { ProfileState } from '@synapcity/features-account/contracts';
 import {
   getCaller,
   mirrorToSession,

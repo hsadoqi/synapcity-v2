@@ -1,0 +1,257 @@
+import { act, fireEvent, render, screen } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+/** The toast is the success feedback: replace it so the tests can see what it was given. */
+const toasts = vi.hoisted(() => ({ add: vi.fn() }));
+vi.mock('@synapcity/frontend-ui/core/toast', () => ({
+  toast: { add: toasts.add },
+}));
+
+import { type ProfileState } from '../../../../contracts';
+import { MAX_AVATAR_BYTES } from '@synapcity/domain-identity';
+
+/** Only the Server Action boundary is replaced; React runs the real form. */
+const mocks = vi.hoisted(() => ({ updateAvatar: vi.fn() }));
+
+import { AvatarForm } from './avatar-form';
+
+const photoInput = () => screen.getByLabelText('Photo') as HTMLInputElement;
+const submit = (button?: HTMLElement) =>
+  act(async () => {
+    if (button) fireEvent.click(button);
+    else fireEvent.submit(photoInput().form!);
+  });
+
+const signInHref = (to: string) => `/auth/login?next=${encodeURIComponent(to)}`;
+
+describe('AvatarForm', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('labels the file input, limits its types and describes the rules', () => {
+    render(
+      <AvatarForm
+        action={mocks.updateAvatar}
+        signInHref={signInHref}
+        name="Ada Lovelace"
+        imageUrl={null}
+      />,
+    );
+
+    expect(photoInput().type).toBe('file');
+    expect(photoInput().accept).toBe('image/png,image/jpeg,image/webp');
+    const hint = document.getElementById(
+      photoInput().getAttribute('aria-describedby')!,
+    );
+    expect(hint?.textContent).toBe('PNG, JPEG or WebP, up to 2 MB.');
+  });
+
+  it('shows initials and no default-photo button when there is no photo', () => {
+    render(
+      <AvatarForm
+        action={mocks.updateAvatar}
+        signInHref={signInHref}
+        name="Ada Lovelace"
+        imageUrl={null}
+      />,
+    );
+
+    expect(screen.getByText('AL')).toBeTruthy();
+    expect(
+      screen.queryByRole('button', { name: 'Use default photo' }),
+    ).toBeNull();
+  });
+
+  it('offers the default photo for an uploaded one, sending the remove intent', async () => {
+    mocks.updateAvatar.mockResolvedValue({
+      avatarUrl: null,
+      message: 'Photo removed.',
+      saved: true,
+    } satisfies ProfileState);
+    render(
+      <AvatarForm
+        action={mocks.updateAvatar}
+        signInHref={signInHref}
+        name="Ada"
+        imageUrl="https://x.supabase.co/storage/v1/object/public/avatars/u/a.png"
+      />,
+    );
+
+    await submit(screen.getByRole('button', { name: 'Use default photo' }));
+
+    const formData = mocks.updateAvatar.mock.calls[0]![1] as FormData;
+    expect(formData.get('intent')).toBe('remove');
+    expect(toasts.add).toHaveBeenCalledWith({
+      type: 'success',
+      title: 'Photo removed.',
+    });
+    expect(screen.queryByRole('status')).toBeNull();
+    expect(
+      screen.queryByRole('button', { name: 'Use default photo' }),
+    ).toBeNull();
+  });
+
+  it('words the button as what it does, whether the default is a provider picture or the icon', () => {
+    render(
+      <AvatarForm
+        action={mocks.updateAvatar}
+        signInHref={signInHref}
+        name="Ada"
+        imageUrl="https://x.supabase.co/storage/v1/object/public/avatars/u/a.png"
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Use default photo' }),
+    ).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Remove photo' })).toBeNull();
+  });
+
+  it('cannot remove a provider picture, only replace it', () => {
+    render(
+      <AvatarForm
+        action={mocks.updateAvatar}
+        signInHref={signInHref}
+        name="Ada"
+        imageUrl="https://avatars.githubusercontent.com/u/1"
+      />,
+    );
+
+    expect(
+      screen.queryByRole('button', { name: /remove|default photo/i }),
+    ).toBeNull();
+  });
+
+  it('shows the default person icon when there is no name and no picture', () => {
+    render(
+      <AvatarForm
+        action={mocks.updateAvatar}
+        signInHref={signInHref}
+        name={null}
+        imageUrl={null}
+      />,
+    );
+
+    expect(screen.getByText('Default photo')).toBeTruthy();
+  });
+
+  it('marks the input invalid, explains why and focuses it after a field error', async () => {
+    mocks.updateAvatar.mockResolvedValue({
+      error: 'Use a PNG, JPEG or WebP image.',
+      fields: ['avatar'],
+      avatarUrl: null,
+    } satisfies ProfileState);
+    render(
+      <AvatarForm
+        action={mocks.updateAvatar}
+        signInHref={signInHref}
+        name="Ada"
+        imageUrl={null}
+      />,
+    );
+    await submit();
+
+    const alert = screen.getByRole('alert');
+    expect(alert.textContent).toBe('Use a PNG, JPEG or WebP image.');
+    expect(photoInput().getAttribute('aria-invalid')).toBe('true');
+    expect(photoInput().getAttribute('aria-describedby')).toBe(alert.id);
+    expect(document.activeElement).toBe(photoInput());
+  });
+
+  it('keeps showing the current photo after a failed submit', async () => {
+    mocks.updateAvatar.mockResolvedValue({
+      error: 'Could not save your changes. Try again.',
+      avatarUrl:
+        'https://x.supabase.co/storage/v1/object/public/avatars/u/a.png',
+    } satisfies ProfileState);
+    render(
+      <AvatarForm
+        action={mocks.updateAvatar}
+        signInHref={signInHref}
+        name="Ada"
+        imageUrl="https://x.supabase.co/storage/v1/object/public/avatars/u/a.png"
+      />,
+    );
+    await submit();
+
+    expect(
+      screen.getByRole('button', { name: 'Use default photo' }),
+    ).toBeTruthy();
+  });
+
+  describe('choosing a file', () => {
+    // Testing Library fakes `files` with a plain property, which setting
+    // `value` cannot clear as a browser would, so watch the clearing call.
+    const cleared = vi.fn();
+    beforeEach(() => cleared.mockClear());
+    const choose = (file: File) => {
+      Object.defineProperty(photoInput(), 'value', {
+        configurable: true,
+        get: () => '',
+        set: cleared,
+      });
+      fireEvent.change(photoInput(), { target: { files: [file] } });
+    };
+    const png = (bytes: number, name = 'me.png', type = 'image/png') =>
+      new File([new Uint8Array(bytes)], name, { type });
+
+    it('refuses a file over the size limit before anything is sent', () => {
+      render(
+        <AvatarForm
+          action={mocks.updateAvatar}
+          signInHref={signInHref}
+          name="Ada"
+          imageUrl={null}
+        />,
+      );
+
+      choose(png(MAX_AVATAR_BYTES + 1));
+
+      const alert = screen.getByRole('alert');
+      expect(alert.textContent).toBe('Use an image of at most 2 MB.');
+      expect(photoInput().getAttribute('aria-invalid')).toBe('true');
+      expect(photoInput().getAttribute('aria-describedby')).toBe(alert.id);
+      expect(cleared).toHaveBeenCalledWith('');
+      expect(mocks.updateAvatar).not.toHaveBeenCalled();
+    });
+
+    it('refuses a type that is not allowed, such as SVG', () => {
+      render(
+        <AvatarForm
+          action={mocks.updateAvatar}
+          signInHref={signInHref}
+          name="Ada"
+          imageUrl={null}
+        />,
+      );
+
+      choose(png(10, 'logo.svg', 'image/svg+xml'));
+
+      expect(screen.getByRole('alert').textContent).toBe(
+        'Use a PNG, JPEG or WebP image.',
+      );
+      expect(cleared).toHaveBeenCalledWith('');
+    });
+
+    it('accepts a file at the limit and clears an earlier complaint', () => {
+      render(
+        <AvatarForm
+          action={mocks.updateAvatar}
+          signInHref={signInHref}
+          name="Ada"
+          imageUrl={null}
+        />,
+      );
+      choose(png(MAX_AVATAR_BYTES + 1));
+      expect(screen.getByRole('alert')).toBeTruthy();
+      cleared.mockClear();
+
+      choose(png(MAX_AVATAR_BYTES));
+
+      expect(screen.queryByRole('alert')).toBeNull();
+      expect(photoInput().getAttribute('aria-invalid')).toBeNull();
+      expect(cleared).not.toHaveBeenCalled();
+    });
+  });
+});

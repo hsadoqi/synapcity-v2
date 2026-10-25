@@ -4,7 +4,8 @@ import { redirect } from 'next/navigation';
 import { fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import { createClient } from '@/lib/supabase/server';
 import { safeNextPath } from '@/lib/routing/safe-next';
-import { UpdatePasswordCard } from '@/features/auth/components/password/update-password/update-password-card';
+import { UpdatePasswordCard } from '@synapcity/features-auth/frontend';
+import { updatePassword } from '@/features/auth/server/actions/actions';
 
 export const metadata: Metadata = { title: 'Choose a password' };
 
@@ -25,5 +26,5 @@ export default async function UpdatePasswordPage({
   // Empty when absent: the action then picks the user's own home.
   const next = safeNextPath((await searchParams).next, '');
 
-  return <UpdatePasswordCard next={next} />;
+  return <UpdatePasswordCard next={next} updatePassword={updatePassword} />;
 }

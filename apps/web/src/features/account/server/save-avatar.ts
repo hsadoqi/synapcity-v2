@@ -1,7 +1,9 @@
-import { avatarFileSchema } from '@synapcity/domain-identity';
-import { providerImageFrom } from '@synapcity/domain-identity';
-import { detectImageType, extensionFor } from './image-type';
-import { withAvatarUrl } from './profile-metadata';
+import {
+  removeOldAvatars,
+  saveAvatar as saveProfileAvatar,
+  type AvatarRequest,
+} from '@synapcity/server-account';
+
 import {
   logFailure,
   SAVE_FAILED,
@@ -10,10 +12,9 @@ import {
   type Supabase,
 } from './caller';
 
-const AVATAR_BUCKET = 'avatars';
+export { removeOldAvatars, type AvatarRequest };
 
-export type AvatarRequest =
-  { kind: 'upload'; file: unknown } | { kind: 'remove' };
+const UNSUPPORTED_TYPE = 'Use a PNG, JPEG or WebP image.';
 
 export type AvatarSaved =
   | {
@@ -24,98 +25,32 @@ export type AvatarSaved =
     }
   | { ok: false; error: string; fields?: ['avatar'] };
 
-/** Deletes every file in the user's avatar folder except `keep`. Best effort. */
-export async function removeOldAvatars(
-  supabase: Supabase,
-  userId: string,
-  keep?: string,
-): Promise<void> {
-  const { data: files } = await supabase.storage
-    .from(AVATAR_BUCKET)
-    .list(userId);
-  const stale = (files ?? [])
-    .map((file) => `${userId}/${file.name}`)
-    .filter((path) => path !== keep);
-  if (stale.length > 0) {
-    await supabase.storage.from(AVATAR_BUCKET).remove(stale);
-  }
-}
-
 /**
- * Uploads a new avatar, or removes the uploaded one. The type is read from the
- * file's bytes, not from what the browser claims, and the file is stored in
- * the caller's own folder under a unique name, so a stale copy is never served
- * from cache. Removing returns to the picture the person's Google or GitHub
- * account supplied, or to none, so the default image shows.
+ * Uploads a new avatar, or removes the uploaded one, through the package. The
+ * package returns why it failed; the words and the log lines are owned here.
  */
 export async function saveAvatar(
   supabase: Supabase,
   caller: Caller,
   request: AvatarRequest,
 ): Promise<AvatarSaved> {
-  let path: string | undefined;
-  let avatarUrl: string | null = providerImageFrom(caller.identities);
+  const saved = await saveProfileAvatar(supabase, caller, request);
+  if (saved.ok) return saved;
 
-  if (request.kind === 'upload') {
-    const parsed = avatarFileSchema.safeParse(request.file);
-    if (!parsed.success) {
+  switch (saved.reason) {
+    case 'invalid-file':
       return {
         ok: false,
-        error: parsed.error.issues[0]?.message ?? 'Choose an image.',
+        error: saved.message ?? 'Choose an image.',
         fields: ['avatar'],
       };
-    }
-
-    const bytes = new Uint8Array(await parsed.data.arrayBuffer());
-    const type = detectImageType(bytes);
-    if (!type) {
-      return {
-        ok: false,
-        error: 'Use a PNG, JPEG or WebP image.',
-        fields: ['avatar'],
-      };
-    }
-
-    path = `${caller.id}/${crypto.randomUUID()}.${extensionFor(type)}`;
-    const { error: uploadError } = await supabase.storage
-      .from(AVATAR_BUCKET)
-      .upload(path, bytes, {
-        contentType: type,
-        // The name is unique per upload, so a long cache never goes stale.
-        cacheControl: '31536000',
-        upsert: false,
-      });
-    if (uploadError) {
-      logFailure('saveAvatar.upload', uploadError);
+    case 'unsupported-type':
+      return { ok: false, error: UNSUPPORTED_TYPE, fields: ['avatar'] };
+    case 'upload-failed':
+      logFailure('saveAvatar.upload', saved.failure);
       return { ok: false, error: SAVE_FAILED };
-    }
-
-    avatarUrl = supabase.storage.from(AVATAR_BUCKET).getPublicUrl(path)
-      .data.publicUrl;
+    case 'profile-not-saved':
+      logFailure('saveAvatar.profile', saved.failure);
+      return { ok: false, error: SAVE_FAILED };
   }
-
-  // `select` returns the changed rows: an update that matches nothing is not
-  // an error to Postgres, but nothing was saved, so it must not look saved.
-  const { data: changed, error: profileError } = await supabase
-    .from('profiles')
-    .update({ avatar_url: avatarUrl })
-    .eq('id', caller.id)
-    .select('id');
-  if (profileError || !changed?.length) {
-    logFailure(
-      'saveAvatar.profile',
-      profileError ?? { code: 'profile_row_missing' },
-    );
-    // The picture is not recorded, so do not leave an orphaned file behind.
-    if (path) await supabase.storage.from(AVATAR_BUCKET).remove([path]);
-    return { ok: false, error: SAVE_FAILED };
-  }
-
-  await removeOldAvatars(supabase, caller.id, path);
-
-  return {
-    ok: true,
-    avatarUrl,
-    patch: (existing) => withAvatarUrl(existing, avatarUrl),
-  };
 }
