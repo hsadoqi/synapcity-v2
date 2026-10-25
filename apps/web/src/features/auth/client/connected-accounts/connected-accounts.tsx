@@ -2,7 +2,7 @@
 
 import { createContext, useContext } from 'react';
 
-import type { ConnectedAccount } from '@/features/auth/shared/connected-accounts';
+import type { ConnectedAccount } from '@synapcity/features-auth/contracts';
 
 /** A stable empty list, so reading it without a provider never re-renders. */
 const NONE: readonly ConnectedAccount[] = [];

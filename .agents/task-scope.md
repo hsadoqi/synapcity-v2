@@ -1,3 +1,10 @@
+## Active task: Milestone 7.5 auth experience (2026-10-25)
+
+- Goal and mode: implementation of `docs/superpowers/plans/2026-10-25-m7-5-features-auth.md`. The owner asked on 2026-10-25 to start M7.5; the plan's calls C1 to C7 are Claude's, for the owner to check. No new pull request until M7 ends, so the work is local commits on `refactor/m7-3-frontend-supabase` (pull request #71).
+- Task 1 (done): creates `packages/features/auth/**` (`./contracts` and `./frontend`); moves `types/form-state`, `shared/{connected-accounts, error-messages, recent-link-sign-in}` into contracts and `shared/{auth-shell, auth-divider, auth-confirmation, auth-link-button, resend-button}` into frontend, with their tests; re-points every importer (the pages, the two cards, the in-feature components, the Server Actions, `session.ts`); deletes `features/auth/{shared,types}`; `register-form` and its test import the password constants from `@synapcity/domain-identity`, which removes the temporary re-export. Exact updates: `apps/web/package.json`, `pnpm-lock.yaml`, the root `vitest.config.ts` list, one `@source` line each in the web and Storybook global styles.
+- Next: Task 2 (client state), Task 3 (components with actions as props), Task 4 (exceptions, records, probes). Not changed: Server Actions, `server/session`, `form-data`, `site-origin`, `AuthStatus`, messages, routes.
+- Verification so far: the package's tests (121), type check and lint; web type check and 490 tests across auth, app, components, settings and the architecture ratchets; `pnpm boundaries`, `pnpm deps`, `pnpm format:check`. Not run: the full `pnpm verify`, the manual auth checks.
+
 ## Active task: Milestone 7.4 account experience (2026-10-25)
 
 - Goal and mode: implementation of `docs/superpowers/plans/2026-10-25-m7-4-features-account.md`. The owner accepted the plan's questions A, B and C as recommended and asked for no pull request until M7 ends, so the work is local commits on `refactor/m7-3-frontend-supabase` (pull request #71).

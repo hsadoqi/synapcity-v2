@@ -2,10 +2,10 @@
 
 import { useActionState } from 'react';
 import { requestPasswordReset } from '@/features/auth/server/actions/actions';
-import type { AuthState } from '@/features/auth/types';
-import { AuthLinkButton } from '../../../shared/auth-link-button';
-import { AuthConfirmation } from '../../../shared/auth-confirmation';
-import { AuthShell } from '../../../shared/auth-shell';
+import type { AuthState } from '@synapcity/features-auth/contracts';
+import { AuthLinkButton } from '@synapcity/features-auth/frontend';
+import { AuthConfirmation } from '@synapcity/features-auth/frontend';
+import { AuthShell } from '@synapcity/features-auth/frontend';
 import { useConfirmation } from '@/features/auth/client/use-confirmation';
 import { ForgotPasswordForm } from './forgot-password-form';
 import { ResendResetLink } from '../../resend/resend-reset-link';

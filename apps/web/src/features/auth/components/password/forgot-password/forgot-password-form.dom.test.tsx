@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { AuthState } from '@/features/auth/types';
+import type { AuthState } from '@synapcity/features-auth/contracts';
 import { ForgotPasswordForm } from './forgot-password-form';
 
 const show = (state: AuthState = {}, pending = false) =>

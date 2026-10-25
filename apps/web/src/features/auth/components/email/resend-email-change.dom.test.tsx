@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { AuthState } from '@/features/auth/types';
+import type { AuthState } from '@synapcity/features-auth/contracts';
 
 const mocks = vi.hoisted(() => ({ resendEmailChange: vi.fn() }));
 vi.mock('@/features/auth/server/actions/actions', () => ({

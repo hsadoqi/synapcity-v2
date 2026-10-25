@@ -14,14 +14,14 @@ import {
 } from '@synapcity/frontend-ui/core/alert-dialog';
 
 import { requestAccountDeletion } from '@/features/auth/server/actions/actions';
-import type { AuthState } from '@/features/auth/types';
+import type { AuthState } from '@synapcity/features-auth/contracts';
 import {
   FormField,
   FormMessage,
   fieldErrorProps,
   useFocusFirstError,
 } from '@synapcity/frontend-forms';
-import { LINK_SIGN_IN_WINDOW_MINUTES } from '@/features/auth/shared/recent-link-sign-in';
+import { LINK_SIGN_IN_WINDOW_MINUTES } from '@synapcity/features-auth/contracts';
 import { SignInAgain } from '../sign-in-again';
 
 const initialState: AuthState = {};

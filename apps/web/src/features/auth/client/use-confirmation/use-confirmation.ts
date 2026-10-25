@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import type { AuthState } from '@/features/auth/types';
+import type { AuthState } from '@synapcity/features-auth/contracts';
 
 /**
  * Lets a "Check your email" state be left again without losing what was typed.

@@ -5,7 +5,7 @@ import { Button } from '@synapcity/frontend-ui/core/button';
 
 import { emailRequestSchema } from '@synapcity/domain-identity';
 
-import type { AuthState } from '@/features/auth/types';
+import type { AuthState } from '@synapcity/features-auth/contracts';
 import {
   FormField,
   useActionForm,

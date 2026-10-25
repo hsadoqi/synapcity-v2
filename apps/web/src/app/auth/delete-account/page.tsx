@@ -6,7 +6,7 @@ import { buttonVariants } from '@synapcity/frontend-ui/core/button';
 import { DeleteAccountCard } from '@/components/account/delete-account-card';
 import { MessagePage } from '@/components/shells/message-page';
 import { getVerifiedClaims } from '@/features/auth/server';
-import { hasRecentLinkSignInNow } from '@/features/auth/shared';
+import { hasRecentLinkSignInNow } from '@synapcity/features-auth/contracts';
 import { settingsPathFor } from '@/lib/routing/user-paths';
 
 export const metadata: Metadata = { title: 'Delete your account' };

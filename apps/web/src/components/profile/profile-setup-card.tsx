@@ -10,7 +10,7 @@ import {
   skipProfileSetup,
 } from '@/features/account/server/actions/setup-actions';
 import { signInHref } from '@/lib/routing/sign-in-href';
-import { AuthShell } from '@/features/auth/shared/auth-shell';
+import { AuthShell } from '@synapcity/features-auth/frontend';
 
 /**
  * The step after a sign-up: confirm the name and photo, or skip. It composes

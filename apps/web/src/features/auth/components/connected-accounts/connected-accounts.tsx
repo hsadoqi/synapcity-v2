@@ -24,8 +24,8 @@ import {
   providerLabel,
   type OAuthProvider,
 } from '@synapcity/domain-identity';
-import type { ConnectedAccount } from '@/features/auth/shared/connected-accounts';
-import type { AuthState } from '@/features/auth/types';
+import type { ConnectedAccount } from '@synapcity/features-auth/contracts';
+import type { AuthState } from '@synapcity/features-auth/contracts';
 import { FormMessage } from '@synapcity/frontend-forms';
 import { SignInAgain } from '../sign-in-again';
 

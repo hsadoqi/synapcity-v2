@@ -4,8 +4,8 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   MIN_PASSWORD_LENGTH,
   PASSWORD_REQUIREMENTS,
-  type AuthState,
-} from '@/features/auth/types';
+} from '@synapcity/domain-identity';
+import type { AuthState } from '@synapcity/features-auth/contracts';
 import { MAX_NAME_LENGTH } from '@synapcity/domain-identity';
 import { RegisterForm } from './register-form';
 

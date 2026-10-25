@@ -4,7 +4,7 @@ import { useActionState, useId } from 'react';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
 import { updatePassword } from '@/features/auth/server/actions/actions';
-import { type AuthState } from '@/features/auth/types';
+import { type AuthState } from '@synapcity/features-auth/contracts';
 import {
   MIN_PASSWORD_LENGTH,
   PASSWORD_REQUIREMENTS,

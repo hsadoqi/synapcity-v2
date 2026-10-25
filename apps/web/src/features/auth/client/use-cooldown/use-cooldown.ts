@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import type { AuthState } from '@/features/auth/types';
+import type { AuthState } from '@synapcity/features-auth/contracts';
 
 /**
  * Seconds to wait before another email can be requested. A courtesy so the

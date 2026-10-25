@@ -2,7 +2,7 @@ import { act, render, renderHook, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { useConfirmation } from '@/features/auth/client/use-confirmation';
-import type { AuthState } from '@/features/auth/types';
+import type { AuthState } from '@synapcity/features-auth/contracts';
 
 const sent = (): AuthState => ({
   success: true,

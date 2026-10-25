@@ -1,4 +1,4 @@
-import { AuthShell } from '../../../shared/auth-shell';
+import { AuthShell } from '@synapcity/features-auth/frontend';
 import { UpdatePasswordForm } from './update-password-form';
 
 export function UpdatePasswordCard({ next }: { next: string }) {

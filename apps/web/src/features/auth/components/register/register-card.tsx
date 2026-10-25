@@ -3,13 +3,13 @@
 import { useActionState } from 'react';
 
 import { signUp } from '@/features/auth/server/actions/actions';
-import type { AuthState } from '@/features/auth/types';
-import { AuthLinkButton } from '../../shared/auth-link-button';
+import type { AuthState } from '@synapcity/features-auth/contracts';
+import { AuthLinkButton } from '@synapcity/features-auth/frontend';
 import { OAuthButtons } from '../oauth-buttons';
-import { AuthConfirmation } from '../../shared/auth-confirmation';
-import { AuthShell } from '../../shared/auth-shell';
+import { AuthConfirmation } from '@synapcity/features-auth/frontend';
+import { AuthShell } from '@synapcity/features-auth/frontend';
 import { useConfirmation } from '@/features/auth/client/use-confirmation';
-import { AuthDivider } from '../../shared/auth-divider';
+import { AuthDivider } from '@synapcity/features-auth/frontend';
 import { RegisterForm } from './register-form';
 import { ResendConfirmation } from '../resend/resend-confirmation';
 

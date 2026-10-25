@@ -3,9 +3,9 @@ import type { Metadata } from 'next';
 import { LoginForm } from '@/features/auth/components/login/login-form';
 import { OAuthButtons } from '@/features/auth/components/oauth-buttons';
 import { safeNextPath } from '@/lib/routing/safe-next';
-import { AuthLinkButton } from '@/features/auth/shared/auth-link-button';
-import { AuthShell } from '@/features/auth/shared/auth-shell';
-import { AuthDivider } from '@/features/auth/shared/auth-divider';
+import { AuthLinkButton } from '@synapcity/features-auth/frontend';
+import { AuthShell } from '@synapcity/features-auth/frontend';
+import { AuthDivider } from '@synapcity/features-auth/frontend';
 
 export const metadata: Metadata = { title: 'Sign in' };
 
