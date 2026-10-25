@@ -9,8 +9,15 @@ vi.mock('@/features/auth/server/actions/actions', () => ({
 
 import { ForgotPasswordCard } from './forgot-password-card';
 
-const submit = () =>
+/**
+ * Types an address, then submits. The form validates in the browser first, so
+ * a test that wants the server's reply has to send something the schema accepts.
+ */
+const submit = (email = 'ada@example.com') =>
   act(async () => {
+    fireEvent.change(screen.getByLabelText('Email'), {
+      target: { value: email },
+    });
     fireEvent.submit(
       screen.getByRole('button', { name: 'Send reset link' }).closest('form')!,
     );
@@ -93,5 +100,29 @@ describe('ForgotPasswordCard', () => {
     await submit();
 
     expect(screen.getByRole('alert').textContent).toBe('Try later.');
+  });
+
+  it('sends the typed address to the server action', async () => {
+    render(<ForgotPasswordCard />);
+
+    await submit('ada@example.com');
+
+    expect(mocks.requestPasswordReset).toHaveBeenCalledTimes(1);
+    const formData = mocks.requestPasswordReset.mock.calls[0]?.[1] as FormData;
+    expect(formData.get('email')).toBe('ada@example.com');
+  });
+
+  it('refuses an empty address in the browser, with the same message and marking as the server', async () => {
+    render(<ForgotPasswordCard />);
+
+    await submit('');
+
+    expect(mocks.requestPasswordReset).not.toHaveBeenCalled();
+    const alert = screen.getByRole('alert');
+    expect(alert.textContent).toBe('Enter your email.');
+    const email = screen.getByLabelText('Email');
+    expect(email.getAttribute('aria-invalid')).toBe('true');
+    expect(email.getAttribute('aria-describedby')).toBe(alert.id);
+    expect(document.activeElement).toBe(email);
   });
 });

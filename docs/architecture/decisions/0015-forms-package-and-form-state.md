@@ -50,11 +50,22 @@ Governs the placement of form interaction foundations, the form-state library, a
 
 ## Unresolved
 
-- **Progressive enhancement.** Today's forms submit as native forms and work before hydration. A React Hook Form `handleSubmit` flow runs in JavaScript. Whether the binding keeps a native `action` path, validates on the client only as an addition, or accepts client-only submit for some forms is open. Decide against the first pilot form.
-- **Server errors into form state.** Mapping an action's `fields` and `error` onto React Hook Form errors, and keeping first-error focus correct, needs a verified approach for React 19 `useActionState` and Next.js 16 server actions.
-- **`@hookform/resolvers` 6.0.0** is a new major. Its Zod 4 support and API must be read from the version's own documentation at implementation time. This ADR makes no claim about its API.
-- **Exact versions** of `react-hook-form` and `@hookform/resolvers` are pinned when the dependency is added, after re-reading the registry. Both are architecturally relevant dependencies and are introduced by a task the owner approves.
-- **Storybook discovery of stories in new packages** is open per the decisions index and is expected to be settled by M5. The forms package depends on that answer for its stories.
+- **Server errors into form state.** Server errors are handled: eight existing forms (login, register, forgot password, update password, email change, delete account, name, avatar) show an action's `{ error, fields }` state, and `useActionForm` shows that same state as it is, so the shared field marking, message linking and focus keep working. What stays open is copying a server result into React Hook Form's own error store, which no current form needs because every server error targets one named field. Decide it against the first form that needs React Hook Form to own server errors (for example nested or array fields).
+- **The other six forms.** Forgot password and register use `useActionForm`. Login, update password, email change, delete account, name and avatar do not yet; each is checked when it migrates. The binding validates files and repeated names (added after the pilot), but the avatar form's own flow, which previews the chosen image, has not been tried with it.
+- **A newer `react-hook-form`.** 7.91.0 is the registry's latest but fails the repository's release-age policy until it is old enough; moving off the pinned 7.90.0 is a separate change.
+
+## Implementation notes
+
+Added 2026-10-24 after extraction Parts A and B. They record what was found; they do not change the decision above.
+
+- **Progressive enhancement: resolved.** `useActionForm` keeps the form's `action` and `noValidate`, so the form works before hydration. Once hydrated, the submit handler validates the form's own `FormData` against the same schema the server action uses, shows a refusal at once in the server's shape, and otherwise calls the action unchanged. An end-to-end test with JavaScript off shows the native path still reaches the server action and gets the same refusal. React Hook Form's documented pattern (calling the action dispatcher inside `handleSubmit` on a form with no `action`) needs JavaScript and was not used.
+- **React 19 resets a form after its action finishes and React Hook Form does not see that reset,** so values are synced from the form's data just before validating. React Hook Form's `reset()` also resets the DOM form and must not be used on such a form.
+- **Versions.** `react-hook-form` 7.90.0 and `@hookform/resolvers` 6.0.0, pinned exactly in the forms package only. Their peer ranges cover React 19.3.0, Zod 4.6.7 and each other. `@hookform/resolvers` 6.0.0 was run against Zod 4.6.7: messages come through and `.trim()` applies to the parsed values.
+- **Boundary.** Only `packages/frontend/forms` can resolve `react-hook-form`, because nothing is hoisted; no boundary rule was added.
+- **Storybook discovery** of stories in new packages was settled in M5.3; the forms package lists its stories there.
+- **Register, the multi-field pilot.** Register (three fields, a password reveal) was migrated after forgot password. For the same input the browser refuses with the message and field the server's `firstRefusal` gives, marks only that field and focuses it; tests compare the two directly, including a password that fails the custom character check. The reveal and the server-side refusal with JavaScript off are checked end to end.
+- **Files and repeated names.** The binding passes `File` values through and turns a name that appears more than once into a list. A chosen file is checked in a Storybook story, because jsdom's `FormData` ignores a file a test assigns.
+- **Verification.** Unit and DOM tests, end-to-end tests with JavaScript on and off for both pilots, and Storybook stories with the a11y addon's axe checks pass. The manual keyboard and screen-reader check has not been done.
 
 ## Governance boundary
 

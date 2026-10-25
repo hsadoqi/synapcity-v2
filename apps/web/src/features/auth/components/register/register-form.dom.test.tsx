@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import {
@@ -45,7 +45,7 @@ describe('RegisterForm', () => {
     );
   });
 
-  it('leaves validation to the server', () => {
+  it("turns off the browser's own validation, so the schema decides", () => {
     show();
     expect(field('Name').form!.noValidate).toBe(true);
   });
@@ -75,11 +75,16 @@ describe('RegisterForm', () => {
     expect(button.hasAttribute('disabled')).toBe(true);
   });
 
-  it('hands the submit to the action it was given', () => {
+  it('hands a valid submit to the action it was given', async () => {
     const action = vi.fn();
     show({}, false, action);
 
-    fireEvent.submit(field('Name').form!);
+    fireEvent.change(field('Name'), { target: { value: 'Ada' } });
+    fireEvent.change(field('Email'), { target: { value: 'ada@example.com' } });
+    fireEvent.change(field('Password'), { target: { value: 'Analytical1!' } });
+    await act(async () => {
+      fireEvent.submit(field('Name').form!);
+    });
 
     expect(action).toHaveBeenCalledTimes(1);
   });
