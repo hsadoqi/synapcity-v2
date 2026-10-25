@@ -28,6 +28,7 @@
     "@synapcity/frontend-error-reports": "workspace:*",
     "@synapcity/frontend-forms": "workspace:*",
     "@synapcity/frontend-preferences": "workspace:*",
+    "@synapcity/frontend-supabase": "workspace:*",
     "@synapcity/frontend-site": "workspace:*",
     "@synapcity/frontend-ui": "workspace:*",
     "@synapcity/server-account": "workspace:*",

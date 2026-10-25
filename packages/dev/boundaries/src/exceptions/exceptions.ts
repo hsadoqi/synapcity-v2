@@ -71,18 +71,6 @@ export const EXCEPTIONS: readonly Exception[] = [
       "Pre-existing barrel-induced module cycle across the account components' index files.",
     removal: 'M7 account migration',
   },
-  {
-    rule: 'R9',
-    file: 'apps/web/src/features/auth/client/index.ts',
-    members: [
-      'apps/web/src/features/auth/client/index.ts',
-      'apps/web/src/features/auth/client/user-provider/index.ts',
-      'apps/web/src/features/auth/client/user-provider/user-provider.tsx',
-    ],
-    reason:
-      'Pre-existing barrel-induced module cycle: the auth client barrel and the user provider import each other.',
-    removal: 'M7 auth migration',
-  },
 ];
 
 const sameMembers = (a: string[] | undefined, b: string[] | undefined) =>

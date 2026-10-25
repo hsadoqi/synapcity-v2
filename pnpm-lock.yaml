@@ -382,6 +382,9 @@ importers:
       '@synapcity/frontend-site':
         specifier: workspace:*
         version: link:../../packages/frontend/site
+      '@synapcity/frontend-supabase':
+        specifier: workspace:*
+        version: link:../../packages/frontend/supabase
       '@synapcity/frontend-ui':
         specifier: workspace:*
         version: link:../../packages/frontend/ui
@@ -1370,6 +1373,37 @@ importers:
       react:
         specifier: 19.3.0
         version: 19.3.0
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: 4.1.12
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/browser-playwright@4.1.12)(@vitest/coverage-v8@4.1.12)(jsdom@30.1.2)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
+
+  packages/frontend/supabase:
+    dependencies:
+      '@supabase/ssr':
+        specifier: 0.12.7
+        version: 0.12.7(@supabase/supabase-js@2.117.3(@opentelemetry/api@1.9.1))
+      '@supabase/supabase-js':
+        specifier: 2.117.3
+        version: 2.117.3(@opentelemetry/api@1.9.1)
+    devDependencies:
+      '@synapcity/dev-eslint-config':
+        specifier: workspace:*
+        version: link:../../dev/eslint-config
+      '@synapcity/dev-typescript-config':
+        specifier: workspace:*
+        version: link:../../dev/typescript-config
+      '@synapcity/dev-vitest-config':
+        specifier: workspace:*
+        version: link:../../dev/vitest-config
+      '@vitest/coverage-v8':
+        specifier: 4.1.12
+        version: 4.1.12(@vitest/browser@4.1.12)(vitest@4.1.12)
+      eslint:
+        specifier: 10.9.1
+        version: 10.9.1(jiti@2.7.0)(supports-color@7.2.0)
       typescript:
         specifier: 7.0.2
         version: 7.0.2

@@ -1,8 +1,7 @@
-import { createBrowserClient } from '@supabase/ssr';
+import { createBrowserSupabaseClient } from '@synapcity/frontend-supabase';
 
 import { getSupabaseEnv } from './env';
 
 export function createClient() {
-  const { url, publishableKey } = getSupabaseEnv();
-  return createBrowserClient(url, publishableKey);
+  return createBrowserSupabaseClient(getSupabaseEnv());
 }
