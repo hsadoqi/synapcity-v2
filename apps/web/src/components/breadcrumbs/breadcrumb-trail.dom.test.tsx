@@ -1,11 +1,22 @@
 import { render, screen, within } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('next/navigation', () => ({ usePathname: () => '/' }));
 
 import { ModeProvider } from '@synapcity/frontend-preferences';
 
 import { BreadcrumbRootShell, SetBreadcrumbs } from './breadcrumb-trail';
+
+beforeEach(() => {
+  vi.stubGlobal(
+    'ResizeObserver',
+    class {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    },
+  );
+});
 
 const account = { homeHref: '/u/home', settingsHref: '/u/settings' };
 
