@@ -38,14 +38,14 @@ export function ContextSwitcher({
                 size="lg"
                 aria-label="Switch version"
                 {...props}
-                className="data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
+                className="data-popup-open:bg-sidebar data-popup-open:text-sidebar-accent flex items-center justify-around outline-none data-[state=open]:bg-sidebar data-[state=open]:text-sidebar-accent"
               >
-                <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-sm bg-sidebar-primary text-sidebar-primary-foreground">
+                <div className="flex aspect-square size-8 shrink-0 items-center justify-center bg-sidebar-background text-sidebar-primary">
                   <SynapcityMark className="size-4" />
                 </div>
                 <div className="flex min-w-0 flex-1 items-center leading-none">
                   <SynapcityWordmark
-                    size="md"
+                    size="sm"
                     title={null}
                     className="text-sidebar-foreground"
                   />
