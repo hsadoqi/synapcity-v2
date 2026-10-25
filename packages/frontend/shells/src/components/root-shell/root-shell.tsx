@@ -1,0 +1,137 @@
+import { SkipLinkButton } from '@synapcity/frontend-ui/components/skip-link';
+import { RootHeader } from './root-header';
+import { RootFooter } from './root-footer';
+import { RootContent } from './root-content';
+import { SidebarShell } from '../sidebar-shell';
+import React from 'react';
+import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';
+import type { RootBreadcrumb } from './root-header';
+
+type ShellProps = {
+  children: React.ReactNode;
+  headerActions?: React.ReactNode;
+  /** Optional content for the authenticated shell's session-local utility panel. */
+  globalPanel?: React.ReactNode;
+  /** The path to the current page, shown in the header once someone is signed in. */
+  breadcrumbs?: RootBreadcrumb[];
+};
+
+// export default function RootShell({
+//   children,
+//   headerActions,
+//   account,
+// }: {
+//   children: React.ReactNode;
+//   headerActions?: React.ReactNode;
+//   /** Present when someone is signed in; the app supplies where they lead. */
+//   account?: AccountLinks | null;
+// }) {
+//   const content = (
+//     <>
+//       <RootContent>{children}</RootContent>
+//       <RootFooter />
+//     </>
+//   );
+
+//   // The skip link comes first in the DOM so it is the first Tab stop, ahead
+//   // of the header and sidebar. It is position: fixed, so this costs no layout.
+//   if (account) {
+//     return (
+//       <>
+//         <SkipLinkButton />
+//         <SidebarShell
+//           header={<RootHeader account={account} actions={headerActions} />}
+//           account={account}
+//         >
+//           {content}
+//         </SidebarShell>
+//       </>
+//     );
+//   }
+
+//   // Pages position themselves (the home page centers, auth sits near the top),
+//   // so this column only stacks header, content and footer.
+//   return (
+//     <div className="flex flex-col flex-1">
+//       <SkipLinkButton />
+//       <RootHeader account={account} actions={headerActions} />
+//       <div className="flex flex-1 flex-col">{content}</div>
+//     </div>
+//   );
+// }
+
+const ShellContent = ({ children }: { children: React.ReactNode }) => (
+  <>
+    <RootContent>{children}</RootContent>
+    <RootFooter />
+  </>
+);
+
+export function PublicShell({ children, headerActions }: ShellProps) {
+  return (
+    <div
+      data-slot="public-shell"
+      className="flex min-h-svh flex-1 flex-col z-0"
+    >
+      <SkipLinkButton />
+      <RootHeader actions={headerActions} />
+      <div className="flex flex-1 flex-col">
+        <ShellContent>{children}</ShellContent>
+      </div>
+    </div>
+  );
+}
+
+export function AuthenticatedShell({
+  children,
+  headerActions,
+  account,
+  globalPanel,
+  breadcrumbs,
+}: ShellProps & { account: AccountLinks }) {
+  return (
+    <div
+      data-slot="authenticated-shell"
+      className="flex min-h-svh flex-1 flex-col z-0"
+    >
+      <SkipLinkButton />
+      <SidebarShell
+        header={
+          <RootHeader
+            account={account}
+            actions={headerActions}
+            breadcrumbs={breadcrumbs}
+          />
+        }
+        account={account}
+        globalPanel={globalPanel}
+      >
+        <ShellContent>{children}</ShellContent>
+      </SidebarShell>
+    </div>
+  );
+}
+
+export default function RootShell({
+  children,
+  headerActions,
+  account,
+  globalPanel,
+  breadcrumbs,
+}: ShellProps & {
+  /** Present when someone is signed in; the app supplies where they lead. */
+  account?: AccountLinks | null;
+}) {
+  return account ? (
+    <AuthenticatedShell
+      account={account}
+      headerActions={headerActions}
+      globalPanel={globalPanel}
+      breadcrumbs={breadcrumbs}
+    >
+      {children}
+    </AuthenticatedShell>
+  ) : (
+    <PublicShell headerActions={headerActions}>{children}</PublicShell>
+  );
+}

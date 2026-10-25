@@ -93,6 +93,17 @@ describe('imports', () => {
   const importPattern =
     /\bfrom\s+['"]([^'"]+)['"]|\bimport\s+['"]([^'"]+)['"]/g;
 
+  /*
+   * Moved from `frontend-ui` as they were (frontend-shells plan, Task 2). They
+   * carry the same two R11 exceptions in `pnpm boundaries`. Removal: Task 4,
+   * when links come from the host through the `./next` binding. An entry that
+   * stops matching fails this test, so the list cannot go stale.
+   */
+  const PENDING_NEXT_IMPORTS = [
+    'components/root-shell/root-header/root-header.tsx -> next/link',
+    'components/sidebar-shell/root-sidebar/root-sidebar.tsx -> next/link',
+  ];
+
   it('imports next/* only under src/next/', () => {
     const offenders: string[] = [];
     for (const file of sourceFiles()) {
@@ -105,7 +116,7 @@ describe('imports', () => {
       }
     }
 
-    expect(offenders).toEqual([]);
+    expect(offenders.sort()).toEqual([...PENDING_NEXT_IMPORTS].sort());
   });
 });
 

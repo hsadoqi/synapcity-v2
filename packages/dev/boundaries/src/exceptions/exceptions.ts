@@ -4,6 +4,8 @@ import type { Exception, Violation } from '../model/index.ts';
  * Existing violations, one file or edge each, with the milestone that removes it
  * (workspace conventions, Boundary checks). An entry that stops matching fails the run.
  */
+const NEXT_IN_SHELLS =
+  'Pre-existing Next.js import moved unchanged from shared UI into frontend-shells (frontend-shells plan, Task 2).';
 const NEXT_IN_SHARED_UI =
   'Pre-existing Next.js import in shared UI (ownership map: framework-coupled presentation).';
 
@@ -18,19 +20,19 @@ export const EXCEPTIONS: readonly Exception[] = [
   },
   {
     rule: 'R11',
-    file: 'packages/frontend/ui/src/blocks/root-shell/root-header/root-header.tsx',
+    file: 'packages/frontend/shells/src/components/root-shell/root-header/root-header.tsx',
     specifier: 'next/link',
-    reason: NEXT_IN_SHARED_UI,
+    reason: NEXT_IN_SHELLS,
     removal:
-      'M5 Spaces slice or the later slice that needs this shell (frontend-shells, host-supplied links)',
+      'frontend-shells plan Task 4 (host-supplied links through the ./next binding)',
   },
   {
     rule: 'R11',
-    file: 'packages/frontend/ui/src/blocks/sidebar-shell/root-sidebar/root-sidebar.tsx',
+    file: 'packages/frontend/shells/src/components/sidebar-shell/root-sidebar/root-sidebar.tsx',
     specifier: 'next/link',
-    reason: NEXT_IN_SHARED_UI,
+    reason: NEXT_IN_SHELLS,
     removal:
-      'M5 Spaces slice or the later slice that needs this shell (frontend-shells, host-supplied links)',
+      'frontend-shells plan Task 4 (host-supplied links through the ./next binding)',
   },
   {
     rule: 'R11',
