@@ -853,6 +853,9 @@ importers:
       '@synapcity/domain-prototypes':
         specifier: workspace:*
         version: link:../../domain/prototypes
+      '@synapcity/frontend-forms':
+        specifier: workspace:*
+        version: link:../../frontend/forms
       '@synapcity/frontend-ui':
         specifier: workspace:*
         version: link:../../frontend/ui

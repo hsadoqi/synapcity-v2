@@ -15,13 +15,13 @@ describe('ActionsToolbar', () => {
     expect(slot(container, 'actions-toolbar')).not.toBeNull();
   });
 
-  it('makes icon actions toolbar buttons that fold away below @3xs', () => {
+  it('makes icon actions toolbar buttons that fold away below @toolbar-icons', () => {
     const onSelect = vi.fn();
     render(
       <ActionsToolbar actions={[{ label: 'Pin', icon: <Pin />, onSelect }]} />,
     );
     const pin = screen.getByRole('button', { name: 'Pin' });
-    expect(pin.className).toContain('@3xs/actions:inline-flex');
+    expect(pin.className).toContain('@toolbar-icons/actions:inline-flex');
     fireEvent.click(pin);
     expect(onSelect).toHaveBeenCalledTimes(1);
   });

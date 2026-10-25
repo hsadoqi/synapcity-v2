@@ -113,4 +113,21 @@ describe('createDashboardStore', () => {
     a.getState().addWidget('stat');
     expect(b.getState().composition.widgets).toHaveLength(0);
   });
+
+  it('adds an event in one update, and ignores a blank name', () => {
+    const store = createDashboardStore(init());
+    let updates = 0;
+    store.subscribe(() => updates++);
+    store.getState().addEvent('Standup', '2026-10-24T13:00:00.000Z');
+    expect(updates).toBe(1);
+    const [event] = Object.values(store.getState().records.event);
+    expect(event).toMatchObject({
+      name: 'Standup',
+      startsAt: '2026-10-24T13:00:00.000Z',
+    });
+
+    store.getState().addEvent('   ', '2026-10-24T14:00:00.000Z');
+    expect(updates).toBe(1);
+    expect(Object.keys(store.getState().records.event)).toHaveLength(1);
+  });
 });

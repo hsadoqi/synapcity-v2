@@ -6,10 +6,15 @@ import {
   type PrototypeRecordKind,
   type PrototypeRecords,
 } from '@synapcity/domain-prototypes';
+import { toCalendarDate } from '@synapcity/frontend-ui/lib/calendar-date';
+import { CalendarPlusIcon } from 'lucide-react';
+import { useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
 import { useNow } from '../../hooks/use-now';
 import { useDashboardStore } from '../../store';
+import { AgendaBody } from '../../widgets/agenda-body';
+import { AgendaEventDialog } from '../../widgets/agenda-body/agenda-event-dialog';
 import { WidgetBody } from '../../widgets/widget-body';
 import { WidgetShell } from '../../widgets/widget-shell';
 
@@ -67,35 +72,75 @@ export function ConnectedWidget({ widgetId }: { widgetId: string }) {
   const updateMetricValue = useDashboardStore((s) => s.updateMetricValue);
   const updateGoal = useDashboardStore((s) => s.updateGoal);
   const addTask = useDashboardStore((s) => s.addTask);
+  const addEvent = useDashboardStore((s) => s.addEvent);
   const now = useNow(widget && TIME_WIDGETS.has(widget.type) ? 30_000 : null);
+  // The agenda's day and Add event dialog, held here so the toolbar action and
+  // the dialog share the day on screen. View state, not saved.
+  const [adding, setAdding] = useState(false);
+  const [agendaDay, setAgendaDay] = useState<string>();
 
   if (!widget) return null;
+  const records = { ...EMPTY_RECORDS, ...tables };
+  const isAgenda = widget.type === 'agenda';
+  const day = agendaDay ?? toCalendarDate(new Date(now));
   return (
-    <WidgetShell
-      widget={widget}
-      settings={settings}
-      editMode={editMode}
-      actions={{
-        update: (patch) => updateWidget(widgetId, patch),
-        duplicate: () => duplicateWidget(widgetId),
-        hide: () => setWidgetStatus(widgetId, 'hidden'),
-        archive: () => setWidgetStatus(widgetId, 'archived'),
-        remove: () => removeWidget(widgetId),
-      }}
-    >
-      <WidgetBody
+    <>
+      <WidgetShell
         widget={widget}
-        records={{ ...EMPTY_RECORDS, ...tables }}
-        now={now}
+        settings={settings}
+        editMode={editMode}
         actions={{
-          toggleTask,
-          toggleHabitDay,
-          updateNoteBody,
-          updateMetricValue,
-          updateGoal,
-          addTask,
+          update: (patch) => updateWidget(widgetId, patch),
+          duplicate: () => duplicateWidget(widgetId),
+          hide: () => setWidgetStatus(widgetId, 'hidden'),
+          archive: () => setWidgetStatus(widgetId, 'archived'),
+          remove: () => removeWidget(widgetId),
         }}
-      />
-    </WidgetShell>
+        toolbar={
+          isAgenda
+            ? {
+                actions: [
+                  {
+                    label: 'Add event',
+                    icon: <CalendarPlusIcon />,
+                    onSelect: () => setAdding(true),
+                  },
+                ],
+              }
+            : undefined
+        }
+      >
+        {isAgenda ? (
+          <AgendaBody
+            events={records.event}
+            now={now}
+            day={day}
+            onDayChange={setAgendaDay}
+          />
+        ) : (
+          <WidgetBody
+            widget={widget}
+            records={records}
+            now={now}
+            actions={{
+              toggleTask,
+              toggleHabitDay,
+              updateNoteBody,
+              updateMetricValue,
+              updateGoal,
+              addTask,
+            }}
+          />
+        )}
+      </WidgetShell>
+      {isAgenda && (
+        <AgendaEventDialog
+          open={adding}
+          onOpenChange={setAdding}
+          day={day}
+          onAdd={addEvent}
+        />
+      )}
+    </>
   );
 }

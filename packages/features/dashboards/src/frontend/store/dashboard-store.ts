@@ -21,6 +21,7 @@ import {
   type LayoutItem,
 } from '@synapcity/domain-grids';
 import {
+  addEvent,
   addTask,
   toggleHabitDay,
   toggleTask,
@@ -61,6 +62,7 @@ type DashboardActions = {
   updateSettings(patch: Partial<DashboardSettings>): void;
   toggleTask(taskId: string): void;
   addTask(projectId: string, name: string): void;
+  addEvent(name: string, startsAt: string): void;
   toggleHabitDay(habitId: string, day: string): void;
   updateNoteBody(noteId: string, body: string): void;
   updateMetricValue(metricId: string, value: number): void;
@@ -152,6 +154,8 @@ export function createDashboardStore({
       toggleTask: (taskId) => record((r) => toggleTask(r, taskId, context())),
       addTask: (projectId, name) =>
         record((r) => addTask(r, projectId, name, context())),
+      addEvent: (name, startsAt) =>
+        record((r) => addEvent(r, name, startsAt, context())),
       updateMetricValue: (metricId, value) =>
         record((r) => updateMetricValue(r, metricId, value, now())),
       updateGoal: (goalId, patch) =>

@@ -43,11 +43,11 @@ export const Roomy: Story = {
   },
 };
 
-/** 12rem of room: everything folds into "More actions". */
+/** 8rem wide, under 8rem of toolbar once padded: everything folds into "More actions". */
 export const Cramped: Story = {
   decorators: [
     (Story) => (
-      <div className="flex w-48 rounded-xl bg-card p-3 text-card-foreground">
+      <div className="flex w-32 rounded-xl bg-card p-3 text-card-foreground">
         <Story />
       </div>
     ),

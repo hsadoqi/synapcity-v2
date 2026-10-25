@@ -111,9 +111,12 @@ function MoreMenu({
  * about it. Its outer box is the container (`@container/actions`), so it
  * measures its own space: give it `flex-1` in a header row.
  *
- * - From `@3xs` (16rem) up: actions with an icon are icon buttons, and "More
- *   actions" holds the rest (and is left out if there is none).
+ * - From `@toolbar-icons` (8rem, a theme token: room for four icon buttons) up:
+ *   actions with an icon are icon buttons, and "More actions" holds the rest
+ *   (and is left out if there is none).
  * - Below: every action is in "More actions".
+ * - Settings in `'auto'` is a separate question, whether the host is big enough
+ *   for a dialog, so it keeps its own, larger threshold: `@3xs` (16rem).
  *
  * Menu content is portaled to `body`, outside the container, so a container
  * query cannot hide items inside an open menu. Instead there are two menus and
@@ -157,7 +160,7 @@ export function ActionsToolbar({
             aria-label={action.label}
             disabled={action.disabled}
             onClick={action.onSelect}
-            className="hidden @3xs/actions:inline-flex"
+            className="hidden @toolbar-icons/actions:inline-flex"
           >
             {action.icon}
           </IconButton>
@@ -196,7 +199,7 @@ export function ActionsToolbar({
         {actions.length > 0 && (
           <div
             data-slot="actions-toolbar-more-compact"
-            className="@3xs/actions:hidden"
+            className="@toolbar-icons/actions:hidden"
           >
             <MoreMenu actions={actions} trigger={more} />
           </div>
@@ -204,7 +207,7 @@ export function ActionsToolbar({
         {menuActions.length > 0 && (
           <div
             data-slot="actions-toolbar-more-wide"
-            className="hidden @3xs/actions:block"
+            className="hidden @toolbar-icons/actions:block"
           >
             <MoreMenu actions={menuActions} trigger={more} />
           </div>
