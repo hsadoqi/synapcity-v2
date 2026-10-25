@@ -599,6 +599,26 @@ Verification on 2026-10-24, after the renderers and the enhancements: `frontend-
 
 Repository issues found along the way, outside forms: the pre-push hook runs `test:e2e` before `build` and Playwright reuses a server already on port 8080 outside CI, so a push can test a stale build; the ownership map links to a `patches` folder that does not exist; two active ADRs are numbered 0011.
 
+### Added after the plan was approved
+
+Items raised while Tasks 1 to 4 and the extraction were built. None is implemented unless the row says so.
+
+| Item                                                                                             | State                                                                             | What would start it                                                                                     |
+| ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `useActionForm`: browser validation for forms that keep their server action                      | Implemented (extraction Part B); used by forgot password and register             | Done                                                                                                    |
+| Files and repeated names (checkbox groups) in `useActionForm`; absent keys read as not sent      | Implemented                                                                       | Done                                                                                                    |
+| Migrate login, update password, email change, delete account, name and avatar to `useActionForm` | Not started                                                                       | Each feature's own milestone (Auth and Account, M7); copy register's browser-versus-server parity tests |
+| The avatar form's preview flow with `useActionForm`                                              | Not tried                                                                         | The avatar migration                                                                                    |
+| Copy server errors into React Hook Form's error store                                            | Not started; no current form needs it (every server error names one field)        | A form with nested or array fields whose server errors React Hook Form must own                         |
+| Reconcile `FormField` with the engine's field frame (Task 5), so there is one field presentation | Not started                                                                       | Task 5                                                                                                  |
+| `FormRenderer` and `useActionForm` share one submit, refusal and focus path                      | Not started                                                                       | Task 6a (see its Consumes line)                                                                         |
+| A popover container, and an inline expanding panel                                               | Not planned; Task 7's set is closed                                               | A consumer that needs one; until then the `custom` container                                            |
+| An option for a dialog or sheet container to close itself after a successful submit              | Not planned; closing stays with the caller                                        | Repetition in Settings dialogs                                                                          |
+| Move `react-hook-form` from 7.90.0 to 7.91.0                                                     | Not done; 7.91.0 fails the release-age policy until about 21:37 UTC on 2026-10-24 | The release-age policy accepting it                                                                     |
+| Manual keyboard and screen-reader check of the forgot-password and register forms                | Not done; needs a person                                                          | The owner                                                                                               |
+
+Repository issues found along the way, outside forms: the pre-push hook runs `test:e2e` before `build` and Playwright reuses a server already on port 8080 outside CI, so a push can test a stale build; the ownership map links to a `patches` folder that does not exist; two active ADRs are numbered 0011.
+
 Dropped: the prototype's `useOptimizedRendering` stub, which per-field render isolation covers.
 
 ### Outside this package
