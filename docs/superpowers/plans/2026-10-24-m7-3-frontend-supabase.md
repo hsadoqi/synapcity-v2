@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Implemented on `refactor/m7-3-frontend-supabase` (2026-10-25). The owner chose option (a) of the thin-package question and approved the scope. Task 1 is done; Task 2 steps 1 to 2 are done and the repository gate and manual checks are open.
+**Status:** Implemented on `refactor/m7-3-frontend-supabase` (2026-10-25). The owner chose option (a) of the thin-package question and approved the scope. Task 1 is done; Task 2 steps 1 to 3 are done (the repository gate passed locally and in CI on pull request #71) and the manual check in step 4 is open.
 
 **Goal:** The browser Supabase client factory and the auth-event rule leave `apps/web` for a new `@synapcity/frontend-supabase` package, the only frontend package importing `@supabase/*`. No behavior changes.
 
@@ -43,7 +43,7 @@ This package would hold about 35 lines of source. ADR-0015 lists a thin wrapper 
 - [x] **Step 1: Update the records:** the package README, the workspace-conventions inventory row (`frontend-supabase`: M7.3, exists), the ownership map `lib/supabase` row, the M7 design status, and `.agents/task-scope.md`. No owner quotes.
 - [x] **Step 2: Boundary probe** (planted, then removed): `import 'next/link'` in the package should report R11; a server import should report R3.
   - Result (2026-10-25): both planted imports were reported, but as R0 (import does not resolve), because the package declares neither `next` nor a server package. R3 and R11 did not fire, so those rules were not exercised here; the undeclared dependency is the guard.
-- [ ] **Step 3: Repository gate.** `pnpm verify` with nothing else running (or CI on the pull request).
+- [x] **Step 3: Repository gate.** `pnpm verify` with nothing else running (or CI on the pull request).
 - [ ] **Step 4: Report** per AGENTS.md section 9. Manual: sign in, open Settings in two tabs, sign out in one, and see the other refresh; change an email address and see the pending state.
 
 ## Calls made (owner to check)
