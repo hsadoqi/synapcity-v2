@@ -20,7 +20,7 @@ describe('AgendaDropdownMenu items', () => {
     render(
       <AgendaDropdownMenu
         items={[
-          { label: 'New time slot', onSelect },
+          { label: 'Add event', onSelect },
           { label: 'Archive', disabled: true },
         ]}
       />,
@@ -28,7 +28,7 @@ describe('AgendaDropdownMenu items', () => {
     fireEvent.click(screen.getByRole('button', { name: 'More actions' }));
     const menu = await screen.findByRole('menu');
     expect(menu.textContent).not.toContain('Theme');
-    fireEvent.click(screen.getByRole('menuitem', { name: 'New time slot' }));
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Add event' }));
     expect(onSelect).toHaveBeenCalledTimes(1);
   });
 });

@@ -224,7 +224,7 @@ export const ManySlots: Story = {
 
 export const CustomMenuItems: Story = {
   args: {
-    menuItems: [{ label: 'New time slot' }, { label: 'Import calendar' }],
+    menuItems: [{ label: 'Add event' }, { label: 'Import calendar' }],
   },
 };
 
@@ -232,7 +232,7 @@ export const CustomMenuItems: Story = {
 export const ResponsiveToolbar: Story = {
   args: {
     menuItems: [
-      { label: 'New time slot', icon: <CalendarPlus /> },
+      { label: 'Add event', icon: <CalendarPlus /> },
       { label: 'Pin', icon: <Pin /> },
       { label: 'Help' },
     ],

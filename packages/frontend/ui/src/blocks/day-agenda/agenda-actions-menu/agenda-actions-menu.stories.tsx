@@ -36,7 +36,7 @@ export const CustomTrigger: Story = {
 };
 
 const toolbarItems = [
-  { label: 'New time slot', icon: <CalendarPlus /> },
+  { label: 'Add event', icon: <CalendarPlus /> },
   { label: 'Pin', icon: <Pin /> },
   { label: 'Share', icon: <Share2 /> },
   { label: 'Help' },
@@ -45,7 +45,7 @@ const toolbarItems = [
 const visible = (element: Element | null) =>
   element !== null && getComputedStyle(element).display !== 'none';
 
-/** 32rem of room, past `@3xs`: icon items are buttons, "More actions" holds Help. */
+/** 32rem of room, past `@toolbar-icons`: icon items are buttons, "More actions" holds Help. */
 export const WideToolbar: Story = {
   args: { menuItems: toolbarItems },
   play: async ({ canvasElement }) => {
@@ -66,12 +66,12 @@ export const WideToolbar: Story = {
   },
 };
 
-/** 12rem of room, under `@3xs`: only settings and "More actions", which holds everything. */
+/** 8rem wide (under 8rem of toolbar once padded): only settings and "More actions", which holds everything. */
 export const CompactToolbar: Story = {
   args: { menuItems: toolbarItems },
   decorators: [
     (Story) => (
-      <div className="flex w-48 rounded-xl bg-card p-3">
+      <div className="flex w-32 rounded-xl bg-card p-3">
         <Story />
       </div>
     ),

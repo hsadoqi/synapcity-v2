@@ -28,7 +28,7 @@ export const Open: Story = {
 export const CustomItems: Story = {
   args: {
     items: [
-      { label: 'New time slot', onSelect: fn() },
+      { label: 'Add event', onSelect: fn() },
       { label: 'Import calendar', disabled: true },
       { label: 'Clear day', variant: 'destructive', onSelect: fn() },
     ],
