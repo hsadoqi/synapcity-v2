@@ -4,8 +4,10 @@ import { createContext, useContext, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 import type { CurrentUser } from '@synapcity/domain-identity';
-import { shouldRefreshOnAuthEvent } from '@synapcity/frontend-supabase';
-import { createClient } from '@/lib/supabase/client';
+import {
+  shouldRefreshOnAuthEvent,
+  type createBrowserSupabaseClient,
+} from '@synapcity/frontend-supabase';
 
 // `undefined` means "no provider above", which is a bug; `null` means signed out.
 const UserContext = createContext<CurrentUser | null | undefined>(undefined);
@@ -21,9 +23,12 @@ const UserContext = createContext<CurrentUser | null | undefined>(undefined);
  */
 export function UserProvider({
   user,
+  createClient,
   children,
 }: {
   user: CurrentUser | null;
+  /** The host's browser client; it owns the environment values (M7.3). */
+  createClient: () => ReturnType<typeof createBrowserSupabaseClient>;
   children: React.ReactNode;
 }) {
   const router = useRouter();
@@ -52,7 +57,7 @@ export function UserProvider({
       }
     });
     return () => data.subscription.unsubscribe();
-  }, [router, fixture]);
+  }, [router, fixture, createClient]);
 
   return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
 }

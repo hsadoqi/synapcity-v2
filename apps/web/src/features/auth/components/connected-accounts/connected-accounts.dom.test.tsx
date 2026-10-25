@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { AuthState } from '@synapcity/features-auth/contracts';
-import { ConnectedAccountsProvider } from '@/features/auth/client';
+import { ConnectedAccountsProvider } from '@synapcity/features-auth/frontend';
 
 const mocks = vi.hoisted(() => ({
   connectAccount: vi.fn(),

@@ -1,7 +1,7 @@
 'use client';
 
 import { ProfileAvatar } from '@synapcity/features-account/frontend';
-import { useCurrentUser } from '@/features/auth/client';
+import { useCurrentUser } from '@synapcity/features-auth/frontend';
 
 export function CurrentUserAvatar() {
   const user = useCurrentUser();

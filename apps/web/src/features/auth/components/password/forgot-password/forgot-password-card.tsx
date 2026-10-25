@@ -6,7 +6,7 @@ import type { AuthState } from '@synapcity/features-auth/contracts';
 import { AuthLinkButton } from '@synapcity/features-auth/frontend';
 import { AuthConfirmation } from '@synapcity/features-auth/frontend';
 import { AuthShell } from '@synapcity/features-auth/frontend';
-import { useConfirmation } from '@/features/auth/client/use-confirmation';
+import { useConfirmation } from '@synapcity/features-auth/frontend';
 import { ForgotPasswordForm } from './forgot-password-form';
 import { ResendResetLink } from '../../resend/resend-reset-link';
 

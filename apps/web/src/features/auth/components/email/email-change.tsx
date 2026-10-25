@@ -6,7 +6,7 @@ import { Loader2 } from 'lucide-react';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
 import { requestEmailChange } from '@/features/auth/server/actions/actions';
-import { usePendingEmail } from '@/features/auth/client';
+import { usePendingEmail } from '@synapcity/features-auth/frontend';
 import type { AuthState } from '@synapcity/features-auth/contracts';
 import {
   FormField,

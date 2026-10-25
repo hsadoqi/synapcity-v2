@@ -8,7 +8,7 @@ import { AuthLinkButton } from '@synapcity/features-auth/frontend';
 import { OAuthButtons } from '../oauth-buttons';
 import { AuthConfirmation } from '@synapcity/features-auth/frontend';
 import { AuthShell } from '@synapcity/features-auth/frontend';
-import { useConfirmation } from '@/features/auth/client/use-confirmation';
+import { useConfirmation } from '@synapcity/features-auth/frontend';
 import { AuthDivider } from '@synapcity/features-auth/frontend';
 import { RegisterForm } from './register-form';
 import { ResendConfirmation } from '../resend/resend-confirmation';

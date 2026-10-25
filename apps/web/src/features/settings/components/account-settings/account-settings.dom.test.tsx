@@ -11,7 +11,10 @@ const mocks = vi.hoisted(() => ({
   updateAvatar: vi.fn(),
 }));
 
-vi.mock('@/features/auth/client', () => ({
+vi.mock('@synapcity/features-auth/frontend', async (importOriginal) => ({
+  ...(await importOriginal<
+    typeof import('@synapcity/features-auth/frontend')
+  >()),
   useCurrentUser: () => mocks.user,
   usePendingEmail: () => mocks.pending,
   useConnectedAccounts: () => mocks.accounts,

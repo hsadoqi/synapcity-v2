@@ -18,7 +18,7 @@ import {
   connectAccount,
   disconnectAccount,
 } from '@/features/auth/server/actions/actions';
-import { useConnectedAccounts } from '@/features/auth/client';
+import { useConnectedAccounts } from '@synapcity/features-auth/frontend';
 import {
   OAUTH_PROVIDERS,
   providerLabel,

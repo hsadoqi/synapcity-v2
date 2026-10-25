@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import {
   ConnectedAccountsProvider,
   PendingEmailProvider,
-} from '@/features/auth/client';
+} from '@synapcity/features-auth/frontend';
 import {
   getConnectedAccounts,
   getPendingEmail,

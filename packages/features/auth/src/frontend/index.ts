@@ -3,3 +3,8 @@ export * from './auth-divider';
 export * from './auth-link-button';
 export * from './auth-shell';
 export * from './resend-button';
+export * from './client/connected-accounts';
+export * from './client/pending-email';
+export * from './client/use-confirmation';
+export * from './client/use-cooldown';
+export * from './next/user-provider';

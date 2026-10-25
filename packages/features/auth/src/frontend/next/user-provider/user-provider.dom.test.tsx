@@ -1,7 +1,8 @@
 import { act, render, screen } from '@testing-library/react';
+import type { ComponentProps } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { UserProvider, useCurrentUser } from '@/features/auth/client';
+import { UserProvider, useCurrentUser } from './user-provider';
 import type { CurrentUser } from '@synapcity/domain-identity';
 
 const mocks = vi.hoisted(() => ({
@@ -15,11 +16,6 @@ vi.mock('next/navigation', () => {
   const router = { refresh: mocks.refresh };
   return { useRouter: () => router };
 });
-vi.mock('@/lib/supabase/client', () => ({
-  createClient: () => ({
-    auth: { onAuthStateChange: mocks.onAuthStateChange },
-  }),
-}));
 
 type Listener = (
   event: string,
@@ -32,6 +28,10 @@ function listener(): Listener {
   if (!call) throw new Error('The provider never subscribed.');
   return call[0] as Listener;
 }
+
+const createClient = (() => ({
+  auth: { onAuthStateChange: mocks.onAuthStateChange },
+})) as unknown as ComponentProps<typeof UserProvider>['createClient'];
 
 const ada = { id: 'user-1', email: 'ada@b.co' } as CurrentUser;
 const grace = { id: 'user-2', email: 'grace@b.co' } as CurrentUser;
@@ -50,14 +50,14 @@ describe('UserProvider', () => {
 
   it('hands the server-provided user to consumers and follows new props', () => {
     const { rerender } = render(
-      <UserProvider user={ada}>
+      <UserProvider createClient={createClient} user={ada}>
         <Who />
       </UserProvider>,
     );
     expect(screen.getByText('ada@b.co')).toBeTruthy();
 
     rerender(
-      <UserProvider user={null}>
+      <UserProvider createClient={createClient} user={null}>
         <Who />
       </UserProvider>,
     );
@@ -66,7 +66,7 @@ describe('UserProvider', () => {
 
   it('refreshes once when another tab signs the user out', () => {
     render(
-      <UserProvider user={ada}>
+      <UserProvider createClient={createClient} user={ada}>
         <Who />
       </UserProvider>,
     );
@@ -76,7 +76,7 @@ describe('UserProvider', () => {
 
   it('ignores events that do not change who is signed in', () => {
     render(
-      <UserProvider user={ada}>
+      <UserProvider createClient={createClient} user={ada}>
         <Who />
       </UserProvider>,
     );
@@ -90,7 +90,7 @@ describe('UserProvider', () => {
 
   it('refreshes on a sign-in as a different user and on a user update', () => {
     render(
-      <UserProvider user={ada}>
+      <UserProvider createClient={createClient} user={ada}>
         <Who />
       </UserProvider>,
     );
@@ -101,12 +101,12 @@ describe('UserProvider', () => {
 
   it('judges events against the latest server user, not the first one', () => {
     const { rerender } = render(
-      <UserProvider user={ada}>
+      <UserProvider createClient={createClient} user={ada}>
         <Who />
       </UserProvider>,
     );
     rerender(
-      <UserProvider user={grace}>
+      <UserProvider createClient={createClient} user={grace}>
         <Who />
       </UserProvider>,
     );
@@ -116,7 +116,7 @@ describe('UserProvider', () => {
 
   it('does not refresh a sign-out when nobody was signed in', () => {
     render(
-      <UserProvider user={null}>
+      <UserProvider createClient={createClient} user={null}>
         <Who />
       </UserProvider>,
     );
@@ -126,12 +126,12 @@ describe('UserProvider', () => {
 
   it('subscribes once and unsubscribes on unmount', () => {
     const { rerender, unmount } = render(
-      <UserProvider user={ada}>
+      <UserProvider createClient={createClient} user={ada}>
         <Who />
       </UserProvider>,
     );
     rerender(
-      <UserProvider user={grace}>
+      <UserProvider createClient={createClient} user={grace}>
         <Who />
       </UserProvider>,
     );
@@ -148,7 +148,10 @@ describe('UserProvider', () => {
 
   it('does not subscribe to auth events for a fixture user', () => {
     render(
-      <UserProvider user={{ ...ada, fixture: true }}>
+      <UserProvider
+        createClient={createClient}
+        user={{ ...ada, fixture: true }}
+      >
         <Who />
       </UserProvider>,
     );

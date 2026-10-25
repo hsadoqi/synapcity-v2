@@ -6,7 +6,7 @@ import { resendConfirmation } from '@/features/auth/server/actions/actions';
 import type { AuthState } from '@synapcity/features-auth/contracts';
 import { FormMessage } from '@synapcity/frontend-forms';
 import { ResendButton } from '@synapcity/features-auth/frontend';
-import { useCooldown } from '@/features/auth/client';
+import { useCooldown } from '@synapcity/features-auth/frontend';
 
 const initialState: AuthState = {};
 

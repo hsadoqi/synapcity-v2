@@ -5,7 +5,7 @@ import { useActionState, useId } from 'react';
 import { resendEmailChange } from '@/features/auth/server/actions/actions';
 import type { AuthState } from '@synapcity/features-auth/contracts';
 import { FormMessage } from '@synapcity/frontend-forms';
-import { useCooldown } from '@/features/auth/client';
+import { useCooldown } from '@synapcity/features-auth/frontend';
 import { ResendButton } from '@synapcity/features-auth/frontend';
 import { SignInAgain } from '../sign-in-again';
 

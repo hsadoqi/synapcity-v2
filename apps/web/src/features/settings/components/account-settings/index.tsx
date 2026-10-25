@@ -6,7 +6,7 @@ import { ProfileSummary } from '@synapcity/features-account/frontend';
 import { updateAvatar } from '@/features/account/server/actions/avatar-actions';
 import { updateName } from '@/features/account/server/actions/name-actions';
 import { signInHref } from '@/lib/routing/sign-in-href';
-import { useCurrentUser } from '@/features/auth/client';
+import { useCurrentUser } from '@synapcity/features-auth/frontend';
 import {
   ConnectedAccounts,
   DeleteAccount,

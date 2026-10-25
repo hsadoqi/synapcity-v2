@@ -23,15 +23,15 @@ What the non-test code needs from the app:
 
 ## Calls made (owner to check)
 
-| #   | Call                                                                                                                                                            | Why                                                                                                                                            |
-| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| C1  | Server Actions, `server/session`, `form-data` and `site-origin` stay in `apps/web/src/features/auth/server`.                                                    | Design 4.7 and Q3: they use `next/*`, `createClient`, fixture mode and routing, so they are the host's. The importers need no change.          |
-| C2  | Each component takes its action as a prop; the pages and the settings composition pass them in (the M7.4 pattern).                                              | A package cannot import app code (ADR-0014 section 3).                                                                                         |
-| C3  | `AuthStatus` stays in the app as host composition. It is an async server component over `getCurrentUser`, fixture mode and the user paths. `AuthButtons` moves. | It cannot be a package frontend component without importing session and routing. `AuthButtons` already takes caller-supplied hrefs (ADR-0009). |
-| C4  | `UserProvider` and `EmailChange` take a `createClient` prop (the host's one-line binding from M7.3).                                                            | The environment values are host configuration (M7.3 call C2).                                                                                  |
-| C5  | The connected-accounts model stays in `features-auth/contracts`.                                                                                                | Design Q2 wanted the edge one-way. M7.4 verified `features-account` imports nothing from auth, so no move is needed.                           |
-| C6  | `ProfileSetupCard` and `DeleteAccountCard` move here and receive their actions, as agreed for M7.4 (question A).                                                | They wrap `AuthShell`.                                                                                                                         |
-| C7  | The recent-link sign-in check stays a pure helper in `features-auth/contracts` (design Q5); the page calls it.                                                  | Widening `VerifiedIdentity` was an M4 anti-goal.                                                                                               |
+| #   | Call                                                                                                                                                                                                                                                                                                          | Why                                                                                                                                            |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| C1  | Server Actions, `server/session`, `form-data` and `site-origin` stay in `apps/web/src/features/auth/server`.                                                                                                                                                                                                  | Design 4.7 and Q3: they use `next/*`, `createClient`, fixture mode and routing, so they are the host's. The importers need no change.          |
+| C2  | Each component takes its action as a prop; the pages and the settings composition pass them in (the M7.4 pattern).                                                                                                                                                                                            | A package cannot import app code (ADR-0014 section 3).                                                                                         |
+| C3  | `AuthStatus` stays in the app as host composition. It is an async server component over `getCurrentUser`, fixture mode and the user paths. `AuthButtons` moves.                                                                                                                                               | It cannot be a package frontend component without importing session and routing. `AuthButtons` already takes caller-supplied hrefs (ADR-0009). |
+| C4  | `UserProvider` and `EmailChange` take a `createClient` prop (the host's one-line binding from M7.3). A function cannot cross from the server layout to a client component, so `apps/web/src/components/user-provider` is a small client wrapper that binds `createClient` and renders the package's provider. | The environment values are host configuration (M7.3 call C2).                                                                                  |
+| C5  | The connected-accounts model stays in `features-auth/contracts`.                                                                                                                                                                                                                                              | Design Q2 wanted the edge one-way. M7.4 verified `features-account` imports nothing from auth, so no move is needed.                           |
+| C6  | `ProfileSetupCard` and `DeleteAccountCard` move here and receive their actions, as agreed for M7.4 (question A).                                                                                                                                                                                              | They wrap `AuthShell`.                                                                                                                         |
+| C7  | The recent-link sign-in check stays a pure helper in `features-auth/contracts` (design Q5); the page calls it.                                                                                                                                                                                                | Widening `VerifiedIdentity` was an M4 anti-goal.                                                                                               |
 
 ## Global Constraints
 
@@ -44,15 +44,15 @@ What the non-test code needs from the app:
 
 ### Task 1: Package, contracts and shared pieces
 
-- [ ] **Step 1: Create the package** (manifest, configs, README, indexes); register it in the root Vitest list, the web dependencies and the Tailwind `@source` lines; `pnpm install`.
-- [ ] **Step 2: Move `types/form-state`, `shared/connected-accounts`, `shared/error-messages` and `shared/recent-link-sign-in` to `contracts`** with their tests; re-point importers.
-- [ ] **Step 3: Move `shared/{auth-shell, auth-divider, auth-confirmation, auth-link-button, resend-button}` to `frontend`** with their tests (`cn` from the `cn` package); re-point importers, including the two cards.
-- [ ] **Step 4: Run the package and web checks;** commit locally.
+- [x] **Step 1: Create the package** (manifest, configs, README, indexes); register it in the root Vitest list, the web dependencies and the Tailwind `@source` lines; `pnpm install`.
+- [x] **Step 2: Move `types/form-state`, `shared/connected-accounts`, `shared/error-messages` and `shared/recent-link-sign-in` to `contracts`** with their tests; re-point importers.
+- [x] **Step 3: Move `shared/{auth-shell, auth-divider, auth-confirmation, auth-link-button, resend-button}` to `frontend`** with their tests (`cn` from the `cn` package); re-point importers, including the two cards.
+- [x] **Step 4: Run the package and web checks;** commit locally.
 
 ### Task 2: Client state
 
-- [ ] **Step 1: Move `use-confirmation`, `use-cooldown`, `pending-email` and `connected-accounts` (client) to `frontend`;** `user-provider` to `frontend/next` taking `createClient`.
-- [ ] **Step 2: Re-point importers** (layout, settings page, `features/home`) and mocks; commit locally.
+- [x] **Step 1: Move `use-confirmation`, `use-cooldown`, `pending-email` and `connected-accounts` (client) to `frontend`;** `user-provider` to `frontend/next` taking `createClient`.
+- [x] **Step 2: Re-point importers** (layout, settings page, `features/home`) and mocks; commit locally.
 
 ### Task 3: Components with actions as props
 

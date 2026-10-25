@@ -1,6 +1,6 @@
 'use client';
 
-import { useCurrentUser } from '@/features/auth/client/user-provider/user-provider';
+import { useCurrentUser } from '@synapcity/features-auth/frontend';
 
 /** Today's date, a greeting and the quick ways to create something. */
 export function HomePageHeader({
