@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, userEvent, within } from 'storybook/test';
-import { useState } from 'react';
+import { useActionState } from 'react';
 import { Button } from '@synapcity/frontend-ui/core/button';
 import { Label } from '@synapcity/frontend-ui/core/label';
 import { Input } from '@synapcity/frontend-ui/core/input';
@@ -10,7 +10,9 @@ import { FormField } from '../../components/form-field';
 import { FormMessage } from '../../components/form-message';
 import { fieldErrorProps } from '../../utils/form-feedback';
 import { useFocusFirstError } from '../use-focus-first-error';
-import { useActionForm } from './use-action-form';
+import { useActionForm, type FormFeedback } from './use-action-form';
+
+type Result = FormFeedback & { readonly message?: string };
 
 const schema = z.object({
   email: z.string().trim().min(1, 'Enter your email.'),
@@ -18,11 +20,16 @@ const schema = z.object({
 
 /** A form shaped like the forgot-password pilot, with a stand-in for the server action. */
 function ActionForm() {
-  const [sent, setSent] = useState<string>();
+  const [result, action] = useActionState<Result, FormData>(
+    async (_previous, formData) => ({
+      message: `Sent to ${String(formData.get('email'))}.`,
+    }),
+    {},
+  );
   const { formProps, register, state } = useActionForm({
     schema,
-    action: (formData) => setSent(String(formData.get('email'))),
-    state: {},
+    action,
+    state: result,
   });
   const formRef = useFocusFirstError(state);
   return (
@@ -41,10 +48,7 @@ function ActionForm() {
         required
         {...register('email')}
       />
-      <FormMessage
-        id="email-message"
-        state={sent ? { message: `Sent to ${sent}.` } : state}
-      />
+      <FormMessage id="email-message" state={state} />
       <Button type="submit">Send reset link</Button>
     </form>
   );
@@ -98,14 +102,17 @@ const avatarSchema = z.object({
 
 /** A file input, checked in a real browser: jsdom cannot set a chosen file. */
 function AvatarForm() {
-  const [sent, setSent] = useState<string>();
+  const [result, action] = useActionState<Result, FormData>(
+    async (_previous, formData) => {
+      const file = formData.get('avatar');
+      return { message: `Uploaded ${file instanceof File ? file.name : ''}.` };
+    },
+    {},
+  );
   const { formProps, state } = useActionForm({
     schema: avatarSchema,
-    action: (formData) => {
-      const file = formData.get('avatar');
-      setSent(file instanceof File ? file.name : '');
-    },
-    state: {},
+    action,
+    state: result,
   });
   return (
     <form
@@ -115,10 +122,7 @@ function AvatarForm() {
     >
       <Label htmlFor="avatar">Avatar</Label>
       <Input id="avatar" name="avatar" type="file" />
-      <FormMessage
-        id="avatar-message"
-        state={sent ? { message: `Uploaded ${sent}.` } : state}
-      />
+      <FormMessage id="avatar-message" state={state} />
       <Button type="submit">Upload</Button>
     </form>
   );

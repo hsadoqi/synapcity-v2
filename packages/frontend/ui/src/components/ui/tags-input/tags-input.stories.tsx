@@ -1,12 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { useState } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
+import { useArgs } from 'storybook/preview-api';
 
 import { Label } from '@synapcity/frontend-ui/core/label';
-import {
-  TagsInput,
-  type TagsInputProps,
-} from '@synapcity/frontend-ui/core/tags-input';
+import { TagsInput } from '@synapcity/frontend-ui/core/tags-input';
 
 const meta: Meta<typeof TagsInput> = {
   title: 'Components/TagsInput',
@@ -59,24 +56,26 @@ export const Disabled: Story = {
 };
 
 /** Controlled by its owner, as a form field would be. */
-function ControlledDemo(args: TagsInputProps) {
-  const [tags, setTags] = useState<string[]>(['alpha']);
-  return (
-    <div className="flex max-w-sm flex-col gap-2">
-      <Label htmlFor="controlled">Topics</Label>
-      <TagsInput
-        {...args}
-        id="controlled"
-        value={tags}
-        onValueChange={setTags}
-      />
-      <p className="text-xs text-muted-foreground">
-        {tags.join(' · ') || 'None'}
-      </p>
-    </div>
-  );
-}
-
 export const Controlled: Story = {
-  render: (args) => <ControlledDemo {...args} />,
+  args: { value: ['alpha'] },
+  render: function Render(args) {
+    const [{ value = [] }, updateArgs] = useArgs<{ value: string[] }>();
+    return (
+      <div className="flex max-w-sm flex-col gap-2">
+        <Label htmlFor="controlled">Topics</Label>
+        <TagsInput
+          {...args}
+          id="controlled"
+          value={value}
+          onValueChange={(next) => {
+            updateArgs({ value: next });
+            args.onValueChange?.(next);
+          }}
+        />
+        <p className="text-xs text-muted-foreground">
+          {value.join(' · ') || 'None'}
+        </p>
+      </div>
+    );
+  },
 };

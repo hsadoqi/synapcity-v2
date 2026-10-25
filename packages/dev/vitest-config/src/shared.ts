@@ -10,6 +10,7 @@ export const sharedConfig = {
     // alone then time out. A test that really hangs still fails, just later.
     // Measured: tests that take ~1.5 s alone exceeded 15 s in a full
     // `test:coverage` run, so the margin is 30 s.
+    maxWorkers: 2,
     testTimeout: 30_000,
     coverage: {
       clean: false,
@@ -21,15 +22,15 @@ export const sharedConfig = {
     },
   },
   exclude: [
-    'dist/**',
+    '**/dist/**',
     '**/coverage/**',
-    'storybook-static/**',
-    'node_modules/**',
-    '.turbo/**',
-    '.next/**',
-    '.vercel/**',
-    '.vscode/**',
-    'pnpm-store/**',
-    'docs/archive/**',
+    '**/storybook-static/**',
+    '**/node_modules/**',
+    '**/.turbo/**',
+    '**/.next/**',
+    '**/.vercel/**',
+    '**/.vscode/**',
+    '**/pnpm-store/**',
+    '**/docs/archive/**',
   ],
 };

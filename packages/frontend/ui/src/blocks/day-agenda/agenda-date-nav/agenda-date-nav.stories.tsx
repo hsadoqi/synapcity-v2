@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { useState } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { AgendaDateNav } from '@synapcity/frontend-ui/blocks/day-agenda/agenda-date-nav';
@@ -9,19 +8,6 @@ const meta = {
   component: AgendaDateNav,
   parameters: { layout: 'centered' },
   args: { date: '2026-10-24', onDateChange: fn() },
-  render: function Render(args) {
-    const [date, setDate] = useState(args.date);
-    return (
-      <AgendaDateNav
-        {...args}
-        date={date}
-        onDateChange={(next) => {
-          setDate(next);
-          args.onDateChange(next);
-        }}
-      />
-    );
-  },
 } satisfies Meta<typeof AgendaDateNav>;
 
 export default meta;
@@ -32,9 +18,10 @@ export const Default: Story = {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole('button', { name: 'Next day' }));
     await expect(args.onDateChange).toHaveBeenLastCalledWith('2026-10-25');
+    // The parent owns `date`: the nav asks for the next day and the date stays put until told.
     await expect(
       canvas.getByRole('button', { name: /choose a date/i }),
-    ).toHaveTextContent('Sun, Oct 25');
+    ).toHaveTextContent('Sat, Oct 24');
   },
 };
 

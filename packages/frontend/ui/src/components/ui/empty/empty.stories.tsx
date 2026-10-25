@@ -1,4 +1,3 @@
-import { type ComponentProps } from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { FileIcon, FolderIcon, SearchIcon } from 'lucide-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
@@ -13,7 +12,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@synapcity/frontend-ui/core/empty';
-import React from 'react';
 
 const meta = {
   title: 'Components/Empty',
@@ -28,15 +26,8 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
   argTypes: { children: { control: false } },
-  render: (args) => <Example {...args} />,
-} satisfies Meta<typeof Empty>;
-
-export default meta;
-type Story = StoryObj<typeof meta>;
-
-function Example(props: ComponentProps<typeof Empty>) {
-  return (
-    <Empty {...props}>
+  render: (args) => (
+    <Empty {...args}>
       <EmptyHeader>
         <EmptyTitle>No documents yet</EmptyTitle>
         <EmptyDescription>
@@ -44,8 +35,11 @@ function Example(props: ComponentProps<typeof Empty>) {
         </EmptyDescription>
       </EmptyHeader>
     </Empty>
-  );
-}
+  ),
+} satisfies Meta<typeof Empty>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
@@ -164,12 +158,11 @@ export const TitleOnly: Story = {
   ),
 };
 
-function SearchExample(props: ComponentProps<typeof Empty>) {
-  const [cleared, setCleared] = React.useState(false);
-  if (cleared)
-    return <p role="status">Filters cleared. Showing all documents.</p>;
-  return (
-    <Empty {...props}>
+const onClearFilters = fn();
+
+export const NoSearchResults: Story = {
+  render: (args) => (
+    <Empty {...args}>
       <EmptyHeader>
         <EmptyMedia variant="icon">
           <SearchIcon aria-hidden="true" />
@@ -180,22 +173,17 @@ function SearchExample(props: ComponentProps<typeof Empty>) {
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent className="flex-row justify-center">
-        <Button onClick={() => setCleared(true)}>Clear filters</Button>
+        <Button onClick={onClearFilters}>Clear filters</Button>
         <LinkButton variant="outline" href="#search-help">
           Search help
         </LinkButton>
       </EmptyContent>
     </Empty>
-  );
-}
-
-/** Local story state demonstrates the action; it does not query application data. */
-export const NoSearchResults: Story = {
-  render: (args) => <SearchExample {...args} />,
+  ),
 };
 
 export const ClearsFiltersWithKeyboard: Story = {
-  render: (args) => <SearchExample {...args} />,
+  ...NoSearchResults,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const clear = canvas.getByRole('button', { name: 'Clear filters' });
@@ -207,11 +195,6 @@ export const ClearsFiltersWithKeyboard: Story = {
     ).toHaveFocus();
     await userEvent.tab({ shift: true });
     await userEvent.keyboard('{Enter}');
-    await expect(canvas.getByRole('status')).toHaveTextContent(
-      'Filters cleared. Showing all documents.',
-    );
-    await expect(
-      canvas.queryByText('No matching documents'),
-    ).not.toBeInTheDocument();
+    await expect(onClearFilters).toHaveBeenCalledTimes(1);
   },
 };

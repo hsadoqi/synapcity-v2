@@ -30,6 +30,12 @@ describe('the repository', () => {
       'web',
       '@synapcity/frontend-ui',
       '@synapcity/dev-fixtures',
+      '@synapcity/frontend-forms',
+      '@synapcity/features-dashboards',
+      '@synapcity/features-settings',
+      '@synapcity/features-spaces',
+      '@synapcity/frontend-collection',
+      '@synapcity/frontend-preferences',
     ]) {
       expect(result.fileCounts[name]).toBeGreaterThan(0);
     }

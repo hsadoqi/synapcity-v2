@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { CalendarPlus, Pin } from 'lucide-react';
-import { useState } from 'react';
-import { expect, screen, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, screen, userEvent, waitFor, within } from 'storybook/test';
 import { DayAgenda, type DayAgendaWithDialog } from './day-agenda';
 import type { TimeSlot } from './day-agenda.types';
 
@@ -183,16 +182,14 @@ export const CustomSettings: Story = {
 
 /** With `onDateChange`, the date gets previous and next buttons and opens a calendar. */
 export const DateNavigation: Story = {
-  render: function Render(args) {
-    const [date, setDate] = useState('2026-10-24');
-    return <DayAgenda {...args} date={date} onDateChange={setDate} />;
-  },
-  play: async ({ canvasElement }) => {
+  args: { date: '2026-10-24', onDateChange: fn() },
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole('button', { name: 'Next day' }));
+    await expect(args.onDateChange).toHaveBeenLastCalledWith('2026-10-25');
     await expect(
       canvas.getByRole('button', { name: /choose a date/i }),
-    ).toHaveTextContent('Sun, Oct 25');
+    ).toHaveTextContent('Sat, Oct 24');
   },
 };
 
