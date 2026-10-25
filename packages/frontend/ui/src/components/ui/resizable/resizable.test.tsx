@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   ResizableHandle,
   ResizablePanel,
@@ -8,16 +8,6 @@ import {
 
 // jsdom has no layout observer. Actual sizing and keyboard/pointer behavior
 // are exercised with the real observer in the browser stories and web E2E.
-beforeEach(() => {
-  vi.stubGlobal(
-    'ResizeObserver',
-    class {
-      observe() {}
-      unobserve() {}
-      disconnect() {}
-    },
-  );
-});
 
 describe('Resizable', () => {
   it('renders a labelled, keyboard-focusable separator between real panels', () => {

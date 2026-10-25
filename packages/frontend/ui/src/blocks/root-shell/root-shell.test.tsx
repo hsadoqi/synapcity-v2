@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
   AuthenticatedShell,
@@ -9,17 +9,6 @@ import {
 import { ModeProvider } from '@synapcity/frontend-preferences';
 
 vi.mock('next/navigation', () => ({ usePathname: () => '/' }));
-
-beforeEach(() => {
-  vi.stubGlobal(
-    'ResizeObserver',
-    class {
-      observe() {}
-      unobserve() {}
-      disconnect() {}
-    },
-  );
-});
 
 const account = { homeHref: '/u/home', settingsHref: '/u/settings' };
 

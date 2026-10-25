@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { mockViewport } from '@synapcity/dev-vitest-config/viewport';
 import {
   ModeButton,
   ModeMenu,
@@ -13,21 +14,10 @@ import {
 } from '@synapcity/frontend-ui/core/dropdown-menu';
 import { ModeProvider } from '@synapcity/frontend-preferences';
 
-const mockMatchMedia = (dark: boolean) => {
-  window.matchMedia = ((query: string) => ({
-    matches: query.includes('dark') ? dark : !dark,
-    media: query,
-    addEventListener: () => {},
-    removeEventListener: () => {},
-    addListener: () => {},
-    removeListener: () => {},
-  })) as unknown as typeof window.matchMedia;
-};
-
 beforeEach(() => {
   localStorage.clear();
   document.documentElement.className = '';
-  mockMatchMedia(false);
+  mockViewport();
 });
 
 describe('ModeButton', () => {

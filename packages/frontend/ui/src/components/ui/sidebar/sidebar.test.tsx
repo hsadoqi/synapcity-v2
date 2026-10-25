@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { mockViewport } from '@synapcity/dev-vitest-config/viewport';
 import {
   Sidebar,
   SidebarContent,
@@ -23,20 +24,6 @@ import {
   useSidebar,
 } from '@synapcity/frontend-ui/core/sidebar';
 import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
-
-/** jsdom has no matchMedia; `matches` decides what useIsMobile reports. */
-const mockViewport = (width: number) => {
-  Object.defineProperty(window, 'innerWidth', {
-    configurable: true,
-    value: width,
-  });
-  window.matchMedia = ((query: string) => ({
-    matches: width < 768,
-    media: query,
-    addEventListener: () => {},
-    removeEventListener: () => {},
-  })) as unknown as typeof window.matchMedia;
-};
 
 const State = () => {
   const { state, open, openMobile, isMobile } = useSidebar();
@@ -85,7 +72,7 @@ const renderShell = (providerProps = {}, sidebarProps = {}) =>
   );
 
 describe('Sidebar', () => {
-  beforeEach(() => mockViewport(1280));
+  beforeEach(() => mockViewport({ width: 1280 }));
   afterEach(() => {
     document.cookie = 'sidebar_state=; max-age=0; path=/';
   });
@@ -244,7 +231,7 @@ describe('Sidebar', () => {
   });
 
   describe('on a small screen', () => {
-    beforeEach(() => mockViewport(500));
+    beforeEach(() => mockViewport({ width: 500 }));
 
     it('renders no desktop sidebar and opens a sheet from the trigger', async () => {
       renderShell();

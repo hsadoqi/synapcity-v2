@@ -1,21 +1,10 @@
 import { render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { SidebarShell } from '@synapcity/frontend-ui/blocks/sidebar-shell';
 import { ModeProvider } from '@synapcity/frontend-preferences';
 
 const account = { homeHref: '/u/home', settingsHref: '/u/settings' };
-
-beforeEach(() => {
-  vi.stubGlobal(
-    'ResizeObserver',
-    class {
-      observe() {}
-      unobserve() {}
-      disconnect() {}
-    },
-  );
-});
 
 const renderShell = (header: React.ReactNode = <div>Header</div>) =>
   render(
