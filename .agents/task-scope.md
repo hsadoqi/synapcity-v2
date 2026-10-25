@@ -1,3 +1,12 @@
+## Active task: `frontend-shells` package (2026-10-25)
+
+- Goal and mode: implementation of `docs/superpowers/plans/2026-10-25-frontend-shells.md`, approved by the owner on 2026-10-25 with calls C1 to C8 and the Task 6 direction. Create `@synapcity/frontend-shells`, move the app shell family out of `frontend-ui` and `apps/web`, deduplicate the sidebar stack, then give web's sidebar real content.
+- Branch: `docs/frontend-shells-plan` from `main` at `f285d062` (the plan commit), continuing on the same branch for the tasks unless the owner asks for a split.
+- Exact creates (Task 1): `packages/frontend/shells/**` (manifest, tsconfig, eslint and vitest configs, README, `src/index.ts`, `src/next/index.ts`, `src/package-structure.test.ts`). Exact updates (Task 1): root `vitest.config.ts` (one project line), `apps/storybook/.storybook/main.ts` (one stories glob), the `@source` lines in `apps/web/src/styles/globals.css` and `apps/storybook/styles/globals.css`, `pnpm-lock.yaml` (workspace entry only, no version changes), `docs/architecture/workspace-conventions.md` (inventory row), this ledger, the plan's checkboxes.
+- Later tasks' moves are named in the plan; each is a checkpoint commit.
+- Not changed: dependencies' versions, ADRs (until Task 7's records), `components/ui/sidebar`, the settings frames and feature wrappers (C1), the `Resizable` primitive's location (C2, open).
+- Commits: local checkpoint commits per task under the approved plan. Pushes and merging are not authorized.
+
 ## Active task: Milestone 7 Auth and Account design (2026-10-24)
 
 - Goal and mode: documentation only. Write one Proposed design for moving `apps/web/src/features/auth` and `features/account` into packages, with owner questions, so a plan can follow after approval.
