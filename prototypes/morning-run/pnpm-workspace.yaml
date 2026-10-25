@@ -1,0 +1,5 @@
+# Marks this folder as its own pnpm project root so it never joins the Synapcity workspace.
+allowBuilds:
+  esbuild: true
+  sharp: false
+  unrs-resolver: false

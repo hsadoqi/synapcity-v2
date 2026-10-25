@@ -1,0 +1,250 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'react-grid-layout/css/styles.css';
+
+/*
+ * Three views share one set of components. Each view only changes tokens (colour, radius,
+ * density); components use the semantic names below and never a raw colour.
+ * The names follow shadcn so the generated components work unchanged.
+ */
+@custom-variant dark (&:is([data-tone='dark'] *));
+
+:root,
+[data-view='focus'] {
+  color-scheme: dark;
+  --background: #0a0a0b;
+  --foreground: #f1f1ef;
+  --card: #0a0a0b;
+  --card-foreground: #f1f1ef;
+  --popover: #141416;
+  --popover-foreground: #f1f1ef;
+  --primary: #ffb454;
+  --primary-foreground: #0a0a0b;
+  --secondary: #1a1a1d;
+  --secondary-foreground: #f1f1ef;
+  --muted: #141416;
+  --muted-foreground: #8c8f94;
+  --accent: #1d1d20;
+  --accent-foreground: #f1f1ef;
+  --border: #26272b;
+  --input: #3a3b40;
+  --ring: #ffb454;
+  --destructive: #ff8a80;
+  --progress-now: #8a6330;
+  --warn: #ffb454;
+  --radius: 0.25rem;
+}
+
+[data-view='stage'] {
+  color-scheme: dark;
+  --background: #0e1a22;
+  --foreground: #eaf1f4;
+  --card: #15252f;
+  --card-foreground: #eaf1f4;
+  --popover: #15252f;
+  --popover-foreground: #eaf1f4;
+  --primary: #6fd8b8;
+  --primary-foreground: #0b1a18;
+  --secondary: #1b2f3b;
+  --secondary-foreground: #eaf1f4;
+  --muted: #1b2f3b;
+  --muted-foreground: #9fb3bf;
+  --accent: #1b2f3b;
+  --accent-foreground: #eaf1f4;
+  --border: #26404f;
+  --input: #3a5b6d;
+  --ring: #6fd8b8;
+  --destructive: #ff9d94;
+  --progress-now: #3f8f7b;
+  --warn: #ffc9a8;
+  --radius: 0.625rem;
+}
+
+[data-view='workbench'] {
+  color-scheme: light;
+  --background: #f3f4f6;
+  --foreground: #14181d;
+  --card: #ffffff;
+  --card-foreground: #14181d;
+  --popover: #ffffff;
+  --popover-foreground: #14181d;
+  --primary: #1f6f5c;
+  --primary-foreground: #ffffff;
+  --secondary: #e3f0ec;
+  --secondary-foreground: #14564a;
+  --muted: #eef1f4;
+  --muted-foreground: #5b6570;
+  --accent: #eef1f4;
+  --accent-foreground: #14181d;
+  --border: #d7dbe0;
+  --input: #c5ccd3;
+  --ring: #1f6f5c;
+  --destructive: #b42318;
+  --progress-now: #7fb3a5;
+  --warn: #9a4a14;
+  --radius: 0.25rem;
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-progress-now: var(--progress-now);
+  --color-warn: var(--warn);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+
+  --animate-rise: rise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-timer-pulse: timer-pulse 1s ease-in-out infinite;
+  --animate-pop: pop 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* The timer pulse swells; it never changes opacity or colour, so contrast holds at every frame. */
+@keyframes timer-pulse {
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  60% {
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    background: var(--background);
+    color: var(--foreground);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100dvh;
+    font-family: var(--font-sans);
+    background: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  [role='radio'],
+  [role='checkbox'] {
+    cursor: pointer;
+  }
+
+  /* A visible, high-contrast focus ring everywhere; components can refine it. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+  }
+
+  ::placeholder {
+    color: var(--muted-foreground);
+    opacity: 0.8;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--primary) 35%, transparent);
+  }
+}
+
+/*
+ * Amber sweep: a soft wash of the brand colour slides in from the left on hover and focus.
+ * Paint-only (transform), and it does nothing when reduced motion is requested.
+ */
+@utility sweep {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  outline-offset: -2px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--primary) 16%, transparent),
+      transparent 85%
+    );
+    transform: translateX(-101%);
+    transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  &:hover::before,
+  &:focus-visible::before {
+    transform: translateX(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &::before {
+      transition: none;
+    }
+  }
+}
+
+/* Motion that is purely decorative is removed, not slowed, for reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  .motion-decor {
+    animation: none;
+  }
+}
+
+/* react-grid-layout: match the board to the active view. */
+.react-grid-item.react-grid-placeholder {
+  background: var(--primary);
+  opacity: 0.18;
+  border-radius: var(--radius);
+}
+
+.react-grid-item > .react-resizable-handle::after {
+  border-color: var(--muted-foreground);
+}
