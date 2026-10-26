@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 
-import { fixtureModeEnabled } from '@/lib/access/dev-fixture';
-import { getVerifiedIdentity } from '@/features/auth/server/session';
-import { getSpaceSource } from '@/lib/spaces';
+import { fixtureModeEnabled } from '../../../../src/lib/access/dev-fixture';
+import { getVerifiedIdentity } from '../../../../src/features/auth/server/session';
+import { getSpaceSource } from '../../../../src/lib/spaces';
 
 /** The signed-in owner's spaces. Row-level security does the scoping. */
 export async function GET() {

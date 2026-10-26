@@ -1,5 +1,5 @@
 import { CollectionPage } from '@synapcity/frontend-collection';
-import type { OwnedRecordSummary } from '@/lib/owned-records';
+import type { OwnedRecordSummary } from '../../../../lib/owned-records';
 
 import { DOCUMENTS_INTRO, DOCUMENTS_TITLE } from './documents-copy';
 import { DocumentsIndex } from './documents-index';

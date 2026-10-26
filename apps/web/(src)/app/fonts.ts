@@ -1,7 +1,7 @@
 import localFont from 'next/font/local';
 import { Inter } from 'next/font/google';
 
-import { cn } from '@/lib/utils';
+import { cn } from '../../src/lib/utils';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 

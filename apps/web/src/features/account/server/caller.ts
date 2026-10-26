@@ -8,7 +8,7 @@ import {
   type ProviderUser,
 } from '@synapcity/server-supabase';
 
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '../../../lib/supabase/server';
 
 export type Supabase = Awaited<ReturnType<typeof createClient>>;
 

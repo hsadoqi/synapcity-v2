@@ -1,5 +1,5 @@
 import { CollectionPage } from '@synapcity/frontend-collection';
-import type { OwnedRecordSummary } from '@/lib/owned-records';
+import type { OwnedRecordSummary } from '../../../../lib/owned-records';
 
 import { DASHBOARDS_INTRO, DASHBOARDS_TITLE } from './dashboards-copy';
 import { DashboardsIndex } from './dashboards-index';

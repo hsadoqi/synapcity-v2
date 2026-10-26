@@ -10,7 +10,7 @@ import {
 } from '@synapcity/features-spaces/frontend';
 import { describe, expect, it } from 'vitest';
 
-import { appSidebar } from '@/components/app-sidebar';
+import { appSidebar } from '../../components/app-sidebar';
 
 import {
   dashboardPathFor,
@@ -143,7 +143,6 @@ describe('links in the signed-in sidebar', () => {
       const { groups } = appSidebar('u1', trail, '/u1/home', {
         records,
         onOpenPalette: () => {},
-        onSearch: () => {},
         onCreate: () => {},
       });
       const links = groups

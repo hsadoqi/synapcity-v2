@@ -18,7 +18,7 @@ import {
 } from '@synapcity/frontend-ui/core/field';
 import { Input } from '@synapcity/frontend-ui/core/input';
 
-import { collectionFor, type CollectionKind } from '@/components/app-sidebar';
+import { collectionFor, type CollectionKind } from '../app-sidebar';
 
 /**
  * A small dialog for starting a Space, document or dashboard by name. Nothing

@@ -8,7 +8,8 @@ import { createClient } from '@/lib/supabase/client';
 /**
  * The auth feature's user provider, bound to this app's browser client. It is a
  * client component of its own because a function (the client factory) cannot be
- * passed from the server layout to a client component.
+ * passed from the server layout to a client component. Read the user with
+ * `useCurrentUser` from `@synapcity/features-auth/frontend`.
  */
 export function UserProvider(
   props: Omit<ComponentProps<typeof AuthUserProvider>, 'createClient'>,

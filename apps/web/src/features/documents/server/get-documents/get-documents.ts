@@ -1,9 +1,9 @@
-import { fixtureModeEnabled } from '@/lib/access/dev-fixture';
+import { fixtureModeEnabled } from '../../../../lib/access/dev-fixture';
 import {
   listOwnedRecordSummaries,
   type OwnedRecordSummary,
-} from '@/lib/owned-records';
-import { createClient } from '@/lib/supabase/server';
+} from '../../../../lib/owned-records';
+import { createClient } from '../../../../lib/supabase/server';
 
 import { DOCUMENT_FIXTURES } from '../../lib/fixtures';
 

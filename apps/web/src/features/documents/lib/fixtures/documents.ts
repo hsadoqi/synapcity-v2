@@ -1,4 +1,4 @@
-import type { OwnedRecordSummary } from '@/lib/owned-records';
+import type { OwnedRecordSummary } from '../../../../lib/owned-records';
 
 /** Sample data for development fixture mode and tests; these are not saved records. */
 export const DOCUMENT_FIXTURES: readonly OwnedRecordSummary[] = [

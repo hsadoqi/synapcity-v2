@@ -1,8 +1,8 @@
 import { cache } from 'react';
 
-import { logFailure, type Supabase } from '@/features/account/server/caller';
-import { createClient } from '@/lib/supabase/server';
-import { fixtureModeEnabled } from '@/lib/access/dev-fixture';
+import { logFailure, type Supabase } from '../../account/server/caller';
+import { createClient } from '../../../lib/supabase/server';
+import { fixtureModeEnabled } from '../../../lib/access/dev-fixture';
 import type { StoredAccountPreferences } from '@synapcity/domain-preferences';
 import { loadSettingsAccountPreferences } from '@synapcity/features-settings/server';
 

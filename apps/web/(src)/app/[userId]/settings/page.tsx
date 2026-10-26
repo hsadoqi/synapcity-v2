@@ -7,13 +7,13 @@ import {
 import {
   getConnectedAccounts,
   getPendingEmail,
-} from '@/features/auth/server/session';
+} from '../../../../src/features/auth/server/session';
 import { profileFromClaims } from '@synapcity/domain-identity';
-import { FIXTURE_MESSAGE } from '@/lib/access/dev-fixture';
-import { requireOwner } from '@/lib/access/require-owner';
-import { getAccountPreferences } from '@/features/settings/server/account-preferences';
-import { saveAccountPreferences } from '@/features/settings/server/actions/preferences-actions';
-import { SettingsContent } from '@/features/settings/settings-content';
+import { FIXTURE_MESSAGE } from '../../../../src/lib/access/dev-fixture';
+import { requireOwner } from '../../../../src/lib/access/require-owner';
+import { getAccountPreferences } from '../../../../src/features/settings/server/account-preferences';
+import { saveAccountPreferences } from '../../../../src/features/settings/server/actions/preferences-actions';
+import { SettingsContent } from '../../../../src/features/settings/settings-content';
 
 export const metadata: Metadata = { title: 'Account settings' };
 

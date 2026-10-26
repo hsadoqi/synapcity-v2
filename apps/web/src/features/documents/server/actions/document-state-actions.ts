@@ -6,13 +6,13 @@ import {
   getCallerIdentity,
   logFailure,
   SAVE_FAILED,
-} from '@/features/account/server/caller';
-import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
+} from '../../../account/server/caller';
+import { FIXTURE_MESSAGE, fixtureModeEnabled } from '../../../../lib/access/dev-fixture';
 import {
   setOwnedRecordPinned,
   type SetRecordPinnedResult,
-} from '@/lib/owned-records';
-import { createClient } from '@/lib/supabase/server';
+} from '../../../../lib/owned-records';
+import { createClient } from '../../../../lib/supabase/server';
 
 const idSchema = z.uuid();
 

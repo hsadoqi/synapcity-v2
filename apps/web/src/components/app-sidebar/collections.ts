@@ -1,15 +1,13 @@
 import { FileText, Layers, LayoutDashboard } from 'lucide-react';
 
-import { COLLECTION_LABELS } from '@/components/breadcrumbs';
-import type { SidebarRecords } from '@/lib/sidebar-records';
+import { COLLECTION_LABELS } from '../breadcrumbs';
+import type { SidebarRecords } from '../../lib/sidebar-records';
 import {
-  dashboardPathFor,
   dashboardsPathFor,
-  documentPathFor,
   documentsPathFor,
   spacePathFor,
   spacesPathFor,
-} from '@/lib/routing/user-paths';
+} from '../../lib/routing/user-paths';
 
 /** A kind of record someone can create and browse. */
 export type CollectionKind = 'space' | 'document' | 'dashboard';
@@ -24,7 +22,8 @@ export type Collection = {
   singular: string;
   icon: typeof FileText;
   indexHref: (userId: string) => string;
-  itemHref: (userId: string, id: string) => string;
+  /** One record's page, or null while that page is not built (Milestone 8). */
+  itemHref: ((userId: string, id: string) => string) | null;
 };
 
 /** The three collections, in the order the sidebar lists them. */
@@ -45,7 +44,7 @@ export const COLLECTIONS: readonly Collection[] = [
     singular: 'document',
     icon: FileText,
     indexHref: documentsPathFor,
-    itemHref: documentPathFor,
+    itemHref: null,
   },
   {
     kind: 'dashboard',
@@ -54,7 +53,7 @@ export const COLLECTIONS: readonly Collection[] = [
     singular: 'dashboard',
     icon: LayoutDashboard,
     indexHref: dashboardsPathFor,
-    itemHref: dashboardPathFor,
+    itemHref: null,
   },
 ];
 

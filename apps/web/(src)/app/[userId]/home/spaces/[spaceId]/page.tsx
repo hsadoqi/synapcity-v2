@@ -6,12 +6,12 @@ import {
 import { getSpace } from '@synapcity/features-spaces/server';
 
 import { SetBreadcrumbs } from '@synapcity/frontend-shells';
-import { COLLECTION_LABELS } from '@/components/breadcrumbs';
-import { logFailure } from '@/features/account/server/caller';
-import { requireOwner } from '@/lib/access/require-owner';
-import { homePathFor, spacesPathFor } from '@/lib/routing/user-paths';
-import { getSpaceSource } from '@/lib/spaces';
-import { recordSpaceView } from '@/lib/spaces/space-state-actions';
+import { COLLECTION_LABELS } from '../../../../../../src/components/breadcrumbs';
+import { logFailure } from '../../../../../../src/features/account/server/caller';
+import { requireOwner } from '../../../../../../src/lib/access/require-owner';
+import { homePathFor, spacesPathFor } from '../../../../../../src/lib/routing/user-paths';
+import { getSpaceSource } from '../../../../../../src/lib/spaces';
+import { recordSpaceView } from '../../../../../../src/lib/spaces/space-state-actions';
 
 export default async function SpaceShowPage({
   params,

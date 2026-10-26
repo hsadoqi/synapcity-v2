@@ -6,9 +6,9 @@ import {
   getCallerIdentity,
   logFailure,
   SAVE_FAILED,
-} from '@/features/account/server/caller';
-import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
-import { createClient } from '@/lib/supabase/server';
+} from '../../features/account/server/caller';
+import { FIXTURE_MESSAGE, fixtureModeEnabled } from '../access/dev-fixture';
+import { createClient } from '../supabase/server';
 
 import type { SetSpacePinnedResult } from '@synapcity/features-spaces/contracts';
 import { serverSpaceSource } from '@synapcity/features-spaces/server';

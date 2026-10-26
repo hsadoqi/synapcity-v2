@@ -1,6 +1,6 @@
-import { getDashboards } from '@/features/dashboards/server/get-dashboards';
-import { getDocuments } from '@/features/documents/server/get-documents';
-import { getSpaceSource } from '@/lib/spaces';
+import { getDashboards } from '../../features/dashboards/server/get-dashboards';
+import { getDocuments } from '../../features/documents/server/get-documents';
+import { getSpaceSource } from '../spaces';
 
 import {
   latestRecords,

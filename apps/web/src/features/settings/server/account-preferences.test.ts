@@ -8,7 +8,7 @@ import {
   getAccountPreferences,
   loadAccountPreferences,
 } from './account-preferences';
-import type { Supabase } from '@/features/account/server/caller';
+import type { Supabase } from '../../account/server/caller';
 import { settingsDefaults } from '@synapcity/domain-preferences';
 
 const maybeSingle = vi.fn();

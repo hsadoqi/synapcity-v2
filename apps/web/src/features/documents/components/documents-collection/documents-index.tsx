@@ -11,8 +11,8 @@ import type {
   CollectionItem,
   CollectionItemAction,
 } from '@synapcity/frontend-collection';
-import type { OwnedRecordSummary } from '@/lib/owned-records';
-import { homePathFor, signInPathFor } from '@/lib/routing/user-paths';
+import type { OwnedRecordSummary } from '../../../../lib/owned-records';
+import { homePathFor, signInPathFor } from '../../../../lib/routing/user-paths';
 
 import { toCollectionItem } from '../../lib/collection-item';
 import { setDocumentPinned } from '../../server/actions/document-state-actions';

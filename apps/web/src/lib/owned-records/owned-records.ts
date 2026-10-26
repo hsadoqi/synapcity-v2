@@ -1,7 +1,7 @@
 import type { z } from 'zod';
 import { baseRecordSchema } from '@synapcity/domain-records';
 
-import type { createClient } from '@/lib/supabase/server';
+import type { createClient } from '../supabase/server';
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 

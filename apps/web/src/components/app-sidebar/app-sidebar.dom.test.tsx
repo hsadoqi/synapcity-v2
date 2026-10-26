@@ -17,7 +17,6 @@ const options = (
 ): AppSidebarOptions => ({
   records,
   onOpenPalette: vi.fn(),
-  onSearch: vi.fn(),
   onCreate: vi.fn(),
   ...overrides,
 });
@@ -48,11 +47,12 @@ function switcherLabel(trail: RootBreadcrumb[], pathname = '/u1/home') {
   return name?.replace('Switch context: ', '');
 }
 
-// One case per row of the frontend-shells plan's context table (Task 6).
+// Contexts are Global or a Space; collection pages are surfaces, so they
+// leave the switcher on Global (PRODUCT.md: context and surface differ).
 describe('the sidebar context follows the trail', () => {
   it.each<[string, RootBreadcrumb[], string]>([
-    ['Home', [], 'Home'],
-    ['the Spaces page', [{ label: 'Spaces', kind: 'collection' }], 'Spaces'],
+    ['Home', [], 'Global'],
+    ['the Spaces page', [{ label: 'Spaces', kind: 'collection' }], 'Global'],
     ['a Space', [spaces, { label: 'Writing', kind: 'space' }], 'Writing'],
     [
       'a document inside a Space',
@@ -62,12 +62,12 @@ describe('the sidebar context follows the trail', () => {
     [
       'the Documents page',
       [{ label: 'Documents', kind: 'collection' }],
-      'Documents',
+      'Global',
     ],
     [
       'the Dashboards page',
       [{ label: 'Dashboards', kind: 'collection' }],
-      'Dashboards',
+      'Global',
     ],
     [
       'a document outside any Space',
@@ -75,7 +75,7 @@ describe('the sidebar context follows the trail', () => {
         { label: 'Documents', href: '/u1/home/documents', kind: 'collection' },
         { label: 'Draft' },
       ],
-      'Documents',
+      'Global',
     ],
   ])('on %s it shows %s', (_page, trail, expected) => {
     expect(switcherLabel(trail)).toBe(expected);
@@ -88,23 +88,30 @@ describe('the sidebar sections', () => {
     pathname = '/u1/home',
   ) => appSidebar('u1', [], pathname, options(overrides));
 
-  it('starts with Home, the command palette, Inbox and Settings', () => {
+  it('starts with Home, Search, Inbox and Settings', () => {
     const [core] = sidebar().groups;
 
     expect(core!.title).toBeUndefined();
     expect(core!.items!.map((item) => item.title)).toEqual([
       'Home',
-      'Command palette',
+      'Search',
       'Inbox',
       'Settings',
     ]);
     expect(core!.items!.map((item) => item.href)).toEqual([
       '/u1/home',
       undefined,
-      '#',
+      undefined,
       '/u1/settings',
     ]);
     expect(core!.items![0]!.isActive).toBe(true);
+  });
+
+  it('shows Inbox as not built yet instead of linking nowhere', () => {
+    const inbox = sidebar().groups[0]!.items![2]!;
+
+    expect(inbox).toMatchObject({ disabled: true, note: 'Soon' });
+    expect(inbox.href).toBeUndefined();
   });
 
   it('opens the palette from its core item', () => {
@@ -115,25 +122,40 @@ describe('the sidebar sections', () => {
     expect(onOpenPalette).toHaveBeenCalledOnce();
   });
 
-  it('puts a search field next, which hands its query on', () => {
-    const onSearch = vi.fn();
-    const search = sidebar({ onSearch }).groups[1]!;
+  it('switches between Global, the latest Spaces and all Spaces', async () => {
+    const { header } = appSidebar(
+      'u1',
+      [spaces, writing],
+      '/u1/home/spaces/s1',
+      options(),
+    );
     render(
       <TooltipProvider>
-        <SidebarProvider>{search.content}</SidebarProvider>
+        <SidebarProvider>{header}</SidebarProvider>
       </TooltipProvider>,
     );
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Switch context: Writing' }),
+    );
+    const items = await screen.findAllByRole('menuitem');
 
-    fireEvent.change(screen.getByLabelText('Search'), {
-      target: { value: 'garden' },
-    });
-    fireEvent.submit(screen.getByRole('search'));
-    expect(onSearch).toHaveBeenCalledWith('garden');
+    expect(
+      items.map((item) => [
+        item.textContent?.trim(),
+        item.getAttribute('href'),
+      ]),
+    ).toEqual([
+      ['Global', '/u1/home'],
+      ['Writing', '/u1/home/spaces/s1'],
+      ['All spaces', '/u1/home/spaces'],
+    ]);
+    expect(items[1]!.getAttribute('aria-current')).toBe('page');
+    expect(items[0]!.getAttribute('aria-current')).toBeNull();
   });
 
   it('gives each collection a link to its page, a create action and its records', () => {
     const onCreate = vi.fn();
-    const [, , spaces, documents, dashboards] = sidebar({ onCreate }).groups;
+    const [, spaces, documents, dashboards] = sidebar({ onCreate }).groups;
 
     expect(
       [spaces, documents, dashboards].map((g) => [g!.title, g!.href]),
@@ -145,9 +167,11 @@ describe('the sidebar sections', () => {
     expect(spaces!.items!.map((i) => [i.title, i.href])).toEqual([
       ['Writing', '/u1/home/spaces/s1'],
     ]);
-    expect(documents!.items!.map((i) => i.href)).toEqual([
-      '/u1/home/documents/d1',
+    // A document's page is not built yet (Milestone 8): listed, not linked.
+    expect(documents!.items).toEqual([
+      expect.objectContaining({ title: 'Launch checklist', disabled: true }),
     ]);
+    expect(documents!.items![0]!.href).toBeUndefined();
     expect(dashboards!.items).toEqual([]);
     expect(dashboards!.empty).toBe('No dashboards yet');
     expect(spaces!.hideWhenCollapsed).toBe(true);
@@ -158,7 +182,7 @@ describe('the sidebar sections', () => {
   });
 
   it('marks the open record as the current page', () => {
-    const [, , spaces] = sidebar({}, '/u1/home/spaces/s1').groups;
+    const [, spaces] = sidebar({}, '/u1/home/spaces/s1').groups;
 
     expect(spaces!.items![0]!.isActive).toBe(true);
   });
@@ -190,6 +214,11 @@ describe('the command palette groups', () => {
     expect(groups[1]!.items).toEqual([
       expect.objectContaining({ label: 'Writing', href: '/u1/home/spaces/s1' }),
     ]);
+
+    expect(groups[2]!.items).toEqual([
+      expect.objectContaining({ label: 'Launch checklist', disabled: true }),
+    ]);
+    expect(groups[2]!.items[0]!.href).toBeUndefined();
 
     groups[4]!.items[0]!.onSelect!();
     expect(onCreate).toHaveBeenCalledWith('space');

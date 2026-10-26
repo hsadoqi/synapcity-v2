@@ -7,7 +7,7 @@ import {
 } from '@synapcity/frontend-preferences';
 import { Toaster } from '@synapcity/frontend-ui/core/toast';
 
-import { NoticeToast } from '@/components/notices/notice-toast';
+import { NoticeToast } from '../notices/notice-toast';
 import { ErrorReports } from '@synapcity/frontend-error-reports';
 import { TooltipProvider } from '@synapcity/frontend-ui/components';
 

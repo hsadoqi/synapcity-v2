@@ -1,15 +1,15 @@
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
-import '../styles/globals.css';
+import '@/styles/globals.css';
 import { fontVariables } from './fonts';
 import RootProviders from '../components/providers/root-providers';
 import { AuthStatus } from '@/features/auth/components/auth-status';
-import { AppShell } from '@/components/app-shell';
-import { getSidebarRecords } from '@/lib/sidebar-records/get-sidebar-records';
+import { AppShell } from '../components/app-shell';
+import { getSidebarRecords } from '../lib/sidebar-records/get-sidebar-records';
 import { NextShellNavigation } from '@synapcity/frontend-shells/next';
 import { createMetadata } from '@synapcity/frontend-site/metadata';
-import { UserProvider } from '@/components/user-provider/user-provider';
-import { getCurrentUser } from '@/features/auth/server';
+import { UserProvider } from '@/providers/user-provider';
+import { getCurrentUser } from '../features/auth/server';
 import {
   appearanceBootScript,
   fontBootScript,
@@ -18,14 +18,14 @@ import {
   lookHtmlAttributes,
 } from '@synapcity/frontend-preferences';
 import { AccountPreferencesSync } from '@synapcity/features-settings/frontend';
-import { getAccountPreferences } from '@/features/settings/server/account-preferences';
+import { getAccountPreferences } from '../features/settings/server/account-preferences';
 import {
   LOOK_COOKIE_NAME,
   lookWithAccount,
   pageLanguage,
   parseLookCookieValue,
 } from '@synapcity/domain-preferences';
-import { cn } from '@/lib/utils';
+import { cn } from '../lib/utils';
 
 export const metadata: Metadata = createMetadata({
   title: 'Synapcity',

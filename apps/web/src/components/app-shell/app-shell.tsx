@@ -11,10 +11,13 @@ import {
   appPaletteGroups,
   appSidebar,
   type CollectionKind,
-} from '@/components/app-sidebar';
-import { QuickCreateDialog } from '@/components/quick-create';
-import { NO_SIDEBAR_RECORDS, type SidebarRecords } from '@/lib/sidebar-records';
-import { accountLinksFor } from '@/lib/routing/user-paths';
+} from '../app-sidebar';
+import {
+  QuickCreateDialog,
+  QuickCreateProvider,
+} from '../quick-create';
+import { NO_SIDEBAR_RECORDS, type SidebarRecords } from '../../lib/sidebar-records';
+import { accountLinksFor } from '../../lib/routing/user-paths';
 
 /**
  * The app's root shell. A client component because the sidebar follows the
@@ -44,8 +47,8 @@ export function AppShell({
   const [search, setSearch] = useState('');
   const [creating, setCreating] = useState<CollectionKind | null>(null);
 
-  const openPalette = (query = '') => {
-    setSearch(query);
+  const openPalette = () => {
+    setSearch('');
     setPaletteOpen(true);
   };
 
@@ -58,15 +61,14 @@ export function AppShell({
           ? (trail) =>
               appSidebar(userId, trail, pathname, {
                 records,
-                onOpenPalette: () => openPalette(),
-                onSearch: openPalette,
+                onOpenPalette: openPalette,
                 onCreate: setCreating,
                 footer: sidebarFooter,
               })
           : undefined
       }
     >
-      {children}
+      <QuickCreateProvider value={setCreating}>{children}</QuickCreateProvider>
       {userId && (
         <>
           <CommandPalette

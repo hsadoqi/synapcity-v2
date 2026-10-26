@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 
-import { requireOwner } from '@/lib/access/require-owner';
-import { HomePageView } from '@/features/home/components/home-page';
+import { requireOwner } from '../../../../src/lib/access/require-owner';
+import { HomePageView } from '../../../../src/features/home/components/home-page';
 import {
   fixtureItems,
   fixturePinned,
-} from '@/features/home/lib/overview.fixtures';
+} from '../../../../src/features/home/lib/overview.fixtures';
 
 export const metadata: Metadata = { title: 'Home' };
 
@@ -28,9 +28,12 @@ export default async function HomePage({
   //       <SignOutButton />
   //     </div>
   //   );
+  // Home has no real history source yet, so it shows fixtures labelled as
+  // sample content rather than passing them off as the person's own work.
   return (
     <HomePageView
       state="populated"
+      sample
       items={fixtureItems}
       pinned={fixturePinned}
       dateLabel="Today"
