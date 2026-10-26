@@ -16,4 +16,4 @@ export { toneClasses } from '@synapcity/frontend-ui/blocks/day-agenda/agenda-tim
 //   glass: 'bg-card/60 text-card-foreground backdrop-blur-md',
 // };
 
-// export const invertedClasses = 'theme-dark dark:theme-light';
+export const invertedClasses = 'theme-dark dark:theme-light';

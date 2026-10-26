@@ -18,6 +18,7 @@ import {
   surfaceClasses,
   type Surface,
 } from '@synapcity/frontend-ui/lib/surface';
+import { invertedClasses } from './day-variants';
 export type DayAgendaData = {
   /** Shown in place of the list when there are no slots. */
   empty?: ReactNode;
@@ -148,7 +149,7 @@ export function DayAgenda({
         // slot list can scroll inside it.
         'flex size-full justify-center',
         frame && 'p-4',
-        inverted && surfaceClasses[surface][inverted ? 'inverted' : 'plain'],
+        inverted && invertedClasses,
         className,
       )}
     >
@@ -158,7 +159,7 @@ export function DayAgenda({
           'relative flex w-full flex-1 flex-col gap-2',
           frame && 'rounded-xl p-3 shadow-sm',
           dialogContainer === 'card' && 'contain-layout',
-          frame && surfaceClasses[surface],
+          frame && surfaceClasses[surface].plain,
           frame && bordered && 'border border-border/15',
         )}
       >
