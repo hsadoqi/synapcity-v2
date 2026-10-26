@@ -1,3 +1,30 @@
+## Active task: Notion import owner decision and design spec (2026-10-23)
+
+- Goal and mode: record the owner's decision to bring Notion import into scope and draft its design spec. Planning and documentation only.
+- Direct authority: in this session the owner approved a proposal to "draft an owner decision note + design spec" for Notion import, following the 2026-10-17 notifications precedent. This authorizes drafting. It does not adopt any architecture, accept ADRs, or approve execution.
+- Source readiness: read AGENTS.md, `.agents/workflows/planning-artifacts.md`, `docs/product/non-goals.md`, `PRODUCT.md` (Documents), `docs/product/first-slice.md`, the ADR index candidate list, the ADR-0013 migration, `features/auth/server/session/session.ts`, `lib/access/dev-fixture.ts`, `lib/supabase/env.ts` and the notifications spec. Upstream Notion docs (authorization, request limits, file object, webhooks, event delivery, versioning) and npm registry versions checked 2026-10-23. The prototype at `~/Desktop/notion-lexical` is used as evidence only (section 4).
+- Create 1: `docs/superpowers/specs/2026-10-23-notion-import-design.md`.
+- Update 3: this entry; `docs/product/non-goals.md` (new "Notion import track" section only); `docs/architecture/decisions/README.md` (one candidate-list entry only).
+- Budget: repository document creates 1, updates 3; delete/move/rename 0; application/package source and config 0; migrations/schemas 0; dependencies 0; Git commits/branches/PRs 0; GitHub issues/labels/milestones/project fields 0; external systems 0.
+- Systems of record: non-goals owns the scope decision; the spec owns the proposed design and the open decisions D0 to D9; the ADR index candidate list points to it. No status is mirrored elsewhere.
+- Preconditions: the spec path was absent; the edits are additive and preserve all existing text.
+- Verification: scoped Prettier check on the three Markdown files; read back; internal link and current-source path checks; diff whitespace check. Runtime checks are not required for documentation-only work and are not claimed.
+- Recovery: if separately authorized, remove the new spec and revert only this task's hunks in the three existing files. No reset, stash or clean.
+- Not authorized: creating migrations, ADRs, code, dependencies or routes; accepting any D0 to D9 recommendation; committing or publishing.
+
+### Approved scope extension: correct the spec's prototype evidence (2026-10-23)
+
+- Direct authority: after the prototype gained token refresh, the owner said "continue" in reply to an offer to correct the spec's now-stale "does not store or use refresh tokens" line.
+- Additional exact destination: `docs/superpowers/specs/2026-10-23-notion-import-design.md`, the "Prototype (evidence, not authority)" subsection only.
+- Revised total budgets: repository document creates 1, updates 4 (the spec correction counted as one, plus this entry's extension). All other mutation classes remain 0. Verification and recovery as above.
+
+### Approved scope extension: record the owner's D0 to D4 decisions (2026-10-23)
+
+- Direct authority: in this session the owner selected the recommended option for D0 (start after Minimal Documents), D1 (one table, owner-only RLS), D2 (app-level AES-256-GCM) and D3 plus D4 (approve both as specced). This is acceptance by direct instruction, as with ADR-0010.
+- Additional exact destinations: create `docs/architecture/decisions/0014-notion-connection-and-token-handling.md` (Accepted, covering D1 to D3; number 0014 confirmed free). Update the spec (status line, decision summary and the D0 to D4 headings) and `docs/architecture/decisions/README.md` (one index row, plus narrowing the Notion candidate entry).
+- Revised total budgets: repository document creates 2, updates 4 (spec, ADR index, non-goals unchanged since its first edit, this entry). Migrations, schemas, code, dependencies, routes, commits, branches, PRs and external systems remain 0. D5 to D9 remain open.
+- Recovery: if separately authorized, delete only ADR-0014 and revert this extension's hunks.
+
 ## Active task: repair main integration on feat/build-spaces-feature (2026-10-17)
 
 - Goal and mode: owner requested fixing the main integration, then explicitly approved saving recovery state, aborting the duplicate-history rebase, and merging fetched origin/main (c5f03cf) into feat/build-spaces-feature. Implementing integration only.

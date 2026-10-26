@@ -42,6 +42,10 @@ The following are outside the initial committed slice unless the MVP decision ex
 
 The product owner moved notifications into scope on 2026-10-17, as a track separate from the first slice in `first-slice.md` (which still excludes them from its hypothesis). Included: account and security alerts, product announcements, and reminders on user content; delivered in-app with an optional sound, by browser push, and by email. The design, the phases and the decisions still open are in [`docs/superpowers/specs/2026-10-17-notifications-design.md`](../superpowers/specs/2026-10-17-notifications-design.md). Each architecture choice it lists still needs its own approval.
 
+## Notion import track (owner decision, 2026-10-23)
+
+On 2026-10-23 the product owner moved Notion import into scope, as a track separate from the first slice in `first-slice.md`. A person who is signed in links their own Notion account, which is never a sign-in method, chooses pages, and gets them as Documents they can edit, with re-sync from Notion. This narrows "broad third-party integrations and provider synchronization" for this one provider and this direction only. Other integrations and write-back to Notion stay deferred. The design, the phases and the open decisions are in [`docs/superpowers/specs/2026-10-23-notion-import-design.md`](../superpowers/specs/2026-10-23-notion-import-design.md). Each architecture choice it lists still needs its own approval.
+
 ## Deferred product directions
 
 The following are deliberately deferred rather than rejected:

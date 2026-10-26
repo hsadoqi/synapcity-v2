@@ -37,6 +37,7 @@ ADRs are numbered sequentially (`0001-*.md`, `0002-*.md`, ...) and never renumbe
 | [0011](0011-resizable-global-panel-shell.md)          | Resizable global panel in the authenticated shell            | Accepted |
 | [0012](0012-owned-space-records.md)                   | Owned Space records and serializable icon identifiers        | Accepted |
 | [0013](0013-document-and-dashboard-persistence.md)    | Document and dashboard persistence boundary                  | Accepted |
+| [0014](0014-notion-connection-and-token-handling.md)  | Notion connection storage and token handling                 | Accepted |
 
 **Lineage.** The ADRs in `docs/archive/architecture/decisions/` (0001-0016) belong to the previous implementation. They are evidence under `docs/engineering/preservation-policy.md`, not authority, and several describe workspaces that do not exist here (`apps/storybook`, `packages/ui/core`). This index restarted at 0001 for the current repository. When a current ADR needs an archived decision, it restates the decision it adopts rather than citing the archived number.
 
@@ -52,6 +53,7 @@ Not decided. Each needs an ADR, and the owner's approval, before it is treated a
 - **Deployment topology.** Includes the production domain, which does not exist yet. Until it does, `metadataBase` is unset in `apps/web/src/app/layout.tsx` and the build warns that social image URLs resolve to `http://localhost:3000`. Set `metadataBase` once the domain is chosen.
 - **Documentation site content and tooling** for `apps/docs`.
 - **Notifications delivery.** Storage, live updates, email provider, consent, push delivery and scheduling. Recommendations are in [the notifications spec](../../superpowers/specs/2026-10-17-notifications-design.md) (D0 to D6); none is decided.
+- **Notion import.** Connection storage, token protection, the OAuth flow and refresh are decided by [ADR-0014](0014-notion-connection-and-token-handling.md). Still open: where an imported Document's source is recorded, converter nodes and dependencies, imported files, sync rules, and webhooks (D5 to D9 in [the Notion import spec](../../superpowers/specs/2026-10-23-notion-import-design.md)).
 
 ## Template
 
