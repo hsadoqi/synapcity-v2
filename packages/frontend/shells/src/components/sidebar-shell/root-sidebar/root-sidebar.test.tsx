@@ -37,11 +37,11 @@ describe('RootSidebar', () => {
     expect(header.textContent).toBe('Context and search');
   });
 
-  //   it('renders no header when given none', () => {
-  //     renderSidebar();
+  it('renders no header when given none', () => {
+    renderSidebar();
 
-  //     expect(document.querySelector('[data-slot="sidebar-header"]')).toBeNull();
-  //   });
+    expect(document.querySelector('[data-slot="sidebar-header"]')).toBeNull();
+  });
 
   it('groups navigation under one label per section', () => {
     renderSidebar();

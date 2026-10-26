@@ -14,15 +14,9 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from '@synapcity/frontend-ui/core/sidebar';
-import { ChevronDown, Cog } from 'lucide-react';
+import { Cog } from 'lucide-react';
 import { ModeToggle } from '@synapcity/frontend-ui/components/mode-toggle';
 import { ShellLink } from '../../../providers/shell-navigation';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from '@synapcity/frontend-ui/components';
 
 /** One destination in a sidebar section. */
 export type RootSidebarItem = {
@@ -46,28 +40,6 @@ export type RootSidebarContent = {
   groups: RootSidebarGroup[];
 };
 
-const RootSidebarHeader = () => {
-  return (
-    <SidebarHeader>
-      <SidebarMenu>
-        <SidebarMenuItem>
-          <DropdownMenu>
-            <DropdownMenuTrigger render={<SidebarMenuButton />}>
-              Select Workspace
-              <ChevronDown className="ml-auto" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>
-                <span>Acme Inc</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </SidebarMenuItem>
-      </SidebarMenu>
-    </SidebarHeader>
-  );
-};
-
 export function RootSidebar({
   settingsHref,
   header,
@@ -77,8 +49,7 @@ export function RootSidebar({
   RootSidebarContent & { settingsHref: string }) {
   return (
     <Sidebar {...props}>
-      <RootSidebarHeader />
-      {/* {header && <SidebarHeader>{header}</SidebarHeader>} */}
+      {header && <SidebarHeader>{header}</SidebarHeader>}
       <SidebarContent>
         {groups.map((group) => (
           <SidebarGroup key={group.title}>
