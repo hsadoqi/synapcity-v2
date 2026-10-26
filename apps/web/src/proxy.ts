@@ -6,7 +6,7 @@ import { updateSession } from './lib/supabase/middleware';
 export async function proxy(request: NextRequest) {
   const response = await updateSession(request);
   const cookie = refreshedLookCookie(request.headers.get('cookie'), {
-    domain: process.env.NEXT_PUBLIC_PREFERENCES_COOKIE_DOUGH,
+    domain: process.env.NEXT_PUBLIC_PREFERENCES_COOKIE_DOMAIN,
     secure: request.nextUrl.protocol === 'https:',
   });
   // Append rather than replace: Supabase may have refreshed auth cookies on

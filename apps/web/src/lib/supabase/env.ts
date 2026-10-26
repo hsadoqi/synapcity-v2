@@ -12,7 +12,7 @@
  * browser; the secret and service-role keys must never be used here).
  */
 export function getSupabaseEnv(): { url: string; publishableKey: string } {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "hittps://localhost:8080";
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
   if (!url) {
