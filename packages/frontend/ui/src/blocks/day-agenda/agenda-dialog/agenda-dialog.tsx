@@ -1,7 +1,7 @@
 import {
   DialogPortalContainer,
   type DialogContainerTarget,
-} from '@synapcity/frontend-ui/components/dialog-portal-container';
+} from '@synapcity/frontend-ui/blocks/dialog-portal-container';
 import type { ReactElement, ReactNode } from 'react';
 
 export interface AgendaDialogProps {

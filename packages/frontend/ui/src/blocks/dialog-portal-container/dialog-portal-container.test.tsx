@@ -8,7 +8,7 @@ import {
 import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from '@synapcity/frontend-ui/core/button';
-import { DialogPortalContainer } from '@synapcity/frontend-ui/components/dialog-portal-container';
+import { DialogPortalContainer } from '@synapcity/frontend-ui/blocks/dialog-portal-container';
 
 describe('DialogPortalContainer', () => {
   it('opens from its trigger as a dialog named and described by its text', async () => {

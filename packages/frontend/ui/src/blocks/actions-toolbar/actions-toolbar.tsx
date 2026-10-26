@@ -4,7 +4,7 @@ import { useRender } from '@base-ui/react/use-render';
 import {
   DialogPortalContainer,
   type DialogContainerTarget,
-} from '@synapcity/frontend-ui/components/dialog-portal-container';
+} from '@synapcity/frontend-ui/blocks/dialog-portal-container';
 import { IconButton } from '@synapcity/frontend-ui/components/icon-button';
 import {
   DropdownMenu,
