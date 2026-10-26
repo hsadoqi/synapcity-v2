@@ -2,6 +2,19 @@ import { act, cleanup, render, screen } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+const regional = vi.hoisted(() => ({
+  formatting: {
+    locale: 'en-US',
+    timeZone: 'UTC',
+    hourCycle: 'h12' as 'h12' | 'h23',
+    dateFormat: 'MM/DD/YYYY',
+    weekStartsOn: 0,
+  },
+}));
+vi.mock('@synapcity/frontend-preferences', () => ({
+  useDateTimeFormatting: () => regional.formatting,
+}));
+
 import { DatePill } from './date-pill';
 
 const NOW = Date.UTC(2026, 3, 23, 9, 0);
@@ -16,6 +29,12 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   vi.useRealTimers();
+  regional.formatting = {
+    ...regional.formatting,
+    locale: 'en-US',
+    timeZone: 'UTC',
+    hourCycle: 'h12',
+  };
 });
 
 // Intl writes the space before AM/PM as a narrow no-break space in recent ICU versions.
@@ -88,6 +107,35 @@ describe('DatePill', () => {
     const html = renderToString(<DatePill value={VALUE} {...zone} />);
     expect(html).not.toContain('Thu');
     expect(html).not.toContain('PM');
+  });
+
+  it("follows the person's language, zone and hour cycle when not told otherwise", () => {
+    regional.formatting = {
+      ...regional.formatting,
+      locale: 'en-GB',
+      timeZone: 'Asia/Tokyo',
+      hourCycle: 'h23',
+    };
+    render(<DatePill value={Date.UTC(2026, 3, 23, 23, 30)} />);
+    act(() => vi.advanceTimersByTime(0));
+
+    // 23:30 UTC is 08:30 the next morning in Tokyo, written the British way.
+    expect(screen.getByText('Fri')).toBeTruthy();
+    expect(screen.getByText('24 Apr')).toBeTruthy();
+    expect(screen.getByText('08:30')).toBeTruthy();
+  });
+
+  it('lets locale and timeZone override the settings', () => {
+    regional.formatting = {
+      ...regional.formatting,
+      locale: 'en-GB',
+      timeZone: 'Asia/Tokyo',
+    };
+    render(<DatePill value={VALUE} locale="en-US" timeZone="UTC" />);
+    act(() => vi.advanceTimersByTime(0));
+
+    expect(screen.getByText('Apr 23')).toBeTruthy();
+    expect(screen.getByText('Thu')).toBeTruthy();
   });
 
   it('inverts by re-scoping the theme', () => {

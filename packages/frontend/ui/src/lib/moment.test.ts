@@ -91,6 +91,21 @@ describe('describeMoment', () => {
     expect(parts?.relative).toBe('Tomorrow');
   });
 
+  it('writes the time in the hour cycle it is given', () => {
+    const at = Date.UTC(2026, 3, 23, 14, 0);
+    const read = (hourCycle: 'h12' | 'h23') =>
+      plain(
+        describeMoment(at, now, {
+          locale: 'en-US',
+          timeZone: 'UTC',
+          hourCycle,
+        })!.time,
+      );
+
+    expect(read('h23')).toBe('14:00');
+    expect(read('h12')).toBe('2:00 PM');
+  });
+
   it('accepts a Date', () => {
     expect(
       describeMoment(new Date(Date.UTC(2026, 3, 23, 14, 0)), now, {

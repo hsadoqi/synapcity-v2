@@ -14,6 +14,8 @@ const DAY_MS = 86_400_000;
 export interface MomentOptions {
   locale?: Intl.LocalesArgument;
   timeZone?: string;
+  /** 12- or 24-hour time. Left out, the locale's own habit. */
+  hourCycle?: 'h12' | 'h23';
 }
 
 /** The day an instant falls on in the zone, as `yyyy-MM-dd`. */
@@ -78,13 +80,13 @@ export function describeMoment(
 ): MomentParts | null {
   const instant = typeof value === 'number' ? value : value.getTime();
   if (!Number.isFinite(instant)) return null;
-  const { locale, timeZone } = options;
+  const { locale, timeZone, hourCycle } = options;
   const format = (format: Intl.DateTimeFormatOptions) =>
     new Intl.DateTimeFormat(locale, { timeZone, ...format }).format(instant);
   return {
     weekday: format({ weekday: 'short' }),
     date: format({ month: 'short', day: 'numeric' }),
-    time: format({ timeStyle: 'short' }),
+    time: format({ timeStyle: 'short', hourCycle }),
     relative: relativeDayLabel(instant, now, options),
   };
 }
