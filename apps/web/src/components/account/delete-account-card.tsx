@@ -1,6 +1,5 @@
 'use client';
 
-// TODO: Can we make this more generic/reusable so it can be used for contexts/use cases beyond deleting account like deleting a space/document/dashboard/widget(future)?
 import { useActionState, useId } from 'react';
 import Link from 'next/link';
 import { Button, buttonVariants } from '@synapcity/frontend-ui/core/button';
@@ -15,9 +14,10 @@ import { AuthShell } from '@/features/auth/shared/auth-shell';
 const initialState: DeleteAccountState = {};
 
 /**
- * The final step of deleting an account. Opening the emailed link only brings
- * the person here; the deletion happens when this button is pressed, so a mail
- * scanner or a link preview that opens the link cannot delete anything.
+ * The account-specific final step of the emailed deletion flow. Opening the
+ * link only brings the person here; the deletion happens when this button is
+ * pressed, so a mail scanner or a link preview cannot delete anything.
+ * Ordinary resource deletion uses the shared ConfirmDialog instead.
  */
 export function DeleteAccountCard({
   email,

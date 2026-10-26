@@ -5,7 +5,7 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
   createToastManager,
@@ -142,15 +142,18 @@ describe('Toaster', () => {
     await waitFor(() => expect(screen.queryByText('Saved')).toBeNull());
   });
 
-  it('renders an action button from actionProps', async () => {
+  it('renders an action button and calls its handler', async () => {
+    const onClick = vi.fn();
     renderToaster();
 
-    add({ title: 'Deleted', actionProps: { children: 'Undo' } });
+    add({ title: 'Deleted', actionProps: { children: 'Undo', onClick } });
     await screen.findByText('Deleted');
 
-    expect(
-      screen.getByRole('button', { name: 'Undo' }).getAttribute('data-slot'),
-    ).toBe('toast-action');
+    const action = screen.getByRole('button', { name: 'Undo' });
+    expect(action.getAttribute('data-slot')).toBe('toast-action');
+
+    fireEvent.click(action);
+    expect(onClick).toHaveBeenCalledOnce();
   });
 
   it('stacks several toasts', async () => {

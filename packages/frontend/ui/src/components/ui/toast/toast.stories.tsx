@@ -50,23 +50,49 @@ export const Types: Story = {
     <>
       <Trigger
         label="Success"
-        options={{ type: 'success', title: 'Profile updated' }}
+        options={{
+          type: 'success',
+          title: 'Profile updated.',
+          description: 'Your changes are now available everywhere.',
+          timeout: 0,
+        }}
       />
       <Trigger
         label="Info"
-        options={{ type: 'info', title: 'New version available' }}
+        options={{
+          type: 'info',
+          title: 'Link confirmed.',
+          description: 'Confirm the other message to finish the change.',
+          timeout: 0,
+        }}
       />
       <Trigger
         label="Warning"
-        options={{ type: 'warning', title: 'Storage almost full' }}
+        options={{
+          type: 'warning',
+          title: 'Storage almost full.',
+          description: 'Remove unused files before uploading more.',
+          timeout: 0,
+        }}
       />
       <Trigger
         label="Error"
-        options={{ type: 'error', title: 'Could not save' }}
+        options={{
+          type: 'error',
+          title: 'Could not save.',
+          description: 'Check your connection and try again.',
+          timeout: 0,
+          priority: 'high',
+        }}
       />
       <Trigger
         label="Loading"
-        options={{ type: 'loading', title: 'Uploading…' }}
+        options={{
+          type: 'loading',
+          title: 'Uploading…',
+          description: 'Keep this page open until the upload finishes.',
+          timeout: 0,
+        }}
       />
     </>
   ),
@@ -77,7 +103,10 @@ export const WithAction: Story = {
     <Trigger
       label="Delete note"
       options={{
-        title: 'Note deleted',
+        type: 'success',
+        title: 'Note moved to trash.',
+        description: 'It will be permanently deleted after 30 days.',
+        timeout: 0,
         actionProps: { children: 'Undo' },
       }}
     />
