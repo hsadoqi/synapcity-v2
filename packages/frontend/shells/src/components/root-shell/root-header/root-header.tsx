@@ -14,7 +14,10 @@ import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';
 import { Separator } from '@synapcity/frontend-ui/core/separator';
 import { GlobalPanelToggle } from '../global-panel';
 import { ShellLink } from '../../../providers/shell-navigation';
-import { SidebarTrigger } from '@synapcity/frontend-ui/core/sidebar';
+import {
+  SidebarTrigger,
+  useSidebar,
+} from '@synapcity/frontend-ui/core/sidebar';
 import { IconButton } from '@synapcity/frontend-ui/components/icon-button';
 import {
   Breadcrumb,
@@ -62,7 +65,7 @@ export const RootHeaderContent = ({
       ) : (
         <RootLogoLink homeHref="/" />
       )}
-      <RootIconActions>
+      <RootIconActions signedIn={!!account}>
         {account && <GlobalPanelToggle />}
         {actions}
       </RootIconActions>
@@ -74,7 +77,7 @@ export const RootHeader = ({ account, ...props }: RootHeaderProps) => {
   // Same gutters as RootContent and RootFooter so the logo lines up with the
   // page below it.
   return (
-    <div className="sticky top-0 z-10 flex h-16 shrink-0 items-stretch border-b border-border bg-background/95 supports-backdrop-filter:backdrop-blur-sm">
+    <div className="sticky top-0 z-10 flex h-16 shrink-0 items-stretch border-b border-border bg-background">
       <header
         className={cn(
           'flex min-w-0 flex-1 items-center justify-between',
@@ -84,17 +87,7 @@ export const RootHeader = ({ account, ...props }: RootHeaderProps) => {
         {account && (
           <>
             <div className="flex shrink-0 items-center p-2">
-              <SidebarTrigger
-                render={
-                  <IconButton variant="ghost" aria-label="Open sidebar">
-                    <SynapcityMark
-                      size="sm"
-                      title={null}
-                      className="text-foreground"
-                    />
-                  </IconButton>
-                }
-              />
+              <HeaderSidebarTrigger />
               <Separator orientation="vertical" />
             </div>
           </>
@@ -102,6 +95,28 @@ export const RootHeader = ({ account, ...props }: RootHeaderProps) => {
         <RootHeaderContent account={account} {...props} />
       </header>
     </div>
+  );
+};
+
+/**
+ * The sidebar toggle, drawn as the brand mark. Its name and aria-expanded follow
+ * the sidebar: the sheet on phones, expanded or folded to icons elsewhere.
+ */
+const HeaderSidebarTrigger = () => {
+  const { state, isMobile, openMobile } = useSidebar();
+  const expanded = isMobile ? openMobile : state === 'expanded';
+  return (
+    <SidebarTrigger
+      render={
+        <IconButton
+          variant="ghost"
+          aria-label={expanded ? 'Close sidebar' : 'Open sidebar'}
+          aria-expanded={expanded}
+        >
+          <SynapcityMark size="sm" title={null} className="text-foreground" />
+        </IconButton>
+      }
+    />
   );
 };
 
@@ -125,9 +140,8 @@ const RootBreadcrumbs = ({ items }: { items?: RootBreadcrumb[] }) => {
           return (
             <React.Fragment key={`${item.href ?? ''}${item.label}`}>
               {index > 0 && (
-                <BreadcrumbSeparator
-                  className={cn(!isLast && 'hidden sm:inline-flex')}
-                />
+                // Below sm only the current page shows, so no separator does.
+                <BreadcrumbSeparator className="hidden sm:inline-flex" />
               )}
               <BreadcrumbItem
                 className={cn('min-w-0', !isLast && 'hidden sm:inline-flex')}
@@ -166,7 +180,7 @@ const RootLogoLink = ({
       href={homeHref}
       aria-label="Synapcity home"
       className={cn(
-        'inline-flex min-h-10 shrink-0 items-center rounded-sm outline-none transition-opacity hover:opacity-70 focus-visible:ring-2 focus-visible:ring-ring/50 pointer-coarse:min-h-11',
+        'inline-flex min-h-10 shrink-0 items-center rounded-sm transition-opacity hover:opacity-70 pointer-coarse:min-h-11',
         className,
       )}
     >
@@ -185,17 +199,23 @@ const RootLogoLink = ({
 };
 
 // Settings lives in the sidebar's core links, not here.
-const RootIconActions = ({ children }: { children?: ReactNode }) => {
+const RootIconActions = ({
+  signedIn,
+  children,
+}: {
+  /** Signed in, phones reach the theme toggle in the sidebar sheet instead. */
+  signedIn: boolean;
+  children?: ReactNode;
+}) => {
   return (
     <nav
       aria-label="Account and appearance"
       className="flex items-center gap-1"
     >
-      {' '}
       <ModeToggle
         variant="ghost"
         size="lg"
-        className="shrink-0 hidden md:block"
+        className={cn('shrink-0', signedIn && 'hidden md:block')}
       />
       {children}
     </nav>

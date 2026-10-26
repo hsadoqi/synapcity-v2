@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -113,11 +113,22 @@ describe('RootHeader', () => {
 
   it('shows the sidebar trigger only when signed in', () => {
     const { unmount } = renderHeader(account);
-    expect(screen.getByRole('button', { name: 'Open sidebar' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /sidebar$/ })).toBeTruthy();
     unmount();
 
     renderHeader(null);
-    expect(screen.queryByRole('button', { name: 'Open sidebar' })).toBeNull();
+    expect(screen.queryByRole('button', { name: /sidebar$/ })).toBeNull();
+  });
+
+  it('names the sidebar trigger after what it will do', () => {
+    renderHeader(account);
+    const trigger = screen.getByRole('button', { name: 'Close sidebar' });
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+
+    fireEvent.click(trigger);
+
+    const reopened = screen.getByRole('button', { name: 'Open sidebar' });
+    expect(reopened.getAttribute('aria-expanded')).toBe('false');
   });
 
   it('groups utility actions in a labelled navigation', () => {

@@ -9,13 +9,13 @@ const meta: Meta<typeof ContextSwitcher> = {
   component: ContextSwitcher,
   tags: ['autodocs'],
   args: {
-    current: 'Home',
+    current: 'Global',
     options: [
-      { label: 'Home', href: '#home' },
-      { label: 'Spaces', href: '#spaces' },
-      { label: 'Documents', href: '#documents' },
-      { label: 'Dashboards', href: '#dashboards' },
+      { label: 'Global', href: '#global', active: true },
+      { label: 'Writing', href: '#writing' },
+      { label: 'Garden plans', href: '#garden' },
     ],
+    more: { label: 'All spaces', href: '#spaces' },
   },
   decorators: [
     (Story) => (
@@ -35,5 +35,14 @@ type Story = StoryObj<typeof ContextSwitcher>;
 
 export const Default: Story = {};
 
-/** Inside a Space, the switcher names the Space; no option is checked. */
-export const InASpace: Story = { args: { current: 'Garden plans' } };
+/** Inside a Space, the switcher names the Space and checks it. */
+export const InASpace: Story = {
+  args: {
+    current: 'Garden plans',
+    options: [
+      { label: 'Global', href: '#global' },
+      { label: 'Writing', href: '#writing' },
+      { label: 'Garden plans', href: '#garden', active: true },
+    ],
+  },
+};

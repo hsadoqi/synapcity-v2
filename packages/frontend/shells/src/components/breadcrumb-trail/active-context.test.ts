@@ -13,22 +13,20 @@ const writing = {
   kind: 'space' as const,
 };
 
-// One case per row of the frontend-shells plan's context table (Task 6).
+// Contexts are Global (none) or a Space; collections are surfaces.
 describe('activeContext', () => {
   it('is none on Home, which sets no trail', () => {
     expect(activeContext([])).toBeNull();
   });
 
-  it('is the collection on a collection page', () => {
+  it('is none on a collection page, which is a surface, not a context', () => {
+    expect(activeContext([{ label: 'Spaces', kind: 'collection' }])).toBeNull();
     expect(
-      activeContext([{ label: 'Spaces', kind: 'collection' }])?.label,
-    ).toBe('Spaces');
+      activeContext([{ label: 'Documents', kind: 'collection' }]),
+    ).toBeNull();
     expect(
-      activeContext([{ label: 'Documents', kind: 'collection' }])?.label,
-    ).toBe('Documents');
-    expect(
-      activeContext([{ label: 'Dashboards', kind: 'collection' }])?.label,
-    ).toBe('Dashboards');
+      activeContext([{ label: 'Dashboards', kind: 'collection' }]),
+    ).toBeNull();
   });
 
   it('is the Space on a Space page', () => {
@@ -43,13 +41,13 @@ describe('activeContext', () => {
     );
   });
 
-  it('is the collection for a document or dashboard outside any Space', () => {
+  it('is none for a document or dashboard outside any Space', () => {
     expect(
       activeContext([
         { label: 'Documents', href: '/u/home/documents', kind: 'collection' },
         { label: 'Draft' },
-      ])?.label,
-    ).toBe('Documents');
+      ]),
+    ).toBeNull();
   });
 
   it('ignores crumbs that name no place', () => {

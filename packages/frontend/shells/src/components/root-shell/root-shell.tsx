@@ -81,7 +81,8 @@ export function AuthenticatedShell({
         }
         globalPanel={globalPanel}
       >
-        <ShellContent>{children}</ShellContent>
+        {/* No footer: a copyright line has no work to do inside the tool. */}
+        <RootContent>{children}</RootContent>
       </SidebarShell>
     </div>
   );

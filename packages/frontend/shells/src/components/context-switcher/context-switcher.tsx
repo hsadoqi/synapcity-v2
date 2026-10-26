@@ -6,6 +6,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@synapcity/frontend-ui/core/dropdown-menu';
 import {
@@ -18,20 +19,28 @@ import { SynapcityMark } from '@synapcity/frontend-ui/components/logo-mark';
 import { ShellLink } from '../../providers/shell-navigation';
 
 /** A place the switcher can take someone to. */
-export type ContextOption = { label: string; href: string };
+export type ContextOption = {
+  label: string;
+  href: string;
+  /** The context the page is in. Set by the host, since two can share a name. */
+  active?: boolean;
+};
 
 /**
  * The top of the sidebar: shows the context the page is in and opens a menu of
- * the places to switch to. The host decides both, usually from the page's
- * breadcrumb trail (see `activeContext`).
+ * the contexts to switch to (working globally, or inside one Space). The host
+ * decides both, usually from the page's breadcrumb trail (see `activeContext`).
  */
 export function ContextSwitcher({
   current,
   options,
+  more,
 }: {
-  /** The active context's name, such as Home or a Space's name. */
+  /** The active context's name, such as a Space's name. */
   current: string;
   options: ContextOption[];
+  /** A link after the options, such as to every Space. */
+  more?: ContextOption;
 }) {
   return (
     <SidebarMenu>
@@ -58,12 +67,21 @@ export function ContextSwitcher({
             {options.map((option) => (
               <DropdownMenuItem
                 key={option.href}
+                aria-current={option.active ? 'page' : undefined}
                 render={<ShellLink href={option.href} />}
               >
-                {option.label}
-                {option.label === current && <Check className="ml-auto" />}
+                <span className="min-w-0 flex-1 truncate">{option.label}</span>
+                {option.active && <Check className="ml-auto" />}
               </DropdownMenuItem>
             ))}
+            {more && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem render={<ShellLink href={more.href} />}>
+                  {more.label}
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

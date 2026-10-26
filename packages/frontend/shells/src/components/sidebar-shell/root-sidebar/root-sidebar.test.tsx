@@ -26,6 +26,22 @@ const menuLinks = () =>
     .filter((link) => link.getAttribute('data-slot') === 'sidebar-menu-button');
 
 describe('RootSidebar', () => {
+  it('shows a disabled item as a focusable, unusable button with its note', () => {
+    const onSelect = vi.fn();
+    renderSidebar({
+      groups: [
+        { items: [{ title: 'Inbox', disabled: true, note: 'Soon', onSelect }] },
+      ],
+    });
+    const inbox = screen.getByRole('button', { name: /Inbox/ });
+
+    expect(inbox.getAttribute('aria-disabled')).toBe('true');
+    expect(inbox.textContent).toContain('Soon');
+    expect(menuLinks()).toHaveLength(0);
+    fireEvent.click(inbox);
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
   it('shows the header it is given', () => {
     renderSidebar({ header: <p>Context and search</p> });
     const header = document.querySelector('[data-slot="sidebar-header"]')!;

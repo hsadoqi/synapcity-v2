@@ -22,6 +22,8 @@ export type CommandPaletteItem = {
   /** Runs instead of navigating, such as opening a create dialog. */
   onSelect?: () => void;
   icon?: IconComponent;
+  /** Listed but not choosable, such as a record whose page is not built yet. */
+  disabled?: boolean;
 };
 
 export type CommandPaletteGroup = {
@@ -52,7 +54,7 @@ export function CommandPalette({
 }) {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'k' && (event.metaKey || event.ctrlKey)) {
+      if (event.key.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey)) {
         event.preventDefault();
         onOpenChange(!open);
       }
@@ -81,15 +83,17 @@ export function CommandPalette({
             .filter((group) => group.items.length > 0)
             .map((group) => (
               <CommandGroup key={group.heading} heading={group.heading}>
-                {group.items.map((item) => {
+                {group.items.map((item, index) => {
                   const Icon = item.icon;
                   return (
                     <CommandItem
                       key={`${group.heading}:${item.label}:${item.href ?? ''}`}
                       // Unique per group, and the heading makes a search for
-                      // "spaces" bring up every Space.
-                      value={`${group.heading}:${item.label}:${item.href ?? ''}`}
+                      // "spaces" bring up every Space. The href stays out:
+                      // every route contains "home", so it would match them all.
+                      value={`${group.heading}:${item.label}:${index}`}
                       keywords={[item.label, group.heading]}
+                      disabled={item.disabled}
                       onSelect={() => choose(item)}
                     >
                       {Icon && <Icon />}

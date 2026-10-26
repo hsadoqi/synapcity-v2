@@ -6,9 +6,9 @@ import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
 import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
 
 const options = [
-  { label: 'Home', href: '/u/home' },
-  { label: 'Spaces', href: '/u/home/spaces' },
-  { label: 'Documents', href: '/u/home/documents' },
+  { label: 'Global', href: '/u/home' },
+  { label: 'Writing', href: '/u/home/spaces/s1' },
+  { label: 'Garden', href: '/u/home/spaces/s2' },
 ];
 
 // const documents = [
@@ -58,16 +58,27 @@ const options = [
 
 // const contexts = ['home', 'space', 'document', 'dashboard'];
 
-const renderSwitcher = (current = 'Home') =>
+const renderSwitcher = (
+  current = 'Global',
+  activeHref?: string,
+  more?: { label: string; href: string },
+) =>
   render(
     <TooltipProvider>
       <SidebarProvider>
-        <ContextSwitcher current={current} options={options} />
+        <ContextSwitcher
+          current={current}
+          options={options.map((option) => ({
+            ...option,
+            active: option.href === activeHref,
+          }))}
+          more={more}
+        />
       </SidebarProvider>
     </TooltipProvider>,
   );
 
-const open = async (current = 'Home') => {
+const open = async (current = 'Global') => {
   fireEvent.click(
     screen.getByRole('button', { name: `Switch context: ${current}` }),
   );
@@ -99,17 +110,37 @@ describe('ContextSwitcher', () => {
     );
   });
 
-  it('marks the active context with a check', async () => {
-    renderSwitcher('Spaces');
-    const [home, spaces] = await open('Spaces');
+  it('marks the active context with a check and aria-current', async () => {
+    renderSwitcher('Writing', '/u/home/spaces/s1');
+    const [global, writing] = await open('Writing');
 
-    expect(home!.querySelector('svg')).toBeNull();
-    expect(spaces!.querySelector('svg')).not.toBeNull();
+    expect(global!.querySelector('svg')).toBeNull();
+    expect(writing!.querySelector('svg')).not.toBeNull();
+    expect(writing!.getAttribute('aria-current')).toBe('page');
   });
 
-  it('marks nothing when the context is not one of the options', async () => {
-    renderSwitcher('Writing');
-    const items = await open('Writing');
+  it('follows the active flag, not the name, when two share one', async () => {
+    renderSwitcher('Writing', '/u/home/spaces/s2');
+    const [, first, second] = await open('Writing');
+
+    expect(first!.querySelector('svg')).toBeNull();
+    expect(second!.querySelector('svg')).not.toBeNull();
+  });
+
+  it('adds a link after the options when given one', async () => {
+    renderSwitcher('Global', '/u/home', {
+      label: 'All spaces',
+      href: '/u/home/spaces',
+    });
+    const items = await open();
+
+    expect(items.at(-1)!.textContent).toBe('All spaces');
+    expect(items.at(-1)!.getAttribute('href')).toBe('/u/home/spaces');
+  });
+
+  it('marks nothing when no option is active', async () => {
+    renderSwitcher('Elsewhere');
+    const items = await open('Elsewhere');
 
     expect(items.every((item) => item.querySelector('svg') === null)).toBe(
       true,

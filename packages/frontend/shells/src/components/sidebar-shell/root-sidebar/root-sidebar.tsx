@@ -25,7 +25,7 @@ type IconComponent = React.ComponentType<{ className?: string }>;
 /** One entry in a sidebar section: a link, or a button that runs an action. */
 export type RootSidebarItem = {
   title: string;
-  /** Where it leads. `#` for a destination that is not built yet. */
+  /** Where it leads. Leave it out, with `disabled`, for a page not built yet. */
   href?: string;
   /** Runs instead of navigating, such as opening a command palette. Used when there is no `href`. */
   onSelect?: () => void;
@@ -33,6 +33,13 @@ export type RootSidebarItem = {
   icon?: IconComponent;
   /** Marks the current page. */
   isActive?: boolean;
+  /**
+   * Shown but not usable, such as a destination that is not built yet. It
+   * stays focusable (aria-disabled) so a screen reader still finds it.
+   */
+  disabled?: boolean;
+  /** A short word after the title, such as "Soon". */
+  note?: string;
 };
 
 /** One section of the sidebar. */
@@ -69,13 +76,23 @@ const SidebarItem = ({ item }: { item: RootSidebarItem }) => {
   const body = (
     <>
       {Icon && <Icon />}
-      <span>{item.title}</span>
+      <span className="min-w-0 flex-1 truncate">{item.title}</span>
+      {item.note && (
+        <span className="shrink-0 text-xs text-muted-foreground group-data-[collapsible=icon]:hidden">
+          {item.note}
+        </span>
+      )}
     </>
   );
+  const tooltip = item.note ? `${item.title} (${item.note})` : item.title;
 
   return (
     <SidebarMenuItem>
-      {item.href !== undefined || !item.onSelect ? (
+      {item.disabled ? (
+        <SidebarMenuButton aria-disabled tooltip={tooltip}>
+          {body}
+        </SidebarMenuButton>
+      ) : item.href !== undefined || !item.onSelect ? (
         <SidebarMenuButton
           isActive={item.isActive}
           tooltip={item.title}
@@ -135,7 +152,7 @@ const SidebarSection = ({ group }: { group: RootSidebarGroup }) => {
               />
             ))}
             {items.length === 0 && group.empty && (
-              <li className="px-2 py-1 text-xs text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">
+              <li className="px-2 py-1 text-xs text-muted-foreground group-data-[collapsible=icon]:hidden">
                 {group.empty}
               </li>
             )}
