@@ -27,7 +27,7 @@ import {
   RecordSpaceView,
   SpaceContent,
 } from '@synapcity/features-spaces/frontend';
-import { SetBreadcrumbs } from '@/components/breadcrumbs';
+import { SetBreadcrumbs } from '@synapcity/frontend-shells';
 
 import SpaceShowPage from './page';
 

@@ -5,7 +5,8 @@ import {
 } from '@synapcity/features-spaces/frontend';
 import { getSpace } from '@synapcity/features-spaces/server';
 
-import { COLLECTION_LABELS, SetBreadcrumbs } from '@/components/breadcrumbs';
+import { SetBreadcrumbs } from '@synapcity/frontend-shells';
+import { COLLECTION_LABELS } from '@/components/breadcrumbs';
 import { logFailure } from '@/features/account/server/caller';
 import { requireOwner } from '@/lib/access/require-owner';
 import { homePathFor, spacesPathFor } from '@/lib/routing/user-paths';

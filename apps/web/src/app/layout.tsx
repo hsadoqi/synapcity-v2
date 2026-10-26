@@ -4,7 +4,7 @@ import '../styles/globals.css';
 import { fontVariables } from './fonts';
 import RootProviders from '../components/providers/root-providers';
 import { AuthStatus } from '@/features/auth/components/auth-status';
-import { BreadcrumbRootShell } from '@/components/breadcrumbs';
+import { BreadcrumbRootShell } from '@synapcity/frontend-shells';
 import { STAND_IN_SIDEBAR } from '@/components/stand-in-sidebar';
 import { NextShellNavigation } from '@synapcity/frontend-shells/next';
 import { createMetadata } from '@synapcity/frontend-site/metadata';

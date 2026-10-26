@@ -1,4 +1,4 @@
-import { AuthPageShell } from '@/components/shells';
+import { AuthPageShell } from '@synapcity/frontend-shells';
 import { createMetadata } from '@synapcity/frontend-site/metadata';
 import { Metadata } from 'next';
 

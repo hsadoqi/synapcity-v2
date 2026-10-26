@@ -5,7 +5,7 @@ vi.mock('next/navigation', () => ({ usePathname: () => '/' }));
 
 import { ModeProvider } from '@synapcity/frontend-preferences';
 
-import { BreadcrumbRootShell, SetBreadcrumbs } from './breadcrumb-trail';
+import { BreadcrumbRootShell, SetBreadcrumbs } from '.';
 
 beforeEach(() => {
   vi.stubGlobal(

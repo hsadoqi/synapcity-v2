@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 
 import { SpacesCollection } from '@synapcity/features-spaces/frontend';
-import { COLLECTION_LABELS, SetBreadcrumbs } from '@/components/breadcrumbs';
+import { SetBreadcrumbs } from '@synapcity/frontend-shells';
+import { COLLECTION_LABELS } from '@/components/breadcrumbs';
 import { requireOwner } from '@/lib/access/require-owner';
 import {
   homePathFor,

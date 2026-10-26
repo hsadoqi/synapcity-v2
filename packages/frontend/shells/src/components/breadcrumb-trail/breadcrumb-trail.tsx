@@ -1,8 +1,8 @@
 'use client';
-// TODO: Shouldnt this be in the ui package? why or why not?
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { ComponentProps } from 'react';
-import { RootShell, type RootBreadcrumb } from '@synapcity/frontend-shells';
+import { RootShell } from '../root-shell';
+import type { RootBreadcrumb } from '../root-shell/root-header';
 
 type SetTrail = (items: RootBreadcrumb[]) => void;
 

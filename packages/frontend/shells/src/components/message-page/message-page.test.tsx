@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { MESSAGE_HEADING_ID, MessagePage } from '../message-page';
+import { MESSAGE_HEADING_ID, MessagePage } from '.';
 
 describe('MessagePage', () => {
   it('has one h1 with the title, the description and the ways forward', () => {

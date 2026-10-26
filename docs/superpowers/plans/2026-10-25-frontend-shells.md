@@ -90,9 +90,11 @@ Checks: shells 74 tests; web 64 files, 637 tests; boundary checker 148 of 149 an
 
 ### Task 5: Breadcrumb trail and page frames
 
-- [ ] **Step 1:** Move `BreadcrumbRootShell`/`SetBreadcrumbs` (rename only if the glossary allows; otherwise keep the names) into shells; `collection-labels` stays in `apps/web`. Move `AuthPageShell` and `MessagePage` as page frames; re-point the 8 importers (`auth/layout`, `error`, `global-error`, `not-found`, the three `home/*/error` files, `auth/delete-account/page`). Keep `MESSAGE_HEADING_ID` and the focus behavior.
-- [ ] **Step 2:** Tests: breadcrumb dom test and the message-page and auth-page tests move with the code.
-- [ ] **Step 3:** Checkpoint commit.
+- [x] **Step 1:** Move `BreadcrumbRootShell`/`SetBreadcrumbs` (rename only if the glossary allows; otherwise keep the names) into shells; `collection-labels` stays in `apps/web`. Move `AuthPageShell` and `MessagePage` as page frames; re-point the 8 importers (`auth/layout`, `error`, `global-error`, `not-found`, the three `home/*/error` files, `auth/delete-account/page`). Keep `MESSAGE_HEADING_ID` and the focus behavior.
+- [x] **Step 2:** Tests: breadcrumb dom test and the message-page and auth-page tests move with the code.
+- [x] **Step 3:** Checkpoint commit.
+
+**Done 2026-10-25, on branch `refactor/shells-sidebar-slots`.** `BreadcrumbRootShell` and `SetBreadcrumbs` (names unchanged, C7), `AuthPageShell`, and `MessagePage` with `MESSAGE_HEADING_ID` moved with `git mv` from `apps/web/src/components/{breadcrumbs,shells}` to `frontend-shells/src/components/{breadcrumb-trail,auth-page-shell,message-page}` and are exported from the package root. `COLLECTION_LABELS` stays in `apps/web/src/components/breadcrumbs`; `apps/web/src/components/shells` is gone. The web importers (root layout, the auth layout and delete-account page, `error`, `global-error`, `not-found`, the three `home/*/error` files, and the spaces and dashboards pages that set a trail) import from `@synapcity/frontend-shells`. The three `.dom.test.tsx` files became the folders' `.test.tsx`, unchanged apart from the import; each folder gained a story for the package's structure test. Checks: shells 82 tests; web `src/app` and `src/components` 19 files, 123 tests; type check and lint clean for shells and web; the shells stories in Chromium with axe, 14 files, 31 tests; `pnpm boundaries` no violations; Knip clean.
 
 ### Task 6: Real navigation in the sidebar (needs the owner's go-ahead)
 

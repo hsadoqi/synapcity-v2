@@ -5,10 +5,7 @@ import { reportCaughtError } from '@synapcity/frontend-error-reports';
 import { Button } from '@synapcity/frontend-ui/core/button';
 import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 
-import {
-  MESSAGE_HEADING_ID,
-  MessagePage,
-} from '@/components/shells/message-page';
+import { MESSAGE_HEADING_ID, MessagePage } from '@synapcity/frontend-shells';
 
 /**
  * What a route shows when something unexpected throws while it renders or runs
