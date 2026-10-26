@@ -1,10 +1,12 @@
-"use client";
+'use client';
 
-import { X } from "lucide-react";
+import { X } from 'lucide-react';
 
-import { cn } from "@/lib/utils";
-
-type Surface = "card" | "glass";
+import { cn } from '@synapcity/frontend-ui/lib/utils';
+import {
+  blockSurface,
+  type BlockSurface as Surface,
+} from '@synapcity/frontend-ui/lib/block-surface';
 
 interface ContentPanelProps {
   componentId?: string;
@@ -22,40 +24,16 @@ interface ContentPanelProps {
   className?: string;
 }
 
-
 /* The card sets the colour and everything inside it is drawn in `current`, so
    inverting is two classes rather than a condition on every element.
    `glass` is a deliberate exception to the solid-surface rule: these pieces sit
    over section background images, and a frosted panel is the point of it. */
-const surfaceClasses: Record<Surface, { plain: string; inverted: string }> = {
-  card: {
-    plain: "bg-card text-card-foreground",
-    inverted: "bg-foreground text-background",
-  },
-  glass: {
-    plain: "bg-card/60 text-card-foreground backdrop-blur-md",
-    inverted: "bg-foreground/60 text-background backdrop-blur-md",
-  },
-};
 
 // The editable fields are the one solid thing inside the panel. On glass a solid
 // field reads as a white hole in the frosting, so it takes a tint of `current`.
 const fieldClasses: Record<Surface, string> = {
-  card: "bg-background text-foreground",
-  glass: "bg-current/5",
-};
-
-export const ContentPanelDemo: ContentPanelProps = {
-  surface: "card",
-  bordered: false,
-  inverted: false,
-  componentId: "Feature177 Content",
-  sizeLabel: "Size",
-  headingLabel: "Heading",
-  heading: "No tutorials needed.",
-  descriptionLabel: "Description",
-  description:
-    "If you can order food online, you can build a website with Beste.",
+  card: 'bg-background text-foreground',
+  glass: 'bg-current/5',
 };
 
 function Toolbar({
@@ -71,9 +49,7 @@ function Toolbar({
         type="button"
         className="flex items-center gap-1 rounded px-1.5 py-0.5 hover:bg-current/10"
       >
-        <span className="font-semibold">
-          {leadLetter}
-        </span>
+        <span className="font-semibold">{leadLetter}</span>
         <span>{sizeLabel}</span>
       </button>
       <span className="mx-1 h-4 w-px bg-border" aria-hidden="true" />
@@ -106,12 +82,12 @@ export function ContentPanel({
   componentId,
   componentTag,
   locale,
-  sizeLabel = "Size",
+  sizeLabel = 'Size',
   headingLabel,
   heading,
   descriptionLabel,
   description,
-  surface = "card",
+  surface = 'card',
   bordered = false,
   inverted = false,
   className,
@@ -122,21 +98,19 @@ export function ContentPanel({
   const hasDescription = Boolean(trimmedDescription);
   const hasBody = hasHeading || hasDescription;
 
-  const surfaceTone = surfaceClasses[surface][inverted ? "inverted" : "plain"];
   const fieldTone = fieldClasses[surface];
 
   return (
     <div
       className={cn(
-        "relative flex size-full items-center justify-center p-4",
-        className
+        'relative flex size-full items-center justify-center p-4',
+        className,
       )}
     >
       <div
         className={cn(
-          "w-full max-w-xs overflow-hidden rounded-xl shadow-lg",
-          surfaceTone,
-          bordered && "border border-current/15"
+          'w-full max-w-xs overflow-hidden rounded-xl shadow-lg',
+          blockSurface({ surface, inverted, bordered }),
         )}
       >
         <div className="flex items-center justify-between gap-3 px-4 py-3">
@@ -156,7 +130,12 @@ export function ContentPanel({
             {locale && (
               <button
                 type="button"
-                className={cn("flex size-7 items-center justify-center overflow-hidden rounded-full text-foreground", bordered ? "border border-current/15 bg-background" : "bg-current/10")}
+                className={cn(
+                  'flex size-7 items-center justify-center overflow-hidden rounded-full text-foreground',
+                  bordered
+                    ? 'border border-current/15 bg-background'
+                    : 'bg-current/10',
+                )}
                 aria-label="Locale"
               >
                 <span className="text-base leading-none" aria-hidden="true">
@@ -166,7 +145,12 @@ export function ContentPanel({
             )}
             <button
               type="button"
-              className={cn("flex size-7 items-center justify-center rounded-full text-foreground/60 hover:bg-current/10", bordered ? "border border-current/15 bg-background" : "bg-current/10")}
+              className={cn(
+                'flex size-7 items-center justify-center rounded-full text-foreground/60 hover:bg-current/10',
+                bordered
+                  ? 'border border-current/15 bg-background'
+                  : 'bg-current/10',
+              )}
               aria-label="Close"
             >
               <X className="size-3.5" aria-hidden="true" />
@@ -176,8 +160,6 @@ export function ContentPanel({
 
         {hasBody && (
           <div className="space-y-3 px-4 pb-4">
-           
-
             {hasHeading && (
               <div className="space-y-1.5">
                 {headingLabel && (
@@ -187,9 +169,9 @@ export function ContentPanel({
                 )}
                 <div
                   className={cn(
-                    "overflow-hidden rounded-lg",
-              bordered ? "border border-current/15" : "bg-current/10",
-                    fieldTone
+                    'overflow-hidden rounded-lg',
+                    bordered ? 'border border-current/15' : 'bg-current/10',
+                    fieldTone,
                   )}
                 >
                   <Toolbar leadLetter="H2" sizeLabel={sizeLabel} />
@@ -211,9 +193,9 @@ export function ContentPanel({
                 )}
                 <div
                   className={cn(
-                    "overflow-hidden rounded-lg",
-              bordered ? "border border-current/15" : "bg-current/10",
-                    fieldTone
+                    'overflow-hidden rounded-lg',
+                    bordered ? 'border border-current/15' : 'bg-current/10',
+                    fieldTone,
                   )}
                 >
                   <Toolbar leadLetter="P" sizeLabel={sizeLabel} />

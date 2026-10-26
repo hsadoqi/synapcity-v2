@@ -1,6 +1,6 @@
 'use client';
 
-import type { DialogContainerTarget } from '@synapcity/frontend-ui/blocks/dialog-portal-container';
+import type { DialogContainerTarget } from '@synapcity/frontend-ui/components/dialog-portal-container';
 import { AgendaActionsMenu } from '@synapcity/frontend-ui/blocks/day-agenda/agenda-actions-menu';
 import { AgendaDate } from '@synapcity/frontend-ui/blocks/day-agenda/agenda-date';
 import { AgendaDateNav } from '@synapcity/frontend-ui/blocks/day-agenda/agenda-date-nav';

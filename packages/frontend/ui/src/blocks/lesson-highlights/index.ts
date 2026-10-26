@@ -1,1 +1,1 @@
-export * from "./lesson-highlights"
+export * from './lesson-highlights';

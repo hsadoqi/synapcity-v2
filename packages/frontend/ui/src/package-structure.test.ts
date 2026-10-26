@@ -10,7 +10,11 @@ import { describe, expect, it } from 'vitest';
  *   stories, its tests and an index that is the folder's public surface;
  * - code reaches other folders through `@synapcity/frontend-ui/*`; a relative
  *   path may only name a file in the same folder (`./sibling`);
- * - every such specifier, and every `exports` entry, resolves to a real file.
+ * - every such specifier, and every `exports` entry, resolves to a real file;
+ * - imports only point down the layers: lib and hooks, then core (shadcn),
+ *   then components, then blocks. A leaf block imports no other block; a
+ *   composite block (listed in COMPOSITE_BLOCKS) may import leaf blocks only.
+ *   No file imports the index of the folder it sits in.
  */
 
 const root = join(import.meta.dirname, '..');
@@ -81,6 +85,51 @@ function resolveExport(specifier: string): string | null {
     }
   }
   return null;
+}
+
+/**
+ * Blocks that compose other blocks. Every other block is a leaf and imports
+ * no block at all; a composite imports leaves, never another composite.
+ */
+const COMPOSITE_BLOCKS = new Set(['day-agenda']);
+
+const LAYER_RANK = { lib: 0, core: 1, components: 2, block: 3 } as const;
+type Layer =
+  { kind: 'lib' | 'core' | 'components' } | { kind: 'block'; name: string };
+
+/** The layer a source file belongs to, from its path under `src/`. */
+function layerOfFile(path: string): Layer | null {
+  const [top, second] = path.split('/');
+  if (top === 'lib' || top === 'hooks') return { kind: 'lib' };
+  if (top === 'components') {
+    return second === 'ui' ? { kind: 'core' } : { kind: 'components' };
+  }
+  // `blocks/index.ts` is the package's barrel of blocks, not a block.
+  if (top === 'blocks' && second && !second.endsWith('.ts')) {
+    return { kind: 'block', name: second };
+  }
+  return null;
+}
+
+/** The layer a `@synapcity/frontend-ui/<subpath>` import points at. */
+function layerOfSpecifier(subpath: string): Layer | null {
+  const [top, second] = subpath.split('/');
+  if (top === 'lib' || top === 'hooks') return { kind: 'lib' };
+  if (top === 'core') return { kind: 'core' };
+  // `components/ui/<name>` is the long spelling of `core/<name>`.
+  if (top === 'components') {
+    return second === 'ui' ? { kind: 'core' } : { kind: 'components' };
+  }
+  if (top === 'blocks') return { kind: 'block', name: second ?? '*' };
+  return null;
+}
+
+function allowed(from: Layer, to: Layer): boolean {
+  if (from.kind === 'block' && to.kind === 'block') {
+    if (from.name === to.name) return true;
+    return COMPOSITE_BLOCKS.has(from.name) && !COMPOSITE_BLOCKS.has(to.name);
+  }
+  return LAYER_RANK[to.kind] <= LAYER_RANK[from.kind];
 }
 
 describe('component folders', () => {
@@ -155,6 +204,51 @@ describe('imports', () => {
         // Anything that climbs (`../`) or descends (`./parts/x`) crosses a
         // module boundary and goes through the package path instead.
         if (/^\.\/[\w.-]+$/.test(specifier)) continue;
+        offenders.push(`${rel(file)} -> ${specifier}`);
+      }
+    }
+
+    expect(offenders).toEqual([]);
+  });
+
+  it('uses no path alias such as `@/`', () => {
+    const offenders = files.flatMap((file) =>
+      importsOf(file)
+        .filter((specifier) => specifier.startsWith('@/'))
+        .map((specifier) => `${rel(file)} -> ${specifier}`),
+    );
+
+    expect(offenders).toEqual([]);
+  });
+
+  it('never imports the index of the folder a file sits in', () => {
+    const offenders: string[] = [];
+    for (const file of files) {
+      // Tests and stories import their component the way a consumer does;
+      // nothing imports them back, so they cannot close a cycle.
+      if (/\/index\.ts$|\.(test|stories)\.tsx?$/.test(file)) continue;
+      for (const specifier of importsOf(file)) {
+        if (!specifier.startsWith(`${pkg.name}/`)) continue;
+        const target = resolveExport(specifier);
+        if (!target?.endsWith('/index.ts')) continue;
+        if (file.startsWith(target.slice(0, -'index.ts'.length))) {
+          offenders.push(`${rel(file)} -> ${specifier}`);
+        }
+      }
+    }
+
+    expect(offenders).toEqual([]);
+  });
+
+  it('only imports down the layers', () => {
+    const offenders: string[] = [];
+    for (const file of files) {
+      const from = layerOfFile(rel(file));
+      if (!from) continue;
+      for (const specifier of importsOf(file)) {
+        if (!specifier.startsWith(`${pkg.name}/`)) continue;
+        const to = layerOfSpecifier(specifier.slice(pkg.name.length + 1));
+        if (!to || allowed(from, to)) continue;
         offenders.push(`${rel(file)} -> ${specifier}`);
       }
     }

@@ -1,1 +1,1 @@
-export * from "./content-panel";
+export * from './content-panel';

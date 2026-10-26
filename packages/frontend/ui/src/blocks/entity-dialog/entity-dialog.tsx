@@ -4,7 +4,7 @@ import {
   DialogPortalContainer,
   type DialogContainerTarget,
   type DialogContainerWidth,
-} from '@synapcity/frontend-ui/blocks/dialog-portal-container';
+} from '@synapcity/frontend-ui/components/dialog-portal-container';
 import { ConfirmDialog } from '@synapcity/frontend-ui/components/confirm-dialog';
 import { Button } from '@synapcity/frontend-ui/core/button';
 import {

@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { cn } from "@/lib/utils";
+import { cn } from '@synapcity/frontend-ui/lib/utils';
 
 interface Highlight {
   text: string;
-  tone: "amber" | "sky" | "emerald" | "rose";
+  tone: 'amber' | 'sky' | 'emerald' | 'rose';
 }
 
 interface LessonHighlightsProps {
@@ -15,27 +15,11 @@ interface LessonHighlightsProps {
   className?: string;
 }
 
-const toneClasses: Record<Highlight["tone"], string> = {
-  amber: "bg-amber-500/25 text-amber-900 dark:text-amber-100",
-  sky: "bg-sky-500/25 text-sky-900 dark:text-sky-100",
-  emerald: "bg-emerald-500/25 text-emerald-900 dark:text-emerald-100",
-  rose: "bg-rose-500/25 text-rose-900 dark:text-rose-100",
-};
-
-export const lessonHighlightsDemo: LessonHighlightsProps = {
-  lesson: "Lesson 6",
-  highlights: [
-    {
-      text: "useEffect runs after the DOM commit, not during render.",
-      tone: "amber",
-    },
-    {
-      text: "Cleanup runs before the next effect, and on unmount.",
-      tone: "sky",
-    },
-  ],
-  note: "Ask Priya about the stale-closure example in office hours.",
-  bordered: false,
+const toneClasses: Record<Highlight['tone'], string> = {
+  amber: 'bg-amber-500/25 text-amber-900 dark:text-amber-100',
+  sky: 'bg-sky-500/25 text-sky-900 dark:text-sky-100',
+  emerald: 'bg-emerald-500/25 text-emerald-900 dark:text-emerald-100',
+  rose: 'bg-rose-500/25 text-rose-900 dark:text-rose-100',
 };
 
 export function LessonHighlights({
@@ -48,11 +32,16 @@ export function LessonHighlights({
   return (
     <div
       className={cn(
-        "relative flex size-full items-center justify-center p-4",
-        className
+        'relative flex size-full items-center justify-center p-4',
+        className,
       )}
     >
-      <div className={cn("flex w-full max-w-80 flex-col gap-2 rounded-xl bg-card p-3 shadow-sm", bordered && "border border-border")}>
+      <div
+        className={cn(
+          'flex w-full max-w-80 flex-col gap-2 rounded-xl bg-card p-3 shadow-sm',
+          bordered && 'border border-border',
+        )}
+      >
         {lesson && (
           <span className="text-xs font-semibold text-muted-foreground">
             {lesson}
@@ -63,8 +52,8 @@ export function LessonHighlights({
             <span
               key={idx}
               className={cn(
-                "rounded px-2 py-1 text-xs leading-snug",
-                toneClasses[h.tone]
+                'rounded px-2 py-1 text-xs leading-snug',
+                toneClasses[h.tone],
               )}
             >
               {h.text}

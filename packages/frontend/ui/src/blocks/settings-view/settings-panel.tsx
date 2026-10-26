@@ -1,18 +1,21 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { useEffect, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 
-import { cn } from "@/lib/utils";
+import { cn } from '@synapcity/frontend-ui/lib/utils';
 
-type Surface = "card" | "glass";
+import {
+  blockSurface,
+  type BlockSurface as Surface,
+} from '@synapcity/frontend-ui/lib/block-surface';
 
 interface SettingRow {
   label: string;
   value: string;
 }
 
-interface SectionSettingsProps {
+interface SettingsProps {
   sectionLabel?: string;
   sectionId?: string;
   rows?: SettingRow[];
@@ -23,32 +26,21 @@ interface SectionSettingsProps {
   className?: string;
 }
 
-
 /* The card sets the colour and everything inside it is drawn in `current`, so
    inverting is two classes rather than a condition on every element.
    `glass` is a deliberate exception to the solid-surface rule: these pieces sit
    over section background images, and a frosted panel is the point of it. */
-const surfaceClasses: Record<Surface, { plain: string; inverted: string }> = {
-  card: {
-    plain: "bg-card text-card-foreground",
-    inverted: "bg-foreground text-background",
-  },
-  glass: {
-    plain: "bg-card/60 text-card-foreground backdrop-blur-md",
-    inverted: "bg-foreground/60 text-background backdrop-blur-md",
-  },
-};
 
-export const sectionSettingsDemo: SectionSettingsProps = {
-  surface: "card",
+export const sectionSettingsDemo: SettingsProps = {
+  surface: 'card',
   bordered: false,
   inverted: false,
-  sectionLabel: "Feature",
+  sectionLabel: 'Feature',
   rows: [
-    { label: "Padding", value: "96 px" },
-    { label: "Container", value: "7xl" },
-    { label: "Background", value: "Background" },
-    { label: "Card borders", value: "Per block" },
+    { label: 'Padding', value: '96 px' },
+    { label: 'Container', value: '7xl' },
+    { label: 'Background', value: 'Background' },
+    { label: 'Card borders', value: 'Per block' },
   ],
   dwellMs: 900,
 };
@@ -61,43 +53,40 @@ const STYLES = `
 @media (prefers-reduced-motion: reduce) { .editor55-glow { animation: none; } }
 `;
 
-export function SectionSettingsPanel({
+export function SettingsPanel({
   sectionLabel,
   sectionId,
   rows = [],
   dwellMs = 900,
-  surface = "card",
+  surface = 'card',
   bordered = false,
   inverted = false,
   className,
-}: SectionSettingsProps) {
+}: SettingsProps) {
   const [active, setActive] = useState(0);
 
   useEffect(() => {
     if (rows.length < 2) return;
     const id = setInterval(
       () => setActive((value) => (value + 1) % rows.length),
-      dwellMs
+      dwellMs,
     );
     return () => clearInterval(id);
   }, [rows.length, dwellMs]);
 
-  const surfaceTone = surfaceClasses[surface][inverted ? "inverted" : "plain"];
-
   return (
     <div
       className={cn(
-        "relative flex size-full items-center justify-center p-4",
-        className
+        'relative flex size-full items-center justify-center p-4',
+        className,
       )}
     >
       <style>{STYLES}</style>
 
       <div
         className={cn(
-          "flex w-full max-w-72 flex-col gap-3 rounded-xl p-4 shadow-sm",
-          surfaceTone,
-          bordered && "border border-current/15"
+          'flex w-full max-w-72 flex-col gap-3 rounded-xl p-4 shadow-sm',
+          blockSurface({ surface, inverted, bordered }),
         )}
       >
         <div className="flex items-center gap-2">
@@ -118,13 +107,11 @@ export function SectionSettingsPanel({
             <div
               key={row.label}
               className={cn(
-                "-mx-2 flex items-center justify-between gap-3 rounded-md px-2 py-1.5",
-                index === active && "editor55-glow bg-current/10"
+                '-mx-2 flex items-center justify-between gap-3 rounded-md px-2 py-1.5',
+                index === active && 'editor55-glow bg-current/10',
               )}
             >
-              <span className="truncate text-xs">
-                {row.label}
-              </span>
+              <span className="truncate text-xs">{row.label}</span>
               <span className="flex shrink-0 items-center gap-1 text-xs text-current/60">
                 {row.value}
                 <ChevronDown className="size-3" aria-hidden="true" />

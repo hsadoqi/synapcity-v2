@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { Brain } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Brain } from 'lucide-react';
+import { cn } from '@synapcity/frontend-ui/lib/utils';
 
 interface Flashcard {
   front: string;
-  status: "new" | "learning" | "review" | "mastered";
+  status: 'new' | 'learning' | 'review' | 'mastered';
 }
 
 interface FlashcardProps {
@@ -16,34 +16,26 @@ interface FlashcardProps {
   className?: string;
 }
 
-const statusClasses: Record<Flashcard["status"], { pill: string; label: string }> = {
+const statusClasses: Record<
+  Flashcard['status'],
+  { pill: string; label: string }
+> = {
   new: {
-    pill: "bg-sky-500/15 text-sky-700 dark:text-sky-300",
-    label: "New",
+    pill: 'bg-sky-500/15 text-sky-700 dark:text-sky-300',
+    label: 'New',
   },
   learning: {
-    pill: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
-    label: "Learning",
+    pill: 'bg-amber-500/15 text-amber-700 dark:text-amber-300',
+    label: 'Learning',
   },
   review: {
-    pill: "bg-violet-500/15 text-violet-700 dark:text-violet-300",
-    label: "Review",
+    pill: 'bg-violet-500/15 text-violet-700 dark:text-violet-300',
+    label: 'Review',
   },
   mastered: {
-    pill: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
-    label: "Mastered",
+    pill: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300',
+    label: 'Mastered',
   },
-};
-
-export const flashcardDemo: FlashcardProps = {
-  deck: "Spanish vocab",
-  due: "12 due today",
-  cards: [
-    { front: "resolver", status: "review" },
-    { front: "compartir", status: "learning" },
-    { front: "bienvenida", status: "mastered" },
-  ],
-  bordered: false,
 };
 
 export function Flashcard({
@@ -56,13 +48,21 @@ export function Flashcard({
   return (
     <div
       className={cn(
-        "relative flex size-full items-center justify-center p-4",
-        className
+        'relative flex size-full items-center justify-center p-4',
+        className,
       )}
     >
-      <div className={cn("flex w-full max-w-80 flex-col gap-2 rounded-xl bg-card p-3 shadow-sm", bordered && "border border-border")}>
+      <div
+        className={cn(
+          'flex w-full max-w-80 flex-col gap-2 rounded-xl bg-card p-3 shadow-sm',
+          bordered && 'border border-border',
+        )}
+      >
         <div className="flex items-center gap-2">
-          <Brain className="size-4 shrink-0 text-violet-500" aria-hidden="true" />
+          <Brain
+            className="size-4 shrink-0 text-violet-500"
+            aria-hidden="true"
+          />
           <div className="flex min-w-0 flex-1 flex-col">
             {deck && (
               <span className="truncate text-sm font-semibold text-card-foreground">
@@ -89,8 +89,8 @@ export function Flashcard({
                 </span>
                 <span
                   className={cn(
-                    "rounded-full px-2 py-0.5 font-semibold",
-                    s.pill
+                    'rounded-full px-2 py-0.5 font-semibold',
+                    s.pill,
                   )}
                 >
                   {s.label}

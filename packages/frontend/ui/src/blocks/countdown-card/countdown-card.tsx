@@ -1,22 +1,11 @@
-"use client";
+'use client';
 
-import { cn } from "@/lib/utils";
-import { surfaceClasses } from "./countdown-card-variants";
-import type { CountdownUnit, Surface } from "./countdown-card.types";
-
-
-export const countdownCardDemo: CountdownCardProps = {
-  surface: "card",
-  bordered: false,
-  inverted: false,
-  title: "Opens to everyone in",
-  units: [
-    { value: "12", label: "days" },
-    { value: "06", label: "hrs" },
-    { value: "48", label: "min" },
-  ],
-};
-
+import { cn } from '@synapcity/frontend-ui/lib/utils';
+import {
+  blockSurface,
+  type BlockSurface as Surface,
+} from '@synapcity/frontend-ui/lib/block-surface';
+import type { CountdownUnit } from './countdown-card.types';
 
 interface CountdownCardProps {
   title?: string;
@@ -28,12 +17,28 @@ interface CountdownCardProps {
   className?: string;
 }
 
-export function CountdownCard({ title, units = [], caption, surface = "card", bordered = false, inverted = false, className }: CountdownCardProps) {
-  const surfaceTone = surfaceClasses[surface][inverted ? "inverted" : "plain"];
-
+export function CountdownCard({
+  title,
+  units = [],
+  caption,
+  surface = 'card',
+  bordered = false,
+  inverted = false,
+  className,
+}: CountdownCardProps) {
   return (
-    <div className={cn("relative flex size-full items-center justify-center p-4", className)}>
-      <div className={cn("w-full max-w-80 rounded-md p-5 text-center shadow-xl", surfaceTone, bordered && "border border-current/15")}>
+    <div
+      className={cn(
+        'relative flex size-full items-center justify-center p-4',
+        className,
+      )}
+    >
+      <div
+        className={cn(
+          'w-full max-w-80 rounded-md p-5 text-center shadow-xl',
+          blockSurface({ surface, inverted, bordered }),
+        )}
+      >
         {title && <p className="text-sm text-current/60">{title}</p>}
 
         <div className="mt-3 flex items-stretch justify-center divide-x divide-border">
