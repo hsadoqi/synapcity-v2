@@ -95,8 +95,7 @@ const COMPOSITE_BLOCKS = new Set(['day-agenda']);
 
 const LAYER_RANK = { lib: 0, core: 1, components: 2, block: 3 } as const;
 type Layer =
-  | { kind: 'lib' | 'core' | 'components' }
-  | { kind: 'block'; name: string };
+  { kind: 'lib' | 'core' | 'components' } | { kind: 'block'; name: string };
 
 /** The layer a source file belongs to, from its path under `src/`. */
 function layerOfFile(path: string): Layer | null {
