@@ -7,6 +7,12 @@
  * from its parts in local time and reject anything that is not a real day.
  */
 
+import {
+  formatWrittenDate,
+  type DateTimeFormatting,
+  type WrittenDateOptions,
+} from '@synapcity/domain-preferences';
+
 const CALENDAR_DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
 
 /** Parses `yyyy-MM-dd` as a local date, or returns `null` for anything else (including 2026-02-31). */
@@ -58,4 +64,21 @@ export function addCalendarDays(date: string, days: number): string | null {
   return toCalendarDate(
     new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate() + days),
   );
+}
+
+/**
+ * Writes a calendar day with the person's formatting: a date picker's `Date`
+ * (local midnight) or a parsed `yyyy-MM-dd`. The day is read from the date's
+ * local parts and written in UTC, so the chosen timezone can never move it to
+ * the day before or after; a calendar day has no zone.
+ */
+export function formatCalendarDay(
+  date: Date,
+  formatting: DateTimeFormatting,
+  options?: WrittenDateOptions,
+): string {
+  const day = new Date(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
+  );
+  return formatWrittenDate(day, { ...formatting, timeZone: 'UTC' }, options);
 }

@@ -63,10 +63,3 @@ const interfaceLanguages: readonly RegionalSettings['language'][] = ['en'];
 export function pageLanguage(language: RegionalSettings['language']) {
   return interfaceLanguages.includes(language) ? language : 'en';
 }
-
-/** The IANA timezone to format with: the device's when the setting is `system`. */
-export function resolveTimezone(timezone: RegionalSettings['timezone']) {
-  return timezone === SYSTEM_TIMEZONE
-    ? Intl.DateTimeFormat().resolvedOptions().timeZone
-    : timezone;
-}

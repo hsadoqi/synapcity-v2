@@ -8,7 +8,7 @@ import {
   DayAgenda,
   type TimeSlot,
 } from '@synapcity/frontend-ui/blocks/day-agenda';
-import { toCalendarDate } from '@synapcity/frontend-ui/lib/calendar-date';
+import { toCalendarDate } from '@synapcity/frontend-ui/lib/calendar-utils';
 import { useState } from 'react';
 
 import { WidgetEmpty } from '../widget-states';

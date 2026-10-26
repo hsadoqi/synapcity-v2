@@ -13,7 +13,7 @@ import {
   addCalendarDays,
   parseCalendarDate,
   toCalendarDate,
-} from '@synapcity/frontend-ui/lib/calendar-date';
+} from '@synapcity/frontend-ui/lib/calendar-utils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 

@@ -1,9 +1,9 @@
 'use client';
 
 import * as React from 'react';
-import { format } from 'date-fns';
 import { ChevronDownIcon } from 'lucide-react';
 
+import { useDateTimeFormatting } from '@synapcity/frontend-preferences';
 import { Button } from '@synapcity/frontend-ui/core/button';
 import { Calendar } from '@synapcity/frontend-ui/core/calendar';
 import {
@@ -17,10 +17,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@synapcity/frontend-ui/core/popover';
+import { formatCalendarDay } from '@synapcity/frontend-ui/lib/calendar-utils';
 
 export function TimePicker() {
   const [open, setOpen] = React.useState(false);
   const [date, setDate] = React.useState<Date | undefined>(undefined);
+  const formatting = useDateTimeFormatting();
 
   return (
     <FieldGroup className="mx-auto max-w-xs flex-row">
@@ -34,7 +36,13 @@ export function TimePicker() {
                 id="date-picker-optional"
                 className="w-32 justify-between font-normal"
               >
-                {date ? format(date, 'PPP') : 'Select date'}
+                {date
+                  ? formatCalendarDay(date, formatting, {
+                      weekday: false,
+                      year: true,
+                      month: 'long',
+                    })
+                  : 'Select date'}
                 <ChevronDownIcon data-icon="inline-end" />
               </Button>
             }
