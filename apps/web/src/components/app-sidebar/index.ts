@@ -3,9 +3,4 @@ export {
   appSidebar,
   type AppSidebarOptions,
 } from './app-sidebar';
-export {
-  COLLECTIONS,
-  collectionFor,
-  type Collection,
-  type CollectionKind,
-} from './collections';
+export { collectionFor, type CollectionKind } from './collections';
