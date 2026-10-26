@@ -24,6 +24,7 @@
     "react": "19.3.0"
   },
   "devDependencies": {
+    "@synapcity/server-supabase": "workspace:*",
     "@storybook/nextjs-vite": "10.6.3",
     "@synapcity/dev-eslint-config": "workspace:*",
     "@synapcity/dev-typescript-config": "workspace:*",
