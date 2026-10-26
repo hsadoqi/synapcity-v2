@@ -37,20 +37,20 @@ Why this reflects current status without client state: `signInWithPassword`, `si
 
 | Piece                           | Behaviour                                                                                                                                                                                                                            |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `AuthStatus` (server component) | Reads `getClaims()`. Signed in: `UserMenu` (name from `full_name` or `name`, email, `avatar_url`) with `SignOutButton`. Signed out: `AuthButtons`. Takes a `variant` prop. In the hero variant, signed-in shows a "Go to home" link. |
+| `AuthActions` (server component) | Reads `getClaims()`. Signed in: `UserMenu` (name from `full_name` or `name`, email, `avatar_url`) with `SignOutButton`. Signed out: `AuthButtons`. Takes a `variant` prop. In the hero variant, signed-in shows a "Go to home" link. |
 | `SignOutButton`                 | `<form action={signOut}>` with a pending state via `useFormStatus`. The only sign-out path.                                                                                                                                          |
 
 ## Wiring and cleanup
 
-- `app/layout.tsx`: pass `<AuthStatus variant="header" />` to `RootShell` as `headerActions`.
-- `app/page.tsx`: replace the "Get Started" stub with `<AuthStatus variant="hero" />`.
+- `app/layout.tsx`: pass `<AuthActions variant="header" />` to `RootShell` as `headerActions`.
+- `app/page.tsx`: replace the "Get Started" stub with `<AuthActions variant="hero" />`.
 - `app/home/page.tsx`: use `SignOutButton` instead of the inline form.
 - Delete `components/auth/logout-button.tsx` and remove the `logout` type from `AuthLinkButton` (client-side sign-out and a link to a nonexistent `/auth/logout`).
 - `CurrentUserAvatar` and `useCurrentUserProfile` are left in place (still used on `/home`); revisit separately.
 
 ## Data flow
 
-Request, then proxy refreshes the session, then the root layout runs `AuthStatus`, which calls `getClaims()` (verified JWT claims, per ADR-0006), then renders the signed-in or signed-out UI. Claims are used for display only; protected routes still authorize on their own.
+Request, then proxy refreshes the session, then the root layout runs `AuthActions`, which calls `getClaims()` (verified JWT claims, per ADR-0006), then renders the signed-in or signed-out UI. Claims are used for display only; protected routes still authorize on their own.
 
 ## Testing and verification
 
