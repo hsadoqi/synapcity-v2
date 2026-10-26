@@ -3,7 +3,13 @@
 import { useState, useTransition, type ReactNode } from 'react';
 import Link from 'next/link';
 
-import { Cog, HomeIcon, LogOutIcon, UserRound } from 'lucide-react';
+import {
+  ChevronsUpDown,
+  Cog,
+  HomeIcon,
+  LogOutIcon,
+  UserRound,
+} from 'lucide-react';
 
 import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';
 import {
@@ -23,6 +29,11 @@ import {
   DropdownMenuTrigger,
 } from '@synapcity/frontend-ui/core/dropdown-menu';
 import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from '@synapcity/frontend-ui/core/sidebar';
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -40,6 +51,12 @@ type UserMenuProps = AccountLinks & {
    * than shown as a control that does nothing.
    */
   onSignOut?: () => void | Promise<void>;
+  /**
+   * `icon` is the avatar button for a header. `sidebar` is a full-width row
+   * with the avatar, name and email, for a sidebar footer; it must sit inside
+   * a SidebarProvider.
+   */
+  variant?: 'icon' | 'sidebar';
 };
 
 function UserMenu({
@@ -50,44 +67,82 @@ function UserMenu({
   imageUrl,
   children,
   onSignOut,
+  variant = 'icon',
 }: UserMenuProps) {
   const [open, setOpen] = useState(false);
   // A transition, so a server action's redirect() is handled by React/Next
   // and the item can show a pending state.
   const [signingOut, startSigningOut] = useTransition();
 
+  const avatar = (
+    <Avatar>
+      {imageUrl && <AvatarImage src={imageUrl} alt="" />}
+      {/* An icon, not initials: visible text in this button would have to be
+      part of its accessible name (WCAG 2.5.3), and axe flags it. */}
+      <AvatarFallback>
+        <UserRound aria-hidden />
+      </AvatarFallback>
+    </Avatar>
+  );
+
+  const iconTrigger = (
+    <TooltipProvider>
+      <Tooltip disabled={open}>
+        <TooltipTrigger
+          render={
+            <DropdownMenuTrigger
+              render={
+                <Button
+                  data-slot="user-menu-trigger"
+                  variant="ghost"
+                  size="icon-xl"
+                  label="Account menu"
+                  tooltip={false}
+                />
+              }
+            />
+          }
+        >
+          {avatar}
+        </TooltipTrigger>
+        <TooltipContent>Account menu</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+
+  // The row's visible name and email are part of its accessible name, after
+  // a hidden "Account menu" so the purpose is announced first.
+  const sidebarTrigger = (
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenuTrigger
+          render={<SidebarMenuButton size="lg" data-slot="user-menu-trigger" />}
+        >
+          {avatar}
+          <span className="sr-only">Account menu:</span>{' '}
+          <span className="flex min-w-0 flex-1 flex-col text-left leading-tight">
+            {name && <span className="truncate font-medium">{name}</span>}
+            {name && email && ' '}
+            {email && (
+              <span className="truncate text-xs text-muted-foreground">
+                {email}
+              </span>
+            )}
+          </span>
+          <ChevronsUpDown aria-hidden className="ml-auto" />
+        </DropdownMenuTrigger>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  );
+
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
-      <TooltipProvider>
-        <Tooltip disabled={open}>
-          <TooltipTrigger
-            render={
-              <DropdownMenuTrigger
-                render={
-                  <Button
-                    data-slot="user-menu-trigger"
-                    variant="ghost"
-                    size="icon-xl"
-                    label="Account menu"
-                    tooltip={false}
-                  />
-                }
-              />
-            }
-          >
-            <Avatar>
-              {imageUrl && <AvatarImage src={imageUrl} alt="" />}
-              {/* An icon, not initials: visible text in this button would have to be
-              part of its accessible name (WCAG 2.5.3), and axe flags it. */}
-              <AvatarFallback>
-                <UserRound aria-hidden />
-              </AvatarFallback>
-            </Avatar>
-          </TooltipTrigger>
-          <TooltipContent>Account menu</TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-      <DropdownMenuContent align="end" className="w-64">
+      {variant === 'sidebar' ? sidebarTrigger : iconTrigger}
+      <DropdownMenuContent
+        align={variant === 'sidebar' ? 'start' : 'end'}
+        side={variant === 'sidebar' ? 'top' : 'bottom'}
+        className="w-64"
+      >
         <DropdownMenuGroup>
           <DropdownMenuLabel className="flex flex-col items-start gap-1">
             {name && (

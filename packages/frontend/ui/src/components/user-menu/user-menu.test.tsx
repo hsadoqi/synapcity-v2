@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { UserMenu } from '@synapcity/frontend-ui/components/user-menu';
 import { DropdownMenuItem } from '@synapcity/frontend-ui/core/dropdown-menu';
+import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
 
 describe('UserMenu', () => {
   it('names the trigger for assistive tech', () => {
@@ -115,5 +116,41 @@ describe('UserMenu', () => {
     // Nothing interactive is nested inside a menu item.
     expect(home.querySelector('a, button')).toBeNull();
     expect(settings.querySelector('a, button')).toBeNull();
+  });
+
+  describe('as a sidebar row', () => {
+    const renderRow = () =>
+      render(
+        <SidebarProvider>
+          <UserMenu
+            variant="sidebar"
+            homeHref="/user-1/home"
+            settingsHref="/user-1/settings"
+            name="Hanaa Sadoqi"
+            email="h@example.com"
+            imageUrl={null}
+          />
+        </SidebarProvider>,
+      );
+
+    it('shows the name and email, announced as the account menu', () => {
+      renderRow();
+      const trigger = screen.getByRole('button', {
+        name: 'Account menu: Hanaa Sadoqi h@example.com',
+      });
+
+      expect(trigger.getAttribute('data-sidebar')).toBe('menu-button');
+      expect(trigger.textContent).toContain('h@example.com');
+    });
+
+    it('opens the same account actions', async () => {
+      renderRow();
+      fireEvent.click(screen.getByRole('button', { name: /^Account menu/ }));
+
+      expect(
+        await screen.findByRole('menuitem', { name: 'Settings' }),
+      ).toBeTruthy();
+      expect(screen.getByRole('menuitem', { name: 'Home' })).toBeTruthy();
+    });
   });
 });
