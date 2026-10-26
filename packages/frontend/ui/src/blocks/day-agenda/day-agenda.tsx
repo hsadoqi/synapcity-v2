@@ -1,28 +1,28 @@
 'use client';
 
-import type { DialogContainerTarget } from '@synapcity/frontend-ui/blocks/dialog-portal-container';
+import type { DialogContainerTarget } from '@synapcity/frontend-ui/components/dialog-portal-container';
 import { AgendaActionsMenu } from '@synapcity/frontend-ui/blocks/day-agenda/agenda-actions-menu';
 import { AgendaDate } from '@synapcity/frontend-ui/blocks/day-agenda/agenda-date';
 import { AgendaDateNav } from '@synapcity/frontend-ui/blocks/day-agenda/agenda-date-nav';
 import { AgendaSettingsView } from '@synapcity/frontend-ui/blocks/day-agenda/agenda-settings-view';
 import type { AgendaMenuItem } from '@synapcity/frontend-ui/blocks/day-agenda/agenda-dropdown-menu';
-import { AgendaTimeSlot } from '@synapcity/frontend-ui/blocks/day-agenda/agenda-time-slot';
+import {
+  AgendaTimeSlot,
+  TimeSlot,
+} from '@synapcity/frontend-ui/blocks/day-agenda/agenda-time-slot';
 import { ScrollArea } from '@synapcity/frontend-ui/core/scroll-area';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 import { useRef, useState, type ReactElement, type ReactNode } from 'react';
-import type {
-  DayAgendaDialogContainer,
-  Surface,
-  TimeSlot,
-} from './day-agenda.types';
-import { invertedClasses, surfaceClasses } from './day-variants';
-
+import type { DayAgendaDialogContainer } from './day-agenda.types';
+import { surfaceClasses } from '@synapcity/frontend-ui/blocks/countdown-card';
 export type DayAgendaData = {
   /** Shown in place of the list when there are no slots. */
   empty?: ReactNode;
   date: string;
   slots: TimeSlot[];
 };
+
+type Surface = 'card' | 'glass';
 
 /**
  * How the date is written. Separate from the style props so a settings form
@@ -147,7 +147,7 @@ export function DayAgenda({
         // slot list can scroll inside it.
         'flex size-full justify-center',
         frame && 'p-4',
-        inverted && invertedClasses,
+        inverted && surfaceClasses[surface][inverted ? 'inverted' : 'plain'],
         className,
       )}
     >

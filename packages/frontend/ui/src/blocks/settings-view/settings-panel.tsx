@@ -1,0 +1,128 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
+
+import { cn } from '@synapcity/frontend-ui/lib/utils';
+
+import {
+  surfaceClasses,
+  type Surface,
+} from '@synapcity/frontend-ui/lib/surface';
+
+interface SettingRow {
+  label: string;
+  value: string;
+}
+
+interface SettingsProps {
+  sectionLabel?: string;
+  sectionId?: string;
+  rows?: SettingRow[];
+  dwellMs?: number;
+  surface?: Surface;
+  bordered?: boolean;
+  inverted?: boolean;
+  className?: string;
+}
+
+/* The card sets the colour and everything inside it is drawn in `current`, so
+   inverting is two classes rather than a condition on every element.
+   `glass` is a deliberate exception to the solid-surface rule: these pieces sit
+   over section background images, and a frosted panel is the point of it. */
+
+export const sectionSettingsDemo: SettingsProps = {
+  surface: 'card',
+  bordered: false,
+  inverted: false,
+  sectionLabel: 'Feature',
+  rows: [
+    { label: 'Padding', value: '96 px' },
+    { label: 'Container', value: '7xl' },
+    { label: 'Background', value: 'Background' },
+    { label: 'Card borders', value: 'Per block' },
+  ],
+  dwellMs: 900,
+};
+
+/* The highlight is a background only, so nothing in the panel moves while it
+   travels. Row heights are fixed from the first frame. */
+const STYLES = `
+@keyframes editor55-glow { from { opacity: 0; } to { opacity: 1; } }
+.editor55-glow { animation: editor55-glow 260ms ease-out both; }
+@media (prefers-reduced-motion: reduce) { .editor55-glow { animation: none; } }
+`;
+
+export function SettingsPanel({
+  sectionLabel,
+  sectionId,
+  rows = [],
+  dwellMs = 900,
+  surface = 'card',
+  bordered = false,
+  inverted = false,
+  className,
+}: SettingsProps) {
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    if (rows.length < 2) return;
+    const id = setInterval(
+      () => setActive((value) => (value + 1) % rows.length),
+      dwellMs,
+    );
+    return () => clearInterval(id);
+  }, [rows.length, dwellMs]);
+
+  const surfaceTone = surfaceClasses[surface][inverted ? 'inverted' : 'plain'];
+
+  return (
+    <div
+      className={cn(
+        'relative flex size-full items-center justify-center p-4',
+        className,
+      )}
+    >
+      <style>{STYLES}</style>
+
+      <div
+        className={cn(
+          'flex w-full max-w-72 flex-col gap-3 rounded-xl p-4 shadow-sm',
+          surfaceTone,
+          bordered && 'border border-current/15',
+        )}
+      >
+        <div className="flex items-center gap-2">
+          {sectionLabel && (
+            <span className="truncate text-sm font-semibold">
+              {sectionLabel}
+            </span>
+          )}
+          {sectionId && (
+            <span className="truncate text-xs text-current/60">
+              {sectionId}
+            </span>
+          )}
+        </div>
+
+        <div className="flex flex-col">
+          {rows.map((row, index) => (
+            <div
+              key={row.label}
+              className={cn(
+                '-mx-2 flex items-center justify-between gap-3 rounded-md px-2 py-1.5',
+                index === active && 'editor55-glow bg-current/10',
+              )}
+            >
+              <span className="truncate text-xs">{row.label}</span>
+              <span className="flex shrink-0 items-center gap-1 text-xs text-current/60">
+                {row.value}
+                <ChevronDown className="size-3" aria-hidden="true" />
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}

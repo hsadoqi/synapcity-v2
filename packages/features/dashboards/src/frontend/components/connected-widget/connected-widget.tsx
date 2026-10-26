@@ -6,7 +6,7 @@ import {
   type PrototypeRecordKind,
   type PrototypeRecords,
 } from '@synapcity/domain-prototypes';
-import { toCalendarDate } from '@synapcity/frontend-ui/lib/calendar-date';
+import { toCalendarDate } from '@synapcity/frontend-ui/lib/calendar-utils';
 import { CalendarPlusIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';

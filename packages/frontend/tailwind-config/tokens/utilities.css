@@ -186,8 +186,14 @@
 /* A destructive item's highlight: the popover tinted with --destructive. The label keeps its
    own destructive colour (about 5.7:1 on it in both themes), and because --destructive is
    remapped per theme no hand-written dark: colour is needed. */
-@utility bg-destructive-hover {
-  background-color: color-mix(in oklch, var(--popover), var(--destructive) 12%);
+@layer utilities {
+  .bg-destructive-hover {
+    background-color: color-mix(
+      in oklch,
+      var(--popover),
+      var(--destructive) 12%
+    );
+  }
 }
 
 /* Filled-button states: the fill mixed toward the page, so hover and pressed stay

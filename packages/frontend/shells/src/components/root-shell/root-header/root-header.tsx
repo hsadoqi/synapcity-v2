@@ -1,3 +1,7 @@
+'use client';
+
+// TODO: Again, duplicate/inefficient functionality/implementations/styles...also there's a lot of code that isn't necessarily tightly coupled with the root header yet is defined here alongsid it...why?
+
 import * as React from 'react';
 import type { ReactNode } from 'react';
 import {

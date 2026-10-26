@@ -1,0 +1,3 @@
+# `@synapcity/frontend-components`
+
+---

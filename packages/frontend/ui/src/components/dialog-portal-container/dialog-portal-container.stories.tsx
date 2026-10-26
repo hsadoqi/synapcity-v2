@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, screen, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button } from '@synapcity/frontend-ui/core/button';
-import { DialogPortalContainer } from '@synapcity/frontend-ui/blocks/dialog-portal-container';
+import { DialogPortalContainer } from '@synapcity/frontend-ui/components/dialog-portal-container';
 
 const longBody = (
   <div className="flex flex-col gap-2 pr-3 text-sm text-muted-foreground">

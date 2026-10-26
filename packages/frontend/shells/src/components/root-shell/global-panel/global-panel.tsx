@@ -1,5 +1,6 @@
 'use client';
 
+// TODO: SO MUCH reusable functionality, UI, styles, behavior, etc. that can be reused elsewhere. Also the panel would probably end up more efficient/performant as a result.
 import {
   createContext,
   useCallback,

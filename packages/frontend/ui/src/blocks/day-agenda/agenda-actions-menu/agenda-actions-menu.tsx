@@ -1,5 +1,5 @@
 import { ActionsToolbar } from '@synapcity/frontend-ui/blocks/actions-toolbar';
-import type { DialogContainerTarget } from '@synapcity/frontend-ui/blocks/dialog-portal-container';
+import type { DialogContainerTarget } from '@synapcity/frontend-ui/components/dialog-portal-container';
 import {
   defaultAgendaMenuItems,
   type AgendaMenuItem,
