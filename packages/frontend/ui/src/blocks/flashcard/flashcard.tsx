@@ -16,24 +16,26 @@ interface FlashcardProps {
   className?: string;
 }
 
+/* Each status is a tint of its token with ordinary text on it: `warning` and
+   `info` are too light to be read as text on a pale tint. */
 const statusClasses: Record<
   Flashcard['status'],
   { pill: string; label: string }
 > = {
   new: {
-    pill: 'bg-sky-500/15 text-sky-700 dark:text-sky-300',
+    pill: 'bg-info/20 text-foreground',
     label: 'New',
   },
   learning: {
-    pill: 'bg-amber-500/15 text-amber-700 dark:text-amber-300',
+    pill: 'bg-warning/30 text-foreground',
     label: 'Learning',
   },
   review: {
-    pill: 'bg-violet-500/15 text-violet-700 dark:text-violet-300',
+    pill: 'bg-accent/30 text-foreground',
     label: 'Review',
   },
   mastered: {
-    pill: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300',
+    pill: 'bg-success/20 text-foreground',
     label: 'Mastered',
   },
 };
@@ -59,10 +61,7 @@ export function Flashcard({
         )}
       >
         <div className="flex items-center gap-2">
-          <Brain
-            className="size-4 shrink-0 text-violet-500"
-            aria-hidden="true"
-          />
+          <Brain className="size-4 shrink-0 text-primary" aria-hidden="true" />
           <div className="flex min-w-0 flex-1 flex-col">
             {deck && (
               <span className="truncate text-sm font-semibold text-card-foreground">

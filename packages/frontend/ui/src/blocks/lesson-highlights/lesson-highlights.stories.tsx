@@ -11,11 +11,11 @@ const meta = {
     highlights: [
       {
         text: 'useEffect runs after the DOM commit, not during render.',
-        tone: 'amber',
+        tone: 'warning',
       },
       {
         text: 'Cleanup runs before the next effect, and on unmount.',
-        tone: 'sky',
+        tone: 'info',
       },
     ],
     note: 'Ask Priya about the stale-closure example in office hours.',
@@ -33,10 +33,10 @@ export const Bordered: Story = { args: { bordered: true } };
 export const AllTones: Story = {
   args: {
     highlights: [
-      { text: 'Amber highlight', tone: 'amber' },
-      { text: 'Sky highlight', tone: 'sky' },
-      { text: 'Emerald highlight', tone: 'emerald' },
-      { text: 'Rose highlight', tone: 'rose' },
+      { text: 'Warning highlight', tone: 'warning' },
+      { text: 'Info highlight', tone: 'info' },
+      { text: 'Success highlight', tone: 'success' },
+      { text: 'Destructive highlight', tone: 'destructive' },
     ],
   },
 };

@@ -9,8 +9,8 @@ describe('LessonHighlights', () => {
       <LessonHighlights
         lesson="Lesson 6"
         highlights={[
-          { text: 'Effects run after commit.', tone: 'amber' },
-          { text: 'Cleanup runs first.', tone: 'sky' },
+          { text: 'Effects run after commit.', tone: 'warning' },
+          { text: 'Cleanup runs first.', tone: 'info' },
         ]}
         note="Ask in office hours."
       />,
@@ -26,10 +26,10 @@ describe('LessonHighlights', () => {
     render(
       <LessonHighlights
         highlights={[
-          { text: 'a', tone: 'amber' },
-          { text: 'b', tone: 'sky' },
-          { text: 'c', tone: 'emerald' },
-          { text: 'd', tone: 'rose' },
+          { text: 'a', tone: 'warning' },
+          { text: 'b', tone: 'info' },
+          { text: 'c', tone: 'success' },
+          { text: 'd', tone: 'destructive' },
         ]}
       />,
     );
@@ -41,7 +41,9 @@ describe('LessonHighlights', () => {
   });
 
   it('leaves out the lesson and note when not given', () => {
-    render(<LessonHighlights highlights={[{ text: 'Only', tone: 'rose' }]} />);
+    render(
+      <LessonHighlights highlights={[{ text: 'Only', tone: 'destructive' }]} />,
+    );
 
     expect(screen.getByText('Only')).toBeTruthy();
     expect(screen.queryByText('Lesson 6')).toBeNull();

@@ -4,7 +4,8 @@ import { cn } from '@synapcity/frontend-ui/lib/utils';
 
 interface Highlight {
   text: string;
-  tone: 'amber' | 'sky' | 'emerald' | 'rose';
+  /** What the highlight marks, shown as a tint of the matching token. */
+  tone: 'warning' | 'info' | 'success' | 'destructive';
 }
 
 interface LessonHighlightsProps {
@@ -16,10 +17,10 @@ interface LessonHighlightsProps {
 }
 
 const toneClasses: Record<Highlight['tone'], string> = {
-  amber: 'bg-amber-500/25 text-amber-900 dark:text-amber-100',
-  sky: 'bg-sky-500/25 text-sky-900 dark:text-sky-100',
-  emerald: 'bg-emerald-500/25 text-emerald-900 dark:text-emerald-100',
-  rose: 'bg-rose-500/25 text-rose-900 dark:text-rose-100',
+  warning: 'bg-warning/30 text-foreground',
+  info: 'bg-info/20 text-foreground',
+  success: 'bg-success/20 text-foreground',
+  destructive: 'bg-destructive/15 text-foreground',
 };
 
 export function LessonHighlights({

@@ -18,16 +18,15 @@ interface QuizQuestionProps {
 }
 
 const stateClasses: Record<NonNullable<Option['state']>, string> = {
-  correct:
-    'border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
-  incorrect: 'border-rose-500 bg-rose-500/10 text-rose-700 dark:text-rose-300',
+  correct: 'border-success bg-success/15 text-foreground',
+  incorrect: 'border-destructive bg-destructive/10 text-foreground',
   selected: 'border-primary bg-primary/10 text-card-foreground',
   idle: 'border-border bg-card text-card-foreground hover:bg-muted',
 };
 
 const letterClasses: Record<NonNullable<Option['state']>, string> = {
-  correct: 'bg-emerald-500 text-white',
-  incorrect: 'bg-rose-500 text-white',
+  correct: 'bg-success/45 text-foreground',
+  incorrect: 'bg-destructive/40 text-foreground',
   selected: 'bg-primary text-primary-foreground',
   idle: 'bg-muted text-card-foreground',
 };
