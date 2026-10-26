@@ -1,3 +1,13 @@
+## Active task: `frontend-feedback` design and plan (2026-10-25)
+
+- Goal and mode: planning only. Record the accepted design for `@synapcity/frontend-feedback` (error boundary, inline error, route error view and effect, keyed notice bridge with a `./next` binding) and its implementation plan. The owner accepted design questions Q1 to Q6 on 2026-10-25 and merged in four parts of a parallel draft from the `fix/feedback-package-architecture-c6d992` worktree (`InlineError` with three alert adoptions, the notifications non-goal, the `frontend-ui` follow-ups). Later the same day the owner folded in four findings from the previous implementation (spec M2 and section 12), read read-only from a scratch extraction of `code-library/quarantine/batch-02/synapcity-monorepo.zip` (feedback, error and status folders only; nothing run). The plan gained Task 8 (form dialog boundary). The owner approved the plan on 2026-10-25 with native execution, to start once frontend-shells plan Task 5 is on `main`.
+- Branch: `docs/frontend-feedback-design`, from `main` at `f3768472`.
+- Exact creates: `docs/superpowers/specs/2026-10-25-frontend-feedback-design.md`, `docs/superpowers/plans/2026-10-25-frontend-feedback.md`. Exact updates: this ledger.
+- Not changed: source code, package manifests, the inventory, the ownership map and ADRs (the plan's Task 1 and Task 8 change them). The parallel draft in the other worktree was not edited; it is superseded by this design.
+- Blocked: implementation waits for frontend-shells plan Task 5 (design Q6).
+- Verified: Prettier on the two documents and this ledger. Not run: any code check (no code changed).
+- Commits and pushes: the owner authorized one commit of the spec, plan and this ledger on this branch (2026-10-25). Pushing and a pull request are not authorized.
+
 ## Active task: Milestone 7 close-out (2026-10-25)
 
 - Goal and mode: commit the package-internal kind-folder restructure of `features-account` and `features-auth` and the close-out records, in the one pull request the owner allowed at the end of M7. The owner accepted the review's three recommendations on 2026-10-25 (Q2 and Q5 amendments; no `./next` entry for now). Branch `refactor/m7-feature-layout`, from `main` after pull requests #71 and #72.
