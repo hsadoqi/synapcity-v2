@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SidebarShell } from '.';
@@ -7,20 +7,36 @@ import { useSidebar } from '@synapcity/frontend-ui/core/sidebar';
 import { ModeProvider } from '@synapcity/frontend-preferences';
 import { sampleSidebarGroups } from '../../testing/sidebar-sample';
 
+/** Every observed element's callback, so a test can report the shell's width. */
+let observed: { element: Element; callback: ResizeObserverCallback }[] = [];
+
+/** Reports a new width for the sidebar wrapper, the box the shell fits. */
+const reportSize = (width: number) => {
+  const wrapper = document.querySelector('[data-slot="sidebar-wrapper"]');
+  for (const entry of observed.filter((o) => o.element === wrapper)) {
+    entry.callback(
+      [{ contentRect: { width } } as ResizeObserverEntry],
+      {} as ResizeObserver,
+    );
+  }
+};
+
 beforeEach(() => {
+  observed = [];
   vi.stubGlobal(
     'ResizeObserver',
     class {
-      observe() {}
+      constructor(private callback: ResizeObserverCallback) {}
+      observe(element: Element) {
+        observed.push({ element, callback: this.callback });
+      }
       unobserve() {}
       disconnect() {}
     },
   );
 });
 
-const sidebar = (
-  <RootSidebar settingsHref="/u/settings" groups={sampleSidebarGroups} />
-);
+const sidebar = <RootSidebar groups={sampleSidebarGroups} />;
 
 const renderShell = (
   header: React.ReactNode = <div>Header</div>,
@@ -72,11 +88,39 @@ describe('SidebarShell', () => {
     expect(screen.getByTestId('probe').textContent).toBe('collapsed:false');
   });
 
-  it('wraps the page in a full-height sidebar wrapper', () => {
+  it('fills its container instead of the window', () => {
     renderShell();
     const wrapper = document.querySelector('[data-slot="sidebar-wrapper"]')!;
 
-    expect(wrapper.className).toContain('h-svh');
+    expect(wrapper.className).toContain('h-full');
+    expect(wrapper.className).not.toContain('svh');
+  });
+
+  it('opens in a wide container and folds to icons in a narrow one', () => {
+    renderShell(<div>Header</div>, <SidebarStateProbe />);
+    const probe = () => screen.getByTestId('probe').textContent;
+
+    act(() => reportSize(1280));
+    expect(probe()).toBe('expanded:true');
+
+    act(() => reportSize(600));
+    expect(probe()).toBe('collapsed:false');
+  });
+
+  it("keeps the person's toggle until the container crosses the line again", () => {
+    renderShell(<div>Header</div>, <SidebarStateProbe />);
+    const probe = () => screen.getByTestId('probe').textContent;
+
+    act(() => reportSize(1280));
+    fireEvent.keyDown(window, { key: 'b', ctrlKey: true });
+    expect(probe()).toBe('collapsed:false');
+
+    act(() => reportSize(1300));
+    expect(probe()).toBe('collapsed:false');
+
+    act(() => reportSize(700));
+    act(() => reportSize(1280));
+    expect(probe()).toBe('expanded:true');
   });
 
   it('lets wide content shrink instead of pushing past the viewport', () => {

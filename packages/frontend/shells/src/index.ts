@@ -37,3 +37,8 @@ export {
   type ContextOption,
 } from './components/context-switcher';
 export { SearchForm } from './components/search-form';
+export {
+  CommandPalette,
+  type CommandPaletteGroup,
+  type CommandPaletteItem,
+} from './components/command-palette';

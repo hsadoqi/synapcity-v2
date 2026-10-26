@@ -109,11 +109,16 @@ describe('RootShell', () => {
     ).not.toBeNull();
   });
 
-  it('keeps the settings link in the sidebar footer', () => {
-    renderShell({ account });
+  it('puts the footer the host gives it in the sidebar footer', () => {
+    renderShell({
+      account,
+      sidebar: { groups: [], footer: <p>Account row</p> },
+    });
     const footer = document.querySelector('[data-slot="sidebar-footer"]')!;
 
-    expect(footer.querySelector('a[href="/u/settings"]')).not.toBeNull();
+    expect(footer.textContent).toContain('Account row');
+    // Settings is one of the host's core links now, not a shell footer link.
+    expect(footer.querySelector('a[href="/u/settings"]')).toBeNull();
   });
 
   it('shows no template navigation when the host gives no sidebar content', () => {

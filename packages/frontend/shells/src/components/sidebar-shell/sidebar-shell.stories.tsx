@@ -11,12 +11,7 @@ const meta: Meta<typeof SidebarShell> = {
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
   args: {
-    sidebar: (
-      <RootSidebar
-        settingsHref="/user-1/settings"
-        groups={sampleSidebarGroups}
-      />
-    ),
+    sidebar: <RootSidebar groups={sampleSidebarGroups} />,
     header: <div className="h-12 border-b px-4 text-xs">Header</div>,
     children: <p className="p-4 text-xs">Page content</p>,
   },

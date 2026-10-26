@@ -9,8 +9,6 @@ import {
   SynapcityMark,
 } from '@synapcity/frontend-ui/components/logo-mark';
 import { ModeToggle } from '@synapcity/frontend-ui/components/mode-toggle';
-import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
-import { Cog } from 'lucide-react';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';
 import { Separator } from '@synapcity/frontend-ui/core/separator';
@@ -64,7 +62,7 @@ export const RootHeaderContent = ({
       ) : (
         <RootLogoLink homeHref="/" />
       )}
-      <RootIconActions settingsHref={account?.settingsHref}>
+      <RootIconActions>
         {account && <GlobalPanelToggle />}
         {actions}
       </RootIconActions>
@@ -186,33 +184,8 @@ const RootLogoLink = ({
   );
 };
 
-const SettingsLinkIcon = ({
-  href,
-  className,
-}: {
-  href: string;
-  className?: string;
-}) => {
-  return (
-    <LinkButton
-      variant="ghost"
-      href={href}
-      size="icon-lg"
-      aria-label="Settings"
-      className={cn('shrink-0', className)}
-    >
-      <Cog />
-    </LinkButton>
-  );
-};
-
-const RootIconActions = ({
-  settingsHref,
-  children,
-}: {
-  settingsHref?: string;
-  children?: ReactNode;
-}) => {
+// Settings lives in the sidebar's core links, not here.
+const RootIconActions = ({ children }: { children?: ReactNode }) => {
   return (
     <nav
       aria-label="Account and appearance"
@@ -224,12 +197,6 @@ const RootIconActions = ({
         size="lg"
         className="shrink-0 hidden md:block"
       />
-      {settingsHref && (
-        <SettingsLinkIcon
-          href={settingsHref}
-          className="hidden md:inline-flex"
-        />
-      )}
       {children}
     </nav>
   );

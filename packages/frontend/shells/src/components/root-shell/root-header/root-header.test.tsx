@@ -38,8 +38,8 @@ describe('RootHeaderContent', () => {
     expect(markup).not.toContain('/settings');
   });
 
-  it('offers settings only when signed in', () => {
-    expect(html('user-1')).toContain('href="/user-1/settings"');
+  it('offers no settings link signed in either; it lives in the sidebar', () => {
+    expect(html('user-1')).not.toContain('/settings');
   });
 });
 
@@ -127,10 +127,11 @@ describe('RootHeader', () => {
     });
 
     expect(within(nav).getByRole('button', { name: 'Theme' })).toBeTruthy();
-    expect(within(nav).getByRole('link', { name: 'Settings' })).toBeTruthy();
+    expect(within(nav).queryByRole('link', { name: 'Settings' })).toBeNull();
     expect(within(nav).getByRole('button', { name: 'Extra' })).toBeTruthy();
   });
 
+  // Settings moved to the sidebar's core links; the header has none either way.
   it('offers no settings link when signed out', () => {
     renderHeader(null);
 

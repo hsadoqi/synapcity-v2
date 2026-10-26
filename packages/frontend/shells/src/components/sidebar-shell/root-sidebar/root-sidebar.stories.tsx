@@ -13,19 +13,15 @@ const meta: Meta<typeof RootSidebar> = {
   component: RootSidebar,
   tags: ['autodocs'],
   args: {
-    settingsHref: '/user-1/settings',
     groups: sampleSidebarGroups,
     header: (
-      <>
-        <ContextSwitcher
-          current="Home"
-          options={[
-            { label: 'Home', href: '#home' },
-            { label: 'Spaces', href: '#spaces' },
-          ]}
-        />
-        <SearchForm />
-      </>
+      <ContextSwitcher
+        current="Home"
+        options={[
+          { label: 'Home', href: '#home' },
+          { label: 'Spaces', href: '#spaces' },
+        ]}
+      />
     ),
   },
   parameters: { layout: 'fullscreen' },
@@ -33,7 +29,7 @@ const meta: Meta<typeof RootSidebar> = {
     (Story) => (
       <ModeProvider>
         <TooltipProvider>
-          <SidebarProvider className="min-h-160">
+          <SidebarProvider contained className="h-160">
             <Story />
           </SidebarProvider>
         </TooltipProvider>
@@ -48,6 +44,31 @@ type Story = StoryObj<typeof RootSidebar>;
 export const Default: Story = {};
 
 export const Right: Story = { args: { side: 'right' } };
+
+/** Core links, a search form, and a collection with its action and records. */
+export const WithSearchAndCollections: Story = {
+  args: {
+    groups: [
+      sampleSidebarGroups[0]!,
+      { content: <SearchForm /> },
+      {
+        title: 'Spaces',
+        href: '#spaces',
+        action: { label: 'New space', onSelect: () => {} },
+        items: [
+          { title: 'Writing', href: '#writing' },
+          { title: 'Garden plans', href: '#garden' },
+        ],
+      },
+      {
+        title: 'Documents',
+        href: '#documents',
+        items: [],
+        empty: 'No documents yet',
+      },
+    ],
+  },
+};
 
 /** No sections and no header: only the small-screen footer and the rail. */
 export const Empty: Story = { args: { groups: [], header: undefined } };

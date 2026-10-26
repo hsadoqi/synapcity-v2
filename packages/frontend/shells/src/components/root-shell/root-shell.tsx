@@ -61,7 +61,7 @@ export function AuthenticatedShell({
   return (
     <div
       data-slot="authenticated-shell"
-      className="flex min-h-svh flex-1 flex-col z-0"
+      className="flex h-svh flex-1 flex-col z-0"
     >
       <SkipLinkButton />
       <SidebarShell
@@ -74,9 +74,9 @@ export function AuthenticatedShell({
         }
         sidebar={
           <RootSidebar
-            settingsHref={account.settingsHref}
             header={sidebar.header}
             groups={sidebar.groups}
+            footer={sidebar.footer}
           />
         }
         globalPanel={globalPanel}
