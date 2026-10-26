@@ -17,19 +17,6 @@ interface QuizQuestionProps {
   className?: string;
 }
 
-export const quizQuestionDemo: QuizQuestionProps = {
-  questionIndex: 3,
-  totalQuestions: 10,
-  question: 'Which hook schedules an effect after the DOM is painted?',
-  options: [
-    { letter: 'A', label: 'useLayoutEffect', state: 'idle' },
-    { letter: 'B', label: 'useEffect', state: 'selected' },
-    { letter: 'C', label: 'useMemo', state: 'idle' },
-    { letter: 'D', label: 'useDeferredValue', state: 'idle' },
-  ],
-  bordered: false,
-};
-
 const stateClasses: Record<NonNullable<Option['state']>, string> = {
   correct:
     'border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',

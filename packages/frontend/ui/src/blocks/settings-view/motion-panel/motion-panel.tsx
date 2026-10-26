@@ -39,30 +39,6 @@ interface MotionPanelProps extends StyleProps {
    `glass` is a deliberate exception to the solid-surface rule: these pieces sit
    over section background images, and a frosted panel is the point of it. */
 
-export const motionDefaults: MotionPanelProps = {
-  surface: 'card',
-  bordered: false,
-  inverted: false,
-  sectionLabel: 'Appearance',
-  sections: [
-    {
-      label: 'Images',
-      rows: [
-        { label: 'Image entrance', value: 'Blur in' },
-        { label: 'Scroll effect', value: 'Parallax' },
-      ],
-    },
-    {
-      label: 'Motion',
-      rows: [
-        { label: 'Section animation', value: 'Blur in' },
-        { label: 'Animation speed', value: 'Slow' },
-      ],
-    },
-  ],
-  stepMs: 340,
-};
-
 /* Labels are there from the first frame; only the values travel, so the rows
    never change height while the panel fills in. */
 const STYLES = `

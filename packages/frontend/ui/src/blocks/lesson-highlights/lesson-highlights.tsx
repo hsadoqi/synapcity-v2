@@ -22,22 +22,6 @@ const toneClasses: Record<Highlight['tone'], string> = {
   rose: 'bg-rose-500/25 text-rose-900 dark:text-rose-100',
 };
 
-export const lessonHighlightsDemo: LessonHighlightsProps = {
-  lesson: 'Lesson 6',
-  highlights: [
-    {
-      text: 'useEffect runs after the DOM commit, not during render.',
-      tone: 'amber',
-    },
-    {
-      text: 'Cleanup runs before the next effect, and on unmount.',
-      tone: 'sky',
-    },
-  ],
-  note: 'Ask Priya about the stale-closure example in office hours.',
-  bordered: false,
-};
-
 export function LessonHighlights({
   lesson,
   highlights = [],

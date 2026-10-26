@@ -38,7 +38,6 @@ const statusClasses: Record<
   },
 };
 
-
 export function Flashcard({
   deck,
   due,

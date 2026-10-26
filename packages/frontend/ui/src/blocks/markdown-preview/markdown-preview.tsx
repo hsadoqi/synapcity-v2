@@ -11,13 +11,6 @@ interface MarkdownPreviewProps {
   className?: string;
 }
 
-export const markdownPreviewDemo: MarkdownPreviewProps = {
-  title: 'Launch Checklist',
-  lede: 'Ship with confidence by running through the five-point review.',
-  bullets: ['Verify preview URL', 'Run smoke suite', 'Tag the release'],
-  bordered: false,
-};
-
 export function MarkdownPreview({
   title = 'Heading',
   lede,
