@@ -11,12 +11,10 @@ import type {
   CollectionItem,
   CollectionItemAction,
 } from '@synapcity/frontend-collection';
-import type { OwnedRecordSummary } from '../../../../lib/owned-records';
-import { homePathFor, signInPathFor } from '../../../../lib/routing/user-paths';
+import type { OwnedRecordSummary } from '@/lib/owned-records';
+import { homePathFor, signInPathFor } from '@/lib/routing/user-paths';
 
-import { toCollectionItem } from '../../lib/collection-item';
-import { setDashboardPinned } from '../../server/actions/dashboard-state-actions';
-import { DashboardPreview } from './dashboard-preview';
+
 
 interface DashboardsIndexProps {
   dashboards: OwnedRecordSummary[];
@@ -35,6 +33,8 @@ const EMPTY_STATE = {
   description:
     'A dashboard lays your work out side by side. Everything you build shows up here, in a space or not.',
 };
+
+
 
 async function saveDashboardPinned(
   id: string,

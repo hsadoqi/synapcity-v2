@@ -12,11 +12,11 @@ import {
   appSidebar,
   type CollectionKind,
 } from '../app-sidebar';
+import { QuickCreateDialog, QuickCreateProvider } from '../quick-create';
 import {
-  QuickCreateDialog,
-  QuickCreateProvider,
-} from '../quick-create';
-import { NO_SIDEBAR_RECORDS, type SidebarRecords } from '../../lib/sidebar-records';
+  NO_SIDEBAR_RECORDS,
+  type SidebarRecords,
+} from '../../lib/sidebar-records';
 import { accountLinksFor } from '../../lib/routing/user-paths';
 
 /**

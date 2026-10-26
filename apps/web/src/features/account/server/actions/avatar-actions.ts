@@ -6,7 +6,10 @@ import type { ProfileState } from '@synapcity/features-account/contracts';
 import { getCaller, mirrorToSession, SHOWS_LATER } from '../caller';
 import { saveAvatar } from '../save-avatar';
 import { createClient } from '../../../../lib/supabase/server';
-import { FIXTURE_MESSAGE, fixtureModeEnabled } from '../../../../lib/access/dev-fixture';
+import {
+  FIXTURE_MESSAGE,
+  fixtureModeEnabled,
+} from '../../../../lib/access/dev-fixture';
 
 /**
  * Uploads a new avatar, or removes the uploaded one when the submit came from

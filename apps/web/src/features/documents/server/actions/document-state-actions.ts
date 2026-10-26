@@ -7,7 +7,10 @@ import {
   logFailure,
   SAVE_FAILED,
 } from '../../../account/server/caller';
-import { FIXTURE_MESSAGE, fixtureModeEnabled } from '../../../../lib/access/dev-fixture';
+import {
+  FIXTURE_MESSAGE,
+  fixtureModeEnabled,
+} from '../../../../lib/access/dev-fixture';
 import {
   setOwnedRecordPinned,
   type SetRecordPinnedResult,

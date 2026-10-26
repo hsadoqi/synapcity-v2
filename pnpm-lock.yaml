@@ -212,6 +212,9 @@ importers:
       '@synapcity/frontend-ui':
         specifier: workspace:*
         version: link:../../packages/frontend/ui
+      '@synapcity/server-supabase':
+        specifier: workspace:*
+        version: link:../../packages/server/supabase
       '@tailwindcss/postcss':
         specifier: ^4.3.3
         version: 4.3.3
@@ -957,6 +960,9 @@ importers:
       '@synapcity/dev-vitest-config':
         specifier: workspace:*
         version: link:../../dev/vitest-config
+      '@synapcity/server-supabase':
+        specifier: workspace:*
+        version: link:../../server/supabase
       '@testing-library/dom':
         specifier: 10.4.2
         version: 10.4.2

@@ -12,7 +12,10 @@ import {
 } from '../caller';
 import { saveName } from '../save-name';
 import { createClient } from '../../../../lib/supabase/server';
-import { FIXTURE_MESSAGE, fixtureModeEnabled } from '../../../../lib/access/dev-fixture';
+import {
+  FIXTURE_MESSAGE,
+  fixtureModeEnabled,
+} from '../../../../lib/access/dev-fixture';
 
 /**
  * Updates the signed-in user's display name. A name change needs no
