@@ -14,15 +14,16 @@ import { ScrollArea } from '@synapcity/frontend-ui/core/scroll-area';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 import { useRef, useState, type ReactElement, type ReactNode } from 'react';
 import type { DayAgendaDialogContainer } from './day-agenda.types';
-import { surfaceClasses } from '@synapcity/frontend-ui/blocks/countdown-card';
+import {
+  surfaceClasses,
+  type Surface,
+} from '@synapcity/frontend-ui/lib/surface';
 export type DayAgendaData = {
   /** Shown in place of the list when there are no slots. */
   empty?: ReactNode;
   date: string;
   slots: TimeSlot[];
 };
-
-type Surface = 'card' | 'glass';
 
 /**
  * How the date is written. Separate from the style props so a settings form

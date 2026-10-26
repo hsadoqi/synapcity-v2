@@ -1,7 +1,10 @@
 'use client';
 
 import { cn } from '@synapcity/frontend-ui/lib/utils';
-import { surfaceClasses } from './countdown-card-variants';
+import {
+  surfaceClasses,
+  type Surface,
+} from '@synapcity/frontend-ui/lib/surface';
 import type { CountdownUnit } from './countdown-card.types';
 
 export const countdownCardDemo: CountdownCardProps = {
@@ -15,8 +18,6 @@ export const countdownCardDemo: CountdownCardProps = {
     { value: '48', label: 'min' },
   ],
 };
-
-type Surface = 'card' | 'glass';
 
 interface CountdownCardProps {
   title?: string;
