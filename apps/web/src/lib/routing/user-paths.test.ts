@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
 import {
   accountLinksFor,
   dashboardPathFor,
+  dashboardsPathFor,
   documentPathFor,
+  documentsPathFor,
   homePathFor,
   settingsPathFor,
   signInPathFor,
@@ -23,6 +25,13 @@ describe('homePathFor', () => {
   it('never lets an id act as a dot segment', () => {
     expect(homePathFor('..')).toBe('/%2E%2E/home');
     expect(homePathFor('.')).toBe('/%2E/home');
+  });
+});
+
+describe('collection paths', () => {
+  it('put each collection under the owner’s home', () => {
+    expect(documentsPathFor('u1')).toBe('/u1/home/documents');
+    expect(dashboardsPathFor('u1')).toBe('/u1/home/dashboards');
   });
 });
 

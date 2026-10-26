@@ -4,8 +4,7 @@ import '../styles/globals.css';
 import { fontVariables } from './fonts';
 import RootProviders from '../components/providers/root-providers';
 import { AuthStatus } from '@/features/auth/components/auth-status';
-import { BreadcrumbRootShell } from '@synapcity/frontend-shells';
-import { STAND_IN_SIDEBAR } from '@/components/stand-in-sidebar';
+import { AppShell } from '@/components/app-shell';
 import { NextShellNavigation } from '@synapcity/frontend-shells/next';
 import { createMetadata } from '@synapcity/frontend-site/metadata';
 import { UserProvider } from '@/components/user-provider/user-provider';
@@ -25,7 +24,6 @@ import {
   pageLanguage,
   parseLookCookieValue,
 } from '@synapcity/domain-preferences';
-import { accountLinksFor } from '@/lib/routing/user-paths';
 import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = createMetadata({
@@ -72,13 +70,12 @@ export default async function RootLayout({
         <RootProviders>
           <UserProvider user={user}>
             <NextShellNavigation>
-              <BreadcrumbRootShell
-                account={user ? accountLinksFor(user.id) : null}
+              <AppShell
+                userId={user?.id ?? null}
                 headerActions={<AuthStatus variant="header" />}
-                sidebar={STAND_IN_SIDEBAR}
               >
                 {children}
-              </BreadcrumbRootShell>
+              </AppShell>
             </NextShellNavigation>
           </UserProvider>
         </RootProviders>

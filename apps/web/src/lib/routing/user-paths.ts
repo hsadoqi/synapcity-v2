@@ -18,6 +18,14 @@ export function spacesPathFor(userId: string): string {
   return `${homePathFor(userId)}/spaces`;
 }
 
+export function documentsPathFor(userId: string): string {
+  return `${homePathFor(userId)}/documents`;
+}
+
+export function dashboardsPathFor(userId: string): string {
+  return `${homePathFor(userId)}/dashboards`;
+}
+
 /** A document's top-level route (ADR-0013, item 9); its page arrives with Milestone 8. */
 export function documentPathFor(userId: string, documentId: string): string {
   return `${homePathFor(userId)}/documents/${documentId}`;

@@ -43,11 +43,22 @@ describe('RootSidebar', () => {
     expect(document.querySelector('[data-slot="sidebar-header"]')).toBeNull();
   });
 
+  it('gives a group without a title no label', () => {
+    renderSidebar({
+      groups: [{ items: [{ title: 'Home', href: '/u/home' }] }],
+    });
+
+    expect(
+      document.querySelector('[data-slot="sidebar-group-label"]'),
+    ).toBeNull();
+    expect(screen.getByRole('link', { name: 'Home' })).toBeTruthy();
+  });
+
   it('groups navigation under one label per section', () => {
     renderSidebar();
 
     for (const group of sampleSidebarGroups) {
-      expect(screen.getByText(group.title)).toBeTruthy();
+      expect(screen.getByText(group.title!)).toBeTruthy();
     }
   });
 

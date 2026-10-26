@@ -29,7 +29,8 @@ export type RootSidebarItem = {
 
 /** One labelled section of sidebar destinations. */
 export type RootSidebarGroup = {
-  title: string;
+  /** Shown above the items. A group without one, such as the core links, has no label. */
+  title?: string;
   items: RootSidebarItem[];
 };
 
@@ -51,9 +52,11 @@ export function RootSidebar({
     <Sidebar {...props}>
       {header && <SidebarHeader>{header}</SidebarHeader>}
       <SidebarContent>
-        {groups.map((group) => (
-          <SidebarGroup key={group.title}>
-            <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
+        {groups.map((group, index) => (
+          <SidebarGroup key={group.title ?? index}>
+            {group.title && (
+              <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
+            )}
             <SidebarGroupContent>
               <SidebarMenu>
                 {group.items.map((item) => (

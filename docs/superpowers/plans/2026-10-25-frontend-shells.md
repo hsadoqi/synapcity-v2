@@ -100,7 +100,7 @@ Checks: shells 74 tests; web 64 files, 637 tests; boundary checker 148 of 149 an
 
 Everything in this task is owner direction (2026-10-25), not a fixed decision; the owner expects it to change as the app grows. Build it so the content is data the host passes in, and changing the sections means changing that data, not the shell.
 
-- [ ] **Step 1: Context switcher rule.** The `ContextSwitcher` at the top of the sidebar (today it switches template "versions") shows the active context, which follows the route:
+- [x] **Step 1: Context switcher rule.** The `ContextSwitcher` at the top of the sidebar (today it switches template "versions") shows the active context, which follows the route:
 
   | Route                                     | Context shown                                       |
   | ----------------------------------------- | --------------------------------------------------- |
@@ -113,14 +113,27 @@ Everything in this task is owner direction (2026-10-25), not a fixed decision; t
 
   Source of truth: the page's existing `SetBreadcrumbs` trail, not a second mechanism. The context is the trail's Space entry when there is one, otherwise its collection entry, otherwise Home, so the sidebar and the breadcrumbs cannot disagree. A crumb may need a `kind` (`collection` or `space`) so the shell can pick the context without parsing labels; that is a small contract change to `RootBreadcrumb`. Gap found: `/home/documents` sets no breadcrumbs today; it needs one before this rule works there.
 
-- [ ] **Step 2: Sidebar body.** Two parts:
+- [x] **Step 2: Sidebar body.** Two parts:
   - **Core section, always on top:** the main destinations, such as Home and Settings. Only link routes that exist and are decided (ADR-0013 link check). Inbox is included as a placeholder linking to `#` (owner decision, 2026-10-25): no Inbox route exists and capture/intake is an open product decision in `PRODUCT.md`, so the entry carries no route until that is decided. Any other not-yet-built destination follows the same rule. Check that the `apps/web` link check accepts `#`; if it does not, allow `#` explicitly there rather than adding a route.
   - **Context sections below:** chosen by the active context. Examples to confirm when building: in a Space, sections for that Space's documents and dashboards; in Documents or Dashboards, recent or pinned items of that kind; on Home, nothing extra or recents. Build from the host's path helpers (`homePathFor`, `spaceItemPath`, `documentPathFor`, `dashboardPathFor`, settings).
   - The shell takes `sections: { label?, items }[]` and renders them with the `ui` sidebar primitives (the data-driven `SidebarNav` from Task 4). This is the visible change; nothing earlier in the plan alters what a user sees.
-- [ ] **Step 3: Search (open).** Either the inline `SearchForm` at the top of the sidebar (as today, but it searches nothing yet) or a magnifying-glass button that opens a command palette (with a keyboard shortcut). The palette needs a component that is not installed (`pnpm ui:add command`) and a search source, which does not exist; so for this task: keep or hide the inline form, and record the palette as its own follow-up.
-- [ ] **Step 4: Tests:** one per row of the context table (render with that trail, assert the switcher label); the core section always present; context sections switch with the context; the missing documents breadcrumb.
-- [ ] **Step 5:** `apps/docs` keeps its own content (its real doc navigation is a separate decision).
+- [x] **Step 3: Search (open).** Either the inline `SearchForm` at the top of the sidebar (as today, but it searches nothing yet) or a magnifying-glass button that opens a command palette (with a keyboard shortcut). The palette needs a component that is not installed (`pnpm ui:add command`) and a search source, which does not exist; so for this task: keep or hide the inline form, and record the palette as its own follow-up.
+- [x] **Step 4: Tests:** one per row of the context table (render with that trail, assert the switcher label); the core section always present; context sections switch with the context; the missing documents breadcrumb.
+- [x] **Step 5:** `apps/docs` keeps its own content (its real doc navigation is a separate decision).
 - [ ] **Step 6:** E2E: the sidebar links reach their routes; the link check walks only decided routes (ADR-0013).
+
+**Built 2026-10-25, on branch `refactor/shells-sidebar-slots` (owner go-ahead the same day).** What changed:
+
+- `RootBreadcrumb` gained an optional `kind` (`collection` or `space`). The spaces, Space, dashboards and documents pages mark their crumbs; the documents page now sets its trail (the gap noted above).
+- `activeContext(trail)` (shells) picks the Space crumb, else the collection crumb, else none. `BreadcrumbRootShell`'s `sidebar` may be a function of the trail, so the sidebar follows the page from the same trail as the breadcrumbs.
+- `ContextSwitcher` now takes `current` and `options` (label and href) and shows the active context, with a check on it in its menu and links through `ShellLink`; the template versions are gone. A sidebar group's `title` is optional, for the unlabelled core section.
+- `apps/web`: `AppShell` (a client component, so it can read the trail and the path) replaces the layout's direct `BreadcrumbRootShell`; `appSidebar(userId, trail, pathname)` builds the content: the switcher (Home, Spaces, Documents, Dashboards), the core section (Home, and Inbox linking to `#`), and one section for the active context with an Overview link to its page. `documentsPathFor`, `dashboardsPathFor` and `COLLECTION_LABELS.documents` were added. `stand-in-sidebar` is deleted.
+- Search: the inline `SearchForm` is hidden (it searches nothing); the command palette stays a follow-up. The component remains in shells.
+- The `#` placeholder needs no link-check change: the check only walks links that start with `/`.
+
+To confirm with the owner: the context section is only an Overview link for now. A Space's documents and dashboards, or recents in a collection, need data the client sidebar does not have yet. Settings is not in the core section because the header (from md up) and the small-screen footer already carry it.
+
+Checks: shells 90 tests; web 63 files, 644 tests (one per context-table row, the core section, the context section switching, the documents trail, and sidebar and switcher links reaching served routes); type check and lint 61 of 61 tasks; shells stories in Chromium with axe, 14 files, 31 tests; `pnpm boundaries` no violations; Knip and Prettier clean. Not run: the Step 6 end-to-end run (needs the Supabase environment) and a look at the signed-in sidebar in a browser.
 
 ### Task 7: Records and verification
 

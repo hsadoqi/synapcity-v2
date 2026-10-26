@@ -5,7 +5,11 @@ import { ContextSwitcher } from '.';
 import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
 import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
 
-const versions = ['1.0.1', '1.1.0-alpha', '2.0.0-beta1'];
+const options = [
+  { label: 'Home', href: '/u/home' },
+  { label: 'Spaces', href: '/u/home/spaces' },
+  { label: 'Documents', href: '/u/home/documents' },
+];
 
 // const documents = [
 //   {
@@ -54,54 +58,61 @@ const versions = ['1.0.1', '1.1.0-alpha', '2.0.0-beta1'];
 
 // const contexts = ['home', 'space', 'document', 'dashboard'];
 
-const renderSwitcher = (defaultVersion = versions[0]!) =>
+const renderSwitcher = (current = 'Home') =>
   render(
     <TooltipProvider>
       <SidebarProvider>
-        <ContextSwitcher versions={versions} defaultVersion={defaultVersion} />
+        <ContextSwitcher current={current} options={options} />
       </SidebarProvider>
     </TooltipProvider>,
   );
 
-describe('ContextSwitcher', () => {
-  it('shows the Synapcity wordmark in an accessibly named trigger', () => {
-    renderSwitcher();
-    const trigger = screen.getByRole('button', { name: 'Switch version' });
+const open = async (current = 'Home') => {
+  fireEvent.click(
+    screen.getByRole('button', { name: `Switch context: ${current}` }),
+  );
+  return screen.findAllByRole('menuitem');
+};
 
+describe('ContextSwitcher', () => {
+  it('shows the active context in an accessibly named trigger', () => {
+    renderSwitcher('Writing');
+    const trigger = screen.getByRole('button', {
+      name: 'Switch context: Writing',
+    });
+
+    expect(trigger.textContent).toContain('Writing');
     expect(
-      trigger.querySelector('[data-slot="synapcity-wordmark"]'),
+      trigger.querySelector('[data-slot="synapcity-mark"]'),
     ).not.toBeNull();
   });
 
-  it('lists every version when opened', async () => {
+  it('lists every place to switch to as a link', async () => {
     renderSwitcher();
-    fireEvent.click(screen.getByRole('button', { name: 'Switch version' }));
-    await screen.findByRole('menu');
+    const items = await open();
 
-    expect(
-      screen.getAllByRole('menuitem').map((el) => el.textContent?.trim()),
-    ).toEqual(versions.map((version) => `v${version}`));
-  });
-
-  it('marks the selected version with a check', async () => {
-    renderSwitcher();
-    fireEvent.click(screen.getByRole('button', { name: 'Switch version' }));
-    const [first, second] = await screen.findAllByRole('menuitem');
-
-    expect(first!.querySelector('svg')).not.toBeNull();
-    expect(second!.querySelector('svg')).toBeNull();
-  });
-
-  it('moves the check when another version is chosen', async () => {
-    renderSwitcher();
-    fireEvent.click(screen.getByRole('button', { name: 'Switch version' }));
-    fireEvent.click(
-      await screen.findByRole('menuitem', { name: 'v2.0.0-beta1' }),
+    expect(items.map((item) => item.textContent?.trim())).toEqual(
+      options.map((option) => option.label),
     );
-    fireEvent.click(screen.getByRole('button', { name: 'Switch version' }));
-    const items = await screen.findAllByRole('menuitem');
+    expect(items.map((item) => item.getAttribute('href'))).toEqual(
+      options.map((option) => option.href),
+    );
+  });
 
-    expect(items[0]!.querySelector('svg')).toBeNull();
-    expect(items[2]!.querySelector('svg')).not.toBeNull();
+  it('marks the active context with a check', async () => {
+    renderSwitcher('Spaces');
+    const [home, spaces] = await open('Spaces');
+
+    expect(home!.querySelector('svg')).toBeNull();
+    expect(spaces!.querySelector('svg')).not.toBeNull();
+  });
+
+  it('marks nothing when the context is not one of the options', async () => {
+    renderSwitcher('Writing');
+    const items = await open('Writing');
+
+    expect(items.every((item) => item.querySelector('svg') === null)).toBe(
+      true,
+    );
   });
 });

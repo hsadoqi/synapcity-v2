@@ -88,4 +88,26 @@ describe('BreadcrumbRootShell', () => {
     expect(within(trail()!).getByText('Dashboards')).toBeTruthy();
     expect(within(trail()!).queryByText('Spaces')).toBeNull();
   });
+
+  it('builds the sidebar from the trail when given a function', () => {
+    const sidebar = (crumbs: { label: string }[]) => ({
+      groups: [
+        {
+          title: crumbs.length ? `In ${crumbs.at(-1)!.label}` : 'Nowhere',
+          items: [],
+        },
+      ],
+    });
+    render(
+      <ModeProvider>
+        <BreadcrumbRootShell account={account} sidebar={sidebar}>
+          <SetBreadcrumbs items={[{ label: 'Spaces', kind: 'collection' }]} />
+        </BreadcrumbRootShell>
+      </ModeProvider>,
+    );
+    const nav = document.querySelector('[data-slot="sidebar"]')!;
+
+    expect(nav.textContent).toContain('In Spaces');
+    expect(nav.textContent).not.toContain('Nowhere');
+  });
 });

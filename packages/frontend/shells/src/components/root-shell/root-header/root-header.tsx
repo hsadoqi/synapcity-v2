@@ -31,6 +31,12 @@ import {
 export type RootBreadcrumb = {
   label: string;
   href?: string;
+  /**
+   * What the crumb stands for, when it is a place the sidebar can switch to:
+   * a collection (such as all Spaces) or one Space. The sidebar reads this to
+   * pick the active context without parsing labels.
+   */
+  kind?: 'collection' | 'space';
 };
 
 type RootHeaderProps = {

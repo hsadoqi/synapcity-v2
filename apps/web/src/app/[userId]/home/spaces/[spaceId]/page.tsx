@@ -31,8 +31,12 @@ export default async function SpaceShowPage({
     <>
       <SetBreadcrumbs
         items={[
-          { label: COLLECTION_LABELS.spaces, href: spacesPathFor(userId) },
-          { label: awaitedSpace.name },
+          {
+            label: COLLECTION_LABELS.spaces,
+            href: spacesPathFor(userId),
+            kind: 'collection',
+          },
+          { label: awaitedSpace.name, kind: 'space' },
         ]}
       />
       <RecordSpaceView spaceId={spaceId} recordSpaceView={recordSpaceView} />

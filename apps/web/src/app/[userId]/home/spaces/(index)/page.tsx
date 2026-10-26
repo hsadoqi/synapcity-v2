@@ -25,7 +25,9 @@ export default async function SpacesPage({
 
   return (
     <>
-      <SetBreadcrumbs items={[{ label: COLLECTION_LABELS.spaces }]} />
+      <SetBreadcrumbs
+        items={[{ label: COLLECTION_LABELS.spaces, kind: 'collection' }]}
+      />
       <SpacesCollection
         spaces={spaces}
         homePath={homePathFor(userId)}

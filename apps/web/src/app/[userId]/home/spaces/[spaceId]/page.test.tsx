@@ -81,8 +81,8 @@ describe('the Space detail page', () => {
     });
     expect(find(page, SetBreadcrumbs)?.props).toEqual({
       items: [
-        { label: 'Spaces', href: '/u1/home/spaces' },
-        { label: 'Writing' },
+        { label: 'Spaces', href: '/u1/home/spaces', kind: 'collection' },
+        { label: 'Writing', kind: 'space' },
       ],
     });
   });

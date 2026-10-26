@@ -18,8 +18,11 @@ const meta: Meta<typeof RootSidebar> = {
     header: (
       <>
         <ContextSwitcher
-          versions={['Fitness', 'Dev']}
-          defaultVersion="Fitness"
+          current="Home"
+          options={[
+            { label: 'Home', href: '#home' },
+            { label: 'Spaces', href: '#spaces' },
+          ]}
         />
         <SearchForm />
       </>

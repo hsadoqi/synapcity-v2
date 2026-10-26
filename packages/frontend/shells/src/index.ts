@@ -28,8 +28,12 @@ export {
 export {
   BreadcrumbRootShell,
   SetBreadcrumbs,
+  activeContext,
 } from './components/breadcrumb-trail';
 export { AuthPageShell } from './components/auth-page-shell';
 export { MESSAGE_HEADING_ID, MessagePage } from './components/message-page';
-export { ContextSwitcher } from './components/context-switcher';
+export {
+  ContextSwitcher,
+  type ContextOption,
+} from './components/context-switcher';
 export { SearchForm } from './components/search-form';

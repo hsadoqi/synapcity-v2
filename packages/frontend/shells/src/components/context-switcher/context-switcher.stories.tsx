@@ -9,8 +9,13 @@ const meta: Meta<typeof ContextSwitcher> = {
   component: ContextSwitcher,
   tags: ['autodocs'],
   args: {
-    versions: ['1.0.1', '1.1.0-alpha', '2.0.0-beta1'],
-    defaultVersion: '1.0.1',
+    current: 'Home',
+    options: [
+      { label: 'Home', href: '#home' },
+      { label: 'Spaces', href: '#spaces' },
+      { label: 'Documents', href: '#documents' },
+      { label: 'Dashboards', href: '#dashboards' },
+    ],
   },
   decorators: [
     (Story) => (
@@ -30,6 +35,5 @@ type Story = StoryObj<typeof ContextSwitcher>;
 
 export const Default: Story = {};
 
-export const SecondVersionSelected: Story = {
-  args: { defaultVersion: '1.1.0-alpha' },
-};
+/** Inside a Space, the switcher names the Space; no option is checked. */
+export const InASpace: Story = { args: { current: 'Garden plans' } };

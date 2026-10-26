@@ -5,5 +5,6 @@
  */
 export const COLLECTION_LABELS = {
   spaces: 'Spaces',
+  documents: 'Documents',
   dashboards: 'Dashboards',
 } as const;

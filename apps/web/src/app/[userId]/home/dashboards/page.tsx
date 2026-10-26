@@ -19,7 +19,9 @@ export default async function DashboardsPage({
 
   return (
     <>
-      <SetBreadcrumbs items={[{ label: COLLECTION_LABELS.dashboards }]} />
+      <SetBreadcrumbs
+        items={[{ label: COLLECTION_LABELS.dashboards, kind: 'collection' }]}
+      />
       <DashboardsCollection dashboards={dashboards} userId={userId} />
     </>
   );
