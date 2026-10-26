@@ -8,6 +8,7 @@ import {
   documentsPathFor,
   homePathFor,
   settingsPathFor,
+  spacePathFor,
   signInPathFor,
 } from './user-paths';
 
@@ -32,6 +33,7 @@ describe('collection paths', () => {
   it('put each collection under the owner’s home', () => {
     expect(documentsPathFor('u1')).toBe('/u1/home/documents');
     expect(dashboardsPathFor('u1')).toBe('/u1/home/dashboards');
+    expect(spacePathFor('u1', 's1')).toBe('/u1/home/spaces/s1');
   });
 });
 

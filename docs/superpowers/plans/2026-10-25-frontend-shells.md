@@ -135,6 +135,18 @@ To confirm with the owner: the context section is only an Overview link for now.
 
 Checks: shells 90 tests; web 63 files, 644 tests (one per context-table row, the core section, the context section switching, the documents trail, and sidebar and switcher links reaching served routes); type check and lint 61 of 61 tasks; shells stories in Chromium with axe, 14 files, 31 tests; `pnpm boundaries` no violations; Knip and Prettier clean. Not run: the Step 6 end-to-end run (needs the Supabase environment) and a look at the signed-in sidebar in a browser.
 
+**Revised 2026-10-26 (owner direction): the sidebar layout.** Replaces the core section and the one-link context section above:
+
+- Core links and actions at the top: Home, Command palette (opens the palette), Inbox (`#`), Settings. Settings left the header.
+- A search field (`SearchForm` now hands its query to the host, which opens the palette with it).
+- One section per collection (Spaces, Documents, Dashboards): the title links to the collection's page, a + button opens a quick-create dialog, and the latest 8 records follow (pinned first, then most recently changed), loaded by the root layout and kept off the page when a kind fails to load. Folded to icons, these sections hide.
+- The account menu at the foot (`UserMenu`'s new `sidebar` variant). The header's avatar menu stays as well; which one remains is open.
+- The command palette is shadcn's `command` on `cmdk` (new dependency, owner approved), opened from the sidebar, the search field or Cmd/Ctrl+K, listing places, the latest records and create actions.
+- Quick create: the dialog asks for a name, but Create is disabled and says so; nothing can create a Space, document or dashboard yet, and wiring it up is a separate approved step (storage and schema).
+- Sizing: `SidebarProvider` gained a `contained` option; the shell fills its container instead of the window, the sidebar takes a share of that container's width (container query units) and opens at 1024px or wider and folds to icons below, with the person's toggle holding until the width crosses the line again. The header and footer stay put while the sections scroll.
+
+Checked in a browser in fixture mode at 1440 and 900 pixels wide: the sidebar beside the page, the palette from Cmd+K, the quick-create dialog, and the icon rail.
+
 ### Task 7: Records and verification
 
 - [ ] **Step 1:** Update the README, workspace-conventions, ownership map rows (`components/shells`, `components/breadcrumbs`, the four blocks), ADR-0011's placement note ("moved"), the M5 Q2 follow-up, `.agents/task-scope.md`. No owner quotes.

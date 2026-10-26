@@ -134,14 +134,31 @@ describe('links in the signed-in sidebar', () => {
       [{ label: 'Documents', kind: 'collection' as const }],
       [{ label: 'Dashboards', kind: 'collection' as const }],
     ];
+    const records = {
+      spaces: [{ id: 's1', name: 'Writing' }],
+      documents: [{ id: 'd1', name: 'Draft' }],
+      dashboards: [{ id: 'b1', name: 'Week' }],
+    };
     for (const trail of trails) {
-      const { groups } = appSidebar('u1', trail, '/u1/home');
+      const { groups } = appSidebar('u1', trail, '/u1/home', {
+        records,
+        onOpenPalette: () => {},
+        onSearch: () => {},
+        onCreate: () => {},
+      });
       const links = groups
-        .flatMap((group) => group.items.map((item) => item.href))
-        .filter((href) => href.startsWith('/'));
+        .flatMap((group) => [
+          group.href,
+          ...(group.items ?? []).map((item) => item.href),
+        ])
+        .filter((href): href is string => !!href?.startsWith('/'));
 
       expect(links.length).toBeGreaterThan(0);
-      expect(links.filter((href) => !served(href))).toEqual([]);
+      // A record's own page may be one Milestone 8 builds (documents and
+      // dashboards); any other unserved link is a bug.
+      expect(links.filter((href) => !served(href) && !pending(href))).toEqual(
+        [],
+      );
     }
   });
 

@@ -5,6 +5,7 @@ import { fontVariables } from './fonts';
 import RootProviders from '../components/providers/root-providers';
 import { AuthStatus } from '@/features/auth/components/auth-status';
 import { AppShell } from '@/components/app-shell';
+import { getSidebarRecords } from '@/lib/sidebar-records/get-sidebar-records';
 import { NextShellNavigation } from '@synapcity/frontend-shells/next';
 import { createMetadata } from '@synapcity/frontend-site/metadata';
 import { UserProvider } from '@/components/user-provider/user-provider';
@@ -43,7 +44,9 @@ export default async function RootLayout({
   );
   // ADR-0010: the account's preferences follow the person to every page, not
   // only the settings page. A failed read leaves this browser's own copy.
-  const stored = user ? await getAccountPreferences(user.id) : undefined;
+  const [stored, sidebarRecords] = user
+    ? await Promise.all([getAccountPreferences(user.id), getSidebarRecords()])
+    : [undefined, undefined];
   const account = stored?.preferences ?? null;
   const look = lookWithAccount(requestLook, account);
   const lookAttributes = look ? lookHtmlAttributes(look) : undefined;
@@ -73,6 +76,8 @@ export default async function RootLayout({
               <AppShell
                 userId={user?.id ?? null}
                 headerActions={<AuthStatus variant="header" />}
+                sidebarFooter={<AuthStatus variant="sidebar" />}
+                records={sidebarRecords}
               >
                 {children}
               </AppShell>

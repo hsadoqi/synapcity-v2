@@ -29,9 +29,10 @@ const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_WIDTH = '20svw';
 const SIDEBAR_WIDTH_MOBILE = '90svw';
-// A share of the container it sits in, held between a readable minimum and a
-// maximum so a wide container does not stretch the list.
-const SIDEBAR_WIDTH_CONTAINED = 'clamp(13rem, 22%, 20rem)';
+// A share of the container it sits in (container query units, measured on the
+// provider, so the sidebar and the gap beside it agree whatever their own
+// parents are), held between a readable minimum and a maximum.
+const SIDEBAR_WIDTH_CONTAINED = 'clamp(13rem, 22cqw, 20rem)';
 const SIDEBAR_WIDTH_ICON = '3rem';
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
 
@@ -163,7 +164,7 @@ function SidebarProvider({
         }
         className={cn(
           'group/sidebar-wrapper flex w-full has-data-[variant=inset]:bg-sidebar',
-          contained ? 'relative h-full min-h-0' : 'min-h-svh',
+          contained ? '@container relative h-full min-h-0' : 'min-h-svh',
           className,
         )}
         {...props}

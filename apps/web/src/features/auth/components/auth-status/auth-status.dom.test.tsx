@@ -10,6 +10,8 @@ vi.mock('@/features/auth/server/actions/actions', () => ({
   signOut: mocks.signOut,
 }));
 
+import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
+
 import { AuthStatus } from './auth-status';
 
 const user = {
@@ -20,8 +22,8 @@ const user = {
 };
 
 // AuthStatus is an async server component: await it, then render the result.
-const show = async (variant?: 'header' | 'hero') =>
-  render(await AuthStatus({ variant }));
+const show = async (variant?: 'header' | 'hero' | 'sidebar') =>
+  render(<SidebarProvider>{await AuthStatus({ variant })}</SidebarProvider>);
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -30,6 +32,10 @@ beforeEach(() => {
 describe('AuthStatus', () => {
   describe('signed out', () => {
     beforeEach(() => mocks.getCurrentUser.mockResolvedValue(null));
+
+    it('shows nothing in the sidebar footer', async () => {
+      expect(await AuthStatus({ variant: 'sidebar' })).toBeNull();
+    });
 
     it('offers sign in and sign up', async () => {
       await show();
@@ -49,6 +55,16 @@ describe('AuthStatus', () => {
 
   describe('signed in', () => {
     beforeEach(() => mocks.getCurrentUser.mockResolvedValue(user));
+
+    it('shows the account as a row for the sidebar footer', async () => {
+      await show('sidebar');
+
+      expect(
+        screen.getByRole('button', {
+          name: 'Account menu: Ada Lovelace ada@example.com',
+        }),
+      ).toBeTruthy();
+    });
 
     it('links the hero straight to the workspace', async () => {
       await show('hero');

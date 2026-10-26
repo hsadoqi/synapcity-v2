@@ -1,1 +1,11 @@
-export { appSidebar } from './app-sidebar';
+export {
+  appPaletteGroups,
+  appSidebar,
+  type AppSidebarOptions,
+} from './app-sidebar';
+export {
+  COLLECTIONS,
+  collectionFor,
+  type Collection,
+  type CollectionKind,
+} from './collections';

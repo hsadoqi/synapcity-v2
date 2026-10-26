@@ -18,6 +18,11 @@ export function spacesPathFor(userId: string): string {
   return `${homePathFor(userId)}/spaces`;
 }
 
+/** One Space's page; the same shape the Spaces package links to. */
+export function spacePathFor(userId: string, spaceId: string): string {
+  return `${spacesPathFor(userId)}/${spaceId}`;
+}
+
 export function documentsPathFor(userId: string): string {
   return `${homePathFor(userId)}/documents`;
 }

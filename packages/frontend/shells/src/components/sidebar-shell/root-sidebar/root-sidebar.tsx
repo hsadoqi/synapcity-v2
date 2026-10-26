@@ -17,6 +17,7 @@ import {
   SidebarRail,
 } from '@synapcity/frontend-ui/core/sidebar';
 import { ModeToggle } from '@synapcity/frontend-ui/components/mode-toggle';
+import { cn } from '@synapcity/frontend-ui/lib/utils';
 import { ShellLink } from '../../../providers/shell-navigation';
 
 type IconComponent = React.ComponentType<{ className?: string }>;
@@ -47,6 +48,11 @@ export type RootSidebarGroup = {
   empty?: string;
   /** Rendered in the group instead of items, such as a search form. */
   content?: React.ReactNode;
+  /**
+   * Hide the whole group while the sidebar is folded to icons, such as a list
+   * of records whose icons would all look the same.
+   */
+  hideWhenCollapsed?: boolean;
 };
 
 /** The content a host gives the signed-in sidebar. */
@@ -93,7 +99,11 @@ const SidebarSection = ({ group }: { group: RootSidebarGroup }) => {
   const items = group.items ?? [];
 
   return (
-    <SidebarGroup>
+    <SidebarGroup
+      className={cn(
+        group.hideWhenCollapsed && 'group-data-[collapsible=icon]:hidden',
+      )}
+    >
       {group.title &&
         (group.href ? (
           <SidebarGroupLabel

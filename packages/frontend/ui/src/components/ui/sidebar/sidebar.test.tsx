@@ -127,10 +127,11 @@ describe('Sidebar', () => {
     )!;
 
     expect(wrapper.className).toContain('relative');
+    expect(wrapper.className).toContain('@container');
     expect(wrapper.className).toContain('h-full');
     expect(wrapper.className).not.toContain('min-h-svh');
     expect(wrapper.style.getPropertyValue('--sidebar-width')).toBe(
-      'clamp(13rem, 22%, 20rem)',
+      'clamp(13rem, 22cqw, 20rem)',
     );
     expect(container.className).toContain('absolute');
     expect(container.className).not.toContain('fixed');

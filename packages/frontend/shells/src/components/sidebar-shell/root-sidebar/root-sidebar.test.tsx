@@ -150,6 +150,21 @@ describe('RootSidebar', () => {
     expect(screen.getByRole('textbox', { name: 'Search' })).toBeTruthy();
   });
 
+  it('can hide a group while folded to icons', () => {
+    renderSidebar({
+      groups: [
+        { items: [{ title: 'Home', href: '/u/home' }] },
+        { title: 'Spaces', hideWhenCollapsed: true, items: [] },
+      ],
+    });
+    const [core, spaces] = document.querySelectorAll(
+      '[data-slot="sidebar-group"]',
+    );
+
+    expect(core!.className).not.toContain('collapsible=icon]:hidden');
+    expect(spaces!.className).toContain('group-data-[collapsible=icon]:hidden');
+  });
+
   it('collapses to icons rather than off the screen', () => {
     renderSidebar();
 
