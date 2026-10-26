@@ -37,7 +37,8 @@ describe('MotionPanel', () => {
     expect(value('Blur in').className).not.toContain('invisible');
     expect(value('Parallax').className).toContain('invisible');
 
-    act(() => vi.advanceTimersByTime(200));
+    act(() => vi.advanceTimersByTime(100));
+    act(() => vi.advanceTimersByTime(100));
     expect(value('Parallax').className).not.toContain('invisible');
     expect(value('Slow').className).not.toContain('invisible');
   });

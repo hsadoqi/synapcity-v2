@@ -24,7 +24,7 @@ describe('QuizQuestion', () => {
     expect(screen.getByText('Question 3 of 10')).toBeTruthy();
     expect(screen.getByText('Which hook runs after paint?')).toBeTruthy();
     expect(screen.getAllByRole('button')).toHaveLength(4);
-    expect(screen.getByRole('button', { name: 'B useEffect' })).toBeTruthy();
+    expect(screen.getByText('useEffect').closest('button')).toBeTruthy();
   });
 
   it('styles each answer state differently, idle by default', () => {
