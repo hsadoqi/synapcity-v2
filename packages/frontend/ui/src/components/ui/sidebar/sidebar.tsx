@@ -264,8 +264,6 @@ function SidebarTrigger({
     <Button
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
-      toggle
-      pressed={expanded}
       variant="ghost"
       size="icon-sm"
       label={label}

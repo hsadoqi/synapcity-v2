@@ -39,8 +39,7 @@ export function FlipDigit({ value }: { value: string }) {
 
   return (
     <span
-      className="relative block h-10 w-7 rounded-md bg-card text-card-foreground shadow-sm"
-      style={{ perspective: '8rem' }}
+      className="relative block h-10 w-7 rounded-md bg-card text-card-foreground shadow-sm perspective-flip"
       aria-hidden="true"
     >
       <HalfDigit pos="top" digit={pair.cur} />
@@ -51,17 +50,13 @@ export function FlipDigit({ value }: { value: string }) {
             key={`top-${pair.cur}`}
             pos="top"
             digit={pair.prev}
-            className="origin-bottom backface-hidden motion-reduce:hidden"
-            style={{ animation: 'event13-flip-top 280ms ease-in forwards' }}
+            className="origin-bottom animate-flip-top backface-hidden motion-reduce:hidden"
           />
           <HalfDigit
             key={`bottom-${pair.cur}`}
             pos="bottom"
             digit={pair.cur}
-            className="origin-top backface-hidden motion-reduce:hidden"
-            style={{
-              animation: 'event13-flip-bottom 280ms ease-out 280ms both',
-            }}
+            className="origin-top animate-flip-bottom backface-hidden motion-reduce:hidden"
           />
         </>
       )}

@@ -25,16 +25,6 @@ export interface DatePillProps extends StyleProps {
    `glass` is a deliberate exception to the solid-surface rule: these pieces sit
    over section background images, and a frosted panel is the point of it. */
 
-export const datePillDemo: DatePillProps = {
-  surface: 'card',
-  bordered: false,
-  inverted: false,
-  weekday: 'Thu',
-  date: 'Apr 23',
-  time: '14:00',
-  relative: 'Today',
-};
-
 export function DatePill({
   weekday,
   date,

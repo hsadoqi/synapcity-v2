@@ -7,18 +7,6 @@ import {
 } from '@synapcity/frontend-ui/lib/surface';
 import type { CountdownUnit } from './countdown-card.types';
 
-export const countdownCardDemo: CountdownCardProps = {
-  surface: 'card',
-  bordered: false,
-  inverted: false,
-  title: 'Opens to everyone in',
-  units: [
-    { value: '12', label: 'days' },
-    { value: '06', label: 'hrs' },
-    { value: '48', label: 'min' },
-  ],
-};
-
 interface CountdownCardProps {
   title?: string;
   units?: CountdownUnit[];

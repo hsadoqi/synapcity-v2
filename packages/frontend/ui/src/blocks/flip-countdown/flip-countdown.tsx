@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
-import { LABELS, pad, parse } from './flip-countdown.utils';
+import { padTime, parseDuration } from '@synapcity/frontend-ui/lib/countdown';
+import { LABELS } from './flip-countdown.utils';
 import { FlipDigit } from './flip-countdown-digit';
 import type { FlipCountdownProps } from './flip-countdown.types';
 
@@ -16,7 +17,7 @@ export function FlipCountdown({
   const curTime = new Date().toTimeString().split(' ')[0];
   const timeStr = ((start && typeof start === 'string') ?? curTime) as string;
   // TODO: Extract into reusable hook date-time functionality across similar components.
-  const total = parse(timeStr);
+  const total = parseDuration(timeStr);
   const [remaining, setRemaining] = useState(total);
 
   useEffect(() => {
@@ -28,9 +29,9 @@ export function FlipCountdown({
   }, [remaining, total, holdMs]);
 
   const digits = [
-    pad(Math.floor(remaining / 3600)),
-    pad(Math.floor((remaining % 3600) / 60)),
-    pad(remaining % 60),
+    padTime(remaining / 3600),
+    padTime((remaining % 3600) / 60),
+    padTime(remaining % 60),
   ];
 
   return (
@@ -40,9 +41,6 @@ export function FlipCountdown({
         className,
       )}
     >
-      {/* TODO: Extract styles into either new Tailwind utilities for animations or inline TW styles. */}
-      <style>{`@keyframes event13-flip-top { from { transform: rotateX(0); } to { transform: rotateX(-90deg); } }
-@keyframes event13-flip-bottom { from { transform: rotateX(90deg); } to { transform: rotateX(0); } }`}</style>
       <div className="flex w-full max-w-80 flex-col items-center gap-3 rounded-xl bg-foreground p-4 text-background shadow-md">
         <p className="text-sm opacity-70">{title}</p>
         <span className="sr-only">{digits.join(':')}</span>

@@ -1,5 +1,17 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { CountdownCard, countdownCardDemo } from './countdown-card';
+import { CountdownCard } from './countdown-card';
+
+const countdownCardDemo = {
+  surface: 'card',
+  bordered: false,
+  inverted: false,
+  title: 'Opens to everyone in',
+  units: [
+    { value: '12', label: 'days' },
+    { value: '06', label: 'hrs' },
+    { value: '48', label: 'min' },
+  ],
+};
 
 // TODO: Refine, enhance with comprehensive stories
 // TODO: Add comprehensive vitest tests

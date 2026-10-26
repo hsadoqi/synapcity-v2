@@ -19,7 +19,7 @@ describe('UserMenu', () => {
     expect(screen.getByRole('button', { name: 'Account menu' })).toBeTruthy();
   });
 
-  it('keeps its toggle state in sync when Escape dismisses the menu', async () => {
+  it('keeps aria-expanded in sync when Escape dismisses the menu', async () => {
     render(
       <UserMenu
         homeHref="/user-1/home"
@@ -34,16 +34,15 @@ describe('UserMenu', () => {
     const button = screen.getByRole('button', { name: 'Account menu' });
 
     expect(screen.getAllByRole('button')).toHaveLength(1);
-    expect(button.getAttribute('aria-pressed')).toBe('false');
+    expect(button.hasAttribute('aria-pressed')).toBe(false);
+    expect(button.getAttribute('aria-expanded')).toBe('false');
     fireEvent.click(button);
     const item = await screen.findByRole('menuitem', { name: 'Sign out' });
-    expect(button.getAttribute('aria-pressed')).toBe('true');
     expect(button.getAttribute('aria-expanded')).toBe('true');
     fireEvent.keyDown(item, { key: 'Escape' });
     await waitFor(() =>
-      expect(button.getAttribute('aria-pressed')).toBe('false'),
+      expect(button.getAttribute('aria-expanded')).toBe('false'),
     );
-    expect(button.getAttribute('aria-expanded')).toBe('false');
   });
 
   it('shows an account tooltip on focus', async () => {

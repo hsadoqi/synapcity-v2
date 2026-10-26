@@ -147,13 +147,12 @@ describe('Sidebar', () => {
     renderShell();
 
     expect(trigger().getAttribute('aria-label')).toBe('Close navigation');
-    expect(trigger().getAttribute('aria-pressed')).toBe('true');
+    expect(trigger().hasAttribute('aria-pressed')).toBe(false);
     expect(trigger().getAttribute('aria-keyshortcuts')).toBe(
       'Control+B Meta+B',
     );
     fireEvent.click(trigger());
     expect(trigger().getAttribute('aria-label')).toBe('Open navigation');
-    expect(trigger().getAttribute('aria-pressed')).toBe('false');
   });
 
   it('toggles with Ctrl+B and Cmd+B but not plain b', () => {

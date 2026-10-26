@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { FlipCountdown } from './flip-countdown';
 import { FlipDigit, HalfDigit } from './flip-countdown-digit';
-import { flipCountdownDemo } from './flip-countdown.utils';
 
-const { title, start } = flipCountdownDemo;
+const title = 'Doors open in';
+const start = '00:15:00';
 
 const meta: Meta<typeof FlipCountdown> = {
   title: 'DateTime/FlipCountdown',

@@ -65,12 +65,11 @@ function UserMenu({
               <DropdownMenuTrigger
                 render={
                   <Button
-                    toggle
-                    pressed={open}
                     data-slot="user-menu-trigger"
                     variant="ghost"
                     size="icon-xl"
                     label="Account menu"
+                    tooltip={false}
                   />
                 }
               />

@@ -36,19 +36,6 @@ const fieldClasses: Record<Surface, string> = {
   glass: 'bg-current/5',
 };
 
-export const ContentPanelDemo: ContentPanelProps = {
-  surface: 'card',
-  bordered: false,
-  inverted: false,
-  componentId: 'Feature177 Content',
-  sizeLabel: 'Size',
-  headingLabel: 'Heading',
-  heading: 'No tutorials needed.',
-  descriptionLabel: 'Description',
-  description:
-    'If you can order food online, you can build a website with Beste.',
-};
-
 function Toolbar({
   leadLetter,
   sizeLabel,
