@@ -1,0 +1,87 @@
+'use client';
+
+import { cn } from '@synapcity/frontend-ui/lib/utils';
+
+interface Highlight {
+  text: string;
+  tone: 'amber' | 'sky' | 'emerald' | 'rose';
+}
+
+interface LessonHighlightsProps {
+  lesson?: string;
+  highlights?: Highlight[];
+  note?: string;
+  bordered?: boolean;
+  className?: string;
+}
+
+const toneClasses: Record<Highlight['tone'], string> = {
+  amber: 'bg-amber-500/25 text-amber-900 dark:text-amber-100',
+  sky: 'bg-sky-500/25 text-sky-900 dark:text-sky-100',
+  emerald: 'bg-emerald-500/25 text-emerald-900 dark:text-emerald-100',
+  rose: 'bg-rose-500/25 text-rose-900 dark:text-rose-100',
+};
+
+export const lessonHighlightsDemo: LessonHighlightsProps = {
+  lesson: 'Lesson 6',
+  highlights: [
+    {
+      text: 'useEffect runs after the DOM commit, not during render.',
+      tone: 'amber',
+    },
+    {
+      text: 'Cleanup runs before the next effect, and on unmount.',
+      tone: 'sky',
+    },
+  ],
+  note: 'Ask Priya about the stale-closure example in office hours.',
+  bordered: false,
+};
+
+export function LessonHighlights({
+  lesson,
+  highlights = [],
+  note,
+  bordered = false,
+  className,
+}: LessonHighlightsProps) {
+  return (
+    <div
+      className={cn(
+        'relative flex size-full items-center justify-center p-4',
+        className,
+      )}
+    >
+      <div
+        className={cn(
+          'flex w-full max-w-80 flex-col gap-2 rounded-xl bg-card p-3 shadow-sm',
+          bordered && 'border border-border',
+        )}
+      >
+        {lesson && (
+          <span className="text-xs font-semibold text-muted-foreground">
+            {lesson}
+          </span>
+        )}
+        <div className="flex flex-col gap-1.5">
+          {highlights.map((h, idx) => (
+            <span
+              key={idx}
+              className={cn(
+                'rounded px-2 py-1 text-xs leading-snug',
+                toneClasses[h.tone],
+              )}
+            >
+              {h.text}
+            </span>
+          ))}
+        </div>
+        {note && (
+          <span className="border-t border-dashed border-border pt-2 text-xs italic text-muted-foreground">
+            {note}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
