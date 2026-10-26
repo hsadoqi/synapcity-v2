@@ -4,8 +4,8 @@ import {
   resendConfirmation,
   signInWithOAuth,
   signInWithPassword,
-} from '@/features/auth/server/actions/actions';
-import { safeNextPath } from '@/lib/routing/safe-next';
+} from '../../../../src/features/auth/server/actions/actions';
+import { safeNextPath } from '../../../../src/lib/routing/safe-next';
 import {
   AuthDivider,
   AuthLinkButton,

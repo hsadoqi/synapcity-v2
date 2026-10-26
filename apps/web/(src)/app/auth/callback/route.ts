@@ -4,12 +4,12 @@ import {
   authErrorPath,
   parseAuthFlow,
   welcomePath,
-} from '@/lib/routing/auth-flow';
+} from '../../../../src/lib/routing/auth-flow';
 import { needsProfileSetup } from '@synapcity/domain-identity';
-import { homePathFor } from '@/lib/routing/user-paths';
-import { safeNextPath } from '@/lib/routing/safe-next';
-import { withNotice } from '@/lib/routing/notices';
-import { createClient } from '@/lib/supabase/server';
+import { homePathFor } from '../../../../src/lib/routing/user-paths';
+import { safeNextPath } from '../../../../src/lib/routing/safe-next';
+import { withNotice } from '../../../../src/lib/routing/notices';
+import { createClient } from '../../../../src/lib/supabase/server';
 
 /**
  * Landing point for every Supabase redirect: OAuth sign-in, the email

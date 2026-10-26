@@ -4,10 +4,10 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import type { DeleteAccountState } from '@synapcity/features-auth/contracts';
-import { removeOldAvatars } from '@/features/account/server/save-avatar';
-import { deleteOwnAccount } from '@/features/auth/server/operations';
-import { withNotice } from '@/lib/routing/notices';
-import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
+import { removeOldAvatars } from '../../../../src/features/account/server/save-avatar';
+import { deleteOwnAccount } from '../../../../src/features/auth/server/operations';
+import { withNotice } from '../../../../src/lib/routing/notices';
+import { FIXTURE_MESSAGE, fixtureModeEnabled } from '../../../../src/lib/access/dev-fixture';
 
 /**
  * The last step of deleting an account, and the one that cannot be undone. It

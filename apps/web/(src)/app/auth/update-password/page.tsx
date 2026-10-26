@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-import { fixtureModeEnabled } from '@/lib/access/dev-fixture';
-import { createClient } from '@/lib/supabase/server';
-import { safeNextPath } from '@/lib/routing/safe-next';
+import { fixtureModeEnabled } from '../../../../src/lib/access/dev-fixture';
+import { createClient } from '../../../../src/lib/supabase/server';
+import { safeNextPath } from '../../../../src/lib/routing/safe-next';
 import { UpdatePasswordCard } from '@synapcity/features-auth/frontend';
-import { updatePassword } from '@/features/auth/server/actions/actions';
+import { updatePassword } from '../../../../src/features/auth/server/actions/actions';
 
 export const metadata: Metadata = { title: 'Choose a password' };
 

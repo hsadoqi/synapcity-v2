@@ -5,13 +5,13 @@ import { ProfileSetupCard } from '@synapcity/features-auth/frontend';
 import {
   completeProfile,
   skipProfileSetup,
-} from '@/features/account/server/actions/setup-actions';
-import { signInHref } from '@/lib/routing/sign-in-href';
-import { getVerifiedClaims } from '@/features/auth/server';
+} from '../../../../src/features/account/server/actions/setup-actions';
+import { signInHref } from '../../../../src/lib/routing/sign-in-href';
+import { getVerifiedClaims } from '../../../../src/features/auth/server';
 import { profileFromClaims } from '@synapcity/domain-identity';
-import { welcomePath } from '@/lib/routing/auth-flow';
-import { safeNextPath } from '@/lib/routing/safe-next';
-import { homePathFor } from '@/lib/routing/user-paths';
+import { welcomePath } from '../../../../src/lib/routing/auth-flow';
+import { safeNextPath } from '../../../../src/lib/routing/safe-next';
+import { homePathFor } from '../../../../src/lib/routing/user-paths';
 
 export const metadata: Metadata = { title: 'Welcome' };
 

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 import { ForgotPasswordCard } from '@synapcity/features-auth/frontend';
-import { requestPasswordReset } from '@/features/auth/server/actions/actions';
+import { requestPasswordReset } from '../../../../src/features/auth/server/actions/actions';
 
 export const metadata: Metadata = { title: 'Reset your password' };
 
