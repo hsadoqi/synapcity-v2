@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
 import {
   accountLinksFor,
   dashboardPathFor,
+  dashboardsPathFor,
   documentPathFor,
+  documentsPathFor,
   homePathFor,
   settingsPathFor,
   signInPathFor,
@@ -47,6 +49,13 @@ describe('accountLinksFor', () => {
       homeHref: '/%2E%2E/home',
       settingsHref: '/%2E%2E/settings',
     });
+  });
+});
+
+describe('documentsPathFor and dashboardsPathFor', () => {
+  it('put each index under the owner’s home', () => {
+    expect(documentsPathFor('u1')).toBe('/u1/home/documents');
+    expect(dashboardsPathFor('..')).toBe(`${homePathFor('..')}/dashboards`);
   });
 });
 

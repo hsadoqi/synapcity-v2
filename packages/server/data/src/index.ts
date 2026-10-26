@@ -1,5 +1,7 @@
 import 'server-only';
 
+export { listDashboardSummaries, setDashboardPinned } from './dashboards';
+export { listDocumentSummaries, setDocumentPinned } from './documents';
 export {
   findSpace,
   listSpaceDashboards,

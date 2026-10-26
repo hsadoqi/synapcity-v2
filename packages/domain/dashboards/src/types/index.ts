@@ -14,3 +14,4 @@ export type {
   WidgetStatus,
   WidgetType,
 } from './widget';
+export type { DashboardEntity, DashboardSummary } from './record';

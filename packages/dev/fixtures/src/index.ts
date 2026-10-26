@@ -122,4 +122,5 @@ export function createFixtures(seed: number = DEFAULT_SEED) {
 
 export type Fixtures = ReturnType<typeof createFixtures>;
 
+export { createDashboardEntity, createDocumentEntity } from './records';
 export { createSpaceEntity } from './spaces';

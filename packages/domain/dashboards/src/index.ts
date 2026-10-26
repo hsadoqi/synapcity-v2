@@ -2,7 +2,9 @@ export type {
   AgendaWidget,
   CalendarWidget,
   DashboardComposition,
+  DashboardEntity,
   DashboardSettings,
+  DashboardSummary,
   FeedWidget,
   HabitWidget,
   NotesWidget,
@@ -33,4 +35,4 @@ export {
   updateWidget,
   widgetsWithStatus,
 } from './utils';
-export { dashboardCompositionSchema } from './schemas';
+export { dashboardCompositionSchema, dashboardSchema } from './schemas';

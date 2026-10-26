@@ -1,4 +1,4 @@
-import { DocumentsCollectionSkeleton } from '@/features/documents/components/documents-collection';
+import { DocumentsCollectionSkeleton } from '@synapcity/features-documents/frontend';
 
 export default function DocumentsLoading() {
   return <DocumentsCollectionSkeleton />;

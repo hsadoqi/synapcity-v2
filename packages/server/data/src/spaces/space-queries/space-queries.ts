@@ -8,7 +8,7 @@ import {
   fromRow,
   type OwnedRow,
   type SpaceSummaryRow,
-} from '../space-row';
+} from '../../owned-row';
 
 /**
  * The signed-in owner's spaces, newest first. Row-level security scopes the

@@ -13,6 +13,8 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@synapcity/domain-dashboards": "workspace:*",
+    "@synapcity/domain-documents": "workspace:*",
     "@synapcity/domain-records": "workspace:*",
     "@synapcity/domain-spaces": "workspace:*",
     "@synapcity/server-supabase": "workspace:*",

@@ -12,6 +12,7 @@ const config: StorybookConfig = {
     '../../../packages/frontend/shells/src/**/*.stories.@(ts|tsx)',
     '../../../packages/features/auth/src/**/*.stories.@(ts|tsx)',
     '../../../packages/features/dashboards/src/**/*.stories.@(ts|tsx)',
+    '../../../packages/features/documents/src/**/*.stories.@(ts|tsx)',
     '../../../packages/features/spaces/src/**/*.stories.@(ts|tsx)',
     '../../../packages/features/settings/src/**/*.stories.@(ts|tsx)',
   ],

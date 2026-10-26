@@ -22,6 +22,7 @@
     "@synapcity/domain-dashboards": "workspace:*",
     "@synapcity/domain-grids": "workspace:*",
     "@synapcity/domain-prototypes": "workspace:*",
+    "@synapcity/frontend-collection": "workspace:*",
     "@synapcity/frontend-forms": "workspace:*",
     "@synapcity/frontend-ui": "workspace:*",
     "lucide-react": "^1.55.0",

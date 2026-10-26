@@ -96,7 +96,7 @@ The example does not prescribe one verification order for every capability. Exis
 
 A persistence package may contain separate modules for Spaces, Documents, and Dashboards. A new query does not automatically require a new package. Keep a concrete owner and narrow API rather than growing an unrestricted backend utility bucket.
 
-Current inputs include [auth operations](../../apps/web/src/features/auth/server/operations/operations.ts), [account caller helpers](../../apps/web/src/features/account/server/caller.ts), the [Space source](../features/spaces/README.md) (the port and its Supabase implementation, over [`server-data`](data/README.md), moved to `features-spaces/server` in M5.4), and [shared document/dashboard persistence](../../apps/web/src/lib/owned-records/owned-records.ts). Account preference row persistence moved to [`server-account`](account/README.md) in M6.4; caller identity, fixture selection, request clients, and failure logging remain host-owned.
+Current inputs include [auth operations](../../apps/web/src/features/auth/server/operations/operations.ts), [account caller helpers](../../apps/web/src/features/account/server/caller.ts), the [Space source](../features/spaces/README.md) (the port and its Supabase implementation, over [`server-data`](data/README.md), moved to `features-spaces/server` in M5.4). Document and Dashboard queries and pin writes moved from `apps/web/src/lib/owned-records` to `server-data` in M8. Account preference row persistence moved to [`server-account`](account/README.md) in M6.4; caller identity, fixture selection, request clients, and failure logging remain host-owned.
 
 ### Example packages
 

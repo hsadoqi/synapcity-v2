@@ -3,3 +3,5 @@ export { renderWithStore } from './render-with-store';
 export { SEED_NOW, SEED_OWNER, seededWorkspace } from './seed';
 export { WidgetFrame } from './widget-frame';
 export { withDashboardStore } from './with-dashboard-store';
+export { sampleSummaries } from './sample-dashboards';
+export { withStubNavigation } from './story-host';

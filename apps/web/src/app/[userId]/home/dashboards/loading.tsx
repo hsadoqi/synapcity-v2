@@ -1,4 +1,4 @@
-import { DashboardsCollectionSkeleton } from '@/features/dashboards/components/dashboards-collection';
+import { DashboardsCollectionSkeleton } from '@synapcity/features-dashboards/frontend';
 
 export default function DashboardsLoading() {
   return <DashboardsCollectionSkeleton />;

@@ -10,5 +10,7 @@
 @source '../../../../packages/frontend/shells/src';
 @source '../../../../packages/features/account/src';
 @source '../../../../packages/features/auth/src';
+@source '../../../../packages/features/dashboards/src';
+@source '../../../../packages/features/documents/src';
 @source '../../../../packages/features/spaces/src';
 @source '../../../../packages/features/settings/src';

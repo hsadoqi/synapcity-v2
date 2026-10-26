@@ -69,7 +69,7 @@ Validation establishes the shape and applicable semantic rules. The server indep
 
 Candidate responsibilities include the existing Space saved-record contract, document/dashboard contracts, and portable preference rules. Names here describe the current code and do not finalize provisional product terminology.
 
-The base record contract lives in [`domain-records`](records/README.md) (M5.1). The Space contract, created there in M5.1, lives in [`domain-spaces`](spaces/README.md) since 2026-10-24 (owner decision). The [document/dashboard query helper](../../apps/web/src/lib/owned-records/owned-records.ts) still combines persistence implementation with its schema, which is now the base contract; the queries move to server data in M8. Extracting a contract must preserve its existing shape unless a separately approved change alters it.
+The base record contract lives in [`domain-records`](records/README.md) (M5.1). The Space contract, created there in M5.1, lives in [`domain-spaces`](spaces/README.md) since 2026-10-24 (owner decision). In M8 the Document contract moved to [`domain-documents`](documents/README.md) and the Dashboard record contract joined [`domain-dashboards`](dashboards/README.md); both are still the base contract, and their queries moved to [`server-data`](../server/data/README.md). Extracting a contract must preserve its existing shape unless a separately approved change alters it.
 
 ### Example Packages
 

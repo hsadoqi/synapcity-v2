@@ -111,7 +111,7 @@ Existing [web features](../../apps/web/src/features) are migration inputs, not p
 
 [Collection](../frontend/collection/README.md) (moved to `frontend-collection` in M5.3) and [Home composition](../../apps/web/src/features/home/components/home-page/home-page-view.tsx) currently contain overlapping or fixture-specific behavior. Their consolidation must preserve approved behavior and separate demo operations explicitly.
 
-[`features-spaces`](spaces/README.md) is the first feature package (M5.4): Space browsing and detail, with `./contracts`, `./frontend` and `./server`, the host supplying the source, the actions and navigation.
+[`features-spaces`](spaces/README.md) is the first feature package (M5.4): Space browsing and detail, with `./contracts`, `./frontend` and `./server`, the host supplying the source, the actions and navigation. [`features-documents`](documents/README.md) and the browsing half of [`features-dashboards`](dashboards/README.md) follow it in M8, without a `./server` entry: the host loads their index straight from `server-data`.
 
 [`features-settings`](settings/README.md) (M6.4) owns Settings presentation, drafts, workflow composition and its server loader. Web keeps the Profile/Auth Account tab as a lazy host slot, along with request, action and logging policy.
 

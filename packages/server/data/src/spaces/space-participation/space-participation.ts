@@ -2,7 +2,7 @@ import type { BaseRecord } from '@synapcity/domain-records';
 import type { SupabaseServerClient } from '@synapcity/server-supabase';
 import { z } from 'zod';
 
-import { COLUMNS, recordFromRow, type OwnedRow } from '../space-row';
+import { COLUMNS, recordFromRow, type OwnedRow } from '../../owned-row';
 
 /**
  * The items taking part in one Space, newest addition first (ADR-0013:

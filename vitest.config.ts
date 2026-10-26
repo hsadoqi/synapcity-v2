@@ -18,6 +18,7 @@ import { sharedConfig } from './packages/dev/vitest-config/src/shared';
 const projects = [
   'apps/web',
   'packages/domain/dashboards',
+  'packages/domain/documents',
   'packages/domain/grids',
   'packages/domain/identity',
   'packages/domain/preferences',
@@ -29,6 +30,7 @@ const projects = [
   'packages/features/account',
   'packages/features/auth',
   'packages/features/dashboards',
+  'packages/features/documents',
   'packages/features/spaces',
   'packages/features/settings',
   'packages/frontend/site',

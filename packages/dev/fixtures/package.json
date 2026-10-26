@@ -17,6 +17,7 @@
   "dependencies": {
     "@faker-js/faker": "10.6.0",
     "@synapcity/domain-dashboards": "workspace:*",
+    "@synapcity/domain-documents": "workspace:*",
     "@synapcity/domain-prototypes": "workspace:*",
     "@synapcity/domain-spaces": "workspace:*",
     "lucide-react": "^1.55.0"

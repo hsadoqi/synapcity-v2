@@ -1,0 +1,1 @@
+export { documentSchema } from './document';

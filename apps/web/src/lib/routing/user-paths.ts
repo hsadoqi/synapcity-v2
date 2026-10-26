@@ -18,12 +18,22 @@ export function spacesPathFor(userId: string): string {
   return `${homePathFor(userId)}/spaces`;
 }
 
-/** A document's top-level route (ADR-0013, item 9); its page arrives with Milestone 8. */
+/** The owner's documents index. */
+export function documentsPathFor(userId: string): string {
+  return `${homePathFor(userId)}/documents`;
+}
+
+/** The owner's dashboards index. */
+export function dashboardsPathFor(userId: string): string {
+  return `${homePathFor(userId)}/dashboards`;
+}
+
+/** A document's top-level route (ADR-0013, item 9); its page is not built yet. */
 export function documentPathFor(userId: string, documentId: string): string {
   return `${homePathFor(userId)}/documents/${documentId}`;
 }
 
-/** A dashboard's top-level route (ADR-0013, item 9); its page arrives with Milestone 8. */
+/** A dashboard's top-level route (ADR-0013, item 9); its page is not built yet. */
 export function dashboardPathFor(userId: string, dashboardId: string): string {
   return `${homePathFor(userId)}/dashboards/${dashboardId}`;
 }
