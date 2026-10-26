@@ -65,5 +65,4 @@ supabase/.temp
 .pnpm-store
 .archives
 
-docs/archive/high-level-roadmap.md
-docs/archive/open-work-backlog.md
+docs/archive/notes
