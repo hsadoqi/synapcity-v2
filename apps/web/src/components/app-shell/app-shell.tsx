@@ -78,9 +78,11 @@ export function AppShell({
           />
           <QuickCreateDialog
             kind={creating}
+            userId={userId}
             onOpenChange={(open) => {
               if (!open) setCreating(null);
             }}
+            onCreated={(href) => router.push(href)}
           />
         </>
       )}
