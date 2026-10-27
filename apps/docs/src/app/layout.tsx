@@ -6,6 +6,7 @@ import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import RootProviders from './providers';
 import { RootShell } from '@synapcity/frontend-shells';
+import { NextShellNavigation } from '@synapcity/frontend-shells/next';
 import { createMetadata } from '@synapcity/frontend-site/metadata';
 import {
   appearanceBootScript,
@@ -68,7 +69,9 @@ export default async function RootLayout({
       </head>
       <body>
         <RootProviders>
-          <RootShell>{children}</RootShell>
+          <NextShellNavigation>
+            <RootShell>{children}</RootShell>
+          </NextShellNavigation>
         </RootProviders>
       </body>
     </html>

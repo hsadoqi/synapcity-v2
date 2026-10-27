@@ -75,3 +75,33 @@ export async function setRecordPinned(
   if (!data.length) return { ok: false, error: { code: 'row_not_written' } };
   return { ok: true, pinnedAt: data[0]?.pinned_at ?? null };
 }
+
+/**
+ * What creating reports: the new row's id, or the failure by code and status.
+ * A failure with a code came from the database or PostgREST, so nothing was
+ * written. A failure without one (a dropped connection, a gateway timeout) is
+ * not proof either way: the row may exist.
+ */
+export type CreatedOutcome =
+  { ok: true; id: string } | { ok: false; error: ProviderFailure };
+
+/**
+ * Creates one of the caller's Spaces, documents or dashboards with only its
+ * name; every other column has a default. The owner is not passed: the column
+ * defaults to the session's user, and row-level security refuses any other.
+ */
+export async function createRecord(
+  client: SupabaseServerClient,
+  table: 'spaces' | RecordKind,
+  input: { name: string },
+): Promise<CreatedOutcome> {
+  const { data, error, status } = await client
+    .from(table)
+    .insert({ name: input.name })
+    .select('id')
+    .single();
+
+  if (error)
+    return { ok: false, error: toProviderFailure({ ...error, status }) };
+  return { ok: true, id: data.id };
+}

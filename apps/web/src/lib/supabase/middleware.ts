@@ -1,9 +1,9 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-import { homePathFor } from '@/lib/routing/user-paths';
-import { safeNextPath } from '@/lib/routing/safe-next';
-import { fixtureModeEnabled } from '@/lib/access/dev-fixture';
+import { homePathFor } from '../routing/user-paths';
+import { safeNextPath } from '../routing/safe-next';
+import { fixtureModeEnabled } from '../access/dev-fixture';
 import { getSupabaseEnv } from './env';
 import { isGuestOnlyPath, isProtectedPath } from '../routing/route-access';
 

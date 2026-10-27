@@ -57,6 +57,8 @@
 
 ### Task B: Session refresh helper
 
+_Superseded (owner, 2026-10-27): session refresh moves to `server-supabase` as `refreshProxySession`, after a spike proves the `server-only` import in the proxy. See the [web Supabase leftovers design](../specs/2026-10-27-web-supabase-leftovers-design.md), D2, and its [plan](2026-10-27-web-supabase-leftovers.md), Task 1. The decision below is kept as the record._
+
 **Decision (owner, 2026-10-24, on the recommendation): not done in M7.2.** Session refresh stays in `apps/web/src/lib/supabase/middleware.ts`. Most of the file is Next.js response handling that must stay in the app; the portable part is about five lines; and importing a `server-only` package from the proxy is NOT VERIFIED. Revisit only if the end-to-end suite is run with the proxy importing the package. The design's `server-supabase` mention of "session refresh helpers" and the M7 exceptions list are unaffected (this file has no boundary exception).
 
 **Why (recorded when the blocker was found, 2026-10-24):** `server-supabase`'s root entry starts with `import 'server-only'` (rule R10), and `proxy.ts` would then import it. Nothing imported by the proxy does that today, and the installed Next.js 16.4.3 docs say the proxy runs on the Node.js runtime but do not say whether `server-only` is safe there. NOT VERIFIED. If it throws at module load, every request fails. Do not implement until one of these is shown by running it: (a) `next start` with the proxy importing the package answers a request, or (b) a dedicated proxy-safe entry is agreed, which needs an owner decision because R10 requires the guard on every server entry. The end-to-end suite (`pnpm test:e2e`) would exercise (a); it was not run here because of machine load.

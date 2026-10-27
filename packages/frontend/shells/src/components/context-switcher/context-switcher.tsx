@@ -1,12 +1,12 @@
 'use client';
 
-import * as React from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@synapcity/frontend-ui/core/dropdown-menu';
 import {
@@ -14,20 +14,34 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@synapcity/frontend-ui/core/sidebar';
-import {
-  SynapcityMark,
-  SynapcityWordmark,
-} from '@synapcity/frontend-ui/components/logo-mark';
+import { SynapcityMark } from '@synapcity/frontend-ui/components/logo-mark';
 
+import { ShellLink } from '../../providers/shell-navigation';
+
+/** A place the switcher can take someone to. */
+export type ContextOption = {
+  label: string;
+  href: string;
+  /** The context the page is in. Set by the host, since two can share a name. */
+  active?: boolean;
+};
+
+/**
+ * The top of the sidebar: shows the context the page is in and opens a menu of
+ * the contexts to switch to (working globally, or inside one Space). The host
+ * decides both, usually from the page's breadcrumb trail (see `activeContext`).
+ */
 export function ContextSwitcher({
-  versions,
-  defaultVersion,
+  current,
+  options,
+  more,
 }: {
-  versions: string[];
-  defaultVersion: string;
+  /** The active context's name, such as a Space's name. */
+  current: string;
+  options: ContextOption[];
+  /** A link after the options, such as to every Space. */
+  more?: ContextOption;
 }) {
-  const [selectedVersion, setSelectedVersion] = React.useState(defaultVersion);
-
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -36,34 +50,38 @@ export function ContextSwitcher({
             render={(props) => (
               <SidebarMenuButton
                 size="lg"
-                aria-label="Switch version"
+                aria-label={`Switch context: ${current}`}
                 {...props}
-                className="data-popup-open:bg-sidebar data-popup-open:text-sidebar-accent flex items-center justify-around outline-none data-[state=open]:bg-sidebar data-[state=open]:text-sidebar-accent"
               >
-                <div className="flex aspect-square size-8 shrink-0 items-center justify-center bg-sidebar-background text-sidebar-primary">
+                <div className="flex aspect-square size-8 shrink-0 items-center justify-center text-sidebar-primary">
                   <SynapcityMark className="size-4" />
                 </div>
-                <div className="flex min-w-0 flex-1 items-center leading-none">
-                  <SynapcityWordmark
-                    size="sm"
-                    title={null}
-                    className="text-sidebar-foreground"
-                  />
-                </div>
+                <span className="min-w-0 flex-1 truncate font-semibold">
+                  {current}
+                </span>
                 <ChevronsUpDown className="ml-auto shrink-0" />
               </SidebarMenuButton>
             )}
           />
           <DropdownMenuContent align="start">
-            {versions.map((version) => (
+            {options.map((option) => (
               <DropdownMenuItem
-                key={version}
-                onClick={() => setSelectedVersion(version)}
+                key={option.href}
+                aria-current={option.active ? 'page' : undefined}
+                render={<ShellLink href={option.href} />}
               >
-                v{version}{' '}
-                {version === selectedVersion && <Check className="ml-auto" />}
+                <span className="min-w-0 flex-1 truncate">{option.label}</span>
+                {option.active && <Check className="ml-auto" />}
               </DropdownMenuItem>
             ))}
+            {more && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem render={<ShellLink href={more.href} />}>
+                  {more.label}
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

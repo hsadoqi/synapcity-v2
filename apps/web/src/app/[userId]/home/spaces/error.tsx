@@ -3,10 +3,7 @@
 import { useEffect } from 'react';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
-import {
-  MESSAGE_HEADING_ID,
-  MessagePage,
-} from '@/components/shells/message-page';
+import { MESSAGE_HEADING_ID, MessagePage } from '@synapcity/frontend-shells';
 import { reportCaughtError } from '@synapcity/frontend-error-reports';
 
 /**

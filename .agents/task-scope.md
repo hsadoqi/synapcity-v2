@@ -1,3 +1,26 @@
+## Active task: Quick Create remediation (2026-10-27)
+
+- Goal and mode: implementing. The owner directed this remediation on 2026-10-27, after a report-only review of `integrate/shells-sidebar-main` and `feat/create-records` (through `bf6280d3`), delegating routine implementation, test and documentation decisions. Branch `feat/create-records`, worktree `synapcity.worktrees/create-records`, local commits only: no push, merge or hosted database change.
+- Changes: Quick Create cannot be closed while it saves and refuses a second submit; a save that fails with no database answer (a dropped connection or a rejected action call) is reported as unconfirmed, keeps the name, asks the person to check before retrying and refreshes the page data; closing returns focus to the control that opened it (the dialog is opened from state, so Base UI had no trigger to return to). `getCallerIdentity` signs out with `Sign in again to save your changes.` (profile actions keep their own message); the fixture-mode message no longer says account actions. Spaces are created through the `SpaceSource` port (`create`), as the ownership map's Spaces row requires; documents and dashboards call `server-data` directly, as their pin actions do. `server-data`'s `createRecord` keeps the response status so a cut-off request can be told apart. READMEs for `server-data` and `features-spaces` updated; the M7.5 entry below reads `AuthStatus` again (the component's name in code).
+- Considered and not changed: a name length limit (no contract or database limit exists; adding one is a schema and product decision for the owner); an idempotency key (clients cannot write `id` under the column grants, so it needs a schema change); moving the kind-to-table map into `server-data` (the app maps its own `CollectionKind` onto `server-data`'s `RecordKind`, checked by `satisfies`).
+- Evidence: `pnpm verify` exit 0 with CI's placeholder Supabase values (61 lint and type tasks; web 680, `server-data` 50, `features-spaces` 62 tests; e2e 66 passed and 5 skipped, the existing authenticated-session skips; Storybook 515; build). Database: all 12 migrations applied to a throwaway Postgres 16 with stub `auth` and `storage` objects (not Supabase's image); as `authenticated` with JWT claims, each table created a row owned by the caller with its defaults, another user could not read it, and `owner_id`, `id`, a blank name and `anon` were refused. The real `createRecord` through supabase-js sent `POST /rest/v1/<table>?select=id` with `Prefer: return=representation`, run against that database. Browser: the real app (`next dev`) with a local stand-in for Supabase's HTTP API over that database passed 31 checks (each kind created by keyboard, saved once, navigated, listed in the sidebar and on its page without a reload; commit-then-drop reported as unconfirmed with the record shown; signed-out copy and link; focus return; 375px width).
+- Push and pull request (2026-10-27): the owner later authorized pushing `feat/create-records` to `origin` (done at `21c8fe12`) and opening a pull request to `main`, which runs CI. Merging still needs a green CI and the owner's go-ahead.
+- Not verified: real PostgREST and Supabase Auth (no Docker, and running a downloaded PostgREST binary was not permitted), the hosted project, screen-reader output, and a pending save cancelled in a browser (covered by unit tests only). The stand-in harness lives outside the repository.
+
+## Retrospective record: Quick Create first slice (2026-10-27)
+
+- Written during the remediation above; this entry did not exist when the work was done. Commit `bf6280d3` on `feat/create-records`: create Spaces, documents and dashboards by name from the Quick Create dialog (`apps/web/src/lib/records/create-record-action.ts`, `server-data` `createRecord`, the dialog and `AppShell`). No spec or plan was written for it.
+- Approval: the repository holds no record of the owner approving this as the first creation slice (an approval gate in `AGENTS.md` section 5). Owner to confirm.
+- Approval recorded (2026-10-27): the owner approved Quick Create as an interim creation path for Spaces, documents and dashboards. Which creation path Synapcity adopts remains an open product decision; this approval does not settle it.
+- Verification then: lint, type checks, coverage tests and build logs from 07:30 to 07:33, before the commit; no recorded exit code, e2e or Storybook run.
+
+## Retrospective record: shells sidebar integration with main (2026-10-27)
+
+- Written during the remediation above. Branch `integrate/shells-sidebar-main`: `c286e596` snapshots the uncommitted work on `refactor/shells-sidebar-slots` (byte-for-byte equal to that worktree's 36 changed and untracked paths; ignored files left in place), and `a30e41ff` merges `origin/main` at `bf6b5ab1` with 28 conflicts resolved (22 take main, whose versions differ from the branch only by import style; one deletion follows main's move of `lib/owned-records`; four combine both sides).
+- Approval: the repository holds no record of the owner approving the integration. Owner to confirm.
+- Approval recorded (2026-10-27): the owner approved the integration, including the 28 conflict resolutions.
+- Recovery: the first parent of `a30e41ff` is the snapshot, and `refactor/shells-sidebar-slots` and its worktree are unchanged.
+
 ## Active task: Supabase review fixes (2026-10-27)
 
 - Goal and mode: implement the approved [Supabase review fixes](../docs/superpowers/specs/2026-10-27-supabase-review-fixes-design.md) (R1 `local`, R3 (a) on `refactor/shells-sidebar-slots`, R8 (a); R2 and R4 to R7 as recommended), then a pre-commit review and reconciliation. Branch `refactor/supabase-review-fixes`, from `main`.
@@ -6,6 +29,44 @@
 - Not changed: migrations, RLS, Supabase dashboard settings, email templates, the hosted project.
 - Not done: plan Tasks 1 and 9 (A2 needs a real inbox and two browsers). Owner decisions (2026-10-27): spec 9.2 option (a), so `20261013184200_declare_rls_auto_enable.sql` is added (new file; no applied migration changed); A2 waits on the manual reproduction. Open: the hosted `supabase db push --include-all` after merge (owner), and Task 9 after the reproduction.
 - Evidence and limits: `pnpm verify` with CI's placeholder Supabase values; no check ran against a real Supabase project except reading its public key set. Types were regenerated from the migrations on a throwaway local Postgres 16 with stub `auth` and `storage` objects, not Supabase's image.
+
+## Active task: web Supabase leftovers review and approval (2026-10-27)
+
+- Goal and mode: documentation only. Pass 1: a critical review of the web Supabase leftovers design and plan. Pass 2: the owner accepted every recommendation; the documents now carry the approved decisions, with E1, E2 and E4 to E7 folded in and E3 deferred, followed by a second read-only review.
+- Exact updates: `docs/superpowers/specs/2026-10-27-web-supabase-leftovers-design.md`, `docs/superpowers/plans/2026-10-27-web-supabase-leftovers.md` (rewritten to the approved design, with replaced wording archived at the end), and the decision records `docs/superpowers/specs/2026-10-24-m7-auth-account-design.md` (status line, Q5 answer), `docs/superpowers/plans/2026-10-24-m7-2-server-packages.md` (Task B) and `docs/superpowers/plans/2026-10-25-m7-5-features-auth.md` (C7); this ledger. Replaced statements are kept, marked "Superseded". Prettier re-padded the M7.5 calls table, a whitespace-only change.
+- Not changed: source, packages, manifests, migrations, ADRs, the ownership map and READMEs (state records, plan Task 6).
+- Evidence: files read on `feat-tokens-package`, including Next.js 16.4.3's webpack config and layer constants, `@supabase/auth-js` 2.117.3's `getClaims` and `@supabase/ssr` 0.12.7's cookie types. Verified: `prettier --check` on every edited file. Not run: any test, type check, build, the Task 1 spike or a live Supabase check.
+- Pass 3 (2026-10-27, the owner asked for further fixes, applied directly). Changes:
+  - Turbo inputs for the guard tests (they would otherwise replay a cached pass);
+  - the pin test covers every workspace manifest;
+  - the implementation branch is named;
+  - task order and `format:check` are added;
+  - the fixture-mode counter is clarified;
+  - the `./proxy` entry and `sideEffects` were considered and not done.
+
+  Evidence: Turbo 2.11.7's own docs for `$TURBO_ROOT$`; `ci.yml`'s cache restore keys.
+
+- Pass 4 (2026-10-27, approved by the owner):
+  - the web wrapper is dropped (D3);
+  - a shared internal client factory;
+  - `middleware.ts` is renamed `proxy-session.ts`;
+  - `hasRecentLinkSignInNow` is used in the operation;
+  - the JWT signing-mode check is added to E7;
+  - `spaces.e2e.ts` is named as the Task 1 evidence;
+  - follow-ups F1 to F4 and the considered items are recorded.
+
+  Also `docs/superpowers/specs/2026-10-27-font-catalogue-picker-design.md`: section 5.1 records enhancements E1 to E4 from the font review, which section 3.4 referred to but which existed only in that conversation.
+
+- Pass 5 (2026-10-27, owner: "update docs, no implementation"): updated the gitignored local note `docs/archive/notes/open-work-backlog.md`, the existing backlog. `docs/engineering/documentation.md` keeps backlog records out of the documentation set, so no new file was created under `docs/`. The update is a 2026-10-27 banner, section 9 (Supabase and font plans, open decisions, follow-ups), status notes on three older items, and a new suggested order with the 2026-10-25 order kept as Superseded. Its 12 pre-existing links, broken since the file moved to `docs/archive/notes/`, are repointed.
+- Open: implementation, starting with plan Task 1, needs the owner's go-ahead.
+
+## Active task: font plans review (2026-10-27)
+
+- Goal and mode: documentation only. The owner asked for a critical review of the shared default fonts and font catalogue picker designs and plans, with clear errors corrected in place and enhancements listed for approval.
+- Exact updates (4): `docs/superpowers/specs/2026-10-27-shared-default-fonts-design.md`, `docs/superpowers/plans/2026-10-27-shared-default-fonts.md`, `docs/superpowers/specs/2026-10-27-font-catalogue-picker-design.md`, `docs/superpowers/plans/2026-10-27-font-catalogue-picker.md`; this ledger. Replaced statements are kept, marked "Superseded".
+- Not changed: source, packages, manifests, ADRs, `AGENTS.md`.
+- Evidence: files read on `feat-tokens-package`; the Google Fonts CSS API queried on 2026-10-27. Verified: `prettier --check` on the four files. Not run: any build, test or the Task 1 spike.
+- Open for the owner: shared fonts O1 and O2; catalogue O1 to O4.
 
 ## Active task: Milestone 7 close-out (2026-10-25)
 

@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -38,8 +38,8 @@ describe('RootHeaderContent', () => {
     expect(markup).not.toContain('/settings');
   });
 
-  it('offers settings only when signed in', () => {
-    expect(html('user-1')).toContain('href="/user-1/settings"');
+  it('offers no settings link signed in either; it lives in the sidebar', () => {
+    expect(html('user-1')).not.toContain('/settings');
   });
 });
 
@@ -113,11 +113,22 @@ describe('RootHeader', () => {
 
   it('shows the sidebar trigger only when signed in', () => {
     const { unmount } = renderHeader(account);
-    expect(screen.getByRole('button', { name: 'Open sidebar' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /sidebar$/ })).toBeTruthy();
     unmount();
 
     renderHeader(null);
-    expect(screen.queryByRole('button', { name: 'Open sidebar' })).toBeNull();
+    expect(screen.queryByRole('button', { name: /sidebar$/ })).toBeNull();
+  });
+
+  it('names the sidebar trigger after what it will do', () => {
+    renderHeader(account);
+    const trigger = screen.getByRole('button', { name: 'Close sidebar' });
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+
+    fireEvent.click(trigger);
+
+    const reopened = screen.getByRole('button', { name: 'Open sidebar' });
+    expect(reopened.getAttribute('aria-expanded')).toBe('false');
   });
 
   it('groups utility actions in a labelled navigation', () => {
@@ -127,10 +138,11 @@ describe('RootHeader', () => {
     });
 
     expect(within(nav).getByRole('button', { name: 'Theme' })).toBeTruthy();
-    expect(within(nav).getByRole('link', { name: 'Settings' })).toBeTruthy();
+    expect(within(nav).queryByRole('link', { name: 'Settings' })).toBeNull();
     expect(within(nav).getByRole('button', { name: 'Extra' })).toBeTruthy();
   });
 
+  // Settings moved to the sidebar's core links; the header has none either way.
   it('offers no settings link when signed out', () => {
     renderHeader(null);
 

@@ -8,17 +8,17 @@ It owns no theme tokens. Tokens live in `@synapcity/frontend-tailwind-config` ([
 
 ## Entry points
 
-| Import                                     | Provides                                                                                                                                 |
-| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `@synapcity/frontend-ui/core/<name>`       | A shadcn component, for example `@synapcity/frontend-ui/core/button`                                                                     |
-| `@synapcity/frontend-ui/components/<name>` | A Synapcity component, for example `.../components/section-heading`                                                                      |
-| `@synapcity/frontend-ui/next/<name>`       | A component that needs Next.js, for example `.../next/link-button` (the only place in this package that imports `next`)                  |
-| `@synapcity/frontend-ui/blocks/<name>`     | A larger composition, for example `.../blocks/day-agenda`                                                                                |
-| `@synapcity/frontend-ui/lib/<name>`        | Helpers: `utils` (`cn`, [ADR-0004](../../../docs/architecture/decisions/0004-class-merging-with-cn.md)), `account-links`, `sidebar-data` |
-| `@synapcity/frontend-ui/hooks/<name>`      | Hooks, for example `use-mobile`                                                                                                          |
-| `@synapcity/frontend-ui/components`        | A barrel of every `core` and `components` export                                                                                         |
-| `@synapcity/frontend-ui/blocks`            | A barrel of every block                                                                                                                  |
-| `@synapcity/frontend-ui/styles.css`        | The shared theme, imported once by each app                                                                                              |
+| Import                                     | Provides                                                                                                                 |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `@synapcity/frontend-ui/core/<name>`       | A shadcn component, for example `@synapcity/frontend-ui/core/button`                                                     |
+| `@synapcity/frontend-ui/components/<name>` | A Synapcity component, for example `.../components/section-heading`                                                      |
+| `@synapcity/frontend-ui/next/<name>`       | A component that needs Next.js, for example `.../next/link-button` (the only place in this package that imports `next`)  |
+| `@synapcity/frontend-ui/blocks/<name>`     | A larger composition, for example `.../blocks/day-agenda`                                                                |
+| `@synapcity/frontend-ui/lib/<name>`        | Helpers: `utils` (`cn`, [ADR-0004](../../../docs/architecture/decisions/0004-class-merging-with-cn.md)), `account-links` |
+| `@synapcity/frontend-ui/hooks/<name>`      | Hooks, for example `use-mobile`                                                                                          |
+| `@synapcity/frontend-ui/components`        | A barrel of every `core` and `components` export                                                                         |
+| `@synapcity/frontend-ui/blocks`            | A barrel of every block                                                                                                  |
+| `@synapcity/frontend-ui/styles.css`        | The shared theme, imported once by each app                                                                              |
 
 ## Layout
 

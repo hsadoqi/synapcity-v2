@@ -56,7 +56,7 @@ export function EntityHeader({
   return (
     <header className="flex min-w-0 flex-1 flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
           {name}
         </h1>
         {description && (

@@ -199,7 +199,7 @@ describe('setSpacePinned caller identity', () => {
 
     await expect(setSpacePinned(ID, true)).resolves.toEqual({
       ok: false,
-      error: 'Sign in again to update your profile.',
+      error: 'Sign in again to save your changes.',
       signedOut: true,
     });
     expect(console.warn).toHaveBeenCalledWith('getCallerIdentity failed', {

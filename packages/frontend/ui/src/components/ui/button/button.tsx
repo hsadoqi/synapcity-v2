@@ -1,8 +1,12 @@
 import { Button as ButtonPrimitive } from '@base-ui/react/button';
-import { Toggle as TogglePrimitive } from '@base-ui/react/toggle';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@synapcity/frontend-ui/lib/utils';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@synapcity/frontend-ui/core/tooltip';
 
 const buttonVariants = cva(
   "group/button inline-flex shrink-0 items-center justify-center rounded-md border border-transparent bg-clip-padding text-xs/relaxed font-medium whitespace-nowrap cursor-pointer transition-[color,background-color,border-color,box-shadow,translate] duration-150 ease-out outline-none select-none focus-visible:border-ring focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
@@ -36,6 +40,7 @@ const buttonVariants = cva(
         xs: "h-5 pointer-coarse:h-11 gap-1 rounded-sm px-2 text-2xs has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-2.5",
         sm: "h-6 pointer-coarse:h-11 gap-1 px-2 text-xs/relaxed has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
         lg: "h-8 pointer-coarse:h-12 gap-1.5 px-3 text-xs/relaxed has-data-[icon=inline-end]:pr-2.5 has-data-[icon=inline-start]:pl-2.5 [&_svg:not([class*='size-'])]:size-4",
+        xl: "h-9 pointer-coarse:h-12 gap-1.5 px-3 text-xs/relaxed has-data-[icon=inline-end]:pr-2.5 has-data-[icon=inline-start]:pl-2.5 [&_svg:not([class*='size-'])]:size-4",
         'icon-xs':
           "size-5 pointer-coarse:size-11 rounded-sm [&_svg:not([class*='size-'])]:size-2.5",
         'icon-sm':
@@ -55,53 +60,54 @@ const buttonVariants = cva(
 );
 
 type ButtonProps = ButtonPrimitive.Props &
-  Pick<
-    TogglePrimitive.Props,
-    'pressed' | 'defaultPressed' | 'onPressedChange'
-  > &
   VariantProps<typeof buttonVariants> & {
-    /**
-     * Accessible name that replaces the visible text. Set it only for
-     * icon-only buttons: on a button with text it overrides that text, so
-     * a changing label such as "Signing in…" would never be announced.
-     */
+    className?: string;
+    iconOnly?: boolean;
     label?: string;
-    toggle?: boolean;
+    /** Icon buttons show `label` in a tooltip. Pass false when the button already sits inside another Tooltip. */
+    tooltip?: boolean;
   };
-type ButtonVariant = VariantProps<typeof buttonVariants>['variant'];
-type ButtonSize = VariantProps<typeof buttonVariants>['size'];
+type ButtonSize = ButtonProps['size'];
+type ButtonVariant = ButtonProps['variant'];
 
 function Button({
   className,
+  label,
   variant = 'default',
   size = 'default',
-  label,
-  toggle = false,
-  pressed,
-  defaultPressed,
-  onPressedChange,
+  iconOnly = false,
+  tooltip = true,
   ...props
 }: ButtonProps) {
+  const isIcon = !!iconOnly || size?.includes('icon');
+  const iconSizes: Partial<
+    Record<NonNullable<ButtonSize>, NonNullable<ButtonSize>>
+  > = {
+    xs: 'icon-xs',
+    sm: 'icon-sm',
+    default: 'icon',
+    lg: 'icon-lg',
+    xl: 'icon-xl',
+  };
+  const buttonSize: ButtonSize = isIcon
+    ? (iconSizes[size ?? 'default'] ?? size ?? 'icon')
+    : size;
   const button = (
     <ButtonPrimitive
       data-slot="button"
       aria-label={label}
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(buttonVariants({ variant, size: buttonSize, className }))}
       {...props}
     />
   );
 
-  return toggle ? (
-    <TogglePrimitive
-      pressed={pressed}
-      defaultPressed={defaultPressed}
-      onPressedChange={onPressedChange}
-      disabled={props.disabled}
-      nativeButton={props.nativeButton}
-      render={button}
-    />
-  ) : (
-    button
+  if (!isIcon || !label || !tooltip) return button;
+
+  return (
+    <Tooltip>
+      <TooltipTrigger render={button} />
+      <TooltipContent>{label}</TooltipContent>
+    </Tooltip>
   );
 }
 

@@ -87,6 +87,48 @@ describe('RootShell', () => {
     expect(screen.getByRole('button', { name: 'Open sidebar' })).toBeTruthy();
   });
 
+  it('fills the sidebar with the content the host gives it', () => {
+    renderShell({
+      account,
+      sidebar: {
+        header: <p>Context and search</p>,
+        groups: [
+          {
+            title: 'Main',
+            items: [{ title: 'Inbox', href: '#' }],
+          },
+        ],
+      },
+    });
+    const sidebar = document.querySelector('[data-slot="sidebar"]')!;
+
+    expect(sidebar.textContent).toContain('Context and search');
+    expect(sidebar.textContent).toContain('Main');
+    expect(
+      sidebar.querySelector('a[data-slot="sidebar-menu-button"][href="#"]'),
+    ).not.toBeNull();
+  });
+
+  it('puts the footer the host gives it in the sidebar footer', () => {
+    renderShell({
+      account,
+      sidebar: { groups: [], footer: <p>Account row</p> },
+    });
+    const footer = document.querySelector('[data-slot="sidebar-footer"]')!;
+
+    expect(footer.textContent).toContain('Account row');
+    // Settings is one of the host's core links now, not a shell footer link.
+    expect(footer.querySelector('a[href="/u/settings"]')).toBeNull();
+  });
+
+  it('shows no template navigation when the host gives no sidebar content', () => {
+    renderShell({ account });
+    const content = document.querySelector('[data-slot="sidebar-content"]')!;
+
+    expect(content.textContent).toBe('');
+    expect(screen.queryByText('Getting Started')).toBeNull();
+  });
+
   it('renders header actions', () => {
     renderShell({ headerActions: <button type="button">Action</button> });
 

@@ -7,10 +7,7 @@ import { reportCaughtError } from '@synapcity/frontend-error-reports';
 import { Button, buttonVariants } from '@synapcity/frontend-ui/core/button';
 import { ModeProvider } from '@synapcity/frontend-preferences';
 
-import {
-  MESSAGE_HEADING_ID,
-  MessagePage,
-} from '@/components/shells/message-page';
+import { MESSAGE_HEADING_ID, MessagePage } from '@synapcity/frontend-shells';
 import { fontVariables } from './fonts';
 
 /**

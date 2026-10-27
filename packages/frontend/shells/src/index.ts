@@ -1,7 +1,5 @@
-// The portable entry: the names consumers imported from `frontend-ui`'s
-// `blocks` entries before these components moved here. Internal pieces
-// (`RootSidebar`, `SidebarProviders`, `RootHeaderContent`) are not exported;
-// nothing outside the shell used them.
+// The portable entry. Internal pieces (`RootSidebar`, `RootHeaderContent`) are
+// not exported: hosts fill the sidebar through `RootShell`'s `sidebar` prop.
 export {
   RootShell,
   AuthenticatedShell,
@@ -16,5 +14,31 @@ export {
   GlobalPanelToggle,
 } from './components/root-shell/global-panel';
 export { SidebarShell } from './components/sidebar-shell';
-export { ContextSwitcher } from './components/context-switcher';
+export type {
+  RootSidebarContent,
+  RootSidebarGroup,
+  RootSidebarItem,
+} from './components/sidebar-shell/root-sidebar';
+export {
+  ShellLink,
+  ShellNavigationProvider,
+  type ShellLinkComponent,
+  type ShellNavigation,
+} from './providers/shell-navigation';
+export {
+  BreadcrumbRootShell,
+  SetBreadcrumbs,
+  activeContext,
+} from './components/breadcrumb-trail';
+export { AuthPageShell } from './components/auth-page-shell';
+export { MESSAGE_HEADING_ID, MessagePage } from './components/message-page';
+export {
+  ContextSwitcher,
+  type ContextOption,
+} from './components/context-switcher';
 export { SearchForm } from './components/search-form';
+export {
+  CommandPalette,
+  type CommandPaletteGroup,
+  type CommandPaletteItem,
+} from './components/command-palette';

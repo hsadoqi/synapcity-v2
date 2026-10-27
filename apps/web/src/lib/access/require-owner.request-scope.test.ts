@@ -29,7 +29,7 @@ import {
   getCurrentUser,
   getVerifiedClaims,
   getVerifiedIdentity,
-} from '@/features/auth/server/session';
+} from '../../features/auth/server/session';
 
 import { requireOwner } from './require-owner';
 

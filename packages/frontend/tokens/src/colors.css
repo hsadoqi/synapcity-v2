@@ -59,10 +59,12 @@
 }
 
 .light {
+  /* --sidebar, --link and --divider are owned by frontend-tailwind-config (it
+     is the adopted source; see the README's overlap list), so this plane does
+     not redeclare them. */
   /* Structural planes — darkest at the canvas, lighter moving outward */
   --background: var(--primary-50);
   --canvas: var(--primary-100);
-  --sidebar: var(--primary-200);
   --panel: var(--primary-100);
   --rail: var(--primary-50);
 
@@ -72,8 +74,8 @@
   --surface-default: var(--primary-100);
   --surface-raised: var(--primary-200);
   --surface-floating: var(--primary-300);
-  --surface-hover: rgb(255 255 255 / 0.045);
-  --surface-active: rgb(255 255 255 / 0.07);
+  --surface-hover: rgb(0 0 0 / 0.045);
+  --surface-active: rgb(0 0 0 / 0.07);
   --surface-selected: rgb(134 104 242 / 0.12);
 
   /* Foreground */
@@ -88,10 +90,9 @@
   /* Borders */
 
   /* Same value as --surface-active by design: a border role and a surface role that may diverge. */
-  --border-subtle: rgb(255 255 255 / 0.07);
-  --border-default: rgb(255 255 255 / 0.11);
-  --border-strong: color-mix(in srgb, var(--primary-0) 18%, transparent);
-  --divider: color-mix(in srgb, var(--primary-0) 6.5%, transparent);
+  --border-subtle: rgb(0 0 0 / 0.07);
+  --border-default: rgb(0 0 0 / 0.11);
+  --border-strong: color-mix(in srgb, var(--primary-1000) 18%, transparent);
 
   /* Accent semantics — notation only: focus, selection, links, relationships */
   --interactive: var(--accent-500);
@@ -101,7 +102,6 @@
   --focus-ring: var(--accent-600);
   --selection-outline: var(--accent-500);
   --selection-background: rgb(134 104 242 / 0.16);
-  --link: var(--accent-700);
   --link-hover: var(--accent-800);
   --relationship-line: var(--accent-600);
   --relationship-node: var(--accent-500);
@@ -124,10 +124,12 @@
 }
 
 .dark {
+  /* --sidebar, --link and --divider are owned by frontend-tailwind-config (it
+     is the adopted source; see the README's overlap list), so this plane does
+     not redeclare them. */
   /* Structural planes — darkest at the canvas, lighter moving outward */
   --background: var(--primary-950);
   --canvas: var(--primary-1000);
-  --sidebar: var(--primary-900);
   --panel: var(--primary-900);
   --rail: var(--primary-950);
 
@@ -156,7 +158,6 @@
   --border-subtle: rgb(255 255 255 / 0.07);
   --border-default: rgb(255 255 255 / 0.11);
   --border-strong: color-mix(in srgb, var(--primary-1000) 18%, transparent);
-  --divider: color-mix(in srgb, var(--primary-1000) 6.5%, transparent);
 
   /* Accent semantics — notation only: focus, selection, links, relationships */
   --interactive: var(--accent-500);
@@ -166,7 +167,6 @@
   --focus-ring: var(--accent-400);
   --selection-outline: var(--accent-500);
   --selection-background: rgb(134 104 242 / 0.16);
-  --link: var(--accent-300);
   --link-hover: var(--accent-200);
   --relationship-line: var(--accent-400);
   --relationship-node: var(--accent-500);

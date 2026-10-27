@@ -17,7 +17,7 @@ export function HomePageHeader({
         <time dateTime={dateTime}>{dateLabel}</time>
       </p>
       <h1 className="text-2xl font-semibold tracking-tight">
-        Welcome back, {user?.name || 'User'}
+        {user?.name ? `Welcome back, ${user.name}` : 'Welcome back'}
       </h1>
     </header>
   );

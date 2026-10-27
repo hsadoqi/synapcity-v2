@@ -1,6 +1,6 @@
 import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 
-import { MessagePage } from '@/components/shells/message-page';
+import { MessagePage } from '@synapcity/frontend-shells';
 
 /**
  * Shown when `notFound()` is called. Another person's `/<userId>/...` area is

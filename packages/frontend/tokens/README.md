@@ -15,10 +15,12 @@ Owns: the Precision Canvas token values (colour ramps and light and dark planes,
 
 `@synapcity/frontend-ui/styles.css` imports `tokens.css` after `@synapcity/frontend-tailwind-config`, so `apps/web` and Storybook load it once through that file.
 
-Because the token variables are unlayered and load last, they override the existing values wherever names overlap. In the files `tokens.css` loads, 35 names overlap:
+Because the token variables are unlayered and load last, they override the existing values wherever names overlap. In the files `tokens.css` loads, 32 names overlap:
 
 - On `:root`, so always: the `--primary-50` to `--primary-950` and `--accent-50` to `--accent-950` ramps, and `--radius-xs` to `--radius-xl`.
-- On `.light` and `.dark` only: `--background`, `--foreground`, `--divider`, `--link`, `--sidebar`, `--info-foreground`, `--success-foreground` and `--warning-foreground`. `apps/web` runs `next-themes` with `attribute="class"`, which sets one of the two on `<html>` before first paint, so in practice these apply too.
+- On `.light` and `.dark` only: `--background`, `--foreground`, `--info-foreground`, `--success-foreground` and `--warning-foreground`. `apps/web` runs `next-themes` with `attribute="class"`, which sets one of the two on `<html>` before first paint, so in practice these apply too.
+
+`--sidebar`, `--link` and `--divider` are no longer redeclared here. Overriding them made the light sidebar a heavy grey (the email in its account row fell to 4.20:1), turned links violet against the achromatic default, and made shell dividers white on white. `frontend-tailwind-config` owns them until the merge. The light plane's own `--surface-hover`, `--surface-active` and `--border-*` values are dark-on-light; they had been copied from the dark plane as white alphas, which disappear on a light surface.
 
 `tailwind-theme.css` overlaps on 35 more `--color-*` names, but nothing loads it.
 
