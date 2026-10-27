@@ -1,12 +1,18 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 
+import type { Database } from '../database-types';
+
 /** The request's cookies, as the host exposes them (Next.js `cookies()`). */
 export type RequestCookies = {
   getAll(): { name: string; value: string }[];
   set(name: string, value: string, options: CookieOptions): void;
 };
 
-/** The client a request builds; what data modules take as their first argument. */
+/**
+ * The client a request builds; what data modules take as their first argument.
+ * Typed from the generated `Database`, so queries and rows are checked against
+ * the schema (`pnpm db:types`).
+ */
 export type SupabaseServerClient = ReturnType<typeof createRequestClient>;
 
 /**
@@ -22,7 +28,7 @@ export function createRequestClient({
   publishableKey: string;
   cookies: RequestCookies;
 }) {
-  return createServerClient(url, publishableKey, {
+  return createServerClient<Database>(url, publishableKey, {
     cookies: {
       getAll() {
         return cookies.getAll();

@@ -1,8 +1,9 @@
-import type {
-  MetadataPatch,
-  ProviderFailure,
-  ProviderUser,
-  SupabaseServerClient,
+import {
+  toProviderFailure,
+  type MetadataPatch,
+  type ProviderFailure,
+  type ProviderUser,
+  type SupabaseServerClient,
 } from '@synapcity/server-supabase';
 
 import { withFullName } from '../profile-metadata';
@@ -32,7 +33,7 @@ export async function saveName(
     return {
       ok: false,
       failure: error
-        ? { code: error.code, status: (error as { status?: number }).status }
+        ? toProviderFailure(error)
         : { code: 'profile_row_missing' },
     };
   }

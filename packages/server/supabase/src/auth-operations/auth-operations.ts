@@ -1,9 +1,9 @@
-import {
-  isAuthRetryableFetchError,
-  isAuthSessionMissingError,
-} from '@supabase/supabase-js';
+import { isAuthRetryableFetchError } from '@supabase/supabase-js';
 import { isRateLimited, type OAuthProvider } from '@synapcity/domain-identity';
 
+import { classifyAuthError } from '../auth-errors';
+import { toProviderFailure, type ProviderFailure } from '../provider-failure';
+import { readProviderUser } from '../provider-user';
 import type { SupabaseServerClient } from '../request-client';
 
 /*
@@ -88,6 +88,52 @@ export async function requestRecoveryEmail(
   return { kind: 'accepted' };
 }
 
+/**
+ * Sends the sign-up confirmation email again. Like the recovery request, every
+ * outcome except a rate limit is `accepted`, so the reply cannot be used to
+ * learn which addresses have a pending sign-up.
+ */
+export async function resendSignupConfirmation(
+  supabase: SupabaseServerClient,
+  input: {
+    email: string;
+    /** Where the confirmation email returns to. Built by the action from configured origin. */
+    confirmationRedirect: string;
+  },
+): Promise<RecoveryOutcome> {
+  const { error } = await supabase.auth.resend({
+    type: 'signup',
+    email: input.email,
+    options: { emailRedirectTo: input.confirmationRedirect },
+  });
+
+  if (error?.code && isRateLimited(error.code)) {
+    return { kind: 'rate-limited', code: error.code };
+  }
+  return { kind: 'accepted' };
+}
+
+export type PasswordUpdateOutcome =
+  | { kind: 'updated'; userId: string }
+  | { kind: 'provider-error'; failure: ProviderFailure };
+
+/**
+ * Sets a new password for the signed-in person, as the reset link or the
+ * settings page leaves them. The failure carries its code and status only.
+ */
+export async function updateOwnPassword(
+  supabase: SupabaseServerClient,
+  input: { password: string },
+): Promise<PasswordUpdateOutcome> {
+  const { data, error } = await supabase.auth.updateUser({
+    password: input.password,
+  });
+  if (error)
+    return { kind: 'provider-error', failure: toProviderFailure(error) };
+  if (!data.user) return { kind: 'provider-error', failure: {} };
+  return { kind: 'updated', userId: data.user.id };
+}
+
 export type EmailChangeInput = {
   newEmail: string;
   /** Where the confirmation link returns to. Built by the action from configured origin. */
@@ -117,13 +163,10 @@ export async function changeEmail(
   supabase: SupabaseServerClient,
   input: EmailChangeInput,
 ): Promise<EmailChangeOutcome> {
-  const { data, error: userError } = await supabase.auth.getUser();
-  if (userError || !data.user) {
-    return isAuthRetryableFetchError(userError)
-      ? { kind: 'unavailable' }
-      : { kind: 'signed-out' };
-  }
-  if (data.user.email?.toLowerCase() === input.newEmail.toLowerCase()) {
+  const found = await readProviderUser(supabase);
+  if (found.kind !== 'user') return { kind: found.kind };
+  const { user } = found;
+  if (user.email?.toLowerCase() === input.newEmail.toLowerCase()) {
     return { kind: 'same-email' };
   }
 
@@ -135,11 +178,11 @@ export async function changeEmail(
 
   // Without email confirmation the provider applies the change at once, and
   // nothing is left pending. Saying a link was sent would then be untrue.
-  const user = updated?.user;
+  const updatedUser = updated?.user;
   if (
-    user &&
-    !user.new_email &&
-    user.email?.toLowerCase() === input.newEmail.toLowerCase()
+    updatedUser &&
+    !updatedUser.new_email &&
+    updatedUser.email?.toLowerCase() === input.newEmail.toLowerCase()
   ) {
     return { kind: 'changed' };
   }
@@ -165,13 +208,10 @@ export async function resendEmailChange(
     redirectTo: string;
   },
 ): Promise<ResendEmailChangeOutcome> {
-  const { data, error: userError } = await supabase.auth.getUser();
-  if (userError || !data.user) {
-    return isAuthRetryableFetchError(userError)
-      ? { kind: 'unavailable' }
-      : { kind: 'signed-out' };
-  }
-  const pending = data.user.new_email;
+  const found = await readProviderUser(supabase);
+  if (found.kind !== 'user') return { kind: found.kind };
+  const { user } = found;
+  const pending = user.new_email;
   if (!pending) return { kind: 'nothing-pending' };
 
   const { error } = await supabase.auth.resend({
@@ -205,13 +245,10 @@ export async function sendOwnPasswordReset(
     resetRedirect: string;
   },
 ): Promise<OwnPasswordResetOutcome> {
-  const { data, error: userError } = await supabase.auth.getUser();
-  if (userError || !data.user) {
-    return isAuthRetryableFetchError(userError)
-      ? { kind: 'unavailable' }
-      : { kind: 'signed-out' };
-  }
-  const email = data.user.email;
+  const found = await readProviderUser(supabase);
+  if (found.kind !== 'user') return { kind: found.kind };
+  const { user } = found;
+  const email = user.email;
   if (!email) return { kind: 'no-email' };
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -248,11 +285,7 @@ export async function startAccountLink(
     provider: input.provider,
     options: { redirectTo: input.redirectTo },
   });
-  if (error) {
-    if (isAuthSessionMissingError(error)) return { kind: 'signed-out' };
-    if (isAuthRetryableFetchError(error)) return { kind: 'unavailable' };
-    return { kind: 'provider-error', code: error.code };
-  }
+  if (error) return classifyAuthError(error);
   if (!data?.url) return { kind: 'provider-error', code: undefined };
   return { kind: 'redirect', url: data.url };
 }
@@ -280,11 +313,7 @@ export async function disconnectAccount(
   },
 ): Promise<DisconnectOutcome> {
   const { data, error } = await supabase.auth.getUserIdentities();
-  if (error) {
-    if (isAuthSessionMissingError(error)) return { kind: 'signed-out' };
-    if (isAuthRetryableFetchError(error)) return { kind: 'unavailable' };
-    return { kind: 'provider-error', code: error.code };
-  }
+  if (error) return classifyAuthError(error);
   const identities = data?.identities ?? [];
   const identity = identities.find((item) => item.provider === input.provider);
   if (!identity) return { kind: 'not-connected' };

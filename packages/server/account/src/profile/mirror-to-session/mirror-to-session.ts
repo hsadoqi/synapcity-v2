@@ -1,8 +1,9 @@
-import type {
-  MetadataPatch,
-  ProviderFailure,
-  ProviderUser,
-  SupabaseServerClient,
+import {
+  toProviderFailure,
+  type MetadataPatch,
+  type ProviderFailure,
+  type ProviderUser,
+  type SupabaseServerClient,
 } from '@synapcity/server-supabase';
 
 export type SessionMirrored =
@@ -34,7 +35,7 @@ export async function mirrorToSession(
     return {
       ok: false,
       step: 'updateUser',
-      failure: { code: updateError.code, status: updateError.status },
+      failure: toProviderFailure(updateError),
     };
   }
   const { error: refreshError } = await client.auth.refreshSession();
@@ -42,7 +43,7 @@ export async function mirrorToSession(
     return {
       ok: false,
       step: 'refreshSession',
-      failure: { code: refreshError.code, status: refreshError.status },
+      failure: toProviderFailure(refreshError),
     };
   }
   return { ok: true };

@@ -4,13 +4,12 @@ import {
   type AvatarRequest,
 } from '@synapcity/server-account';
 
-import {
-  logFailure,
-  SAVE_FAILED,
-  type Caller,
-  type MetadataPatch,
-  type Supabase,
-} from './caller';
+import type { SupabaseServerClient } from '@synapcity/server-supabase';
+
+import { SAVE_FAILED } from '@/lib/access/caller';
+import { logFailure } from '@/lib/log-failure';
+
+import type { Caller, MetadataPatch } from './caller';
 
 export { removeOldAvatars, type AvatarRequest };
 
@@ -30,7 +29,7 @@ export type AvatarSaved =
  * package returns why it failed; the words and the log lines are owned here.
  */
 export async function saveAvatar(
-  supabase: Supabase,
+  supabase: SupabaseServerClient,
   caller: Caller,
   request: AvatarRequest,
 ): Promise<AvatarSaved> {

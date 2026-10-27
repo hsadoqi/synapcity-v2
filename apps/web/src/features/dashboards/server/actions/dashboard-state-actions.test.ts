@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   getUser: vi.fn(),
-  setOwnedRecordPinned: vi.fn(),
+  setRecordPinned: vi.fn(),
   fixtureModeEnabled: vi.fn(() => false),
 }));
 
@@ -14,8 +14,8 @@ vi.mock('@/lib/access/dev-fixture', () => ({
   FIXTURE_MESSAGE: 'Saving is off in fixture mode.',
   fixtureModeEnabled: mocks.fixtureModeEnabled,
 }));
-vi.mock('@/lib/owned-records', () => ({
-  setOwnedRecordPinned: mocks.setOwnedRecordPinned,
+vi.mock('@synapcity/server-data', () => ({
+  setRecordPinned: mocks.setRecordPinned,
 }));
 
 import { setDashboardPinned } from './dashboard-state-actions';
@@ -30,7 +30,7 @@ beforeEach(() => {
     data: { user: { id: 'user-1' } },
     error: null,
   });
-  mocks.setOwnedRecordPinned.mockResolvedValue({
+  mocks.setRecordPinned.mockResolvedValue({
     ok: true,
     pinnedAt: '2026-10-18T12:00:00+00:00',
   });
@@ -42,7 +42,7 @@ describe('setDashboardPinned', () => {
       ok: true,
       pinnedAt: '2026-10-18T12:00:00+00:00',
     });
-    expect(mocks.setOwnedRecordPinned).toHaveBeenCalledWith(
+    expect(mocks.setRecordPinned).toHaveBeenCalledWith(
       expect.anything(),
       'dashboards',
       ID,
@@ -60,7 +60,7 @@ describe('setDashboardPinned', () => {
       ok: false,
     });
     expect(mocks.getUser).not.toHaveBeenCalled();
-    expect(mocks.setOwnedRecordPinned).not.toHaveBeenCalled();
+    expect(mocks.setRecordPinned).not.toHaveBeenCalled();
   });
 
   it('reports signed-out callers', async () => {
@@ -70,11 +70,11 @@ describe('setDashboardPinned', () => {
       ok: false,
       signedOut: true,
     });
-    expect(mocks.setOwnedRecordPinned).not.toHaveBeenCalled();
+    expect(mocks.setRecordPinned).not.toHaveBeenCalled();
   });
 
   it('reports a failed save in plain words', async () => {
-    mocks.setOwnedRecordPinned.mockResolvedValue({
+    mocks.setRecordPinned.mockResolvedValue({
       ok: false,
       error: { code: '42501' },
     });
@@ -92,7 +92,7 @@ describe('setDashboardPinned', () => {
       ok: false,
       error: 'Saving is off in fixture mode.',
     });
-    expect(mocks.setOwnedRecordPinned).not.toHaveBeenCalled();
+    expect(mocks.setRecordPinned).not.toHaveBeenCalled();
   });
 });
 
@@ -107,7 +107,7 @@ describe('setDashboardPinned caller identity', () => {
       ok: false,
       error: 'Could not save your changes. Try again.',
     });
-    expect(mocks.setOwnedRecordPinned).not.toHaveBeenCalled();
+    expect(mocks.setRecordPinned).not.toHaveBeenCalled();
   });
 
   it('asks a signed-out caller to sign in again and logs it by code only', async () => {
@@ -122,6 +122,6 @@ describe('setDashboardPinned caller identity', () => {
       code: undefined,
       status: undefined,
     });
-    expect(mocks.setOwnedRecordPinned).not.toHaveBeenCalled();
+    expect(mocks.setRecordPinned).not.toHaveBeenCalled();
   });
 });

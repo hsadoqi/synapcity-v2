@@ -16,18 +16,14 @@ import { describe, expect, it } from 'vitest';
  */
 const ALLOWED: Record<string, { calls: number; reason: string }> = {
   'features/auth/server/session/session.ts': {
-    calls: 2,
+    calls: 1,
     reason:
-      'Canonical claims read (getVerifiedClaims, reused by the boundary) and the provider record for display (M7).',
+      'The canonical claims read (getVerifiedClaims), memoized per request and reused by the boundary. Kept: it is the one place a page reads claims.',
   },
   'features/auth/server/operations/operations.ts': {
     calls: 2,
     reason:
       'The account-deletion operations (provider user record and claims) stay until the delete-account flow moves (M7.5). The other operations moved to server-supabase in M7.2.',
-  },
-  'app/auth/update-password/page.tsx': {
-    calls: 1,
-    reason: 'Reads session claims for the password flow (M7).',
   },
   'lib/supabase/middleware.ts': {
     calls: 1,

@@ -1,32 +1,21 @@
-import type { SupabaseServerClient } from '@synapcity/server-supabase';
+import {
+  toProviderFailure,
+  type ProviderFailure,
+  type SupabaseServerClient,
+} from '@synapcity/server-supabase';
+
+import { setRecordPinned, type PinnedOutcome } from '../../records';
 
 /** A view recorded less than this long ago is not recorded again. */
 const VIEW_THROTTLE_MS = 60_000;
 
-/**
- * Pins or unpins one of the caller's spaces. The browser asks for a change; the
- * database stamps the time, so `pinnedAt` in the result is the server's own.
- * Row-level security limits the write to the caller's own spaces, and `select`
- * returns the written row so a write it turned away cannot look saved.
- */
-export async function setSpacePinned(
+/** Pins or unpins one of the caller's spaces (see `setRecordPinned`). */
+export function setSpacePinned(
   client: SupabaseServerClient,
   spaceId: string,
   pinned: boolean,
-): Promise<
-  { ok: true; pinnedAt: string | null } | { ok: false; error: unknown }
-> {
-  const { data, error } = await client
-    .from('spaces')
-    // Any non-null value means "pin"; the database replaces it with its clock.
-    .update({ pinned_at: pinned ? new Date().toISOString() : null })
-    .eq('id', spaceId)
-    .select('pinned_at');
-
-  if (error || !data?.length) {
-    return { ok: false, error: error ?? { code: 'row_not_written' } };
-  }
-  return { ok: true, pinnedAt: data[0]?.pinned_at ?? null };
+): Promise<PinnedOutcome> {
+  return setRecordPinned(client, 'spaces', spaceId, pinned);
 }
 
 /**
@@ -38,7 +27,7 @@ export async function recordSpaceView(
   client: SupabaseServerClient,
   spaceId: string,
   now: Date,
-): Promise<{ ok: true } | { ok: false; error: unknown }> {
+): Promise<{ ok: true } | { ok: false; error: ProviderFailure }> {
   const cutoff = new Date(now.getTime() - VIEW_THROTTLE_MS).toISOString();
   const { error } = await client
     .from('spaces')
@@ -46,5 +35,5 @@ export async function recordSpaceView(
     .eq('id', spaceId)
     .or(`last_viewed_at.is.null,last_viewed_at.lt.${cutoff}`);
 
-  return error ? { ok: false, error } : { ok: true };
+  return error ? { ok: false, error: toProviderFailure(error) } : { ok: true };
 }

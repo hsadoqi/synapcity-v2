@@ -5,4 +5,4 @@ export {
   recordFromRow,
   type OwnedRow,
   type SpaceSummaryRow,
-} from './space-row';
+} from './owned-row';
