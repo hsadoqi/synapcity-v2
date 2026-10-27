@@ -1,6 +1,6 @@
 # Dashboard and Widget MVP
 
-**Status:** Proposed (2026-10-27). Needs the owner's decisions in section 6 before any schema change.
+**Status:** Superseded (2026-10-27). After the [review](2026-10-27-dashboard-widgets-mvp-review.md) and the owner's decisions, this design is split into [spec A: Dashboard page and composition persistence](2026-10-27-dashboard-page-composition-design.md) and [spec B: widget data and functional widgets](2026-10-27-dashboard-widget-data-design.md). The text below is kept unchanged for lineage; where it conflicts with spec A, spec B or [ADR-0016](../../architecture/decisions/0016-dashboard-composition-storage.md), they govern. Previous status: Proposed (2026-10-27). Needs the owner's decisions in section 6 before any schema change.
 **Date:** 2026-10-27
 **Requested by:** Repository owner, who moved Dashboards and Widgets ahead of Documents and Quick Capture without removing either.
 **Governing:** `PRODUCT.md` (Dashboards and Widgets; open decision "widget lifecycle and source/input model"), `docs/glossary.md` (Dashboard, Widget: adopted concepts, strong working terms), [ADR-0013](../../architecture/decisions/0013-document-and-dashboard-persistence.md) (the `dashboards` record and its routes), [ADR-0010](../../architecture/decisions/0010-preference-persistence.md) (the JSON-document-per-row precedent), [ADR-0014](../../architecture/decisions/0014-multi-app-package-boundaries.md).

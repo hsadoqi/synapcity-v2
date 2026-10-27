@@ -70,6 +70,31 @@ Owner request of 2026-10-29: one explicit owner for brand geometry, React compon
 - Evidence: `pnpm verify` exit 0 with CI's placeholder Supabase values (unit and component tests in every package, web 686; e2e 66 passed and 5 skipped, the existing authenticated-session skips; Storybook 523 with axe; build). Earlier runs on the way: one web test (`quick-create-dialog.dom.test.tsx`) failed once under full-suite load and passed alone three times and in the two later full runs; two exploration stories failed axe (scrollable placeholders without keyboard access), fixed. Manual, in Storybook, light and dark: header and switcher at 1440, 620 and 400px, the narrow sidebar sheet (Escape closes it, focus returns to the toggle), breadcrumb collapse. Not verified: the switcher in the running app with fixture Spaces, screen-reader output.
 - Deferred, not an approved task: an icon picker for Spaces (a visual and product exploration; ADR-0012 excludes it and requires any future picker to offer installed names only).
 
+## Active task: Dashboard MVP design split (2026-10-27)
+
+- Goal and mode: documentation only, no implementation (owner direction). Revise and split the Dashboard and Widget MVP design after its review. Branch `docs/dashboard-mvp-split`, from `main` at `7220291e` (#77). Worktree `synapcity.worktrees/dashboard-mvp-docs`.
+- Owner decisions (2026-10-27), each the review's recommendation:
+  - composition in a separate one-to-one table with a revision number (D2, option B2);
+  - first widgets are read-only views of existing data: Pinned, Last opened, Spaces (D3, option C2);
+  - Dashboards become a separate track, leaving the Quick Capture first slice unchanged;
+  - removing a widget deletes it, with Undo, and no hidden or archived status is persisted.
+- Created:
+  - `docs/superpowers/specs/2026-10-27-dashboard-widgets-mvp-review.md` (the review, saved verbatim apart from removed teaching notes and repository-relative links);
+  - `docs/superpowers/specs/2026-10-27-dashboard-page-composition-design.md` (spec A, Proposed);
+  - `docs/superpowers/specs/2026-10-27-dashboard-widget-data-design.md` (spec B, Blocked);
+  - `docs/architecture/decisions/0016-dashboard-composition-storage.md` (Proposed).
+- Updated:
+  - the superseded design's status line (its text is kept);
+  - the ADR index;
+  - `docs/product/non-goals.md` (Dashboards track section);
+  - this ledger.
+- Not changed: source, packages, migrations, dependencies, `first-slice.md`, `mvp.md`, `PRODUCT.md`, the glossary.
+- Still open for the owner:
+  - ADR-0016's durable names and its acceptance;
+  - the widget labels;
+  - everything in spec B, section 2 (first, whether Task, Goal or Habit may enter the product).
+- Verification: Prettier on the changed files; `pnpm verify` is not needed for documentation-only changes but runs in CI on the pull request.
+
 ## Active task: Quick Create remediation (2026-10-27)
 
 - Goal and mode: implementing. The owner directed this remediation on 2026-10-27, after a report-only review of `integrate/shells-sidebar-main` and `feat/create-records` (through `bf6280d3`), delegating routine implementation, test and documentation decisions. Branch `feat/create-records`, worktree `synapcity.worktrees/create-records`, local commits only: no push, merge or hosted database change.
