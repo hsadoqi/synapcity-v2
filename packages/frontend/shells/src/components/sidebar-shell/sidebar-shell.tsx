@@ -8,10 +8,6 @@ import {
 } from '@synapcity/frontend-ui/core/sidebar';
 import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
 import { GlobalPanelShell } from '../root-shell/global-panel';
-import {
-  ContextualPanelShell,
-  type ContextualPanelDestination,
-} from '../contextual-panel';
 
 /** Below this container width the sidebar folds to icons; at or above it, it opens. */
 const WIDE_ENOUGH_PX = 1024;
@@ -54,14 +50,11 @@ export const SidebarShell = ({
   sidebar,
   children,
   globalPanel,
-  contextualPanel,
 }: {
   header: React.ReactNode | null;
   sidebar: React.ReactNode;
   children: React.ReactNode;
   globalPanel?: React.ReactNode;
-  /** The contextual panel's destinations; without any, there is no panel or rail. */
-  contextualPanel?: readonly ContextualPanelDestination[];
 }) => {
   const { ref, open, setOpen } = useFitToContainer();
 
@@ -82,13 +75,7 @@ export const SidebarShell = ({
             container. */}
         <SidebarInset className="min-h-0 min-w-0 overflow-hidden">
           <GlobalPanelShell header={header} panel={globalPanel}>
-            {contextualPanel?.length ? (
-              <ContextualPanelShell destinations={contextualPanel}>
-                {children}
-              </ContextualPanelShell>
-            ) : (
-              children
-            )}
+            {children}
           </GlobalPanelShell>
         </SidebarInset>
       </SidebarProvider>

@@ -19,6 +19,7 @@ export {
   useContextualPanel,
   type ContextualPanelDestination,
 } from './components/contextual-panel';
+export { ResourceFrame, ResourceHeader } from './components/resource-frame';
 export type {
   RootSidebarContent,
   RootSidebarGroup,
