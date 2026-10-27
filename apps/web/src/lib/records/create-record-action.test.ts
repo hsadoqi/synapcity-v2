@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   createRecord: vi.fn(),
   revalidatePath: vi.fn(),
   fixtureModeEnabled: vi.fn(() => false),
+  serverSpaceSource: vi.fn(),
 }));
 
 vi.mock('next/cache', () => ({ revalidatePath: mocks.revalidatePath }));
@@ -19,6 +20,14 @@ vi.mock('@/lib/access/dev-fixture', () => ({
 vi.mock('@synapcity/server-data', () => ({
   createRecord: mocks.createRecord,
 }));
+
+// The real Space source, watched, so the test sees Spaces go through it.
+vi.mock('@synapcity/features-spaces/server', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('@synapcity/features-spaces/server')>();
+  mocks.serverSpaceSource.mockImplementation(actual.serverSpaceSource);
+  return { ...actual, serverSpaceSource: mocks.serverSpaceSource };
+});
 
 import { createRecord } from './create-record-action';
 
@@ -129,6 +138,43 @@ describe('createRecord', () => {
       status: undefined,
     });
     expect(mocks.revalidatePath).not.toHaveBeenCalled();
+  });
+
+  it('creates a Space through the Space source, not a table of its own', async () => {
+    await createRecord('space', 'Garden plans');
+    expect(mocks.serverSpaceSource).toHaveBeenCalledTimes(1);
+
+    await createRecord('document', 'Launch plan');
+    expect(mocks.serverSpaceSource).toHaveBeenCalledTimes(1);
+  });
+
+  it('tells a signed-out caller to sign in again to save', async () => {
+    mocks.getUser.mockResolvedValue({ data: { user: null }, error: null });
+
+    await expect(createRecord('document', 'Launch plan')).resolves.toEqual({
+      ok: false,
+      error: 'Sign in again to save your changes.',
+      signedOut: true,
+    });
+  });
+
+  it('reports a cut-off save as unconfirmed and still refreshes the lists', async () => {
+    mocks.createRecord.mockResolvedValue({
+      ok: false,
+      error: { code: '', status: 0 },
+    });
+
+    await expect(createRecord('space', 'Garden plans')).resolves.toEqual({
+      ok: false,
+      error: 'Could not save your changes. Try again.',
+      unconfirmed: true,
+    });
+    expect(console.warn).toHaveBeenCalledWith('createRecord failed', {
+      kind: 'space',
+      code: '',
+      status: 0,
+    });
+    expect(mocks.revalidatePath).toHaveBeenCalledWith('/', 'layout');
   });
 
   it('saves nothing in fixture mode', async () => {

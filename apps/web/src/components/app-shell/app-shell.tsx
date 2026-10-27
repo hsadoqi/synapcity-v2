@@ -43,6 +43,17 @@ export function AppShell({
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [creating, setCreating] = useState<CollectionKind | null>(null);
+  // The control that asked to create, so closing the dialog can return focus
+  // to it; read in the event handler, before the dialog takes focus.
+  const [createOpener, setCreateOpener] = useState<HTMLElement | null>(null);
+  const startCreating = (kind: CollectionKind) => {
+    setCreateOpener(
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null,
+    );
+    setCreating(kind);
+  };
 
   const openPalette = () => {
     setSearch('');
@@ -59,30 +70,34 @@ export function AppShell({
               appSidebar(userId, trail, pathname, {
                 records,
                 onOpenPalette: openPalette,
-                onCreate: setCreating,
+                onCreate: startCreating,
                 footer: sidebarFooter,
               })
           : undefined
       }
     >
-      <QuickCreateProvider value={setCreating}>{children}</QuickCreateProvider>
+      <QuickCreateProvider value={startCreating}>
+        {children}
+      </QuickCreateProvider>
       {userId && (
         <>
           <CommandPalette
             open={paletteOpen}
             onOpenChange={setPaletteOpen}
-            groups={appPaletteGroups(userId, records, setCreating)}
+            groups={appPaletteGroups(userId, records, startCreating)}
             onNavigate={(href) => router.push(href)}
             search={search}
             onSearchChange={setSearch}
           />
           <QuickCreateDialog
             kind={creating}
+            returnFocus={createOpener}
             userId={userId}
             onOpenChange={(open) => {
               if (!open) setCreating(null);
             }}
             onCreated={(href) => router.push(href)}
+            onUnconfirmed={() => router.refresh()}
           />
         </>
       )}

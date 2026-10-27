@@ -76,7 +76,12 @@ export async function setRecordPinned(
   return { ok: true, pinnedAt: data[0]?.pinned_at ?? null };
 }
 
-/** What creating reports: the new row's id, or the failure by code and status. */
+/**
+ * What creating reports: the new row's id, or the failure by code and status.
+ * A failure with a code came from the database or PostgREST, so nothing was
+ * written. A failure without one (a dropped connection, a gateway timeout) is
+ * not proof either way: the row may exist.
+ */
 export type CreatedOutcome =
   { ok: true; id: string } | { ok: false; error: ProviderFailure };
 
@@ -90,12 +95,13 @@ export async function createRecord(
   table: 'spaces' | RecordKind,
   input: { name: string },
 ): Promise<CreatedOutcome> {
-  const { data, error } = await client
+  const { data, error, status } = await client
     .from(table)
     .insert({ name: input.name })
     .select('id')
     .single();
 
-  if (error) return { ok: false, error: toProviderFailure(error) };
+  if (error)
+    return { ok: false, error: toProviderFailure({ ...error, status }) };
   return { ok: true, id: data.id };
 }

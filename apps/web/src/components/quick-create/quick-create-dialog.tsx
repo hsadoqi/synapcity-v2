@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useId, useState, useTransition, type FormEvent } from 'react';
+import { useId, useRef, useState, useTransition, type FormEvent } from 'react';
 import { Button, buttonVariants } from '@synapcity/frontend-ui/core/button';
 import {
   Dialog,
@@ -28,19 +28,27 @@ import { collectionFor, type CollectionKind } from '../collections';
 
 const NAME_NEEDED = 'Give it a name.';
 
+const unconfirmedMessage = (singular: string, label: string) =>
+  `We could not confirm that the ${singular} was created. Check ${label} in the sidebar before you try again.`;
+
 type Failure = { message: string; signedOut: boolean };
 
 /**
  * A small dialog for starting a Space, document or dashboard by name. On
  * success it closes and hands the new record's page (or, while a kind has no
  * page for one record, its list) to `onCreated`. A failed save keeps the typed
- * name and says why; a signed-out session gets a sign-in link.
+ * name and says why; a signed-out session gets a sign-in link. While it saves
+ * it cannot be closed, so a save never finishes behind a closed dialog. When
+ * the outcome is unknown (the request was cut off), it says so instead of
+ * inviting a second copy, and asks the host to refresh with `onUnconfirmed`.
  */
 export function QuickCreateDialog({
   kind,
   userId,
   onOpenChange,
   onCreated,
+  onUnconfirmed,
+  returnFocus,
   create = createRecord,
 }: {
   /** What to create; the dialog is closed while this is null. */
@@ -50,6 +58,13 @@ export function QuickCreateDialog({
   onOpenChange: (open: boolean) => void;
   /** Where to go once it exists. */
   onCreated: (href: string) => void;
+  /** The save may have gone through; refresh what lists it. */
+  onUnconfirmed: () => void;
+  /**
+   * The control that opened the dialog. The dialog is opened from state, not
+   * by a Base UI trigger, so without this focus would fall to the page body.
+   */
+  returnFocus?: HTMLElement | null;
   /** The Server Action; replaceable in tests and stories. */
   create?: (kind: CollectionKind, name: string) => Promise<CreateRecordResult>;
 }) {
@@ -58,6 +73,9 @@ export function QuickCreateDialog({
   const [name, setName] = useState('');
   const [failure, setFailure] = useState<Failure | null>(null);
   const [pending, startTransition] = useTransition();
+  // Set at once, before React re-renders with `pending`, so a second submit in
+  // the same tick is refused too.
+  const submitting = useRef(false);
   const collection = kind ? collectionFor(kind) : null;
 
   const reset = () => {
@@ -67,28 +85,46 @@ export function QuickCreateDialog({
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!collection || pending) return;
+    if (!collection || pending || submitting.current) return;
     if (name.trim() === '') {
       setFailure({ message: NAME_NEEDED, signedOut: false });
       return;
     }
     setFailure(null);
+    submitting.current = true;
     startTransition(async () => {
-      const result = await create(collection.kind, name);
-      if (!result.ok) {
-        setFailure({
-          message: result.error,
-          signedOut: result.signedOut === true,
-        });
-        return;
+      try {
+        let result: CreateRecordResult;
+        try {
+          result = await create(collection.kind, name);
+        } catch {
+          // The request failed on the way or the action threw: the record
+          // may or may not exist.
+          result = { ok: false, error: '', unconfirmed: true };
+        }
+        if (!result.ok) {
+          if (result.unconfirmed) onUnconfirmed();
+          setFailure({
+            message: result.unconfirmed
+              ? unconfirmedMessage(
+                  collection.singular,
+                  collection.label.toLowerCase(),
+                )
+              : result.error,
+            signedOut: result.signedOut === true,
+          });
+          return;
+        }
+        reset();
+        onOpenChange(false);
+        onCreated(
+          collection.itemHref
+            ? collection.itemHref(userId, result.id)
+            : collection.indexHref(userId),
+        );
+      } finally {
+        submitting.current = false;
       }
-      reset();
-      onOpenChange(false);
-      onCreated(
-        collection.itemHref
-          ? collection.itemHref(userId, result.id)
-          : collection.indexHref(userId),
-      );
     });
   };
 
@@ -96,13 +132,21 @@ export function QuickCreateDialog({
     <Dialog
       open={kind !== null}
       onOpenChange={(open) => {
+        if (!open && pending) return;
         if (!open) reset();
         onOpenChange(open);
       }}
     >
       {collection && (
-        <DialogContent>
-          <form className="flex flex-col gap-4" onSubmit={submit} noValidate>
+        <DialogContent
+          finalFocus={() => (returnFocus?.isConnected ? returnFocus : true)}
+        >
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={submit}
+            noValidate
+            aria-busy={pending}
+          >
             <DialogHeader>
               <DialogTitle>New {collection.singular}</DialogTitle>
               <DialogDescription>
@@ -117,6 +161,7 @@ export function QuickCreateDialog({
                 autoComplete="off"
                 autoFocus
                 value={name}
+                readOnly={pending}
                 onChange={(event) => setName(event.target.value)}
                 aria-invalid={failure ? true : undefined}
                 aria-describedby={failure ? errorId : undefined}
@@ -142,7 +187,10 @@ export function QuickCreateDialog({
               )}
             </Field>
             <DialogFooter>
-              <DialogClose render={<Button variant="outline" />}>
+              <DialogClose
+                render={<Button variant="outline" />}
+                disabled={pending}
+              >
                 Cancel
               </DialogClose>
               <Button type="submit" disabled={pending}>

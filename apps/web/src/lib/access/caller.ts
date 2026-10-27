@@ -7,7 +7,10 @@ import {
 
 import { logFailure } from '../log-failure';
 
+/** The profile actions' signed-out message (`features/account/server/caller.ts`). */
 export const SIGN_IN_AGAIN = 'Sign in again to update your profile.';
+/** Every other Server Action's signed-out message. */
+export const SIGN_IN_TO_SAVE = 'Sign in again to save your changes.';
 export const SAVE_FAILED = 'Could not save your changes. Try again.';
 
 /** Who is asking, through the identity boundary, or the message to show instead. */
@@ -29,5 +32,5 @@ export async function getCallerIdentity(
   if (result.status === 'verified') return { identity: result.identity };
   logFailure('getCallerIdentity', failure);
   if (result.status === 'unavailable') return { failure: SAVE_FAILED };
-  return { failure: SIGN_IN_AGAIN, signedOut: true };
+  return { failure: SIGN_IN_TO_SAVE, signedOut: true };
 }

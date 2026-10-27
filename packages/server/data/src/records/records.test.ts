@@ -16,7 +16,11 @@ const row = {
 };
 
 /** A stand-in for the query builder: every method returns it, and awaiting it gives `result`. */
-function clientReturning(result: { data: unknown; error: unknown }) {
+function clientReturning(result: {
+  data: unknown;
+  error: unknown;
+  status?: number;
+}) {
   const builder: Record<string, unknown> = {};
   for (const method of [
     'select',
@@ -183,5 +187,17 @@ describe('createRecord', () => {
     await expect(
       createRecord(client, 'documents', { name: 'x' }),
     ).resolves.toStrictEqual({ ok: false, error: { code: '23514' } });
+  });
+
+  it('keeps the response status, so a dropped request reads as unconfirmed', async () => {
+    const { client } = clientReturning({
+      data: null,
+      error: { code: '', message: 'TypeError: fetch failed' },
+      status: 0,
+    });
+
+    await expect(
+      createRecord(client, 'spaces', { name: 'x' }),
+    ).resolves.toStrictEqual({ ok: false, error: { code: '', status: 0 } });
   });
 });

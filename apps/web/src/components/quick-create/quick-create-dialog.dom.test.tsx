@@ -10,6 +10,7 @@ import { QuickCreateDialog } from '.';
 const create = vi.fn();
 const onCreated = vi.fn();
 const onOpenChange = vi.fn();
+const onUnconfirmed = vi.fn();
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -24,6 +25,7 @@ function renderDialog(kind: 'space' | 'document' | 'dashboard' | null) {
       create={create}
       onCreated={onCreated}
       onOpenChange={onOpenChange}
+      onUnconfirmed={onUnconfirmed}
     />,
   );
 }
@@ -129,7 +131,7 @@ describe('QuickCreateDialog', () => {
   it('offers sign-in when the session has ended', async () => {
     create.mockResolvedValue({
       ok: false,
-      error: 'Sign in again to update your profile.',
+      error: 'Sign in again to save your changes.',
       signedOut: true,
     });
     renderDialog('space');
@@ -149,5 +151,121 @@ describe('QuickCreateDialog', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Cancel' }));
     expect(onOpenChange).toHaveBeenCalledWith(false);
     expect(create).not.toHaveBeenCalled();
+  });
+
+  it('cannot be closed while it saves, so the save never finishes unseen', async () => {
+    let finish!: (value: unknown) => void;
+    create.mockReturnValue(new Promise((resolve) => (finish = resolve)));
+    renderDialog('space');
+    await typeName('Garden plans');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Create' }));
+    const cancel = await screen.findByRole('button', { name: 'Cancel' });
+    expect((cancel as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(cancel);
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+    expect(onOpenChange).not.toHaveBeenCalled();
+
+    finish({ ok: true, id: 'new-id' });
+    await waitFor(() =>
+      expect(onCreated).toHaveBeenCalledWith('/user-1/home/spaces/new-id'),
+    );
+  });
+
+  it('sends one save for two submits in the same moment', async () => {
+    renderDialog('document');
+    await typeName('Launch plan');
+    const form = screen
+      .getByRole('button', { name: 'Create' })
+      .closest('form')!;
+
+    fireEvent.submit(form);
+    fireEvent.submit(form);
+
+    await waitFor(() => expect(onCreated).toHaveBeenCalled());
+    expect(create).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the name and says it may exist when the request fails on the way', async () => {
+    create.mockRejectedValue(new TypeError('Failed to fetch'));
+    renderDialog('space');
+    const name = await typeName('Garden plans');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Create' }));
+
+    expect((await screen.findByRole('alert')).textContent).toBe(
+      'We could not confirm that the space was created. Check spaces in the sidebar before you try again.',
+    );
+    expect(name.value).toBe('Garden plans');
+    expect(onUnconfirmed).toHaveBeenCalledTimes(1);
+    expect(onCreated).not.toHaveBeenCalled();
+    expect(
+      (screen.getByRole('button', { name: 'Create' }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(false);
+  });
+
+  it('treats an unconfirmed result from the server the same way', async () => {
+    create.mockResolvedValue({
+      ok: false,
+      error: 'Could not save your changes. Try again.',
+      unconfirmed: true,
+    });
+    renderDialog('dashboard');
+    await typeName('Launch plan');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Create' }));
+
+    expect((await screen.findByRole('alert')).textContent).toContain(
+      'We could not confirm that the dashboard was created.',
+    );
+    expect(onUnconfirmed).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not refresh for a refusal the database answered', async () => {
+    create.mockResolvedValue({
+      ok: false,
+      error: 'Could not save your changes. Try again.',
+    });
+    renderDialog('document');
+    await typeName('Launch plan');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Create' }));
+
+    await screen.findByRole('alert');
+    expect(onUnconfirmed).not.toHaveBeenCalled();
+  });
+
+  it('returns focus to the control that opened it', async () => {
+    const opener = document.createElement('button');
+    opener.textContent = 'New space';
+    document.body.append(opener);
+    const { rerender } = render(
+      <QuickCreateDialog
+        kind="space"
+        userId="user-1"
+        create={create}
+        onCreated={onCreated}
+        onOpenChange={onOpenChange}
+        onUnconfirmed={onUnconfirmed}
+        returnFocus={opener}
+      />,
+    );
+    await screen.findByRole('dialog');
+
+    rerender(
+      <QuickCreateDialog
+        kind={null}
+        userId="user-1"
+        create={create}
+        onCreated={onCreated}
+        onOpenChange={onOpenChange}
+        onUnconfirmed={onUnconfirmed}
+        returnFocus={opener}
+      />,
+    );
+
+    await waitFor(() => expect(document.activeElement).toBe(opener));
+    opener.remove();
   });
 });

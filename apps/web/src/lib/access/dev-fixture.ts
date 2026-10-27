@@ -12,7 +12,7 @@ import {
 export const FIXTURE_USER_ID = 'fixture-user';
 
 export const FIXTURE_MESSAGE =
-  'Fixture mode is on, so account actions are unavailable. Unset SYNAPCITY_DEV_AUTH to use real sign-in.';
+  'Fixture mode is on, so signing in and saving are unavailable. Unset SYNAPCITY_DEV_AUTH to use real sign-in.';
 
 /**
  * Read on every call, not at import, so tests and a restarted dev server see

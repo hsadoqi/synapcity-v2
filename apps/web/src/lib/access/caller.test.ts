@@ -31,7 +31,7 @@ describe('getCallerIdentity', () => {
     });
 
     await expect(getCallerIdentity(supabase)).resolves.toEqual({
-      failure: 'Sign in again to update your profile.',
+      failure: 'Sign in again to save your changes.',
       signedOut: true,
     });
     expect(console.warn).toHaveBeenCalledWith('getCallerIdentity failed', {
