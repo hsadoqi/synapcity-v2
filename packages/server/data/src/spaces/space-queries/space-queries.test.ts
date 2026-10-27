@@ -91,10 +91,10 @@ describe('space queries', () => {
     });
 
     it('reports a database error', async () => {
-      queryReturning({ data: null, error: { message: 'boom' } });
+      queryReturning({ data: null, error: { code: '42501', message: 'boom' } });
 
       await expect(listSpaces(client)).rejects.toThrow(
-        'Failed to load spaces: boom',
+        'Failed to load spaces (code 42501)',
       );
     });
 
@@ -146,10 +146,10 @@ describe('space queries', () => {
     });
 
     it('reports a database error', async () => {
-      queryReturning({ data: null, error: { message: 'boom' } });
+      queryReturning({ data: null, error: { code: '42501', message: 'boom' } });
 
       await expect(listSpaceSummaries(client)).rejects.toThrow(
-        'Failed to load spaces: boom',
+        'Failed to load spaces (code 42501)',
       );
     });
   });
@@ -178,10 +178,10 @@ describe('space queries', () => {
     });
 
     it('reports a database error with the id', async () => {
-      queryReturning({ data: null, error: { message: 'boom' } });
+      queryReturning({ data: null, error: { code: '42501', message: 'boom' } });
 
       await expect(findSpace(client, row.id)).rejects.toThrow(
-        `Failed to load space ${row.id}: boom`,
+        `Failed to load space ${row.id} (code 42501)`,
       );
     });
   });

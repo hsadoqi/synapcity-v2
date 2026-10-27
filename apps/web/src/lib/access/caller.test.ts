@@ -1,10 +1,12 @@
 import { AuthApiError, AuthRetryableFetchError } from '@supabase/supabase-js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { getCallerIdentity, SAVE_FAILED, type Supabase } from './caller';
+import type { SupabaseServerClient } from '@synapcity/server-supabase';
+
+import { getCallerIdentity, SAVE_FAILED } from './caller';
 
 const getUser = vi.fn();
-const supabase = { auth: { getUser } } as unknown as Supabase;
+const supabase = { auth: { getUser } } as unknown as SupabaseServerClient;
 
 beforeEach(() => {
   getUser.mockReset();

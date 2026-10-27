@@ -1,15 +1,9 @@
 'use server';
 
-import {
-  getCallerIdentity,
-  logFailure,
-  SAVE_FAILED,
-} from '../../../account/server/caller';
-import { createClient } from '../../../../lib/supabase/server';
-import {
-  FIXTURE_MESSAGE,
-  fixtureModeEnabled,
-} from '../../../../lib/access/dev-fixture';
+import { getCallerIdentity, SAVE_FAILED } from '@/lib/access/caller';
+import { logFailure } from '@/lib/log-failure';
+import { createClient } from '@/lib/supabase/server';
+import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import type { SavePreferencesResult } from '@synapcity/features-settings/contracts';
 import { accountPreferencesSchema } from '@synapcity/domain-preferences';
 import { isSupportedTimezone } from '@synapcity/domain-preferences';

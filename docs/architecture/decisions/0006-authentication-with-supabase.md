@@ -118,6 +118,15 @@ Verified by automated tests only (mocked provider and framework boundaries): the
 
 Placement only; the provider, session model and rules above are unchanged. The request-bound server client is built by `@synapcity/server-supabase` (`createRequestClient`) from cookies and environment that `apps/web/src/lib/supabase/server.ts` still supplies. Access decisions go through `@synapcity/server-auth`: `getVerifiedIdentity` (claims, reusing the memoized `getVerifiedClaims` read) for `requireOwner` and the Spaces API routes, and `getCallerIdentity` (`getUser()`) for the Spaces, Documents, Dashboards and preferences actions. `getVerifiedClaims()` keeps its meaning, a fixture is never a verified identity, and `apps/web/src/identity-boundary.test.ts` lists the files still allowed to call `getClaims()`/`getUser()` directly (all scheduled for M7). Design: [M4 design](../../superpowers/specs/2026-10-23-m4-server-identity-boundary-design.md).
 
+## Implementation note, 2026-10-27: Supabase review fixes
+
+Design: [Supabase review fixes](../../superpowers/specs/2026-10-27-supabase-review-fixes-design.md). The provider, session model and PKCE rules above are unchanged, except for two owner decisions:
+
+- **Sign-out scope (R1).** Signing out ends this browser's session only (`signOut({ scope: 'local' })`); the person's other devices stay signed in. Before, supabase-js's default `global` scope signed them out everywhere. A "sign out everywhere" control is not built.
+- **View recording exception (R5).** `recordSpaceView` checks the caller with `getVerifiedIdentity` (claims) instead of `getCallerIdentity` (`getUser()`), because it runs on every Space open and writes only a timestamp that row-level security limits to the caller's own rows. A revoked session can at most stamp its own row until its token expires. Every other write, pins included, keeps the fresh lookup. The saving depends on asymmetric signing keys: the project's key set lists an ES256 key (checked 2026-10-27); a live token's header was not checked.
+
+Placement: the remaining provider calls in the auth Server Actions (password sign-in, sign-up confirmation resend, password update, OAuth sign-in, sign-out) and `/auth/callback`'s code exchange are `server-supabase` operations; the actions and the route stay host entries. `identity-boundary.test.ts` now allows only `getVerifiedClaims` in `session.ts` plus the two files the leftovers change moves. An Auth outage on a protected page still sends a signed-in person to sign-in, because the proxy redirects first; that stays the separate proxy decision (leftovers F4).
+
 ## Reconsideration conditions
 
 A requirement the cookie-session model cannot meet (for example native clients), a Supabase pricing or availability change, a security incident, or a decision to adopt a different persistence or identity stack.

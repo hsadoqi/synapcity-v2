@@ -1,11 +1,10 @@
 import { saveName as saveProfileName } from '@synapcity/server-account';
 
-import {
-  logFailure,
-  type Caller,
-  type MetadataPatch,
-  type Supabase,
-} from './caller';
+import type { SupabaseServerClient } from '@synapcity/server-supabase';
+
+import { logFailure } from '@/lib/log-failure';
+
+import type { Caller, MetadataPatch } from './caller';
 
 export type NameSaved = { ok: true; patch: MetadataPatch } | { ok: false };
 
@@ -14,7 +13,7 @@ export type NameSaved = { ok: true; patch: MetadataPatch } | { ok: false };
  * package. The failure is logged here by code and status only.
  */
 export async function saveName(
-  supabase: Supabase,
+  supabase: SupabaseServerClient,
   caller: Caller,
   name: string,
 ): Promise<NameSaved> {

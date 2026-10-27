@@ -11,7 +11,7 @@ import type {
   CollectionItem,
   CollectionItemAction,
 } from '@synapcity/frontend-collection';
-import type { OwnedRecordSummary } from '@/lib/owned-records';
+import type { OwnedRecordSummary } from '@synapcity/domain-records';
 import { homePathFor, signInPathFor } from '@/lib/routing/user-paths';
 import { toCollectionItem } from '../../lib/collection-item';
 import { setDashboardPinned } from '../../server/actions/dashboard-state-actions';

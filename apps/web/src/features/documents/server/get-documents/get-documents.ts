@@ -1,9 +1,6 @@
-import { fixtureModeEnabled } from '../../../../lib/access/dev-fixture';
-import {
-  listOwnedRecordSummaries,
-  type OwnedRecordSummary,
-} from '../../../../lib/owned-records';
-import { createClient } from '../../../../lib/supabase/server';
+import type { OwnedRecordSummary } from '@synapcity/domain-records';
+
+import { loadRecordSummaries } from '@/lib/records';
 
 import { DOCUMENT_FIXTURES } from '../../lib/fixtures';
 
@@ -12,8 +9,6 @@ import { DOCUMENT_FIXTURES } from '../../lib/fixtures';
  * security scopes the query to the session, so no owner id is passed.
  * Development fixture mode has no session or database and reads sample records.
  */
-export async function getDocuments(): Promise<OwnedRecordSummary[]> {
-  if (fixtureModeEnabled()) return [...DOCUMENT_FIXTURES];
-
-  return listOwnedRecordSummaries(await createClient(), 'documents');
+export function getDocuments(): Promise<OwnedRecordSummary[]> {
+  return loadRecordSummaries('documents', DOCUMENT_FIXTURES);
 }

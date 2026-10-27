@@ -192,8 +192,122 @@ Where the implementation differs from the design above, and why:
 - **A5 docs.** `main` already says `AuthStatus` in the auth UI design and the M7.5 plan; the `AuthActions` wording exists only on `refactor/shells-sidebar-slots`. No edit here.
 - **`schema_version` comment (3.1).** There is no preferences schema-version constant in TypeScript to point at, so the comment names the column and its migration.
 - **`writeAccountPreferenceRow`** takes `AccountPreferences` instead of `unknown`. The typed client required a `jsonb`-compatible value, and the only caller already passes the parsed document.
-- **Generated types (R4).** The CLI's `--local` and `--db-url` generation both need Docker, which this machine does not have. The committed file was generated once, read-only, from the hosted project (`gen types --project-id`); its tables and function match the migrations. `pnpm db:types` and the CI `db-types` job generate from the migrations as designed, so the first CI run also checks the hosted schema against the migrations.
+- **Generated types (R4).** The file is now generated from the migrations by `pnpm db:types` (`scripts/db-types.mjs`: the pinned CLI 2.122.0, `gen types --db-url`, then the repository's Prettier), committed formatted, and checked by the CI `db-types` job (`db start`, `migration up --local`, `db:types`, `git diff`). The output depends only on the migrations and the two pinned tools: three databases built differently (a fresh install, a hosted-shaped one, and one missing `rls_auto_enable`) gave byte-identical files. The job checks the types against the migrations, not the hosted project, and needs no credentials. The hosted and migration schemas match on every table, column, nullability, default and relationship (section 9.1). `__InternalSupabase.PostgrestVersion` is no longer written: it describes the PostgREST the schema is deployed on (hosted `14.18`, the CLI's local stack 16.5), and in postgrest-js 2.117.3 it only unlocks `maxAffected()`, which nothing calls. `supabase/config.toml` `major_version` 15 becomes 17, matching the hosted 17.11 as its own comment requires. Not verified: a run of the job itself. The committed file came from Postgres 16 with stub `auth` and `storage` objects, not Supabase's image; the `public` types do not depend on either. A fresh database stopped at `20261013184213` until section 9.2's migration was added. _Superseded: "The job cannot pass until section 9.2 is decided."_ _Superseded (pre-commit review, first pass): the file was generated from the hosted project, and the job could not reproduce it. Earlier: "The CLI's `--local` and `--db-url` generation both need Docker, which this machine does not have. The committed file was generated once, read-only, from the hosted project (`gen types --project-id`); its tables and function match the migrations. `pnpm db:types` and the CI `db-types` job generate from the migrations as designed, so the first CI run also checks the hosted schema against the migrations."_
 - **Embedded counts (3.4).** The generated types do infer `x(count)` embeds, so no helper was needed. They also rejected the generic participation query, which accepted mismatched table and embed pairs; it is now one literal query per kind.
-- **Write outcomes.** `setSpacePinned`, `setRecordPinned` and `recordSpaceView` return `error` as a `ProviderFailure` instead of `unknown`. `features-spaces`' `SpaceSource` interface still says `unknown`, so `apps/web/src/lib/spaces/space-state-actions.ts` keeps its two `as { code?: string }` casts. Narrowing that interface is a follow-up.
-- **R5 evidence.** The project's public key set lists one ES256 key. A live token's `alg` was not checked, so the saving is likely but not verified.
+- **Write outcomes.** `setSpacePinned`, `setRecordPinned` and `recordSpaceView` return `error` as a `ProviderFailure` instead of `unknown`, and `features-spaces`' `SpaceSource` now says `ProviderFailure` too (pre-commit review), so the two casts in `space-state-actions.ts` are gone. `readError` keeps the code on the thrown error as `code`, so the Space page's `onItemsError` log carries it. _Superseded: "`setSpacePinned`, `setRecordPinned` and `recordSpaceView` return `error` as a `ProviderFailure` instead of `unknown`. `features-spaces`' `SpaceSource` interface still says `unknown`, so `apps/web/src/lib/spaces/space-state-actions.ts` keeps its two `as { code?: string }` casts. Narrowing that interface is a follow-up."_
+- **R5 evidence.** The installed `getClaims` (auth-js 2.117.3) checks expiry, then verifies an ES or RS token locally against the project's published keys, and falls back to `getUser()` for an HS token or one without a `kid`. Security therefore does not depend on which key signs today; only the saving does. The public key set, checked again on 2026-10-27, lists one ES256 signing key. It also lists standby keys, so that alone does not show ES256 is the current key, and no live token was decoded. Saving likely, not verified. _Superseded: "The project's public key set lists one ES256 key. A live token's `alg` was not checked, so the saving is likely but not verified."_
 - **Dependencies.** Root devDependency `supabase` 2.122.0 (the CLI, the latest stable release on 2026-10-27, platform binaries as optional dependencies, no install script). `apps/web` depends on `@synapcity/server-data` for the records helpers.
+
+## 9. Pre-commit investigation, 2026-10-27
+
+### 9.1 Why a fresh database stops at `20261013184213`
+
+Read-only queries against the hosted project (`supabase db query --linked`, catalogue `SELECT`s only) show:
+
+- Its migration history holds exactly the 11 repository migrations. None creates `public.rls_auto_enable()`.
+- The function is owned by `postgres`, belongs to no extension, is `SECURITY DEFINER` with `search_path` `pg_catalog`, and runs from the `ensure_rls` event trigger (`ddl_command_end`, `CREATE TABLE`, `CREATE TABLE AS`, `SELECT INTO`), also owned by `postgres`. Every Supabase platform event trigger (`issue_pg_*`, `pgrst_*`) is owned by `supabase_admin`. The body is the Row Level Security guide's example.
+- Postgres is 17.11; `config.toml` said 15.
+
+So the function is not platform bootstrap, not an extension and not missing history of ours: it was added to the hosted project outside migrations, and `20261013184213` (which revokes `EXECUTE` on it) assumes it. That is schema drift in a non-application object, and the reason the history cannot build a fresh database. How it was added (the dashboard or the SQL editor) is not recorded.
+
+### 9.2 Decision: how fresh databases get the function
+
+**Owner decision, 2026-10-27:** (a). `supabase/migrations/20261013184200_declare_rls_auto_enable.sql` is the tested draft below, with one added comment paragraph. The hosted project needs `supabase db push --include-all` once, run by the owner. _Superseded: "after merge"._ Checked read-only after the commit (2026-10-27): the hosted history already records `20261013184200`, with the committed file's text, from a push made before the commit (who ran it is not recorded); the function body, grants and `ensure_rls` trigger are byte-identical to before, and a `db push --dry-run` (with or without `--include-all`) has nothing to apply.
+
+The applied migration stays as it is in every option.
+
+| Option                                                                                                                                                        | Fresh install (local, CI, preview branch, new project)          | Hosted project                                                                                                                    | History                                                                                                  |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| (a) **Recommended.** A guarded migration, `20261013184200_declare_rls_auto_enable.sql`, before the revoke: creates the function and trigger only where absent | Works everywhere                                                | Applied once with `supabase db push --include-all`; changes nothing (tested: body, grants and trigger identical before and after) | Append-only in content; one out-of-order version, which the CLI refuses unless `--include-all` is passed |
+| (b) `supabase/roles.sql`, which `supabase start` runs before migrations                                                                                       | Local and CI only; preview branches and new projects still stop | Untouched (unless someone runs `db push --include-roles`)                                                                         | Unchanged, but the dependency stays undeclared, in a file meant for roles                                |
+| (c) A migration after the revoke                                                                                                                              | Does not help: the revoke fails first                           | Declares the function going forward                                                                                               | Unchanged                                                                                                |
+
+(a) is the only option under which the migrations alone build a working database everywhere, and it records the hosted state instead of leaving it as drift. Tested on a throwaway Postgres 16 with the CLI's own runner (`migration up --db-url`): a fresh install applies all 12 migrations and produces a function definition identical to the hosted one; a hosted-shaped database (function, trigger and grants present, 11 migrations recorded) is refused without `--include-all` and unchanged with it. It also turns on automatic RLS for new `public` tables in local and CI databases, as on the hosted project; every table already enables RLS itself.
+
+The draft as tested (the committed file adds one comment paragraph):
+
+```sql
+-- Declares public.rls_auto_enable() and its ensure_rls event trigger in the
+-- migration history. The hosted project gained both outside migrations
+-- (checked 2026-10-27: owned by postgres, not part of an extension, created by
+-- none of the migrations, the body of the Row Level Security guide's
+-- example), and the next migration, 20261013184213, revokes EXECUTE on the
+-- function. Without this file a fresh database stops at that revoke.
+--
+-- Guarded: where the function or the trigger already exists (the hosted
+-- project), this changes nothing, so the function's grants and body stay as
+-- they are. Timestamped before 20261013184213 so a fresh database creates the
+-- function first; on the hosted project it is applied once with
+-- `supabase db push --include-all` and does nothing there.
+
+do $do$
+begin
+  if to_regprocedure('public.rls_auto_enable()') is null then
+    create function public.rls_auto_enable()
+      returns event_trigger
+      language plpgsql
+      security definer
+      set search_path to 'pg_catalog'
+    as $fn$
+DECLARE
+  cmd record;
+  tbl name;
+BEGIN
+  FOR cmd IN
+    SELECT *
+    FROM pg_event_trigger_ddl_commands()
+    WHERE command_tag IN ('CREATE TABLE', 'CREATE TABLE AS', 'SELECT INTO')
+      AND object_type IN ('table','partitioned table')
+  LOOP
+     IF cmd.schema_name IS NOT NULL AND cmd.schema_name IN ('public') AND cmd.schema_name NOT IN ('pg_catalog','information_schema') AND cmd.schema_name NOT LIKE 'pg_toast%' AND cmd.schema_name NOT LIKE 'pg_temp%' THEN
+      BEGIN
+        SELECT c.relname INTO tbl FROM pg_catalog.pg_class c WHERE c.oid = cmd.objid;
+        EXECUTE format('alter table if exists %I.%I enable row level security', cmd.schema_name, tbl);
+        RAISE LOG 'rls_auto_enable: enabled RLS on %', cmd.object_identity;
+      EXCEPTION
+        WHEN OTHERS THEN
+          RAISE LOG 'rls_auto_enable: failed to enable RLS on %', cmd.object_identity;
+      END;
+     ELSE
+        RAISE LOG 'rls_auto_enable: skip % (either system schema or not in enforced list: %.)', cmd.object_identity, cmd.schema_name;
+     END IF;
+  END LOOP;
+END;
+$fn$;
+  end if;
+
+  if not exists (select 1 from pg_catalog.pg_event_trigger where evtname = 'ensure_rls') then
+    create event trigger ensure_rls
+      on ddl_command_end
+      when tag in ('CREATE TABLE', 'CREATE TABLE AS', 'SELECT INTO')
+      execute function public.rls_auto_enable();
+  end if;
+end
+$do$;
+```
+
+### 9.3 A2 status
+
+A2 is not implemented: R2 was approved only after Task 1 reproduces the failure, and Task 1 needs a real inbox. What is now known:
+
+- **Reproduced in code.** `sign-in-operations.pkce.test.ts` runs the real SDK: `@supabase/ssr` always uses PKCE, and without the code verifier cookie (any browser except the one that started the flow) `exchangeAuthCode` fails with `pkce_code_verifier_not_found` before any request; with the cookie it calls Supabase.
+- **From the docs** (email templates, read 2026-10-27): sign-up confirmation uses `type=email`; email providers that prefetch links consume them, with two documented workarounds (a code the person types, or a page with a confirm button).
+- **Still unknown:** whether the hosted emails' links carry a PKCE `code` (they should, as the actions use the PKCE client), whether sign-up confirms the address before the failed exchange, the `type` for reset, email change and magic link, whether `{{ .RedirectTo }}` keeps its query string, the `amr` method of a token-hash sign-in, and whether the owner's mail provider prefetches.
+- **Owner decision, 2026-10-27:** the manual reproduction comes first (Task 1 Steps 1, 3 and the unknowns above); Task 9 starts after it.
+- **Decisions Task 9 needs either way:** that the gate is met; the GET-verify or confirm-button route (prefetching); and the owner's dashboard changes (four templates, the redirect allow-list), which must go live together with the route.
+
+### 9.4 Integration with `refactor/shells-sidebar-slots`
+
+This branch starts from `main` at #75; `refactor/shells-sidebar-slots` forked at #74 and has 10 unmerged commits plus uncommitted work. A merge of both worktrees' current states conflicts in 28 files. All 28 were resolved in a scratch copy and the result was checked with `pnpm verify` (section 9.5).
+
+| Files                                                                               | Cause                                                                                                                                                                                         | Resolution                                                                                                                                                                          |
+| ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 23 in `apps/web/src/features/{dashboards,documents,settings,account}`, `lib/spaces` | Imports: that branch rewrote `@/` paths as relative ones; this branch re-pointed the same imports to `@synapcity/domain-records`, `@/lib/records`, `@/lib/access/caller`, `@/lib/log-failure` | This branch's targets. Rewriting them in the relative style afterwards is that branch's choice                                                                                      |
+| `apps/web/src/lib/owned-records/owned-records.ts`                                   | Modified there (an import path), deleted here                                                                                                                                                 | Deleted; no merged file still imports it                                                                                                                                            |
+| `app/[userId]/home/spaces/[spaceId]/page.tsx`                                       | `SetBreadcrumbs` moved to `@synapcity/frontend-shells` there; `logFailure` moved here                                                                                                         | Both                                                                                                                                                                                |
+| `apps/web/src/app/layout.tsx`                                                       | #75 (on `main`) against that branch's `AppShell`, not against this change                                                                                                                     | That branch's `AppShell` inside #75's `RegionalProvider`                                                                                                                            |
+| `docs/architecture/reorganization-ownership-map.md`                                 | One padded table; each side changed a different part of the `auth` row and this side three more rows                                                                                          | Row by row: this side's rows plus that side's `providers/user-provider` path                                                                                                        |
+| `.agents/task-scope.md`                                                             | Both added entries at the top                                                                                                                                                                 | Both                                                                                                                                                                                |
+| `docs/superpowers/specs/2026-10-27-supabase-review-fixes-design.md`                 | Untracked copy there, owned here                                                                                                                                                              | This copy. The copies of this spec, its plan and the leftovers spec and plan on that branch hold nothing this branch lacks; they are removed there before it rebases (owner action) |
+
+Order: this branch merges to `main` first; `refactor/shells-sidebar-slots` then rebases onto `main` and applies the table above. A textual resolution is not proof of integration, so section 9.5 lists what the merged copy passed.

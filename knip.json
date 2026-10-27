@@ -1,6 +1,12 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "ignore": ["apps/web/src/lib/**/*", "tsconfig.json", "packages/dev/**/*"],
+  "ignoreIssues": {
+    "packages/server/supabase/src/database-types/database.types.ts": [
+      "exports",
+      "types"
+    ]
+  },
   "ignoreDependencies": [],
   "workspaces": {
     "packages/frontend/tailwind-config": {

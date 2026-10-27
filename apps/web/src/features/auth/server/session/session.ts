@@ -1,6 +1,9 @@
 import type { IdentityResult } from '@synapcity/domain-identity/types';
 import { verifyIdentity } from '@synapcity/server-auth';
-import { outcomeFromClaims } from '@synapcity/server-supabase';
+import {
+  outcomeFromClaims,
+  readProviderUser,
+} from '@synapcity/server-supabase';
 import { cache } from 'react';
 
 import { createClient } from '@/lib/supabase/server';
@@ -58,9 +61,8 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
  */
 const getProviderUser = cache(async () => {
   if (fixtureModeEnabled()) return null;
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getUser();
-  return data.user ?? null;
+  const found = await readProviderUser(await createClient());
+  return found.kind === 'user' ? found.user : null;
 });
 
 /**

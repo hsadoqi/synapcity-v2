@@ -1,8 +1,10 @@
 import { cache } from 'react';
 
-import { logFailure, type Supabase } from '../../account/server/caller';
-import { createClient } from '../../../lib/supabase/server';
-import { fixtureModeEnabled } from '../../../lib/access/dev-fixture';
+import type { SupabaseServerClient } from '@synapcity/server-supabase';
+
+import { logFailure } from '@/lib/log-failure';
+import { createClient } from '@/lib/supabase/server';
+import { fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import type { StoredAccountPreferences } from '@synapcity/domain-preferences';
 import { loadSettingsAccountPreferences } from '@synapcity/features-settings/server';
 
@@ -11,7 +13,7 @@ import { loadSettingsAccountPreferences } from '@synapcity/features-settings/ser
  * fails, so the page still works from browser storage alone.
  */
 export async function loadAccountPreferences(
-  supabase: Supabase,
+  supabase: SupabaseServerClient,
   userId: string,
 ): Promise<StoredAccountPreferences | undefined> {
   return loadSettingsAccountPreferences(supabase, userId, (failure) =>

@@ -4,12 +4,8 @@ import { revalidatePath } from 'next/cache';
 
 import { checkName } from '@synapcity/domain-identity';
 import type { ProfileState } from '@synapcity/features-account/contracts';
-import {
-  getCaller,
-  mirrorToSession,
-  SAVE_FAILED,
-  SHOWS_LATER,
-} from '../caller';
+import { getCaller, mirrorToSession, SHOWS_LATER } from '../caller';
+import { SAVE_FAILED } from '@/lib/access/caller';
 import { saveName } from '../save-name';
 import { createClient } from '../../../../lib/supabase/server';
 import {

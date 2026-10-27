@@ -1,13 +1,14 @@
 import { isAuthRetryableFetchError } from '@supabase/supabase-js';
 
+import { toProviderFailure, type ProviderFailure } from '../provider-failure';
 import type { SupabaseServerClient } from '../request-client';
-
-/** What a failed provider call can say, by code and status only. */
-export type ProviderFailure = { code?: string; status?: number };
 
 /** What profile operations need to know about the signed-in user. */
 export type ProviderUser = {
   id: string;
+  email?: string | null;
+  /** The address a pending email change is waiting on. */
+  new_email?: string | null;
   user_metadata?: Record<string, unknown> | null;
   identities?:
     | { provider?: string; identity_data?: Record<string, unknown> | null }[]
@@ -37,7 +38,7 @@ export async function readProviderUser(
 ): Promise<ProviderUserResult> {
   const { data, error } = await client.auth.getUser();
   if (!error && data.user) return { kind: 'user', user: data.user };
-  const failure: ProviderFailure = { code: error?.code, status: error?.status };
+  const failure: ProviderFailure = error ? toProviderFailure(error) : {};
   if (isAuthRetryableFetchError(error)) return { kind: 'unavailable', failure };
   return { kind: 'signed-out', failure };
 }

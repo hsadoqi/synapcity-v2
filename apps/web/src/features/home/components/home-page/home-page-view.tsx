@@ -13,7 +13,7 @@ import {
   FeaturedItems,
 } from '@synapcity/frontend-collection';
 
-import type { CollectionKind } from '../../../../components/app-sidebar';
+import type { CollectionKind } from '../../../../components/collections';
 import { useQuickCreate } from '../../../../components/quick-create';
 
 import { FIXTURE_NOW } from '../../lib/fixture-clock';

@@ -1,6 +1,6 @@
 import { FileText, Layers, LayoutDashboard } from 'lucide-react';
 
-import { COLLECTION_LABELS } from '.';
+import { COLLECTION_LABELS } from './collection-labels';
 import type { SidebarRecords } from '../../lib/sidebar-records';
 import {
   dashboardsPathFor,

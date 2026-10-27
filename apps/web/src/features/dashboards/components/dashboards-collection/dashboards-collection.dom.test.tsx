@@ -16,7 +16,7 @@ vi.mock('../../server/actions/dashboard-state-actions', () => ({
   setDashboardPinned: mocks.setDashboardPinned,
 }));
 
-import type { OwnedRecordSummary } from '../../../../lib/owned-records';
+import type { OwnedRecordSummary } from '@synapcity/domain-records';
 
 import { CollectionNavigationProvider } from '@synapcity/frontend-collection';
 import { DASHBOARD_FIXTURES } from '../../lib/fixtures';

@@ -47,7 +47,7 @@ describe('DatePicker', () => {
     const onValueChange = vi.fn();
     render(<DatePicker defaultValue={may4} onValueChange={onValueChange} />);
     await pick(
-      screen.getByRole('button', { name: /May 4th, 2026/ }),
+      screen.getByRole('button', { name: /May 4, 2026/ }),
       /May 11th, 2026/,
     );
     expect(onValueChange).toHaveBeenLastCalledWith(new Date(2026, 4, 11));
@@ -56,7 +56,7 @@ describe('DatePicker', () => {
 
   it('shows a controlled value and follows it', () => {
     const { rerender } = render(<DatePicker value={may4} />);
-    expect(screen.getByRole('button').textContent).toContain('May 4th, 2026');
+    expect(screen.getByRole('button').textContent).toContain('May 4, 2026');
     rerender(<DatePicker value={undefined} placeholder="None" />);
     expect(screen.getByRole('button').textContent).toContain('None');
   });
@@ -84,7 +84,7 @@ describe('DatePicker', () => {
       />,
     );
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /May 4th, 2026/ }));
+      fireEvent.click(screen.getByRole('button', { name: /May 4, 2026/ }));
     });
     const before = await screen.findByRole('button', { name: /May 2nd, 2026/ });
     const after = screen.getByRole('button', { name: /May 21st, 2026/ });
@@ -97,7 +97,7 @@ describe('DatePicker', () => {
       <DatePicker defaultValue={may4} min={new Date(2026, 4, 3)} step={7} />,
     );
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /May 4th, 2026/ }));
+      fireEvent.click(screen.getByRole('button', { name: /May 4, 2026/ }));
     });
 
     expect(
@@ -112,6 +112,16 @@ describe('DatePicker', () => {
         .getByRole('button', { name: /May 10th, 2026/ })
         .hasAttribute('disabled'),
     ).toBe(false);
+  });
+
+  it('writes the date in the saved day-first order', () => {
+    localStorage.setItem(
+      'synapcity-preferences',
+      JSON.stringify({ regional: { dateFormat: 'DD/MM/YYYY' } }),
+    );
+    render(<DatePicker value={may4} />);
+    expect(screen.getByRole('button').textContent).toContain('4 May 2026');
+    localStorage.clear();
   });
 
   it('formats the label with formatValue when given', () => {
@@ -156,7 +166,7 @@ describe('DateRangePicker', () => {
       />,
     );
     await pick(
-      screen.getByRole('button', { name: /May 04, 2026/ }),
+      screen.getByRole('button', { name: /May 4, 2026/ }),
       /May 9th, 2026/,
     );
     expect(onValueChange).toHaveBeenLastCalledWith({
@@ -170,8 +180,8 @@ describe('DateRangePicker', () => {
       <DateRangePicker value={{ from: may4, to: new Date(2026, 4, 9) }} />,
     );
     const label = screen.getByRole('button').textContent ?? '';
-    expect(label).toContain('May 04, 2026');
-    expect(label).toContain('May 09, 2026');
+    expect(label).toContain('May 4, 2026');
+    expect(label).toContain('May 9, 2026');
   });
 
   it('writes two hidden inputs when given fromName and toName', () => {

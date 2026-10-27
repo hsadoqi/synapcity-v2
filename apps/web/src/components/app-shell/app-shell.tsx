@@ -7,11 +7,8 @@ import {
   CommandPalette,
 } from '@synapcity/frontend-shells';
 
-import {
-  appPaletteGroups,
-  appSidebar,
-  type CollectionKind,
-} from '../app-sidebar';
+import { appPaletteGroups, appSidebar } from '../app-sidebar';
+import type { CollectionKind } from '../collections';
 import { QuickCreateDialog, QuickCreateProvider } from '../quick-create';
 import {
   NO_SIDEBAR_RECORDS,

@@ -1,23 +1,6 @@
 'use server';
 
-import { z } from 'zod';
-
-import {
-  getCallerIdentity,
-  logFailure,
-  SAVE_FAILED,
-} from '../../../account/server/caller';
-import {
-  FIXTURE_MESSAGE,
-  fixtureModeEnabled,
-} from '../../../../lib/access/dev-fixture';
-import {
-  setOwnedRecordPinned,
-  type SetRecordPinnedResult,
-} from '../../../../lib/owned-records';
-import { createClient } from '../../../../lib/supabase/server';
-
-const idSchema = z.uuid();
+import { setRecordPinnedFor, type SetRecordPinnedResult } from '@/lib/records';
 
 /**
  * Pins or unpins one of the caller's dashboards. The browser asks for a change;
@@ -28,30 +11,10 @@ export async function setDashboardPinned(
   dashboardId: unknown,
   pinned: unknown,
 ): Promise<SetRecordPinnedResult> {
-  if (fixtureModeEnabled()) return { ok: false, error: FIXTURE_MESSAGE };
-  const id = idSchema.safeParse(dashboardId);
-  if (!id.success || typeof pinned !== 'boolean') {
-    return { ok: false, error: SAVE_FAILED };
-  }
-
-  const supabase = await createClient();
-  const found = await getCallerIdentity(supabase);
-  if (!('identity' in found)) {
-    return { ok: false, error: found.failure, signedOut: found.signedOut };
-  }
-
-  const result = await setOwnedRecordPinned(
-    supabase,
+  return setRecordPinnedFor(
     'dashboards',
-    id.data,
+    'setDashboardPinned',
+    dashboardId,
     pinned,
   );
-  if (!result.ok) {
-    logFailure(
-      'setDashboardPinned',
-      result.error as Parameters<typeof logFailure>[1],
-    );
-    return { ok: false, error: SAVE_FAILED };
-  }
-  return result;
 }

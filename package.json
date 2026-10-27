@@ -25,6 +25,7 @@
     "deps": "knip",
     "boundaries": "pnpm --filter @synapcity/dev-boundaries boundaries",
     "brand:check": "node scripts/check-brand-assets.mjs",
+    "db:types": "node scripts/db-types.mjs",
     "prepare": "git config core.hooksPath .githooks || echo 'git hooks not activated (not a git checkout)'",
     "ui:add": "pnpm dlx shadcn@latest add -c apps/web",
     "report": "vitest run --coverage"
@@ -33,6 +34,7 @@
     "@vitest/coverage-v8": "4.1.12",
     "knip": "^6.38.0",
     "prettier": "3.9.6",
+    "supabase": "2.122.0",
     "turbo": "^2.11.7",
     "typescript": "7.0.2",
     "vitest": "4.1.12"

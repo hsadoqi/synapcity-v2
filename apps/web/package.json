@@ -35,6 +35,7 @@
     "@synapcity/frontend-ui": "workspace:*",
     "@synapcity/server-account": "workspace:*",
     "@synapcity/server-auth": "workspace:*",
+    "@synapcity/server-data": "workspace:*",
     "@synapcity/server-supabase": "workspace:*",
     "@tailwindcss/postcss": "^4.3.3",
     "lucide-react": "^1.55.0",

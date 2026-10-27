@@ -1,8 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  regionalDefaults,
+  resolveDateTimeFormatting,
+} from '@synapcity/domain-preferences';
+import {
   addCalendarDays,
   formatCalendarDate,
+  formatCalendarDay,
   parseCalendarDate,
   toCalendarDate,
 } from '@synapcity/frontend-ui/lib/calendar-utils';
@@ -68,5 +73,34 @@ describe('addCalendarDays', () => {
 
   it('returns null for an invalid date', () => {
     expect(addCalendarDays('someday', 1)).toBeNull();
+  });
+});
+
+describe('formatCalendarDay', () => {
+  const formatting = (
+    timezone: string,
+    dateFormat = regionalDefaults.dateFormat,
+  ) =>
+    resolveDateTimeFormatting(
+      { ...regionalDefaults, timezone, dateFormat },
+      null,
+    );
+  const day = new Date(2026, 9, 24);
+
+  it.each(['Pacific/Kiritimati', 'Pacific/Pago_Pago', 'UTC'])(
+    'keeps the same day in %s',
+    (zone) => {
+      expect(formatCalendarDay(day, formatting(zone))).toBe('Sat, Oct 24');
+    },
+  );
+
+  it('follows the chosen date order and options', () => {
+    expect(
+      formatCalendarDay(day, formatting('UTC', 'DD/MM/YYYY'), {
+        weekday: false,
+        year: true,
+        month: 'long',
+      }),
+    ).toBe('24 October 2026');
   });
 });

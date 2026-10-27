@@ -2,7 +2,7 @@
 
 import { createContext, useContext } from 'react';
 
-import type { CollectionKind } from '../app-sidebar';
+import type { CollectionKind } from '../collections';
 
 const QuickCreateContext = createContext<(kind: CollectionKind) => void>(
   () => {},

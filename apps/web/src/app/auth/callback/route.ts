@@ -5,11 +5,11 @@ import {
   parseAuthFlow,
   welcomePath,
 } from '@/lib/routing/auth-flow';
-import { needsProfileSetup } from '@synapcity/domain-identity';
 import { homePathFor } from '@/lib/routing/user-paths';
 import { safeNextPath } from '@/lib/routing/safe-next';
 import { withNotice } from '@/lib/routing/notices';
 import { createClient } from '@/lib/supabase/server';
+import { exchangeAuthCode } from '@synapcity/server-supabase';
 
 /**
  * Landing point for every Supabase redirect: OAuth sign-in, the email
@@ -24,18 +24,16 @@ export async function GET(request: NextRequest) {
   const flow = parseAuthFlow(searchParams.get('flow'));
 
   if (code) {
-    const supabase = await createClient();
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error && data.user) {
+    const outcome = await exchangeAuthCode(await createClient(), code);
+    if (outcome.kind === 'signed-in') {
       // No (or an unsafe) `next`: send them to their own home.
-      const destination = safeNextPath(next, homePathFor(data.user.id));
+      const destination = safeNextPath(next, homePathFor(outcome.userId));
       // A new account is asked once to confirm its name and photo. Only when
       // the link was a sign-up or a provider sign-in: a password reset is
       // someone who already has an account. If anything about the account is
       // unknown, the answer is no, so doubt never adds a step.
       const welcome =
-        (flow === 'oauth' || flow === 'confirm') &&
-        needsProfileSetup(data.user);
+        (flow === 'oauth' || flow === 'confirm') && outcome.needsProfileSetup;
       // A confirmed email change, or a newly connected account, lands back
       // where it was asked for, saying so.
       const arrival =

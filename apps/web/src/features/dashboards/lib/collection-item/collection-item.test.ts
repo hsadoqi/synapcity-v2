@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { OwnedRecordSummary } from '../../../../lib/owned-records';
+import type { OwnedRecordSummary } from '@synapcity/domain-records';
 
 import { describeSpaces, toCollectionItem } from './collection-item';
 
