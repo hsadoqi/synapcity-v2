@@ -17,9 +17,10 @@ import {
   spacesPathFor,
 } from '../../lib/routing/user-paths';
 
-import { COLLECTIONS, type CollectionKind } from './collections';
+import { COLLECTIONS, type CollectionKind } from '../collections';
 
 const HOME_LABEL = 'Home';
+
 /** The context switcher's name for working across Synapcity, outside any Space. */
 const GLOBAL_LABEL = 'Global';
 

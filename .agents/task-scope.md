@@ -1,3 +1,41 @@
+## Active task: web Supabase leftovers review and approval (2026-10-27)
+
+- Goal and mode: documentation only. Pass 1: a critical review of the web Supabase leftovers design and plan. Pass 2: the owner accepted every recommendation; the documents now carry the approved decisions, with E1, E2 and E4 to E7 folded in and E3 deferred, followed by a second read-only review.
+- Exact updates: `docs/superpowers/specs/2026-10-27-web-supabase-leftovers-design.md`, `docs/superpowers/plans/2026-10-27-web-supabase-leftovers.md` (rewritten to the approved design, with replaced wording archived at the end), and the decision records `docs/superpowers/specs/2026-10-24-m7-auth-account-design.md` (status line, Q5 answer), `docs/superpowers/plans/2026-10-24-m7-2-server-packages.md` (Task B) and `docs/superpowers/plans/2026-10-25-m7-5-features-auth.md` (C7); this ledger. Replaced statements are kept, marked "Superseded". Prettier re-padded the M7.5 calls table, a whitespace-only change.
+- Not changed: source, packages, manifests, migrations, ADRs, the ownership map and READMEs (state records, plan Task 6).
+- Evidence: files read on `feat-tokens-package`, including Next.js 16.4.3's webpack config and layer constants, `@supabase/auth-js` 2.117.3's `getClaims` and `@supabase/ssr` 0.12.7's cookie types. Verified: `prettier --check` on every edited file. Not run: any test, type check, build, the Task 1 spike or a live Supabase check.
+- Pass 3 (2026-10-27, the owner asked for further fixes, applied directly). Changes:
+  - Turbo inputs for the guard tests (they would otherwise replay a cached pass);
+  - the pin test covers every workspace manifest;
+  - the implementation branch is named;
+  - task order and `format:check` are added;
+  - the fixture-mode counter is clarified;
+  - the `./proxy` entry and `sideEffects` were considered and not done.
+
+  Evidence: Turbo 2.11.7's own docs for `$TURBO_ROOT$`; `ci.yml`'s cache restore keys.
+
+- Pass 4 (2026-10-27, approved by the owner):
+  - the web wrapper is dropped (D3);
+  - a shared internal client factory;
+  - `middleware.ts` is renamed `proxy-session.ts`;
+  - `hasRecentLinkSignInNow` is used in the operation;
+  - the JWT signing-mode check is added to E7;
+  - `spaces.e2e.ts` is named as the Task 1 evidence;
+  - follow-ups F1 to F4 and the considered items are recorded.
+
+  Also `docs/superpowers/specs/2026-10-27-font-catalogue-picker-design.md`: section 5.1 records enhancements E1 to E4 from the font review, which section 3.4 referred to but which existed only in that conversation.
+
+- Pass 5 (2026-10-27, owner: "update docs, no implementation"): updated the gitignored local note `docs/archive/notes/open-work-backlog.md`, the existing backlog. `docs/engineering/documentation.md` keeps backlog records out of the documentation set, so no new file was created under `docs/`. The update is a 2026-10-27 banner, section 9 (Supabase and font plans, open decisions, follow-ups), status notes on three older items, and a new suggested order with the 2026-10-25 order kept as Superseded. Its 12 pre-existing links, broken since the file moved to `docs/archive/notes/`, are repointed.
+- Open: implementation, starting with plan Task 1, needs the owner's go-ahead.
+
+## Active task: font plans review (2026-10-27)
+
+- Goal and mode: documentation only. The owner asked for a critical review of the shared default fonts and font catalogue picker designs and plans, with clear errors corrected in place and enhancements listed for approval.
+- Exact updates (4): `docs/superpowers/specs/2026-10-27-shared-default-fonts-design.md`, `docs/superpowers/plans/2026-10-27-shared-default-fonts.md`, `docs/superpowers/specs/2026-10-27-font-catalogue-picker-design.md`, `docs/superpowers/plans/2026-10-27-font-catalogue-picker.md`; this ledger. Replaced statements are kept, marked "Superseded".
+- Not changed: source, packages, manifests, ADRs, `AGENTS.md`.
+- Evidence: files read on `feat-tokens-package`; the Google Fonts CSS API queried on 2026-10-27. Verified: `prettier --check` on the four files. Not run: any build, test or the Task 1 spike.
+- Open for the owner: shared fonts O1 and O2; catalogue O1 to O4.
+
 ## Active task: Milestone 7 close-out (2026-10-25)
 
 - Goal and mode: commit the package-internal kind-folder restructure of `features-account` and `features-auth` and the close-out records, in the one pull request the owner allowed at the end of M7. The owner accepted the review's three recommendations on 2026-10-25 (Q2 and Q5 amendments; no `./next` entry for now). Branch `refactor/m7-feature-layout`, from `main` after pull requests #71 and #72.

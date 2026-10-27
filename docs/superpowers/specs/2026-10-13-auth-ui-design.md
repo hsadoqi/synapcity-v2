@@ -35,10 +35,10 @@ Why this reflects current status without client state: `signInWithPassword`, `si
 
 ### `apps/web`
 
-| Piece                           | Behaviour                                                                                                                                                                                                                            |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Piece                            | Behaviour                                                                                                                                                                                                                            |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `AuthActions` (server component) | Reads `getClaims()`. Signed in: `UserMenu` (name from `full_name` or `name`, email, `avatar_url`) with `SignOutButton`. Signed out: `AuthButtons`. Takes a `variant` prop. In the hero variant, signed-in shows a "Go to home" link. |
-| `SignOutButton`                 | `<form action={signOut}>` with a pending state via `useFormStatus`. The only sign-out path.                                                                                                                                          |
+| `SignOutButton`                  | `<form action={signOut}>` with a pending state via `useFormStatus`. The only sign-out path.                                                                                                                                          |
 
 ## Wiring and cleanup
 

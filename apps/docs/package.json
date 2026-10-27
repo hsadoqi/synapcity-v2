@@ -11,7 +11,6 @@
     "check-types": "next typegen && tsc --noEmit"
   },
   "dependencies": {
-    "@synapcity/server-supabase": "workspace:*", 
     "@synapcity/domain-preferences": "workspace:*",
     "@synapcity/frontend-preferences": "workspace:*",
     "@synapcity/frontend-shells": "workspace:*",
