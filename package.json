@@ -33,7 +33,7 @@
   "devDependencies": {
     "@vitest/coverage-v8": "4.1.12",
     "knip": "^6.38.0",
-    "prettier": "3.9.6",
+    "prettier": "3.9.10",
     "supabase": "2.122.0",
     "turbo": "^2.11.7",
     "typescript": "7.0.2",
