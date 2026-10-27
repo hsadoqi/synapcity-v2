@@ -6,7 +6,7 @@ import {
 import { getSpace } from '@synapcity/features-spaces/server';
 
 import { COLLECTION_LABELS, SetBreadcrumbs } from '@/components/breadcrumbs';
-import { logFailure } from '@/features/account/server/caller';
+import { logFailure } from '@/lib/log-failure';
 import { requireOwner } from '@/lib/access/require-owner';
 import { homePathFor, spacesPathFor } from '@/lib/routing/user-paths';
 import { getSpaceSource } from '@/lib/spaces';

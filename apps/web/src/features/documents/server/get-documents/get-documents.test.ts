@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   createClient: vi.fn(),
-  listOwnedRecordSummaries: vi.fn(),
+  listRecordSummaries: vi.fn(),
   fixtureModeEnabled: vi.fn(() => false),
 }));
 
@@ -10,8 +10,8 @@ vi.mock('@/lib/supabase/server', () => ({ createClient: mocks.createClient }));
 vi.mock('@/lib/access/dev-fixture', () => ({
   fixtureModeEnabled: mocks.fixtureModeEnabled,
 }));
-vi.mock('@/lib/owned-records', () => ({
-  listOwnedRecordSummaries: mocks.listOwnedRecordSummaries,
+vi.mock('@synapcity/server-data', () => ({
+  listRecordSummaries: mocks.listRecordSummaries,
 }));
 
 import { DOCUMENT_FIXTURES } from '../../lib/fixtures';
@@ -25,10 +25,10 @@ beforeEach(() => {
 
 describe('getDocuments', () => {
   it('reads the owner’s documents from the database', async () => {
-    mocks.listOwnedRecordSummaries.mockResolvedValue([...DOCUMENT_FIXTURES]);
+    mocks.listRecordSummaries.mockResolvedValue([...DOCUMENT_FIXTURES]);
 
     await expect(getDocuments()).resolves.toEqual([...DOCUMENT_FIXTURES]);
-    expect(mocks.listOwnedRecordSummaries).toHaveBeenCalledWith(
+    expect(mocks.listRecordSummaries).toHaveBeenCalledWith(
       'client',
       'documents',
     );
@@ -36,7 +36,7 @@ describe('getDocuments', () => {
 
   it('propagates failures', async () => {
     const error = new Error('Connection failed');
-    mocks.listOwnedRecordSummaries.mockRejectedValue(error);
+    mocks.listRecordSummaries.mockRejectedValue(error);
 
     await expect(getDocuments()).rejects.toBe(error);
   });

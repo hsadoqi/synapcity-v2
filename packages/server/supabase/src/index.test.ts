@@ -8,14 +8,21 @@ describe('@synapcity/server-supabase root entry', () => {
       'changeEmail',
       'createRequestClient',
       'disconnectAccount',
+      'exchangeAuthCode',
       'outcomeFromClaims',
       'readProviderUser',
       'registerWithPassword',
       'requestRecoveryEmail',
       'resendEmailChange',
+      'resendSignupConfirmation',
       'sendOwnPasswordReset',
+      'signInWithPassword',
+      'signOutSession',
       'startAccountLink',
+      'startOAuthSignIn',
       'supabaseIdentityProvider',
+      'toProviderFailure',
+      'updateOwnPassword',
     ]);
   });
 });

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { fixtureModeEnabled } from '@/lib/access/dev-fixture';
-import { createClient } from '@/lib/supabase/server';
+import { getVerifiedClaims } from '@/features/auth/server';
 import { safeNextPath } from '@/lib/routing/safe-next';
 import { UpdatePasswordCard } from '@synapcity/features-auth/frontend';
 import { updatePassword } from '@/features/auth/server/actions/actions';
@@ -19,9 +19,7 @@ export default async function UpdatePasswordPage({
 
   // The reset link signs the user in through /auth/callback. Without that
   // session there is nothing to update, so send them back to start over.
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getClaims();
-  if (!data?.claims) redirect('/auth/forgot-password?expired=1');
+  if (!(await getVerifiedClaims())) redirect('/auth/forgot-password?expired=1');
 
   // Empty when absent: the action then picks the user's own home.
   const next = safeNextPath((await searchParams).next, '');

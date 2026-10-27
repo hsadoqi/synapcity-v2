@@ -8,12 +8,12 @@ Runtime: portable TypeScript. The only runtime dependency is `zod`, for the sche
 
 `@synapcity/domain-records` (root entry):
 
-| Export                           | Meaning                                                                                                                                                               |
-| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `baseRecordInputSchema`          | The editable fields: `name` (trimmed, at least one character), `description?`, `icon` (a Lucide identifier), `tags`. No messages                                      |
-| `baseRecordSchema`, `BaseRecord` | The ten shared fields: the editable fields plus `id`, `ownerId`, `createdAt`, `updatedAt`, `pinnedAt` and `lastViewedAt` (both nullable, default `null`). No messages |
-
-| `ICON_NAME_PATTERN` | The Lucide kebab-case identifier pattern, for kinds that add their own icon message |
+| Export                           | Meaning                                                                                                                                                                                         |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `baseRecordInputSchema`          | The editable fields: `name` (trimmed, at least one character), `description?`, `icon` (a Lucide identifier), `tags`. No messages                                                                |
+| `baseRecordSchema`, `BaseRecord` | The ten shared fields: the editable fields plus `id`, `ownerId`, `createdAt`, `updatedAt`, `pinnedAt` and `lastViewedAt` (both nullable, default `null`). No messages                           |
+| `OwnedRecordSummary`             | A document or dashboard as an index reads it: `BaseRecord` plus `spacesTotal`, the number of Spaces it takes part in. The data read returns it (`server-data`), as `SpaceSummary` is for Spaces |
+| `ICON_NAME_PATTERN`              | The Lucide kebab-case identifier pattern, for kinds that add their own icon message                                                                                                             |
 
 ## Rules
 

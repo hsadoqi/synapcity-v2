@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   getUser: vi.fn(),
+  getClaims: vi.fn(),
   from: vi.fn(),
   update: vi.fn(),
   eq: vi.fn(),
@@ -13,7 +14,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: async () => ({
-    auth: { getUser: mocks.getUser },
+    auth: { getUser: mocks.getUser, getClaims: mocks.getClaims },
     from: mocks.from,
   }),
 }));
@@ -32,6 +33,10 @@ beforeEach(() => {
   mocks.fixtureModeEnabled.mockReturnValue(false);
   mocks.getUser.mockResolvedValue({
     data: { user: { id: 'user-1' } },
+    error: null,
+  });
+  mocks.getClaims.mockResolvedValue({
+    data: { claims: { sub: 'user-1' } },
     error: null,
   });
   mocks.select.mockResolvedValue({
@@ -143,13 +148,21 @@ describe('recordSpaceView', () => {
     );
   });
 
-  it('ignores a malformed id and a signed-out caller', async () => {
+  it('checks the caller from the session claims, without a provider lookup', async () => {
+    await recordSpaceView(ID);
+
+    expect(mocks.getClaims).toHaveBeenCalled();
+    expect(mocks.getUser).not.toHaveBeenCalled();
+  });
+
+  it('ignores a malformed id and a signed-out caller, logging nothing', async () => {
     await recordSpaceView('nope');
     expect(mocks.update).not.toHaveBeenCalled();
 
-    mocks.getUser.mockResolvedValue({ data: { user: null }, error: null });
+    mocks.getClaims.mockResolvedValue({ data: null, error: null });
     await recordSpaceView(ID);
     expect(mocks.update).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
   });
 
   it('never throws when the database refuses', async () => {
@@ -199,8 +212,8 @@ describe('setSpacePinned caller identity', () => {
   it.each([
     ['unreachable', new AuthRetryableFetchError('fetch failed', 0)],
     ['signed out', null],
-  ])('records no view when the provider says %s', async (_case, error) => {
-    mocks.getUser.mockResolvedValue({ data: { user: null }, error });
+  ])('records no view when the session check says %s', async (_case, error) => {
+    mocks.getClaims.mockResolvedValue({ data: null, error });
 
     await expect(recordSpaceView(ID)).resolves.toBeUndefined();
     expect(mocks.update).not.toHaveBeenCalled();

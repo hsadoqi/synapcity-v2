@@ -1,9 +1,14 @@
 import type { BaseRecord } from '@synapcity/domain-records';
 import type { SpaceEntity, SpaceSummary } from '@synapcity/domain-spaces';
+import type { ProviderFailure } from '@synapcity/server-supabase';
 
-/** What pinning reports: the database-stamped time, or the error to log. */
+/**
+ * What pinning reports: the database-stamped time, or the failure to log, by
+ * code and status only. Every source reports this shape, so the host logs it
+ * without a cast.
+ */
 export type SetPinnedOutcome =
-  { ok: true; pinnedAt: string | null } | { ok: false; error: unknown };
+  { ok: true; pinnedAt: string | null } | { ok: false; error: ProviderFailure };
 
 /**
  * Where Spaces and what takes part in them come from. Two implementations: the
@@ -22,7 +27,7 @@ export interface SpaceSource {
   /** Notes that the owner opened the Space; the outcome carries any error to log. */
   recordView(
     spaceId: string,
-  ): Promise<{ ok: true } | { ok: false; error: unknown }>;
+  ): Promise<{ ok: true } | { ok: false; error: ProviderFailure }>;
   /** The documents taking part in the Space (ADR-0013). */
   listDocuments(spaceId: string): Promise<BaseRecord[]>;
   /** The dashboards taking part in the Space (ADR-0013). */

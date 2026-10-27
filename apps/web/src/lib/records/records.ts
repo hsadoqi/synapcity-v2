@@ -1,0 +1,66 @@
+import type { OwnedRecordSummary } from '@synapcity/domain-records';
+import {
+  listRecordSummaries,
+  setRecordPinned,
+  type RecordKind,
+} from '@synapcity/server-data';
+import { z } from 'zod';
+
+import { getCallerIdentity, SAVE_FAILED } from '@/lib/access/caller';
+import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
+import { logFailure } from '@/lib/log-failure';
+import { createClient } from '@/lib/supabase/server';
+
+/** What pinning a record reports back; `pinnedAt` is the server's own time. */
+export type SetRecordPinnedResult =
+  | { ok: true; pinnedAt: string | null }
+  | { ok: false; error: string; signedOut?: boolean };
+
+const idSchema = z.uuid();
+
+/**
+ * The body of the document and dashboard pin Server Actions. The browser asks
+ * for a change; the database stamps the time. The id and flag come from the
+ * browser, so both are checked; the caller is verified with a fresh lookup
+ * (ADR-0006), and row-level security limits the write to their own records.
+ * `operation` names the action in the log.
+ */
+export async function setRecordPinnedFor(
+  kind: RecordKind,
+  operation: string,
+  recordId: unknown,
+  pinned: unknown,
+): Promise<SetRecordPinnedResult> {
+  if (fixtureModeEnabled()) return { ok: false, error: FIXTURE_MESSAGE };
+  const id = idSchema.safeParse(recordId);
+  if (!id.success || typeof pinned !== 'boolean') {
+    return { ok: false, error: SAVE_FAILED };
+  }
+
+  const supabase = await createClient();
+  const found = await getCallerIdentity(supabase);
+  if (!('identity' in found)) {
+    return { ok: false, error: found.failure, signedOut: found.signedOut };
+  }
+
+  const result = await setRecordPinned(supabase, kind, id.data, pinned);
+  if (!result.ok) {
+    logFailure(operation, result.error);
+    return { ok: false, error: SAVE_FAILED };
+  }
+  return result;
+}
+
+/**
+ * The signed-in owner's records of one kind with how many spaces each is in.
+ * Row-level security scopes the query to the session, so no owner id is
+ * passed. Development fixture mode has no session or database and reads the
+ * sample records instead.
+ */
+export async function loadRecordSummaries(
+  kind: RecordKind,
+  fixtures: readonly OwnedRecordSummary[],
+): Promise<OwnedRecordSummary[]> {
+  if (fixtureModeEnabled()) return [...fixtures];
+  return listRecordSummaries(await createClient(), kind);
+}

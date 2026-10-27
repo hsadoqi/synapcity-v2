@@ -1,18 +1,20 @@
-import type { StoredAccountPreferences } from '@synapcity/domain-preferences';
+import type {
+  AccountPreferences,
+  StoredAccountPreferences,
+} from '@synapcity/domain-preferences';
 import { readAccountPreferences } from '@synapcity/domain-preferences';
-import type { SupabaseServerClient } from '@synapcity/server-supabase';
-
-export type AccountPreferencesFailure = {
-  code?: string;
-  status?: number;
-};
+import {
+  toProviderFailure,
+  type ProviderFailure,
+  type SupabaseServerClient,
+} from '@synapcity/server-supabase';
 
 export type ReadAccountPreferencesResult =
   | { ok: true; value: StoredAccountPreferences }
-  | { ok: false; failure: AccountPreferencesFailure };
+  | { ok: false; failure: ProviderFailure };
 
 export type WriteAccountPreferencesResult =
-  { ok: true } | { ok: false; failure: AccountPreferencesFailure };
+  { ok: true } | { ok: false; failure: ProviderFailure };
 
 /** Reads the preference row for the already-verified caller. */
 export async function readAccountPreferenceRow(
@@ -25,7 +27,7 @@ export async function readAccountPreferenceRow(
     .eq('user_id', userId)
     .maybeSingle();
 
-  if (error) return { ok: false, failure: error };
+  if (error) return { ok: false, failure: toProviderFailure(error) };
   if (!data) {
     return {
       ok: true,
@@ -47,7 +49,7 @@ export async function readAccountPreferenceRow(
 export async function writeAccountPreferenceRow(
   client: SupabaseServerClient,
   userId: string,
-  preferences: unknown,
+  preferences: AccountPreferences,
   deviceTimezone?: string,
 ): Promise<WriteAccountPreferencesResult> {
   const { data, error } = await client
@@ -56,6 +58,9 @@ export async function writeAccountPreferenceRow(
       {
         user_id: userId,
         preferences,
+        // The row's shape version (`user_preferences.schema_version`, added in
+        // migration 20261017160000). Raise it when the stored document changes
+        // in a way old readers cannot follow.
         schema_version: 1,
         ...(deviceTimezone && { device_timezone: deviceTimezone }),
       },
@@ -63,7 +68,7 @@ export async function writeAccountPreferenceRow(
     )
     .select('user_id');
 
-  if (error) return { ok: false, failure: error };
+  if (error) return { ok: false, failure: toProviderFailure(error) };
   if (!data?.length) {
     return { ok: false, failure: { code: 'row_not_written' } };
   }

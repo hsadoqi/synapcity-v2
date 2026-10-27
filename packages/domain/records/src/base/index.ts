@@ -3,4 +3,4 @@ export {
   baseRecordInputSchema,
   baseRecordSchema,
 } from './schemas';
-export type { BaseRecord } from './types';
+export type { BaseRecord, OwnedRecordSummary } from './types';

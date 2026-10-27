@@ -2,11 +2,12 @@ import {
   avatarFileSchema,
   providerImageFrom,
 } from '@synapcity/domain-identity';
-import type {
-  MetadataPatch,
-  ProviderFailure,
-  ProviderUser,
-  SupabaseServerClient,
+import {
+  toProviderFailure,
+  type MetadataPatch,
+  type ProviderFailure,
+  type ProviderUser,
+  type SupabaseServerClient,
 } from '@synapcity/server-supabase';
 
 import { detectImageType, extensionFor } from '../image-type';
@@ -54,11 +55,6 @@ export async function removeOldAvatars(
   }
 }
 
-const failureOf = (error: { code?: string; status?: number }) => ({
-  code: error.code,
-  status: error.status,
-});
-
 /**
  * Uploads a new avatar, or removes the uploaded one. The type is read from the
  * file's bytes, not from what the browser claims, and the file is stored in
@@ -101,7 +97,7 @@ export async function saveAvatar(
       return {
         ok: false,
         reason: 'upload-failed',
-        failure: failureOf(uploadError as { code?: string; status?: number }),
+        failure: toProviderFailure(uploadError),
       };
     }
 
@@ -123,7 +119,7 @@ export async function saveAvatar(
       ok: false,
       reason: 'profile-not-saved',
       failure: profileError
-        ? failureOf(profileError as { code?: string; status?: number })
+        ? toProviderFailure(profileError)
         : { code: 'profile_row_missing' },
     };
   }

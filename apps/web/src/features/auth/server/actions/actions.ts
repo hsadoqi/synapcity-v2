@@ -26,7 +26,6 @@ import {
   LAST_SIGN_IN,
   linkErrorMessage,
 } from '@synapcity/features-auth/contracts';
-import { isRateLimited } from '@synapcity/domain-identity';
 import { isOAuthProvider } from '@synapcity/domain-identity';
 import { field } from '@/features/auth/server/form-data';
 import { homePathFor, settingsPathFor } from '@/lib/routing/user-paths';
@@ -34,6 +33,7 @@ import { withNotice } from '@/lib/routing/notices';
 import { getOrigin } from '@/features/auth/server/site-origin';
 import { safeNextPath } from '@/lib/routing/safe-next';
 import { createClient } from '@/lib/supabase/server';
+import { logFailure } from '@/lib/log-failure';
 import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 
 import { getCurrentUser } from '../session';
@@ -43,8 +43,13 @@ import {
   registerWithPassword,
   requestRecoveryEmail,
   resendEmailChange as resendEmailChangeOperation,
+  resendSignupConfirmation,
   sendOwnPasswordReset,
+  signInWithPassword as signInWithPasswordOperation,
+  signOutSession,
   startAccountLink,
+  startOAuthSignIn,
+  updateOwnPassword,
 } from '@synapcity/server-supabase';
 import { sendAccountDeletionLink } from '../operations';
 
@@ -78,23 +83,22 @@ export async function signInWithPassword(
   }
   const { email, password } = parsed.data;
 
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.signInWithPassword({
+  const outcome = await signInWithPasswordOperation(await createClient(), {
     email,
     password,
   });
-  if (error)
+  if (outcome.kind === 'refused')
     return {
       ...authFailure(
-        authErrorMessage(error.code),
+        authErrorMessage(outcome.code),
         { email },
-        authErrorFields(error.code),
+        authErrorFields(outcome.code),
       ),
-      unconfirmed: error.code === 'email_not_confirmed',
+      unconfirmed: outcome.code === 'email_not_confirmed',
     };
 
   revalidatePath('/', 'layout');
-  redirect(safeNextPath(field(formData, 'next'), homePathFor(data.user.id)));
+  redirect(safeNextPath(field(formData, 'next'), homePathFor(outcome.userId)));
 }
 
 export async function signUp(
@@ -172,14 +176,12 @@ export async function resendConfirmation(
   }
   const { email } = parsed.data;
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.resend({
-    type: 'signup',
+  const outcome = await resendSignupConfirmation(await createClient(), {
     email,
-    options: { emailRedirectTo: callbackUrl(getOrigin(), next, 'confirm') },
+    confirmationRedirect: callbackUrl(getOrigin(), next, 'confirm'),
   });
-  if (isRateLimited(error?.code)) {
-    return authFailure(authErrorMessage(error?.code), { email });
+  if (outcome.kind === 'rate-limited') {
+    return authFailure(authErrorMessage(outcome.code), { email });
   }
 
   // The same reply whether or not the address has a pending sign-up, like the
@@ -246,25 +248,18 @@ export async function updatePassword(
   }
   const { password } = parsed.data;
 
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.updateUser({ password });
-  if (error) {
+  const outcome = await updateOwnPassword(await createClient(), { password });
+  if (outcome.kind === 'provider-error') {
     // Log the code (never the message or the password) so a failure that shows
     // the generic reply can be traced in the server logs.
-    console.warn('updatePassword failed', {
-      code: error.code,
-      status: error.status,
-    });
-    return authFailure(
-      authErrorMessage(error.code),
-      user,
-      authErrorFields(error.code),
-    );
+    logFailure('updatePassword', outcome.failure);
+    const { code } = outcome.failure;
+    return authFailure(authErrorMessage(code), user, authErrorFields(code));
   }
 
   revalidatePath('/', 'layout');
   // The page they land on shows this once (see NoticeToast).
-  redirect(withNotice(next || homePathFor(data.user.id), 'password-updated'));
+  redirect(withNotice(next || homePathFor(outcome.userId), 'password-updated'));
 }
 
 export async function signInWithOAuth(formData: FormData): Promise<void> {
@@ -272,38 +267,35 @@ export async function signInWithOAuth(formData: FormData): Promise<void> {
   const provider = field(formData, 'provider');
   if (!isOAuthProvider(provider)) redirect(authErrorPath('oauth'));
 
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.signInWithOAuth({
+  const outcome = await startOAuthSignIn(await createClient(), {
     provider,
-    options: {
-      redirectTo: callbackUrl(
-        getOrigin(),
-        safeNextPath(field(formData, 'next'), ''),
-        'oauth',
-      ),
-    },
+    redirectTo: callbackUrl(
+      getOrigin(),
+      safeNextPath(field(formData, 'next'), ''),
+      'oauth',
+    ),
   });
-  if (error || !data.url) redirect(authErrorPath('oauth'));
+  if (outcome.kind !== 'redirect') redirect(authErrorPath('oauth'));
 
-  redirect(data.url);
+  redirect(outcome.url);
 }
 
 export async function signOut(): Promise<void> {
   if (fixtureModeEnabled()) redirect('/');
-  const supabase = await createClient();
-  // Redirect either way: the person asked to leave and has no recovery step to
-  // take. Log only the operation and the code, never the error object, so a
-  // failure can be traced without a session, token or email reaching the logs.
-  try {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.warn('signOut failed', {
-        code: error.code,
-        status: error.status,
-      });
-    }
-  } catch {
-    console.warn('signOut failed', { thrown: true });
+  // This browser only (ADR-0006): signing out here leaves the person's other
+  // devices signed in. Redirect either way: the person asked to leave and has
+  // no recovery step to take. Log only the operation and the code, never the
+  // error object, so a failure can be traced without a session, token or email
+  // reaching the logs.
+  const outcome = await signOutSession(await createClient(), {
+    scope: 'local',
+  });
+  if (outcome.kind === 'failed') {
+    logFailure(
+      'signOut',
+      outcome.failure,
+      outcome.thrown ? { thrown: true } : undefined,
+    );
   }
 
   revalidatePath('/', 'layout');
@@ -359,7 +351,7 @@ export async function requestEmailChange(
       return authFailure(ALREADY_YOUR_EMAIL, { email }, ['email']);
     case 'provider-error':
       // The code only, never the message, which can hold the address.
-      console.warn('requestEmailChange failed', { code: outcome.code });
+      logFailure('requestEmailChange', outcome);
       return authFailure(
         emailChangeErrorMessage(outcome.code),
         { email },
@@ -400,7 +392,7 @@ export async function resendEmailChange(
         email: '',
       });
     case 'provider-error':
-      console.warn('resendEmailChange failed', { code: outcome.code });
+      logFailure('resendEmailChange', outcome);
       return authFailure(authErrorMessage(outcome.code), { email: '' });
     case 'sent':
       return authSuccess('Requested again. It can take a minute to arrive.', {
@@ -441,7 +433,7 @@ export async function requestOwnPasswordReset(
     case 'rate-limited':
       return authFailure(authErrorMessage(outcome.code), { email: '' });
     case 'provider-error':
-      console.warn('requestOwnPasswordReset failed', { code: outcome.code });
+      logFailure('requestOwnPasswordReset', outcome);
       return authFailure(authErrorMessage(outcome.code), { email: '' });
     case 'sent':
       return authSuccess(
@@ -481,10 +473,7 @@ export async function connectAccount(
     case 'unavailable':
       return authFailure(TRY_AGAIN, { email: '' });
     case 'provider-error':
-      console.warn('connectAccount failed', {
-        provider,
-        code: outcome.code,
-      });
+      logFailure('connectAccount', outcome, { provider });
       return authFailure(linkErrorMessage(outcome.code), { email: '' });
   }
 }
@@ -533,7 +522,7 @@ export async function requestAccountDeletion(
     case 'rate-limited':
       return authFailure(authErrorMessage(outcome.code), { email: typed });
     case 'provider-error':
-      console.warn('requestAccountDeletion failed', { code: outcome.code });
+      logFailure('requestAccountDeletion', outcome);
       return authFailure(authErrorMessage(outcome.code), { email: typed });
     case 'sent':
       return authSuccess(
@@ -570,10 +559,7 @@ export async function disconnectAccount(
     case 'last-sign-in':
       return authFailure(LAST_SIGN_IN, { email: '' });
     case 'provider-error':
-      console.warn('disconnectAccount failed', {
-        provider,
-        code: outcome.code,
-      });
+      logFailure('disconnectAccount', outcome, { provider });
       return authFailure(linkErrorMessage(outcome.code), { email: '' });
     case 'not-connected':
     case 'disconnected':
