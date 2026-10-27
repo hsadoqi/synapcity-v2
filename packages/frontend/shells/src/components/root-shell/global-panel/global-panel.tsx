@@ -351,7 +351,7 @@ export function GlobalPanelShell({
               role="group"
               aria-label="Global panel contents"
               tabIndex={0}
-              className="min-h-0 flex-1 overflow-auto p-4 outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:-outline-offset-2 focus-visible:outline-ring"
+              className="scroll-fade-y min-h-0 flex-1 overflow-auto p-4 outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:-outline-offset-2 focus-visible:outline-ring"
             >
               {showingSettings && panelSettings ? (
                 <SettingsView

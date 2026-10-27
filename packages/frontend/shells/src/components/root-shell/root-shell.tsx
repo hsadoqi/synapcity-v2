@@ -10,12 +10,19 @@ import {
 import React from 'react';
 import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';
 import type { RootBreadcrumb } from './root-header';
+import type { ContextualPanelDestination } from '../contextual-panel';
 
 type ShellProps = {
   children: React.ReactNode;
   headerActions?: React.ReactNode;
   /** Optional content for the authenticated shell's session-local utility panel. */
   globalPanel?: React.ReactNode;
+  /**
+   * Where the signed-in shell's right-hand contextual panel can go. Each
+   * destination brings its icon, label and content; without any, the shell has
+   * no contextual panel or rail.
+   */
+  contextualPanel?: readonly ContextualPanelDestination[];
   /** The path to the current page, shown in the header once someone is signed in. */
   breadcrumbs?: RootBreadcrumb[];
   /**
@@ -55,6 +62,7 @@ export function AuthenticatedShell({
   headerActions,
   account,
   globalPanel,
+  contextualPanel,
   breadcrumbs,
   sidebar = NO_SIDEBAR_CONTENT,
 }: ShellProps & { account: AccountLinks }) {
@@ -80,6 +88,7 @@ export function AuthenticatedShell({
           />
         }
         globalPanel={globalPanel}
+        contextualPanel={contextualPanel}
       >
         {/* No footer: a copyright line has no work to do inside the tool. */}
         <RootContent>{children}</RootContent>
@@ -93,6 +102,7 @@ export default function RootShell({
   headerActions,
   account,
   globalPanel,
+  contextualPanel,
   breadcrumbs,
   sidebar,
 }: ShellProps & {
@@ -104,6 +114,7 @@ export default function RootShell({
       account={account}
       headerActions={headerActions}
       globalPanel={globalPanel}
+      contextualPanel={contextualPanel}
       breadcrumbs={breadcrumbs}
       sidebar={sidebar}
     >

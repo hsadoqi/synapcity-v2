@@ -38,6 +38,14 @@ describe('latestRecords', () => {
     ]);
   });
 
+  it('keeps a record’s stored icon name for the sidebar to show', () => {
+    expect(
+      latestRecords([
+        { ...record('a', '2026-10-01T00:00:00Z'), icon: 'pen-line' },
+      ]),
+    ).toEqual([{ id: 'a', name: 'A', icon: 'pen-line' }]);
+  });
+
   it('does not reorder the list it was given', () => {
     const records = [
       record('a', '2026-10-01T00:00:00Z'),

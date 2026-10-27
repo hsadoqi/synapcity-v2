@@ -1,5 +1,6 @@
-import { HomeIcon, Inbox, Search, Settings } from 'lucide-react';
+import { Globe, HomeIcon, Inbox, Search, Settings } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { EntityIcon } from '@synapcity/frontend-collection';
 import {
   activeContext,
   ContextSwitcher,
@@ -40,7 +41,9 @@ const within = (pathname: string, href: string) =>
 /**
  * The context switcher: working globally, or inside one of the latest Spaces,
  * with a link to every Space. The active one comes from the trail's Space
- * crumb, matched by path, since two Spaces can share a name.
+ * crumb, matched by path, since two Spaces can share a name. A Space shows its
+ * stored icon; one that is missing, unknown or not among the latest Spaces
+ * shows the folder (ADR-0012). Global is not a Space, so it has its own icon.
  */
 function contextSwitcher(
   userId: string,
@@ -49,18 +52,24 @@ function contextSwitcher(
   spaces: SidebarRecords['spaces'],
 ) {
   const space = activeContext(trail);
+  let activeIcon: string | undefined;
   const options = spaces.map((record) => {
     const href = spacePathFor(userId, record.id);
-    return {
-      label: record.name,
-      href,
-      active: space !== null && within(pathname, href),
-    };
+    const active = space !== null && within(pathname, href);
+    if (active) activeIcon = record.icon;
+    return { label: record.name, href, active };
   });
   const current = space?.label ?? GLOBAL_LABEL;
   return (
     <ContextSwitcher
       current={current}
+      icon={
+        space ? (
+          <EntityIcon name={activeIcon ?? ''} className="size-4" />
+        ) : (
+          <Globe className="size-4" />
+        )
+      }
       options={[
         { label: GLOBAL_LABEL, href: homePathFor(userId), active: !space },
         ...options,

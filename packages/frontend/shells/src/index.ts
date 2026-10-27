@@ -14,6 +14,11 @@ export {
   GlobalPanelToggle,
 } from './components/root-shell/global-panel';
 export { SidebarShell } from './components/sidebar-shell';
+export {
+  ContextualPanelShell,
+  useContextualPanel,
+  type ContextualPanelDestination,
+} from './components/contextual-panel';
 export type {
   RootSidebarContent,
   RootSidebarGroup,

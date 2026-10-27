@@ -2,9 +2,11 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, type ReactNode } from 'react';
+import { PanelRight } from 'lucide-react';
 import {
   BreadcrumbRootShell,
   CommandPalette,
+  type ContextualPanelDestination,
 } from '@synapcity/frontend-shells';
 
 import { appPaletteGroups, appSidebar } from '../app-sidebar';
@@ -15,6 +17,23 @@ import {
   type SidebarRecords,
 } from '../../lib/sidebar-records';
 import { accountLinksFor } from '../../lib/routing/user-paths';
+
+/**
+ * Until real destinations exist, the contextual panel offers one empty place,
+ * so the rail and panel behave as they will without inventing a capability.
+ */
+const CONTEXTUAL_PANEL: readonly ContextualPanelDestination[] = [
+  {
+    id: 'context',
+    label: 'Context',
+    icon: PanelRight,
+    content: (
+      <p className="p-4 text-sm text-muted-foreground">
+        Nothing here yet. Context for your work will appear here.
+      </p>
+    ),
+  },
+];
 
 /**
  * The app's root shell. A client component because the sidebar follows the
@@ -64,6 +83,7 @@ export function AppShell({
     <BreadcrumbRootShell
       account={userId ? accountLinksFor(userId) : null}
       headerActions={headerActions}
+      contextualPanel={userId ? CONTEXTUAL_PANEL : undefined}
       sidebar={
         userId
           ? (trail) =>

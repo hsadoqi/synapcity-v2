@@ -13,7 +13,7 @@ export function SettingsPageShell({ children }: { children: ReactNode }) {
       className="flex min-h-0 flex-1 flex-col bg-background text-foreground"
     >
       <div className="mx-auto flex min-h-0 w-full min-w-0 max-w-7xl flex-1 flex-col px-4 sm:px-6 lg:px-8">
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto roomy:overflow-hidden">
+        <div className="scroll-fade-y flex min-h-0 flex-1 flex-col overflow-y-auto roomy:overflow-hidden">
           {children}
         </div>
       </div>
