@@ -137,6 +137,8 @@ export type DashboardStoreInit = {
   now?: () => number;
   /** Show the dashboard without allowing changes. @default false */
   readOnly?: boolean;
+  /** Start in edit mode (a replacement store keeps the person's mode). Ignored when read-only. @default false */
+  editMode?: boolean;
 };
 
 /**
@@ -152,6 +154,7 @@ export function createDashboardStore({
   breakpointLocked = false,
   now = Date.now,
   readOnly = false,
+  editMode = false,
 }: DashboardStoreInit): StoreApi<DashboardStore> {
   return createStore<DashboardStore>()((set, get) => {
     const context = (): RecordContext => ({ ownerId, now: now() });
@@ -183,7 +186,7 @@ export function createDashboardStore({
       composition,
       records,
       breakpoint,
-      editMode: false,
+      editMode: editMode && !readOnly,
       readOnly,
       selectedWidgetId: null,
       saveStatus: 'saved',

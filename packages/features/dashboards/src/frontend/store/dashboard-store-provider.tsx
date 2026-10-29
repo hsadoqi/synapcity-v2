@@ -21,6 +21,35 @@ const DashboardStoreContext = createContext<
 >(undefined);
 
 /**
+ * Serves a store the parent owns. When the parent swaps the store, children
+ * stay mounted and every consumer unsubscribes from the old store and
+ * subscribes to the new one (`useStore` follows the store it is given).
+ */
+export function DashboardStoreScope({
+  store,
+  children,
+}: {
+  store: StoreApi<DashboardStore>;
+  children: ReactNode;
+}) {
+  return (
+    <DashboardStoreContext.Provider value={store}>
+      {children}
+    </DashboardStoreContext.Provider>
+  );
+}
+
+/** The store itself, for code that must know when it is replaced. */
+export function useDashboardStoreApi(): StoreApi<DashboardStore> {
+  const store = useContext(DashboardStoreContext);
+  if (!store)
+    throw new Error(
+      'useDashboardStore must be used within DashboardStoreProvider',
+    );
+  return store;
+}
+
+/**
  * Creates one canvas's store on first render and serves it to the canvas.
  * Never module-level (zustand's Next.js guidance), so two canvases never
  * share state. `onStore` receives the store once, for saving.
@@ -37,21 +66,12 @@ export function DashboardStoreProvider({
   const [store] = useState(() => createDashboardStore(init));
   const [connect] = useState(() => onStore);
   useEffect(() => connect?.(store), [connect, store]);
-  return (
-    <DashboardStoreContext.Provider value={store}>
-      {children}
-    </DashboardStoreContext.Provider>
-  );
+  return <DashboardStoreScope store={store}>{children}</DashboardStoreScope>;
 }
 
 /** Reads one slice of the canvas's store; re-renders only when that slice changes. */
 export function useDashboardStore<T>(
   selector: (state: DashboardStore) => T,
 ): T {
-  const store = useContext(DashboardStoreContext);
-  if (!store)
-    throw new Error(
-      'useDashboardStore must be used within DashboardStoreProvider',
-    );
-  return useStore(store, selector);
+  return useStore(useDashboardStoreApi(), selector);
 }

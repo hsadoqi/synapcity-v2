@@ -1,1 +1,1 @@
-export { focusPalette, focusWidget } from './focus';
+export { focusPalette, focusWidget, PALETTE_FOCUS_TIMEOUT_MS } from './focus';

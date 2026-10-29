@@ -1,151 +1,46 @@
 'use client';
 
-import {
-  createComposition,
-  type WidgetType,
-} from '@synapcity/domain-dashboards';
+import { type WidgetType } from '@synapcity/domain-dashboards';
 import { resolveBreakpoint, type Breakpoint } from '@synapcity/domain-grids';
-import { emptyRecords } from '@synapcity/domain-prototypes';
 import {
   Alert,
   AlertDescription,
   AlertTitle,
 } from '@synapcity/frontend-ui/core/alert';
-import { Button } from '@synapcity/frontend-ui/core/button';
-import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
-import { PencilRulerIcon } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
-import { useShallow } from 'zustand/react/shallow';
+import { useEffect } from 'react';
 
-import type {
-  DashboardLinkItem,
-  DashboardSnapshot,
-  DashboardStorage,
-} from '../../../contracts';
-import {
-  DashboardConfigProvider,
-  type DashboardLinkComponent,
-} from '../../config';
+import type { DashboardLinkItem, DashboardStorage } from '../../../contracts';
+import { type DashboardLinkComponent } from '../../config';
 import { useElementWidth } from '../../hooks/use-element-width';
-import { ClockProvider } from '../../hooks/use-now';
-import { connectSaves } from '../../storage';
-import { DashboardStoreProvider, useDashboardStore } from '../../store';
-import { focusPalette, focusWidget } from '../../utils/focus';
-import { BreakpointToolbar } from '../breakpoint-toolbar';
+import { useDashboardStore } from '../../store';
 import { DashboardCanvas } from '../dashboard-canvas';
-import { LiveAnnouncer } from '../live-announcer';
-import { SaveStatusIndicator } from '../save-status';
-import { UndoRemove } from '../undo-remove';
+import { DashboardEditorSurface } from '../dashboard-editor-surface';
 import { WidgetsPanel } from '../widgets-panel';
+import { DashboardWorkspaceProvider } from './dashboard-workspace-provider';
 import { DashboardWorkspaceSkeleton } from './dashboard-workspace-skeleton';
 
-/** The outcome of reading one dashboard; a result for another dashboard id means still loading. */
-type Loaded =
-  | {
-      dashboardId: string;
-      requestId: number;
-      state: 'ready';
-      storage: DashboardStorage;
-      snapshot: DashboardSnapshot;
-    }
-  | {
-      dashboardId: string;
-      requestId: number;
-      state: 'failed';
-      storage: DashboardStorage;
-    };
-
-const DEFAULT_NOW = () => Date.now();
-
 /**
- * Moves focus after the set of widgets changes: to a widget just added or
- * restored, and after a removal to the next widget in reading order, or to the
- * palette when none is left. Nothing moves on the first render.
- */
-function useFocusAfterWidgetChanges() {
-  const ids = useDashboardStore(
-    useShallow((s) => s.composition.widgets.map((w) => w.id)),
-  );
-  const removed = useDashboardStore((s) => s.removed);
-  const previous = useRef<string[] | null>(null);
-
-  useEffect(() => {
-    const before = previous.current;
-    previous.current = ids;
-    if (!before) return;
-    const added = ids.filter((id) => !before.includes(id));
-    const gone = before.filter((id) => !ids.includes(id));
-    const moveFocus = () => {
-      const lastAdded = added[added.length - 1];
-      if (lastAdded) {
-        focusWidget(lastAdded);
-      } else if (gone.length > 0) {
-        const next = removed?.focusAfter;
-        if (!next || !focusWidget(next)) focusPalette();
-      }
-    };
-    const frame = requestAnimationFrame(moveFocus);
-    // A popover that closed with the removal hands focus back to its trigger,
-    // which is gone with the widget, a moment after the frame: look again.
-    const retry = setTimeout(() => {
-      if (!document.activeElement || document.activeElement === document.body) {
-        moveFocus();
-      }
-    }, 80);
-    return () => {
-      cancelAnimationFrame(frame);
-      clearTimeout(retry);
-    };
-  }, [ids, removed]);
-}
-
-/**
- * The toolbar, the canvas and, in edit mode, the widgets panel beside it. The
- * layout follows the canvas's own width until the person picks one in the
- * toolbar, so the contextual panel opening or a narrow window switches it.
+ * The editable surface with the widgets panel in a column beside the canvas
+ * while editing: the layout `DashboardWorkspace` uses on its own. A host with a
+ * panel of its own composes `DashboardEditorSurface` and
+ * `DashboardWidgetsDestination` instead. The layout follows the canvas's own
+ * width until the person picks one in the toolbar.
  */
 export function WorkspaceLayout() {
   const editMode = useDashboardStore((s) => s.editMode);
-  const toggleEditMode = useDashboardStore((s) => s.toggleEditMode);
-  const setBreakpoint = useDashboardStore((s) => s.setBreakpoint);
-  const [ref, width] = useElementWidth<HTMLDivElement>();
-  useEffect(() => {
-    if (width) setBreakpoint(resolveBreakpoint(width));
-  }, [width, setBreakpoint]);
-  useFocusAfterWidgetChanges();
-
   return (
-    <div ref={ref} className="flex min-h-0 min-w-0 flex-1 flex-col">
-      <LiveAnnouncer />
-      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-border px-5 py-2">
-        <div className="flex min-w-0 flex-wrap items-center gap-2">
-          <SaveStatusIndicator />
-          <UndoRemove />
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            variant={editMode ? 'selected' : 'outline'}
-            aria-pressed={editMode}
-            onClick={toggleEditMode}
-          >
-            <PencilRulerIcon aria-hidden="true" />
-            Edit layout
-          </Button>
-          <BreakpointToolbar />
-        </div>
-      </div>
-      <div className="flex min-h-0 flex-1 flex-col md:flex-row">
-        <DashboardCanvas />
-        {editMode && (
+    <DashboardEditorSurface
+      beside={
+        editMode && (
           <aside
             aria-label="Widgets"
             className="max-h-1/2 w-full shrink-0 overflow-auto border-t border-border p-4 md:max-h-none md:w-80 md:border-t-0 md:border-l"
           >
             <WidgetsPanel />
           </aside>
-        )}
-      </div>
-    </div>
+        )
+      }
+    />
   );
 }
 
@@ -175,7 +70,9 @@ function ReadOnlyLayout() {
  * A dashboard's canvas: reads what was saved through `storage`, then saves
  * every change back and says where the save stands. Read-only, it saves
  * nothing and offers no editing. A failed read shows an error and never
- * saves, so a dashboard that could not be read is never overwritten.
+ * saves, so a dashboard that could not be read is never overwritten. It is
+ * `DashboardWorkspaceProvider` with this package's own layout; a host that
+ * frames the dashboard itself uses the provider and the surface directly.
  */
 export function DashboardWorkspace({
   dashboardId,
@@ -219,88 +116,30 @@ export function DashboardWorkspace({
    */
   onReload?: () => void;
 }) {
-  const [loaded, setLoaded] = useState<Loaded | null>(null);
-  const [reloads, setReloads] = useState(0);
-  const loadRequest = useRef(0);
-
-  useEffect(() => {
-    let current = true;
-    const requestId = ++loadRequest.current;
-    storage.load(dashboardId).then(
-      (snapshot) =>
-        current &&
-        setLoaded({
-          dashboardId,
-          requestId,
-          state: 'ready',
-          storage,
-          snapshot,
-        }),
-      () =>
-        current &&
-        setLoaded({
-          dashboardId,
-          requestId,
-          state: 'failed',
-          storage,
-        }),
-    );
-    return () => {
-      current = false;
-    };
-  }, [storage, dashboardId, reloads]);
-
-  if (
-    !loaded ||
-    loaded.dashboardId !== dashboardId ||
-    loaded.storage !== storage
-  )
-    return <DashboardWorkspaceSkeleton />;
-  if (loaded.state === 'failed') {
-    return (
-      <Alert variant="destructive">
-        <AlertTitle>This dashboard could not be loaded.</AlertTitle>
-        <AlertDescription>
-          Nothing was changed. Reload the page to try again.
-        </AlertDescription>
-      </Alert>
-    );
-  }
-
   return (
-    <TooltipProvider>
-      <DashboardConfigProvider
-        items={items}
-        widgetTypes={widgetTypes}
-        persistsStatus={persistsStatus}
-        LinkComponent={LinkComponent}
-        onReload={onReload ?? (() => setReloads((count) => count + 1))}
-      >
-        <DashboardStoreProvider
-          key={`${dashboardId}:${loaded.requestId}`}
-          init={{
-            composition: loaded.snapshot.composition ?? createComposition(),
-            records: loaded.snapshot.records ?? emptyRecords(),
-            ownerId,
-            breakpoint: breakpoint ?? resolveBreakpoint(window.innerWidth),
-            breakpointLocked: breakpoint !== undefined,
-            now,
-            readOnly,
-          }}
-          onStore={
-            readOnly
-              ? undefined
-              : (store) =>
-                  connectSaves(store, storage, dashboardId, {
-                    baseRevision: loaded.snapshot.revision ?? 0,
-                  })
-          }
-        >
-          <ClockProvider now={now ?? DEFAULT_NOW}>
-            {readOnly ? <ReadOnlyLayout /> : <WorkspaceLayout />}
-          </ClockProvider>
-        </DashboardStoreProvider>
-      </DashboardConfigProvider>
-    </TooltipProvider>
+    <DashboardWorkspaceProvider
+      dashboardId={dashboardId}
+      ownerId={ownerId}
+      storage={storage}
+      now={now}
+      breakpoint={breakpoint}
+      readOnly={readOnly}
+      items={items}
+      widgetTypes={widgetTypes}
+      persistsStatus={persistsStatus}
+      LinkComponent={LinkComponent}
+      onReload={onReload}
+      fallback={<DashboardWorkspaceSkeleton />}
+      failureFallback={
+        <Alert variant="destructive">
+          <AlertTitle>This dashboard could not be loaded.</AlertTitle>
+          <AlertDescription>
+            Nothing was changed. Reload the page to try again.
+          </AlertDescription>
+        </Alert>
+      }
+    >
+      {readOnly ? <ReadOnlyLayout /> : <WorkspaceLayout />}
+    </DashboardWorkspaceProvider>
   );
 }
