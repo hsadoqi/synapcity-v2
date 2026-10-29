@@ -7,7 +7,9 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "peerDependencies": {
     "@playwright/test": "1.64.1"
@@ -15,7 +17,10 @@
   "devDependencies": {
     "@playwright/test": "1.64.1",
     "@synapcity/dev-typescript-config": "workspace:*",
+    "@synapcity/dev-vitest-config": "workspace:*",
     "@types/node": "26.6.5",
-    "typescript": "7.0.2"
+    "@vitest/coverage-v8": "5.0.5",
+    "typescript": "7.0.2",
+    "vitest": "5.0.5"
   }
 }
