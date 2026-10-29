@@ -8,9 +8,15 @@ on:
 permissions:
   contents: read
 
+# A newer push cancels an older run on the same pull request. On main a run
+# that has started always finishes: it is the only run that saves the
+# Turborepo cache, and merges in quick succession (Dependabot) otherwise
+# cancelled every run but the last, so main was never verified or cached.
+# GitHub still keeps at most one waiting run per group, so a burst queues
+# only the newest commit behind the running one.
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   verify:
