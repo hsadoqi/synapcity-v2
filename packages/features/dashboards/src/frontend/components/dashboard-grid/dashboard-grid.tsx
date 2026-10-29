@@ -16,12 +16,12 @@ import ReactGridLayout, {
 
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 
+import { usePaletteOpener } from '../../config';
 import {
   keyboardDelta,
   useDashboardStore,
   type DashboardStore,
 } from '../../store';
-import { focusPalette } from '../../utils/focus';
 import { ConnectedWidget } from '../connected-widget';
 import { DashboardEmptyState } from '../dashboard-empty-state';
 
@@ -85,6 +85,7 @@ export function DashboardGrid() {
   const selectWidget = useDashboardStore((s) => s.selectWidget);
   const nudgeWidget = useDashboardStore((s) => s.nudgeWidget);
   const toggleEditMode = useDashboardStore((s) => s.toggleEditMode);
+  const openPalette = usePaletteOpener();
   const applyLayoutChange = useDashboardStore((s) => s.applyLayoutChange);
   const { width, containerRef, mounted } = useContainerWidth({
     measureBeforeMount: true,
@@ -136,7 +137,7 @@ export function DashboardGrid() {
           readOnly={readOnly}
           onAdd={() => {
             if (!editMode) toggleEditMode();
-            focusPalette();
+            openPalette();
           }}
         />
       )}

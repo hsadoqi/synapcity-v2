@@ -7,5 +7,7 @@ export type {
 export { keyboardDelta } from './keyboard-move';
 export {
   DashboardStoreProvider,
+  DashboardStoreScope,
   useDashboardStore,
+  useDashboardStoreApi,
 } from './dashboard-store-provider';
