@@ -21,7 +21,7 @@
     "@synapcity/server-account": "workspace:*",
     "@synapcity/server-supabase": "workspace:*",
     "lucide-react": "^1.55.0",
-    "react": "19.3.0",
+    "react": "19.3.1",
     "server-only": "0.0.1"
   },
   "devDependencies": {
@@ -37,7 +37,7 @@
     "@vitest/coverage-v8": "4.1.12",
     "eslint": "10.13.0",
     "jsdom": "30.1.2",
-    "react-dom": "19.3.0",
+    "react-dom": "19.3.1",
     "storybook": "10.6.3",
     "typescript": "7.0.2",
     "zod": "^4.6.7",
