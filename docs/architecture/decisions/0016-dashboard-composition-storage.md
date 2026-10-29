@@ -1,8 +1,8 @@
 # ADR-0016: Dashboard composition storage
 
-**Status:** Proposed
+**Status:** Accepted (2026-10-29)
 **Date:** 2026-10-27
-**Deciders:** Hanaa Sadoqi (repository owner). On 2026-10-27 the owner chose a separate one-to-one table with a revision number (option B2 of the [review](../../superpowers/specs/2026-10-27-dashboard-widgets-mvp-review.md), decision D2). This ADR records that choice. It becomes Accepted once the owner approves the durable names below and the migration is reviewed.
+**Deciders:** Hanaa Sadoqi (repository owner). On 2026-10-27 the owner chose a separate one-to-one table with a revision number (option B2 of the [review](../../superpowers/specs/2026-10-27-dashboard-widgets-mvp-review.md), decision D2). This ADR records that choice. On 2026-10-29 the owner authorized implementing Slice 4 end to end, which accepts this ADR and the working names below as the names used by the unapplied migration draft. Applying the migration to any shared or hosted database remains a separate reviewed step.
 
 ## Context
 
@@ -45,7 +45,8 @@ The [MVP review](../../superpowers/specs/2026-10-27-dashboard-widgets-mvp-review
    - A write that affects no row is a failure, never a success: either the revision changed elsewhere (a conflict) or RLS filtered the row out.
    - The caller reports a conflict as "changed elsewhere" and reloads; any other zero-row result is a `ProviderFailure`.
    - This applies product principle 16: nothing reads "saved" before the server confirms.
-5. **Access path.** Reads and writes go through `@synapcity/server-data` and Server Actions that verify the caller (`getCallerIdentity`, ADR-0006), following ADR-0014's ownership map. The feature package's `DashboardStorage` port keeps its interface; a server adapter fills it.
+5. **Access path.** (Amended 2026-10-29: the `DashboardStorage` port gains the base revision on save and a save outcome, `saved`, `conflict` or `failed`, because conditional writes cannot be expressed without them.)
+   Reads and writes go through `@synapcity/server-data` and Server Actions that verify the caller (`getCallerIdentity`, ADR-0006), following ADR-0014's ownership map. The feature package's `DashboardStorage` port keeps its interface; a server adapter fills it.
 
 ## Scope
 
@@ -53,7 +54,7 @@ How a Dashboard's composition is stored, protected and written. It amends ADR-00
 
 ## What this does NOT decide
 
-- **Final names.** `dashboard_compositions`, `composition`, `schema_version` and `revision` are working names that still go through the glossary's naming process before the migration is applied.
+- **Final names.** `dashboard_compositions`, `composition`, `schema_version` and `revision` are used by the migration draft. They are storage names, not product vocabulary (the glossary's terms are Dashboard and Widget); renaming them later is a migration.
 - **Widget data.** Where data a widget creates lives, and whether Task, Goal or Habit enter the product. See [spec B](../../superpowers/specs/2026-10-27-dashboard-widget-data-design.md).
 - **Widget lifecycle.** No hidden or archived widget status is persisted (owner decision, 2026-10-27); removal deletes the instance.
 - **History or restore** of compositions, sharing, real-time sync, or merge of concurrent edits beyond conflict detection.
