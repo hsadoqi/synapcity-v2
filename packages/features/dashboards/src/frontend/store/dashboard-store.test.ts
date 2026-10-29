@@ -130,4 +130,17 @@ describe('createDashboardStore', () => {
     expect(updates).toBe(1);
     expect(Object.keys(store.getState().records.event)).toHaveLength(1);
   });
+
+  it('read-only, ignores every change and keeps edit mode off', () => {
+    const store = createDashboardStore({ ...init(), readOnly: true });
+    let updates = 0;
+    store.subscribe(() => updates++);
+    store.getState().addWidget('tasks');
+    store.getState().updateSettings({ columns: 3 });
+    store.getState().toggleEditMode();
+    expect(updates).toBe(0);
+    expect(store.getState().composition.widgets).toHaveLength(0);
+    expect(store.getState().editMode).toBe(false);
+    expect(store.getState().readOnly).toBe(true);
+  });
 });

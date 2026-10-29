@@ -220,11 +220,12 @@ describe('the sidebar sections', () => {
     expect(spaces!.items!.map((i) => [i.title, i.href])).toEqual([
       ['Writing', '/u1/home/spaces/s1'],
     ]);
-    // A document's page is not built yet (Milestone 8): listed, not linked.
     expect(documents!.items).toEqual([
-      expect.objectContaining({ title: 'Launch checklist', disabled: true }),
+      expect.objectContaining({
+        title: 'Launch checklist',
+        href: '/u1/home/documents/d1',
+      }),
     ]);
-    expect(documents!.items![0]!.href).toBeUndefined();
     expect(dashboards!.items).toEqual([]);
     expect(dashboards!.empty).toBe('No dashboards yet');
     expect(spaces!.hideWhenCollapsed).toBe(true);
@@ -269,9 +270,11 @@ describe('the command palette groups', () => {
     ]);
 
     expect(groups[2]!.items).toEqual([
-      expect.objectContaining({ label: 'Launch checklist', disabled: true }),
+      expect.objectContaining({
+        label: 'Launch checklist',
+        href: '/u1/home/documents/d1',
+      }),
     ]);
-    expect(groups[2]!.items[0]!.href).toBeUndefined();
 
     groups[4]!.items[0]!.onSelect!();
     expect(onCreate).toHaveBeenCalledWith('space');

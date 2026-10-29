@@ -1,4 +1,5 @@
 export {
+  loadRecord,
   loadRecordSummaries,
   setRecordPinnedFor,
   type SetRecordPinnedResult,

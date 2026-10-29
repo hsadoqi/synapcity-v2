@@ -1,5 +1,6 @@
 export {
   createRecord,
+  findRecord,
   listRecordSummaries,
   setRecordPinned,
   type CreatedOutcome,

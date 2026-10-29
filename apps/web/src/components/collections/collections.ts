@@ -3,7 +3,9 @@ import { FileText, Layers, LayoutDashboard } from 'lucide-react';
 import { COLLECTION_LABELS } from './collection-labels';
 import type { SidebarRecords } from '../../lib/sidebar-records';
 import {
+  dashboardPathFor,
   dashboardsPathFor,
+  documentPathFor,
   documentsPathFor,
   spacePathFor,
   spacesPathFor,
@@ -22,7 +24,7 @@ export type Collection = {
   singular: string;
   icon: typeof FileText;
   indexHref: (userId: string) => string;
-  /** One record's page, or null while that page is not built (Milestone 8). */
+  /** One record's page, or null while that page is not built. */
   itemHref: ((userId: string, id: string) => string) | null;
 };
 
@@ -44,7 +46,7 @@ export const COLLECTIONS: readonly Collection[] = [
     singular: 'document',
     icon: FileText,
     indexHref: documentsPathFor,
-    itemHref: null,
+    itemHref: documentPathFor,
   },
   {
     kind: 'dashboard',
@@ -53,7 +55,7 @@ export const COLLECTIONS: readonly Collection[] = [
     singular: 'dashboard',
     icon: LayoutDashboard,
     indexHref: dashboardsPathFor,
-    itemHref: null,
+    itemHref: dashboardPathFor,
   },
 ];
 

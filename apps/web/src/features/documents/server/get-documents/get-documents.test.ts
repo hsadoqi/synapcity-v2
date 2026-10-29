@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
   createClient: vi.fn(),
   listRecordSummaries: vi.fn(),
+  findRecord: vi.fn(),
   fixtureModeEnabled: vi.fn(() => false),
 }));
 
@@ -12,10 +13,11 @@ vi.mock('@/lib/access/dev-fixture', () => ({
 }));
 vi.mock('@synapcity/server-data', () => ({
   listRecordSummaries: mocks.listRecordSummaries,
+  findRecord: mocks.findRecord,
 }));
 
 import { DOCUMENT_FIXTURES } from '../../lib/fixtures';
-import { getDocuments } from './get-documents';
+import { getDocument, getDocuments } from './get-documents';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -45,6 +47,29 @@ describe('getDocuments', () => {
     mocks.fixtureModeEnabled.mockReturnValue(true);
 
     await expect(getDocuments()).resolves.toEqual([...DOCUMENT_FIXTURES]);
+    expect(mocks.createClient).not.toHaveBeenCalled();
+  });
+});
+
+describe('getDocument', () => {
+  const sample = DOCUMENT_FIXTURES[0]!;
+
+  it('reads one of the owner’s documents from the database', async () => {
+    mocks.findRecord.mockResolvedValue(sample);
+
+    await expect(getDocument(sample.id)).resolves.toBe(sample);
+    expect(mocks.findRecord).toHaveBeenCalledWith(
+      'client',
+      'documents',
+      sample.id,
+    );
+  });
+
+  it('reads the sample record in fixture mode, and null for an unknown id', async () => {
+    mocks.fixtureModeEnabled.mockReturnValue(true);
+
+    await expect(getDocument(sample.id)).resolves.toEqual(sample);
+    await expect(getDocument('missing')).resolves.toBeNull();
     expect(mocks.createClient).not.toHaveBeenCalled();
   });
 });

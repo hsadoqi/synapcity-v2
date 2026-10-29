@@ -1,6 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { createRecord, listRecordSummaries, setRecordPinned } from './records';
+import {
+  createRecord,
+  findRecord,
+  listRecordSummaries,
+  setRecordPinned,
+} from './records';
 
 const row = {
   id: '9ab8c032-8759-44e9-808d-0573d13f290e',
@@ -32,6 +37,7 @@ function clientReturning(result: {
   ]) {
     builder[method] = vi.fn(() => builder);
   }
+  builder.maybeSingle = vi.fn(() => Promise.resolve(result));
   builder.then = (resolve: (value: unknown) => unknown) => resolve(result);
   const from = vi.fn(() => builder);
   return { client: { from } as never, from, builder };
@@ -199,5 +205,55 @@ describe('createRecord', () => {
     await expect(
       createRecord(client, 'spaces', { name: 'x' }),
     ).resolves.toStrictEqual({ ok: false, error: { code: '', status: 0 } });
+  });
+});
+
+describe('findRecord', () => {
+  it.each(['documents', 'dashboards'] as const)(
+    'reads one %s by id',
+    async (kind) => {
+      const { client, from, builder } = clientReturning({
+        data: row,
+        error: null,
+      });
+
+      const record = await findRecord(client, kind, row.id);
+
+      expect(from).toHaveBeenCalledWith(kind);
+      expect(builder.eq).toHaveBeenCalledWith('id', row.id);
+      expect(record).toMatchObject({
+        id: row.id,
+        ownerId: row.owner_id,
+        name: 'Launch plan',
+        icon: 'file-text',
+      });
+      expect(record?.description).toBeUndefined();
+    },
+  );
+
+  it('returns null when no row is visible to the owner', async () => {
+    const { client } = clientReturning({ data: null, error: null });
+
+    await expect(findRecord(client, 'documents', row.id)).resolves.toBeNull();
+  });
+
+  it('returns null for a malformed id without querying', async () => {
+    const { client, from } = clientReturning({ data: row, error: null });
+
+    await expect(
+      findRecord(client, 'dashboards', 'not-a-uuid'),
+    ).resolves.toBeNull();
+    expect(from).not.toHaveBeenCalled();
+  });
+
+  it('reports a database error with the kind and id', async () => {
+    const { client } = clientReturning({
+      data: null,
+      error: { code: '42501', message: 'boom' },
+    });
+
+    await expect(findRecord(client, 'dashboards', row.id)).rejects.toThrow(
+      `Failed to load dashboard ${row.id} (code 42501)`,
+    );
   });
 });

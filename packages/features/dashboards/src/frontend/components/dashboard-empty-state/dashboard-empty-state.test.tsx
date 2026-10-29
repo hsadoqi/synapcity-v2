@@ -11,4 +11,12 @@ describe('DashboardEmptyState', () => {
       screen.getByText(/Turn on Edit layout and add one from the panel\./),
     ).toBeDefined();
   });
+
+  it('read-only, says editing is not available instead', () => {
+    render(<DashboardEmptyState readOnly />);
+    expect(
+      screen.getByText('Editing dashboards is not available yet.'),
+    ).toBeDefined();
+    expect(screen.queryByText(/Turn on Edit layout/)).toBeNull();
+  });
 });

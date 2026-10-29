@@ -11,3 +11,6 @@ export default meta;
 type Story = StoryObj<typeof DashboardEmptyState>;
 
 export const Default: Story = {};
+
+/** Read-only: the dashboard cannot be edited yet, so it does not point at editing. */
+export const ReadOnly: Story = { args: { readOnly: true } };
