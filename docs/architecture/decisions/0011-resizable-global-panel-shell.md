@@ -45,6 +45,7 @@ The owner set the direction for a second, horizontal panel in the signed-in shel
 - The shell measures its own container, never the viewport. When the container cannot hold both minimums and the rail, an expanded panel takes the whole work area and the main region is `inert` until it collapses.
 - The main region and the panel are size containers (`@container/main`, `@container/panel`), so their content responds to the room each is given.
 - Until real destinations exist, a resource view may offer one empty placeholder destination; the app shell offers none.
+- The Dashboard page offers a Widgets destination before Context (S1b, 2026-10-29). The panel owns only its own state (visibility, destination, width, narrow presentation); the Dashboard store owns edit mode, widgets, layout, undo and save state, and the palette holds none. Edit layout asks the page for the palette through one callback and the page opens the destination; closing or switching the panel never reaches the store. The destination labels are working names.
 
 Not decided here: which destinations exist and their names, whether the panel appears in Spaces and where, resource viewing in the panel (a later slice), persistence of its state, and whether choosing from the rail should leave an unlocked global panel open (today it closes it, as any outside press does).
 
