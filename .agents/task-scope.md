@@ -1,3 +1,25 @@
+## Planned task: Dashboard S2, first-open and responsive polish (2026-10-29)
+
+- Goal and mode: planning only (plan approved 2026-10-29). The plan is [docs/superpowers/plans/2026-10-29-dashboard-s2-first-open-responsive-polish.md](../docs/superpowers/plans/2026-10-29-dashboard-s2-first-open-responsive-polish.md). No implementation starts before the owner approves it. Branch `docs/dashboard-s2-document-s3-plans`, worktree `features/shared-resource-structure`, from `origin/main` at `8053927f`.
+- Proposed scope: separate the layout breakpoint (follows canvas width), the preview lock (`breakpointLocked`, set only by choosing a layout) and the device frame (drawn only for a locked preview with room), fixing the unintended tablet frame at 915 to 1023 px (and, by the same arithmetic, a mobile frame at 471 to 639 px, to be confirmed); measure the single-column layout near 1280 px with the panel open before changing it; populated fixture dashboards for first open (fixture mode only, read-time defaults, nothing written until an edit); widget card polish from an audit matrix of widget type, breakpoint and theme.
+- Boundaries kept: `ResourceFrame`, `ResourceHeader` and `ContextualPanelShell` are unchanged; the store, save scheduler, revision and conflict handling, remove-undo (no redo exists), and keyboard move are not changed; no schema, Server Action, `server-data`, dependency or database change.
+- Fixture ownership: S2 owns the dashboard fixtures; the Document fixtures belong to S3.
+- Decisions (owner, 2026-10-29): D1 approved (layout breakpoint, preview lock and device frame stay distinct working terms); D2 deferred, with no change to `domain-grids` thresholds or panel overlay until Task 1 records container geometry (viewport width and Dashboard canvas width are kept distinct) and the evidence and a recommendation are presented; D3 option a (no starter-layout implementation or persisted starter catalogue in S2); D4 approved (read-time fixture seeds only, `fixture-dashboard-reading-progress` stays empty, nothing written because a page rendered).
+- Status: plan approved; implementation not started and needs its own go-ahead after the planning pull request is integrated. S2a, S2c and S2d may start from updated `main`; S2b stays gated on D2.
+- Independent: the parallel fixture e2e investigation (#122), the shell visual verification baseline (#101).
+- Verification when implemented: the per-task commands and section 8 of the plan; the report must state what was not run.
+
+## Planned task: Document S3, reading layout (2026-10-29)
+
+- Goal and mode: planning only (plan approved 2026-10-29). The plan is [docs/superpowers/plans/2026-10-29-document-s3-reading-layout.md](../docs/superpowers/plans/2026-10-29-document-s3-reading-layout.md). No implementation starts before the owner approves it. Branch `docs/dashboard-s2-document-s3-plans`, worktree `features/shared-resource-structure`, from `origin/main` at `8053927f`.
+- Proposed scope: `apps/web` only. `DocumentView` keeps its `ResourceFrame` composition; a reading column that follows the frame's container, a description lead, a details block (dates through `useDateTimeFormatting`, tags), one honest "unavailable" content state (an "empty" state is specified but not built because the app cannot yet tell empty from unreadable), keyboard and light/dark verification, and the Lexical seam recorded as a hand-off.
+- Boundaries kept: no document content persistence or reads, no editor controls, no `lexical` dependency, no `packages/features/documents`, no schema or Server Action change; `ResourceFrame`, `ResourceHeader`, `RESOURCE_PANEL`, `getDocument` and the `DocumentView` signature are unchanged.
+- Fixture ownership: S3 owns `DOCUMENT_FIXTURES` and the document group in `resource-views.e2e.ts`; S2 owns the dashboard fixtures and `dashboard-edit.e2e.ts`.
+- Decisions (owner, 2026-10-29): S3-D1 keep the unavailable wording; S3-D2 keep the shared `ResourceHeader` and its visual truncation, verify the complete title stays available semantically and accessibly; S3-D3 `DocumentDetails` stays internal to `apps/web`; S3-D4 up to three focused Document fixtures, existing identities preserved, count and order tests updated explicitly. Scrolling checks must use a genuinely scrollable region.
+- Status: plan approved; implementation not started and needs its own go-ahead after the planning pull request is integrated.
+- Independent: S2, #122, #101.
+- Verification when implemented: the per-task commands and section 7 of the plan; the report must state what was not run.
+
 ## Task (integrated): Dashboard composition S1b, panel composition in `apps/web` (2026-10-29)
 
 - Goal and mode: implemented, owner-authorized end to end on 2026-10-29; the owner authorized the squash merge of #120 on stated conditions, which were met. Plan: [docs/superpowers/plans/2026-10-29-dashboard-composition-s1a-s1b.md](../docs/superpowers/plans/2026-10-29-dashboard-composition-s1a-s1b.md). Branch `feat/dashboard-s1b-panel-composition`, worktree `Projects/worktrees/synapcity/features/dashboard-s1b-panel-composition`, from `origin/main` at `8b831cf9` (includes S1a).
