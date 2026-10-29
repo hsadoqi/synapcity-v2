@@ -25,6 +25,141 @@ test.describe('document and dashboard pages', () => {
     await expect(page.getByText(/content can’t be shown yet/)).toBeVisible();
   });
 
+  // The reading page's edge cases, from the long-reading fixture: a name long
+  // enough to truncate, a description with one unbroken string, five tags.
+  const LONG = {
+    path: '/fixture-user/home/documents/fixture-document-long-reading',
+    name: 'Field notes from the long winter of rewriting the onboarding guide, chapter by chapter, with every open question we could not settle before the spring release',
+  };
+  const contents = (page: Page, name: string) =>
+    page.getByRole('group', { name: `${name} contents` });
+  const openContext = (page: Page) =>
+    page
+      .getByRole('toolbar', { name: 'Contextual panel' })
+      .getByRole('button', { name: 'Context' })
+      .click();
+
+  for (const width of [390, 1280]) {
+    for (const panel of [false, true]) {
+      test(`a long document name and an unbroken description do not scroll the page sideways at ${width}${panel ? ', panel open' : ''}`, async ({
+        page,
+      }) => {
+        await page.setViewportSize({ width, height: 800 });
+        await page.goto(LONG.path);
+        await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+        if (panel) {
+          await openContext(page);
+          await expect(
+            page.getByRole('region', { name: 'Contextual panel: Context' }),
+          ).toBeVisible();
+        }
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth - window.innerWidth,
+          ),
+        ).toBeLessThanOrEqual(0);
+      });
+    }
+  }
+
+  test('the complete title is available when the header truncates it', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 800 });
+    await page.goto(LONG.path);
+    const heading = page.getByRole('heading', { level: 1 });
+    await expect(heading).toHaveText(LONG.name);
+    await expect(
+      page.getByRole('heading', { level: 1, name: LONG.name, exact: true }),
+    ).toBeVisible();
+    await expect(page).toHaveTitle(new RegExp(`^${LONG.name}`));
+  });
+
+  test('a long document name keeps the frame inside the window', async ({
+    page,
+  }) => {
+    // Known defect, outside this page's files: the shell's work area does not
+    // let the frame shrink below the header title's full width, so at 390 the
+    // frame is wider than the window and clipped instead of the title
+    // truncating. The page itself does not scroll sideways, so the check
+    // above cannot see it. Remove `test.fail` once the shell is fixed.
+    test.fail();
+    await page.setViewportSize({ width: 390, height: 800 });
+    await page.goto(LONG.path);
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    const box = await page
+      .locator('[data-slot="resource-frame"]')
+      .boundingBox();
+    expect(box?.x).toBeGreaterThanOrEqual(0);
+    expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(390);
+  });
+
+  test('Tab reaches the contents group once and arrow keys scroll it', async ({
+    page,
+  }) => {
+    // Short enough that the body overflows, so there is something to scroll.
+    await page.setViewportSize({ width: 390, height: 360 });
+    await page.goto(LONG.path);
+    const group = contents(page, LONG.name);
+    await expect(group).toBeVisible();
+    expect(
+      await group.evaluate((el) => el.scrollHeight > el.clientHeight),
+    ).toBe(true);
+
+    // Nothing inside the group takes focus, so it is a single tab stop.
+    expect(
+      await group.evaluate(
+        (el) =>
+          el.querySelectorAll(
+            'a[href], button, input, select, textarea, [tabindex], [contenteditable]',
+          ).length,
+      ),
+    ).toBe(0);
+
+    // From the header's title, Tab reaches the group.
+    await page.getByRole('heading', { level: 1 }).click();
+    let reached = false;
+    for (let step = 0; step < 15 && !reached; step++) {
+      await page.keyboard.press('Tab');
+      reached = await group.evaluate((el) => el === document.activeElement);
+    }
+    expect(reached).toBe(true);
+
+    expect(await group.evaluate((el) => el.scrollTop)).toBe(0);
+    await page.keyboard.press('End');
+    await expect
+      .poll(() => group.evaluate((el) => el.scrollTop))
+      .toBeGreaterThan(0);
+
+    // The next Tab leaves it; focus is not trapped.
+    await page.keyboard.press('Tab');
+    expect(await group.evaluate((el) => el === document.activeElement)).toBe(
+      false,
+    );
+  });
+
+  test('the page shows the unavailable note and no editing controls', async ({
+    page,
+  }) => {
+    const hydration: string[] = [];
+    page.on('console', (message) => {
+      if (message.type() === 'error' && /hydrat/i.test(message.text())) {
+        hydration.push(message.text());
+      }
+    });
+    await page.goto(LONG.path);
+    const group = contents(page, LONG.name);
+    const note = group.getByRole('note', { name: 'Document content' });
+    await expect(note).toHaveText(/content can’t be shown yet/);
+    await expect(group.getByRole('textbox')).toHaveCount(0);
+    await expect(group.getByRole('button')).toHaveCount(0);
+    await expect(group.getByRole('link')).toHaveCount(0);
+    await expect(group.locator('[contenteditable]')).toHaveCount(0);
+    await expect(group.getByRole('list', { name: 'Tags' })).toBeVisible();
+    await expect(group.locator('time')).toHaveCount(2);
+    expect(hydration).toEqual([]);
+  });
+
   test('a dashboard opens editable, with the contextual panel beside it', async ({
     page,
   }) => {
