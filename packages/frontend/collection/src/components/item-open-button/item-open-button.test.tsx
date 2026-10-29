@@ -16,7 +16,14 @@ describe('ItemOpenButton', () => {
       className?: string;
       children?: React.ReactNode;
     }) => (
-      <a href={href} className={className} data-host-link>
+      // Like a client router's link: it routes itself, so the browser does
+      // not load a new document (jsdom cannot, and says so on stderr).
+      <a
+        href={href}
+        className={className}
+        data-host-link
+        onClick={(event) => event.preventDefault()}
+      >
         {children}
       </a>
     );
