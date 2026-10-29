@@ -106,3 +106,11 @@ export default function P() {
 ```
 
 Paths they occupied: `app/(public)/probe-{err,nf}`, `app/(auth)/auth/probe-{err,nf}`, `app/(protected)/[userId]/home/probe-{err,nf}`.
+
+## Final verification of the tree at `6bcfe359`
+
+- Root gate, from the repository root, with the CI placeholder values: `pnpm verify` exit 0 (format, lint and types 61 tasks, deps, boundaries with no violations, brand check, coverage, e2e, Storybook, build). Web unit tests: 76 files, 765 tests passed. End-to-end: 104 passed, 26 skipped (nine fixture and account groups plus the 17 `local-session` tests, which need the local stack). Storybook: 167 files passed.
+- Cache: `web:test:coverage` was a cache hit on this run. It replayed the log of an identical-input run on the same tree (765 tests, including `route-groups`, `route-groups.dom`, `welcome-card` and the request-path tests). An earlier run on the pre-fix tree was a cache miss and executed them. End-to-end tasks are never cached.
+- Local-stack suite on the same tree, built against the local stack: 17 passed. A client-sent `x-synapcity-request-path` header (`/evil.example`, `//evil.example/x`, `/x/home`) did not change the redirect: `/someone` always went to `/auth/login?next=%2Fsomeone`. The temporary user and its mail were removed; no `route-groups-*` user, mail or orphaned rows remained.
+- The request-path header mechanism added to the proxy by another session was not separately approved under AGENTS.md section 5; it is flagged in the pull request.
+- Not run: the nine fixture and account e2e tests (they need a fixture dev server and a saved account session); OAuth and email-confirmation callbacks; a hosted deployment; a screen reader.
