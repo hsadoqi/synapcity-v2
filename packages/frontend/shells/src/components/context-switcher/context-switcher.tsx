@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 
 import {
@@ -14,7 +15,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@synapcity/frontend-ui/core/sidebar';
-import { SynapcityMark } from '@synapcity/frontend-ui/components/logo-mark';
 
 import { ShellLink } from '../../providers/shell-navigation';
 
@@ -30,14 +30,22 @@ export type ContextOption = {
  * The top of the sidebar: shows the context the page is in and opens a menu of
  * the contexts to switch to (working globally, or inside one Space). The host
  * decides both, usually from the page's breadcrumb trail (see `activeContext`).
+ * It shows the context's own icon, not the brand: the global header carries
+ * the logo.
  */
 export function ContextSwitcher({
   current,
+  icon,
   options,
   more,
 }: {
   /** The active context's name, such as a Space's name. */
   current: string;
+  /**
+   * The active context's icon, such as a Space's stored icon, sized by the
+   * host (`size-4`). Decorative: the trigger's name already says the context.
+   */
+  icon: ReactNode;
   options: ContextOption[];
   /** A link after the options, such as to every Space. */
   more?: ContextOption;
@@ -53,8 +61,12 @@ export function ContextSwitcher({
                 aria-label={`Switch context: ${current}`}
                 {...props}
               >
-                <div className="flex aspect-square size-8 shrink-0 items-center justify-center text-sidebar-primary">
-                  <SynapcityMark className="size-4" />
+                <div
+                  aria-hidden="true"
+                  data-slot="context-switcher-icon"
+                  className="flex aspect-square size-8 shrink-0 items-center justify-center"
+                >
+                  {icon}
                 </div>
                 <span className="min-w-0 flex-1 truncate font-semibold">
                   {current}

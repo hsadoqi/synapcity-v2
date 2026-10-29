@@ -8,7 +8,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { appPaletteGroups, appSidebar, type AppSidebarOptions } from '.';
 
 const records = {
-  spaces: [{ id: 's1', name: 'Writing' }],
+  spaces: [{ id: 's1', name: 'Writing', icon: 'pen-line' }],
   documents: [{ id: 'd1', name: 'Launch checklist' }],
   dashboards: [],
 };
@@ -79,6 +79,59 @@ describe('the sidebar context follows the trail', () => {
     ],
   ])('on %s it shows %s', (_page, trail, expected) => {
     expect(switcherLabel(trail)).toBe(expected);
+  });
+});
+
+/** The switcher's icon for this trail and these Spaces, by its Lucide class. */
+function switcherIcon(
+  trail: RootBreadcrumb[],
+  pathname: string,
+  spaceRecords: AppSidebarOptions['records']['spaces'] = records.spaces,
+) {
+  const { header } = appSidebar(
+    'u1',
+    trail,
+    pathname,
+    options({ records: { ...records, spaces: spaceRecords } }),
+  );
+  const view = render(
+    <TooltipProvider>
+      <SidebarProvider>{header}</SidebarProvider>
+    </TooltipProvider>,
+  );
+  const svg = screen
+    .getByRole('button', { name: /^Switch context: / })
+    .querySelector('[data-slot="context-switcher-icon"] svg');
+  const icon = [...(svg?.classList ?? [])].find(
+    (name) => name.startsWith('lucide-') && name !== 'lucide-icon',
+  );
+  view.unmount();
+  return icon;
+}
+
+// The switcher shows the context's own icon; the brand stays in the header.
+describe('the sidebar context icon', () => {
+  it('shows the Space’s stored icon inside a Space', () => {
+    expect(switcherIcon([spaces, writing], '/u1/home/spaces/s1')).toBe(
+      'lucide-pen-line',
+    );
+  });
+
+  it.each([
+    ['has no icon', [{ id: 's1', name: 'Writing' }]],
+    [
+      'has an icon outside the set',
+      [{ id: 's1', name: 'Writing', icon: 'not-an-icon' }],
+    ],
+    ['is not among the latest Spaces', []],
+  ])('falls back to the folder when the Space %s', (_case, spaceRecords) => {
+    expect(
+      switcherIcon([spaces, writing], '/u1/home/spaces/s1', spaceRecords),
+    ).toBe('lucide-folder');
+  });
+
+  it('shows a globe for Global, which is not a Space', () => {
+    expect(switcherIcon([], '/u1/home')).toBe('lucide-globe');
   });
 });
 

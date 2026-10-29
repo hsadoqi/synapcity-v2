@@ -9,6 +9,63 @@
   }
 }
 
+/* Fades a vertical scroller's top and bottom edges, each only while there is more content
+ * past it, so a scroll area visibly ends inside its own box instead of running into whatever
+ * is below. Pure CSS: a scroll-driven animation moves two registered lengths with the scroll
+ * position, and a mask uses them. Without content to scroll, or in a browser without scroll
+ * timelines, nothing fades. One mask layer only: Tailwind gives mask utilities
+ * `mask-composite: intersect`, which would hide layers placed side by side.
+ */
+/* How far each fade reaches: --spacing(8) at the default density. A scroller may override it. */
+@property --scroll-fade-size {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 2rem;
+}
+
+@property --scroll-fade-top {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --scroll-fade-bottom {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@keyframes scroll-fade-y {
+  0% {
+    --scroll-fade-top: 0px;
+    --scroll-fade-bottom: var(--scroll-fade-size);
+  }
+  10% {
+    --scroll-fade-top: var(--scroll-fade-size);
+  }
+  90% {
+    --scroll-fade-bottom: var(--scroll-fade-size);
+  }
+  100% {
+    --scroll-fade-top: var(--scroll-fade-size);
+    --scroll-fade-bottom: 0px;
+  }
+}
+
+@utility scroll-fade-y {
+  @supports (animation-timeline: scroll()) {
+    mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      #000 var(--scroll-fade-top),
+      #000 calc(100% - var(--scroll-fade-bottom)),
+      transparent
+    );
+    animation: scroll-fade-y linear both;
+    animation-timeline: scroll(self block);
+  }
+}
+
 /* For something fixed to the bottom of the viewport: a --spacing(4) gap, plus the
  * device's bottom safe area (the iPhone home indicator) when the page is drawn under
  * it (viewport-fit=cover). The inset is 0 otherwise, so this is plain bottom-4. */

@@ -27,8 +27,8 @@ function html(userId: string | null) {
 }
 
 describe('RootHeaderContent', () => {
-  it('leaves the logo to the sidebar once signed in', () => {
-    expect(html('user-1')).not.toContain('Synapcity home');
+  it('shows the logo when signed in without a trail', () => {
+    expect(html('user-1')).toContain('Synapcity home');
   });
 
   it('links the logo to the landing page when signed out', () => {
@@ -65,10 +65,12 @@ describe('RootHeader', () => {
     expect(screen.getByRole('banner')).toBeTruthy();
   });
 
-  it('shows no logo link when signed in, since the sidebar carries the brand', () => {
+  it('shows the logo, leading home, when signed in without a trail', () => {
     renderHeader(account);
 
-    expect(screen.queryByRole('link', { name: 'Synapcity home' })).toBeNull();
+    expect(
+      screen.getByRole('link', { name: 'Synapcity home' }).getAttribute('href'),
+    ).toBe(account.homeHref);
   });
 
   it('shows the breadcrumb trail when signed in, ending on the current page', () => {
@@ -129,6 +131,14 @@ describe('RootHeader', () => {
 
     const reopened = screen.getByRole('button', { name: 'Open sidebar' });
     expect(reopened.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('draws the sidebar trigger as a panel icon, leaving the brand to the logo', () => {
+    renderHeader(account);
+    const trigger = screen.getByRole('button', { name: 'Close sidebar' });
+    expect(trigger.querySelector('svg.lucide-panel-left')).not.toBeNull();
+    expect(trigger.querySelectorAll('svg')).toHaveLength(1);
+    expect(screen.getByRole('link', { name: 'Synapcity home' })).toBeTruthy();
   });
 
   it('groups utility actions in a labelled navigation', () => {

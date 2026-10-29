@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { Globe } from 'lucide-react';
 
 import { RootSidebar } from '.';
 import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
@@ -17,6 +18,7 @@ const meta: Meta<typeof RootSidebar> = {
     header: (
       <ContextSwitcher
         current="Home"
+        icon={<Globe className="size-4" />}
         options={[
           { label: 'Home', href: '#home' },
           { label: 'Spaces', href: '#spaces' },

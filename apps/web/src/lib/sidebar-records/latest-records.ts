@@ -1,5 +1,8 @@
-/** What the sidebar shows of one record: enough to name it and link to it. */
-export type SidebarRecord = { id: string; name: string };
+/**
+ * What the sidebar shows of one record: enough to name it and link to it, and
+ * its stored Lucide icon name when it has one (a Space's shows in the switcher).
+ */
+export type SidebarRecord = { id: string; name: string; icon?: string };
 
 /** The few records of each kind the signed-in sidebar lists. */
 export type SidebarRecords = {
@@ -41,5 +44,5 @@ export function latestRecords(
       return (b.updatedAt ?? '').localeCompare(a.updatedAt ?? '');
     })
     .slice(0, limit)
-    .map(({ id, name }) => ({ id, name }));
+    .map(({ id, name, icon }) => (icon ? { id, name, icon } : { id, name }));
 }

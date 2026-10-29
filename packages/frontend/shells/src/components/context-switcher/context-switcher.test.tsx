@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { Globe, PenLine } from 'lucide-react';
 import { describe, expect, it } from 'vitest';
 
 import { ContextSwitcher } from '.';
@@ -68,6 +69,7 @@ const renderSwitcher = (
       <SidebarProvider>
         <ContextSwitcher
           current={current}
+          icon={current === 'Global' ? <Globe /> : <PenLine />}
           options={options.map((option) => ({
             ...option,
             active: option.href === activeHref,
@@ -93,9 +95,18 @@ describe('ContextSwitcher', () => {
     });
 
     expect(trigger.textContent).toContain('Writing');
-    expect(
-      trigger.querySelector('[data-slot="synapcity-mark"]'),
-    ).not.toBeNull();
+  });
+
+  it('shows the context’s own icon, decorative, and not the brand mark', () => {
+    renderSwitcher('Writing');
+    const trigger = screen.getByRole('button', {
+      name: 'Switch context: Writing',
+    });
+    const icon = trigger.querySelector('[data-slot="context-switcher-icon"]')!;
+
+    expect(icon.getAttribute('aria-hidden')).toBe('true');
+    expect(icon.querySelector('svg.lucide-pen-line')).not.toBeNull();
+    expect(trigger.querySelector('[data-slot="synapcity-mark"]')).toBeNull();
   });
 
   it('lists every place to switch to as a link', async () => {

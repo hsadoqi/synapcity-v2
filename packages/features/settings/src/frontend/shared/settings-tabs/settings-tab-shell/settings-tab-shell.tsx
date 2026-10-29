@@ -66,7 +66,7 @@ export const SettingsTabShell = ({
   const rail = preview && wide;
   const inlinePreview = preview && !wide && preview.inline !== false;
   const settings = (
-    <CardContent className="min-w-0 flex-1 roomy:overflow-auto">
+    <CardContent className="scroll-fade-y min-w-0 flex-1 roomy:overflow-auto">
       <div className="flex flex-col gap-8">
         {inlinePreview && (
           <SettingsAccordion>

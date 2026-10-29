@@ -4,6 +4,7 @@
 
 import * as React from 'react';
 import type { ReactNode } from 'react';
+import { PanelLeftIcon } from 'lucide-react';
 import {
   SynapcityLogo,
   SynapcityMark,
@@ -60,10 +61,12 @@ export const RootHeaderContent = ({
 }: RootHeaderProps) => {
   return (
     <div className="flex min-w-0 flex-1 items-center justify-between gap-4">
-      {account ? (
+      {/* Signed in, a page's trail shows here; without one, the brand does,
+          leading to the person's home. */}
+      {account && breadcrumbs?.length ? (
         <RootBreadcrumbs items={breadcrumbs} />
       ) : (
-        <RootLogoLink homeHref="/" />
+        <RootLogoLink homeHref={account?.homeHref ?? '/'} />
       )}
       <RootIconActions signedIn={!!account}>
         {account && <GlobalPanelToggle />}
@@ -99,8 +102,9 @@ export const RootHeader = ({ account, ...props }: RootHeaderProps) => {
 };
 
 /**
- * The sidebar toggle, drawn as the brand mark. Its name and aria-expanded follow
- * the sidebar: the sheet on phones, expanded or folded to icons elsewhere.
+ * The sidebar toggle, drawn as a panel icon so the logo beside it carries the
+ * brand. Its name and aria-expanded follow the sidebar: the sheet on phones,
+ * expanded or folded to icons elsewhere.
  */
 const HeaderSidebarTrigger = () => {
   const { state, isMobile, openMobile } = useSidebar();
@@ -113,7 +117,7 @@ const HeaderSidebarTrigger = () => {
           aria-label={expanded ? 'Close sidebar' : 'Open sidebar'}
           aria-expanded={expanded}
         >
-          <SynapcityMark size="sm" title={null} className="text-foreground" />
+          <PanelLeftIcon aria-hidden="true" />
         </IconButton>
       }
     />
@@ -122,7 +126,7 @@ const HeaderSidebarTrigger = () => {
 
 /**
  * The trail to the current page. Below the sm breakpoint only the current page
- * shows, since the mark beside the sidebar trigger already says where you are.
+ * shows, since the sidebar already shows where you are.
  */
 const RootBreadcrumbs = ({ items }: { items?: RootBreadcrumb[] }) => {
   if (!items?.length) {
