@@ -50,6 +50,9 @@ export default defineConfig({
   test: {
     testTimeout: 30_000,
     projects,
+    // Vitest 5 matches these patterns against the repository root, as written,
+    // when every project runs. With `--project` it matches them against each
+    // selected project's root instead, so a filtered run reports 0/0.
     coverage: {
       ...sharedConfig.test.coverage,
       include: projects.map((dir) => `${dir}/src/**/*.{ts,tsx}`),
