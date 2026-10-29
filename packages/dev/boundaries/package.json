@@ -16,7 +16,7 @@
     "@synapcity/dev-vitest-config": "workspace:*",
     "@types/node": "26.6.5",
     "@vitest/coverage-v8": "4.1.12",
-    "eslint": "10.9.1",
+    "eslint": "10.13.0",
     "oxc-parser": "0.155.0",
     "oxc-resolver": "11.24.2",
     "typescript": "7.0.2",
