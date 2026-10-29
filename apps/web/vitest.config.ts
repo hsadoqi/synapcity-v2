@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { baseConfig } from '@synapcity/dev-vitest-config/base';
 import { reactConfig } from '@synapcity/dev-vitest-config/react';
 import { serverOnlyAlias } from '@synapcity/dev-vitest-config/server-only';
+import { sharedConfig } from '@synapcity/dev-vitest-config/shared';
 import { defineConfig, mergeConfig } from 'vitest/config';
 
 // Mirrors `paths` in tsconfig.json, so modules that import `@/...` can be
@@ -15,9 +16,12 @@ const alias = [
 ];
 
 // Two projects: ordinary tests stay in Node; only `*.dom.test.tsx` files run in
-// jsdom with the shared React setup.
+// jsdom with the shared React setup. Coverage is a root-only option: Vitest
+// ignores it inside a project, so the presets' coverage settings are set here
+// or the report falls back to Vitest's defaults in `coverage/`.
 export default defineConfig({
   test: {
+    coverage: sharedConfig.test.coverage,
     projects: [
       mergeConfig(baseConfig, {
         resolve: { alias },

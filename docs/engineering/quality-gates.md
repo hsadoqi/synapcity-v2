@@ -56,6 +56,13 @@ flowchart LR
 
 A pull request states plainly what the tests covered and what was verified manually or not at all.
 
+CI skips nine end-to-end tests on purpose, so `pnpm test:e2e` reports them as skipped, not passed:
+
+- `global-panel.e2e.ts` (4) and `resource-views.e2e.ts` (4) need the development fixture identity, which works only under `next dev` with `SYNAPCITY_DEV_AUTH=fixture` (`apps/web/README.md`); CI serves the production build, where fixture mode is off by design. Run them before merging a change to the signed-in shell, with a fixture dev server already on port 8080: `SYNAPCITY_DEV_AUTH=fixture pnpm --filter web exec playwright test global-panel resource-views`. Playwright reuses the running server locally, so make sure it is this checkout's.
+- `shared-look.e2e.ts` (1, account fonts over a stale cookie) needs `apps/web/e2e/.auth/account.json`, the saved session of a real signed-in account. It is git-ignored and never created in CI; there is no test account or test Supabase project.
+
+Running these in CI needs either a dev-server job for the fixture group or a dedicated test account and project for the signed-in check. Both are open infrastructure decisions; until one is made, a change to those flows states whether the skipped tests were run.
+
 ## Accessibility
 
 The only automated accessibility check is the axe run inside the Storybook story tests, and it covers only components that have stories. Semantics, keyboard behavior, focus visibility, contrast and reduced motion are otherwise reviewed manually. Reduced-motion and forced-colours handling is implemented once in `@synapcity/frontend-tailwind-config` (ADR-0002). Report accessibility as verified only for the stories axe ran against.

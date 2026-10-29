@@ -108,7 +108,7 @@ test.describe('global panel in the authenticated shell', () => {
     const panel = page.getByRole('region', { name: 'Global panel' });
     const appHeader = page.locator('[data-slot="shell-app-header"]');
     const panelHeight = (await panel.boundingBox())!.height;
-    const workArea = page.locator('[data-slot="shell-page-scroll"]');
+    const workArea = page.locator('[data-slot="shell-page"]');
     const workHeight = (await workArea.boundingBox())!.height;
     await page.getByRole('button', { name: 'Lock global panel open' }).click();
     await expect(appHeader).toBeHidden();

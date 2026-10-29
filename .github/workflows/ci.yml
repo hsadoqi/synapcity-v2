@@ -22,9 +22,14 @@ jobs:
     # They are placeholders, not credentials: no CI step contacts Supabase, and
     # `.env.local`, where real values live, is not in the repository. NEXT_PUBLIC_*
     # is passed to the web tasks by Turborepo's Next.js framework inference.
+    # SITE_URL is the address the end-to-end server listens on, the same value
+    # as apps/web/.env.example, so the web app resolves `metadataBase` from its
+    # own setting instead of Next's localhost fallback. It is not a deployment
+    # address; this build is never deployed.
     env:
       NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ci-placeholder-key
+      SITE_URL: http://localhost:8080
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # The pnpm version comes from the `packageManager` field in package.json.
