@@ -1,3 +1,13 @@
+## Active task: shared default fonts (2026-10-29)
+
+Owner request of 2026-10-29: one authoritative owner for the three default typefaces, with `apps/web`, `apps/docs` and Storybook consuming it, as an ownership refactor and not a typography redesign. Commit, push and a pull request against `main` were authorized; merging and deployment were not. Governing: [design](../docs/superpowers/specs/2026-10-27-shared-default-fonts-design.md) and [plan](../docs/superpowers/plans/2026-10-27-shared-default-fonts.md).
+
+- Goal and mode: implementing. Branch `shared-typography`, worktree `features/shared-typography`, base `main` at `6973edaf`.
+- Decided here: option B of the design, a new `@synapcity/frontend-fonts` (`packages/frontend/fonts`) with one entry, `./next`, holding the three `next/font` loaders with the arguments they have today, the two Geist `.woff` files (moved with `git mv` from `apps/web`) and `fontVariableClasses` and `fontVariables`; web, docs and Storybook import it; the second `.woff` pair in `apps/docs` (byte-identical, MD5 checked) is deleted. Default code face stays Geist Mono (design O1). The default font labels stay in `domain-preferences`.
+- Not changed: families, weights, subsets, `preload` settings, variable names, roles, `--font-preference-*`, the type scale, user font loading in `frontend-preferences`, `frontend-tokens` (including its self-hosted Inter and JetBrains Mono), brand geometry and assets, dependencies other than workspace links.
+- Added at the review stage: the unmodified upstream OFL 1.1 texts for Geist and Inter in `packages/frontend/fonts/licenses/` (with a test), so the notices accompany the font software the repository holds. The built apps still do not serve them.
+- Recovery: revert the branch; the moved files are in history.
+
 ## Active task: dashboard page and composition persistence, slice 4 (2026-10-29)
 
 - Goal and mode: implementing, owner-authorized end to end (specify, plan, implement, verify) on 2026-10-29. Branch `feat/slice-4-dashboard-composition`, worktree `Projects/worktrees/synapcity/features/slice-4-dashboard-composition`, from `origin/main` at `ab4bcd54` (includes #83). The slice is spec A of the 2026-10-27 dashboard split ([spec](../docs/superpowers/specs/2026-10-27-dashboard-page-composition-design.md), [plan](../docs/superpowers/plans/2026-10-29-slice-4-dashboard-composition.md)); ADR-0016 accepted by the same authorization.

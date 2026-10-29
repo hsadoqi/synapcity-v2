@@ -22,4 +22,4 @@ An app imports, in this order, `tailwindcss`, `shadcn/tailwind.css` and `@synapc
 
 ## Fonts
 
-Roles are `--font-body`, `--font-ui`, `--font-heading` and `--font-code`. Each reads `--font-preference-<role>` first and falls back to the default loaded by the app ([ADR-0003](../../../docs/architecture/decisions/0003-typography-roles-and-font-preferences.md)). The fonts themselves are loaded by the app, not here.
+Roles are `--font-body`, `--font-ui`, `--font-heading` and `--font-code`. Each reads `--font-preference-<role>` first and falls back to the default font variable a host provides ([ADR-0003](../../../docs/architecture/decisions/0003-typography-roles-and-font-preferences.md)). The fonts themselves are loaded by [`@synapcity/frontend-fonts`](../fonts/README.md), not here; the three variable names the roles read (`--font-inter`, `--font-geist-sans`, `--font-geist-mono`) are the ones its loaders define, and `src/tokens.test.ts` checks that they agree.

@@ -38,7 +38,7 @@ Follow these rules when writing or editing UI in this repo.
 ### Typography
 
 - Four roles, set by tokens: `--font-body` (Inter, reading text), `--font-ui` (Inter, controls and labels), `--font-heading` (Geist) and `--font-code` (Geist Mono, code only). Do not declare a font stack in a component or app (ADR-0003).
-- User font choice is a runtime override through `--font-preference-heading`, `--font-preference-body`, `--font-preference-code` and optionally `--font-preference-ui`, never a code change. Fonts are loaded in `apps/web/src/app/layout.tsx` through `next/font`; add a selectable font by adding a loader there.
+- User font choice is a runtime override through `--font-preference-heading`, `--font-preference-body`, `--font-preference-code` and optionally `--font-preference-ui`, never a code change. The three default fonts are loaded once, through `next/font`, in `@synapcity/frontend-fonts` (`packages/frontend/fonts`); web, docs and Storybook put its classes on `<html>`. A font is not declared in an app or a component.
 
 ### Styling discipline
 

@@ -2,7 +2,9 @@ import { render } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 // The font loaders only run inside Next's build; here they are replaced.
-vi.mock('./fonts', () => ({ fontVariables: 'font-inter-var' }));
+vi.mock('@synapcity/frontend-fonts/next', () => ({
+  fontVariables: 'font-inter-var',
+}));
 const reportCaughtError = vi.hoisted(() => vi.fn());
 vi.mock('@synapcity/frontend-error-reports', () => ({ reportCaughtError }));
 

@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
-import localFont from 'next/font/local';
 import '../styles/globals.css';
-import { Inter } from 'next/font/google';
+import { fontVariables } from '@synapcity/frontend-fonts/next';
 import { cn } from '@/lib/utils';
 import RootProviders from './providers';
 import { RootShell } from '@synapcity/frontend-shells';
@@ -20,19 +19,6 @@ import {
   parseLookCookieValue,
 } from '@synapcity/domain-preferences';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
-
-const geistSans = localFont({
-  src: '../lib/fonts/GeistVF.woff',
-  variable: '--font-geist-sans',
-});
-const geistMono = localFont({
-  src: '../lib/fonts/GeistMonoVF.woff',
-  variable: '--font-geist-mono',
-  // Code only: fetch it when a code element first renders, not on every page.
-  preload: false,
-});
-
 export const metadata: Metadata = createMetadata({ title: 'Synapcity Docs' });
 
 export default async function RootLayout({
@@ -48,12 +34,7 @@ export default async function RootLayout({
     <html
       lang="en"
       {...lookAttributes}
-      className={cn(
-        inter.variable,
-        geistSans.variable,
-        geistMono.variable,
-        lookAttributes?.className,
-      )}
+      className={cn(fontVariables, lookAttributes?.className)}
       style={lookAttributes?.style}
       suppressHydrationWarning
     >

@@ -12,6 +12,7 @@
     "test:storybook:watch": "vitest run --watch"
   },
   "dependencies": {
+    "@synapcity/frontend-fonts": "workspace:*",
     "@synapcity/frontend-preferences": "workspace:*",
     "@synapcity/frontend-ui": "workspace:*",
     "next": "16.4.3",

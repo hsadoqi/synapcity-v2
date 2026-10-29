@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import '@/styles/globals.css';
-import { fontVariables } from './fonts';
+import { fontVariables } from '@synapcity/frontend-fonts/next';
 import RootProviders from '../components/providers/root-providers';
 import { NextShellNavigation } from '@synapcity/frontend-shells/next';
 import { createMetadata } from '@synapcity/frontend-site/metadata';

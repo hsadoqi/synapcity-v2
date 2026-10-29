@@ -88,6 +88,7 @@ The host supplies where a link leads and how an action is invoked. A callback ex
 - `preferences` ----> Browser preference runtime: device store, applying theme/mode/fonts, consent state. Exists since M6.2 ([README](preferences/README.md))
 - `error-reports` ----> Consent-gated browser error reporting. Exists since M6.5 ([README](error-reports/README.md))
 - `site` ----> Existing site metadata/brand concerns
+- `fonts` ----> The default typefaces and their `next/font` loaders; hosts put the variable classes on `<html>`. Exists since 2026-10-29 ([README](fonts/README.md))
 - `tailwind-config` ----> Existing styling foundation
 
 ## Current implementation and migration inputs

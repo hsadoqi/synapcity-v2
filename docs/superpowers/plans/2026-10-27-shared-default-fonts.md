@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Approved in direction (owner, 2026-10-27). Reviewed 2026-10-27 (spec section 9). Task 1 can start; Task 3 waits on the owner's answers to spec O1 and O2.
+**Status:** Executed 2026-10-29 (spec section 10). Task 1 was done in place with the real package, Task 2 was settled by the owner's instruction of 2026-10-29 (O1: Geist Mono stays; O2: option B), and Tasks 3 to 7 are in the pull request. Two steps differ from the text below: the Task 6 `AGENTS.md` edit also reaches `design-system-rules.md`, which carries the same sentence, and the stylesheet-before-fonts import order in each layout is a tested rule (it is what removed docs' duplicate Inter request).
 
 **Goal:** Load Inter, Geist and Geist Mono once in a workspace package and have `apps/web`, `apps/docs` and Storybook consume the same font variable classes, from one copy of the font files.
 
