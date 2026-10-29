@@ -11,6 +11,42 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      dashboard_compositions: {
+        Row: {
+          composition: NonNullable<Json>;
+          dashboard_id: string;
+          owner_id: string;
+          revision: number;
+          schema_version: number;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          composition: NonNullable<Json>;
+          dashboard_id: string;
+          owner_id?: string;
+          revision?: number;
+          schema_version?: number;
+          updated_at?: string;
+        };
+        Update: {
+          composition?: NonNullable<Json>;
+          dashboard_id?: string;
+          owner_id?: string;
+          revision?: number;
+          schema_version?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'dashboard_compositions_dashboard_id_fkey';
+            columns: ['dashboard_id'];
+            isOneToOne: true;
+            referencedRelation: 'dashboards';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       dashboards: {
         Row: {
           created_at: string;
