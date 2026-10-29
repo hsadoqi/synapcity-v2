@@ -78,12 +78,9 @@ test.describe('document and dashboard pages', () => {
   test('a long document name keeps the frame inside the window', async ({
     page,
   }) => {
-    // Known defect, outside this page's files: the shell's work area does not
-    // let the frame shrink below the header title's full width, so at 390 the
-    // frame is wider than the window and clipped instead of the title
-    // truncating. The page itself does not scroll sideways, so the check
-    // above cannot see it. Remove `test.fail` once the shell is fixed.
-    test.fail();
+    // The page itself does not scroll sideways even when the frame is wider
+    // than the window and clipped, so the check above cannot see that; this
+    // measures the frame's box instead (issue 126).
     await page.setViewportSize({ width: 390, height: 800 });
     await page.goto(LONG.path);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
