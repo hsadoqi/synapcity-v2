@@ -1,6 +1,6 @@
 # Dashboard S2: Task 1 measurements
 
-**Status:** Evidence for [the S2 plan](2026-10-29-dashboard-s2-first-open-responsive-polish.md), Task 1. Recorded 2026-10-29 from `origin/main` at `10e70ef6`, before any S2 source change. Every value in the tables is **measured**: read from the running page, not derived from code.
+**Status:** Evidence for [the S2 plan](2026-10-29-dashboard-s2-first-open-responsive-polish.md), Task 1. Recorded 2026-10-29 from `origin/main` at `10e70ef6`, before any S2 source change; the last section was added after S2a and S2c and says so. Every value in the tables is **measured**: read from the running page, not derived from code.
 
 ## How it was measured
 
@@ -97,3 +97,18 @@ Below a 1024 px window the sidebar collapses to its 48 px icon rail, which gives
 - Most of what looks wrong at that width is the unintended mobile frame (a 348 px grid in a 540 px canvas). S2a removes it; after S2a the single column fills the 540 px canvas.
 - D2-2 would change which saved layout every host shows at a given width. Two columns would fit at 540 px (about 262 px each, against a 120 px minimum column), so it is possible, but the measurements do not show a defect that requires it. It can be reconsidered after the Task 7 card audit shows how single-column cards read at 500 to 640 px.
 - D2-3 is a `ContextualPanelShell` change and a separate plan; the panel already covers the canvas at phone widths (480 and 390).
+
+## After S2a and S2c: audit of the empty state and cards (Tasks 6 and 7)
+
+Measured on the S2 branch after the frame fix and the fixture seeds, in fixture mode, with the system colour scheme emulated light and dark. Cases: 1440 (lg), 960 (md), 390 (sm) with the panel closed, and 1280 with Widgets open (sm). Dashboards: Project status (seeded with Pinned, Last opened and Spaces) and Reading progress (empty). Screenshots are kept outside the repository.
+
+| Check                                     | Result (measured)                                                                                                    |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Page scrolls sideways                     | Never (`scrollWidth - innerWidth` 0 in all 16 captures)                                                              |
+| Card wider than its cell, clipped content | None. Lists longer than a card scroll inside its focusable body                                                      |
+| Truncated titles                          | None at these widths                                                                                                 |
+| Card sizes                                | lg 328 × 176, md 395 × 176, sm 284 × 224; 1280 with Widgets open: 540 × 224, one column filling the canvas, no frame |
+| Empty state                               | Centred, wraps to two lines at 390, readable in both themes; no defect found                                         |
+| Storybook matrix (`Dashboards/Grid`)      | Six stories, lg, md, sm in light and dark: accessibility checks (axe) and the no-horizontal-overflow assertion pass  |
+
+No defect was found, so Tasks 6 and 7 change no component. Not a defect, recorded for later: a seeded fixture dashboard shows the save status Saved before anything was written, because that status means no unsaved changes; the save status contract is unchanged in S2.
