@@ -411,6 +411,66 @@ test.describe('editing a dashboard', () => {
     expect(saved).toEqual([]);
   });
 
+  test('at a 1280 px window with Widgets open, the canvas is under 640 px and lays out in one column, unframed', async ({
+    page,
+  }) => {
+    // D2-1 (approved 2026-10-29): the layout follows the canvas, with the 640
+    // and 1024 thresholds. Measured in S2 Task 1: about 580 px here.
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(
+      '/fixture-user/home/dashboards/fixture-dashboard-project-status',
+    );
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
+    await expect(page.locator('[data-widget-id]')).toHaveCount(3, {
+      timeout: 15_000,
+    });
+    await page
+      .getByRole('toolbar', { name: 'Contextual panel' })
+      .getByRole('button', { name: 'Widgets' })
+      .click();
+    // Wait out the panel's opening glide: the surface settles under 640 px.
+    const surface = () =>
+      page.evaluate(() => {
+        const canvas = document.querySelector<HTMLElement>(
+          '[data-slot="dashboard-canvas"]',
+        )!;
+        const style = getComputedStyle(canvas);
+        return {
+          viewport: window.innerWidth,
+          // The surface has no padding and nothing beside the canvas, so its
+          // width is the canvas's border box; the canvas content excludes 40 px.
+          surface: canvas.getBoundingClientRect().width,
+          canvas:
+            canvas.clientWidth -
+            parseFloat(style.paddingLeft) -
+            parseFloat(style.paddingRight),
+        };
+      });
+    await expect.poll(async () => (await surface()).surface).toBeLessThan(640);
+    const widths = await surface();
+    expect(widths.viewport).toBe(1280);
+    expect(widths.surface).toBeGreaterThan(500);
+    expect(widths.canvas).toBeLessThan(widths.surface);
+
+    await expect(
+      page.getByRole('button', { name: 'Mobile layout' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    // Nothing was chosen, so no device frame.
+    await expect(page.getByText(/· (834|390)px/)).toHaveCount(0);
+    // One column: every widget starts at the same left edge, one under another.
+    const boxes = await page.locator('[data-widget-id]').evaluateAll((cells) =>
+      cells.map((cell) => {
+        const r = cell.getBoundingClientRect();
+        return { left: Math.round(r.left), top: r.top, width: r.width };
+      }),
+    );
+    expect(new Set(boxes.map((box) => box.left)).size).toBe(1);
+    expect(new Set(boxes.map((box) => box.top)).size).toBe(3);
+    // And the column fills the canvas rather than a 390 px frame.
+    for (const box of boxes) expect(box.width).toBeGreaterThan(500);
+  });
+
   test('leaving with an unsaved change asks first', async ({ page }) => {
     await openEmpty(page);
     let asked = false;
