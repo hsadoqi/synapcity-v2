@@ -50,13 +50,17 @@ jobs:
           key: turbo-${{ runner.os }}-${{ github.sha }}
           restore-keys: turbo-${{ runner.os }}-
 
-      # Chromium is downloaded on every run otherwise. The key follows the
-      # lockfile, which pins the Playwright version. System packages
-      # (`--with-deps`) are still installed each run.
+      # Chromium is downloaded on every run otherwise. The browser follows the
+      # Playwright version alone, so that is the key: keyed on the lockfile,
+      # every dependency change saved another copy of the same browser. System
+      # packages (`--with-deps`) are still installed each run.
+      - name: Read the Playwright version
+        id: playwright
+        run: echo "version=$(pnpm --filter web exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
 
       # `pnpm install` does not download browsers. `pnpm verify` runs the web
       # end-to-end tests and the Storybook story tests, and both drive Chromium.
