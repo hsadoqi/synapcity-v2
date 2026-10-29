@@ -179,7 +179,8 @@ test.describe('editing a dashboard', () => {
     await page.getByRole('button', { name: 'Pinned' }).click();
     // Navigate away before the 400 ms debounce can save.
     await page.evaluate(() => {
-      window.location.href = '/fixture-user/home';
+      const away = '/fixture-user/home';
+      window.location.assign(away);
     });
     await expect.poll(() => asked).toBe(true);
   });
