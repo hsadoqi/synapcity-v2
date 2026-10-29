@@ -5,7 +5,7 @@ import type { DashboardStore } from '../../store';
 
 type Listens = Pick<EventTarget, 'addEventListener' | 'removeEventListener'>;
 
-export type SaveTarget = {
+type SaveTarget = {
   window: Listens;
   document: Listens & { visibilityState: DocumentVisibilityState };
 };

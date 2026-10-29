@@ -1,3 +1,4 @@
+export type { PersistableResult } from './utils';
 export type {
   AgendaWidget,
   CalendarWidget,
@@ -21,6 +22,7 @@ export type {
 export {
   DEFAULT_SETTINGS,
   LINK_WIDGET_TYPES,
+  MAX_COMPOSITION_BYTES,
   WIDGET_SIZES,
   activeWidgets,
   addWidget,
@@ -32,6 +34,7 @@ export {
   gridLayoutFor,
   layoutsForWidgets,
   moveWidgetInOrder,
+  parsePersistableComposition,
   removeWidget,
   setWidgetStatus,
   updateSettings,

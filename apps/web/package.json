@@ -20,6 +20,7 @@
   "dependencies": {
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.117.3",
+    "@synapcity/domain-dashboards": "workspace:*",
     "@synapcity/domain-identity": "workspace:*",
     "@synapcity/domain-preferences": "workspace:*",
     "@synapcity/domain-records": "workspace:*",

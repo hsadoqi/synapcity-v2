@@ -50,7 +50,7 @@ export type SaveStatus =
   | 'conflict';
 
 /** The widget the last removal took out, kept so Undo can put it back. */
-export type RemovedWidget = {
+type RemovedWidget = {
   widget: Widget;
   /** Where it sat among the widgets, so Undo puts it back in the same place. */
   index: number;
