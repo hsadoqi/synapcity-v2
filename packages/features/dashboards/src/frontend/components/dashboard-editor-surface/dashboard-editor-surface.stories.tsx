@@ -7,16 +7,16 @@ import { DashboardWidgetsDestination } from '../dashboard-widgets-destination';
 import { DashboardEditorSurface } from './index';
 
 const meta: Meta<typeof DashboardEditorSurface> = {
-  title: 'Dashboards/EditorSurface',
-  component: DashboardEditorSurface,
-  parameters: { layout: 'fullscreen' },
-  decorators: [
-    (Story) => (
-      <div className="flex h-screen flex-col">
-        <Story />
-      </div>
-    ),
-  ],
+    title: 'Dashboards/EditorSurface',
+    component: DashboardEditorSurface,
+    parameters: { layout: 'fullscreen' },
+    decorators: [
+        (Story) => (
+            <div className="flex h-screen flex-col">
+                <Story />
+            </div>
+        ),
+    ],
 };
 
 export default meta;
@@ -26,7 +26,7 @@ type Story = StoryObj<typeof DashboardEditorSurface>;
 export const Default: Story = { decorators: [withDashboardStore()] };
 
 export const Empty: Story = {
-  decorators: [withDashboardStore({ composition: createComposition() })],
+    decorators: [withDashboardStore({ composition: createComposition() })],
 };
 
 /**
@@ -34,26 +34,28 @@ export const Empty: Story = {
  * surface asks for it with `onOpenPalette`, and the host's column shows it.
  */
 export const WithHostPalette: Story = {
-  decorators: [
-    withDashboardStore(),
-    (Story) => (
-      <div className="flex min-h-0 flex-1">
-        <div className="flex min-w-0 flex-1 flex-col">
-          <Story />
-        </div>
-        <div className="w-80 shrink-0 overflow-auto border-l border-border">
-          <DashboardWidgetsDestination />
-        </div>
-      </div>
-    ),
-  ],
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(
-      canvas.getAllByRole('button', { name: 'Edit layout' })[0]!,
-    );
-    await expect(
-      canvas.getByRole('region', { name: 'Add to dashboard' }),
-    ).toBeVisible();
-  },
+    // The first decorator is the innermost: the layout (which holds the host's
+    // palette) must sit inside the store.
+    decorators: [
+        (Story) => (
+            <div className="flex min-h-0 flex-1">
+                <div className="flex min-w-0 flex-1 flex-col">
+                    <Story />
+                </div>
+                <div className="w-80 shrink-0 overflow-auto border-l border-border">
+                    <DashboardWidgetsDestination />
+                </div>
+            </div>
+        ),
+        withDashboardStore(),
+    ],
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await userEvent.click(
+            canvas.getAllByRole('button', { name: 'Edit layout' })[0]!,
+        );
+        await expect(
+            canvas.getByRole('region', { name: 'Add to dashboard' }),
+        ).toBeVisible();
+    },
 };
