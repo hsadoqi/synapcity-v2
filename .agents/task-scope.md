@@ -1,3 +1,12 @@
+## Active task: route-group follow-up, verification and test review (2026-10-29)
+
+- Goal and mode: implementing, owner-directed. Branch `refactor/route-group-followup`, worktree `refactors/route-group-followup`, based on the pushed `plan/protected-route-architecture` at `16473cc0` (pull request 93), so the shared checkout, held by another session, stays untouched.
+- Changes: real-session and callback checks against the local Supabase stack (`apps/web/e2e/local-session.e2e.ts`, `e2e/support/local-stack.ts`, `e2e/run-local-session.mjs`, `playwright.local-session.config.ts`, script `test:e2e:local-session`); `route-groups.test.ts` rewritten from source-text rules to URL, proxy and boundary-file guarantees plus `app/route-groups.dom.test.tsx` rendering the layouts and boundaries; `/auth/welcome` fixed (client wrapper `welcome-card.tsx`); `metadata` removed from `[userId]/layout.tsx` and `[userId]/home/layout.tsx`; verification record under `docs/engineering/verification-records/`; README, quality gates and ADR-0006 updated.
+- Not changed: any URL, `proxy.ts`, session checks, the callback handler, `requireOwner`, migrations, RLS, dependencies, hosted data, other worktrees. The local stack's configuration was not changed.
+- Operational state touched: one temporary user (`route-groups-e2e-*@example.test`) per run in the local Supabase stack, created through its admin API and removed with its mail afterwards; the stack held none, and no orphaned rows, after the last run. A gitignored `apps/web/.env.local` pointing at the local stack was written in this worktree and the investigation worktree. An investigation worktree of `origin/main` (`investigations/main-404-baseline`) was created to compare 404 behavior.
+- Evidence and corrections: see `docs/engineering/verification-records/2026-10-29-route-groups.md`, including the correction that an earlier `pnpm verify` ran the web package's script, not the repository gate.
+- Not verified: OAuth and email-confirmation callbacks; a hosted deployment's callback origin; render errors in a browser; a screen reader.
+
 ## Active task: CI hygiene and verification reliability (2026-10-29)
 
 - Goal and mode: implementing, owner-requested. Branch `fix/ci-hygiene`, worktree `synapcity.worktrees/ci-hygiene`, kept apart from Dependabot maintenance (no dependency or lockfile change).

@@ -61,6 +61,7 @@ const pages = [
   { path: '/auth/login', heading: 'Sign in' },
   { path: '/auth/register', heading: 'Sign up' },
   { path: '/auth/forgot-password', heading: 'Reset your password' },
+  { path: '/auth/error', heading: 'That link did not work' },
 ];
 
 for (const { path, heading } of pages) {
@@ -100,6 +101,10 @@ for (const { path, heading } of pages) {
         '/opengraph-image',
       );
       await expect(page).toHaveTitle(/Synapcity/);
+      await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
+        'content',
+        'summary_large_image',
+      );
     });
   });
 }

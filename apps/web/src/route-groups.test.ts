@@ -5,170 +5,139 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 import { config } from './proxy';
+import { isGuestOnlyPath, isProtectedPath } from './lib/routing/route-access';
 
 /**
- * The `(public)`, `(auth)` and `(protected)` route groups split page chrome
- * by route family without adding a URL segment. A lexical scan, like
- * `protected-routes.test.ts`: it pins who owns the document, the shell and the
- * access rule, so a later move cannot quietly change them.
+ * The `(public)`, `(auth)` and `(protected)` route groups split page chrome by
+ * route family without adding a URL segment. This file pins what must not
+ * change when routes move between them or new ones are added: the URLs people
+ * and email links rely on, where each family lives, and what the proxy does
+ * with it. How the layouts and boundaries behave when rendered is in
+ * `route-groups.dom.test.tsx`; the effective metadata and landmarks in a
+ * browser are in `e2e/route-groups.e2e.ts`.
  */
 
 const APP = join(dirname(fileURLToPath(import.meta.url)), 'app');
-const read = (path: string) => readFileSync(join(APP, path), 'utf8');
+const GROUP = /^\(.*\)$/;
 
-function routesIn(dir: string, file: RegExp): string[] {
+function filesIn(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const path = join(dir, entry.name);
-    if (entry.isDirectory()) return routesIn(path, file);
-    return file.test(entry.name) ? [path] : [];
+    return entry.isDirectory() ? filesIn(path) : [path];
   });
 }
 
-/** The URL path a page or route handler is served at, groups removed. */
-const urlOf = (file: string) =>
-  '/' +
-  relative(APP, dirname(file))
-    .split('/')
-    .filter((segment) => segment && !/^\(.*\)$/.test(segment))
-    .join('/');
+/** Every page and route handler: its URL pattern and the route group it sits in. */
+const routes = filesIn(APP)
+  .filter((file) => /\/(page\.tsx|route\.ts)$/.test(file))
+  .map((file) => {
+    const segments = relative(APP, dirname(file)).split('/').filter(Boolean);
+    return {
+      group: segments.find((segment) => GROUP.test(segment)) ?? null,
+      url: '/' + segments.filter((segment) => !GROUP.test(segment)).join('/'),
+    };
+  });
 
-const urlsIn = (group: string, file = /^(page\.tsx|route\.ts)$/) =>
-  routesIn(join(APP, group), file).map(urlOf).sort();
+const urlsIn = (group: string) =>
+  routes.filter((route) => route.group === group).map((route) => route.url);
+
+/** A URL with each dynamic segment replaced by a sample value. */
+const sample = (url: string) => url.replace(/\[[^\]]+\]/g, 'sample');
 
 describe('URLs are unchanged by the route groups', () => {
-  it('serves the public pages at / and /privacy', () => {
-    expect(urlsIn('(public)')).toEqual(['/', '/privacy']);
-  });
-
-  it('serves every account-flow page and the callback under /auth', () => {
-    expect(urlsIn('(auth)')).toEqual([
-      '/auth/callback',
-      '/auth/delete-account',
-      '/auth/error',
-      '/auth/forgot-password',
-      '/auth/login',
-      '/auth/register',
-      '/auth/update-password',
-      '/auth/welcome',
-    ]);
-  });
-
-  it('keeps /auth and the public pages out of the other groups and the app root', () => {
-    expect(existsSync(join(APP, 'auth'))).toBe(false);
-    expect(existsSync(join(APP, 'page.tsx'))).toBe(false);
-    expect(existsSync(join(APP, 'privacy'))).toBe(false);
-  });
-
-  it('does not let a group name become a URL matcher in the proxy', () => {
-    expect(config.matcher.join('')).not.toMatch(/public|auth\)|protected/);
-  });
-});
-
-describe('layout ownership', () => {
-  it('keeps the document, and only the document, in the root layout', () => {
-    const layouts = routesIn(APP, /^layout\.tsx$/).filter((file) =>
-      readFileSync(file, 'utf8').includes('<html'),
+  it('still serves the public pages from the (public) group', () => {
+    expect(urlsIn('(public)')).toEqual(
+      expect.arrayContaining(['/', '/privacy']),
     );
-    expect(layouts).toEqual([join(APP, 'layout.tsx')]);
   });
 
-  it('keeps page chrome out of the root layout', () => {
-    const root = read('layout.tsx');
-    expect(root).not.toMatch(/AppShell|PublicShell|AuthPageShell/);
-    expect(root).toContain('RootProviders');
-    expect(root).toContain('modeBootScript');
+  it('still serves every account-flow URL and the callback from the (auth) group', () => {
+    expect(urlsIn('(auth)')).toEqual(
+      expect.arrayContaining([
+        '/auth/callback',
+        '/auth/delete-account',
+        '/auth/error',
+        '/auth/forgot-password',
+        '/auth/login',
+        '/auth/register',
+        '/auth/update-password',
+        '/auth/welcome',
+      ]),
+    );
   });
 
-  it('gives the protected group the workspace shell and the others the public shell', () => {
-    expect(read('(protected)/layout.tsx')).toContain('<AppShell');
-    expect(read('(public)/layout.tsx')).toContain('<PublicShell');
-    expect(read('(auth)/layout.tsx')).toContain('<PublicShell');
-    expect(read('(auth)/layout.tsx')).toContain('<AuthPageShell>');
-    for (const group of ['(public)', '(auth)']) {
-      expect(read(`${group}/layout.tsx`)).not.toContain('AppShell');
-    }
-  });
-});
-
-/**
- * Measured in the running app. Next renders a group's `not-found` inside that
- * group's layout, so a shell in it nests inside the group's own (two `main`
- * landmarks, duplicate skip links and ids). An `error` boundary instead
- * replaces the layouts below it, so the workspace shell is lost unless the
- * group has its own. Root boundaries therefore bring the public shell for
- * addresses no group matches, and every group's boundary brings none.
- */
-describe('error and not-found boundaries', () => {
-  const GROUPS = ['(public)', '(auth)', '(protected)'];
-
-  it('gives the root boundaries the public shell, for addresses no group matches', () => {
-    expect(read('error.tsx')).toContain('<PublicShell>');
-    expect(read('not-found.tsx')).toContain('<PublicShell>');
-  });
-
-  it('gives every group a not-found that brings no shell of its own', () => {
-    for (const group of GROUPS) {
-      const source = read(`${group}/not-found.tsx`);
-      expect(source, group).toContain('NotFoundMessage');
-      expect(source, group).not.toMatch(/Shell/);
-    }
-  });
-
-  it('keeps the workspace shell on screen when a protected page fails', () => {
-    const source = read('(protected)/error.tsx');
-    expect(source).toContain("'use client'");
-    expect(source).toContain('RouteErrorMessage');
-    expect(source).not.toMatch(/Shell/);
-  });
-
-  it('keeps the shared messages free of any shell', () => {
-    const messages = join(dirname(APP), 'components', 'route-messages');
-    for (const file of ['not-found-message.tsx', 'route-error-message.tsx']) {
-      expect(readFileSync(join(messages, file), 'utf8'), file).not.toMatch(
-        /<\w*Shell/,
-      );
-    }
-  });
-});
-
-describe('access is decided by the page, not by the presentation groups', () => {
-  it('adds no session check or redirect to the public or auth layouts', () => {
-    for (const group of ['(public)', '(auth)']) {
-      expect(read(`${group}/layout.tsx`)).not.toMatch(
-        /requireSignedIn|requireOwner|getVerifiedClaims|getVerifiedIdentity|redirect\(/,
+  it('keeps everything under /auth in the (auth) group and nothing else there', () => {
+    for (const route of routes) {
+      expect(route.url.startsWith('/auth/'), route.url).toBe(
+        route.group === '(auth)',
       );
     }
   });
 
-  it('keeps the session check in the flows that need a session', () => {
-    for (const page of ['welcome', 'update-password', 'delete-account']) {
-      expect(read(`(auth)/auth/${page}/page.tsx`)).toContain(
-        'getVerifiedClaims()',
-      );
+  it('keeps the owner area, and only it, in the (protected) group', () => {
+    for (const route of routes.filter((r) => r.group === '(protected)')) {
+      expect(route.url, route.url).toMatch(/^\/\[userId\]/);
     }
+    expect(urlsIn('(protected)')).toEqual(
+      expect.arrayContaining(['/[userId]/home', '/[userId]/settings']),
+    );
+  });
+
+  it('puts every page in a group, leaving only the API outside', () => {
+    const outside = routes.filter((route) => route.group === null);
+    expect(outside.map((route) => route.url).sort()).toEqual(
+      outside
+        .filter((route) => route.url.startsWith('/api/'))
+        .map((r) => r.url)
+        .sort(),
+    );
+    expect(existsSync(join(APP, 'page.tsx'))).toBe(false);
+  });
+
+  it('lets only the root layout own the document', () => {
+    const documents = filesIn(APP).filter(
+      (file) =>
+        /\/layout\.tsx$/.test(file) &&
+        readFileSync(file, 'utf8').includes('<html'),
+    );
+    expect(documents).toEqual([join(APP, 'layout.tsx')]);
   });
 });
 
-describe('metadata inheritance', () => {
-  it('sets the site metadata once, in the root layout', () => {
-    expect(read('layout.tsx')).toContain('createMetadata(');
+describe('the proxy still decides by URL, not by group', () => {
+  it('does not turn a group folder name into a matcher', () => {
+    expect(config.matcher.join('')).not.toMatch(/\((public|auth|protected)\)/);
   });
 
-  it('does not redefine Open Graph in a group layout, which would replace the root image', () => {
+  it('never asks for a session on a public or auth URL', () => {
+    for (const url of [...urlsIn('(public)'), ...urlsIn('(auth)')]) {
+      expect(isProtectedPath(sample(url)), url).toBe(false);
+    }
+  });
+
+  it('asks for a session on the owner area', () => {
+    for (const url of ['/[userId]/home', '/[userId]/settings']) {
+      expect(isProtectedPath(sample(url)), url).toBe(true);
+    }
+  });
+
+  it('keeps sign-in and sign-up the only guest-only pages', () => {
+    const guestOnly = urlsIn('(auth)').filter((url) => isGuestOnlyPath(url));
+    expect(guestOnly.sort()).toEqual(['/auth/login', '/auth/register']);
+  });
+});
+
+describe('boundaries Next selects by file name', () => {
+  it('gives each group its own not-found, and the owner area an error boundary', () => {
     for (const group of ['(public)', '(auth)', '(protected)']) {
-      expect(read(`${group}/layout.tsx`)).not.toMatch(
-        /createMetadata|openGraph/,
-      );
+      expect(existsSync(join(APP, group, 'not-found.tsx')), group).toBe(true);
     }
+    expect(existsSync(join(APP, '(protected)', 'error.tsx'))).toBe(true);
   });
 
-  it('gives every auth page its own title', () => {
-    const pages = routesIn(join(APP, '(auth)'), /^page\.tsx$/);
-    expect(pages.length).toBeGreaterThan(0);
-    for (const page of pages) {
-      expect(readFileSync(page, 'utf8'), page).toMatch(
-        /export const metadata[^=]*= \{ title: /,
-      );
+  it('keeps root boundaries for what no group handles', () => {
+    for (const file of ['error.tsx', 'not-found.tsx', 'global-error.tsx']) {
+      expect(existsSync(join(APP, file)), file).toBe(true);
     }
   });
 });

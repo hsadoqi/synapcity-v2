@@ -47,6 +47,13 @@ describe('the welcome page', () => {
     });
   });
 
+  it('passes the card nothing a Server Component cannot hand to a Client Component', async () => {
+    const element = await page('/u1/settings');
+
+    // The sign-in route is a function; it is supplied inside the client card.
+    expect(element.props.signInHref).toBeUndefined();
+  });
+
   it('starts with an empty name when the account has none', async () => {
     mocks.claims = { sub: 'u1', user_metadata: {} };
 

@@ -9,6 +9,9 @@
   },
   "ignoreDependencies": [],
   "workspaces": {
+    "apps/web": {
+      "entry": ["playwright.local-session.config.ts"]
+    },
     "packages/frontend/tailwind-config": {
       "ignoreDependencies": ["tailwindcss"]
     }

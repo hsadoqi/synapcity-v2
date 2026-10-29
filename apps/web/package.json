@@ -11,6 +11,7 @@
     "check-types": "next typegen && tsc --noEmit",
     "verify": "pnpm lint && pnpm check-types && pnpm build",
     "ui:add": "pnpm dlx shadcn@latest add",
+    "test:e2e:local-session": "node e2e/run-local-session.mjs",
     "test:e2e": "playwright test",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage"

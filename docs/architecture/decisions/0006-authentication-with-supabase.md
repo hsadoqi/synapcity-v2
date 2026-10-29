@@ -175,7 +175,9 @@ Decided by the repository owner, superseding the deferral (D2) in the plan above
 
 **Auth presentation.** The auth column now has a side gutter and vertical spacing (16px each side at 320px; it was flush with the screen edge on phones, as it was before the split). The one auth page that rendered `MessagePage` inside the column, the delete-account "ask for a new link" state, uses the same `AuthShell` card as the other auth pages. No per-flow layout option was added, because every flow fits the shared column.
 
-**Not verified.** Signed-in rendering of the public and auth shells against a real Supabase project (the account menu itself; fixture mode shows its label instead). The probe pages used to measure the boundaries were temporary and are not in the repository.
+**Follow-up, 2026-10-29 (local-stack verification).** Run against the local Supabase stack with a temporary user ([record](../../engineering/verification-records/2026-10-29-route-groups.md)): signed-in `/`, `/privacy` and the auth pages render in one public shell with the account menu; `/auth/login` and `/auth/register` still send a signed-in visitor on; sign-out drops the session; a password-reset link completes through `/auth/callback` (code exchanged, session cookie set, verifier cookie cleared, replay rejected, an unsafe `next` ignored). It found and fixed two defects that the groups did not cause: `/auth/welcome` returned 500 because the server page passed a function to a client component, and the owner-area layouts re-ran `createMetadata`, dropping the share image there as the auth layout had.
+
+**Not verified.** OAuth and email-confirmation callbacks (no provider or confirmation mail in the local stack); a hosted deployment's callback origin (under `next start` the redirect names `localhost` whatever the `Host` header says); the root `error` boundary and `(protected)/error.tsx` with a real thrown error in a browser; a screen reader. The probe pages used to measure the boundaries were temporary and are not in the repository; the record holds a labelled reconstruction of their text.
 
 ## Reconsideration conditions
 

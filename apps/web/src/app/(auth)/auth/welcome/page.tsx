@@ -1,12 +1,11 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-import { ProfileSetupCard } from '@synapcity/features-auth/frontend';
 import {
   completeProfile,
   skipProfileSetup,
 } from '@/features/account/server/actions/setup-actions';
-import { signInHref } from '@/lib/routing/sign-in-href';
+import { WelcomeCard } from './welcome-card';
 import { getVerifiedClaims } from '@/features/auth/server';
 import { profileFromClaims } from '@synapcity/domain-identity';
 import { welcomePath } from '@/lib/routing/auth-flow';
@@ -39,10 +38,9 @@ export default async function WelcomePage({
   const { name, imageUrl } = profileFromClaims(claims);
 
   return (
-    <ProfileSetupCard
+    <WelcomeCard
       completeProfile={completeProfile}
       skipProfileSetup={skipProfileSetup}
-      signInHref={signInHref}
       defaultName={name ?? ''}
       imageUrl={imageUrl}
       next={next}
