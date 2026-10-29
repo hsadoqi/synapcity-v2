@@ -37,7 +37,7 @@ How users authenticate to `apps/web` and how their session is held and refreshed
 
 - The general persistence model, API style or state management for product data. Supabase is chosen here for identity only.
 - Authorization beyond "signed in" and "owns this row" (roles, teams, sharing).
-- Which routes are protected. The first protected route is a proof, not a product decision.
+- Which routes are protected beyond the signed-in owner area (`/<userId>/home` and `/<userId>/settings`). The owner area's organization is settled by the route-group amendment below; any other protected route, and any public route, is not.
 - Account deletion, MFA, magic links, anonymous sign-in, additional OAuth providers (Apple and others).
 - Deployment topology and the production domain.
 - Whether `apps/docs` or other apps authenticate.
@@ -126,6 +126,38 @@ Design: [Supabase review fixes](../../superpowers/specs/2026-10-27-supabase-revi
 - **View recording exception (R5).** `recordSpaceView` checks the caller with `getVerifiedIdentity` (claims) instead of `getCallerIdentity` (`getUser()`), because it runs on every Space open and writes only a timestamp that row-level security limits to the caller's own rows. A revoked session can at most stamp its own row until its token expires. Every other write, pins included, keeps the fresh lookup. The saving depends on asymmetric signing keys: the project's key set lists an ES256 key (checked 2026-10-27); a live token's header was not checked.
 
 Placement: the remaining provider calls in the auth Server Actions (password sign-in, sign-up confirmation resend, password update, OAuth sign-in, sign-out) and `/auth/callback`'s code exchange are `server-supabase` operations; the actions and the route stay host entries. `identity-boundary.test.ts` now allows only `getVerifiedClaims` in `session.ts` plus the two files the leftovers change moves. An Auth outage on a protected page still sends a signed-in person to sign-in, because the proxy redirects first; that stays the separate proxy decision (leftovers F4).
+
+## Amendment, 2026-10-29: the `(protected)` route group
+
+Approved by the repository owner (decisions D1 and D2 of [the protected route architecture plan](../../superpowers/plans/2026-10-29-protected-route-architecture.md)). The provider, session model, `getClaims` rule and PKCE flow above are unchanged, and no URL, schema or policy changes.
+
+**Decision.** The signed-in owner area, `app/(protected)/[userId]/...`, sits in a `(protected)` route group. The group adds no URL segment. It is route organization: it is not a security mechanism, and no code may rely on a page being inside it to be protected. The group's layout (`app/(protected)/layout.tsx`) is a thin server-side backstop that calls `requireSignedIn()` (`lib/access/require-signed-in.ts`), which reads the same memoized claims as `requireOwner` and so adds no second verification. The root layout, shell and providers are unchanged and shared with public and auth pages. Moving the shell into the group is not decided (see below).
+
+**Where access is decided.** Each layer has one job and none replaces another:
+
+| Layer                                 | Decides                                                                                                    | Does not decide                                       |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| Proxy (`proxy.ts`, `isProtectedPath`) | Session refresh; signed-out redirect to `/auth/login?next=<path+query>` for `/<x>/(home\|settings)(/...)`. | Whose area it is. A bare `/<userId>` (see below).     |
+| `(protected)/layout.tsx`              | Signed in or not, as a backstop for any route added to the group.                                          | Whose area it is; the return path (see below).        |
+| `requireOwner`                        | The visitor is the user the URL names. Called by `[userId]/layout.tsx` and by every page under `[userId]`. | Authorization for anything not addressed by an owner. |
+| Server Actions, route handlers        | `getCallerIdentity` (fresh lookup) or `getVerifiedIdentity`, then act as the caller.                       | Anything the database refuses.                        |
+| Row Level Security                    | The rows a caller may read or write: the final authority.                                                  |                                                       |
+
+A layout is not re-run on client navigation (Next.js 16.4.3, authentication guide, "Layouts" caution), so the layout checks are never the only check on a page. `apps/web/src/protected-routes.test.ts` enforces this: every page under `[userId]` must call `requireOwner`; every page under the group must map to a path the proxy protects, or be listed with a reason; no `app/[userId]` may exist outside the group; the group layout must call `requireSignedIn`. The test is a lexical scan and proves a guard is called, not that the call is reached on every path.
+
+**Owner-addressed routes and other authenticated routes are different.** `requireOwner` answers one question: is the visitor the owner named in the URL. A future authenticated route that is not addressed by an owner (a shared record, an invitation) asks a different question and must not be given `requireOwner` by default. The structural test therefore requires `requireOwner` only under `[userId]`; any other page in the group must call a guard from the test's `OTHER_ACCESS_GUARDS` list, to which a guard is added deliberately with the design that needs it.
+
+**The bare `/<userId>` path.** The proxy does not match `/<userId>` on its own, and the code does not record this as a decision. A single-segment path cannot be told from a public one-segment page (`/privacy`) by its shape, so matching it would need an allow-list of every public page, and a missed entry would redirect a public page. The page has no content (it redirects to the owner's home), and the group layout sends a signed-out visitor to sign in, so nothing is exposed; the cost is that the proxy's own redirect, which keeps the full path, is skipped. This amendment records the exception as accepted behaviour and does not change it. A signed-in visitor on another person's id gets a 404 from `requireOwner`, as before.
+
+**Return path.** The proxy keeps the full path and query in `next`. `requireOwner` can return only the owner's home, because it knows the id and not the path. The group layout cannot read the request path in Next.js, so its redirect carries no `next`; signing in then lands on the person's own home, which is the same place for the owner. Before this change a signed-out visit to a bare `/<userId>` was sent to sign in with that id's home as the way back; after it, with no way back. Only a visit that the proxy did not redirect reaches the layout, so the proxy's behaviour for protected paths is unchanged.
+
+**Public and shared resources.** Nothing here adds public access. A resource's owner, persistence and visibility belong to its row and its policies, not to the route that presents it. A future public or shared route must read a record through its own read path with its own policy; it must not reuse `requireOwner`, put its page in this group, or loosen the `*_own` policies. It is out of scope here.
+
+**Not decided.** Moving the authenticated shell and providers out of the root layout into the group (they serve public and auth pages for signed-in visitors, and moving them would change shell lifetime and preference sync there); that waits for a first specified public route. Protection of `/auth/welcome`, `/auth/update-password` and `/auth/delete-account`, which stay outside the group and check the session themselves. The supabase outage behaviour recorded as deferred in the [Web Supabase leftovers design](../../superpowers/specs/2026-10-27-web-supabase-leftovers-design.md).
+
+**Version note.** The Context above records Next.js 16.3.8 as read on 2026-10-13; `apps/web` now declares 16.4.3. The `proxy.ts` convention cited there is unchanged.
+
+**Verification.** See the plan's acceptance criteria and the completion report: unit, structural and end-to-end tests, a build whose route table is identical before and after, and manual navigation checks. Not verified: live Supabase behaviour (expired sessions, two real accounts) and the React `cache` memoization across a real request.
 
 ## Reconsideration conditions
 
