@@ -53,6 +53,15 @@ describe('requireSignedIn', () => {
     expect(await failure()).toContain('/auth/login?next=%2Fu1');
   });
 
+  it('keeps the query string, encoded, as the proxy does for protected paths', async () => {
+    getClaims.mockResolvedValue({ data: null });
+    requestHeaders.path = '/u1/home/spaces?view=list&tab=a%20b';
+
+    expect(await failure()).toContain(
+      '/auth/login?next=%2Fu1%2Fhome%2Fspaces%3Fview%3Dlist%26tab%3Da%2520b',
+    );
+  });
+
   it.each([
     '//evil.example/steal',
     '/\\evil.example',

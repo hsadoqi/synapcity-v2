@@ -265,15 +265,16 @@ test('signing out returns to a public page, drops the session and protects the w
  */
 
 /*
- * The server answers /auth/callback itself: it exchanges the code, sets the
- * session cookies and redirects. Under `next start` Next builds
- * `request.nextUrl.origin` from the server's own host name (`localhost`), not
- * from the `Host` header, so the redirect names `localhost` while the browser
- * is on `127.0.0.1`, a different origin that would not send the cookies. This
- * helper therefore walks the link's redirects through the browser context's own
- * request API (same cookie jar, real server), stops at the callback's answer
- * so it can be inspected, and hands the browser the callback's destination on
- * its own origin. Only that host mapping is not what the server sent.
+ * The browser opens the mailed link and follows every redirect itself: the
+ * stack's verify endpoint, then /auth/callback, then wherever the callback
+ * sends it. Nothing is mapped or substituted. The callback's own response
+ * (status, Location, Set-Cookie) is recorded as it passes, and its Location
+ * must name the browser's origin, or the cookies it just set would be lost.
+ *
+ * The callback answers with a relative Location, so the browser resolves it
+ * against the host it is on. (An absolute one built from `request.nextUrl`
+ * would name `localhost` for a browser on `127.0.0.1`: Next rewrites every
+ * loopback host there. See the callback route.)
  */
 type CallbackAnswer = {
   status: number;
@@ -286,29 +287,30 @@ async function openLinkThroughCallback(
   link: string,
   baseURL: string,
 ): Promise<CallbackAnswer> {
-  let url = link;
-  for (let hop = 0; hop < 6; hop++) {
-    const response = await page.context().request.get(url, { maxRedirects: 0 });
-    const location = response.headers().location;
-    if (!location) {
-      throw new Error(`A redirect was expected, got ${response.status()}`);
-    }
-    if (new URL(url).pathname !== '/auth/callback') {
-      url = new URL(location, url).toString();
-      continue;
-    }
-    // This response is the callback's own answer.
-    const setCookies = response
-      .headersArray()
-      .filter((header) => header.name.toLowerCase() === 'set-cookie')
-      .map((header) => header.value);
-    const destination = new URL(location, url);
-    await page.goto(
-      `${new URL(baseURL).origin}${destination.pathname}${destination.search}`,
-    );
-    return { status: response.status(), location, setCookies };
-  }
-  throw new Error('The link never reached /auth/callback.');
+  const answers: CallbackAnswer[] = [];
+  page.on('response', async (response) => {
+    if (new URL(response.url()).pathname !== '/auth/callback') return;
+    const headers = await response.headersArray();
+    answers.push({
+      status: response.status(),
+      location:
+        headers.find((h) => h.name.toLowerCase() === 'location')?.value ?? '',
+      setCookies: headers
+        .filter((h) => h.name.toLowerCase() === 'set-cookie')
+        .map((h) => h.value),
+    });
+  });
+
+  await page.goto(link);
+
+  const answer = answers[0];
+  if (!answer) throw new Error('The link never reached /auth/callback.');
+  expect(answer.location, 'the callback must redirect').not.toBe('');
+  expect(
+    new URL(answer.location, baseURL).origin,
+    'the callback redirected away from the browser origin',
+  ).toBe(new URL(baseURL).origin);
+  return answer;
 }
 
 test.describe('the callback exchanges a real code', () => {

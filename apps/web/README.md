@@ -53,7 +53,7 @@ Do not copy another checkout's `.env.local` into a worktree; it may hold real pr
 1. The local stack running (`supabase start`; project `synapcity`, API on `127.0.0.1:54321`, mail on `54324`). The runner reads the keys from `supabase status` into its own environment and refuses a non-loopback address; nothing is printed or written.
 2. The app built against that stack and serving on `http://127.0.0.1:3000` (the stack's `site_url`, which email links may return to): put `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `SITE_URL=http://127.0.0.1:3000` in `.env.local`, then `pnpm build` and `pnpm exec next start -p 3000`.
 
-The run creates one `route-groups-e2e-…@example.test` user in the local stack and removes it and its mail afterwards. In an ordinary `pnpm test:e2e` the file is skipped. Under `next start` the callback redirects to `localhost` whatever host the browser used; the test works around that for the browser only (see the comment in the file).
+The run creates one `route-groups-e2e-…@example.test` user in the local stack and removes it and its mail afterwards. In an ordinary `pnpm test:e2e` the file is skipped. The browser follows the mailed link's redirects itself; nothing is mapped to another host.
 
 ### Shared-look production domains
 

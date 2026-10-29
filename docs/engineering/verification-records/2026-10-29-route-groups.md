@@ -78,7 +78,7 @@ Found while reviewing the split: a signed-out visit to `/<userId>` used to reach
 
 A first fix moved the redirect-only page out of the group so `requireOwner` ran first. It was rejected after a signed-in visit to an unknown single segment (`/nope`) rendered the public 404 shell instead of the workspace shell, and it broke the "every page in a group" test. It was reverted before publishing.
 
-The fix kept: the proxy forwards the request path in `x-synapcity-request-path` (always replacing a client value) and `requireSignedIn` uses it through `safeNextPath` and `signInHref`. The `(public)`/`(auth)`/`(protected)` split and layout ownership are unchanged. It is a new proxy-set request header and was not separately approved; see ADR-0006. Coverage: see the ADR.
+The fix kept: the proxy forwards the request path in `x-synapcity-request-path` (always replacing a client value) and `requireSignedIn` uses it through `safeNextPath` and `signInHref`. The `(public)`/`(auth)`/`(protected)` split and layout ownership are unchanged. It is a new proxy-set request header, made on the owner's direct instruction to correct the lost return path (the AGENTS.md section 5 approval); its correctness review is in ADR-0006. Coverage: see the ADR.
 
 ## Final verification
 
@@ -112,5 +112,5 @@ Paths they occupied: `app/(public)/probe-{err,nf}`, `app/(auth)/auth/probe-{err,
 - Root gate, from the repository root, with the CI placeholder values: `pnpm verify` exit 0 (format, lint and types 61 tasks, deps, boundaries with no violations, brand check, coverage, e2e, Storybook, build). Web unit tests: 76 files, 765 tests passed. End-to-end: 104 passed, 26 skipped (nine fixture and account groups plus the 17 `local-session` tests, which need the local stack). Storybook: 167 files passed.
 - Cache: `web:test:coverage` was a cache hit on this run. It replayed the log of an identical-input run on the same tree (765 tests, including `route-groups`, `route-groups.dom`, `welcome-card` and the request-path tests). An earlier run on the pre-fix tree was a cache miss and executed them. End-to-end tasks are never cached.
 - Local-stack suite on the same tree, built against the local stack: 17 passed. A client-sent `x-synapcity-request-path` header (`/evil.example`, `//evil.example/x`, `/x/home`) did not change the redirect: `/someone` always went to `/auth/login?next=%2Fsomeone`. The temporary user and its mail were removed; no `route-groups-*` user, mail or orphaned rows remained.
-- The request-path header mechanism added to the proxy by another session was not separately approved under AGENTS.md section 5; it is flagged in the pull request.
+- The request-path header mechanism falls under AGENTS.md section 5 (routing, security-adjacent). It was made on the owner's direct instruction to correct the lost return path, which is the approval that section requires; its review is in ADR-0006.
 - Not run: the nine fixture and account e2e tests (they need a fixture dev server and a saved account session); OAuth and email-confirmation callbacks; a hosted deployment; a screen reader.

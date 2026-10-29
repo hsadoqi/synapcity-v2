@@ -33,15 +33,49 @@ function exchangeSucceeds() {
   });
 }
 
+/** The redirect target as the browser resolves it against the callback's own URL. */
 function location(response: Response): string {
   const header = response.headers.get('location');
   if (header === null) throw new Error('response did not redirect');
-  return header;
+  expect(header, 'a relative single-slash path').toMatch(/^\/(?![/\\])/);
+  return new URL(header, ORIGIN).toString();
 }
 
 describe('GET /auth/callback', () => {
   beforeEach(() => {
     mocks.exchangeCodeForSession.mockReset();
+  });
+
+  describe('the redirect is relative, so the browser keeps its own origin', () => {
+    it.each(['http://127.0.0.1:3000', 'http://[::1]:3000', 'https://app.test'])(
+      'sends a request on %s to a path, not to another host',
+      async (origin) => {
+        exchangeSucceeds();
+        const response = await GET(
+          new NextRequest(new URL(`${origin}/auth/callback?code=abc`)),
+        );
+        expect(response.status).toBe(307);
+        expect(response.headers.get('location')).toBe(HOME);
+      },
+    );
+
+    it('is relative on the failure path too', async () => {
+      const response = await GET(request({}));
+      expect(response.headers.get('location')).toBe('/auth/error');
+    });
+
+    it('ignores Host and forwarded headers', async () => {
+      exchangeSucceeds();
+      const response = await GET(
+        new NextRequest(new URL(`${ORIGIN}/auth/callback?code=abc`), {
+          headers: {
+            host: 'evil.example',
+            'x-forwarded-host': 'evil.example',
+          },
+        }),
+      );
+      expect(response.headers.get('location')).toBe(HOME);
+    });
   });
 
   describe('a valid code', () => {

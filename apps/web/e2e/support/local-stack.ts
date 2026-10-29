@@ -87,6 +87,13 @@ export async function removeTemporaryUser(
 }
 
 /** The link in the newest mail sent to the address, waiting briefly for it to arrive. */
+/**
+ * Mail already handed out. The timestamp filter compares this process's clock
+ * with the mail container's, which can disagree by a second or more, so an
+ * earlier test's (already used) link could pass it before the new mail arrives.
+ */
+const handedOut = new Set<string>();
+
 export async function newestLinkTo(
   stack: LocalStack,
   email: string,
@@ -97,7 +104,9 @@ export async function newestLinkTo(
     const { messages = [] } = (await (await fetch(search)).json()) as {
       messages?: { ID: string; Created: string }[];
     };
-    const fresh = messages.filter((m) => Date.parse(m.Created) > after);
+    const fresh = messages.filter(
+      (m) => Date.parse(m.Created) > after && !handedOut.has(m.ID),
+    );
     if (fresh[0]) {
       const { Text } = (await (
         await fetch(`${stack.mailUrl}/api/v1/message/${fresh[0].ID}`)
@@ -105,7 +114,10 @@ export async function newestLinkTo(
       const link = Text.match(
         /https?:\/\/[^\s"<>)]+\/auth\/v1\/verify[^\s"<>)]*/,
       );
-      if (link) return link[0];
+      if (link) {
+        handedOut.add(fresh[0].ID);
+        return link[0];
+      }
     }
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
