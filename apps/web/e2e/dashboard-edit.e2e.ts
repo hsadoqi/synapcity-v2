@@ -77,6 +77,8 @@ test.describe('editing a dashboard', () => {
     await expect(
       page.getByRole('status').filter({ hasText: /moved to column 2, row 1/ }),
     ).toBeAttached();
+    // The widget keeps focus through the move, so the next key still reaches it.
+    await expect(cell).toBeFocused();
     await page.keyboard.press('Shift+ArrowDown');
     await expect(
       page.getByRole('status').filter({ hasText: /is now 1 wide, 5 tall/ }),
@@ -179,8 +181,12 @@ test.describe('editing a dashboard', () => {
     await page.getByRole('button', { name: 'Pinned' }).click();
     // Navigate away before the 400 ms debounce can save.
     await page.evaluate(() => {
-      const away = '/fixture-user/home';
-      window.location.assign(away);
+      // A plain anchor click is a navigation the page itself starts, which is
+      // what asks the beforeunload question.
+      const link = document.createElement('a');
+      link.href = '/fixture-user/home';
+      document.body.append(link);
+      link.click();
     });
     await expect.poll(() => asked).toBe(true);
   });
