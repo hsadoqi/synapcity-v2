@@ -13,7 +13,7 @@
 Adopt two config packages under `packages/dev/`, following the `@synapcity/dev-*` convention of `dev-eslint-config` and `dev-typescript-config`:
 
 - `@synapcity/dev-vitest-config` exports `baseConfig` (Node, `src/**/*.test.{ts,tsx}`, no globals), `reactConfig` (jsdom plus Testing Library cleanup), `chromiumBrowser()` (headless Chromium through Playwright) and, since Milestone 4, `serverOnlyAlias` (`./server-only`: maps only the `server-only` specifier to an empty module so tests can load server entries without the `react-server` condition).
-- `@synapcity/dev-playwright-config` exports `createPlaywrightConfig({ port, command, testDir? })` for end-to-end tests: a `webServer`, `**/*.e2e.ts`, Chromium, CI-only retries.
+- `@synapcity/dev-playwright-config` exports `createPlaywrightConfig({ app, extraServers?, testDir? })` for end-to-end tests: run-owned `webServer`s on free ports that are never reused (so concurrent worktrees do not collide), `**/*.e2e.ts`, Chromium, CI-only retries.
 
 Consumers: `frontend-ui` (`reactConfig`), `frontend-site` (`baseConfig`), `server-auth` and `server-supabase` (`baseConfig` with `serverOnlyAlias`), `storybook` (`chromiumBrowser()` in its story-test project) and `web` (`baseConfig` and `reactConfig` with `serverOnlyAlias`, and end-to-end). Root `pnpm test` and `pnpm test:e2e` run them through Turborepo tasks `test` and `test:e2e`.
 

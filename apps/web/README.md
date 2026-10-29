@@ -46,6 +46,10 @@ pnpm verify
 
 Do not copy another checkout's `.env.local` into a worktree; it may hold real project values.
 
+### Running Playwright from several worktrees
+
+`pnpm test:e2e` (and `pnpm --filter web exec playwright test`) picks a free port for web and docs on every run, starts both servers from the checkout it runs in, sets `SITE_URL` to the web origin it serves, prints the addresses (`[e2e] web: http://localhost:<port>`) and stops the servers when it ends. Nothing listens on a fixed port, an already-running server is never reused, and two worktrees can run it at the same time. Both apps must be built in that checkout first (`pnpm build` does this; `test:e2e` depends on it). `E2E_WEB_PORT` and `E2E_DOCS_PORT` pin a port to reproduce a run; a taken port fails the run. `E2E_WEB_MODE=dev` serves `next dev` instead of the build, for the fixture-identity specs (`SYNAPCITY_DEV_AUTH=fixture`, see `docs/engineering/quality-gates.md`); the dev server is also started and stopped by the run, and a fixture run needs `--workers=2` or fewer to avoid a cold-compile timeout. The local-session suite below is the exception: it attaches to a server you start.
+
 ### Signed-in checks against the local Supabase stack
 
 `pnpm test:e2e:local-session` (from `apps/web`) runs `e2e/local-session.e2e.ts`: sign-in, the account menu, public and auth pages signed in, 404 shells, protected-page metadata, sign-out and a real `/auth/callback` code exchange from a password-reset mail. It needs:

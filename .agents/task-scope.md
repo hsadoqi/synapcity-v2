@@ -1,3 +1,11 @@
+## Active task: worktree-safe Playwright runs, issue #98 (2026-10-29)
+
+- Goal and mode: implementing, owner-directed, in the primary checkout on `feat/make-playwright-runs-worktree-safe` (base `origin/main` at `a98c8283`). Test infrastructure only; commit, push and a pull request authorized, merging not.
+- Verified problems: fixed ports 8080 and 4000 with `reuseExistingServer: !CI`, so a run silently tested whatever answered there (another checkout's server, or a stale one from this checkout) and two checkouts could not run at once; `SITE_URL` was a build-time or `.env.local` value naming port 8080, so a server on another port would send auth redirects to a different checkout's server; `shared-look.e2e.ts` hard-coded both ports. Not problems: `.next`, `test-results/`, `playwright-report/` and `e2e/.auth` are relative to the checkout, so they already differ per worktree.
+- Decided here: `createPlaywrightConfig` allocates a free port per server per run (OS-assigned, held together so they differ, pinned across Playwright's workers through the environment), sets `reuseExistingServer: false` everywhere, and publishes `E2E_<NAME>_URL`; web passes `SITE_URL` to its server; `E2E_WEB_MODE=dev` lets Playwright start `next dev` for the fixture-identity specs in place of the manual "start a server first" step. Dynamic ports over worktree-hashed ports because a hash collides, repeats within one checkout and gives no reproducibility the `E2E_*_PORT` pin does not.
+- Not changed: what any test asserts, product code, the Supabase stack, dependencies, the local-session suite (it attaches to a server built against the local stack, so it cannot start its own).
+- Evidence and limits: see the pull request.
+
 ## Active task: shared shell composition audit and refactor (2026-10-29)
 
 - Goal and mode: audit and refactor the shared shell infrastructure; owner-directed implementation, three local commits authorized, no push. Branch `feat/refactor-shared-auth`, worktree `refactors/shared-shells`, pull request #102: three commits, first based on `c7728a89` (before #97), then rebased onto `origin/main` at `d48273e2` (#97) before the push, so the hashes first reported for them no longer exist.
