@@ -1,3 +1,11 @@
+## Active task: breadcrumb composition investigation, issue #99 (2026-10-29)
+
+- Goal and mode: investigate and recommend; no implementation. Branch `feat/investigate-ssr-compatible-breadcrumb-composition`, its existing worktree, base `a98c8283`. No commit, push, pull request or issue change.
+- Changes: create the [investigation](../docs/superpowers/specs/2026-10-29-breadcrumb-composition-investigation.md) and Proposed [ADR-0017](../docs/architecture/decisions/0017-breadcrumb-trail-ownership.md); add ADR-0017's row to the decision index; this record.
+- Not changed: code, tests, routes, layouts, public APIs, dependencies, accepted ADRs, issue #99.
+- Recommendation, awaiting the owner: keep the effect bridge, enforce that only the primary route's page publishes the trail, and keep `activeContext` on the same trail; do not adopt server composition now.
+- Evidence: fixture-mode `next dev` on port 48731, server HTML fetched without JavaScript, and Chromium runs recording header states during client navigation; server stopped after use.
+
 ## Active task: shared shell composition audit and refactor (2026-10-29)
 
 - Goal and mode: audit and refactor the shared shell infrastructure; owner-directed implementation, three local commits authorized, no push. Branch `feat/refactor-shared-auth`, worktree `refactors/shared-shells`, pull request #102: three commits, first based on `c7728a89` (before #97), then rebased onto `origin/main` at `d48273e2` (#97) before the push, so the hashes first reported for them no longer exist.
