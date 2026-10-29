@@ -22,14 +22,16 @@ test.describe('resource page containment in the shell', () => {
     Dashboard: '/fixture-user/home/dashboards/fixture-dashboard-project-status',
   } as const;
 
+  // The multi-word name is over 150 characters, as in the measured failure.
   const NAMES = {
     unbroken:
       'Supercalifragilisticexpialidocious-onboarding-guide-rewrite-chapter-by-chapter-with-every-open-question-unsettled',
     'multi-word':
-      'Field notes from the long winter of rewriting the onboarding guide, chapter by chapter, with every open question we could not settle',
+      'Field notes from the long winter of rewriting the onboarding guide, chapter by chapter, with every open question we could not settle before the spring release',
   } as const;
 
-  const WIDTHS = [390, 400, 640, 768, 1024];
+  // 1280: a 150-character multi-word name overflowed there on a real session.
+  const WIDTHS = [390, 400, 640, 768, 1024, 1280];
 
   /** The shell's narrow line: two 16rem regions and the 48px rail. */
   const SIDE_BY_SIDE_PX = 256 * 2 + 48;
