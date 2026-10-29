@@ -15,6 +15,17 @@ test.describe('global panel in the authenticated shell', () => {
     return page.getByRole('button', { name: 'Toggle global panel' });
   };
 
+  // Opening and closing glide: a CSS transition on the panels' flex-grow
+  // (GlobalPanelShell). The panel is visible from its first frame, so a size
+  // read before the transition ends is a frame of the animation, and a handle
+  // found then moves out from under the pointer before the drag starts.
+  const glideEnded = (page: Page) =>
+    page.waitForFunction(() =>
+      [...document.querySelectorAll('[data-slot="resizable-panel"]')].every(
+        (panel) => panel.getAnimations().length === 0,
+      ),
+    );
+
   test('reflows the page, resizes, remembers settled size, and can be dragged shut', async ({
     page,
   }) => {
@@ -25,14 +36,19 @@ test.describe('global panel in the authenticated shell', () => {
     await toggle.click();
     const panel = page.getByRole('region', { name: 'Global panel' });
     await expect(panel).toBeVisible();
+    await glideEnded(page);
     expect((await main.boundingBox())!.y).toBeGreaterThan(originalTop);
     const handle = page.getByRole('separator', { name: 'Resize global panel' });
     const box = (await handle.boundingBox())!;
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    const openHeight = (await panel.boundingBox())!.height;
+    const startY = box.y + box.height / 2;
+    await page.mouse.move(box.x + box.width / 2, startY);
     await page.mouse.down();
     await page.mouse.move(box.x + box.width / 2, box.y + 100, { steps: 10 });
     await page.mouse.up();
     const height = (await panel.boundingBox())!.height;
+    // A drag never animates: the panel grows by exactly the pointer's travel.
+    expect(height).toBeCloseTo(openHeight + (box.y + 100 - startY), 0);
     const viewport = page.viewportSize()!;
     await page.setViewportSize({ ...viewport, height: viewport.height + 100 });
     await expect
@@ -43,6 +59,7 @@ test.describe('global panel in the authenticated shell', () => {
     await expect
       .poll(async () => (await panel.boundingBox())!.height)
       .toBeCloseTo(height, 0);
+    await glideEnded(page);
     const resized = (await handle.boundingBox())!;
     await page.mouse.move(
       resized.x + resized.width / 2,
@@ -107,6 +124,8 @@ test.describe('global panel in the authenticated shell', () => {
     await toggle.click();
     const panel = page.getByRole('region', { name: 'Global panel' });
     const appHeader = page.locator('[data-slot="shell-app-header"]');
+    await expect(panel).toBeVisible();
+    await glideEnded(page);
     const panelHeight = (await panel.boundingBox())!.height;
     const workArea = page.locator('[data-slot="shell-page"]');
     const workHeight = (await workArea.boundingBox())!.height;
@@ -156,6 +175,7 @@ test.describe('global panel in the authenticated shell', () => {
       await expect(
         page.getByRole('button', { name: 'Close global panel' }),
       ).toBeVisible();
+      await glideEnded(page);
       const handle = page.getByRole('separator', {
         name: 'Resize global panel',
       });
