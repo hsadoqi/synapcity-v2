@@ -86,6 +86,42 @@ export async function removeTemporaryUser(
     throw new Error(`Removing the user failed: ${response.status}`);
 }
 
+/**
+ * Removes the temporary users `shouldRemove` selects, by the time they were
+ * created, together with their mail. Only the exact address shape
+ * `createTemporaryUser` produces is ever considered. The runner uses it for
+ * the leftovers of a run that was killed (users older than any run could
+ * still be using) and for whatever its own run left behind (users created
+ * since it started).
+ */
+export async function removeTemporaryUsers(
+  stack: LocalStack,
+  shouldRemove: (createdAtMs: number) => boolean,
+): Promise<number> {
+  const mine = /^route-groups-e2e-\d+-[0-9a-f]{8}@example\.test$/;
+  // Collect first: deleting while paging would shift the pages.
+  const stale: TemporaryUser[] = [];
+  for (let page = 1; ; page += 1) {
+    const response = await fetch(
+      `${stack.apiUrl}/auth/v1/admin/users?page=${page}&per_page=200`,
+      { headers: admin(stack) },
+    );
+    if (!response.ok)
+      throw new Error(`Listing users failed: ${response.status}`);
+    const { users = [] } = (await response.json()) as {
+      users?: { id: string; email?: string; created_at: string }[];
+    };
+    for (const { id, email, created_at } of users) {
+      if (!email || !mine.test(email)) continue;
+      if (!shouldRemove(Date.parse(created_at))) continue;
+      stale.push({ id, email, password: '' });
+    }
+    if (users.length < 200) break;
+  }
+  for (const user of stale) await removeTemporaryUser(stack, user);
+  return stale.length;
+}
+
 /** The link in the newest mail sent to the address, waiting briefly for it to arrive. */
 /**
  * Mail already handed out. The timestamp filter compares this process's clock
