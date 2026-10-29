@@ -28,7 +28,7 @@ const OPTIONS: { value: Breakpoint; label: string; Icon: LucideIcon }[] = [
 /** Chooses which breakpoint's saved layout is shown and edited; each keeps its own. */
 export function BreakpointToolbar() {
   const breakpoint = useDashboardStore((s) => s.breakpoint);
-  const setBreakpoint = useDashboardStore((s) => s.setBreakpoint);
+  const chooseBreakpoint = useDashboardStore((s) => s.chooseBreakpoint);
   return (
     <ToggleGroup
       aria-label="Layout breakpoint"
@@ -37,7 +37,7 @@ export function BreakpointToolbar() {
       value={[breakpoint]}
       onValueChange={(values: string[]) => {
         const next = values[0] as Breakpoint | undefined;
-        if (next) setBreakpoint(next);
+        if (next) chooseBreakpoint(next);
       }}
     >
       {OPTIONS.map(({ value, label, Icon }) => (

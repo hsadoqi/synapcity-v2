@@ -11,6 +11,7 @@ import { CalendarPlusIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
+import { useDashboardConfig } from '../../config';
 import { useNow } from '../../hooks/use-now';
 import { useDashboardStore } from '../../store';
 import { AgendaBody } from '../../widgets/agenda-body';
@@ -28,6 +29,10 @@ const WIDGET_TABLES: Record<WidgetType, readonly PrototypeRecordKind[]> = {
   calendar: ['event'],
   agenda: ['event'],
   feed: ['activity'],
+  // Link widgets read the host's items, not prototype records.
+  pinned: [],
+  'last-opened': [],
+  spaces: [],
 };
 
 /** Widget types that show the time (today's habit day, this week's events, "4 min ago"). */
@@ -62,6 +67,7 @@ export function ConnectedWidget({ widgetId }: { widgetId: string }) {
     useShallow((s) => pickTables(s.records, widget?.type)),
   );
   const editMode = useDashboardStore((s) => s.editMode);
+  const { persistsStatus } = useDashboardConfig();
   const updateWidget = useDashboardStore((s) => s.updateWidget);
   const duplicateWidget = useDashboardStore((s) => s.duplicateWidget);
   const setWidgetStatus = useDashboardStore((s) => s.setWidgetStatus);
@@ -92,8 +98,10 @@ export function ConnectedWidget({ widgetId }: { widgetId: string }) {
         actions={{
           update: (patch) => updateWidget(widgetId, patch),
           duplicate: () => duplicateWidget(widgetId),
-          hide: () => setWidgetStatus(widgetId, 'hidden'),
-          archive: () => setWidgetStatus(widgetId, 'archived'),
+          ...(persistsStatus && {
+            hide: () => setWidgetStatus(widgetId, 'hidden'),
+            archive: () => setWidgetStatus(widgetId, 'archived'),
+          }),
           remove: () => removeWidget(widgetId),
         }}
         toolbar={

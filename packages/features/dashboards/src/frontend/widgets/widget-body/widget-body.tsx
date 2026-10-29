@@ -9,6 +9,7 @@ import { AgendaBody } from '../agenda-body';
 import { CalendarBody } from '../calendar-body';
 import { FeedBody } from '../feed-body';
 import { HabitBody } from '../habit-body';
+import { LinkBody } from '../link-body';
 import { NotesBody } from '../notes-body';
 import { ProgressBody, type GoalChange } from '../progress-body';
 import { StatBody } from '../stat-body';
@@ -108,5 +109,9 @@ export function WidgetBody({
           now={now}
         />
       );
+    case 'pinned':
+    case 'last-opened':
+    case 'spaces':
+      return <LinkBody type={widget.type} limit={widget.query.limit} />;
   }
 }

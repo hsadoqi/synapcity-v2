@@ -10,9 +10,17 @@ export {
   setSpacePinned,
 } from './spaces';
 export {
+  COMPOSITION_SCHEMA_VERSION,
+  loadComposition,
+  saveComposition,
+  type SaveCompositionOutcome,
+  type StoredComposition,
+} from './dashboards';
+export {
   createRecord,
   findRecord,
   listRecordSummaries,
+  recordRecordView,
   setRecordPinned,
   type CreatedOutcome,
   type PinnedOutcome,

@@ -25,7 +25,7 @@ test.describe('document and dashboard pages', () => {
     await expect(page.getByText(/content can’t be shown yet/)).toBeVisible();
   });
 
-  test('a dashboard opens read-only, with the contextual panel beside it', async ({
+  test('a dashboard opens editable, with the contextual panel beside it', async ({
     page,
   }) => {
     await page.goto(
@@ -34,9 +34,10 @@ test.describe('document and dashboard pages', () => {
     await expect(
       page.getByRole('heading', { level: 1, name: 'Project status' }),
     ).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Edit layout' })).toHaveCount(
-      0,
-    );
+    await expect(
+      page.getByRole('button', { name: 'Edit layout' }),
+    ).toBeVisible();
+    await expect(page.getByRole('status').first()).toBeAttached();
     await page
       .getByRole('toolbar', { name: 'Contextual panel' })
       .getByRole('button', { name: 'Context' })

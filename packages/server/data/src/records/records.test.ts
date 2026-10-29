@@ -1,9 +1,11 @@
+import type { SupabaseServerClient } from '@synapcity/server-supabase';
 import { describe, expect, it, vi } from 'vitest';
 
 import {
   createRecord,
   findRecord,
   listRecordSummaries,
+  recordRecordView,
   setRecordPinned,
 } from './records';
 
@@ -255,5 +257,49 @@ describe('findRecord', () => {
     await expect(findRecord(client, 'dashboards', row.id)).rejects.toThrow(
       `Failed to load dashboard ${row.id} (code 42501)`,
     );
+  });
+});
+
+describe('recordRecordView', () => {
+  const id = '9ab8c032-8759-44e9-808d-0573d13f290e';
+  const now = new Date('2026-10-29T10:00:00.000Z');
+
+  function viewClient(error: unknown = null) {
+    const or = vi.fn().mockResolvedValue({ error });
+    const eq = vi.fn(() => ({ or }));
+    const update = vi.fn(() => ({ eq }));
+    const from = vi.fn(() => ({ update }));
+    return {
+      client: { from } as unknown as SupabaseServerClient,
+      from,
+      update,
+      eq,
+      or,
+    };
+  }
+
+  it('stamps the view on the named table, skipping a view under a minute old', async () => {
+    const { client, from, update, eq, or } = viewClient();
+
+    await expect(
+      recordRecordView(client, 'dashboards', id, now),
+    ).resolves.toEqual({ ok: true });
+
+    expect(from).toHaveBeenCalledWith('dashboards');
+    expect(update).toHaveBeenCalledWith({
+      last_viewed_at: '2026-10-29T10:00:00.000Z',
+    });
+    expect(eq).toHaveBeenCalledWith('id', id);
+    expect(or).toHaveBeenCalledWith(
+      'last_viewed_at.is.null,last_viewed_at.lt.2026-10-29T09:59:00.000Z',
+    );
+  });
+
+  it('reports a failure by code and status only', async () => {
+    const { client } = viewClient({ code: '42501', message: 'private' });
+
+    await expect(
+      recordRecordView(client, 'dashboards', id, now),
+    ).resolves.toEqual({ ok: false, error: { code: '42501' } });
   });
 });

@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { DashboardStorage } from '../../../contracts';
@@ -11,7 +11,7 @@ const DASH = 'dash-1';
 async function seededStorage() {
   const storage = memoryDashboardStorage(SEED_OWNER);
   const { composition, records } = seededWorkspace();
-  await storage.saveComposition(DASH, composition);
+  await storage.saveComposition(DASH, composition, 0);
   await storage.saveRecords(records);
   return storage;
 }
@@ -216,6 +216,177 @@ describe('DashboardWorkspace', () => {
       expect(
         await screen.findByText('Editing dashboards is not available yet.'),
       ).toBeDefined();
+    });
+  });
+
+  describe('editing a server-backed dashboard', () => {
+    const LINK_ITEMS = [
+      {
+        id: 's1',
+        kind: 'space' as const,
+        name: 'Research',
+        icon: 'folder',
+        href: '/home/spaces/s1',
+        pinnedAt: '2026-10-20T00:00:00Z',
+        lastViewedAt: '2026-10-21T00:00:00Z',
+      },
+    ];
+
+    function serverLike(
+      overrides: Partial<DashboardStorage> = {},
+      revision = 3,
+    ) {
+      const saveComposition = vi.fn<DashboardStorage['saveComposition']>(
+        async (_id, _composition, base) => ({ ok: true, revision: base + 1 }),
+      );
+      const storage: DashboardStorage = {
+        load: async () => ({ composition: null, records: null, revision }),
+        saveComposition,
+        saveRecords: async () => {},
+        ...overrides,
+      };
+      return { storage, saveComposition };
+    }
+
+    function renderServerLike(storage: DashboardStorage) {
+      return render(
+        <DashboardWorkspace
+          dashboardId={DASH}
+          ownerId={SEED_OWNER}
+          storage={storage}
+          now={() => SEED_NOW}
+          breakpoint="lg"
+          items={LINK_ITEMS}
+          widgetTypes={['pinned', 'last-opened', 'spaces']}
+          persistsStatus={false}
+        />,
+      );
+    }
+
+    it('adds a widget from the empty state, offers only the allowed widgets and lists the items', async () => {
+      const { storage } = serverLike();
+      renderServerLike(storage);
+
+      fireEvent.click(
+        await screen.findByRole('button', { name: 'Add a widget' }),
+      );
+      const palette = screen.getByRole('region', { name: 'Add to dashboard' });
+      expect(
+        within(palette)
+          .getAllByRole('button')
+          .map((b) => b.textContent),
+      ).toEqual(['Pinned', 'Last opened', 'Spaces']);
+      expect(screen.queryByRole('heading', { name: /Hidden/ })).toBeNull();
+
+      fireEvent.click(within(palette).getByRole('button', { name: 'Spaces' }));
+      expect(
+        await screen.findByRole('link', { name: 'Research' }),
+      ).toBeDefined();
+      expect(screen.getByText('Spaces added')).toBeDefined();
+    });
+
+    it('saves against the revision it read, says Saved only after the server confirms, and then the next save builds on the answer', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      const { storage, saveComposition } = serverLike();
+      renderServerLike(storage);
+      fireEvent.click(
+        await screen.findByRole('button', { name: 'Add a widget' }),
+      );
+      fireEvent.click(screen.getByRole('button', { name: 'Pinned' }));
+      expect(screen.getByText('Unsaved changes')).toBeDefined();
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(400);
+      });
+      expect(saveComposition).toHaveBeenCalledWith(
+        DASH,
+        expect.objectContaining({ widgets: expect.any(Array) }),
+        3,
+      );
+      expect(await screen.findByText('Saved')).toBeDefined();
+
+      fireEvent.click(screen.getByRole('button', { name: 'Spaces' }));
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(400);
+      });
+      expect(saveComposition.mock.calls[1]?.[2]).toBe(4);
+    });
+
+    it('shows Changed elsewhere with Reload after a conflict, and Reload reads the dashboard again', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      const load = vi.fn(async () => ({
+        composition: null,
+        records: null,
+        revision: 3,
+      }));
+      const { storage } = serverLike({
+        load,
+        saveComposition: async () => ({ ok: false, reason: 'conflict' }),
+      });
+      renderServerLike(storage);
+      fireEvent.click(
+        await screen.findByRole('button', { name: 'Add a widget' }),
+      );
+      fireEvent.click(screen.getByRole('button', { name: 'Pinned' }));
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(400);
+      });
+      expect(await screen.findByText(/Changed elsewhere/)).toBeDefined();
+
+      fireEvent.click(screen.getByRole('button', { name: 'Reload' }));
+      await vi.waitFor(() => expect(load).toHaveBeenCalledTimes(2));
+    });
+
+    it('removes a widget, can Undo it, and moves focus to the next widget', async () => {
+      const { storage } = serverLike();
+      renderServerLike(storage);
+      fireEvent.click(
+        await screen.findByRole('button', { name: 'Add a widget' }),
+      );
+      fireEvent.click(screen.getByRole('button', { name: 'Pinned' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Spaces' }));
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Settings for Pinned' }),
+      );
+      fireEvent.click(
+        await screen.findByRole('button', { name: 'Remove widget' }),
+      );
+
+      expect(screen.queryByRole('region', { name: 'Pinned' })).toBeNull();
+      await vi.waitFor(() =>
+        expect(document.activeElement?.getAttribute('aria-label')).toBe(
+          'Spaces',
+        ),
+      );
+      expect(screen.getByText('Pinned removed')).toBeDefined();
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Undo remove Pinned' }),
+      );
+      expect(screen.getByRole('region', { name: 'Pinned' })).toBeDefined();
+      await vi.waitFor(() =>
+        expect(document.activeElement?.getAttribute('aria-label')).toBe(
+          'Pinned',
+        ),
+      );
+    });
+
+    it('offers no Hide or Archive when the host stores no widget status', async () => {
+      const { storage } = serverLike();
+      renderServerLike(storage);
+      fireEvent.click(
+        await screen.findByRole('button', { name: 'Add a widget' }),
+      );
+      fireEvent.click(screen.getByRole('button', { name: 'Pinned' }));
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Settings for Pinned' }),
+      );
+      await screen.findByRole('button', { name: 'Remove widget' });
+      expect(screen.queryByRole('button', { name: 'Hide widget' })).toBeNull();
+      expect(
+        screen.queryByRole('button', { name: 'Archive widget' }),
+      ).toBeNull();
     });
   });
 });

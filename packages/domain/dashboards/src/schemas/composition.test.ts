@@ -15,6 +15,9 @@ const TYPES: WidgetType[] = [
   'calendar',
   'agenda',
   'feed',
+  'pinned',
+  'last-opened',
+  'spaces',
 ];
 
 function fullComposition(): DashboardComposition {
@@ -144,4 +147,23 @@ describe('dashboardCompositionSchema', () => {
       dashboardCompositionSchema.safeParse({ ...c, widgets }).success,
     ).toBe(false);
   });
+
+  it.each(['pinned', 'last-opened', 'spaces'] as const)(
+    'bounds the %s widget limit between 1 and 50',
+    (type) => {
+      const c = createComposition();
+      const { widget } = createWidget(type, emptyRecords(), ctx);
+      const withLimit = (limit: number) =>
+        addWidget(c, { ...widget, query: { limit } } as typeof widget);
+      expect(dashboardCompositionSchema.safeParse(withLimit(6)).success).toBe(
+        true,
+      );
+      expect(dashboardCompositionSchema.safeParse(withLimit(0)).success).toBe(
+        false,
+      );
+      expect(dashboardCompositionSchema.safeParse(withLimit(51)).success).toBe(
+        false,
+      );
+    },
+  );
 });
