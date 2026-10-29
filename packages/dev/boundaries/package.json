@@ -15,11 +15,11 @@
     "@synapcity/dev-typescript-config": "workspace:*",
     "@synapcity/dev-vitest-config": "workspace:*",
     "@types/node": "26.6.5",
-    "@vitest/coverage-v8": "4.1.12",
+    "@vitest/coverage-v8": "5.0.5",
     "eslint": "10.13.0",
     "oxc-parser": "0.155.0",
     "oxc-resolver": "11.24.2",
     "typescript": "7.0.2",
-    "vitest": "4.1.12"
+    "vitest": "5.0.5"
   }
 }

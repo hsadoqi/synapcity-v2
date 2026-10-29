@@ -31,13 +31,13 @@
     "report": "vitest run --coverage"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "4.1.12",
+    "@vitest/coverage-v8": "5.0.5",
     "knip": "^6.38.0",
     "prettier": "3.9.10",
     "supabase": "2.122.0",
     "turbo": "^2.11.7",
     "typescript": "7.0.2",
-    "vitest": "4.1.12"
+    "vitest": "5.0.5"
   },
   "packageManager": "pnpm@12.15.0",
   "engines": {
