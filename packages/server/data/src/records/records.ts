@@ -1,9 +1,10 @@
-import type { OwnedRecordSummary } from '@synapcity/domain-records';
+import type { BaseRecord, OwnedRecordSummary } from '@synapcity/domain-records';
 import {
   toProviderFailure,
   type ProviderFailure,
   type SupabaseServerClient,
 } from '@synapcity/server-supabase';
+import { z } from 'zod';
 
 import { COLUMNS, countOf, recordFromRow, type OwnedRow } from '../owned-row';
 import { readError } from '../read-error';
@@ -50,6 +51,35 @@ export async function listRecordSummaries(
     ...recordFromRow(row),
     spacesTotal: countOf(spaces),
   }));
+}
+
+/** Singular names for read errors. */
+const SINGULAR: Record<RecordKind, string> = {
+  documents: 'document',
+  dashboards: 'dashboard',
+};
+
+/**
+ * One of the owner's documents or dashboards, or null when it does not exist
+ * or is not theirs. Row-level security scopes the query to the session, so a
+ * record another person owns reads as missing, never as forbidden.
+ */
+export async function findRecord(
+  client: SupabaseServerClient,
+  kind: RecordKind,
+  id: string,
+): Promise<BaseRecord | null> {
+  // A malformed id cannot match a uuid column; PostgREST would error instead.
+  if (!z.uuid().safeParse(id).success) return null;
+
+  const { data, error } = await client
+    .from(kind)
+    .select(COLUMNS)
+    .eq('id', id)
+    .maybeSingle();
+
+  if (error) throw readError(`${SINGULAR[kind]} ${id}`, error);
+  return data ? recordFromRow(data satisfies OwnedRow) : null;
 }
 
 /**

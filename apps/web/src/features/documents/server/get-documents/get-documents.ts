@@ -1,6 +1,6 @@
-import type { OwnedRecordSummary } from '@synapcity/domain-records';
+import type { BaseRecord, OwnedRecordSummary } from '@synapcity/domain-records';
 
-import { loadRecordSummaries } from '@/lib/records';
+import { loadRecord, loadRecordSummaries } from '@/lib/records';
 
 import { DOCUMENT_FIXTURES } from '../../lib/fixtures';
 
@@ -11,4 +11,12 @@ import { DOCUMENT_FIXTURES } from '../../lib/fixtures';
  */
 export function getDocuments(): Promise<OwnedRecordSummary[]> {
   return loadRecordSummaries('documents', DOCUMENT_FIXTURES);
+}
+
+/**
+ * One of the signed-in owner's documents, or null when it does not exist or is
+ * not theirs. Fixture mode reads the sample records.
+ */
+export function getDocument(id: string): Promise<BaseRecord | null> {
+  return loadRecord('documents', id, DOCUMENT_FIXTURES);
 }

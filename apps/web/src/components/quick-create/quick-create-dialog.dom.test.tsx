@@ -66,19 +66,16 @@ describe('QuickCreateDialog', () => {
   });
 
   it.each([
-    ['document', '/user-1/home/documents'],
-    ['dashboard', '/user-1/home/dashboards'],
-  ] as const)(
-    'creates a %s and shows it in its list, which has no page for one yet',
-    async (kind, href) => {
-      renderDialog(kind);
-      await typeName('Launch plan');
+    ['document', '/user-1/home/documents/new-id'],
+    ['dashboard', '/user-1/home/dashboards/new-id'],
+  ] as const)('creates a %s and opens it', async (kind, href) => {
+    renderDialog(kind);
+    await typeName('Launch plan');
 
-      fireEvent.click(screen.getByRole('button', { name: 'Create' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Create' }));
 
-      await waitFor(() => expect(onCreated).toHaveBeenCalledWith(href));
-    },
-  );
+    await waitFor(() => expect(onCreated).toHaveBeenCalledWith(href));
+  });
 
   it('says Creating… and blocks a second submit while it saves', async () => {
     let finish!: (value: unknown) => void;
@@ -199,10 +196,9 @@ describe('QuickCreateDialog', () => {
     expect(name.value).toBe('Garden plans');
     expect(onUnconfirmed).toHaveBeenCalledTimes(1);
     expect(onCreated).not.toHaveBeenCalled();
-    expect(
-      (screen.getByRole('button', { name: 'Create' }) as HTMLButtonElement)
-        .disabled,
-    ).toBe(false);
+    // The alert can appear a moment before the button leaves "Creating…".
+    const button = await screen.findByRole('button', { name: 'Create' });
+    expect((button as HTMLButtonElement).disabled).toBe(false);
   });
 
   it('treats an unconfirmed result from the server the same way', async () => {

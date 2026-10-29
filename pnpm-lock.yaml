@@ -375,6 +375,9 @@ importers:
       '@synapcity/features-auth':
         specifier: workspace:*
         version: link:../../packages/features/auth
+      '@synapcity/features-dashboards':
+        specifier: workspace:*
+        version: link:../../packages/features/dashboards
       '@synapcity/features-settings':
         specifier: workspace:*
         version: link:../../packages/features/settings

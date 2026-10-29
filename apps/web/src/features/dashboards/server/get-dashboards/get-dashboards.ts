@@ -1,6 +1,6 @@
-import type { OwnedRecordSummary } from '@synapcity/domain-records';
+import type { BaseRecord, OwnedRecordSummary } from '@synapcity/domain-records';
 
-import { loadRecordSummaries } from '@/lib/records';
+import { loadRecord, loadRecordSummaries } from '@/lib/records';
 
 import { DASHBOARD_FIXTURES } from '../../lib/fixtures';
 
@@ -11,4 +11,12 @@ import { DASHBOARD_FIXTURES } from '../../lib/fixtures';
  */
 export function getDashboards(): Promise<OwnedRecordSummary[]> {
   return loadRecordSummaries('dashboards', DASHBOARD_FIXTURES);
+}
+
+/**
+ * One of the signed-in owner's dashboards, or null when it does not exist or is
+ * not theirs. Fixture mode reads the sample records.
+ */
+export function getDashboard(id: string): Promise<BaseRecord | null> {
+  return loadRecord('dashboards', id, DASHBOARD_FIXTURES);
 }

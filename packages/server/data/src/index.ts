@@ -11,6 +11,7 @@ export {
 } from './spaces';
 export {
   createRecord,
+  findRecord,
   listRecordSummaries,
   setRecordPinned,
   type CreatedOutcome,

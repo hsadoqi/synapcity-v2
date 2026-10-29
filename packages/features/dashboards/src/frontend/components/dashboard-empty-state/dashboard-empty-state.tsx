@@ -7,7 +7,12 @@ import {
 } from '@synapcity/frontend-ui/core/empty';
 import { LayoutDashboardIcon } from 'lucide-react';
 
-export function DashboardEmptyState() {
+/** Shown on a dashboard with no widgets; read-only, it does not point at editing. */
+export function DashboardEmptyState({
+  readOnly = false,
+}: {
+  readOnly?: boolean;
+}) {
   return (
     <Empty>
       <EmptyHeader>
@@ -16,7 +21,9 @@ export function DashboardEmptyState() {
         </EmptyMedia>
         <EmptyTitle>No widgets yet</EmptyTitle>
         <EmptyDescription>
-          Turn on Edit layout and add one from the panel.
+          {readOnly
+            ? 'Editing dashboards is not available yet.'
+            : 'Turn on Edit layout and add one from the panel.'}
         </EmptyDescription>
       </EmptyHeader>
     </Empty>

@@ -6,6 +6,7 @@ describe('@synapcity/server-data root entry', () => {
 
     expect(Object.keys(entry).sort()).toEqual([
       'createRecord',
+      'findRecord',
       'findSpace',
       'listRecordSummaries',
       'listSpaceDashboards',
