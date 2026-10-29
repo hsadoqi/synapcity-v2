@@ -3,9 +3,6 @@ import { cookies } from 'next/headers';
 import '@/styles/globals.css';
 import { fontVariables } from './fonts';
 import RootProviders from '../components/providers/root-providers';
-import { AuthStatus } from '@/features/auth/components/auth-status';
-import { AppShell } from '../components/app-shell';
-import { getSidebarRecords } from '../lib/sidebar-records/get-sidebar-records';
 import { NextShellNavigation } from '@synapcity/frontend-shells/next';
 import { createMetadata } from '@synapcity/frontend-site/metadata';
 import { UserProvider } from '@/providers/user-provider';
@@ -34,6 +31,12 @@ export const metadata: Metadata = createMetadata({
   siteUrl: process.env.SITE_URL,
 });
 
+/**
+ * The document, the global styles and the providers every page needs. The page
+ * chrome belongs to the route group: `(public)` and `(auth)` use the public
+ * shell, `(protected)` the workspace shell. Root `error` and `not-found` bring
+ * their own.
+ */
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -45,9 +48,7 @@ export default async function RootLayout({
   );
   // ADR-0010: the account's preferences follow the person to every page, not
   // only the settings page. A failed read leaves this browser's own copy.
-  const [stored, sidebarRecords] = user
-    ? await Promise.all([getAccountPreferences(user.id), getSidebarRecords()])
-    : [undefined, undefined];
+  const stored = user ? await getAccountPreferences(user.id) : undefined;
   const account = stored?.preferences ?? null;
   const look = lookWithAccount(requestLook, account);
   const lookAttributes = look ? lookHtmlAttributes(look) : undefined;
@@ -79,16 +80,7 @@ export default async function RootLayout({
         >
           <RootProviders>
             <UserProvider user={user}>
-              <NextShellNavigation>
-                <AppShell
-                  userId={user?.id ?? null}
-                  headerActions={<AuthStatus variant="header" />}
-                  sidebarFooter={<AuthStatus variant="sidebar" />}
-                  records={sidebarRecords}
-                >
-                  {children}
-                </AppShell>
-              </NextShellNavigation>
+              <NextShellNavigation>{children}</NextShellNavigation>
             </UserProvider>
           </RootProviders>
         </RegionalProvider>

@@ -153,11 +153,25 @@ A layout is not re-run on client navigation (Next.js 16.4.3, authentication guid
 
 **Public and shared resources.** Nothing here adds public access. A resource's owner, persistence and visibility belong to its row and its policies, not to the route that presents it. A future public or shared route must read a record through its own read path with its own policy; it must not reuse `requireOwner`, put its page in this group, or loosen the `*_own` policies. It is out of scope here.
 
-**Not decided.** Moving the authenticated shell and providers out of the root layout into the group (they serve public and auth pages for signed-in visitors, and moving them would change shell lifetime and preference sync there); that waits for a first specified public route. Protection of `/auth/welcome`, `/auth/update-password` and `/auth/delete-account`, which stay outside the group and check the session themselves. The supabase outage behaviour recorded as deferred in the [Web Supabase leftovers design](../../superpowers/specs/2026-10-27-web-supabase-leftovers-design.md).
+**Not decided.** The shell split, which the next amendment records. Protection of `/auth/welcome`, `/auth/update-password` and `/auth/delete-account`, which stay outside the group and check the session themselves. The supabase outage behaviour recorded as deferred in the [Web Supabase leftovers design](../../superpowers/specs/2026-10-27-web-supabase-leftovers-design.md).
 
 **Version note.** The Context above records Next.js 16.3.8 as read on 2026-10-13; `apps/web` now declares 16.4.3. The `proxy.ts` convention cited there is unchanged.
 
 **Verification.** See the plan's acceptance criteria and the completion report: unit, structural and end-to-end tests, a build whose route table is identical before and after, and manual navigation checks. Not verified: live Supabase behaviour (expired sessions, two real accounts) and the React `cache` memoization across a real request.
+
+## Amendment, 2026-10-29: `(public)` and `(auth)` route groups and the shell split
+
+Decided by the repository owner, superseding the deferral (D2) in the plan above. No URL, session rule, proxy rule or policy changes.
+
+**Decision.** `app/(public)` holds `/` and `/privacy`; `app/(auth)/auth` holds every `/auth/*` page and `/auth/callback`; `app/(protected)` is unchanged in its access rule. The groups add no URL segment and are presentation only. The root layout keeps the document, the boot scripts, the account-preference sync and the providers every page needs (`RegionalProvider`, `RootProviders`, `UserProvider`, `NextShellNavigation`). The workspace shell (`AppShell`, with the sidebar records read) moved to `(protected)/layout.tsx`; `(public)` and `(auth)` use `PublicShell` from `@synapcity/frontend-shells`, and `(auth)` adds `AuthPageShell` for the centred column. Root `error.tsx` and `not-found.tsx` render inside `PublicShell`, because the root layout no longer supplies chrome.
+
+**Access is unchanged and not implied by the group.** `(auth)` has no blanket guest-only or session-required guard: the login, register and forgot-password pages keep their signed-in behaviour, and `welcome`, `update-password` and `delete-account` keep their own `getVerifiedClaims` checks. `/auth/callback` is a route handler and renders no layout; the proxy still sees it, because the matcher excludes only static assets.
+
+**Behaviour changes for a signed-in visitor.** On `/`, `/privacy` and `/auth/*` they now get the public shell (header with the account menu, footer) instead of the workspace sidebar, and the shell remounts when they move between the public and owner areas. Root `error` and `not-found` show the public shell without an account menu (`error` is a client component and cannot render the server-read menu). Entering the app from the public shell is the hero button on `/` and the account menu.
+
+**Metadata.** `(auth)/layout.tsx` no longer calls `createMetadata`: a layout's `openGraph` object replaces the root one, which dropped the file-based `og:image` from `/auth/login`. Every auth page sets its own title through the root template.
+
+**Not verified.** Signed-in rendering of the public and auth shells against a real Supabase project; the root `error` boundary with a real thrown error in the browser.
 
 ## Reconsideration conditions
 

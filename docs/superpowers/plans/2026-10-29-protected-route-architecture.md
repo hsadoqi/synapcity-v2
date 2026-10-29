@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Approved (owner, 2026-10-29): D1 = option B, D2 = defer. Implemented and verified in this worktree, uncommitted; see "Implementation record" at the end. Base `main` at `a44316ed`.
+**Status:** Approved (owner, 2026-10-29): D1 = option B, D2 = defer (superseded the same day: the owner decided the `(public)`/`(auth)` shell split; see ADR-0006's second 2026-10-29 amendment). Implemented and verified in this worktree, uncommitted; see "Implementation record" at the end. Base `main` at `a44316ed`.
 
 **Goal:** Give `apps/web` an explicit `(protected)` route group for the signed-in `/<userId>/...` area, with no change to any URL, to authentication, to authorization or to Supabase RLS, and with a test that keeps the group, the proxy's path rule and the per-page owner checks from drifting apart.
 

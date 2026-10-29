@@ -90,12 +90,12 @@ Not verified against a real project at the time of writing: the avatars and Goog
 
 ## Structure
 
-| Path                     | Contains                                                             |
-| ------------------------ | -------------------------------------------------------------------- |
-| `src/app/`               | Routes and the root layout, which loads Inter, Geist, Geist Mono     |
-| `src/styles/globals.css` | Imports and `@source` lines only; no tokens                          |
-| `src/lib/`               | App-level helpers, including the `cn` re-export                      |
-| `components.json`        | shadcn config; routes added components into `@synapcity/frontend-ui` |
+| Path                     | Contains                                                                                    |
+| ------------------------ | ------------------------------------------------------------------------------------------- |
+| `src/app/`               | Routes in `(public)`, `(auth)` and `(protected)` groups; the root layout (fonts, providers) |
+| `src/styles/globals.css` | Imports and `@source` lines only; no tokens                                                 |
+| `src/lib/`               | App-level helpers, including the `cn` re-export                                             |
+| `components.json`        | shadcn config; routes added components into `@synapcity/frontend-ui`                        |
 
 ## Styling
 
