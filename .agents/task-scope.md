@@ -1,3 +1,15 @@
+## Planned task: Dashboard composition S1a and S1b (2026-10-29)
+
+- Goal and mode: planning only. The plan is [docs/superpowers/plans/2026-10-29-dashboard-composition-s1a-s1b.md](../docs/superpowers/plans/2026-10-29-dashboard-composition-s1a-s1b.md). No implementation starts before the owner approves it. Branch `shared-resource-structure`, worktree `features/shared-resource-structure`, from `origin/main` at `d5397a47`.
+- S1a (proposed scope): `features-dashboards` only. A workspace provider that owns the store lifetime and replaces the store without remounting its children; an editor surface and a widgets destination as separate exports; `DashboardWorkspace` kept as their composition; palette focus that waits for the panel to open. No visible change.
+- S1b (proposed scope): `apps/web` only. The Dashboard page composed as provider, `ResourceFrame`, editor surface, with a Widgets destination beside Context; Edit layout opens that destination through one host callback; page-level and fixture e2e tests; documentation of the composition.
+- Boundaries kept: the contextual panel shell and its controls own panel state; the Dashboard store owns editing, layout, undo and save state; the palette owns no state. `ResourceFrame`, `ResourceHeader` and `ContextualPanelShell` are not changed or replaced.
+- Decisions recorded (owner, 2026-10-29): Document content in a separate one-to-one `document_contents` storage with versioned Lexical JSON and revision-based concurrency; Document editor in `packages/features/documents`; widget data ownership deferred, Dashboard widgets stay query-backed.
+- Not in scope: the breakpoint and device-frame change (recorded for the S2 plan), Document schema or editor, widget-owned tables, any change to `public.dashboards`, `server-data`, Server Actions, dependencies, other worktrees.
+- Independent: the request-level loading investigation (#111) and the shell visual verification baseline (#101); #99 and #106 are resolved. Stale squash-merged worktrees are not used unless unique changes must be recovered.
+- Open for the owner: U1 to U6 in section 7 of the plan (rail behaviour while editing is off, narrow-width behaviour after adding a widget, store replacement on Reload, edit mode after Reload, working labels, the S1a and S1b split because the Phase A report could not be read).
+- Verification when implemented: the per-task commands and the full list in section 8 of the plan; the report must state what was not run.
+
 ## Task: unambiguous Playwright file filters (2026-10-29)
 
 - Goal and mode: implement a documentation correction noted in #114. Branch `docs/playwright-file-filters`, worktree `fixes/playwright-file-filters`, base `origin/main` at `c36551ab`.
