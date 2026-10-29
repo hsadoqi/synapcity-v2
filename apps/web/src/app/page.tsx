@@ -9,7 +9,7 @@ export default function Home() {
       <div className="flex w-full max-w-3xl flex-col items-start gap-10 border-t border-divider py-10 sm:gap-12 sm:py-16">
         <h1
           id="welcome-heading"
-          className="font-heading text-4xl font-medium leading-tight tracking-tight text-balance sm:text-6xl"
+          className="font-heading text-4xl font-medium leading-tight tracking-tight text-balance sm:text-5xl"
         >
           <span className="block text-muted-foreground">Welcome to</span>
           <span className="block">Synapcity Web</span>

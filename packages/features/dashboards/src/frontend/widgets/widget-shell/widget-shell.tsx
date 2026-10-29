@@ -360,7 +360,7 @@ export function WidgetShell({
           role="group"
           aria-label={`${widget.title} content`}
           tabIndex={0}
-          className="min-h-0 flex-1 overflow-auto border-t border-divider px-3.5 py-3 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
+          className="scroll-fade-y min-h-0 flex-1 overflow-auto border-t border-divider px-3.5 py-3 focus-visible:outline-2 focus-visible:outline-solid focus-visible:-outline-offset-2 focus-visible:outline-ring"
         >
           {children}
         </div>

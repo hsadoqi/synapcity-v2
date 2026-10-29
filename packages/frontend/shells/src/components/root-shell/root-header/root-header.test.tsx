@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -27,8 +27,8 @@ function html(userId: string | null) {
 }
 
 describe('RootHeaderContent', () => {
-  it('leaves the logo to the sidebar once signed in', () => {
-    expect(html('user-1')).not.toContain('Synapcity home');
+  it('shows the logo when signed in without a trail', () => {
+    expect(html('user-1')).toContain('Synapcity home');
   });
 
   it('links the logo to the landing page when signed out', () => {
@@ -38,8 +38,8 @@ describe('RootHeaderContent', () => {
     expect(markup).not.toContain('/settings');
   });
 
-  it('offers settings only when signed in', () => {
-    expect(html('user-1')).toContain('href="/user-1/settings"');
+  it('offers no settings link signed in either; it lives in the sidebar', () => {
+    expect(html('user-1')).not.toContain('/settings');
   });
 });
 
@@ -65,10 +65,12 @@ describe('RootHeader', () => {
     expect(screen.getByRole('banner')).toBeTruthy();
   });
 
-  it('shows no logo link when signed in, since the sidebar carries the brand', () => {
+  it('shows the logo, leading home, when signed in without a trail', () => {
     renderHeader(account);
 
-    expect(screen.queryByRole('link', { name: 'Synapcity home' })).toBeNull();
+    expect(
+      screen.getByRole('link', { name: 'Synapcity home' }).getAttribute('href'),
+    ).toBe(account.homeHref);
   });
 
   it('shows the breadcrumb trail when signed in, ending on the current page', () => {
@@ -113,11 +115,30 @@ describe('RootHeader', () => {
 
   it('shows the sidebar trigger only when signed in', () => {
     const { unmount } = renderHeader(account);
-    expect(screen.getByRole('button', { name: 'Open sidebar' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /sidebar$/ })).toBeTruthy();
     unmount();
 
     renderHeader(null);
-    expect(screen.queryByRole('button', { name: 'Open sidebar' })).toBeNull();
+    expect(screen.queryByRole('button', { name: /sidebar$/ })).toBeNull();
+  });
+
+  it('names the sidebar trigger after what it will do', () => {
+    renderHeader(account);
+    const trigger = screen.getByRole('button', { name: 'Close sidebar' });
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+
+    fireEvent.click(trigger);
+
+    const reopened = screen.getByRole('button', { name: 'Open sidebar' });
+    expect(reopened.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('draws the sidebar trigger as a panel icon, leaving the brand to the logo', () => {
+    renderHeader(account);
+    const trigger = screen.getByRole('button', { name: 'Close sidebar' });
+    expect(trigger.querySelector('svg.lucide-panel-left')).not.toBeNull();
+    expect(trigger.querySelectorAll('svg')).toHaveLength(1);
+    expect(screen.getByRole('link', { name: 'Synapcity home' })).toBeTruthy();
   });
 
   it('groups utility actions in a labelled navigation', () => {
@@ -127,10 +148,11 @@ describe('RootHeader', () => {
     });
 
     expect(within(nav).getByRole('button', { name: 'Theme' })).toBeTruthy();
-    expect(within(nav).getByRole('link', { name: 'Settings' })).toBeTruthy();
+    expect(within(nav).queryByRole('link', { name: 'Settings' })).toBeNull();
     expect(within(nav).getByRole('button', { name: 'Extra' })).toBeTruthy();
   });
 
+  // Settings moved to the sidebar's core links; the header has none either way.
   it('offers no settings link when signed out', () => {
     renderHeader(null);
 

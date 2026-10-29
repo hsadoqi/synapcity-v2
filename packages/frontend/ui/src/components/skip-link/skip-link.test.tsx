@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { SkipLinkButton } from '@synapcity/frontend-ui/components/skip-link';
@@ -25,5 +25,17 @@ describe('SkipLinkButton', () => {
     link.focus();
 
     expect(document.activeElement).toBe(link);
+  });
+
+  it('moves focus into the main content when chosen', () => {
+    render(
+      <>
+        <SkipLinkButton />
+        <main id="main-content" tabIndex={-1} />
+      </>,
+    );
+    fireEvent.click(screen.getByRole('link'));
+
+    expect(document.activeElement).toBe(screen.getByRole('main'));
   });
 });

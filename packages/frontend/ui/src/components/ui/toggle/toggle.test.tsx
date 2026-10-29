@@ -44,7 +44,16 @@ describe('Toggle', () => {
 
   it('gives each variant and size its own classes', () => {
     const variants = ['default', 'outline', 'ghost', 'destructive'] as const;
-    const sizes = ['default', 'sm', 'lg'] as const;
+    const sizes = [
+      'default',
+      'sm',
+      'lg',
+      'icon-xs',
+      'icon-sm',
+      'icon',
+      'icon-lg',
+      'icon-xl',
+    ] as const;
 
     const base = toggleVariants({ variant: 'default' });
 

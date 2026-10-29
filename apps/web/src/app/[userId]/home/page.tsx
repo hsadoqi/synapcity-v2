@@ -28,9 +28,12 @@ export default async function HomePage({
   //       <SignOutButton />
   //     </div>
   //   );
+  // Home has no real history source yet, so it shows fixtures labelled as
+  // sample content rather than passing them off as the person's own work.
   return (
     <HomePageView
       state="populated"
+      sample
       items={fixtureItems}
       pinned={fixturePinned}
       dateLabel="Today"

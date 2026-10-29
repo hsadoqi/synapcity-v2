@@ -1,18 +1,24 @@
+'use client';
+
+// TODO: Again, duplicate/inefficient functionality/implementations/styles...also there's a lot of code that isn't necessarily tightly coupled with the root header yet is defined here alongsid it...why?
+
 import * as React from 'react';
 import type { ReactNode } from 'react';
+import { PanelLeftIcon } from 'lucide-react';
 import {
   SynapcityLogo,
   SynapcityMark,
 } from '@synapcity/frontend-ui/components/logo-mark';
 import { ModeToggle } from '@synapcity/frontend-ui/components/mode-toggle';
-import Link from 'next/link';
-import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
-import { Cog } from 'lucide-react';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';
 import { Separator } from '@synapcity/frontend-ui/core/separator';
 import { GlobalPanelToggle } from '../global-panel';
-import { SidebarTrigger } from '@synapcity/frontend-ui/core/sidebar';
+import { ShellLink } from '../../../providers/shell-navigation';
+import {
+  SidebarTrigger,
+  useSidebar,
+} from '@synapcity/frontend-ui/core/sidebar';
 import { IconButton } from '@synapcity/frontend-ui/components/icon-button';
 import {
   Breadcrumb,
@@ -27,6 +33,12 @@ import {
 export type RootBreadcrumb = {
   label: string;
   href?: string;
+  /**
+   * What the crumb stands for, when it is a place the sidebar can switch to:
+   * a collection (such as all Spaces) or one Space. The sidebar reads this to
+   * pick the active context without parsing labels.
+   */
+  kind?: 'collection' | 'space';
 };
 
 type RootHeaderProps = {
@@ -49,12 +61,14 @@ export const RootHeaderContent = ({
 }: RootHeaderProps) => {
   return (
     <div className="flex min-w-0 flex-1 items-center justify-between gap-4">
-      {account ? (
+      {/* Signed in, a page's trail shows here; without one, the brand does,
+          leading to the person's home. */}
+      {account && breadcrumbs?.length ? (
         <RootBreadcrumbs items={breadcrumbs} />
       ) : (
-        <RootLogoLink homeHref="/" />
+        <RootLogoLink homeHref={account?.homeHref ?? '/'} />
       )}
-      <RootIconActions settingsHref={account?.settingsHref}>
+      <RootIconActions signedIn={!!account}>
         {account && <GlobalPanelToggle />}
         {actions}
       </RootIconActions>
@@ -66,7 +80,7 @@ export const RootHeader = ({ account, ...props }: RootHeaderProps) => {
   // Same gutters as RootContent and RootFooter so the logo lines up with the
   // page below it.
   return (
-    <div className="sticky top-0 z-10 flex h-16 shrink-0 items-stretch border-b border-border bg-background/95 supports-backdrop-filter:backdrop-blur-sm">
+    <div className="sticky top-0 z-10 flex h-16 shrink-0 items-stretch border-b border-border bg-background">
       <header
         className={cn(
           'flex min-w-0 flex-1 items-center justify-between',
@@ -76,17 +90,7 @@ export const RootHeader = ({ account, ...props }: RootHeaderProps) => {
         {account && (
           <>
             <div className="flex shrink-0 items-center p-2">
-              <SidebarTrigger
-                render={
-                  <IconButton variant="ghost" aria-label="Open sidebar">
-                    <SynapcityMark
-                      size="sm"
-                      title={null}
-                      className="text-foreground"
-                    />
-                  </IconButton>
-                }
-              />
+              <HeaderSidebarTrigger />
               <Separator orientation="vertical" />
             </div>
           </>
@@ -98,8 +102,31 @@ export const RootHeader = ({ account, ...props }: RootHeaderProps) => {
 };
 
 /**
+ * The sidebar toggle, drawn as a panel icon so the logo beside it carries the
+ * brand. Its name and aria-expanded follow the sidebar: the sheet on phones,
+ * expanded or folded to icons elsewhere.
+ */
+const HeaderSidebarTrigger = () => {
+  const { state, isMobile, openMobile } = useSidebar();
+  const expanded = isMobile ? openMobile : state === 'expanded';
+  return (
+    <SidebarTrigger
+      render={
+        <IconButton
+          variant="ghost"
+          aria-label={expanded ? 'Close sidebar' : 'Open sidebar'}
+          aria-expanded={expanded}
+        >
+          <PanelLeftIcon aria-hidden="true" />
+        </IconButton>
+      }
+    />
+  );
+};
+
+/**
  * The trail to the current page. Below the sm breakpoint only the current page
- * shows, since the mark beside the sidebar trigger already says where you are.
+ * shows, since the sidebar already shows where you are.
  */
 const RootBreadcrumbs = ({ items }: { items?: RootBreadcrumb[] }) => {
   if (!items?.length) {
@@ -117,9 +144,8 @@ const RootBreadcrumbs = ({ items }: { items?: RootBreadcrumb[] }) => {
           return (
             <React.Fragment key={`${item.href ?? ''}${item.label}`}>
               {index > 0 && (
-                <BreadcrumbSeparator
-                  className={cn(!isLast && 'hidden sm:inline-flex')}
-                />
+                // Below sm only the current page shows, so no separator does.
+                <BreadcrumbSeparator className="hidden sm:inline-flex" />
               )}
               <BreadcrumbItem
                 className={cn('min-w-0', !isLast && 'hidden sm:inline-flex')}
@@ -131,7 +157,7 @@ const RootBreadcrumbs = ({ items }: { items?: RootBreadcrumb[] }) => {
                 ) : (
                   <BreadcrumbLink
                     className="truncate"
-                    render={<Link href={item.href} />}
+                    render={<ShellLink href={item.href} />}
                   >
                     {item.label}
                   </BreadcrumbLink>
@@ -154,11 +180,11 @@ const RootLogoLink = ({
   className?: string;
 }) => {
   return (
-    <Link
+    <ShellLink
       href={homeHref}
       aria-label="Synapcity home"
       className={cn(
-        'inline-flex min-h-10 shrink-0 items-center rounded-sm outline-none transition-opacity hover:opacity-70 focus-visible:ring-2 focus-visible:ring-ring/50 pointer-coarse:min-h-11',
+        'inline-flex min-h-10 shrink-0 items-center rounded-sm transition-opacity hover:opacity-70 pointer-coarse:min-h-11',
         className,
       )}
     >
@@ -172,35 +198,17 @@ const RootLogoLink = ({
         title={null}
         className="hidden text-foreground sm:block"
       />
-    </Link>
+    </ShellLink>
   );
 };
 
-const SettingsLinkIcon = ({
-  href,
-  className,
-}: {
-  href: string;
-  className?: string;
-}) => {
-  return (
-    <LinkButton
-      variant="ghost"
-      href={href}
-      size="icon-lg"
-      aria-label="Settings"
-      className={cn('shrink-0', className)}
-    >
-      <Cog />
-    </LinkButton>
-  );
-};
-
+// Settings lives in the sidebar's core links, not here.
 const RootIconActions = ({
-  settingsHref,
+  signedIn,
   children,
 }: {
-  settingsHref?: string;
+  /** Signed in, phones reach the theme toggle in the sidebar sheet instead. */
+  signedIn: boolean;
   children?: ReactNode;
 }) => {
   return (
@@ -208,18 +216,11 @@ const RootIconActions = ({
       aria-label="Account and appearance"
       className="flex items-center gap-1"
     >
-      {' '}
       <ModeToggle
         variant="ghost"
         size="lg"
-        className="shrink-0 hidden md:block"
+        className={cn('shrink-0', signedIn && 'hidden md:block')}
       />
-      {settingsHref && (
-        <SettingsLinkIcon
-          href={settingsHref}
-          className="hidden md:inline-flex"
-        />
-      )}
       {children}
     </nav>
   );

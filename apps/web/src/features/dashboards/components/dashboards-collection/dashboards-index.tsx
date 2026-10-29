@@ -13,7 +13,6 @@ import type {
 } from '@synapcity/frontend-collection';
 import type { OwnedRecordSummary } from '@synapcity/domain-records';
 import { homePathFor, signInPathFor } from '@/lib/routing/user-paths';
-
 import { toCollectionItem } from '../../lib/collection-item';
 import { setDashboardPinned } from '../../server/actions/dashboard-state-actions';
 import { DashboardPreview } from './dashboard-preview';

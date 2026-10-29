@@ -1,6 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { listRecordSummaries, setRecordPinned } from './records';
+import {
+  createRecord,
+  findRecord,
+  listRecordSummaries,
+  setRecordPinned,
+} from './records';
 
 const row = {
   id: '9ab8c032-8759-44e9-808d-0573d13f290e',
@@ -16,11 +21,23 @@ const row = {
 };
 
 /** A stand-in for the query builder: every method returns it, and awaiting it gives `result`. */
-function clientReturning(result: { data: unknown; error: unknown }) {
+function clientReturning(result: {
+  data: unknown;
+  error: unknown;
+  status?: number;
+}) {
   const builder: Record<string, unknown> = {};
-  for (const method of ['select', 'order', 'update', 'eq']) {
+  for (const method of [
+    'select',
+    'order',
+    'update',
+    'eq',
+    'insert',
+    'single',
+  ]) {
     builder[method] = vi.fn(() => builder);
   }
+  builder.maybeSingle = vi.fn(() => Promise.resolve(result));
   builder.then = (resolve: (value: unknown) => unknown) => resolve(result);
   const from = vi.fn(() => builder);
   return { client: { from } as never, from, builder };
@@ -145,5 +162,98 @@ describe('setRecordPinned', () => {
     await expect(
       setRecordPinned(client, 'documents', 'id-1', true),
     ).resolves.toStrictEqual({ ok: false, error: { code: '42501' } });
+  });
+});
+
+describe('createRecord', () => {
+  it.each(['spaces', 'documents', 'dashboards'] as const)(
+    'creates one of the %s with only its name and reports the new id',
+    async (table) => {
+      const { client, from, builder } = clientReturning({
+        data: { id: 'new-id' },
+        error: null,
+      });
+
+      await expect(
+        createRecord(client, table, { name: 'Garden plans' }),
+      ).resolves.toEqual({ ok: true, id: 'new-id' });
+      expect(from).toHaveBeenCalledWith(table);
+      // The owner comes from the session (the column defaults to auth.uid()).
+      expect(builder.insert).toHaveBeenCalledWith({ name: 'Garden plans' });
+      expect(builder.select).toHaveBeenCalledWith('id');
+    },
+  );
+
+  it('reports a database error by code and status only', async () => {
+    const { client } = clientReturning({
+      data: null,
+      error: { code: '23514', message: 'check (secret)', details: 'row' },
+    });
+
+    await expect(
+      createRecord(client, 'documents', { name: 'x' }),
+    ).resolves.toStrictEqual({ ok: false, error: { code: '23514' } });
+  });
+
+  it('keeps the response status, so a dropped request reads as unconfirmed', async () => {
+    const { client } = clientReturning({
+      data: null,
+      error: { code: '', message: 'TypeError: fetch failed' },
+      status: 0,
+    });
+
+    await expect(
+      createRecord(client, 'spaces', { name: 'x' }),
+    ).resolves.toStrictEqual({ ok: false, error: { code: '', status: 0 } });
+  });
+});
+
+describe('findRecord', () => {
+  it.each(['documents', 'dashboards'] as const)(
+    'reads one %s by id',
+    async (kind) => {
+      const { client, from, builder } = clientReturning({
+        data: row,
+        error: null,
+      });
+
+      const record = await findRecord(client, kind, row.id);
+
+      expect(from).toHaveBeenCalledWith(kind);
+      expect(builder.eq).toHaveBeenCalledWith('id', row.id);
+      expect(record).toMatchObject({
+        id: row.id,
+        ownerId: row.owner_id,
+        name: 'Launch plan',
+        icon: 'file-text',
+      });
+      expect(record?.description).toBeUndefined();
+    },
+  );
+
+  it('returns null when no row is visible to the owner', async () => {
+    const { client } = clientReturning({ data: null, error: null });
+
+    await expect(findRecord(client, 'documents', row.id)).resolves.toBeNull();
+  });
+
+  it('returns null for a malformed id without querying', async () => {
+    const { client, from } = clientReturning({ data: row, error: null });
+
+    await expect(
+      findRecord(client, 'dashboards', 'not-a-uuid'),
+    ).resolves.toBeNull();
+    expect(from).not.toHaveBeenCalled();
+  });
+
+  it('reports a database error with the kind and id', async () => {
+    const { client } = clientReturning({
+      data: null,
+      error: { code: '42501', message: 'boom' },
+    });
+
+    await expect(findRecord(client, 'dashboards', row.id)).rejects.toThrow(
+      `Failed to load dashboard ${row.id} (code 42501)`,
+    );
   });
 });

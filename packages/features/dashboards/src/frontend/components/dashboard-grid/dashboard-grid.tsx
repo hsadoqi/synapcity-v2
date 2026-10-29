@@ -79,6 +79,7 @@ export function DashboardGrid() {
   const composition = useDashboardStore((s) => s.composition);
   const breakpoint = useDashboardStore((s) => s.breakpoint);
   const editMode = useDashboardStore((s) => s.editMode);
+  const readOnly = useDashboardStore((s) => s.readOnly);
   const selectedWidgetId = useDashboardStore((s) => s.selectedWidgetId);
   const selectWidget = useDashboardStore((s) => s.selectWidget);
   const nudgeWidget = useDashboardStore((s) => s.nudgeWidget);
@@ -96,7 +97,7 @@ export function DashboardGrid() {
   );
   const minWidth = minGridWidth(cols);
 
-  if (layout.length === 0) return <DashboardEmptyState />;
+  if (layout.length === 0) return <DashboardEmptyState readOnly={readOnly} />;
 
   /**
    * Keyboard select and move, edit mode only. Acts only when the wrapper

@@ -10,6 +10,10 @@ import type { ProviderFailure } from '@synapcity/server-supabase';
 export type SetPinnedOutcome =
   { ok: true; pinnedAt: string | null } | { ok: false; error: ProviderFailure };
 
+/** What creating reports: the new Space's id, or the failure to log. */
+export type CreatedOutcome =
+  { ok: true; id: string } | { ok: false; error: ProviderFailure };
+
 /**
  * Where Spaces and what takes part in them come from. Two implementations: the
  * real one over Supabase (`serverSpaceSource`) and the host's fixture-mode demo
@@ -23,6 +27,8 @@ export interface SpaceSource {
   listSummaries(): Promise<SpaceSummary[]>;
   /** One Space, or null when it does not exist or is not the owner's. */
   find(spaceId: string): Promise<SpaceEntity | null>;
+  /** Creates one of the owner's Spaces from its name; the owner comes from the session. */
+  create(input: { name: string }): Promise<CreatedOutcome>;
   setPinned(spaceId: string, pinned: boolean): Promise<SetPinnedOutcome>;
   /** Notes that the owner opened the Space; the outcome carries any error to log. */
   recordView(

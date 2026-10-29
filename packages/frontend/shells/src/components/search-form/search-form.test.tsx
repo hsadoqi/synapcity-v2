@@ -17,7 +17,7 @@ describe('SearchForm', () => {
     const input = screen.getByLabelText('Search');
 
     expect(input.id).toBe('search');
-    expect(input.getAttribute('placeholder')).toBe('Search the docs...');
+    expect(input.getAttribute('placeholder')).toBe('Search…');
     expect(screen.getByText('Search').className).toContain('sr-only');
   });
 
@@ -38,6 +38,23 @@ describe('SearchForm', () => {
     expect((screen.getByLabelText('Search') as HTMLInputElement).value).toBe(
       'routing',
     );
+  });
+
+  it('is a search landmark', () => {
+    renderForm();
+
+    expect(screen.getByRole('search')).toBeTruthy();
+  });
+
+  it('hands the trimmed query to onSearch on submit', () => {
+    const onSearch = vi.fn();
+    renderForm({ onSearch });
+    fireEvent.change(screen.getByLabelText('Search'), {
+      target: { value: '  garden  ' },
+    });
+    fireEvent.submit(screen.getByRole('search'));
+
+    expect(onSearch).toHaveBeenCalledWith('garden');
   });
 
   it('forwards form props such as onSubmit', () => {

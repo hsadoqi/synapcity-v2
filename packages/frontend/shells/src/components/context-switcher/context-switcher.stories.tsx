@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { Globe, Sprout } from 'lucide-react';
 
 import { ContextSwitcher } from '.';
 import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
@@ -9,8 +10,14 @@ const meta: Meta<typeof ContextSwitcher> = {
   component: ContextSwitcher,
   tags: ['autodocs'],
   args: {
-    versions: ['1.0.1', '1.1.0-alpha', '2.0.0-beta1'],
-    defaultVersion: '1.0.1',
+    current: 'Global',
+    icon: <Globe className="size-4" />,
+    options: [
+      { label: 'Global', href: '#global', active: true },
+      { label: 'Writing', href: '#writing' },
+      { label: 'Garden plans', href: '#garden' },
+    ],
+    more: { label: 'All spaces', href: '#spaces' },
   },
   decorators: [
     (Story) => (
@@ -30,6 +37,15 @@ type Story = StoryObj<typeof ContextSwitcher>;
 
 export const Default: Story = {};
 
-export const SecondVersionSelected: Story = {
-  args: { defaultVersion: '1.1.0-alpha' },
+/** Inside a Space, the switcher shows the Space's own icon and name, and checks it. */
+export const InASpace: Story = {
+  args: {
+    current: 'Garden plans',
+    icon: <Sprout className="size-4" />,
+    options: [
+      { label: 'Global', href: '#global' },
+      { label: 'Writing', href: '#writing' },
+      { label: 'Garden plans', href: '#garden', active: true },
+    ],
+  },
 };

@@ -36,7 +36,7 @@ The owner must approve the required-prop API change explicitly. Update every con
 
 ## Integration expectations
 
-Preserve labels, accessible names, theme styling and header/hero variants. Update app AuthStatus, component tests/stories and the root-header story. Re-inventory consumers before execution. Do not introduce Supabase or app imports into the UI package.
+Preserve labels, accessible names, theme styling and header/hero variants. Update app AuthActions, component tests/stories and the root-header story. Re-inventory consumers before execution. Do not introduce Supabase or app imports into the UI package.
 
 ## Verification expectations
 

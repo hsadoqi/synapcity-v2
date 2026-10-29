@@ -10,7 +10,16 @@ import {
 } from '@synapcity/features-spaces/frontend';
 import { describe, expect, it } from 'vitest';
 
-import { dashboardPathFor, documentPathFor, homePathFor } from './user-paths';
+import { appSidebar } from '../../components/app-sidebar';
+
+import {
+  dashboardPathFor,
+  dashboardsPathFor,
+  documentPathFor,
+  documentsPathFor,
+  homePathFor,
+  spacesPathFor,
+} from './user-paths';
 
 const APP = join(__dirname, '../../app');
 
@@ -114,5 +123,52 @@ describe('links on the Spaces pages', () => {
     expect(pending(dashboardPathFor('u1', 'b1'))).toBe(true);
     expect(served('/u1/home/spaces/s1')).toBe(true);
     expect(served('/u1/home/nowhere')).toBe(false);
+  });
+});
+
+describe('links in the signed-in sidebar', () => {
+  it('reach a page the app serves, in every context', () => {
+    const trails = [
+      [],
+      [{ label: 'Spaces', kind: 'collection' as const }],
+      [{ label: 'Documents', kind: 'collection' as const }],
+      [{ label: 'Dashboards', kind: 'collection' as const }],
+    ];
+    const records = {
+      spaces: [{ id: 's1', name: 'Writing' }],
+      documents: [{ id: 'd1', name: 'Draft' }],
+      dashboards: [{ id: 'b1', name: 'Week' }],
+    };
+    for (const trail of trails) {
+      const { groups } = appSidebar('u1', trail, '/u1/home', {
+        records,
+        onOpenPalette: () => {},
+        onCreate: () => {},
+      });
+      const links = groups
+        .flatMap((group) => [
+          group.href,
+          ...(group.items ?? []).map((item) => item.href),
+        ])
+        .filter((href): href is string => !!href?.startsWith('/'));
+
+      expect(links.length).toBeGreaterThan(0);
+      // A record's own page may be one Milestone 8 builds (documents and
+      // dashboards); any other unserved link is a bug.
+      expect(links.filter((href) => !served(href) && !pending(href))).toEqual(
+        [],
+      );
+    }
+  });
+
+  it('offer only served places in the context switcher', () => {
+    for (const href of [
+      homePathFor('u1'),
+      spacesPathFor('u1'),
+      documentsPathFor('u1'),
+      dashboardsPathFor('u1'),
+    ]) {
+      expect(served(href), href).toBe(true);
+    }
   });
 });

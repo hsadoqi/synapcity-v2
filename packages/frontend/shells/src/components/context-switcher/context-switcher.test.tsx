@@ -1,11 +1,16 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { Globe, PenLine } from 'lucide-react';
 import { describe, expect, it } from 'vitest';
 
 import { ContextSwitcher } from '.';
 import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
 import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
 
-const versions = ['1.0.1', '1.1.0-alpha', '2.0.0-beta1'];
+const options = [
+  { label: 'Global', href: '/u/home' },
+  { label: 'Writing', href: '/u/home/spaces/s1' },
+  { label: 'Garden', href: '/u/home/spaces/s2' },
+];
 
 // const documents = [
 //   {
@@ -54,54 +59,102 @@ const versions = ['1.0.1', '1.1.0-alpha', '2.0.0-beta1'];
 
 // const contexts = ['home', 'space', 'document', 'dashboard'];
 
-const renderSwitcher = (defaultVersion = versions[0]!) =>
+const renderSwitcher = (
+  current = 'Global',
+  activeHref?: string,
+  more?: { label: string; href: string },
+) =>
   render(
     <TooltipProvider>
       <SidebarProvider>
-        <ContextSwitcher versions={versions} defaultVersion={defaultVersion} />
+        <ContextSwitcher
+          current={current}
+          icon={current === 'Global' ? <Globe /> : <PenLine />}
+          options={options.map((option) => ({
+            ...option,
+            active: option.href === activeHref,
+          }))}
+          more={more}
+        />
       </SidebarProvider>
     </TooltipProvider>,
   );
 
+const open = async (current = 'Global') => {
+  fireEvent.click(
+    screen.getByRole('button', { name: `Switch context: ${current}` }),
+  );
+  return screen.findAllByRole('menuitem');
+};
+
 describe('ContextSwitcher', () => {
-  it('shows the Synapcity wordmark in an accessibly named trigger', () => {
-    renderSwitcher();
-    const trigger = screen.getByRole('button', { name: 'Switch version' });
+  it('shows the active context in an accessibly named trigger', () => {
+    renderSwitcher('Writing');
+    const trigger = screen.getByRole('button', {
+      name: 'Switch context: Writing',
+    });
 
-    expect(
-      trigger.querySelector('[data-slot="synapcity-wordmark"]'),
-    ).not.toBeNull();
+    expect(trigger.textContent).toContain('Writing');
   });
 
-  it('lists every version when opened', async () => {
-    renderSwitcher();
-    fireEvent.click(screen.getByRole('button', { name: 'Switch version' }));
-    await screen.findByRole('menu');
+  it('shows the context’s own icon, decorative, and not the brand mark', () => {
+    renderSwitcher('Writing');
+    const trigger = screen.getByRole('button', {
+      name: 'Switch context: Writing',
+    });
+    const icon = trigger.querySelector('[data-slot="context-switcher-icon"]')!;
 
-    expect(
-      screen.getAllByRole('menuitem').map((el) => el.textContent?.trim()),
-    ).toEqual(versions.map((version) => `v${version}`));
+    expect(icon.getAttribute('aria-hidden')).toBe('true');
+    expect(icon.querySelector('svg.lucide-pen-line')).not.toBeNull();
+    expect(trigger.querySelector('[data-slot="synapcity-mark"]')).toBeNull();
   });
 
-  it('marks the selected version with a check', async () => {
+  it('lists every place to switch to as a link', async () => {
     renderSwitcher();
-    fireEvent.click(screen.getByRole('button', { name: 'Switch version' }));
-    const [first, second] = await screen.findAllByRole('menuitem');
+    const items = await open();
 
-    expect(first!.querySelector('svg')).not.toBeNull();
-    expect(second!.querySelector('svg')).toBeNull();
-  });
-
-  it('moves the check when another version is chosen', async () => {
-    renderSwitcher();
-    fireEvent.click(screen.getByRole('button', { name: 'Switch version' }));
-    fireEvent.click(
-      await screen.findByRole('menuitem', { name: 'v2.0.0-beta1' }),
+    expect(items.map((item) => item.textContent?.trim())).toEqual(
+      options.map((option) => option.label),
     );
-    fireEvent.click(screen.getByRole('button', { name: 'Switch version' }));
-    const items = await screen.findAllByRole('menuitem');
+    expect(items.map((item) => item.getAttribute('href'))).toEqual(
+      options.map((option) => option.href),
+    );
+  });
 
-    expect(items[0]!.querySelector('svg')).toBeNull();
-    expect(items[2]!.querySelector('svg')).not.toBeNull();
+  it('marks the active context with a check and aria-current', async () => {
+    renderSwitcher('Writing', '/u/home/spaces/s1');
+    const [global, writing] = await open('Writing');
+
+    expect(global!.querySelector('svg')).toBeNull();
+    expect(writing!.querySelector('svg')).not.toBeNull();
+    expect(writing!.getAttribute('aria-current')).toBe('page');
+  });
+
+  it('follows the active flag, not the name, when two share one', async () => {
+    renderSwitcher('Writing', '/u/home/spaces/s2');
+    const [, first, second] = await open('Writing');
+
+    expect(first!.querySelector('svg')).toBeNull();
+    expect(second!.querySelector('svg')).not.toBeNull();
+  });
+
+  it('adds a link after the options when given one', async () => {
+    renderSwitcher('Global', '/u/home', {
+      label: 'All spaces',
+      href: '/u/home/spaces',
+    });
+    const items = await open();
+
+    expect(items.at(-1)!.textContent).toBe('All spaces');
+    expect(items.at(-1)!.getAttribute('href')).toBe('/u/home/spaces');
+  });
+
+  it('marks nothing when no option is active', async () => {
+    renderSwitcher('Elsewhere');
+    const items = await open('Elsewhere');
+
+    expect(items.every((item) => item.querySelector('svg') === null)).toBe(
+      true,
+    );
   });
 });

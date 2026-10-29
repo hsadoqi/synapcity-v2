@@ -1,3 +1,52 @@
+## Active task: read-only Document and Dashboard pages, slice 3 (2026-10-29)
+
+- Goal and mode: implementing, next in the agreed sequence. Branch `feat/resource-views`, stacked on `feat/resource-frame` (pull request 79).
+- Changes: `findRecord` in `server-data` (one document or dashboard by id, null when missing, not the owner's, or not a UUID); `loadRecord`, `getDocument` and `getDashboard` in `apps/web` (fixture mode reads the samples); routes `home/documents/[documentId]` and `home/dashboards/[dashboardId]` using `ResourceFrame`, with `requireOwner`, `notFound()` (also from `generateMetadata`, so the status is 404) and breadcrumbs. The collection index pages move into `(index)` route groups, as Spaces already do, so their loading skeleton does not wrap a record page and turn its 404 into a streamed 200. The document page shows the name, icon and description and says content is not available yet (document storage is undecided). The dashboard page shows the existing canvas in a new read-only mode in `features-dashboards`: no edit controls, no saves (the store ignores every change), and a breakpoint taken from the canvas's own width, so it follows the contextual panel. Sidebar, palette and Quick Create now link to and open the new pages. `apps/web` depends on `features-dashboards` and imports its stylesheet. One empty Context destination per resource view.
+- Not changed: document storage, dashboard server storage (reads come from this browser, nothing is saved), Spaces, nested Space routes.
+- Evidence: unit tests (server-data 59, dashboards 143, web), e2e `resource-views.e2e.ts` (4 passed against a fixture dev server: card to page, heading and trail, read-only dashboard with the panel, unknown id is 404). Pre-existing and unchanged: `global-panel.e2e.ts` lock-and-reveal test waits for a `shell-page-scroll` element no component renders (also on `main`; CI skips the signed-in group).
+
+## Active task: ResourceFrame, slice 2 (2026-10-27)
+
+- Goal and mode: implementing, in the agreed sequence after the contextual panel (owner direction 2026-10-27: functional progress on the provisional layout baseline; show results without per-detail visual approval). Branch `feat/resource-frame`, stacked on `feat/contextual-panel` (pull request 78), worktree `synapcity.worktrees/contextual-panel`.
+- Changes: `ResourceFrame` and `ResourceHeader` in `frontend-shells` (component, stories at about 280, 480, 900 and 1400px, tests). The frame holds one resource's bounded view: an optional header, the body (scrolled by the frame as a focusable labelled region, or left to content that scrolls itself) and the contextual panel with the destinations the view passes. The header shows the icon and the title as the page heading, truncated, with actions through the existing `ActionsToolbar`, which folds them into More actions by its own width. The panel moves from the app shell to the resource view: the slice 1 `contextualPanel` slot and the `AppShell` placeholder are removed, so collection and Space pages have no panel (whether it appears in Spaces stays open). ADR-0011 amendment and the shells README updated.
+- Not changed: routes, breadcrumbs (still in the global header), the global panel, Spaces, dependencies.
+- Next: slice 3, read-only Document and Dashboard pages using the frame.
+
+## Active task: Contextual panel, slice 1 (2026-10-27)
+
+- Goal and mode: implementing. The owner authorized the first slice of the shared resource-view foundation: a resizable, collapsible contextual panel on the right of the signed-in work area that collapses into an icon rail, with host-supplied destinations and container-measured layout. Branch `feat/contextual-panel` from `origin/main` at `7220291e`, worktree `synapcity.worktrees/contextual-panel`. The owner directed finishing this slice's normal integration (2026-10-27): commit, push and a pull request to `main`. Merging still needs a green CI and the owner's go-ahead.
+- Changes: `ContextualPanelShell` and `useContextualPanel` in `frontend-shells` (component, stories, tests); a `contextualPanel` slot threaded through `RootShell`, `AuthenticatedShell` and `SidebarShell`; one empty placeholder destination in `apps/web` `AppShell`; story-only helpers in `frontend-shells/src/testing` (width probe, panel placeholder, proposed workspace); thin token-coloured scrollbars (`base.css`) and a `scroll-fade-y` utility (`utilities.css`, scroll-driven, applied only where `animation-timeline` is supported) on the existing scroll areas (home, settings, dashboard canvas and widgets, entity dialog, global panel contents); the ADR-0011 contextual panel amendment; the `frontend-shells` README.
+- Not changed: dependencies, global panel behaviour, routes, Document or Dashboard code, Spaces, other worktrees and their uncommitted files.
+- Deferred to the owner's review: the rail and panel arrangement, narrow-container behaviour, whether rail choices leave an unlocked global panel open, destination set and names.
+- Header hierarchy refinement (owner direction, 2026-10-27): the signed-in global header shows the Synapcity logo, linked to the account home, when it has no trail, and keeps theme switching and the Global Panel trigger. Its sidebar toggle is drawn as a panel icon instead of the brand mark (same names, `aria-expanded` and shortcut). The sidebar context switcher shows the selected context's own icon instead of the brand mark: a Space's stored Lucide name through `EntityIcon` (folder fallback for a missing, unknown or unlisted icon, per ADR-0012), and a globe for Global, which is not a Space. Sidebar records keep a record's stored icon name; the persistence model is unchanged.
+- Exploratory only: the bounded workspace and its header (breadcrumbs collapsing by the header's own width, workspace action slots) exist as story content in `frontend-shells/src/testing/proposed-workspace.tsx`. App routes still pass their trail to the global header; no route uses a workspace header yet.
+- Visual status (owner direction, 2026-10-27): the workspace's visual composition (bounded frame, header hierarchy, panel and rail arrangement) is provisional, accepted as the working baseline for continued development, not finalized or adopted. The explorations and alternatives stay in the stories. Later UI slices build on this baseline and show functional results without per-detail visual approval; deeper visual exploration resumes once Document and Dashboard views work with the panel. Continuing development does not approve the workspace header, nested navigation, Space-specific layout (Space sidebar, tabs, header hierarchy, whether the panel appears in Spaces) or other exploratory features.
+- Evidence: `pnpm verify` exit 0 with CI's placeholder Supabase values (unit and component tests in every package, web 686; e2e 66 passed and 5 skipped, the existing authenticated-session skips; Storybook 523 with axe; build). Earlier runs on the way: one web test (`quick-create-dialog.dom.test.tsx`) failed once under full-suite load and passed alone three times and in the two later full runs; two exploration stories failed axe (scrollable placeholders without keyboard access), fixed. Manual, in Storybook, light and dark: header and switcher at 1440, 620 and 400px, the narrow sidebar sheet (Escape closes it, focus returns to the toggle), breadcrumb collapse. Not verified: the switcher in the running app with fixture Spaces, screen-reader output.
+- Deferred, not an approved task: an icon picker for Spaces (a visual and product exploration; ADR-0012 excludes it and requires any future picker to offer installed names only).
+
+## Active task: Quick Create remediation (2026-10-27)
+
+- Goal and mode: implementing. The owner directed this remediation on 2026-10-27, after a report-only review of `integrate/shells-sidebar-main` and `feat/create-records` (through `bf6280d3`), delegating routine implementation, test and documentation decisions. Branch `feat/create-records`, worktree `synapcity.worktrees/create-records`, local commits only: no push, merge or hosted database change.
+- Changes: Quick Create cannot be closed while it saves and refuses a second submit; a save that fails with no database answer (a dropped connection or a rejected action call) is reported as unconfirmed, keeps the name, asks the person to check before retrying and refreshes the page data; closing returns focus to the control that opened it (the dialog is opened from state, so Base UI had no trigger to return to). `getCallerIdentity` signs out with `Sign in again to save your changes.` (profile actions keep their own message); the fixture-mode message no longer says account actions. Spaces are created through the `SpaceSource` port (`create`), as the ownership map's Spaces row requires; documents and dashboards call `server-data` directly, as their pin actions do. `server-data`'s `createRecord` keeps the response status so a cut-off request can be told apart. READMEs for `server-data` and `features-spaces` updated; the M7.5 entry below reads `AuthStatus` again (the component's name in code).
+- Considered and not changed: a name length limit (no contract or database limit exists; adding one is a schema and product decision for the owner); an idempotency key (clients cannot write `id` under the column grants, so it needs a schema change); moving the kind-to-table map into `server-data` (the app maps its own `CollectionKind` onto `server-data`'s `RecordKind`, checked by `satisfies`).
+- Evidence: `pnpm verify` exit 0 with CI's placeholder Supabase values (61 lint and type tasks; web 680, `server-data` 50, `features-spaces` 62 tests; e2e 66 passed and 5 skipped, the existing authenticated-session skips; Storybook 515; build). Database: all 12 migrations applied to a throwaway Postgres 16 with stub `auth` and `storage` objects (not Supabase's image); as `authenticated` with JWT claims, each table created a row owned by the caller with its defaults, another user could not read it, and `owner_id`, `id`, a blank name and `anon` were refused. The real `createRecord` through supabase-js sent `POST /rest/v1/<table>?select=id` with `Prefer: return=representation`, run against that database. Browser: the real app (`next dev`) with a local stand-in for Supabase's HTTP API over that database passed 31 checks (each kind created by keyboard, saved once, navigated, listed in the sidebar and on its page without a reload; commit-then-drop reported as unconfirmed with the record shown; signed-out copy and link; focus return; 375px width).
+- Push and pull request (2026-10-27): the owner later authorized pushing `feat/create-records` to `origin` (done at `21c8fe12`) and opening a pull request to `main`, which runs CI. Merging still needs a green CI and the owner's go-ahead.
+- Not verified: real PostgREST and Supabase Auth (no Docker, and running a downloaded PostgREST binary was not permitted), the hosted project, screen-reader output, and a pending save cancelled in a browser (covered by unit tests only). The stand-in harness lives outside the repository.
+
+## Retrospective record: Quick Create first slice (2026-10-27)
+
+- Written during the remediation above; this entry did not exist when the work was done. Commit `bf6280d3` on `feat/create-records`: create Spaces, documents and dashboards by name from the Quick Create dialog (`apps/web/src/lib/records/create-record-action.ts`, `server-data` `createRecord`, the dialog and `AppShell`). No spec or plan was written for it.
+- Approval: the repository holds no record of the owner approving this as the first creation slice (an approval gate in `AGENTS.md` section 5). Owner to confirm.
+- Approval recorded (2026-10-27): the owner approved Quick Create as an interim creation path for Spaces, documents and dashboards. Which creation path Synapcity adopts remains an open product decision; this approval does not settle it.
+- Verification then: lint, type checks, coverage tests and build logs from 07:30 to 07:33, before the commit; no recorded exit code, e2e or Storybook run.
+
+## Retrospective record: shells sidebar integration with main (2026-10-27)
+
+- Written during the remediation above. Branch `integrate/shells-sidebar-main`: `c286e596` snapshots the uncommitted work on `refactor/shells-sidebar-slots` (byte-for-byte equal to that worktree's 36 changed and untracked paths; ignored files left in place), and `a30e41ff` merges `origin/main` at `bf6b5ab1` with 28 conflicts resolved (22 take main, whose versions differ from the branch only by import style; one deletion follows main's move of `lib/owned-records`; four combine both sides).
+- Approval: the repository holds no record of the owner approving the integration. Owner to confirm.
+- Approval recorded (2026-10-27): the owner approved the integration, including the 28 conflict resolutions.
+- Recovery: the first parent of `a30e41ff` is the snapshot, and `refactor/shells-sidebar-slots` and its worktree are unchanged.
+
 ## Active task: Supabase review fixes (2026-10-27)
 
 - Goal and mode: implement the approved [Supabase review fixes](../docs/superpowers/specs/2026-10-27-supabase-review-fixes-design.md) (R1 `local`, R3 (a) on `refactor/shells-sidebar-slots`, R8 (a); R2 and R4 to R7 as recommended), then a pre-commit review and reconciliation. Branch `refactor/supabase-review-fixes`, from `main`.
@@ -6,6 +55,44 @@
 - Not changed: migrations, RLS, Supabase dashboard settings, email templates, the hosted project.
 - Not done: plan Tasks 1 and 9 (A2 needs a real inbox and two browsers). Owner decisions (2026-10-27): spec 9.2 option (a), so `20261013184200_declare_rls_auto_enable.sql` is added (new file; no applied migration changed); A2 waits on the manual reproduction. Open: the hosted `supabase db push --include-all` after merge (owner), and Task 9 after the reproduction.
 - Evidence and limits: `pnpm verify` with CI's placeholder Supabase values; no check ran against a real Supabase project except reading its public key set. Types were regenerated from the migrations on a throwaway local Postgres 16 with stub `auth` and `storage` objects, not Supabase's image.
+
+## Active task: web Supabase leftovers review and approval (2026-10-27)
+
+- Goal and mode: documentation only. Pass 1: a critical review of the web Supabase leftovers design and plan. Pass 2: the owner accepted every recommendation; the documents now carry the approved decisions, with E1, E2 and E4 to E7 folded in and E3 deferred, followed by a second read-only review.
+- Exact updates: `docs/superpowers/specs/2026-10-27-web-supabase-leftovers-design.md`, `docs/superpowers/plans/2026-10-27-web-supabase-leftovers.md` (rewritten to the approved design, with replaced wording archived at the end), and the decision records `docs/superpowers/specs/2026-10-24-m7-auth-account-design.md` (status line, Q5 answer), `docs/superpowers/plans/2026-10-24-m7-2-server-packages.md` (Task B) and `docs/superpowers/plans/2026-10-25-m7-5-features-auth.md` (C7); this ledger. Replaced statements are kept, marked "Superseded". Prettier re-padded the M7.5 calls table, a whitespace-only change.
+- Not changed: source, packages, manifests, migrations, ADRs, the ownership map and READMEs (state records, plan Task 6).
+- Evidence: files read on `feat-tokens-package`, including Next.js 16.4.3's webpack config and layer constants, `@supabase/auth-js` 2.117.3's `getClaims` and `@supabase/ssr` 0.12.7's cookie types. Verified: `prettier --check` on every edited file. Not run: any test, type check, build, the Task 1 spike or a live Supabase check.
+- Pass 3 (2026-10-27, the owner asked for further fixes, applied directly). Changes:
+  - Turbo inputs for the guard tests (they would otherwise replay a cached pass);
+  - the pin test covers every workspace manifest;
+  - the implementation branch is named;
+  - task order and `format:check` are added;
+  - the fixture-mode counter is clarified;
+  - the `./proxy` entry and `sideEffects` were considered and not done.
+
+  Evidence: Turbo 2.11.7's own docs for `$TURBO_ROOT$`; `ci.yml`'s cache restore keys.
+
+- Pass 4 (2026-10-27, approved by the owner):
+  - the web wrapper is dropped (D3);
+  - a shared internal client factory;
+  - `middleware.ts` is renamed `proxy-session.ts`;
+  - `hasRecentLinkSignInNow` is used in the operation;
+  - the JWT signing-mode check is added to E7;
+  - `spaces.e2e.ts` is named as the Task 1 evidence;
+  - follow-ups F1 to F4 and the considered items are recorded.
+
+  Also `docs/superpowers/specs/2026-10-27-font-catalogue-picker-design.md`: section 5.1 records enhancements E1 to E4 from the font review, which section 3.4 referred to but which existed only in that conversation.
+
+- Pass 5 (2026-10-27, owner: "update docs, no implementation"): updated the gitignored local note `docs/archive/notes/open-work-backlog.md`, the existing backlog. `docs/engineering/documentation.md` keeps backlog records out of the documentation set, so no new file was created under `docs/`. The update is a 2026-10-27 banner, section 9 (Supabase and font plans, open decisions, follow-ups), status notes on three older items, and a new suggested order with the 2026-10-25 order kept as Superseded. Its 12 pre-existing links, broken since the file moved to `docs/archive/notes/`, are repointed.
+- Open: implementation, starting with plan Task 1, needs the owner's go-ahead.
+
+## Active task: font plans review (2026-10-27)
+
+- Goal and mode: documentation only. The owner asked for a critical review of the shared default fonts and font catalogue picker designs and plans, with clear errors corrected in place and enhancements listed for approval.
+- Exact updates (4): `docs/superpowers/specs/2026-10-27-shared-default-fonts-design.md`, `docs/superpowers/plans/2026-10-27-shared-default-fonts.md`, `docs/superpowers/specs/2026-10-27-font-catalogue-picker-design.md`, `docs/superpowers/plans/2026-10-27-font-catalogue-picker.md`; this ledger. Replaced statements are kept, marked "Superseded".
+- Not changed: source, packages, manifests, ADRs, `AGENTS.md`.
+- Evidence: files read on `feat-tokens-package`; the Google Fonts CSS API queried on 2026-10-27. Verified: `prettier --check` on the four files. Not run: any build, test or the Task 1 spike.
+- Open for the owner: shared fonts O1 and O2; catalogue O1 to O4.
 
 ## Active task: Milestone 7 close-out (2026-10-25)
 

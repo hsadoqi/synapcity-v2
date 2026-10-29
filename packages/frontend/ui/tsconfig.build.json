@@ -8,7 +8,10 @@
     "sourceMap": true,
     "noEmit": false,
     "composite": false,
-    "incremental": false
+    "incremental": false,
+    "paths": {
+      "@synapcity/frontend-ui/*": ["./src/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": [

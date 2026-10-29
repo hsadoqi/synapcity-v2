@@ -1,5 +1,6 @@
 'use client';
 
+// TODO: SO MUCH reusable functionality, UI, styles, behavior, etc. that can be reused elsewhere. Also the panel would probably end up more efficient/performant as a result.
 import {
   createContext,
   useCallback,
@@ -350,7 +351,7 @@ export function GlobalPanelShell({
               role="group"
               aria-label="Global panel contents"
               tabIndex={0}
-              className="min-h-0 flex-1 overflow-auto p-4 outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
+              className="scroll-fade-y min-h-0 flex-1 overflow-auto p-4 outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:-outline-offset-2 focus-visible:outline-ring"
             >
               {showingSettings && panelSettings ? (
                 <SettingsView
@@ -381,8 +382,9 @@ export function GlobalPanelShell({
             data-global-panel={open ? 'open' : 'closed'}
             role="group"
             aria-label="Work area"
-            tabIndex={0}
-            className="group/work-area flex h-full min-h-0 flex-col overflow-hidden outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
+            // Not a tab stop: it does not scroll (each page owns its scroller),
+            // so focusing it only added a stop before the page's own content.
+            className="group/work-area flex h-full min-h-0 flex-col overflow-hidden"
           >
             {children}
           </div>

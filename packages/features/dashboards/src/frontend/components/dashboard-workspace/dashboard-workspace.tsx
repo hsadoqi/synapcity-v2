@@ -13,6 +13,8 @@ import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
 import { PencilRulerIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
+import { useElementWidth } from '../../hooks/use-element-width';
+
 import type { DashboardSnapshot, DashboardStorage } from '../../../contracts';
 import { ClockProvider } from '../../hooks/use-now';
 import { connectSaves } from '../../storage';
@@ -73,8 +75,30 @@ export function WorkspaceLayout() {
 }
 
 /**
+ * Read-only: only the canvas, laid out at the breakpoint its own width calls
+ * for, so the same dashboard shows its narrow layout in a narrow container
+ * (such as beside the contextual panel) whatever the window's size.
+ */
+function ReadOnlyLayout() {
+  const setBreakpoint = useDashboardStore((s) => s.setBreakpoint);
+  const [ref, width] = useElementWidth<HTMLDivElement>();
+  useEffect(() => {
+    if (width) setBreakpoint(resolveBreakpoint(width));
+  }, [width, setBreakpoint]);
+  return (
+    <div
+      ref={ref}
+      data-slot="dashboard-read-only"
+      className="flex min-h-0 min-w-0 flex-1"
+    >
+      <DashboardCanvas deviceFrame={false} />
+    </div>
+  );
+}
+
+/**
  * A dashboard's canvas: reads what was saved through `storage`, then saves
- * every change back. A failed read shows an error and never saves, so a
+ * every change back. Read-only, it saves nothing and offers no editing. A failed read shows an error and never saves, so a
  * dashboard that could not be read is never overwritten.
  */
 export function DashboardWorkspace({
@@ -83,6 +107,7 @@ export function DashboardWorkspace({
   storage,
   now,
   breakpoint,
+  readOnly = false,
 }: {
   dashboardId: string;
   ownerId: string;
@@ -91,6 +116,11 @@ export function DashboardWorkspace({
   now?: () => number;
   /** The breakpoint to open at; defaults to the viewport's. */
   breakpoint?: Breakpoint;
+  /**
+   * Show without editing or saving; the breakpoint then follows the canvas's
+   * own width. @default false
+   */
+  readOnly?: boolean;
 }) {
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const loadRequest = useRef(0);
@@ -149,11 +179,16 @@ export function DashboardWorkspace({
           ownerId,
           breakpoint: breakpoint ?? resolveBreakpoint(window.innerWidth),
           now,
+          readOnly,
         }}
-        onStore={(store) => connectSaves(store, storage, dashboardId)}
+        onStore={
+          readOnly
+            ? undefined
+            : (store) => connectSaves(store, storage, dashboardId)
+        }
       >
         <ClockProvider now={now ?? DEFAULT_NOW}>
-          <WorkspaceLayout />
+          {readOnly ? <ReadOnlyLayout /> : <WorkspaceLayout />}
         </ClockProvider>
       </DashboardStoreProvider>
     </TooltipProvider>

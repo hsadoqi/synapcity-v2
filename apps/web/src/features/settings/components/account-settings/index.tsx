@@ -3,9 +3,9 @@
 import { FieldGroup } from '@synapcity/frontend-ui/core/field';
 
 import { ProfileSummary } from '@synapcity/features-account/frontend';
-import { updateAvatar } from '@/features/account/server/actions/avatar-actions';
-import { updateName } from '@/features/account/server/actions/name-actions';
-import { signInHref } from '@/lib/routing/sign-in-href';
+import { updateAvatar } from '../../../account/server/actions/avatar-actions';
+import { updateName } from '../../../account/server/actions/name-actions';
+import { signInHref } from '../../../../lib/routing/sign-in-href';
 import {
   ConnectedAccounts,
   DeleteAccount,
@@ -20,8 +20,8 @@ import {
   requestEmailChange,
   requestOwnPasswordReset,
   resendEmailChange,
-} from '@/features/auth/server/actions/actions';
-import { createClient } from '@/lib/supabase/client';
+} from '../../../auth/server/actions/actions';
+import { createClient } from '../../../../lib/supabase/client';
 import {
   SettingsAccordion,
   SettingsAccordionItem,

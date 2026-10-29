@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import '@synapcity/frontend-ui/styles.css';
+@import '@synapcity/features-dashboards/styles.css';
 
 @source '../app';
 @source '../components';
@@ -11,4 +12,12 @@
 @source '../../../../packages/features/account/src';
 @source '../../../../packages/features/auth/src';
 @source '../../../../packages/features/spaces/src';
+@source '../../../../packages/features/dashboards/src';
 @source '../../../../packages/features/settings/src';
+
+@layer base {
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+}

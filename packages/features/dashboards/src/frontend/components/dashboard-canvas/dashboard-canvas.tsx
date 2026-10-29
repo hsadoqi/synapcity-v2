@@ -15,19 +15,29 @@ const FRAME_CHROME = 80;
 /**
  * Desktop fills the canvas; tablet and mobile render inside a frame at the
  * device width, so the grid lays out exactly as it would there. On a screen
- * already that narrow, the frame is dropped: the canvas is the device.
+ * already that narrow, the frame is dropped: the canvas is the device. Without
+ * `deviceFrame`, the breakpoint follows the canvas's own width, so the canvas
+ * is always the device and no frame is drawn.
  */
-export function DashboardCanvas() {
+export function DashboardCanvas({
+  deviceFrame = true,
+}: {
+  /** Preview narrower breakpoints in a device frame. @default true */
+  deviceFrame?: boolean;
+}) {
   const breakpoint = useDashboardStore((s) => s.breakpoint);
   const [ref, width] = useElementWidth<HTMLDivElement>();
   const frameWidth = DEVICE_FRAME_WIDTH[breakpoint];
   const framed =
-    frameWidth !== null && width !== null && width > frameWidth + FRAME_CHROME;
+    deviceFrame &&
+    frameWidth !== null &&
+    width !== null &&
+    width > frameWidth + FRAME_CHROME;
 
   return (
     <div
       ref={ref}
-      className="flex min-w-0 flex-1 flex-col overflow-auto bg-muted px-5 pt-7 pb-16"
+      className="scroll-fade-y flex min-w-0 flex-1 flex-col overflow-auto bg-muted px-5 pt-7 pb-16"
     >
       <div
         className="mx-auto flex w-full flex-col gap-2"

@@ -9,7 +9,7 @@ import {
   NOTICE_PARAM,
   isNoticeKey,
   noticeTimeout,
-} from '@/lib/routing/notices';
+} from '../../lib/routing/notices';
 
 /**
  * Shows the notice a redirect carried (`?notice=<key>`) as a toast, then

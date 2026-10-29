@@ -171,4 +171,51 @@ describe('DashboardWorkspace', () => {
 
     expect(setIntervalSpy).toHaveBeenCalledTimes(initialCalls);
   });
+
+  describe('read-only', () => {
+    const renderReadOnly = (storage: DashboardStorage) =>
+      render(
+        <DashboardWorkspace
+          dashboardId={DASH}
+          ownerId={SEED_OWNER}
+          storage={storage}
+          now={() => SEED_NOW}
+          breakpoint="lg"
+          readOnly
+        />,
+      );
+
+    it('shows the saved widgets with no editing controls', async () => {
+      const { container } = renderReadOnly(await seededStorage());
+      await screen.findAllByRole('region');
+      expect(container.querySelectorAll('[data-slot="widget"]')).toHaveLength(
+        8,
+      );
+      expect(screen.queryByRole('button', { name: 'Edit layout' })).toBeNull();
+      expect(screen.queryByRole('group', { name: 'Layout breakpoint' })).toBe(
+        null,
+      );
+      expect(screen.queryByText(/· \d+px/)).toBeNull();
+    });
+
+    it('never saves', async () => {
+      const storage = await seededStorage();
+      const saveComposition = vi.fn(storage.saveComposition);
+      const saveRecords = vi.fn(storage.saveRecords);
+      renderReadOnly({ ...storage, saveComposition, saveRecords });
+      await screen.findAllByRole('region');
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      });
+      expect(saveComposition).not.toHaveBeenCalled();
+      expect(saveRecords).not.toHaveBeenCalled();
+    });
+
+    it('says editing is not available on an empty dashboard', async () => {
+      renderReadOnly(memoryDashboardStorage(SEED_OWNER));
+      expect(
+        await screen.findByText('Editing dashboards is not available yet.'),
+      ).toBeDefined();
+    });
+  });
 });

@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { Popover as PopoverPrimitive } from '@base-ui/react/popover';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Button, buttonVariants } from '@synapcity/frontend-ui/core/button';
@@ -23,37 +24,89 @@ describe('Button', () => {
     expect(screen.getByRole('button').getAttribute('data-slot')).toBe('button');
   });
 
-  it('opts into a toggle without nesting buttons', () => {
-    const onPressedChange = vi.fn();
-    render(
-      <Button toggle label="Pin" onPressedChange={onPressedChange}>
-        Pin
-      </Button>,
-    );
-    const button = screen.getByRole('button', { name: 'Pin' });
-
-    expect(screen.getAllByRole('button')).toHaveLength(1);
-    expect(button.textContent).toBe('Pin');
-    expect(button.getAttribute('aria-pressed')).toBe('false');
-    fireEvent.click(button);
-    expect(button.getAttribute('aria-pressed')).toBe('true');
-    expect(onPressedChange).toHaveBeenCalledWith(true, expect.any(Object));
-    fireEvent.click(button);
-    expect(button.getAttribute('aria-pressed')).toBe('false');
-  });
-
-  it('keeps ordinary buttons free of toggle state', () => {
+  it('never reports a pressed state; that is what Toggle is for', () => {
     render(<Button label="Save" />);
+    fireEvent.click(screen.getByRole('button'));
+
     expect(screen.getByRole('button').hasAttribute('aria-pressed')).toBe(false);
   });
+});
 
-  it('does not toggle when disabled', () => {
-    const onPressedChange = vi.fn();
+describe('Button icon tooltip', () => {
+  const hover = async (element: HTMLElement) => {
+    await act(async () => {
+      fireEvent.pointerEnter(element, { pointerType: 'mouse' });
+      fireEvent.mouseEnter(element);
+      fireEvent.mouseMove(element);
+    });
+  };
+
+  it('names an icon button by its label and shows it on hover', async () => {
     render(
-      <Button toggle disabled label="Pin" onPressedChange={onPressedChange} />,
+      <Button size="icon" label="Add item">
+        <svg aria-hidden />
+      </Button>,
     );
-    fireEvent.click(screen.getByRole('button'));
-    expect(onPressedChange).not.toHaveBeenCalled();
+    const button = screen.getByRole('button', { name: 'Add item' });
+
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+    expect(screen.queryByText('Add item')).toBeNull();
+    await hover(button);
+    expect(await screen.findByText('Add item')).toBeTruthy();
+  });
+
+  it('maps a text size to its icon size with iconOnly', () => {
+    render(<Button size="sm" iconOnly label="Add" />);
+    const classes = screen.getByRole('button').className.split(' ');
+
+    expect(classes).toContain('size-6');
+    expect(classes).not.toContain('h-6');
+  });
+
+  it('adds no tooltip to a text button or when turned off', async () => {
+    render(
+      <>
+        <Button label="Text label">Save</Button>
+        <Button size="icon" label="Off" tooltip={false} />
+      </>,
+    );
+    for (const button of screen.getAllByRole('button')) await hover(button);
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
+    expect(screen.queryByText('Text label')).toBeNull();
+    expect(screen.queryByText('Off')).toBeNull();
+  });
+
+  it('keeps clicks working through the tooltip', () => {
+    const onClick = vi.fn();
+    render(<Button size="icon" label="Go" onClick={onClick} />);
+    const button = screen.getByRole('button', { name: 'Go' });
+    fireEvent.click(button);
+
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(button.getAttribute('data-slot')).toBe('button');
+  });
+
+  it('still works as the render element of another trigger', async () => {
+    render(
+      <PopoverPrimitive.Root>
+        <PopoverPrimitive.Trigger
+          render={<Button size="icon" label="More" />}
+        />
+        <PopoverPrimitive.Portal>
+          <PopoverPrimitive.Positioner>
+            <PopoverPrimitive.Popup>Menu body</PopoverPrimitive.Popup>
+          </PopoverPrimitive.Positioner>
+        </PopoverPrimitive.Portal>
+      </PopoverPrimitive.Root>,
+    );
+    const button = screen.getByRole('button', { name: 'More' });
+
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+    expect(button.getAttribute('aria-expanded')).toBe('false');
+    fireEvent.click(button);
+    expect(await screen.findByText('Menu body')).toBeTruthy();
+    expect(button.getAttribute('aria-expanded')).toBe('true');
   });
 });
 
@@ -80,6 +133,7 @@ describe('Button variants', () => {
       'sm',
       'default',
       'lg',
+      'xl',
       'icon-xs',
       'icon-sm',
       'icon',
@@ -128,17 +182,5 @@ describe('Button variants', () => {
     );
     fireEvent.click(screen.getByRole('button'));
     expect(onClick).toHaveBeenCalledTimes(1);
-  });
-
-  it('supports a controlled pressed state', () => {
-    const { rerender } = render(<Button toggle pressed={false} label="Pin" />);
-    expect(screen.getByRole('button').getAttribute('aria-pressed')).toBe(
-      'false',
-    );
-
-    rerender(<Button toggle pressed label="Pin" />);
-    expect(screen.getByRole('button').getAttribute('aria-pressed')).toBe(
-      'true',
-    );
   });
 });

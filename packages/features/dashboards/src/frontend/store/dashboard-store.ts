@@ -42,6 +42,11 @@ type DashboardState = {
   breakpoint: Breakpoint;
   /** Whether widgets can be dragged, resized and configured. View state, not saved. */
   editMode: boolean;
+  /**
+   * Shown, never changed: edit mode stays off and every change to the
+   * composition or records is ignored, so nothing looks saved that is not.
+   */
+  readOnly: boolean;
   /** The widget selected for keyboard move or resize. View state, not saved. */
   selectedWidgetId: string | null;
 };
@@ -78,6 +83,8 @@ export type DashboardStoreInit = {
   breakpoint: Breakpoint;
   /** The clock, for tests and stories; defaults to `Date.now`. */
   now?: () => number;
+  /** Show the dashboard without allowing changes. @default false */
+  readOnly?: boolean;
 };
 
 /**
@@ -91,14 +98,17 @@ export function createDashboardStore({
   ownerId,
   breakpoint,
   now = Date.now,
+  readOnly = false,
 }: DashboardStoreInit): StoreApi<DashboardStore> {
   return createStore<DashboardStore>()((set, get) => {
     const context = (): RecordContext => ({ ownerId, now: now() });
     const compose = (fn: (c: DashboardComposition) => DashboardComposition) => {
+      if (readOnly) return;
       const next = fn(get().composition);
       if (next !== get().composition) set({ composition: next });
     };
     const record = (fn: (r: PrototypeRecords) => PrototypeRecords) => {
+      if (readOnly) return;
       const next = fn(get().records);
       if (next !== get().records) set({ records: next });
     };
@@ -108,13 +118,13 @@ export function createDashboardStore({
       records,
       breakpoint,
       editMode: false,
+      readOnly,
       selectedWidgetId: null,
       setBreakpoint: (bp) => set({ breakpoint: bp }),
-      toggleEditMode: () =>
-        set((s) => ({
-          editMode: !s.editMode,
-          selectedWidgetId: null,
-        })),
+      toggleEditMode: () => {
+        if (readOnly) return;
+        set((s) => ({ editMode: !s.editMode, selectedWidgetId: null }));
+      },
       selectWidget: (id) => set({ selectedWidgetId: id }),
       nudgeWidget: (id, delta) =>
         compose((c) => {
@@ -130,6 +140,7 @@ export function createDashboardStore({
           return unchanged ? c : applyLayoutChange(c, bp, next);
         }),
       addWidget: (type) => {
+        if (readOnly) return;
         const created = createWidget(type, get().records, context());
         set({
           records: created.records,

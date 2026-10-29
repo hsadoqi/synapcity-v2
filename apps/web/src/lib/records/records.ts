@@ -1,5 +1,6 @@
-import type { OwnedRecordSummary } from '@synapcity/domain-records';
+import type { BaseRecord, OwnedRecordSummary } from '@synapcity/domain-records';
 import {
+  findRecord,
   listRecordSummaries,
   setRecordPinned,
   type RecordKind,
@@ -63,4 +64,20 @@ export async function loadRecordSummaries(
 ): Promise<OwnedRecordSummary[]> {
   if (fixtureModeEnabled()) return [...fixtures];
   return listRecordSummaries(await createClient(), kind);
+}
+
+/**
+ * One of the signed-in owner's records of one kind, or null when it does not
+ * exist or is not theirs (row-level security makes the two look the same).
+ * Development fixture mode reads the sample records instead.
+ */
+export async function loadRecord(
+  kind: RecordKind,
+  id: string,
+  fixtures: readonly OwnedRecordSummary[],
+): Promise<BaseRecord | null> {
+  if (fixtureModeEnabled()) {
+    return fixtures.find((record) => record.id === id) ?? null;
+  }
+  return findRecord(await createClient(), kind, id);
 }

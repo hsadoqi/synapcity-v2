@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { RootShell } from '.';
+import { sampleSidebarGroups } from '../../testing/sidebar-sample';
 
 // No `nextjs.appDirectory`: the app-router mock in @storybook/nextjs-vite 10.6 does not
 // provide the layout cache node that next 16.4's useRouter reads, so every story crashed.
@@ -35,6 +36,7 @@ export const LoggedIn: Story = {
       settingsHref: '/user-123/settings',
     },
     globalPanel: <p>Caller-owned utility content</p>,
+    sidebar: { groups: sampleSidebarGroups },
   },
 };
 

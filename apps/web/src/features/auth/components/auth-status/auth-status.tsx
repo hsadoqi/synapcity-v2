@@ -6,6 +6,7 @@ import { signOut } from '@/features/auth/server/actions/actions';
 import { accountLinksFor, homePathFor } from '@/lib/routing/user-paths';
 import { getCurrentUser } from '@/features/auth/server/session';
 import { FIXTURE_MESSAGE } from '@/lib/access/dev-fixture';
+import { cn } from '@/lib/utils';
 
 /**
  * Reads the verified session claims on the server (ADR-0006) so the first paint
@@ -14,9 +15,12 @@ import { FIXTURE_MESSAGE } from '@/lib/access/dev-fixture';
 export async function AuthStatus({
   variant = 'header',
 }: {
-  variant?: 'header' | 'hero';
+  /** `sidebar` is the account row for the sidebar's foot; it shows nothing signed out. */
+  variant?: 'header' | 'hero' | 'sidebar';
 }) {
   const user = await getCurrentUser();
+
+  if (!user && variant === 'sidebar') return null;
 
   if (!user) {
     return (
@@ -24,7 +28,7 @@ export async function AuthStatus({
         signInHref="/auth/login"
         signUpHref="/auth/register"
         quietPathPrefix="/auth"
-        variant={variant}
+        variant={variant === 'sidebar' ? 'header' : variant}
       />
     );
   }
@@ -41,7 +45,11 @@ export async function AuthStatus({
     return (
       <span
         title={FIXTURE_MESSAGE}
-        className="rounded-md border border-border px-2 py-1 text-xs text-muted-foreground"
+        className={cn(
+          'rounded-md border border-border px-2 py-1 text-xs text-muted-foreground',
+          // Folded to icons, the sidebar has no room for the label.
+          variant === 'sidebar' && 'group-data-[collapsible=icon]:hidden',
+        )}
       >
         Fixture mode
       </span>
@@ -50,6 +58,7 @@ export async function AuthStatus({
 
   return (
     <UserMenu
+      variant={variant === 'sidebar' ? 'sidebar' : 'icon'}
       {...accountLinksFor(user.id)}
       name={user.name}
       email={user.email}

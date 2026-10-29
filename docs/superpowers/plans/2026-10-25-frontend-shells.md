@@ -65,23 +65,42 @@ Not needed. The premise was wrong: `GlobalPanelShell` already takes its content 
 
 ### Task 4: Convert the shell to slots and deduplicate the sidebar (the behavior-risky one)
 
-- [ ] **Step 1: Failing tests first** for the new contract: `SidebarShell` renders the `sidebar`, `header`, `footer` and `panel` it is given and nothing else; `RootShell` forwards them; links go through the injected link capability; with no sidebar content it renders no template navigation.
-- [ ] **Step 2: Deduplicate the sidebar stack (C8)** in `frontend-shells` (moved in Task 2). Four layers become two. `components/ui/sidebar` stays as the primitive. `SidebarProviders` (22 lines: a `TooltipProvider` and a `SidebarProvider` with `defaultOpen={false}` and a height class, one caller) is inlined into `SidebarShell` and deleted. `RootSidebar` is deleted as a component that owns content: `SidebarShell` takes a `sidebar` slot, and the host (or a small data-driven `SidebarNav` taking `groups`, `header` and `footer` props) supplies the content. The mobile-only Settings and mode-toggle footer that `RootSidebar` hard-wires moves to the host's sidebar content. `lib/sidebar-data.ts` is deleted with its test (no app renders it once web passes real or stand-in content); the `AccountLinks` type moves to shells per C4. Also delete the 40-line commented-out `RootShell` block in `root-shell.tsx`. The `next/link` uses move behind `./next` (a `ShellNavigationProvider`, the pattern `frontend-collection` uses) and the two R11 exceptions are removed from `packages/dev/boundaries/src/exceptions/exceptions.ts`.
-- [ ] **Step 3: Update the consumers** for the new props (already re-pointed to the package in Task 2): `apps/docs/src/app/layout.tsx` (renders `PublicShell`, no sidebar, so docs is unchanged), `apps/web/src/components/breadcrumbs`, Storybook stories. Remove the two R11 exceptions and the structure test's `PENDING_NEXT_IMPORTS` entries. `apps/web` passes its sidebar content in Task 6, not here; until then web passes the same template data so this task changes no pixels.
-- [ ] **Step 4:** Package, `frontend-ui` and web tests; `pnpm boundaries` (expect the R11 exceptions gone); Storybook shell stories.
-- [ ] **Step 5:** Checkpoint commit.
+- [x] **Step 1: Failing tests first** for the new contract: `SidebarShell` renders the `sidebar`, `header`, `footer` and `panel` it is given and nothing else; `RootShell` forwards them; links go through the injected link capability; with no sidebar content it renders no template navigation.
+- [x] **Step 2: Deduplicate the sidebar stack (C8)** in `frontend-shells` (moved in Task 2). Four layers become two. `components/ui/sidebar` stays as the primitive. `SidebarProviders` (22 lines: a `TooltipProvider` and a `SidebarProvider` with `defaultOpen={false}` and a height class, one caller) is inlined into `SidebarShell` and deleted. `RootSidebar` is deleted as a component that owns content: `SidebarShell` takes a `sidebar` slot, and the host (or a small data-driven `SidebarNav` taking `groups`, `header` and `footer` props) supplies the content. The mobile-only Settings and mode-toggle footer that `RootSidebar` hard-wires moves to the host's sidebar content. `lib/sidebar-data.ts` is deleted with its test (no app renders it once web passes real or stand-in content); the `AccountLinks` type moves to shells per C4. Also delete the 40-line commented-out `RootShell` block in `root-shell.tsx`. The `next/link` uses move behind `./next` (a `ShellNavigationProvider`, the pattern `frontend-collection` uses) and the two R11 exceptions are removed from `packages/dev/boundaries/src/exceptions/exceptions.ts`.
+- [x] **Step 3: Update the consumers** for the new props (already re-pointed to the package in Task 2): `apps/docs/src/app/layout.tsx` (renders `PublicShell`, no sidebar, so docs is unchanged), `apps/web/src/components/breadcrumbs`, Storybook stories. Remove the two R11 exceptions and the structure test's `PENDING_NEXT_IMPORTS` entries. `apps/web` passes its sidebar content in Task 6, not here; until then web passes the same template data so this task changes no pixels.
+- [x] **Step 4:** Package, `frontend-ui` and web tests; `pnpm boundaries` (expect the R11 exceptions gone); Storybook shell stories.
+- [x] **Step 5:** Checkpoint commit.
+
+**Done 2026-10-25, on branch `refactor/shells-sidebar-slots`.** What changed:
+
+- `SidebarShell` takes a `sidebar` slot and renders the tooltip and sidebar providers itself (collapsed to start, full viewport height); `SidebarProviders` is deleted, and its three assertions moved into the `SidebarShell` tests.
+- `RootSidebar` no longer reads template data. It takes `header` and `groups` (`RootSidebarContent`), and `RootShell`/`AuthenticatedShell` take a `sidebar` prop and build it. Without one, the sidebar has no sections (tested: no template navigation appears).
+- Links: `ShellLink` and `ShellNavigationProvider` (plain anchor with no provider) in `src/providers/shell-navigation`; `NextShellNavigation` in `src/next`, mounted in the web and docs root layouts. The logo, breadcrumb, sidebar item and small-screen Settings links use it. The two R11 exceptions and the structure test's temporary allowance are gone; `next/*` is imported only under `src/next/`.
+- `frontend-ui/src/lib/sidebar-data.ts` is deleted. `apps/web/src/components/stand-in-sidebar` passes the same template content (generated from the deleted file, 4 sections, 25 items, 3 versions), so nothing a user sees changes; Task 6 replaces it.
+- The commented-out legacy `RootShell` block is deleted.
+
+Changed from the steps above, on purpose:
+
+1. The small-screen Settings link and theme toggle stay in the shell (`RootSidebar`, from `account.settingsHref`), not in the host's content: they mirror the header's actions from md up, which the shell owns, so keeping both in one place keeps them in step.
+2. `RootSidebar` stays as the data-driven sidebar (C7, names unchanged) instead of a new `SidebarNav`; hosts fill it through `RootShell`'s `sidebar` prop.
+3. `AccountLinks` stays in `frontend-ui/lib/account-links`: ui's `user-menu` still uses it.
+4. The header's Settings icon still uses `frontend-ui`'s `./next/link-button` entry. It is a ui entry, not a direct `next/*` import, so R11 allows it; making it a `ShellLink` with button styling is a follow-up.
+
+Checks: shells 74 tests; web 64 files, 637 tests; boundary checker 148 of 149 and `pnpm boundaries` with one violation, both the other session's untracked `flip-countdown` cycle; `frontend-ui` structure-test failures and Knip's two unused files, all in that session's untracked blocks; type check and lint clean for shells, ui, boundaries, web, docs and Storybook; the shells stories in Chromium with axe, 11 files, 26 tests. Full `pnpm verify` runs in a clean worktree before the pull request.
 
 ### Task 5: Breadcrumb trail and page frames
 
-- [ ] **Step 1:** Move `BreadcrumbRootShell`/`SetBreadcrumbs` (rename only if the glossary allows; otherwise keep the names) into shells; `collection-labels` stays in `apps/web`. Move `AuthPageShell` and `MessagePage` as page frames; re-point the 8 importers (`auth/layout`, `error`, `global-error`, `not-found`, the three `home/*/error` files, `auth/delete-account/page`). Keep `MESSAGE_HEADING_ID` and the focus behavior.
-- [ ] **Step 2:** Tests: breadcrumb dom test and the message-page and auth-page tests move with the code.
-- [ ] **Step 3:** Checkpoint commit.
+- [x] **Step 1:** Move `BreadcrumbRootShell`/`SetBreadcrumbs` (rename only if the glossary allows; otherwise keep the names) into shells; `collection-labels` stays in `apps/web`. Move `AuthPageShell` and `MessagePage` as page frames; re-point the 8 importers (`auth/layout`, `error`, `global-error`, `not-found`, the three `home/*/error` files, `auth/delete-account/page`). Keep `MESSAGE_HEADING_ID` and the focus behavior.
+- [x] **Step 2:** Tests: breadcrumb dom test and the message-page and auth-page tests move with the code.
+- [x] **Step 3:** Checkpoint commit.
+
+**Done 2026-10-25, on branch `refactor/shells-sidebar-slots`.** `BreadcrumbRootShell` and `SetBreadcrumbs` (names unchanged, C7), `AuthPageShell`, and `MessagePage` with `MESSAGE_HEADING_ID` moved with `git mv` from `apps/web/src/components/{breadcrumbs,shells}` to `frontend-shells/src/components/{breadcrumb-trail,auth-page-shell,message-page}` and are exported from the package root. `COLLECTION_LABELS` stays in `apps/web/src/components/breadcrumbs`; `apps/web/src/components/shells` is gone. The web importers (root layout, the auth layout and delete-account page, `error`, `global-error`, `not-found`, the three `home/*/error` files, and the spaces and dashboards pages that set a trail) import from `@synapcity/frontend-shells`. The three `.dom.test.tsx` files became the folders' `.test.tsx`, unchanged apart from the import; each folder gained a story for the package's structure test. Checks: shells 82 tests; web `src/app` and `src/components` 19 files, 123 tests; type check and lint clean for shells and web; the shells stories in Chromium with axe, 14 files, 31 tests; `pnpm boundaries` no violations; Knip clean.
 
 ### Task 6: Real navigation in the sidebar (needs the owner's go-ahead)
 
 Everything in this task is owner direction (2026-10-25), not a fixed decision; the owner expects it to change as the app grows. Build it so the content is data the host passes in, and changing the sections means changing that data, not the shell.
 
-- [ ] **Step 1: Context switcher rule.** The `ContextSwitcher` at the top of the sidebar (today it switches template "versions") shows the active context, which follows the route:
+- [x] **Step 1: Context switcher rule.** The `ContextSwitcher` at the top of the sidebar (today it switches template "versions") shows the active context, which follows the route:
 
   | Route                                     | Context shown                                       |
   | ----------------------------------------- | --------------------------------------------------- |
@@ -94,14 +113,39 @@ Everything in this task is owner direction (2026-10-25), not a fixed decision; t
 
   Source of truth: the page's existing `SetBreadcrumbs` trail, not a second mechanism. The context is the trail's Space entry when there is one, otherwise its collection entry, otherwise Home, so the sidebar and the breadcrumbs cannot disagree. A crumb may need a `kind` (`collection` or `space`) so the shell can pick the context without parsing labels; that is a small contract change to `RootBreadcrumb`. Gap found: `/home/documents` sets no breadcrumbs today; it needs one before this rule works there.
 
-- [ ] **Step 2: Sidebar body.** Two parts:
+- [x] **Step 2: Sidebar body.** Two parts:
   - **Core section, always on top:** the main destinations, such as Home and Settings. Only link routes that exist and are decided (ADR-0013 link check). Inbox is included as a placeholder linking to `#` (owner decision, 2026-10-25): no Inbox route exists and capture/intake is an open product decision in `PRODUCT.md`, so the entry carries no route until that is decided. Any other not-yet-built destination follows the same rule. Check that the `apps/web` link check accepts `#`; if it does not, allow `#` explicitly there rather than adding a route.
   - **Context sections below:** chosen by the active context. Examples to confirm when building: in a Space, sections for that Space's documents and dashboards; in Documents or Dashboards, recent or pinned items of that kind; on Home, nothing extra or recents. Build from the host's path helpers (`homePathFor`, `spaceItemPath`, `documentPathFor`, `dashboardPathFor`, settings).
   - The shell takes `sections: { label?, items }[]` and renders them with the `ui` sidebar primitives (the data-driven `SidebarNav` from Task 4). This is the visible change; nothing earlier in the plan alters what a user sees.
-- [ ] **Step 3: Search (open).** Either the inline `SearchForm` at the top of the sidebar (as today, but it searches nothing yet) or a magnifying-glass button that opens a command palette (with a keyboard shortcut). The palette needs a component that is not installed (`pnpm ui:add command`) and a search source, which does not exist; so for this task: keep or hide the inline form, and record the palette as its own follow-up.
-- [ ] **Step 4: Tests:** one per row of the context table (render with that trail, assert the switcher label); the core section always present; context sections switch with the context; the missing documents breadcrumb.
-- [ ] **Step 5:** `apps/docs` keeps its own content (its real doc navigation is a separate decision).
+- [x] **Step 3: Search (open).** Either the inline `SearchForm` at the top of the sidebar (as today, but it searches nothing yet) or a magnifying-glass button that opens a command palette (with a keyboard shortcut). The palette needs a component that is not installed (`pnpm ui:add command`) and a search source, which does not exist; so for this task: keep or hide the inline form, and record the palette as its own follow-up.
+- [x] **Step 4: Tests:** one per row of the context table (render with that trail, assert the switcher label); the core section always present; context sections switch with the context; the missing documents breadcrumb.
+- [x] **Step 5:** `apps/docs` keeps its own content (its real doc navigation is a separate decision).
 - [ ] **Step 6:** E2E: the sidebar links reach their routes; the link check walks only decided routes (ADR-0013).
+
+**Built 2026-10-25, on branch `refactor/shells-sidebar-slots` (owner go-ahead the same day).** What changed:
+
+- `RootBreadcrumb` gained an optional `kind` (`collection` or `space`). The spaces, Space, dashboards and documents pages mark their crumbs; the documents page now sets its trail (the gap noted above).
+- `activeContext(trail)` (shells) picks the Space crumb, else the collection crumb, else none. `BreadcrumbRootShell`'s `sidebar` may be a function of the trail, so the sidebar follows the page from the same trail as the breadcrumbs.
+- `ContextSwitcher` now takes `current` and `options` (label and href) and shows the active context, with a check on it in its menu and links through `ShellLink`; the template versions are gone. A sidebar group's `title` is optional, for the unlabelled core section.
+- `apps/web`: `AppShell` (a client component, so it can read the trail and the path) replaces the layout's direct `BreadcrumbRootShell`; `appSidebar(userId, trail, pathname)` builds the content: the switcher (Home, Spaces, Documents, Dashboards), the core section (Home, and Inbox linking to `#`), and one section for the active context with an Overview link to its page. `documentsPathFor`, `dashboardsPathFor` and `COLLECTION_LABELS.documents` were added. `stand-in-sidebar` is deleted.
+- Search: the inline `SearchForm` is hidden (it searches nothing); the command palette stays a follow-up. The component remains in shells.
+- The `#` placeholder needs no link-check change: the check only walks links that start with `/`.
+
+To confirm with the owner: the context section is only an Overview link for now. A Space's documents and dashboards, or recents in a collection, need data the client sidebar does not have yet. Settings is not in the core section because the header (from md up) and the small-screen footer already carry it.
+
+Checks: shells 90 tests; web 63 files, 644 tests (one per context-table row, the core section, the context section switching, the documents trail, and sidebar and switcher links reaching served routes); type check and lint 61 of 61 tasks; shells stories in Chromium with axe, 14 files, 31 tests; `pnpm boundaries` no violations; Knip and Prettier clean. Not run: the Step 6 end-to-end run (needs the Supabase environment) and a look at the signed-in sidebar in a browser.
+
+**Revised 2026-10-26 (owner direction): the sidebar layout.** Replaces the core section and the one-link context section above:
+
+- Core links and actions at the top: Home, Command palette (opens the palette), Inbox (`#`), Settings. Settings left the header.
+- A search field (`SearchForm` now hands its query to the host, which opens the palette with it).
+- One section per collection (Spaces, Documents, Dashboards): the title links to the collection's page, a + button opens a quick-create dialog, and the latest 8 records follow (pinned first, then most recently changed), loaded by the root layout and kept off the page when a kind fails to load. Folded to icons, these sections hide.
+- The account menu at the foot (`UserMenu`'s new `sidebar` variant). The header's avatar menu stays as well; which one remains is open.
+- The command palette is shadcn's `command` on `cmdk` (new dependency, owner approved), opened from the sidebar, the search field or Cmd/Ctrl+K, listing places, the latest records and create actions.
+- Quick create: the dialog asks for a name, but Create is disabled and says so; nothing can create a Space, document or dashboard yet, and wiring it up is a separate approved step (storage and schema).
+- Sizing: `SidebarProvider` gained a `contained` option; the shell fills its container instead of the window, the sidebar takes a share of that container's width (container query units) and opens at 1024px or wider and folds to icons below, with the person's toggle holding until the width crosses the line again. The header and footer stay put while the sections scroll.
+
+Checked in a browser in fixture mode at 1440 and 900 pixels wide: the sidebar beside the page, the palette from Cmd+K, the quick-create dialog, and the icon rail.
 
 ### Task 7: Records and verification
 

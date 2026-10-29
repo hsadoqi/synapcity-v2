@@ -97,7 +97,7 @@ export function RecentCarousel({
         role="list"
         tabIndex={0}
         aria-label={heading}
-        className="scrollbar-hidden flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-md outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        className="scrollbar-hidden flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-md outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-ring"
       >
         {items.map((item, index) => {
           const size = sizeOf(index, items.length);

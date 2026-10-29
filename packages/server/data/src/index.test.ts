@@ -5,6 +5,8 @@ describe('@synapcity/server-data root entry', () => {
     const entry = await import('./index');
 
     expect(Object.keys(entry).sort()).toEqual([
+      'createRecord',
+      'findRecord',
       'findSpace',
       'listRecordSummaries',
       'listSpaceDashboards',

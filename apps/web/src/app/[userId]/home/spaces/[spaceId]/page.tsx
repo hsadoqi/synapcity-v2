@@ -5,7 +5,8 @@ import {
 } from '@synapcity/features-spaces/frontend';
 import { getSpace } from '@synapcity/features-spaces/server';
 
-import { COLLECTION_LABELS, SetBreadcrumbs } from '@/components/breadcrumbs';
+import { SetBreadcrumbs } from '@synapcity/frontend-shells';
+import { COLLECTION_LABELS } from '@/components/collections';
 import { logFailure } from '@/lib/log-failure';
 import { requireOwner } from '@/lib/access/require-owner';
 import { homePathFor, spacesPathFor } from '@/lib/routing/user-paths';
@@ -30,8 +31,12 @@ export default async function SpaceShowPage({
     <>
       <SetBreadcrumbs
         items={[
-          { label: COLLECTION_LABELS.spaces, href: spacesPathFor(userId) },
-          { label: awaitedSpace.name },
+          {
+            label: COLLECTION_LABELS.spaces,
+            href: spacesPathFor(userId),
+            kind: 'collection',
+          },
+          { label: awaitedSpace.name, kind: 'space' },
         ]}
       />
       <RecordSpaceView spaceId={spaceId} recordSpaceView={recordSpaceView} />

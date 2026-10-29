@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 
 import { SpacesCollection } from '@synapcity/features-spaces/frontend';
-import { COLLECTION_LABELS, SetBreadcrumbs } from '@/components/breadcrumbs';
+import { SetBreadcrumbs } from '@synapcity/frontend-shells';
+import { COLLECTION_LABELS } from '@/components/collections';
 import { requireOwner } from '@/lib/access/require-owner';
 import {
   homePathFor,
@@ -24,7 +25,9 @@ export default async function SpacesPage({
 
   return (
     <>
-      <SetBreadcrumbs items={[{ label: COLLECTION_LABELS.spaces }]} />
+      <SetBreadcrumbs
+        items={[{ label: COLLECTION_LABELS.spaces, kind: 'collection' }]}
+      />
       <SpacesCollection
         spaces={spaces}
         homePath={homePathFor(userId)}

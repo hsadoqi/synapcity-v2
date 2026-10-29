@@ -15,7 +15,7 @@ vi.mock('next/navigation', () => ({
 
 import DeleteAccountPage from './page';
 import { DeleteAccountCard } from '@synapcity/features-auth/frontend';
-import { MessagePage } from '@/components/shells/message-page';
+import { MessagePage } from '@synapcity/frontend-shells';
 
 const NOW = 1_800_000_000;
 

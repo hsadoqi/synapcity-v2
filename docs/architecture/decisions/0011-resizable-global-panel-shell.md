@@ -33,6 +33,21 @@ The owner approved hiding the app header while the open global panel is locked, 
 - Unlocking, explicitly closing, or dragging the panel shut restores the app header. Focus returns to the header's panel toggle only after the header is available again; a header control is never left focused inside the hidden header.
 - No hover trigger, animation, new shortcut, or saved preference is introduced. The public shell remains unchanged.
 
+### Contextual panel amendment (owner approved, 2026-10-27)
+
+The owner set the direction for a second, horizontal panel in the signed-in shell: a resizable, collapsible contextual panel on the right of the work area that collapses into an icon rail, with several destinations, one of which will show another Document or Dashboard. The owner authorized its first implementation slice. It reuses this decision's dependency and behaviours; it is distinct from the global panel.
+
+- `ContextualPanelShell` in `frontend-shells` sits in the work area below the app header and global panel. It takes a list of destinations (id, label, icon, content); without any, there is no panel or rail. The shell knows only the list.
+- The resource view mounts it, not the app shell (revised 2026-10-27, slice 2): `ResourceFrame` in `frontend-shells` holds one resource's bounded view (an optional `ResourceHeader`, the body, and the panel with the destinations the view passes). Pages without a resource frame, such as collections and Spaces, have no panel, which keeps whether the panel appears in Spaces open. The first slice's `contextualPanel` slot on `RootShell`, `AuthenticatedShell` and `SidebarShell` is removed.
+- The rail is a vertical toolbar of icon buttons with accessible names and tooltips, one tab stop moved through with arrow keys. Choosing a destination expands the panel on it and moves focus into the panel; choosing the shown one again, or the collapse button, collapses it and returns focus to the rail.
+- It is a working surface, not a popover: no outside-click or Escape dismissal. Contents stay mounted once visited and are `inert` and hidden from assistive technology while collapsed.
+- Each region keeps a 16rem minimum. The first open is 22rem, clamped so the main region keeps its minimum; a completed resize by the person (pointer or keyboard) is remembered for the session. Nothing is saved.
+- The shell measures its own container, never the viewport. When the container cannot hold both minimums and the rail, an expanded panel takes the whole work area and the main region is `inert` until it collapses.
+- The main region and the panel are size containers (`@container/main`, `@container/panel`), so their content responds to the room each is given.
+- Until real destinations exist, a resource view may offer one empty placeholder destination; the app shell offers none.
+
+Not decided here: which destinations exist and their names, whether the panel appears in Spaces and where, resource viewing in the panel (a later slice), persistence of its state, and whether choosing from the rail should leave an unlocked global panel open (today it closes it, as any outside press does).
+
 ## Scope
 
 This decision governs the bounded resizing dependency, current shared-shell composition, in-memory behavior, and caller-owned content slot. It evaluates and adapts the archive's shell and collapsible-panel behavior without copying its directory tree or utility system.
