@@ -27,7 +27,7 @@ export function DocumentView({ document }: { document: BaseRecord }) {
     >
       <div className="mx-auto flex w-full max-w-prose flex-col gap-4 px-4 py-6 @3xl/main:px-8 @3xl/main:py-10">
         {document.description && (
-          <p className="text-pretty text-muted-foreground">
+          <p className="text-pretty wrap-break-word text-muted-foreground">
             {document.description}
           </p>
         )}
