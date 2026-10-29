@@ -3,6 +3,9 @@
   "globalPassThroughEnv": [
     "E2E_AUTH_STATE",
     "E2E_DASHBOARD_PATH",
+    "E2E_DOCS_PORT",
+    "E2E_WEB_MODE",
+    "E2E_WEB_PORT",
     "SITE_URL",
     "SYNAPCITY_DEV_AUTH"
   ],
