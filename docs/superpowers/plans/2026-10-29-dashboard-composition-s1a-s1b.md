@@ -1,6 +1,6 @@
 # Dashboard composition S1a and S1b Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. **Status: approved by the owner on 2026-10-29, with decisions U1 to U6 as recommended (U5 provisionally). S1a is being implemented; S1b follows after S1a is integrated.**
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. **Status: approved by the owner on 2026-10-29, with decisions U1 to U6 as recommended (U5 provisionally). S1a is integrated (pull request #119, `8b831cf9`); S1b is in review.**
 
 **Goal:** Let the Dashboard page offer its Widgets palette as a destination of the existing contextual panel, with Edit layout opening it, while the Dashboard store keeps sole ownership of editing, layout, undo and save state.
 
