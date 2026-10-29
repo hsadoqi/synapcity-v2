@@ -21,7 +21,17 @@ const config: StorybookConfig = {
     '@storybook/addon-a11y',
     '@storybook/addon-themes',
   ],
-  staticDirs: ['../public'],
+  // Storybook hosts the brand, it does not own it. `/brand-assets` is the brand
+  // package's canonical assets, plus the compatibility aliases in
+  // ../public/brand-assets (generated, names Storybook served before); `pnpm brand:check`
+  // verifies both.
+  staticDirs: [
+    '../public',
+    {
+      from: '../../../packages/frontend/brand/assets',
+      to: '/brand-assets',
+    },
+  ],
   typescript: {
     // Storybook's default `react-docgen` is used on purpose. `react-docgen-typescript` would
     // document props inherited from external types, but its Vite plugin

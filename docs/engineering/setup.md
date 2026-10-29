@@ -30,7 +30,8 @@ pnpm verify
 | `pnpm check-types`                  | `tsc --noEmit` in every workspace, including unused locals and parameters (Next apps run `next typegen` first)                                                        |
 | `pnpm deps`                         | Knip: unused files, exports and dependencies                                                                                                                          |
 | `pnpm boundaries`                   | Workspace import boundaries (ADR-0014): dependency matrix, browser reachability, `exports`, cycles, `server-only` guard                                               |
-| `pnpm brand:check`                  | Static brand exports match the logo geometry in `logo-mark.tsx` (not the rasters)                                                                                     |
+| `pnpm brand:sync`                   | Regenerates every brand output from `@synapcity/frontend-brand` (SVGs, web public files, Storybook alias, app `icon.svg`)                                             |
+| `pnpm brand:check`                  | Every brand output equals what `@synapcity/frontend-brand` builds; no stray copies; rasters identical (not proven against the geometry)                               |
 | `pnpm test`                         | Vitest unit tests in every workspace that has them, through Turbo                                                                                                     |
 | `pnpm test:coverage`                | The same tests with v8 coverage (no thresholds)                                                                                                                       |
 | `pnpm test:e2e`                     | Playwright smoke test of `apps/web` against a production build (Chromium)                                                                                             |

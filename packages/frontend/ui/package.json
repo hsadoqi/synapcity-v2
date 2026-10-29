@@ -46,6 +46,7 @@
   "dependencies": {
     "@base-ui/react": "^1.9.0",
     "@synapcity/domain-preferences": "workspace:*",
+    "@synapcity/frontend-brand": "workspace:*",
     "@synapcity/frontend-preferences": "workspace:*",
     "@synapcity/frontend-tailwind-config": "workspace:*",
     "@synapcity/frontend-tokens": "workspace:*",

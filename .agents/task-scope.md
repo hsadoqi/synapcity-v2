@@ -1,3 +1,14 @@
+## Active task: frontend-brand package and brand-asset ownership (2026-10-29)
+
+Owner request of 2026-10-29: one explicit owner for brand geometry, React components, server-safe SVG strings and canonical SVG exports. No commits, pushes, pull requests or external changes were authorized.
+
+- Goal and mode: create `@synapcity/frontend-brand`; make web public files, Storybook aliases and app `icon.svg` generated, verified outputs; remove the Open Graph literal. Mode: implementing.
+- Decided here: package at `packages/frontend/brand` with `geometry`, `svg`, `manifest`, `react` and `assets/*` exports; `frontend-ui/components/logo-mark` becomes a transitional re-export; `@synapcity/frontend-shells` imports the brand package; `scripts/sync-brand-assets.mjs` (`pnpm brand:sync`) and a rewritten `scripts/check-brand-assets.mjs` compare exact bytes; Storybook mounts `assets/` at `/brand-assets` with generated aliases for its four older names.
+- Not decided or changed: logo design and geometry values; web public URLs; Next metadata files (kept in each app's `src/app`); PNG and ICO bytes (no generator, no rasteriser dependency added); fonts and `frontend-tokens` (Shared Default Fonts plan stays separate); deployment settings. No ADR amendment: ADR-0014's category and matrix are unchanged and `frontend-brand` is a frontend package.
+- Removed: Storybook's duplicated copies (`logo-on-dark`, `mark-*`, and the named files below, now served from the mount or as generated aliases), and Storybook's `icon.svg` and `apple-icon.png` (built HTML and a browser session requested neither). Storybook keeps four generated aliases (`logo-dark`, `logo-light`, `wordmark-dark`, `wordmark-light`) so every previously served URL still resolves. Retained: root `public/`, covered by `brand:check`; the repository gives no evidence anything serves it, but the Vercel projects' Root Directory setting could not be read (the available CLI account is not on the owning team), so removal waits for the owner.
+- Dependencies: workspace links only (`@synapcity/frontend-brand` in ui, shells and site); `cn` reused at the version `frontend-ui` already pins.
+- Recovery: revert the working tree; deleted Storybook files are recoverable from HEAD.
+
 ## Active task: route-group follow-up, verification and test review (2026-10-29)
 
 - Goal and mode: implementing, owner-directed. Branch `refactor/route-group-followup`, worktree `refactors/route-group-followup`, based on the pushed `plan/protected-route-architecture` at `16473cc0` (pull request 93), so the shared checkout, held by another session, stays untouched.

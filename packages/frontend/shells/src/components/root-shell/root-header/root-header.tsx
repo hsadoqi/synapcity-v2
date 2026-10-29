@@ -5,10 +5,7 @@
 import * as React from 'react';
 import type { ReactNode } from 'react';
 import { PanelLeftIcon } from 'lucide-react';
-import {
-  SynapcityLogo,
-  SynapcityMark,
-} from '@synapcity/frontend-ui/components/logo-mark';
+import { SynapcityLogo, SynapcityMark } from '@synapcity/frontend-brand/react';
 import { ModeToggle } from '@synapcity/frontend-ui/components/mode-toggle';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';

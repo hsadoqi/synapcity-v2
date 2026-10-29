@@ -31,6 +31,7 @@ const projects = [
   'packages/features/dashboards',
   'packages/features/spaces',
   'packages/features/settings',
+  'packages/frontend/brand',
   'packages/frontend/site',
   'packages/frontend/collection',
   'packages/frontend/error-reports',

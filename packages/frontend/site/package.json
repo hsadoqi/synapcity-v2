@@ -16,6 +16,9 @@
     "test:watch": "vitest run --watch",
     "test:coverage": "vitest run --coverage"
   },
+  "dependencies": {
+    "@synapcity/frontend-brand": "workspace:*"
+  },
   "peerDependencies": {
     "next": "16.4.3",
     "react": "19.3.1"
