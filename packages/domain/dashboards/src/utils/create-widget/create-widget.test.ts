@@ -32,4 +32,13 @@ describe('createWidget', () => {
       );
     },
   );
+
+  it.each(['pinned', 'last-opened', 'spaces'] as const)(
+    'creates the %s link widget with a limit and no record',
+    (type) => {
+      const { widget, records } = createWidget(type, emptyRecords(), ctx);
+      expect(widget).toMatchObject({ type, query: { limit: 6 } });
+      expect(records).toEqual(emptyRecords());
+    },
+  );
 });

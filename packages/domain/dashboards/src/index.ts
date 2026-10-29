@@ -5,8 +5,11 @@ export type {
   DashboardSettings,
   FeedWidget,
   HabitWidget,
+  LastOpenedWidget,
   NotesWidget,
+  PinnedWidget,
   ProgressWidget,
+  SpacesWidget,
   StatWidget,
   TasksWidget,
   Widget,
@@ -17,6 +20,7 @@ export type {
 } from './types';
 export {
   DEFAULT_SETTINGS,
+  LINK_WIDGET_TYPES,
   WIDGET_SIZES,
   activeWidgets,
   addWidget,
@@ -27,6 +31,7 @@ export {
   duplicateWidget,
   gridLayoutFor,
   layoutsForWidgets,
+  moveWidgetInOrder,
   removeWidget,
   setWidgetStatus,
   updateSettings,

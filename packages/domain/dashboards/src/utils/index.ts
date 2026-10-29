@@ -10,9 +10,11 @@ export {
 export { createWidget } from './create-widget';
 export { WIDGET_SIZES } from './widget-sizes';
 export {
+  LINK_WIDGET_TYPES,
   activeWidgets,
   addWidget,
   duplicateWidget,
+  moveWidgetInOrder,
   removeWidget,
   setWidgetStatus,
   updateWidget,

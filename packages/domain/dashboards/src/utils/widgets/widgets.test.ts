@@ -8,6 +8,8 @@ import {
   activeWidgets,
   addWidget,
   duplicateWidget,
+  LINK_WIDGET_TYPES,
+  moveWidgetInOrder,
   removeWidget,
   setWidgetStatus,
   updateWidget,
@@ -106,5 +108,52 @@ describe('widget operations', () => {
     const widget = c.widgets[0]!;
 
     expect(updateWidget(c, widget.id, { title: widget.title })).toBe(c);
+  });
+});
+
+describe('LINK_WIDGET_TYPES', () => {
+  it('names the three link widgets only', () => {
+    expect(LINK_WIDGET_TYPES).toEqual(['pinned', 'last-opened', 'spaces']);
+  });
+});
+
+describe('moveWidgetInOrder', () => {
+  const orderAt = (c: DashboardComposition, bp: 'lg' | 'md' | 'sm') =>
+    [...c.layouts[bp]]
+      .sort((a, b) => a.y - b.y || a.x - b.x)
+      .map((item) => c.widgets.find((w) => w.id === item.i)?.title);
+
+  it('swaps a widget with its neighbour in reading order and repacks', () => {
+    const { c } = compositionWith('pinned', 'spaces', 'last-opened');
+    expect(orderAt(c, 'lg')).toEqual(['Pinned', 'Spaces', 'Last opened']);
+    const id = c.widgets[2]!.id;
+
+    const next = moveWidgetInOrder(c, 'lg', id, -1);
+
+    expect(orderAt(next, 'lg')).toEqual(['Pinned', 'Last opened', 'Spaces']);
+    // Other breakpoints keep their own arrangement.
+    expect(orderAt(next, 'sm')).toEqual(orderAt(c, 'sm'));
+    // Sizes survive the repack, and no two widgets overlap.
+    const cells = new Set(
+      next.layouts.lg.flatMap((l) =>
+        Array.from(
+          { length: l.w * l.h },
+          (_, n) => `${l.x + (n % l.w)},${l.y + Math.floor(n / l.w)}`,
+        ),
+      ),
+    );
+    expect(cells.size).toBe(
+      next.layouts.lg.reduce((sum, l) => sum + l.w * l.h, 0),
+    );
+  });
+
+  it('leaves the composition alone at either end, for a locked or missing widget', () => {
+    const { c } = compositionWith('pinned', 'spaces');
+    const [first, second] = c.widgets;
+    expect(moveWidgetInOrder(c, 'lg', first!.id, -1)).toBe(c);
+    expect(moveWidgetInOrder(c, 'lg', second!.id, 1)).toBe(c);
+    expect(moveWidgetInOrder(c, 'lg', 'nope', 1)).toBe(c);
+    const locked = updateWidget(c, first!.id, { locked: true });
+    expect(moveWidgetInOrder(locked, 'lg', first!.id, 1)).toBe(locked);
   });
 });
