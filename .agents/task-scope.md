@@ -1,3 +1,10 @@
+## Task: unambiguous Playwright file filters (2026-10-29)
+
+- Goal and mode: implement a documentation correction noted in #114. Branch `docs/playwright-file-filters`, worktree `fixes/playwright-file-filters`, base `origin/main` at `db2c93d7`.
+- Changes: the fixture-suite command in `docs/engineering/quality-gates.md` names the files (`global-panel.e2e` and so on) and says why a bare name can select every spec.
+- Not changed: Playwright configuration or test discovery, the archived and planning documents that show older commands, any test.
+- Evidence: `prettier --check` on the two files. No tests run; documentation only.
+
 ## Active task: global-panel drag and resize failures, issue #106 (2026-10-29)
 
 - Goal and mode: investigate, then fix at the owning layer. Branch `test/global-panel-glide-race`, worktree `investigations/global-panel-interactions`, base `origin/main` at `ed22f185`. Commit, push and a pull request authorized; merging needs the owner's authorization.
