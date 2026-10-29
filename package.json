@@ -8,6 +8,7 @@
     "start": "turbo run start",
     "dev": "turbo run dev",
     "dev:web": "turbo run dev --filter=web",
+    "dev:web:local": "pnpm --filter web dev:local",
     "dev:docs": "turbo run dev --filter=docs",
     "dev:storybook": "turbo run dev --filter=storybook",
     "lint": "turbo run lint",

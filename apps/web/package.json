@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 8080",
+    "dev:local": "next dev --hostname 127.0.0.1 --port 3000",
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --cache --cache-strategy content --max-warnings 0",
