@@ -39,11 +39,15 @@ Results (17 tests, all passed on the final tree):
 - Unknown addresses: a single unknown segment and another person's area answer 404 inside the workspace shell (a single segment is read as an owner id); missing Space, document and dashboard answer 404 inside the workspace shell; `/privacy/missing` answers 404 inside one public shell.
 - Effective metadata of `/<id>/home` and `/<id>/settings` includes the site title and `og:image` (see Defects found).
 
-Callback, exercised with a real code: the app starts a password reset, which stores the PKCE verifier cookie in the browser; the stack mails the link; the test follows the link's redirects through the browser context to the stack's verify endpoint and then to `/auth/callback` on the running server. Asserted: before, a verifier cookie and no session cookie; the callback answers 307 to `/auth/update-password` with no `code` in the location and a `Set-Cookie` for `sb-*-auth-token`; afterwards the session cookies are `Path=/`, `SameSite=Lax`, the verifier cookie is gone, the page renders signed in with the account menu; the same link used again leads to `/auth/error?reason=reset` and sets no session. A second reset link whose `next` was replaced with `//evil.example/steal` leads to the person's own home and never to the external address.
+Callback, exercised with a real code: the app starts a password reset, which stores the PKCE verifier cookie in the browser; the stack mails the link; the browser opens it and follows every redirect itself (the stack's verify endpoint, then `/auth/callback` on the running server), with no host mapping or substitution. The callback's own response is recorded as it passes. Asserted: before, a verifier cookie and no session cookie; the callback answers 307 with a relative `Location` to `/auth/update-password`, no `code` in it, and a `Set-Cookie` for `sb-*-auth-token`, and its `Location` resolves to the browser's own origin; afterwards the session cookies are `Path=/`, `SameSite=Lax`, the verifier cookie is gone, the page renders signed in with the account menu; the same link used again leads to `/auth/error?reason=reset` and sets no session. A second reset link whose `next` was replaced with `//evil.example/steal` leads to the person's own home and never to the external address.
+
+## Callback origin
+
+Earlier runs of this suite worked around a mismatch: the callback redirected a browser on `127.0.0.1` to `localhost`, a different cookie origin, and the test mapped the destination back. Measured cause: the callback built an absolute URL from `request.nextUrl.origin`, and Next's `NextURL` rewrites every loopback host (`127.x.x.x`, `[::1]`) to `localhost` (`next/dist/server/web/next-url.js`). It was not the `Host` header (a request with `Host: evil.example` still got `localhost`), not the server's bind host (`next start -H 127.0.0.1` made no difference), and not the test harness. Fix: the callback answers with a relative `Location` (a single-slash path, else `/`), which the browser resolves against the address it requested; no `Host` or forwarded header is trusted. The proxy's own redirects were unaffected because Next relativizes middleware redirects. The workaround is gone from the test, which now asserts that the callback's `Location` stays on the browser's origin. A hosted deployment is expected to behave the same by construction; that was not verified on a deployment.
 
 What could not be exercised, and why:
 
-- Under `next start` Next builds `request.nextUrl.origin` from the server's host name (`localhost`), not from the `Host` header, and the callback redirects to that origin. A browser on `127.0.0.1` therefore leaves its cookie origin. The test follows the redirect chain through the context's request API, reads the callback's own response, and loads the destination on the browser's origin. That mapping is the only part not performed by the server. The behavior is the same on `origin/main` (`route.ts` is unchanged) and is a local-run property, not a hosted one; whether a hosted deployment derives the origin correctly was not checked.
+- Hosted callback origin: not deployment-verified. From the implementation, the callback answers with a relative `Location`, so a hosted browser resolves it against the host it requested, whatever the deployment's host or proxy headers; this was exercised only on loopback (see "Callback origin" below).
 - OAuth sign-in (Google, GitHub) and email-confirmation and email-change links: no provider or confirmation mail exists in the local stack (confirmations are off). They reach the same handler; covered only by the unit tests in `route.test.ts`.
 - The cookies are not `HttpOnly` (the Supabase SSR default); recorded, not changed.
 
@@ -82,7 +86,7 @@ The fix kept: the proxy forwards the request path in `x-synapcity-request-path` 
 
 ## Final verification
 
-See the pull request description for the results of the final runs on the pushed head; they are not repeated here so they cannot drift from the logs.
+Final results are in the last section below and the pull request description. Sanitized summaries of the runs are in [2026-10-29-route-groups-run-summaries.md](2026-10-29-route-groups-run-summaries.md); the probe scripts are in [2026-10-29-route-groups-probes/](2026-10-29-route-groups-probes/README.md).
 
 ## Reconstructed probe pages
 
@@ -114,3 +118,13 @@ Paths they occupied: `app/(public)/probe-{err,nf}`, `app/(auth)/auth/probe-{err,
 - Local-stack suite on the same tree, built against the local stack: 17 passed. A client-sent `x-synapcity-request-path` header (`/evil.example`, `//evil.example/x`, `/x/home`) did not change the redirect: `/someone` always went to `/auth/login?next=%2Fsomeone`. The temporary user and its mail were removed; no `route-groups-*` user, mail or orphaned rows remained.
 - The request-path header mechanism falls under AGENTS.md section 5 (routing, security-adjacent). It was made on the owner's direct instruction to correct the lost return path, which is the approval that section requires; its review is in ADR-0006.
 - Not run: the nine fixture and account e2e tests (they need a fixture dev server and a saved account session); OAuth and email-confirmation callbacks; a hosted deployment; a screen reader.
+
+## Final verification of the code tree at `29255f3b`
+
+Commits after it change documentation only. The pushed head is named in the pull request.
+
+- Root gate from the repository root, CI placeholder values (`pnpm verify`): exit 0. Format, lint and types 61 tasks; deps; boundaries; brand check; coverage 29 of 29 tasks (web 76 files, 771 tests, `web:test:coverage` a cache miss so it ran); e2e 104 passed, 26 skipped (fixture-gated and local-session-gated); Storybook 167 files, 530 tests; build.
+- Local-session suite against the local Supabase stack, server built and started from this worktree on port 3000 (verified by its working directory), 17 passed on each of three consecutive runs after the callback fix, including the callback code exchange followed naturally by the browser. The run on the last callback-code change was the third. A first run in this sequence failed once from a mail-helper race (a used link was picked), fixed by never reusing a returned message; the later runs passed.
+- Callback unit tests: 51 passed, including loopback hosts, spoofed `Host`/forwarded headers and the failure path.
+- The three kinds of check stay distinct: fixture checks (e2e matrix on a placeholder build), real local-session checks (real sign-in against the local stack), and the successful callback code exchange (a real emailed code).
+- Not verified: a hosted deployment (callback origin, cookies on a real domain); OAuth and email-confirmation callbacks; a screen reader; forced-colors and reduced-motion.
