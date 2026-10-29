@@ -228,4 +228,24 @@ describe('ContextualPanelShell', () => {
     await choose('Notes');
     expect(main.hasAttribute('inert')).toBe(false);
   });
+
+  it('knows a container is narrow from its first render, so an early choice is not lost', async () => {
+    containerWidth = 400;
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(
+      () => new DOMRect(0, 0, containerWidth, 800),
+    );
+    render(
+      <TooltipProvider>
+        <ContextualPanelShell destinations={DESTINATIONS}>
+          <button>Page action</button>
+        </ContextualPanelShell>
+      </TooltipProvider>,
+    );
+    // Chosen before ResizeObserver has reported any size.
+    fireEvent.click(railButton('Notes'));
+    await layout();
+    const main = document.querySelector('[data-slot="contextual-main"]')!;
+    expect(main.hasAttribute('inert')).toBe(true);
+    expect(region().hasAttribute('inert')).toBe(false);
+  });
 });
