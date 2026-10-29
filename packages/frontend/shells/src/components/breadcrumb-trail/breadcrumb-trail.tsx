@@ -47,10 +47,13 @@ export function BreadcrumbRootShell({
  * Tells the header where this page sits. Renders nothing, and clears the trail
  * when the page goes away so the next page never shows a stale one.
  *
- * One page publishes at a time. The shell keeps a single trail: if two of these
- * are mounted, the last to run wins and either one unmounting clears it. Route
- * layouts that need a crumb of their own should be folded into the page's items
- * rather than publishing a second trail.
+ * The primary navigable route owns the trail and publishes at most one
+ * (ADR-0017): exactly one when it shows a trail, none when it is trail-free.
+ * Resource views, contextual panel destinations and drawers never render this.
+ * The shell keeps a single trail: if two of these are mounted, the last to run
+ * wins and either one unmounting clears it. Route layouts that need a crumb of
+ * their own should be folded into the page's items rather than publishing a
+ * second trail.
  */
 export function SetBreadcrumbs({ items }: { items: RootBreadcrumb[] }) {
   const setTrail = useContext(SetTrailContext);

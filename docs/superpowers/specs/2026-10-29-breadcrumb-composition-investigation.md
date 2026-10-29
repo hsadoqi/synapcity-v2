@@ -128,9 +128,9 @@ The header is rendered once, by the shell, outside `<main>`. Without a slot, a r
 
 ## 5. Ownership semantics for resource layouts and drawers
 
-**Invariant (ADR-0017): the primary navigable route owns the trail, and it has exactly one publisher.** The primary navigable route is the route the URL resolves to through `children`. A resource shown in a contextual panel, drawer or client-state tab is participation and presentation, not navigation, so it cannot change where the person is, and resource views (`DocumentView`, `DashboardView`, future Space content) never publish a trail.
+**Invariant (ADR-0017): the primary navigable route owns the trail, and publishes at most one.** A route that shows a trail has exactly one publisher; an intentionally trail-free route (Home and Settings today) has none, and the header shows its no-trail state. The primary navigable route is the route the URL resolves to through `children`. A resource shown in a contextual panel, drawer or client-state tab is participation and presentation, not navigation, so it cannot change where the person is, and resource views (`DocumentView`, `DashboardView`, future Space content) never publish a trail.
 
-**Convention (today):** the route's `page.tsx` renders `SetBreadcrumbs` directly. This is the current enforcement boundary, not the invariant. A later component that the route explicitly owns, such as a route-level composition component that a page renders to publish on its behalf, would satisfy the invariant, provided the route still has exactly one publisher. Adopting such a component means updating the convention and its guardrail together.
+**Convention (today):** the route's `page.tsx` renders `SetBreadcrumbs` directly, once, or not at all. This is the current enforcement boundary, not the invariant. A later component that the route explicitly owns, such as a route-level composition component that a page renders to publish on its behalf, would satisfy the invariant, provided the route still has at most one publisher. Adopting such a component means updating the convention and its guardrail together.
 
 | Scenario                                        | Behavior under the rule                                                                                                                                                                                                                                                                                                                                                                                        |
 | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -148,7 +148,7 @@ The header is rendered once, by the shell, outside `<main>`. Without a slot, a r
 
 ## 6. Recommendation
 
-**Keep the effect-driven bridge (option A) as the breadcrumb architecture, unchanged in behavior. Guard the single-publisher rule with a test, not just documentation. Do not adopt server-rendered composition under the current shell architecture.** (Accepted by the owner, 2026-10-29, as ADR-0017.)
+**Keep the effect-driven bridge (option A) as the breadcrumb architecture, unchanged in behavior. Guard the at-most-one-publisher rule with a test, not just documentation. Do not adopt server-rendered composition under the current shell architecture.** (Accepted by the owner, 2026-10-29, as ADR-0017.)
 
 **Scope of the recommendation:** it applies to the current architecture, in which one global header is rendered by the shell outside `<main>`. It does not prejudge the workspace header, resource-layout composition, or route-specific server-rendered header content; each of those is a separate design decision that reopens this one.
 
@@ -169,15 +169,15 @@ Why:
 - Measured hydration on target devices makes the logo-to-trail swap noticeable, or the owner decides the Space switcher's "Global" first paint must be fixed (E2 is one candidate, not a pre-selected answer).
 - Next.js adds a supported way for a child segment to contribute server output to an ancestor layout.
 
-## 7. Implementation plan (for ADR-0017; a later, separate task; not executed)
+## 7. Implementation plan (for ADR-0017; slices 1 and 2 implemented after acceptance, in the #99 pull request)
 
 Each slice is independent and keeps working behavior throughout. Existing unit tests already cover much of the bridge: `breadcrumb-trail.test.tsx` checks setting, replacing, clearing on unmount, one page replacing another, equal trails not rebuilding the shell, Strict Mode, and the sidebar built from the trail; `active-context.test.ts` checks each context rule; `app-sidebar.dom.test.tsx` checks the switcher for each trail. The slices add only what is missing.
 
-**Slice 1: guard the single publisher** (small).
+**Slice 1: guard the publisher rule** (small).
 
-- Add a lexical check to [`apps/web/src/protected-routes.test.ts`](../../../apps/web/src/protected-routes.test.ts) (the existing scanner of `(protected)` pages), or a sibling test in the same style: `SetBreadcrumbs` may be imported only by route `page.tsx` files under `app/`, and each such page renders it at most once. A view, layout or panel destination importing it fails the test, with a message naming the invariant.
+- Add a lexical check to [`apps/web/src/protected-routes.test.ts`](../../../apps/web/src/protected-routes.test.ts) (the existing scanner of `(protected)` pages), or a sibling test in the same style: `SetBreadcrumbs` may be imported only by route `page.tsx` files under `app/`, and each such page renders it at most once. Trail-free pages are named in the test with their reason; every other signed-in page publishes exactly once. A view, layout or panel destination importing it fails the test, with a message naming the invariant.
 - The check is a guardrail for today's convention, not proof of ownership. It reads imports, so it cannot see a publisher reached indirectly, and it cannot tell whether a page is the primary route. If a route-owned composition component is adopted later, its file is added to the allowed list in the same change that introduces it, with the reason, so the guardrail follows the convention instead of blocking it.
-- Extend the doc comment on `SetBreadcrumbs` ([breadcrumb-trail.tsx:46](../../../packages/frontend/shells/src/components/breadcrumb-trail/breadcrumb-trail.tsx)) and the `frontend-shells` README sentence on the bridge: the primary navigable route owns the trail and publishes it once; resource views, drawers and panel destinations never publish one. No API change.
+- Extend the doc comment on `SetBreadcrumbs` ([breadcrumb-trail.tsx:46](../../../packages/frontend/shells/src/components/breadcrumb-trail/breadcrumb-trail.tsx)) and the `frontend-shells` README sentence on the bridge: the primary navigable route owns the trail and publishes at most one (exactly one when it shows a trail); resource views, drawers and panel destinations never publish one. No API change.
 - Interfaces: none added or removed.
 
 **Slice 2: browser checks for replacement, cleanup and context consistency** (small).
@@ -202,7 +202,7 @@ Regressions and rollback: the new tests can only fail builds, not change behavio
 The issue's adoption criteria apply "if an approach is adopted". The decision retains the existing approach, so for #99:
 
 1. The written comparison and recommendation exist (this document), and the decision is recorded as Accepted ADR-0017.
-2. The single-owner contract on `SetBreadcrumbs` is kept, restated as ownership by the primary navigable route, and guarded by a test (slice 1, a later task).
+2. The single-owner contract on `SetBreadcrumbs` is kept, restated as ownership by the primary navigable route, and guarded by a test (slice 1, `apps/web/src/breadcrumb-ownership.test.ts`).
 3. Shared UI stays free of route and auth knowledge: no change to `frontend-shells`' imports or exports.
 4. "The correct trail in the first server HTML" is explicitly **not** met, by decision, as an accepted limitation under the current global-header architecture, with the reconsideration conditions above.
 

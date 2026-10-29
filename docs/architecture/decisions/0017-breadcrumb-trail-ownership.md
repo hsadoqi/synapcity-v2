@@ -19,8 +19,8 @@ ADR-0013 item 9 requires context to come from the route. ADR-0014 keeps routes a
 
 ## Decision
 
-1. **Invariant: the primary navigable route owns the breadcrumb trail, and each route has exactly one publisher.** The primary navigable route is the route the URL resolves to through `children`. Resource views, contextual panel destinations, drawers and client-state tabs present or participate; they do not navigate, so they never publish a trail.
-2. **Convention: the route's `page.tsx` renders `SetBreadcrumbs` directly.** This is today's enforcement boundary, not the invariant. A component that the route explicitly owns and renders to publish on its behalf may replace direct publication later, provided the single-publisher rule still holds. That change updates the convention and its guardrail together.
+1. **Invariant: the primary navigable route owns the breadcrumb trail, and publishes at most one.** The primary navigable route is the route the URL resolves to through `children`. A route that shows a trail has exactly one publisher. A route may also be intentionally trail-free (Home and Settings today), in which case it has no publisher and the header shows its no-trail state. Resource views, contextual panel destinations, drawers and client-state tabs present or participate; they do not navigate, so they never publish a trail.
+2. **Convention: the route's `page.tsx` renders `SetBreadcrumbs` directly, once, or not at all.** This is today's enforcement boundary, not the invariant. A component that the route explicitly owns and renders to publish on its behalf may replace direct publication later, provided the at-most-one rule still holds. That change updates the convention and its guardrail together.
 3. **The trail reaches the header through the existing client bridge** (`BreadcrumbRootShell` and `SetBreadcrumbs`). Server-rendered composition of the trail is not adopted. This covers a parallel `@header` slot, resource layouts that render trails, and a pathname-derived trail.
 4. **`activeContext` stays derived from the same trail**, so the header and the sidebar's context switcher stay consistent. Consistency is not correctness: before hydration both are empty, so a Space route first shows "Global". That is a known, deferred UX limitation (see Unresolved), not a correct state. Contextual panel and drawer state is presentation, not navigation context.
 
@@ -51,13 +51,14 @@ No new package, dependency, export or route. `frontend-shells` keeps importing n
 
 ## Verification expectations
 
-Implemented as a separate, later task (the investigation's section 7):
+Implemented after acceptance, in the same #99 pull request as this ADR (the investigation's section 7, slices 1 and 2):
 
-- **Ownership guardrail.** A structural test in `apps/web` fails when `SetBreadcrumbs` is imported outside a route `page.tsx` or the files the convention allows, or rendered more than once by one page. It guards the convention; it is not proof of ownership. It reads imports, so it cannot see indirect publishers or tell which page is the primary route. Review still applies.
-- **Replacement and cleanup in the browser.** Fixture-gated e2e steps check that client navigation between resources replaces the trail, that navigating to a page without a trail clears it, and that opening a contextual panel destination leaves it unchanged.
+- **Ownership guardrail.** A structural test in `apps/web` (`src/breadcrumb-ownership.test.ts`) fails when `SetBreadcrumbs` is imported outside a signed-in route `page.tsx` or the files the convention allows, or rendered more than once by one page. It guards the convention; it is not proof of ownership. It reads imports, so it cannot see indirect publishers or tell which page is the primary route. Whether a route shows a trail is route policy, so trail-free pages are named in the test with a reason, and every other signed-in page must publish exactly once. Review still applies.
+- **Replacement and cleanup in the browser.** Fixture-gated e2e steps in `resource-views.e2e.ts` check that client navigation between resources replaces the trail, that navigating to a page without a trail clears it, and that opening a contextual panel destination leaves it unchanged.
 - **Consistency with navigation context.** An e2e step checks that the trail and the context switcher agree after client navigation into and out of a Space.
 - The existing breadcrumb, `activeContext` and sidebar unit tests, the page tests and `resource-views.e2e.ts` keep passing.
 - No test asserts the logo-first server HTML. It is an accepted limitation, not a requirement.
+- The e2e steps need the development fixture identity, so they run only under `next dev` with `SYNAPCITY_DEV_AUTH=fixture`. CI's production-mode `pnpm test:e2e` reports them as skipped (`docs/engineering/quality-gates.md`).
 
 ## Reconsideration conditions
 

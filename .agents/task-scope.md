@@ -1,4 +1,14 @@
-## Active task: breadcrumb composition investigation, issue #99 (2026-10-29)
+## Active task: breadcrumb ownership verification, issue #99 (2026-10-29)
+
+- Goal and mode: implement ADR-0017's verification expectations (investigation section 7, slices 1 and 2). Same branch and worktree as the investigation below. Commit, push and a pull request against `main` authorized on 2026-10-29; merging only after required checks pass; issue #99 stays open.
+- Changes: ADR-0017 and the investigation restated as at most one trail per primary route, exactly one when the route shows a trail, so trail-free routes (Home, Settings) are explicit; `apps/web/src/breadcrumb-ownership.test.ts` (the import and publish-count guardrail, scanning `apps/web/src` and `packages/features`, with a named trail-free list); four fixture-gated steps in `apps/web/e2e/resource-views.e2e.ts`; the `SetBreadcrumbs` doc comment and the `frontend-shells` README sentence; the fixture suite count in `docs/engineering/quality-gates.md`.
+- Not changed: the effect bridge's behavior, shell APIs, routes, layouts, Playwright configuration, dependencies.
+- Also corrected: the stale end-to-end skip count in `docs/engineering/quality-gates.md` (two contradictory sentences, 26 and 18) to the measured 39.
+- Evidence: format, lint, typecheck, deps, boundaries and brand checks pass; `pnpm test` (web 825, frontend-shells 137); `pnpm build`; production `pnpm test:e2e` 104 passed, 39 skipped. Fixture-mode `next dev` on port 48731, driven by a temporary, uncommitted Playwright config (removed after use) because #98's worktree-safe configuration is not on this branch: `resource-views` 8 of 8 (the four new steps among them) and `dashboard-edit` 8 of 8 on a cold server. The four new steps pass locally and are skipped by CI's production-mode `pnpm test:e2e`. The guardrail and the e2e steps were each shown to fail on a deliberate regression, then restored.
+- The full fixture suite did not pass: `global-panel.e2e.ts` passed 1 of 4. Its three drag and resize tests fail deterministically in this environment (the panel returns 30 px off its settled height), also with all runtime source restored to `HEAD` and with one worker, so they are pre-existing and not caused by #99. Not investigated further, outside #99.
+- Not verified: `pnpm test:storybook` (the only shells change is a comment), a real Supabase session, the mobile sidebar, dark mode, screen readers.
+
+## Task: breadcrumb composition investigation, issue #99 (2026-10-29)
 
 - Goal and mode: investigate and recommend; no implementation. Branch `feat/investigate-ssr-compatible-breadcrumb-composition`, its existing worktree, base `a98c8283`. No commit, push, pull request or issue change.
 - Changes: create the [investigation](../docs/superpowers/specs/2026-10-29-breadcrumb-composition-investigation.md) and [ADR-0017](../docs/architecture/decisions/0017-breadcrumb-trail-ownership.md) (drafted Proposed, then Accepted); add ADR-0017's row to the decision index; this record.
