@@ -28,6 +28,10 @@ const WIDGET_TABLES: Record<WidgetType, readonly PrototypeRecordKind[]> = {
   calendar: ['event'],
   agenda: ['event'],
   feed: ['activity'],
+  // Link widgets read the host's items, not prototype records.
+  pinned: [],
+  'last-opened': [],
+  spaces: [],
 };
 
 /** Widget types that show the time (today's habit day, this week's events, "4 min ago"). */

@@ -51,7 +51,7 @@ describe('browserDashboardStorage', () => {
     const { map, storage } = mapStorage();
     const adapter = browserDashboardStorage({ ownerId: OWNER, storage });
     const { composition, records } = sample();
-    await adapter.saveComposition(DASH, composition);
+    await adapter.saveComposition(DASH, composition, 0);
     await adapter.saveRecords(records);
     expect([...map.keys()].sort()).toEqual(
       [COMPOSITION_KEY, RECORDS_KEY].sort(),
@@ -74,7 +74,7 @@ describe('browserDashboardStorage', () => {
     const { storage } = mapStorage();
     const { composition, records } = sample();
     const mine = browserDashboardStorage({ ownerId: OWNER, storage });
-    await mine.saveComposition(DASH, composition);
+    await mine.saveComposition(DASH, composition, 0);
     await mine.saveRecords(records);
     const theirs = browserDashboardStorage({ ownerId: OTHER, storage });
     expect(await theirs.load(DASH)).toEqual({
@@ -174,7 +174,7 @@ describe('browserDashboardStorage', () => {
       onError,
     });
     await expect(
-      adapter.saveComposition(DASH, sample().composition),
+      adapter.saveComposition(DASH, sample().composition, 0),
     ).rejects.toThrow();
     expect(onError).toHaveBeenCalledWith(
       expect.objectContaining({ kind: 'write', key: COMPOSITION_KEY }),

@@ -4,6 +4,7 @@ import {
   createWidget,
   duplicateWidget,
   gridLayoutFor,
+  moveWidgetInOrder,
   removeWidget,
   setWidgetStatus,
   updateSettings,
@@ -35,6 +36,28 @@ import { createStore, type StoreApi } from 'zustand/vanilla';
 
 import { nudgeLayoutItem, type LayoutDelta } from './keyboard-move';
 
+/** Where the save stands (Slice 4). Shown, never saved. */
+export type SaveStatus =
+  /** Everything on screen is stored. */
+  | 'saved'
+  /** A change is waiting for the debounce. */
+  | 'unsaved'
+  | 'saving'
+  /** The save failed (after one automatic retry); Retry asks again. */
+  | 'failed'
+  /** The stored composition moved on; nothing is saved until the page reloads. */
+  | 'conflict';
+
+/** The widget the last removal took out, kept so Undo can put it back. */
+export type RemovedWidget = {
+  /** The composition as it was before the removal. */
+  composition: DashboardComposition;
+  widgetId: string;
+  title: string;
+  /** The widget to focus after removing: the next in reading order, else the previous. */
+  focusAfter: string | null;
+};
+
 type DashboardState = {
   composition: DashboardComposition;
   records: PrototypeRecords;
@@ -49,6 +72,15 @@ type DashboardState = {
   readOnly: boolean;
   /** The widget selected for keyboard move or resize. View state, not saved. */
   selectedWidgetId: string | null;
+  saveStatus: SaveStatus;
+  /** Why the save failed, when the host said. */
+  saveMessage: string | null;
+  /** Bumped by Retry; the save scheduler watches it. */
+  saveRequests: number;
+  /** What a screen reader hears after a move, resize, reorder, add or remove. */
+  announcement: string;
+  /** Set by a removal and cleared by the next change or by Undo. */
+  removed: RemovedWidget | null;
 };
 
 type GoalPatch = { current?: number; target?: number };
@@ -63,6 +95,15 @@ type DashboardActions = {
   duplicateWidget(id: string): void;
   setWidgetStatus(id: string, status: WidgetStatus): void;
   removeWidget(id: string): void;
+  /** Puts back the widget the last removal took out. */
+  undoRemove(): void;
+  /** Forgets the removal, so Undo is no longer offered. */
+  clearRemoved(): void;
+  /** Moves a widget one place earlier or later in reading order. */
+  moveWidgetInOrder(id: string, direction: -1 | 1): void;
+  setSaveStatus(status: SaveStatus, message?: string | null): void;
+  /** Asks the save scheduler to save again now (Retry). */
+  requestSave(): void;
   applyLayoutChange(bp: Breakpoint, items: LayoutItem[]): void;
   updateSettings(patch: Partial<DashboardSettings>): void;
   toggleTask(taskId: string): void;
@@ -102,11 +143,24 @@ export function createDashboardStore({
 }: DashboardStoreInit): StoreApi<DashboardStore> {
   return createStore<DashboardStore>()((set, get) => {
     const context = (): RecordContext => ({ ownerId, now: now() });
-    const compose = (fn: (c: DashboardComposition) => DashboardComposition) => {
+    /**
+     * Applies a pure change to the composition. A change that happens drops
+     * Undo, and `extra` adds view state (an announcement) to the same update.
+     */
+    const compose = (
+      fn: (c: DashboardComposition) => DashboardComposition,
+      extra?: (next: DashboardComposition) => Partial<DashboardState>,
+    ) => {
       if (readOnly) return;
       const next = fn(get().composition);
-      if (next !== get().composition) set({ composition: next });
+      if (next === get().composition) return;
+      set({ composition: next, removed: null, ...extra?.(next) });
     };
+    const titleOf = (c: DashboardComposition, id: string) =>
+      c.widgets.find((w) => w.id === id)?.title ?? 'Widget';
+    /** Active widgets at the current breakpoint, in reading order. */
+    const readingOrder = (c: DashboardComposition) =>
+      [...c.layouts[get().breakpoint]].sort((a, b) => a.y - b.y || a.x - b.x);
     const record = (fn: (r: PrototypeRecords) => PrototypeRecords) => {
       if (readOnly) return;
       const next = fn(get().records);
@@ -120,6 +174,11 @@ export function createDashboardStore({
       editMode: false,
       readOnly,
       selectedWidgetId: null,
+      saveStatus: 'saved',
+      saveMessage: null,
+      saveRequests: 0,
+      announcement: '',
+      removed: null,
       setBreakpoint: (bp) => set({ breakpoint: bp }),
       toggleEditMode: () => {
         if (readOnly) return;
@@ -127,24 +186,42 @@ export function createDashboardStore({
       },
       selectWidget: (id) => set({ selectedWidgetId: id }),
       nudgeWidget: (id, delta) =>
-        compose((c) => {
-          const bp = get().breakpoint;
-          const current = gridLayoutFor(c, bp);
-          if (!current.some((item) => item.i === id)) return c;
-          const cols = columnsFor(c.settings.columns, bp);
-          const next = nudgeLayoutItem(current, id, delta, cols);
-          const unchanged = layoutsEqual(
-            next,
-            current.map(({ i, x, y, w, h }) => ({ i, x, y, w, h })),
-          );
-          return unchanged ? c : applyLayoutChange(c, bp, next);
-        }),
+        compose(
+          (c) => {
+            const bp = get().breakpoint;
+            const current = gridLayoutFor(c, bp);
+            if (!current.some((item) => item.i === id)) return c;
+            const cols = columnsFor(c.settings.columns, bp);
+            const next = nudgeLayoutItem(current, id, delta, cols);
+            const unchanged = layoutsEqual(
+              next,
+              current.map(({ i, x, y, w, h }) => ({ i, x, y, w, h })),
+            );
+            return unchanged ? c : applyLayoutChange(c, bp, next);
+          },
+          (next) => {
+            const placed = next.layouts[get().breakpoint].find(
+              (item) => item.i === id,
+            );
+            const title = titleOf(next, id);
+            const resized = delta.dw !== 0 || delta.dh !== 0;
+            return {
+              announcement: !placed
+                ? ''
+                : resized
+                  ? `${title} is now ${placed.w} wide, ${placed.h} tall`
+                  : `${title} moved to column ${placed.x + 1}, row ${placed.y + 1}`,
+            };
+          },
+        ),
       addWidget: (type) => {
         if (readOnly) return;
         const created = createWidget(type, get().records, context());
         set({
           records: created.records,
           composition: addWidget(get().composition, created.widget),
+          removed: null,
+          announcement: `${created.widget.title} added`,
         });
       },
       updateWidget: (id, patch) => compose((c) => updateWidget(c, id, patch)),
@@ -156,9 +233,57 @@ export function createDashboardStore({
         }
       },
       removeWidget: (id) => {
-        compose((c) => removeWidget(c, id));
+        const before = get().composition;
+        if (readOnly || !before.widgets.some((w) => w.id === id)) return;
+        const order = readingOrder(before);
+        const at = order.findIndex((item) => item.i === id);
+        const neighbour = order[at + 1] ?? order[at - 1];
+        const title = titleOf(before, id);
+        compose(
+          (c) => removeWidget(c, id),
+          () => ({
+            announcement: `${title} removed`,
+            removed: {
+              composition: before,
+              widgetId: id,
+              title,
+              focusAfter: at >= 0 ? (neighbour?.i ?? null) : null,
+            },
+          }),
+        );
         if (get().selectedWidgetId === id) set({ selectedWidgetId: null });
       },
+      undoRemove: () => {
+        const { removed } = get();
+        if (readOnly || !removed) return;
+        set({
+          composition: removed.composition,
+          removed: null,
+          announcement: `${removed.title} restored`,
+        });
+      },
+      clearRemoved: () => {
+        if (get().removed) set({ removed: null });
+      },
+      moveWidgetInOrder: (id, direction) =>
+        compose(
+          (c) => moveWidgetInOrder(c, get().breakpoint, id, direction),
+          (next) => {
+            const order = readingOrder(next);
+            const place = order.findIndex((item) => item.i === id) + 1;
+            return {
+              announcement: `${titleOf(next, id)} moved ${
+                direction < 0 ? 'earlier' : 'later'
+              }, position ${place} of ${order.length}`,
+            };
+          },
+        ),
+      setSaveStatus: (status, message = null) => {
+        const s = get();
+        if (s.saveStatus === status && s.saveMessage === message) return;
+        set({ saveStatus: status, saveMessage: message });
+      },
+      requestSave: () => set((s) => ({ saveRequests: s.saveRequests + 1 })),
       applyLayoutChange: (bp, items) =>
         compose((c) => applyLayoutChange(c, bp, items)),
       updateSettings: (patch) => compose((c) => updateSettings(c, patch)),

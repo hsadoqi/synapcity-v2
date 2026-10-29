@@ -11,7 +11,7 @@ const DASH = 'dash-1';
 async function seededStorage() {
   const storage = memoryDashboardStorage(SEED_OWNER);
   const { composition, records } = seededWorkspace();
-  await storage.saveComposition(DASH, composition);
+  await storage.saveComposition(DASH, composition, 0);
   await storage.saveRecords(records);
   return storage;
 }

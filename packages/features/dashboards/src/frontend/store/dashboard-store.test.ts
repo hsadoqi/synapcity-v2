@@ -143,4 +143,145 @@ describe('createDashboardStore', () => {
     expect(store.getState().editMode).toBe(false);
     expect(store.getState().readOnly).toBe(true);
   });
+
+  describe('removal and Undo', () => {
+    function withWidgets() {
+      const store = createDashboardStore(init());
+      for (const type of ['pinned', 'spaces', 'last-opened'] as const) {
+        store.getState().addWidget(type);
+      }
+      return store;
+    }
+
+    it('remembers the removed widget with the one to focus next, and Undo puts it back where it was', () => {
+      const store = withWidgets();
+      const before = store.getState().composition;
+      const [first, second] = before.widgets;
+
+      store.getState().removeWidget(first!.id);
+
+      expect(store.getState().composition.widgets).toHaveLength(2);
+      expect(store.getState().removed).toMatchObject({
+        widgetId: first!.id,
+        title: 'Pinned',
+        focusAfter: second!.id,
+      });
+      expect(store.getState().announcement).toBe('Pinned removed');
+
+      store.getState().undoRemove();
+
+      expect(store.getState().composition).toBe(before);
+      expect(store.getState().removed).toBeNull();
+      expect(store.getState().announcement).toBe('Pinned restored');
+    });
+
+    it('focuses the previous widget when the last one is removed, and none when it was the only one', () => {
+      const store = withWidgets();
+      const last = store.getState().composition.widgets[2]!;
+      store.getState().removeWidget(last.id);
+      expect(store.getState().removed?.focusAfter).toBe(
+        store.getState().composition.widgets[1]!.id,
+      );
+
+      const single = createDashboardStore(init());
+      single.getState().addWidget('pinned');
+      single
+        .getState()
+        .removeWidget(single.getState().composition.widgets[0]!.id);
+      expect(single.getState().removed?.focusAfter).toBeNull();
+    });
+
+    it('drops Undo with the next change, or when cleared', () => {
+      const store = withWidgets();
+      store
+        .getState()
+        .removeWidget(store.getState().composition.widgets[0]!.id);
+      store.getState().updateSettings({ columns: 2 });
+      expect(store.getState().removed).toBeNull();
+
+      store
+        .getState()
+        .removeWidget(store.getState().composition.widgets[0]!.id);
+      store.getState().clearRemoved();
+      store.getState().undoRemove();
+      expect(store.getState().composition.widgets).toHaveLength(1);
+    });
+
+    it('ignores removal and Undo when read-only', () => {
+      const store = createDashboardStore({ ...init(), readOnly: true });
+      store.getState().removeWidget('anything');
+      store.getState().undoRemove();
+      expect(store.getState().removed).toBeNull();
+    });
+  });
+
+  describe('announcements', () => {
+    it('announces where a widget moved and how big it became', () => {
+      const store = createDashboardStore(init());
+      store.getState().addWidget('pinned');
+      const id = store.getState().composition.widgets[0]!.id;
+      expect(store.getState().announcement).toBe('Pinned added');
+
+      store.getState().nudgeWidget(id, { dx: 1, dy: 0, dw: 0, dh: 0 });
+      expect(store.getState().announcement).toBe(
+        'Pinned moved to column 2, row 1',
+      );
+
+      store.getState().nudgeWidget(id, { dx: 0, dy: 0, dw: 0, dh: 1 });
+      expect(store.getState().announcement).toBe(
+        'Pinned is now 1 wide, 5 tall',
+      );
+    });
+
+    it('leaves the announcement alone when a nudge changes nothing', () => {
+      const store = createDashboardStore(init());
+      store.getState().addWidget('pinned');
+      const id = store.getState().composition.widgets[0]!.id;
+      store.getState().nudgeWidget(id, { dx: -1, dy: 0, dw: 0, dh: 0 });
+      expect(store.getState().announcement).toBe('Pinned added');
+    });
+
+    it('reorders by reading order and announces the new position', () => {
+      const store = createDashboardStore(init());
+      for (const type of ['pinned', 'spaces', 'last-opened'] as const) {
+        store.getState().addWidget(type);
+      }
+      const third = store.getState().composition.widgets[2]!;
+
+      store.getState().moveWidgetInOrder(third.id, -1);
+
+      expect(store.getState().announcement).toBe(
+        'Last opened moved earlier, position 2 of 3',
+      );
+      const sorted = [...store.getState().composition.layouts.lg].sort(
+        (a, b) => a.y - b.y || a.x - b.x,
+      );
+      expect(sorted[1]!.i).toBe(third.id);
+    });
+  });
+
+  describe('save state', () => {
+    it('starts saved and records status changes once', () => {
+      const store = createDashboardStore(init());
+      let updates = 0;
+      store.subscribe(() => updates++);
+      expect(store.getState().saveStatus).toBe('saved');
+
+      store.getState().setSaveStatus('failed', 'Sign in again.');
+      store.getState().setSaveStatus('failed', 'Sign in again.');
+
+      expect(updates).toBe(1);
+      expect(store.getState()).toMatchObject({
+        saveStatus: 'failed',
+        saveMessage: 'Sign in again.',
+      });
+    });
+
+    it('counts save requests', () => {
+      const store = createDashboardStore(init());
+      store.getState().requestSave();
+      store.getState().requestSave();
+      expect(store.getState().saveRequests).toBe(2);
+    });
+  });
 });
