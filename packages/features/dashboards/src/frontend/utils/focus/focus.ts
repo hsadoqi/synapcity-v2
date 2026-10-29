@@ -66,13 +66,18 @@ export function focusPalette(
       } else if (isStolen(document.activeElement, button)) {
         button.focus();
       }
-      if (performance.now() - settledAt >= PALETTE_FOCUS_SETTLE_MS) {
-        end();
-        return;
-      }
     } else if (
       settledAt === undefined &&
       performance.now() - startedAt >= timeoutMs
+    ) {
+      end();
+      return;
+    }
+    // The settle window ends the handoff even if the palette went away or
+    // turned inert in the meantime (its panel closed without cancelling).
+    if (
+      settledAt !== undefined &&
+      performance.now() - settledAt >= PALETTE_FOCUS_SETTLE_MS
     ) {
       end();
       return;

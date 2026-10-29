@@ -149,6 +149,59 @@ describe('focusPalette against a host that moves focus as its panel opens', () =
     expect(document.activeElement?.id).toBe('region');
   });
 
+  it('does not take focus back once cancelled during the settle window', () => {
+    mount(PANEL);
+    const cancel = focusPalette();
+    vi.advanceTimersByTime(20);
+    cancel();
+    document.getElementById('region')!.focus();
+    vi.advanceTimersByTime(100);
+    expect(document.activeElement?.id).toBe('region');
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('does not take focus back after a pointer press during the settle window', () => {
+    mount(PANEL);
+    focusPalette();
+    vi.advanceTimersByTime(20);
+    document.dispatchEvent(new Event('pointerdown'));
+    document.getElementById('region')!.focus();
+    vi.advanceTimersByTime(100);
+    expect(document.activeElement?.id).toBe('region');
+  });
+
+  it('is replaced by a newer handoff during the settle window, so only the newer one acts', () => {
+    const first = mount(PANEL);
+    focusPalette(first);
+    vi.advanceTimersByTime(20);
+    const second = mount(PANEL.replaceAll('id="', 'id="n-'));
+    focusPalette(second);
+    // The first handoff must not pull focus back from the newer palette.
+    vi.advanceTimersByTime(20);
+    expect(document.activeElement?.id).toBe('n-a');
+    vi.advanceTimersByTime(PALETTE_FOCUS_SETTLE_MS * 2);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('ends on its own when the palette goes away during the settle window', () => {
+    const root = mount(PANEL);
+    focusPalette(root);
+    vi.advanceTimersByTime(20);
+    // The panel closed or switched destination without calling the cancel.
+    root.replaceChildren();
+    vi.advanceTimersByTime(PALETTE_FOCUS_SETTLE_MS * 2);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('ends on its own when the palette turns inert during the settle window', () => {
+    const root = mount(PANEL);
+    focusPalette(root);
+    vi.advanceTimersByTime(20);
+    root.setAttribute('inert', '');
+    vi.advanceTimersByTime(PALETTE_FOCUS_SETTLE_MS * 2);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
   it('does not take focus back after the person pressed a key', () => {
     mount(PANEL);
     focusPalette();
