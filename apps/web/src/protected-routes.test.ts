@@ -32,15 +32,14 @@ const GROUP = join(APP, '(protected)');
 const OTHER_ACCESS_GUARDS = ['getVerifiedIdentity(', 'requireSignedIn('];
 
 /**
- * The one page under `app/[userId]` that sits outside the group: the user's
- * bare root, which only redirects to their home. The proxy does not match
- * `/<userId>` (it cannot be told from a public one-segment page by shape), so
- * the page's own `requireOwner` is what sends a signed-out visitor to sign in,
- * with `next` set to the person's home. It is outside the group because a
- * group layout runs first, cannot read the request path and would redirect to
- * sign in without `next`.
+ * Pages the proxy deliberately does not match, with the reason. `/<userId>`
+ * cannot be told apart from a public one-segment page by its shape, so the
+ * proxy leaves it to the app: it has no content, it only redirects to the
+ * person's home. A signed-out visitor is sent to sign in by the group layout
+ * (without `next`, which a layout cannot build) and a signed-in stranger gets
+ * a 404 from `requireOwner`.
  */
-const OWNER_ROOT = join(APP, '[userId]');
+const NOT_MATCHED_BY_PROXY = new Set(['/some-user']);
 
 function pagesIn(dir: string): string[] {
   if (!existsSync(dir)) return [];
@@ -109,12 +108,11 @@ describe('the (protected) route group', () => {
     expect(readFileSync(layout, 'utf8')).toContain('requireOwner(');
   });
 
-  it('keeps every owner-addressed route inside the group except the bare root', () => {
-    // A branch merged later could add more under `app/[userId]` beside the
-    // group; that route would sit outside what this test reads.
-    expect(
-      readdirSync(OWNER_ROOT).filter((name) => !name.includes('.test.')),
-    ).toEqual(['page.tsx']);
+  it('keeps every owner-addressed route inside the group', () => {
+    // A branch merged later could re-create `app/[userId]` beside the group;
+    // that route would be guarded by the proxy and its own checks but would
+    // sit outside what this test reads.
+    expect(existsSync(join(APP, '[userId]'))).toBe(false);
   });
 
   it.each(pages.map((page) => [relative(APP, page), page]))(
@@ -129,20 +127,12 @@ describe('the (protected) route group', () => {
   it.each(pages.map((page) => [urlOf(page), page]))(
     '%s is a path the proxy protects',
     (url) => {
-      expect(isProtectedPath(url)).toBe(true);
+      expect(isProtectedPath(url) || NOT_MATCHED_BY_PROXY.has(url)).toBe(true);
     },
   );
-});
 
-describe('the bare owner root', () => {
-  const source = readFileSync(join(OWNER_ROOT, 'page.tsx'), 'utf8');
-
-  it('is not matched by the proxy, so its own page must check the owner', () => {
-    expect(isProtectedPath('/some-user')).toBe(false);
-    expect(source).toContain('requireOwner(');
-  });
-
-  it('is not under the group layout, whose redirect cannot carry a return path', () => {
-    expect(existsSync(join(GROUP, '[userId]', 'page.tsx'))).toBe(false);
+  it('keeps the proxy exemptions to pages that exist', () => {
+    const urls = new Set(pages.map(urlOf));
+    for (const url of NOT_MATCHED_BY_PROXY) expect(urls).toContain(url);
   });
 });

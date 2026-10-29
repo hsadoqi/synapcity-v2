@@ -197,9 +197,7 @@ test('unknown addresses end in one shell each: workspace inside the owner area, 
     // Next serves a 404 raised inside a matched route as a bootstrap document;
     // the shell and message render once it hydrates (also true on main).
     await expect(notFound, path).toBeVisible();
-    await expect
-      .poll(() => slots(page), { message: path })
-      .toEqual(['authenticated-shell']);
+    expect(await slots(page), path).toEqual(['authenticated-shell']);
     await expect(page.getByRole('main'), path).toHaveCount(1);
   }
 
@@ -211,16 +209,14 @@ test('unknown addresses end in one shell each: workspace inside the owner area, 
     // Next serves a 404 raised inside a matched route as a bootstrap document;
     // the shell and message render once it hydrates (also true on main).
     await expect(notFound, path).toBeVisible();
-    await expect
-      .poll(() => slots(page), { message: path })
-      .toEqual(['authenticated-shell']);
+    expect(await slots(page), path).toEqual(['authenticated-shell']);
     await expect(page.getByRole('main'), path).toHaveCount(1);
   }
 
   // Deeper than any public route: the public boundary, one shell.
   expect((await page.goto('/privacy/missing'))?.status()).toBe(404);
   await expect(notFound).toBeVisible();
-  await expect.poll(() => slots(page)).toEqual(['public-shell']);
+  expect(await slots(page)).toEqual(['public-shell']);
   await expect(page.getByRole('main')).toHaveCount(1);
 });
 

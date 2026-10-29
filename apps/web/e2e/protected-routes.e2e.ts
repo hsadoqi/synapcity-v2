@@ -25,16 +25,15 @@ for (const path of [
 }
 
 // The proxy does not match a bare `/<userId>`, which cannot be told apart from
-// a public one-segment page. The page sits outside the `(protected)` group so
-// its own `requireOwner` runs first and sends a signed-out visitor to sign in
-// with that person's home as the way back (a group layout cannot read the
-// request path and would drop `next`).
-test('sends a signed-out visitor from a bare /someone to sign in, keeping the way back', async ({
+// a public one-segment page. The `(protected)` layout sends a signed-out
+// visitor to sign in instead. A layout cannot read the request path, so this
+// redirect carries no `next`; signing in then lands on the person's own home.
+test('sends a signed-out visitor from a bare /someone to sign in', async ({
   page,
 }) => {
   await page.goto('/someone');
 
-  await expect(page).toHaveURL(/\/auth\/login\?next=%2Fsomeone%2Fhome$/);
+  await expect(page).toHaveURL(/\/auth\/login$/);
 });
 
 for (const path of [
