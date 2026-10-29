@@ -72,6 +72,14 @@ Not run: a screen reader, forced-colors or reduced-motion passes, a real touch d
 - `/auth/welcome` returned 500 for a signed-in visitor: the server page passed `signInHref`, a function, to a client component. It also fails on `origin/main`. Fixed with a small client wrapper (`welcome-card.tsx`) and a regression test.
 - The owner-area layouts `[userId]/layout.tsx` and `[userId]/home/layout.tsx` re-ran `createMetadata`, which replaces `openGraph` and dropped `og:image` and the `summary_large_image` card from every owner-area page (the same defect as `/auth/login` before the groups). Their metadata exports repeated the root's values, so they were removed.
 
+## Return path on a bare `/<userId>`
+
+Found while reviewing the split: a signed-out visit to `/<userId>` used to reach the page's `requireOwner` and be sent to `/auth/login?next=/<userId>/home`. After the split the `(protected)` layout's `requireSignedIn()` ran first, cannot read the request path, and redirected to `/auth/login` with no `next` (commit `af58422c`; the earlier amendment in ADR-0006 recorded this as accepted). The destination was recoverable, so it was treated as a regression. The redirect-only page now lives at `app/[userId]/page.tsx`, outside the group, so `requireOwner` runs first and uses the existing `homePathFor` and `/auth/login?next=` convention (the sign-in page validates `next` with `safeNextPath`). The `(public)`/`(auth)`/`(protected)` split and layout ownership are unchanged. Regression coverage: `app/[userId]/page.test.tsx` (redirect target, owner, stranger), `protected-routes.test.ts` (only that page sits beside the group, it calls `requireOwner`, it is not in the group), and the fixture end-to-end test asserting `next=%2Fsomeone%2Fhome`.
+
+## Final verification
+
+See the pull request description for the results of the final runs on the pushed head; they are not repeated here so they cannot drift from the logs.
+
 ## Reconstructed probe pages
 
 The six throwaway pages used while measuring boundaries (a throwing page and a `notFound()` page under each of `(public)`, `(auth)/auth` and `(protected)/[userId]/home`) were deleted by the session that wrote them, and one copy was swept into a commit and removed again. The originals were not archived. The text below is a reconstruction from the contents seen in the working tree before they were deleted; it is not a copy of the files. It is kept outside the route tree on purpose, and no executable probe route exists.
