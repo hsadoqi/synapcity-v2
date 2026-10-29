@@ -1,9 +1,11 @@
 ## Active task: breadcrumb composition investigation, issue #99 (2026-10-29)
 
 - Goal and mode: investigate and recommend; no implementation. Branch `feat/investigate-ssr-compatible-breadcrumb-composition`, its existing worktree, base `a98c8283`. No commit, push, pull request or issue change.
-- Changes: create the [investigation](../docs/superpowers/specs/2026-10-29-breadcrumb-composition-investigation.md) and Proposed [ADR-0017](../docs/architecture/decisions/0017-breadcrumb-trail-ownership.md); add ADR-0017's row to the decision index; this record.
+- Changes: create the [investigation](../docs/superpowers/specs/2026-10-29-breadcrumb-composition-investigation.md) and [ADR-0017](../docs/architecture/decisions/0017-breadcrumb-trail-ownership.md) (drafted Proposed, then Accepted); add ADR-0017's row to the decision index; this record.
 - Not changed: code, tests, routes, layouts, public APIs, dependencies, accepted ADRs, issue #99.
-- Recommendation, awaiting the owner: keep the effect bridge, enforce that only the primary route's page publishes the trail, and keep `activeContext` on the same trail; do not adopt server composition now.
+- Recommendation: keep the effect bridge, guard that only the primary route's page publishes the trail, and keep `activeContext` on the same trail; do not adopt server composition now.
+- Decision (owner, 2026-10-29): recommendation accepted with refinements, recorded as Accepted ADR-0017. The invariant is ownership by the primary navigable route with one publisher; direct publication from `page.tsx` is the current convention. The import test is a guardrail, not proof of ownership. No test pins the logo-first server HTML. `activeContext` consistency is not correctness: the "Global" first paint on Space routes stays a documented, deferred limitation. The decision covers the current global-header architecture only. Record-loader memoization is a separate performance follow-up outside #99. Test slices are a later task, not implemented here.
+- Also changed: the decision index's routing candidate notes ADR-0017's narrow scope.
 - Evidence: fixture-mode `next dev` on port 48731, server HTML fetched without JavaScript, and Chromium runs recording header states during client navigation; server stopped after use.
 
 ## Active task: shared shell composition audit and refactor (2026-10-29)
