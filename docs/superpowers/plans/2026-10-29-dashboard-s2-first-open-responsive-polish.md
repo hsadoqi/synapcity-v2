@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Proposed, 2026-10-29. Planning only. Nothing here is implemented, and the owner has not approved it. Tasks marked **Gated** cannot start until the matching decision in section 7 is answered.
+**Status:** Plan and decisions D1, D3 and D4 approved by the owner on 2026-10-29; D2 deferred until Task 1's measurements. Implementation has not started and needs its own go-ahead once this plan is integrated on `main`. S2a, S2c and S2d are independent of D2 and may start from updated `main`; S2b stays gated on D2.
 
 **Goal:** Make the Dashboard feel right the first time it opens, at every width and in both themes, without changing what is saved, how it is saved, or how it is edited.
 
@@ -84,9 +84,9 @@ Order is by dependency. S2a and S2c can run in parallel after Task 1. S2d is gat
 - Test: none yet
 
 - [ ] **Step 1:** In fixture mode (`E2E_WEB_MODE=dev SYNAPCITY_DEV_AUTH=fixture`, one server, one worker), open `/fixture-user/home/dashboards/fixture-dashboard-reading-progress` at window widths 1440, 1280, 1100, 1024, 960, 800, 640, 600, 480, 390, each with the panel closed and with Widgets open.
-- [ ] **Step 2:** Record in the measurements file: window width, surface width (devtools), canvas width, active breakpoint (`aria-pressed` toolbar button), framed yes/no, columns. Mark each cell **measured**.
+- [ ] **Step 2:** Viewport width and Dashboard canvas width are different quantities and are never conflated: the breakpoint follows the canvas (`DashboardCanvas`'s own element, read with `useElementWidth`), not `window.innerWidth`. Record in the measurements file: window width, surface width (devtools), canvas width, active breakpoint (`aria-pressed` toolbar button), framed yes/no, columns. Mark each cell **measured**.
 - [ ] **Step 3:** Confirm D-a at 915–1023 and the inferred mobile case at 471–639; record the window width at which a 1280px window's surface crosses 640. This number settles D2.
-- [ ] **Step 4:** Report the table to the owner before any change in Tasks 2 to 6.
+- [ ] **Step 4:** Report the table, with a recommendation for D2, to the owner. Tasks 2 and 3 do not wait for it; Task 4 does.
 
 #### Task 2: Frame only for a locked preview
 
@@ -101,7 +101,7 @@ Order is by dependency. S2a and S2c can run in parallel after Task 1. S2d is gat
 - Produces: no new export. `DashboardCanvas({ deviceFrame })` keeps its prop and default.
 
 - [ ] **Step 1: Failing tests** in the existing canvas test, using that file's width stub. Names and assertions:
-  - `does not frame an unlocked tablet canvas that is wider than the frame`: store `{breakpoint:'md', breakpointLocked:false}`, width 960, no `Tablet · 834px` text.
+  - (In these tests the width is the canvas element's, not the window's.) `does not frame an unlocked tablet canvas that is wider than the frame`: store `{breakpoint:'md', breakpointLocked:false}`, width 960, no `Tablet · 834px` text.
   - `does not frame an unlocked mobile canvas that is wider than the frame`: `breakpoint:'sm'`, unlocked, width 500, no `Mobile · 390px` text.
   - `frames a locked tablet preview when there is room`: locked, width 1100, text `Tablet · 834px` present.
   - `does not frame a locked preview without room`: locked md at width 900, no frame text.
@@ -178,11 +178,11 @@ Fixture ownership: dashboard fixtures (`DASHBOARD_FIXTURES`, `fixture-compositio
 - [ ] **Step 3:** Run the Storybook accessibility tests (`pnpm test:storybook`) for the matrix stories; expected PASS (axe contrast in both themes).
 - [ ] **Step 4:** Commit one defect per commit: `fix: <the defect>`.
 
-### S2e. Starter layout (Gated on D3)
+### S2e. Starter layout (decided: not built in S2)
 
 #### Task 8: Starter layout behavior
 
-Blocked on D3. Options recorded in section 7. The only part allowed before D3 is non-persisting: Task 5's fixture seeds. No code path that writes a starter layout to any store, browser or server, is built until D3 is answered.
+Closed by D3 (option a, 2026-10-29): S2 builds no starter layout, no starter catalogue and no code path that writes one. Explicit starter layouts may be reconsidered as a separate product slice after Task 7's visual audit. Task 5's fixture seeds are not a starter layout and write nothing.
 
 ### S2f. Whole-feature verification
 
@@ -208,12 +208,25 @@ Blocked on D3. Options recorded in section 7. The only part allowed before D3 is
 
 Document layout (S3); the Lexical editor; any schema, Server Action, or `server-data` change; widget data ownership; a general undo or redo stack; the parallel fixture e2e investigation (#122); shell visual verification (#101); changes to `ContextualPanelShell`.
 
-## 7. Decisions needing the owner
+## 7. Decisions
 
-- **D1 (vocabulary).** Confirm the three concepts in section 3 and keep the working labels as working labels. No glossary entry is proposed.
-- **D2 (panel and width).** After Task 1's numbers: D2-1 keep container-based resolution and pin it with a test (recommended if the canvas is genuinely under 640px), D2-2 change thresholds in `domain-grids`, or D2-3 overlay the panel at some width (separate plan). Task 4 does not start before this.
-- **D3 (starter layout and persisted data).** Options: (a) none; the empty state stays and fixture seeds exist only for development; (b) a "Start from a layout" choice in the empty state that adds widgets through the existing `addWidget` action, so nothing is written until the person's first edit saves through the existing contract; (c) seed a composition when a dashboard is created, which writes durable data. (b) and (c) define a starter catalogue whose entries become durable identifiers if stored; (c) writes data on behalf of the person. Both need explicit approval before any build. Recommendation: (a) now, revisit (b) after Task 7, because first-open polish can be judged with fixture seeds alone.
-- **D4 (fixture seeding).** Task 5 changes what fixture mode shows on first open for four dashboards. Confirm that only `fixture-dashboard-reading-progress` stays empty.
+Recorded 2026-10-29 from the owner's review.
+
+- **D1 (vocabulary): approved.** Layout breakpoint, preview lock and device frame stay distinct. They remain working terms, not canonical names; no glossary entry.
+- **D2 (panel and width): deferred.** No change to `domain-grids` thresholds or to the contextual panel's overlay behavior yet. After Task 1, record actual container geometry (viewport width, sidebar, panel, canvas) and present the evidence with a recommendation: D2-1 keep container-based resolution and pin it with a test (recommended if the canvas is genuinely under 640px), D2-2 change `resolveBreakpoint` thresholds, or D2-3 overlay the panel at some width (a separate shells plan). Task 4 does not start before the owner answers. S2a, S2c and S2d do not depend on it.
+- **D3 (starter layout): option a approved.** No starter-layout implementation and no persisted starter catalogue in S2. Explicit starter layouts may be reconsidered as a separate product slice after the visual audit.
+- **D4 (fixture seeding): approved.** Supported fixture Dashboards open populated through read-time defaults only. `fixture-dashboard-reading-progress` stays empty. Seed content is never written merely because a page rendered; the first edit saves through the existing scheduler.
+
+### Refinements that bind every task
+
+1. Measurements and tests distinguish **viewport width** from **Dashboard canvas width**. A canvas-width case sets the canvas element's width (the width the hook reads), never `window.innerWidth`, and e2e cases record both numbers.
+2. S2 and S3 keep their own files: S2 does not edit Document code, `DOCUMENT_FIXTURES` or `resource-views.e2e.ts`; S3 does not edit Dashboard code, dashboard fixtures or `dashboard-edit.e2e.ts`.
+3. No persisted-data behavior, migration, Lexical, or new shared shell abstraction.
+4. Save, revision, conflict, keyboard and removal-undo semantics are preserved. There is no redo and none is claimed.
+
+### Starting S2 after this plan is integrated
+
+Branch from updated `main` in a fresh worktree. First action is Task 1 (measure, no source change), then Task 2 and Task 3 (S2a). S2c (Tasks 5 and 6) and S2d (Task 7) can follow in separate pull requests. Task 4 waits for D2.
 
 ## 8. Verification commands
 

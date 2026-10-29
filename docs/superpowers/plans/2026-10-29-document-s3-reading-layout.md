@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Proposed, 2026-10-29. Planning only. Nothing here is implemented, and the owner has not approved it.
+**Status:** Plan and decisions S3-D1 to S3-D4 approved by the owner on 2026-10-29. Implementation has not started and needs its own go-ahead once this plan is integrated on `main`.
 
 **Goal:** Give the read-only Document page a considered reading layout (width, header block, metadata, honest content states, keyboard and theme behavior) while the document has no stored content and no editor.
 
@@ -72,7 +72,7 @@ Read from `origin/main` at `9fa6ba34`, 2026-10-29: `apps/web/src/features/docume
 
 - Consumes: `DocumentView({ document })`; the repository's DOM test setup used by `dashboard-view.dom.test.tsx` for `ResourceFrame` and the panel (copy its wrapper and mocks).
 
-- [ ] **Step 1: Write tests that pass against today's code:** `names the page with the document's name as its only level-one heading` (one `heading` level 1 with the name); `shows the description when there is one and omits it when there is not`; `says the content cannot be shown yet`; `offers no editing control` (no `textbox`, no `button` named like Edit/Save/Bold within the body group).
+- [ ] **Step 1: Write tests that pass against today's code:** `names the page with the document's name as its only level-one heading` (one `heading` level 1 with the name); `shows the description when there is one and omits it when there is not`; `says the content cannot be shown yet`; `keeps the complete title in the heading's accessible name when the name is long` (render a name of 200 characters; `getByRole('heading', { level: 1 })` has that exact text, since truncation is only CSS) ; `offers no editing control` (no `textbox`, no `button` named like Edit/Save/Bold within the body group).
 - [ ] **Step 2:** Run `pnpm --filter web exec vitest run document-view`. Expected: PASS (these pin the baseline). If the `h1` assertion fails, the header block is not what section 1 says: stop and report.
 - [ ] **Step 3:** Commit `test: pin the document view's reading page`.
 
@@ -133,7 +133,7 @@ Read from `origin/main` at `9fa6ba34`, 2026-10-29: `apps/web/src/features/docume
 Fixture ownership: S3 owns `DOCUMENT_FIXTURES`. S2 owns dashboard fixtures. Neither plan edits the other's files or specs.
 
 - [ ] **Step 1:** Before adding fixtures, `git grep` the fixture count in `documents.test.ts`, the collection tests and `resource-views.e2e.ts`; list the assertions that depend on the number or order. Add only fixtures the checks need: a long title with a long unbroken description and five tags; one with no description and no tags; one never edited. Update exactly the count-dependent assertions and nothing else.
-- [ ] **Step 2: e2e (fixture mode, one worker first):** `a long document name and an unbroken description do not scroll the page sideways` at 390 and 1280 (document, panel open and closed): `scrollWidth - innerWidth <= 0`. `Tab reaches the contents group once and arrow keys scroll it` (focus the group named `<name> contents`, press `End`, assert it scrolled). `the page shows the unavailable note and no editing controls`.
+- [ ] **Step 2: e2e (fixture mode, one worker first):** `a long document name and an unbroken description do not scroll the page sideways` at 390 and 1280 (document, panel open and closed): `scrollWidth - innerWidth <= 0`. `the complete title is available when the header truncates it` (at 390 wide, the level-one heading's text equals the full fixture name and the page `title` contains it); `Tab reaches the contents group once and arrow keys scroll it` (set the viewport to 390 by 360 so the body overflows, assert `scrollHeight > clientHeight` on the group named `<name> contents` as a precondition, focus it, press `End`, assert `scrollTop > 0`). `the page shows the unavailable note and no editing controls`.
 - [ ] **Step 3:** Run `E2E_WEB_MODE=dev SYNAPCITY_DEV_AUTH=fixture pnpm --filter web exec playwright test --workers=1 resource-views.e2e`. Expected PASS.
 - [ ] **Step 4: Manual, not automated:** light and dark at 1440 and 390 with the browser's contrast inspector on description, details and note; keyboard-only pass; a screen reader pass over heading, description, details and note. Record results as measured or not run.
 - [ ] **Step 5:** Commit `test: check the document page's reading layout`.
@@ -150,12 +150,24 @@ Fixture ownership: S3 owns `DOCUMENT_FIXTURES`. S2 owns dashboard fixtures. Neit
 
 Document content persistence or loading; any editor or toolbar; Lexical; `packages/features/documents`; schema or Server Actions; sharing, comments, outline or table of contents; print styles; the Dashboard (S2); changes to `ResourceFrame`, `ResourceHeader`, `RESOURCE_PANEL`, `getDocument`; the parallel fixture e2e investigation (#122).
 
-## 6. Decisions needing the owner
+## 6. Decisions
 
-- **S3-D1 (copy).** Keep the current unavailable sentence, or change it. Plan default: keep.
-- **S3-D2 (long titles).** The `h1` is `truncate` at `text-sm` in the frame header, which this plan does not change. A very long name is cut with no way to read it on the page (the breadcrumb and tab title carry it). Options: accept it; add the full name under the details as plain text, which repeats the title; or change `ResourceHeader` (a shared-shell change, a separate plan). Plan default: accept, and verify in Task 3.
-- **S3-D3 (placement and testing).** The new `DocumentDetails` stays in `apps/web` because it is one-use and `apps/web` has no Storybook, so it has DOM and e2e tests only. Extracting it to a package would be an ownership choice and is not proposed.
-- **S3-D4 (fixtures).** Task 5 adds up to three fixtures to the shared Documents list in fixture mode, so the collection page shows them. Confirm, or ask for them to be test-only.
+Recorded 2026-10-29 from the owner's review.
+
+- **S3-D1 (copy): approved.** Keep the current unavailable-content wording for now.
+- **S3-D2 (long titles): approved with clarification.** Preserve the shared `ResourceHeader` and its visual truncation. Verify that the complete title stays available semantically and accessibly (Task 1 and Task 5 below). Any broader change to the shared header's presentation is a separate plan.
+- **S3-D3 (placement): approved.** `DocumentDetails` stays internal to `apps/web`; it is not extracted while it has one use.
+- **S3-D4 (fixtures): approved.** Add up to three focused Document fixtures. Existing fixture identities are preserved, and count- or order-dependent tests are updated explicitly (Task 5 Step 1).
+
+### Refinements that bind every task
+
+1. Scrolling checks run against a genuinely scrollable region: the e2e asserts the precondition `scrollHeight > clientHeight` before it presses a key, and sets a viewport height small enough to make that true, because a short unavailable-content page does not scroll.
+2. S3 and S2 keep their own files (S3 owns `DOCUMENT_FIXTURES` and the document group in `resource-views.e2e.ts`).
+3. No persisted-data behavior, migration, Lexical, editor controls, or new shared shell abstraction.
+
+### Starting S3 after this plan is integrated
+
+Branch from updated `main` in a fresh worktree. Start with Task 1 (the DOM baseline, which passes against today's code), then Tasks 2 to 5 in order.
 
 ## 7. Verification commands
 
