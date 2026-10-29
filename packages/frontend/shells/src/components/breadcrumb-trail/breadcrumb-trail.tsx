@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { ComponentProps } from 'react';
 import { RootShell } from '../root-shell';
-import type { RootBreadcrumb } from '../root-shell/root-header';
+import type { RootBreadcrumb } from '../header-breadcrumbs';
 import type { RootSidebarContent } from '../sidebar-shell/root-sidebar';
 
 type SetTrail = (items: RootBreadcrumb[]) => void;
