@@ -1,17 +1,25 @@
+import { Button } from '@synapcity/frontend-ui/core/button';
 import {
   Empty,
+  EmptyContent,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
 } from '@synapcity/frontend-ui/core/empty';
-import { LayoutDashboardIcon } from 'lucide-react';
+import { LayoutDashboardIcon, PlusIcon } from 'lucide-react';
 
-/** Shown on a dashboard with no widgets; read-only, it does not point at editing. */
+/**
+ * Shown on a dashboard with no widgets. Read-only, it does not point at
+ * editing; otherwise **Add a widget** opens the palette (the host turns on
+ * Edit layout and moves focus there).
+ */
 export function DashboardEmptyState({
   readOnly = false,
+  onAdd,
 }: {
   readOnly?: boolean;
+  onAdd?: () => void;
 }) {
   return (
     <Empty>
@@ -23,9 +31,17 @@ export function DashboardEmptyState({
         <EmptyDescription>
           {readOnly
             ? 'Editing dashboards is not available yet.'
-            : 'Turn on Edit layout and add one from the panel.'}
+            : 'Add a widget to start building this dashboard.'}
         </EmptyDescription>
       </EmptyHeader>
+      {!readOnly && onAdd && (
+        <EmptyContent>
+          <Button onClick={onAdd}>
+            <PlusIcon aria-hidden="true" />
+            Add a widget
+          </Button>
+        </EmptyContent>
+      )}
     </Empty>
   );
 }

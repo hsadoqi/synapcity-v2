@@ -4,3 +4,4 @@ export {
 } from './components/dashboard-workspace';
 export { browserDashboardStorage } from './storage';
 export type { BrowserDashboardStorageOptions } from './storage';
+export type { DashboardLinkComponent } from './config';

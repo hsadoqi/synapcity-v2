@@ -170,7 +170,15 @@ describe('createDashboardStore', () => {
 
       store.getState().undoRemove();
 
-      expect(store.getState().composition).toBe(before);
+      expect(store.getState().composition.widgets).toEqual(before.widgets);
+      // Layout entries are keyed by widget id; their array order carries nothing.
+      const byId = (items: { i: string }[]) =>
+        [...items].sort((a, b) => a.i.localeCompare(b.i));
+      for (const bp of ['lg', 'md', 'sm'] as const) {
+        expect(byId(store.getState().composition.layouts[bp])).toEqual(
+          byId(before.layouts[bp]),
+        );
+      }
       expect(store.getState().removed).toBeNull();
       expect(store.getState().announcement).toBe('Pinned restored');
     });
@@ -189,6 +197,31 @@ describe('createDashboardStore', () => {
         .getState()
         .removeWidget(single.getState().composition.widgets[0]!.id);
       expect(single.getState().removed?.focusAfter).toBeNull();
+    });
+
+    it('keeps Undo through the layout the grid reports after a removal, and restores into what is there now', () => {
+      const store = withWidgets();
+      const [first, second, third] = store.getState().composition.widgets;
+      store.getState().removeWidget(first!.id);
+      const remaining = store.getState().composition.layouts.lg;
+
+      // The grid compacts what is left and reports it.
+      store.getState().applyLayoutChange(
+        'lg',
+        remaining.map((item, index) => ({ ...item, x: 0, y: index * 10 })),
+      );
+      expect(store.getState().removed).not.toBeNull();
+
+      store.getState().undoRemove();
+
+      const { widgets, layouts } = store.getState().composition;
+      expect(widgets.map((w) => w.id)).toEqual([
+        first!.id,
+        second!.id,
+        third!.id,
+      ]);
+      expect(layouts.lg.find((l) => l.i === second!.id)?.y).toBe(0);
+      expect(layouts.lg.find((l) => l.i === first!.id)).toBeDefined();
     });
 
     it('drops Undo with the next change, or when cleared', () => {

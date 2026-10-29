@@ -12,6 +12,9 @@ const ALL_TYPES: WidgetType[] = [
   'calendar',
   'agenda',
   'feed',
+  'pinned',
+  'last-opened',
+  'spaces',
 ];
 
 describe('WIDGET_CATALOG', () => {
@@ -25,6 +28,9 @@ describe('WIDGET_CATALOG', () => {
       'Notes',
       'Habit tracker',
       'Goal tracker',
+      'Pinned',
+      'Last opened',
+      'Spaces',
     ]);
   });
 

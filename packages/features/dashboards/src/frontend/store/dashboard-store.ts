@@ -11,6 +11,7 @@ import {
   updateWidget,
   type DashboardComposition,
   type DashboardSettings,
+  type Widget,
   type WidgetPatch,
   type WidgetStatus,
   type WidgetType,
@@ -50,8 +51,11 @@ export type SaveStatus =
 
 /** The widget the last removal took out, kept so Undo can put it back. */
 export type RemovedWidget = {
-  /** The composition as it was before the removal. */
-  composition: DashboardComposition;
+  widget: Widget;
+  /** Where it sat among the widgets, so Undo puts it back in the same place. */
+  index: number;
+  /** Its placement at each breakpoint it had one. */
+  placements: Partial<Record<Breakpoint, LayoutItem>>;
   widgetId: string;
   title: string;
   /** The widget to focus after removing: the next in reading order, else the previous. */
@@ -63,6 +67,8 @@ type DashboardState = {
   records: PrototypeRecords;
   /** Which saved layout is shown and edited. View state, not saved. */
   breakpoint: Breakpoint;
+  /** Set once the person picks a layout in the toolbar; the canvas width then stops choosing. */
+  breakpointLocked: boolean;
   /** Whether widgets can be dragged, resized and configured. View state, not saved. */
   editMode: boolean;
   /**
@@ -86,7 +92,10 @@ type DashboardState = {
 type GoalPatch = { current?: number; target?: number };
 
 type DashboardActions = {
+  /** Follows the canvas width; ignored once the person has chosen a layout. */
   setBreakpoint(bp: Breakpoint): void;
+  /** The person picked a layout to preview; it stays until reload. */
+  chooseBreakpoint(bp: Breakpoint): void;
   toggleEditMode(): void;
   selectWidget(id: string | null): void;
   nudgeWidget(id: string, delta: LayoutDelta): void;
@@ -122,6 +131,8 @@ export type DashboardStoreInit = {
   records: PrototypeRecords;
   ownerId: string;
   breakpoint: Breakpoint;
+  /** Keep `breakpoint` whatever the canvas width is. @default false */
+  breakpointLocked?: boolean;
   /** The clock, for tests and stories; defaults to `Date.now`. */
   now?: () => number;
   /** Show the dashboard without allowing changes. @default false */
@@ -138,6 +149,7 @@ export function createDashboardStore({
   records,
   ownerId,
   breakpoint,
+  breakpointLocked = false,
   now = Date.now,
   readOnly = false,
 }: DashboardStoreInit): StoreApi<DashboardStore> {
@@ -179,7 +191,11 @@ export function createDashboardStore({
       saveRequests: 0,
       announcement: '',
       removed: null,
-      setBreakpoint: (bp) => set({ breakpoint: bp }),
+      breakpointLocked,
+      setBreakpoint: (bp) => {
+        if (!get().breakpointLocked) set({ breakpoint: bp });
+      },
+      chooseBreakpoint: (bp) => set({ breakpoint: bp, breakpointLocked: true }),
       toggleEditMode: () => {
         if (readOnly) return;
         set((s) => ({ editMode: !s.editMode, selectedWidgetId: null }));
@@ -244,7 +260,14 @@ export function createDashboardStore({
           () => ({
             announcement: `${title} removed`,
             removed: {
-              composition: before,
+              widget: before.widgets.find((w) => w.id === id) as Widget,
+              index: before.widgets.findIndex((w) => w.id === id),
+              placements: Object.fromEntries(
+                (['lg', 'md', 'sm'] as const).flatMap((bp) => {
+                  const entry = before.layouts[bp].find((l) => l.i === id);
+                  return entry ? [[bp, entry]] : [];
+                }),
+              ),
               widgetId: id,
               title,
               focusAfter: at >= 0 ? (neighbour?.i ?? null) : null,
@@ -256,8 +279,26 @@ export function createDashboardStore({
       undoRemove: () => {
         const { removed } = get();
         if (readOnly || !removed) return;
+        // Put back into the composition as it is now, not an older copy, so a
+        // layout change made since (the grid compacts after a removal) stays.
+        const c = get().composition;
+        if (c.widgets.some((w) => w.id === removed.widgetId)) return;
+        const widgets = [...c.widgets];
+        widgets.splice(removed.index, 0, removed.widget);
+        const withEntry = (bp: Breakpoint) => {
+          const entry = removed.placements[bp];
+          return entry ? [...c.layouts[bp], entry] : c.layouts[bp];
+        };
         set({
-          composition: removed.composition,
+          composition: {
+            ...c,
+            widgets,
+            layouts: {
+              lg: withEntry('lg'),
+              md: withEntry('md'),
+              sm: withEntry('sm'),
+            },
+          },
           removed: null,
           announcement: `${removed.title} restored`,
         });
@@ -284,8 +325,13 @@ export function createDashboardStore({
         set({ saveStatus: status, saveMessage: message });
       },
       requestSave: () => set((s) => ({ saveRequests: s.saveRequests + 1 })),
+      // The grid reports a layout right after any widget set change (it
+      // compacts); that must not take Undo away.
       applyLayoutChange: (bp, items) =>
-        compose((c) => applyLayoutChange(c, bp, items)),
+        compose(
+          (c) => applyLayoutChange(c, bp, items),
+          () => ({ removed: get().removed }),
+        ),
       updateSettings: (patch) => compose((c) => updateSettings(c, patch)),
       toggleTask: (taskId) => record((r) => toggleTask(r, taskId, context())),
       addTask: (projectId, name) =>

@@ -45,8 +45,9 @@ export type WidgetShellToolbar = {
 export type WidgetShellActions = {
   update(patch: WidgetPatch): void;
   duplicate(): void;
-  hide(): void;
-  archive(): void;
+  /** Left out by a host that does not store widget status. */
+  hide?(): void;
+  archive?(): void;
   remove(): void;
 };
 
@@ -195,22 +196,26 @@ function WidgetSettings({
         >
           Duplicate widget
         </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full"
-          onClick={run(actions.hide)}
-        >
-          Hide widget
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full"
-          onClick={run(actions.archive)}
-        >
-          Archive widget
-        </Button>
+        {actions.hide && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={run(actions.hide)}
+          >
+            Hide widget
+          </Button>
+        )}
+        {actions.archive && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={run(actions.archive)}
+          >
+            Archive widget
+          </Button>
+        )}
         <Button
           variant="destructive"
           size="sm"
@@ -273,8 +278,10 @@ export function WidgetShell({
           },
         ]
       : []),
-    { label: 'Hide', onSelect: actions.hide },
-    { label: 'Archive', onSelect: actions.archive },
+    ...(actions.hide ? [{ label: 'Hide', onSelect: actions.hide }] : []),
+    ...(actions.archive
+      ? [{ label: 'Archive', onSelect: actions.archive }]
+      : []),
   ];
   const toolbarActions = [...(toolbar?.actions ?? []), ...shellActions];
   const movable = editMode && !widget.locked;
