@@ -36,7 +36,12 @@ Each host keeps applying the fonts to its own runtime; this package only provide
 
 ## Licence
 
-Geist and Geist Mono (Vercel, in collaboration with basement.studio; `LICENSE.txt` and `OFL.txt` in `vercel/geist-font`) and Inter (The Inter Project Authors; `LICENSE.txt` in `rsms/inter`) are under the SIL Open Font License 1.1. Checked against those repositories on 2026-10-29. The `.woff` files are the ones the apps shipped before this package existed and are unchanged: they embed no licence or copyright strings (name table ids 0, 13 and 14 are absent), and the repository holds no copy of the licence text for Geist. That gap predates this package; whether to add the notices is the owner's call.
+Geist and Geist Mono (Vercel, in collaboration with basement.studio) and Inter (The Inter Project Authors) are under the SIL Open Font License 1.1. The OFL asks that the copyright notice and licence text accompany the font software, so the upstream texts are kept here unmodified:
+
+- `licenses/Geist-LICENSE.txt`: `LICENSE.txt` from `vercel/geist-font`, covering the two `.woff` files in `src/next/`.
+- `licenses/Inter-LICENSE.txt`: `LICENSE.txt` from `rsms/inter`, covering Inter, which `next/font/google` fetches at build time and the apps serve from their own `_next/static/media/`.
+
+Both were copied on 2026-10-29 from the `main` and `master` branches of those repositories. Do not edit them; replace them from upstream. The `.woff` files themselves embed no licence strings (name table ids 0, 13 and 14 are absent) and are unchanged from what the apps shipped before this package existed. The built apps do not serve the licence texts; whether to publish them (for example on a legal page) is a product decision outside this package. `frontend-tokens` carries its own Inter and JetBrains Mono files, which this package does not cover.
 
 ## Scripts
 

@@ -55,6 +55,25 @@ describe('font files', () => {
   });
 });
 
+describe('licence notices', () => {
+  // The SIL Open Font License asks for the copyright notice and licence text
+  // to accompany the font software: keep the upstream files, unmodified.
+  const licenses = join(import.meta.dirname, '..', 'licenses');
+  const expected: Record<string, string> = {
+    'Geist-LICENSE.txt':
+      'Copyright (c) 2023 Vercel, in collaboration with basement.studio',
+    'Inter-LICENSE.txt': 'Copyright (c) 2016 The Inter Project Authors',
+  };
+  for (const [file, copyright] of Object.entries(expected)) {
+    it(`${file} holds the upstream copyright line and the OFL 1.1 text`, () => {
+      const text = readFileSync(join(licenses, file), 'utf8');
+      expect(text.startsWith(copyright)).toBe(true);
+      expect(text).toContain('SIL OPEN FONT LICENSE Version 1.1');
+      expect(text).toContain('PERMISSION AND CONDITIONS');
+    });
+  }
+});
+
 describe('next/font', () => {
   it('is imported by the loader file and nothing else', () => {
     const importers = all
