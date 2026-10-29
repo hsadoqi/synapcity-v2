@@ -88,10 +88,46 @@ describe('layout ownership', () => {
       expect(read(`${group}/layout.tsx`)).not.toContain('AppShell');
     }
   });
+});
 
-  it('gives the root boundaries a shell of their own', () => {
+/**
+ * Measured in the running app. Next renders a group's `not-found` inside that
+ * group's layout, so a shell in it nests inside the group's own (two `main`
+ * landmarks, duplicate skip links and ids). An `error` boundary instead
+ * replaces the layouts below it, so the workspace shell is lost unless the
+ * group has its own. Root boundaries therefore bring the public shell for
+ * addresses no group matches, and every group's boundary brings none.
+ */
+describe('error and not-found boundaries', () => {
+  const GROUPS = ['(public)', '(auth)', '(protected)'];
+
+  it('gives the root boundaries the public shell, for addresses no group matches', () => {
     expect(read('error.tsx')).toContain('<PublicShell>');
     expect(read('not-found.tsx')).toContain('<PublicShell>');
+  });
+
+  it('gives every group a not-found that brings no shell of its own', () => {
+    for (const group of GROUPS) {
+      const source = read(`${group}/not-found.tsx`);
+      expect(source, group).toContain('NotFoundMessage');
+      expect(source, group).not.toMatch(/Shell/);
+    }
+  });
+
+  it('keeps the workspace shell on screen when a protected page fails', () => {
+    const source = read('(protected)/error.tsx');
+    expect(source).toContain("'use client'");
+    expect(source).toContain('RouteErrorMessage');
+    expect(source).not.toMatch(/Shell/);
+  });
+
+  it('keeps the shared messages free of any shell', () => {
+    const messages = join(dirname(APP), 'components', 'route-messages');
+    for (const file of ['not-found-message.tsx', 'route-error-message.tsx']) {
+      expect(readFileSync(join(messages, file), 'utf8'), file).not.toMatch(
+        /<\w*Shell/,
+      );
+    }
   });
 });
 

@@ -14,6 +14,14 @@ describe('AuthPageShell', () => {
     expect(screen.getByRole('heading', { name: 'Sign in' })).toBeTruthy();
   });
 
+  it('keeps a gutter around the card so it never touches the screen edge', () => {
+    const { container } = render(<AuthPageShell>Body</AuthPageShell>);
+
+    const wrapper = container.firstElementChild as HTMLElement;
+    expect(wrapper.className).toContain('px-4');
+    expect(wrapper.className).toContain('py-6');
+  });
+
   it('adds no landmark of its own', () => {
     render(<AuthPageShell>Body</AuthPageShell>);
 

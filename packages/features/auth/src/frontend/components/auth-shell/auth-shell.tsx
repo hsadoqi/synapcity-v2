@@ -18,7 +18,7 @@ interface AuthShellProps {
 }
 
 /**
- * The one card every auth page renders. `auth/layout.tsx` owns centring and
+ * The one card every auth page renders. `(auth)/layout.tsx` owns centring and
  * width; this owns the heading structure, so each page has exactly one h1.
  */
 export function AuthShell({

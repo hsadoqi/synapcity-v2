@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Approved (owner, 2026-10-29): D1 = option B, D2 = defer (superseded the same day: the owner decided the `(public)`/`(auth)` shell split; see ADR-0006's second 2026-10-29 amendment). Implemented and verified in this worktree, uncommitted; see "Implementation record" at the end. Base `main` at `a44316ed`.
+**Status:** Approved (owner, 2026-10-29): D1 = option B, D2 = defer (superseded the same day: the owner decided the `(public)`/`(auth)` shell split; see ADR-0006's second 2026-10-29 amendment). Implemented and verified in this worktree, committed locally; see "Implementation record" at the end. Base `main` at `a44316ed`.
 
 **Goal:** Give `apps/web` an explicit `(protected)` route group for the signed-in `/<userId>/...` area, with no change to any URL, to authentication, to authorization or to Supabase RLS, and with a test that keeps the group, the proxy's path rule and the per-page owner checks from drifting apart.
 
@@ -276,3 +276,7 @@ Deviations from the plan as written, and what the work found:
 - **Integration.** `git merge-tree` with a dangling commit of this change merges cleanly into `origin/main` (`71ec2d07`). The older stacked branches already conflict with `main` and gain rename conflicts on moved paths (`feat/resource-views` 0 to 22). No other worktree or branch was modified.
 
 Evidence, final tree: `pnpm verify` exit 0 (web 735 tests; e2e 77 passed, 9 skipped; Storybook 530; build); build route table identical to the baseline; e2e `protected-routes`, `spaces`, `auth` 47 passed; fixture-mode e2e 7 passed and 1 failed (`global-panel.e2e.ts:103`, existing); manual fixture-mode navigation check passed (soft navigation across home, spaces, documents, dashboards, record page, back, forward, refresh; another id is 404). Not verified: live Supabase (expired session, two real accounts, Server Action after sign-out in another tab), React `cache` across a real request, the `shared-look` authenticated test (needs the docs dev server), and RLS (not touched).
+
+### Follow-up: the `(public)` and `(auth)` groups (2026-10-29)
+
+The owner superseded D2 and had the shell split built. The first version was committed as `1663c5ce`; a second commit fixes what measuring it showed. Boundaries: Next renders a group's `not-found` inside the group's layout and an `error` boundary replaces the layouts below it, so the group boundaries bring no shell, the root boundaries bring the public shell for unmatched addresses, and `(protected)` keeps the workspace on screen when a page fails. The auth column gained a gutter. Evidence: `pnpm verify` exit 0 (web 752 tests, e2e 101 passed and 9 skipped, Storybook 530, build); route table identical to the pre-change baseline. The owner-area claims above about the root layout reading sidebar records for every signed-in request no longer hold: the records are now read in `(protected)` only. Details and limits: ADR-0006 and `.agents/task-scope.md`.

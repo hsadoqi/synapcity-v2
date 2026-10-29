@@ -50,6 +50,18 @@ test.describe('document and dashboard pages', () => {
     test(`an unknown record in ${kind} is not found`, async ({ page }) => {
       const response = await page.goto(`/fixture-user/home/${kind}/no-such-id`);
       expect(response?.status()).toBe(404);
+      // The workspace stays around the message, with no second shell nested in it.
+      await expect(page.getByRole('main')).toHaveCount(1);
+      await expect(
+        page.locator('[data-slot="authenticated-shell"]'),
+      ).toHaveCount(1);
+      await expect(page.locator('[data-slot="public-shell"]')).toHaveCount(0);
+      await expect(
+        page.getByRole('heading', {
+          level: 1,
+          name: 'We could not find that page',
+        }),
+      ).toBeVisible();
     });
   }
 });

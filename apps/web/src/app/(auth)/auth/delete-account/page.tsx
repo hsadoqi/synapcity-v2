@@ -3,9 +3,11 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { buttonVariants } from '@synapcity/frontend-ui/core/button';
 
-import { DeleteAccountCard } from '@synapcity/features-auth/frontend';
+import {
+  AuthShell,
+  DeleteAccountCard,
+} from '@synapcity/features-auth/frontend';
 import { confirmAccountDeletion } from './actions';
-import { MessagePage } from '@synapcity/frontend-shells';
 import { getVerifiedClaims } from '@/features/auth/server';
 import { hasRecentLinkSignInNow } from '@synapcity/features-auth/contracts';
 import { settingsPathFor } from '@/lib/routing/user-paths';
@@ -30,17 +32,18 @@ export default async function DeleteAccountPage() {
 
   if (!fresh) {
     return (
-      <MessagePage
+      <AuthShell
         title="Ask for a new link"
         description="This page works only right after you open the link we emailed you. Nothing was deleted."
-      >
-        <Link
-          href={settingsHref}
-          className={buttonVariants({ variant: 'outline' })}
-        >
-          Back to settings
-        </Link>
-      </MessagePage>
+        footer={
+          <Link
+            href={settingsHref}
+            className={buttonVariants({ variant: 'outline' })}
+          >
+            Back to settings
+          </Link>
+        }
+      />
     );
   }
 

@@ -49,3 +49,76 @@ test('an unknown nested address shows the not-found page in the public shell', a
     page.getByRole('heading', { name: 'We could not find that page' }),
   ).toBeVisible();
 });
+
+/*
+ * Landmarks and the skip link, page by page. The public shell and the auth
+ * column must each leave exactly one banner, one main, one heading and a
+ * footer, so a shell never nests inside another.
+ */
+const pages = [
+  { path: '/', heading: 'Welcome to Synapcity Web' },
+  { path: '/privacy', heading: 'Privacy' },
+  { path: '/auth/login', heading: 'Sign in' },
+  { path: '/auth/register', heading: 'Sign up' },
+  { path: '/auth/forgot-password', heading: 'Reset your password' },
+];
+
+for (const { path, heading } of pages) {
+  test.describe(`${path} landmarks`, () => {
+    test('has one banner, one main, one heading and a footer', async ({
+      page,
+    }) => {
+      await page.goto(path);
+
+      await expect(page.getByRole('banner')).toHaveCount(1);
+      await expect(page.getByRole('main')).toHaveCount(1);
+      await expect(page.getByRole('contentinfo')).toHaveCount(1);
+      await expect(
+        page.getByRole('heading', { level: 1, name: heading }),
+      ).toHaveCount(1);
+    });
+
+    test('lets the skip link move focus to the content', async ({ page }) => {
+      await page.goto(path);
+      await page.waitForLoadState('networkidle');
+
+      await page.keyboard.press('Tab');
+      await expect(
+        page.getByRole('link', { name: 'Skip to main content' }),
+      ).toBeFocused();
+      await page.keyboard.press('Enter');
+      await expect(page.locator('#main-content')).toBeFocused();
+    });
+
+    test('serves the site share image and a titled page', async ({ page }) => {
+      await page.goto(path);
+
+      const image = await page
+        .locator('meta[property="og:image"]')
+        .getAttribute('content');
+      expect(new URL(image ?? '', 'http://x').pathname).toBe(
+        '/opengraph-image',
+      );
+      await expect(page).toHaveTitle(/Synapcity/);
+    });
+  });
+}
+
+test('an address no group matches is a 404 inside one public shell', async ({
+  page,
+}) => {
+  const response = await page.goto('/a/page/that/does/not/exist');
+
+  expect(response?.status()).toBe(404);
+  await expect(page.getByRole('main')).toHaveCount(1);
+  await expect(page.getByRole('banner')).toHaveCount(1);
+});
+
+test('the sign-in card keeps a gutter on a narrow phone', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 740 });
+  await page.goto('/auth/login');
+
+  const card = await page.locator('main [data-slot="card"]').boundingBox();
+  expect(card?.x).toBeGreaterThanOrEqual(16);
+  expect((card?.x ?? 0) + (card?.width ?? 0)).toBeLessThanOrEqual(320 - 16);
+});

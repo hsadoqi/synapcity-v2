@@ -14,8 +14,10 @@ vi.mock('next/navigation', () => ({
 }));
 
 import DeleteAccountPage from './page';
-import { DeleteAccountCard } from '@synapcity/features-auth/frontend';
-import { MessagePage } from '@synapcity/frontend-shells';
+import {
+  AuthShell,
+  DeleteAccountCard,
+} from '@synapcity/features-auth/frontend';
 
 const NOW = 1_800_000_000;
 
@@ -61,7 +63,7 @@ describe('the delete-account page', () => {
 
       const element = await DeleteAccountPage();
 
-      expect(element.type).toBe(MessagePage);
+      expect(element.type).toBe(AuthShell);
       expect(element.props.title).toBe('Ask for a new link');
     },
   );
