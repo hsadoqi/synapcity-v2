@@ -1,4 +1,4 @@
-import { createServer } from 'node:net';
+import { connect, createServer } from 'node:net';
 import type { AddressInfo, Server as NetServer } from 'node:net';
 import { defineConfig, devices } from '@playwright/test';
 import type { PlaywrightTestConfig } from '@playwright/test';
@@ -18,6 +18,11 @@ type E2EServer = {
    * this run by name. Added to the inherited environment.
    */
   env?: (origin: (name: string) => string) => Record<string, string>;
+  /**
+   * How long the run waits for the server to answer on its address, in
+   * milliseconds. Defaults to two minutes, which covers a cold `next dev`.
+   */
+  startupTimeout?: number;
 };
 
 type CreatePlaywrightConfigInput = {
@@ -69,6 +74,60 @@ async function freePorts(count: number): Promise<number[]> {
   }
 }
 
+/*
+ * Whether something accepts a TCP connection on the port, on either loopback
+ * address (the two Playwright's own check looks at). A connection that does
+ * not finish in a second counts as a listener too: on loopback that means a
+ * full accept queue, so something is bound there.
+ */
+function hasListener(port: number): Promise<boolean> {
+  const tryHost = (host: string) =>
+    new Promise<boolean>((resolve) => {
+      const socket = connect({ port, host });
+      socket.setTimeout(1000, () => {
+        socket.destroy();
+        resolve(true);
+      });
+      socket.once('connect', () => {
+        socket.destroy();
+        resolve(true);
+      });
+      socket.once('error', () => {
+        socket.destroy();
+        resolve(false);
+      });
+    });
+  return Promise.all([tryHost('127.0.0.1'), tryHost('::1')]).then((answers) =>
+    answers.some(Boolean),
+  );
+}
+
+/*
+ * Stops the run before Playwright starts a server on an address that already
+ * has a listener. Playwright makes the same check itself, but with an HTTP
+ * request that has no timeout and sits outside `webServer.timeout`
+ * (playwright 1.64.1: `WebServerPlugin._startProcess`, then `httpRequest` in
+ * playwright-core, which never sets a socket timeout). A listener that accepts
+ * the connection and never answers, such as a stuck or half-started process on
+ * a pinned port, therefore holds the run indefinitely, well past the timeout.
+ * Connecting here is bounded and names the address.
+ *
+ * Another process can still bind the port between this check and Playwright's
+ * own; that window is a few milliseconds for the first server and the startup
+ * of the earlier servers for the later ones.
+ */
+export async function assertNoListener(
+  name: string,
+  port: number,
+): Promise<void> {
+  if (!(await hasListener(port))) return;
+  throw new Error(
+    `[e2e] ${name}: http://localhost:${port} already has a listener, so this run will not start its own server there. ` +
+      `Playwright would wait on a listener that never answers instead of failing. ` +
+      `Find it with \`lsof -nP -iTCP:${port} -sTCP:LISTEN\`, stop it, or unset ${portVariable(name)} to take a free port.`,
+  );
+}
+
 function pinnedPort(name: string): number | undefined {
   const variable = portVariable(name);
   const raw = process.env[variable];
@@ -115,6 +174,14 @@ export async function createPlaywrightConfig({
         `[e2e] ${server.name}: http://localhost:${port}${pinned[index] ? ` (pinned by ${portVariable(server.name)})` : ''}`,
       );
     });
+    await Promise.all(
+      servers.map((server) =>
+        assertNoListener(
+          server.name,
+          Number(process.env[portVariable(server.name)]),
+        ),
+      ),
+    );
     process.env[RESOLVED] = '1';
   }
 
@@ -148,7 +215,7 @@ export async function createPlaywrightConfig({
       url: origin(server.name),
       env: server.env?.(origin),
       reuseExistingServer: false,
-      timeout: 120_000,
+      timeout: server.startupTimeout ?? 120_000,
     })),
   });
 }
