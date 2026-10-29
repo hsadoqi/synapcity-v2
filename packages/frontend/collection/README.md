@@ -11,7 +11,7 @@ Runtime: browser and server rendering, framework-neutral. Links and navigation c
 | `@synapcity/frontend-collection`      | The components, the collection and entity types, the query and record helpers, and `CollectionNavigationProvider` / `useCollectionNavigation` |
 | `@synapcity/frontend-collection/next` | `NextCollectionNavigation`: the Next.js binding (`next/link` and `useRouter().push`), mounted once by the host                                |
 
-`apps/web` mounts `NextCollectionNavigation` in `app/[userId]/layout.tsx`, so every collection and Space page under it navigates client-side.
+`apps/web` mounts `NextCollectionNavigation` in `app/(protected)/[userId]/layout.tsx`, so every collection and Space page under it navigates client-side.
 
 Two host-facing details: an `EntityItem` may carry its own `href`, which the entity blocks use before any prefix (an item with neither is shown as text, not a dead link); and `SetPinnedResult` may carry `signedOut`, for which `CollectionIndex` offers "Sign in again" when the host gives it a `signInHref`. `EntityHeader` shows only the actions it is given handlers for.
 

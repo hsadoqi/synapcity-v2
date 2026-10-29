@@ -1,6 +1,11 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "ignore": ["apps/web/src/lib/**/*", "tsconfig.json", "packages/dev/**/*"],
+  "ignore": [
+    "apps/web/src/lib/**/*",
+    "tsconfig.json",
+    "packages/dev/**/*",
+    "docs/engineering/verification-records/**/*"
+  ],
   "ignoreIssues": {
     "packages/server/supabase/src/database-types/database.types.ts": [
       "exports",
@@ -9,6 +14,9 @@
   },
   "ignoreDependencies": [],
   "workspaces": {
+    "apps/web": {
+      "entry": ["playwright.local-session.config.ts"]
+    },
     "packages/frontend/tailwind-config": {
       "ignoreDependencies": ["tailwindcss"]
     }

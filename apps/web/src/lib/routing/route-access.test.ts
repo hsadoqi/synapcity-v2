@@ -27,6 +27,15 @@ describe('isProtectedPath', () => {
     expect(isProtectedPath(path)).toBe(false);
   });
 
+  it.each(['/0b1d6f0e', '/0b1d6f0e/'])(
+    'leaves the bare %s to its page, which cannot be told from a public page by shape',
+    (path) => {
+      // The `(protected)` layout still sends a signed-out visitor to sign in;
+      // only the proxy's own redirect (which keeps the full path) is skipped.
+      expect(isProtectedPath(path)).toBe(false);
+    },
+  );
+
   it.each([
     '/homepage',
     '/home-assistant',

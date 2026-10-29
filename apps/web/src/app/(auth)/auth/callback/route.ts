@@ -12,12 +12,26 @@ import { createClient } from '@/lib/supabase/server';
 import { exchangeAuthCode } from '@synapcity/server-supabase';
 
 /**
+ * Redirects with a relative `Location`, so the browser resolves it against the
+ * address it just requested. An absolute URL would have to be built from
+ * `request.nextUrl.origin`, and Next rewrites every loopback host (`127.0.0.1`,
+ * `[::1]`) to `localhost` there, which sent a local browser to another origin
+ * than the one holding the session cookies this response sets. Relative also
+ * means no `Host` or forwarded header is ever trusted. The target is a path
+ * built by this app; anything that is not a single-slash path goes home.
+ */
+function redirectTo(path: string): NextResponse {
+  const safe = /^\/(?![/\\])/.test(path) ? path : '/';
+  return new NextResponse(null, { status: 307, headers: { location: safe } });
+}
+
+/**
  * Landing point for every Supabase redirect: OAuth sign-in, the email
  * confirmation link and the password-reset link all return here with a `code`
  * that is exchanged for a session (PKCE).
  */
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = request.nextUrl;
+  const { searchParams } = request.nextUrl;
   const code = searchParams.get('code');
   const next = searchParams.get('next');
   // Set by the action that started the flow, so a failure can say which link broke.
@@ -44,7 +58,7 @@ export async function GET(request: NextRequest) {
             : welcome
               ? welcomePath(destination)
               : destination;
-      return NextResponse.redirect(`${origin}${arrival}`);
+      return redirectTo(arrival);
     }
   }
 
@@ -62,10 +76,8 @@ export async function GET(request: NextRequest) {
     !searchParams.has('error_code')
   ) {
     const back = safeNextPath(next, '/');
-    return NextResponse.redirect(
-      `${origin}${withNotice(back, 'email-change-step')}`,
-    );
+    return redirectTo(withNotice(back, 'email-change-step'));
   }
 
-  return NextResponse.redirect(`${origin}${authErrorPath(flow)}`);
+  return redirectTo(authErrorPath(flow));
 }

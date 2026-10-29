@@ -13,7 +13,7 @@ pnpm install
 pnpm dev:web      # http://localhost:8080
 ```
 
-Per-app checks run through the root scripts (`pnpm lint`, `pnpm check-types`, `pnpm build`); `pnpm verify` runs everything.
+Per-app checks run through the root scripts (`pnpm lint`, `pnpm check-types`, `pnpm build`); `pnpm verify` runs everything. Start `pnpm verify` from the repository root: inside `apps/web`, `pnpm verify` is this package's own script (`lint`, `check-types`, `build` only) and skips the tests, end-to-end run, Storybook tests, `deps` and `boundaries`.
 
 Tests: Vitest unit tests sit beside the code they cover as `*.test.ts` (`pnpm test` from the root, or `pnpm --filter web test`). They cover the pure auth helpers and route policy in `src/lib`, the auth and profile server actions (with the Supabase client replaced), the auth callback route handler, the session proxy (`src/lib/supabase/middleware.ts`) and an import-boundary check (`src/architecture.test.ts`). Component and hook tests that need a DOM are named `*.dom.test.tsx` and run in jsdom; everything else runs in Node. `pnpm test:e2e` runs the Playwright tests against a production build. The authenticated shared-look case is opt-in: save a session for an account with saved preferences to `e2e/.auth/account.json` (ignored by Git); the test reads account preferences and does not change them.
 
@@ -32,6 +32,28 @@ Set these in `apps/web/.env.local` (git-ignored) and, for deployments, in the ho
 | `NEXT_PUBLIC_PREFERENCES_COOKIE_DOMAIN` | yes                    | Optional. Valid parent DNS domain for the shared look cookie (for example `.example.com`). Empty means host-only. Set the same value in the web and docs production builds |
 
 The app throws on the first sign-up, reset or OAuth call if `SITE_URL` is missing.
+
+### A worktree has no `.env.local`
+
+`.env.local` is git-ignored, so a new worktree starts without it and the server answers every page with 500. For `pnpm test:e2e` and `pnpm verify`, pass the same placeholders CI uses (they hold no credentials and nothing contacts Supabase):
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321 \
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=ci-placeholder-key \
+SITE_URL=http://localhost:8080 \
+pnpm verify
+```
+
+Do not copy another checkout's `.env.local` into a worktree; it may hold real project values.
+
+### Signed-in checks against the local Supabase stack
+
+`pnpm test:e2e:local-session` (from `apps/web`) runs `e2e/local-session.e2e.ts`: sign-in, the account menu, public and auth pages signed in, 404 shells, protected-page metadata, sign-out and a real `/auth/callback` code exchange from a password-reset mail. It needs:
+
+1. The local stack running (`supabase start`; project `synapcity`, API on `127.0.0.1:54321`, mail on `54324`). The runner reads the keys from `supabase status` into its own environment and refuses a non-loopback address; nothing is printed or written.
+2. The app built against that stack and serving on `http://127.0.0.1:3000` (the stack's `site_url`, which email links may return to): put `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `SITE_URL=http://127.0.0.1:3000` in `.env.local`, then `pnpm build` and `pnpm exec next start -p 3000`.
+
+The run creates one `route-groups-e2e-…@example.test` user in the local stack and removes it and its mail afterwards. In an ordinary `pnpm test:e2e` the file is skipped. The browser follows the mailed link's redirects itself; nothing is mapped to another host.
 
 ### Shared-look production domains
 
@@ -90,12 +112,12 @@ Not verified against a real project at the time of writing: the avatars and Goog
 
 ## Structure
 
-| Path                     | Contains                                                             |
-| ------------------------ | -------------------------------------------------------------------- |
-| `src/app/`               | Routes and the root layout, which loads Inter, Geist, Geist Mono     |
-| `src/styles/globals.css` | Imports and `@source` lines only; no tokens                          |
-| `src/lib/`               | App-level helpers, including the `cn` re-export                      |
-| `components.json`        | shadcn config; routes added components into `@synapcity/frontend-ui` |
+| Path                     | Contains                                                                                    |
+| ------------------------ | ------------------------------------------------------------------------------------------- |
+| `src/app/`               | Routes in `(public)`, `(auth)` and `(protected)` groups; the root layout (fonts, providers) |
+| `src/styles/globals.css` | Imports and `@source` lines only; no tokens                                                 |
+| `src/lib/`               | App-level helpers, including the `cn` re-export                                             |
+| `components.json`        | shadcn config; routes added components into `@synapcity/frontend-ui`                        |
 
 ## Styling
 
