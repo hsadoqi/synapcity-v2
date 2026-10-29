@@ -1,4 +1,5 @@
-import { render, screen, within } from '@testing-library/react';
+import { StrictMode, useState } from 'react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('next/navigation', () => ({ usePathname: () => '/' }));
@@ -109,5 +110,77 @@ describe('BreadcrumbRootShell', () => {
 
     expect(nav.textContent).toContain('In Spaces');
     expect(nav.textContent).not.toContain('Nowhere');
+  });
+});
+
+describe('SetBreadcrumbs stability', () => {
+  /** A page that re-renders itself, handing SetBreadcrumbs a new equal array. */
+  const Page = () => {
+    const [, setCount] = useState(0);
+    return (
+      <>
+        <button onClick={() => setCount((n) => n + 1)}>Render again</button>
+        <SetBreadcrumbs items={[{ label: 'Spaces' }]} />
+      </>
+    );
+  };
+
+  it('does not rebuild the shell when a page passes an equal trail again', () => {
+    const sidebar = vi.fn(() => ({ groups: [] }));
+    render(
+      <ModeProvider>
+        <BreadcrumbRootShell account={account} sidebar={sidebar}>
+          <Page />
+        </BreadcrumbRootShell>
+      </ModeProvider>,
+    );
+    const calls = sidebar.mock.calls.length;
+
+    fireEvent.click(screen.getByRole('button', { name: 'Render again' }));
+
+    expect(sidebar.mock.calls.length).toBe(calls);
+  });
+});
+
+describe('SetBreadcrumbs lifecycle', () => {
+  const inShell = (page: React.ReactNode) => (
+    <ModeProvider>
+      <BreadcrumbRootShell account={account}>{page}</BreadcrumbRootShell>
+    </ModeProvider>
+  );
+
+  it('shows the next page trail, never the old one, when one page replaces another', () => {
+    // Different keys: the old publisher unmounts as the new one mounts, as on
+    // a route change. Cleanups run before the new effect, so the new trail wins.
+    const view = render(
+      inShell(<SetBreadcrumbs key="a" items={[{ label: 'Spaces' }]} />),
+    );
+
+    view.rerender(
+      inShell(<SetBreadcrumbs key="b" items={[{ label: 'Documents' }]} />),
+    );
+
+    expect(within(trail()!).getByText('Documents')).toBeTruthy();
+    expect(within(trail()!).queryByText('Spaces')).toBeNull();
+  });
+
+  it('shows no trail for a page that sets an empty one', () => {
+    const view = render(
+      inShell(<SetBreadcrumbs key="a" items={[{ label: 'Spaces' }]} />),
+    );
+
+    view.rerender(inShell(<SetBreadcrumbs key="b" items={[]} />));
+
+    expect(trail()).toBeNull();
+  });
+
+  it('keeps the trail through Strict Mode mounting its effects twice', () => {
+    render(
+      <StrictMode>
+        {inShell(<SetBreadcrumbs items={[{ label: 'Spaces' }]} />)}
+      </StrictMode>,
+    );
+
+    expect(within(trail()!).getByText('Spaces')).toBeTruthy();
   });
 });
