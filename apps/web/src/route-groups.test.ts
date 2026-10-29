@@ -83,11 +83,16 @@ describe('URLs are unchanged by the route groups', () => {
     );
   });
 
-  it('puts every page in a group, leaving only the API outside', () => {
+  it('puts every page in a group, leaving only the API and the bare owner root outside', () => {
+    // `/[userId]` redirects and has no shell. It sits outside `(protected)` so
+    // its own `requireOwner` runs before the group layout's sign-in backstop,
+    // which cannot keep the return path (see `protected-routes.test.ts`).
     const outside = routes.filter((route) => route.group === null);
     expect(outside.map((route) => route.url).sort()).toEqual(
       outside
-        .filter((route) => route.url.startsWith('/api/'))
+        .filter(
+          (route) => route.url.startsWith('/api/') || route.url === '/[userId]',
+        )
         .map((r) => r.url)
         .sort(),
     );
