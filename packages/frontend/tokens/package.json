@@ -2,6 +2,7 @@
   "name": "@synapcity/frontend-tokens",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "description": "Synapcity Precision Canvas design tokens and the Tailwind v4 theme bridge.",
   "sideEffects": [
     "*.css"

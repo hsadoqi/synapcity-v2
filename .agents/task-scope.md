@@ -1,3 +1,10 @@
+## Active task: CI hygiene and verification reliability (2026-10-29)
+
+- Goal and mode: implementing, owner-requested. Branch `fix/ci-hygiene`, worktree `synapcity.worktrees/ci-hygiene`, kept apart from Dependabot maintenance (no dependency or lockfile change).
+- Changes: `apps/web` coverage settings at the Vitest root (a project ignores them); `"type": "module"` in `frontend-tokens`; a dead `optimizeDeps` entry removed from Storybook; the widget-shell story no longer duplicates the shell's own Pin action; one form-renderer test no longer queries inside `act`; Supabase `[inbucket]` renamed to `[local_smtp]` and the local `project_id` set to `synapcity`; `no-html-link-for-pages` off for Storybook, which has no Next routes; the item-open-button test's host link stops jsdom navigating; the CI Playwright browser cache keyed on the Playwright version instead of the lockfile; the Turborepo cache restored on every run but saved only from `main`, without week-old entries; CI sets `SITE_URL` to the end-to-end server's address; the `global-panel` e2e locator follows the `shell-page` rename from pull request 54; skipped e2e tests and `metadataBase` behaviour documented.
+- Not changed: dependencies, coverage thresholds (none), accessibility checks, which tests CI skips, metadata inheritance, any production or preview address (deployment topology stays open).
+- Evidence: forced and cached `web#test:coverage` runs; served `og:image` URLs per environment; the eight fixture-gated e2e tests run against a fixture dev server; full `pnpm verify`.
+
 ## Active task: read-only Document and Dashboard pages, slice 3 (2026-10-29)
 
 - Goal and mode: implementing, next in the agreed sequence. Branch `feat/resource-views`, stacked on `feat/resource-frame` (pull request 79).

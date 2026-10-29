@@ -69,7 +69,7 @@ When the address of `apps/web` changes (for example a custom domain), change the
 3. **Google and GitHub consoles:** nothing to change. They hold only Supabase's own callback address.
 4. **Email:** a custom SMTP provider needs SPF and DKIM records on the sending domain.
 
-`SITE_URL` also sets `metadataBase`, so share images resolve against the real address. If it is unset, Next falls back to `http://localhost:3000` and warns at build.
+`SITE_URL` also sets `metadataBase` for `apps/web`, so share images resolve against the real address. If it is unset, Next falls back to the deployment address on Vercel and to `http://localhost:<port>` elsewhere (3000 during `next build`), and warns outside Vercel. CI sets it to `http://localhost:8080`, where the end-to-end server listens. `apps/docs` has no `SITE_URL` and sets no `metadataBase`: on Vercel its share images resolve to the deployment address, and in CI its build and end-to-end server print the localhost warning, which is expected until the deployment topology is decided.
 
 ## Generated files and caches
 
