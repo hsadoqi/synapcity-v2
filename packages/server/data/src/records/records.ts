@@ -135,3 +135,28 @@ export async function createRecord(
     return { ok: false, error: toProviderFailure({ ...error, status }) };
   return { ok: true, id: data.id };
 }
+
+/** A view recorded less than this long ago is not recorded again. */
+const VIEW_THROTTLE_MS = 60_000;
+
+/**
+ * Notes that the caller opened one of their Spaces, documents or dashboards.
+ * Skipped when the last view was under a minute ago. The outcome carries the
+ * error so the host can log it; a view that was not recorded is not worth
+ * interrupting anyone for.
+ */
+export async function recordRecordView(
+  client: SupabaseServerClient,
+  table: 'spaces' | RecordKind,
+  id: string,
+  now: Date,
+): Promise<{ ok: true } | { ok: false; error: ProviderFailure }> {
+  const cutoff = new Date(now.getTime() - VIEW_THROTTLE_MS).toISOString();
+  const { error } = await client
+    .from(table)
+    .update({ last_viewed_at: now.toISOString() })
+    .eq('id', id)
+    .or(`last_viewed_at.is.null,last_viewed_at.lt.${cutoff}`);
+
+  return error ? { ok: false, error: toProviderFailure(error) } : { ok: true };
+}
