@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
   refresh: vi.fn(),
   save: vi.fn(),
+  browserSave: vi.fn(),
 }));
 
 vi.mock('next/navigation', () => ({
@@ -15,7 +16,32 @@ vi.mock('next/link', () => ({
 vi.mock('../../server/actions/dashboard-composition-actions', () => ({
   saveDashboardComposition: mocks.save,
 }));
+// The real browser storage, with its saveComposition watched.
+vi.mock('@synapcity/features-dashboards/frontend', async (importOriginal) => {
+  const actual =
+    await importOriginal<
+      typeof import('@synapcity/features-dashboards/frontend')
+    >();
+  return {
+    ...actual,
+    browserDashboardStorage: (
+      options: Parameters<typeof actual.browserDashboardStorage>[0],
+    ) => {
+      const storage = actual.browserDashboardStorage(options);
+      return {
+        ...storage,
+        saveComposition: (
+          ...args: Parameters<typeof storage.saveComposition>
+        ) => {
+          mocks.browserSave(...args);
+          return storage.saveComposition(...args);
+        },
+      };
+    },
+  };
+});
 
+import { createComposition } from '@synapcity/domain-dashboards';
 import type { BaseRecord } from '@synapcity/domain-records';
 import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
 import { DashboardView } from './dashboard-view';
@@ -31,6 +57,8 @@ beforeEach(() => {
   containerWidth = 1200;
   mocks.refresh.mockReset();
   mocks.save.mockReset();
+  mocks.browserSave.mockReset();
+  localStorage.clear();
   mocks.save.mockImplementation(
     async (_id: string, _c: unknown, base: number) => ({
       ok: true,
@@ -383,6 +411,86 @@ describe('DashboardView composition', () => {
       expect(await screen.findByText('No widgets yet')).toBeTruthy();
       expect(rail()).toBeTruthy();
       result.unmount();
+    });
+
+    const fixture = (id: string) =>
+      ({ ...DASHBOARD, id }) as unknown as BaseRecord;
+    const dashboardWrites = () =>
+      Object.keys(localStorage).filter((key) =>
+        key.startsWith('synapcity.dashboard.'),
+      );
+
+    it('a seeded fixture dashboard shows its widgets on first open and saves nothing until it is edited', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      render(
+        view({
+          persistence: 'browser',
+          dashboard: fixture('fixture-dashboard-project-status'),
+        }),
+      );
+      await layout();
+      expect(
+        await screen.findByRole('region', { name: 'Pinned' }),
+      ).toBeTruthy();
+      expect(screen.getByRole('region', { name: 'Last opened' })).toBeTruthy();
+      expect(screen.getByRole('region', { name: 'Spaces' })).toBeTruthy();
+      expect(screen.queryByText('No widgets yet')).toBeNull();
+
+      // Well past the save debounce: rendering wrote nothing.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1000);
+      });
+      expect(mocks.browserSave).not.toHaveBeenCalled();
+      expect(dashboardWrites()).toEqual([]);
+
+      // The first edit saves through the scheduler, seed included.
+      await press(editToggle());
+      await press(within(palette()!).getByRole('button', { name: 'Spaces' }));
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(500);
+      });
+      expect(mocks.browserSave).toHaveBeenCalledTimes(1);
+      const [id, saved] = mocks.browserSave.mock.calls[0] as [
+        string,
+        { widgets: { type: string }[] },
+      ];
+      expect(id).toBe('fixture-dashboard-project-status');
+      expect(saved.widgets.map((widget) => widget.type)).toEqual([
+        'pinned',
+        'last-opened',
+        'spaces',
+        'spaces',
+      ]);
+      expect(dashboardWrites()).toHaveLength(1);
+    });
+
+    it('a stored composition wins over the seed, even an empty one', async () => {
+      const id = 'fixture-dashboard-project-status';
+      localStorage.setItem(
+        `synapcity.dashboard.${DASHBOARD.ownerId}.${id}.v1`,
+        JSON.stringify(createComposition()),
+      );
+      render(view({ persistence: 'browser', dashboard: fixture(id) }));
+      await layout();
+      expect(await screen.findByText('No widgets yet')).toBeTruthy();
+      expect(screen.queryByRole('region', { name: 'Pinned' })).toBeNull();
+    });
+
+    it('keeps reading-progress empty', async () => {
+      render(
+        view({
+          persistence: 'browser',
+          dashboard: fixture('fixture-dashboard-reading-progress'),
+        }),
+      );
+      await layout();
+      expect(await screen.findByText('No widgets yet')).toBeTruthy();
+      expect(mocks.browserSave).not.toHaveBeenCalled();
+    });
+
+    it('does not seed in server mode', async () => {
+      await setup({ dashboard: fixture('fixture-dashboard-project-status') });
+      expect(screen.getByText('No widgets yet')).toBeTruthy();
     });
   });
 });

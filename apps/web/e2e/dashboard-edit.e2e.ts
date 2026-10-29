@@ -383,6 +383,34 @@ test.describe('editing a dashboard', () => {
     ).toEqual([]);
   });
 
+  test('a seeded fixture dashboard opens with its widgets and writes nothing until edited', async ({
+    page,
+  }) => {
+    await page.goto(
+      '/fixture-user/home/dashboards/fixture-dashboard-project-status',
+    );
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
+    for (const name of ['Pinned', 'Last opened', 'Spaces']) {
+      await expect(page.getByRole('region', { name })).toBeVisible({
+        timeout: 15_000,
+      });
+    }
+    // Past the 400 ms save debounce, and across a width change that resolves
+    // another layout: rendering the seed saved nothing.
+    await page.setViewportSize({ width: 800, height: 900 });
+    await expect(
+      page.getByRole('button', { name: 'Tablet layout' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    await page.waitForTimeout(800);
+    const saved = await page.evaluate(() =>
+      Object.keys(localStorage).filter((key) =>
+        key.startsWith('synapcity.dashboard.'),
+      ),
+    );
+    expect(saved).toEqual([]);
+  });
+
   test('leaving with an unsaved change asks first', async ({ page }) => {
     await openEmpty(page);
     let asked = false;
