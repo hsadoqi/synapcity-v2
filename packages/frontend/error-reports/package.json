@@ -15,7 +15,7 @@
   "dependencies": {
     "@sentry/browser": "11.8.0",
     "@synapcity/frontend-preferences": "workspace:*",
-    "react": "19.3.0"
+    "react": "19.3.1"
   },
   "devDependencies": {
     "@synapcity/domain-preferences": "workspace:*",

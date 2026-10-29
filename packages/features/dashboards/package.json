@@ -25,7 +25,7 @@
     "@synapcity/frontend-forms": "workspace:*",
     "@synapcity/frontend-ui": "workspace:*",
     "lucide-react": "^1.55.0",
-    "react": "19.3.0",
+    "react": "19.3.1",
     "react-grid-layout": "2.3.0",
     "zod": "^4.6.7",
     "zustand": "5.0.16"

@@ -23,7 +23,7 @@
     "@synapcity/server-data": "workspace:*",
     "@synapcity/server-supabase": "workspace:*",
     "lucide-react": "^1.55.0",
-    "react": "19.3.0",
+    "react": "19.3.1",
     "server-only": "0.0.1"
   },
   "devDependencies": {

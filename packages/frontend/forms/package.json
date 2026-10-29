@@ -17,7 +17,7 @@
   "dependencies": {
     "@hookform/resolvers": "6.0.0",
     "@synapcity/frontend-ui": "workspace:*",
-    "react": "19.3.0",
+    "react": "19.3.1",
     "react-hook-form": "7.90.0",
     "zod": "^4.6.7"
   },
