@@ -41,10 +41,11 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      # Turborepo's local task cache. A new key per commit with a prefix
-      # fallback restores the latest run's results, so unchanged tasks replay
-      # instead of re-running.
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      # Turborepo's local task cache. Every run restores the latest saved copy,
+      # so unchanged tasks replay instead of re-running. Only pushes to main
+      # save it (after `pnpm verify`): a pull request run's copy is visible only
+      # to that pull request, and each one was about 300 MB of the 10 GB limit.
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .turbo/cache
           key: turbo-${{ runner.os }}-${{ github.sha }}
@@ -69,6 +70,19 @@ jobs:
         run: pnpm --filter web exec playwright install --with-deps chromium
 
       - run: pnpm verify
+
+      # A restored copy is saved again with this run's entries added, so it
+      # would keep every entry ever made. Restored files keep the time they were
+      # first written: dropping those older than seven days bounds the copy, at
+      # the cost of one rebuild for a task whose inputs have not changed since.
+      - name: Drop week-old Turborepo cache entries
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: if [ -d .turbo/cache ]; then find .turbo/cache -type f -mtime +7 -delete; fi
+      - if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .turbo/cache
+          key: turbo-${{ runner.os }}-${{ github.sha }}
 
   # The committed database types must match what the migrations produce. Every
   # input is pinned: the migrations, the Supabase CLI (root devDependency, which
