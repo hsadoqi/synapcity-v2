@@ -6,6 +6,8 @@ import { ResourceFrame, ResourceHeader } from '@synapcity/frontend-shells';
 
 import { RESOURCE_PANEL } from '@/components/resource-panel';
 
+import { DocumentDetails } from './document-details';
+
 /**
  * One document, read-only: its name, icon and description. Document content is
  * not stored yet (its storage is undecided), so the body says so plainly
@@ -29,6 +31,11 @@ export function DocumentView({ document }: { document: BaseRecord }) {
             {document.description}
           </p>
         )}
+        <DocumentDetails
+          createdAt={document.createdAt}
+          updatedAt={document.updatedAt}
+          tags={document.tags}
+        />
         <p className="rounded-md border border-dashed border-border p-4 text-sm text-muted-foreground">
           This document’s content can’t be shown yet. Writing and saving
           document content isn’t available yet.

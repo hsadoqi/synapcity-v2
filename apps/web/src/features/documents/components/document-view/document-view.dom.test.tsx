@@ -1,8 +1,13 @@
 import { act, render, screen, within } from '@testing-library/react';
+import { hydrateRoot } from 'react-dom/client';
+import { renderToString } from 'react-dom/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { regionalDefaults } from '@synapcity/domain-preferences';
 import type { BaseRecord } from '@synapcity/domain-records';
+import { RegionalProvider } from '@synapcity/frontend-preferences';
 import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
+import { DocumentDetails } from './document-details';
 import { DocumentView } from './document-view';
 
 // The panel library lays out against browser measurements; supply them, as
@@ -149,5 +154,94 @@ describe('DocumentView reading page', () => {
     expect(
       screen.queryByRole('button', { name: /edit|save|bold/i }),
     ).toBeNull();
+  });
+});
+
+describe('DocumentView details', () => {
+  /** The details list, found through the heading that names it. */
+  const details = () => {
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: 'Document details',
+    });
+    const list = heading.nextElementSibling;
+    expect(list?.tagName).toBe('DL');
+    return list as HTMLElement;
+  };
+  /** The value beside a term in the details list. */
+  const value = (term: string) => {
+    const entry = within(details())
+      .getAllByRole('term')
+      .find((element) => element.textContent === term);
+    return entry?.nextElementSibling as HTMLElement | undefined;
+  };
+
+  it('uses a description list named Document details', async () => {
+    await setup();
+    expect(details()).toBeTruthy();
+    // The body adds no second level-one heading.
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+  });
+
+  it('lists created and updated dates as time elements with machine-readable values', async () => {
+    await setup();
+    const updated = value('Updated')?.querySelector('time');
+    const created = value('Created')?.querySelector('time');
+    expect(updated?.getAttribute('dateTime')).toBe('2026-10-17T16:20:00Z');
+    expect(created?.getAttribute('dateTime')).toBe('2026-10-14T09:00:00Z');
+    expect(updated?.textContent).toMatch(/2026/);
+    expect(created?.textContent).toMatch(/2026/);
+  });
+
+  it('omits Updated when the document was never edited', async () => {
+    await setup({ updatedAt: DOCUMENT.createdAt });
+    expect(value('Updated')).toBeUndefined();
+    expect(value('Created')?.querySelector('time')).toBeTruthy();
+  });
+
+  it('lists each tag as a list item', async () => {
+    await setup();
+    const tags = within(value('Tags')!).getByRole('list', { name: 'Tags' });
+    expect(
+      within(tags)
+        .getAllByRole('listitem')
+        .map((item) => item.textContent),
+    ).toEqual(['work', 'planning']);
+  });
+
+  it('omits the tags row when there are none', async () => {
+    await setup({ tags: [] });
+    expect(value('Tags')).toBeUndefined();
+    expect(screen.queryByRole('list', { name: 'Tags' })).toBeNull();
+  });
+
+  it('hydrates the server-written dates without a mismatch', async () => {
+    // The server writes dates in the account's zone; hydration must read the
+    // same zone, whatever this browser's own is. 23:30 UTC is the next day in
+    // Tokyo, so a zone mismatch would change the text.
+    const regional = { ...regionalDefaults, timezone: 'Asia/Tokyo' };
+    const ui = (
+      <RegionalProvider regional={regional} deviceTimeZone={null}>
+        <DocumentDetails
+          createdAt="2026-10-14T23:30:00Z"
+          updatedAt="2026-10-17T23:30:00Z"
+          tags={['work']}
+        />
+      </RegionalProvider>
+    );
+    const html = renderToString(ui);
+    expect(html).toContain('Oct 15, 2026');
+    const container = document.createElement('div');
+    container.innerHTML = html;
+    document.body.append(container);
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const recoverable = vi.fn();
+    const root = await act(async () =>
+      hydrateRoot(container, ui, { onRecoverableError: recoverable }),
+    );
+    expect(recoverable).not.toHaveBeenCalled();
+    expect(errors).not.toHaveBeenCalled();
+    act(() => root.unmount());
+    container.remove();
   });
 });
