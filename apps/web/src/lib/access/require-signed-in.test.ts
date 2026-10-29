@@ -1,6 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const getClaims = vi.fn();
+const requestHeaders = vi.hoisted(() => ({ path: null as string | null }));
+
+vi.mock('next/headers', () => ({
+  headers: async () =>
+    new Headers(
+      requestHeaders.path
+        ? { 'x-synapcity-request-path': requestHeaders.path }
+        : {},
+    ),
+}));
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: async () => ({ auth: { getClaims } }),
@@ -18,7 +28,10 @@ async function failure(): Promise<string> {
 }
 
 describe('requireSignedIn', () => {
-  beforeEach(() => getClaims.mockReset());
+  beforeEach(() => {
+    getClaims.mockReset();
+    requestHeaders.path = null;
+  });
   afterEach(() => vi.unstubAllEnvs());
 
   it('returns without redirecting when claims verify', async () => {
@@ -31,6 +44,28 @@ describe('requireSignedIn', () => {
     getClaims.mockResolvedValue({ data: null });
 
     expect(await failure()).toContain('/auth/login');
+  });
+
+  it('sends a signed-out visitor to sign in with the page they asked for', async () => {
+    getClaims.mockResolvedValue({ data: null });
+    requestHeaders.path = '/u1';
+
+    expect(await failure()).toContain('/auth/login?next=%2Fu1');
+  });
+
+  it.each([
+    '//evil.example/steal',
+    '/\\evil.example',
+    'https://evil.example',
+    '',
+  ])('ignores %j as a way back', async (path) => {
+    getClaims.mockResolvedValue({ data: null });
+    requestHeaders.path = path;
+
+    const digest = await failure();
+
+    expect(digest).toContain('/auth/login');
+    expect(digest).not.toContain('next=');
   });
 
   it('treats a failed claims read as signed out', async () => {

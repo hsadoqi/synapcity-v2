@@ -35,9 +35,9 @@ const OTHER_ACCESS_GUARDS = ['getVerifiedIdentity(', 'requireSignedIn('];
  * Pages the proxy deliberately does not match, with the reason. `/<userId>`
  * cannot be told apart from a public one-segment page by its shape, so the
  * proxy leaves it to the app: it has no content, it only redirects to the
- * person's home. A signed-out visitor is sent to sign in by the group layout
- * (without `next`, which a layout cannot build) and a signed-in stranger gets
- * a 404 from `requireOwner`.
+ * person's home. A signed-out visitor is sent to sign in by the group layout,
+ * with the path the proxy forwards in a header as `next`, and a signed-in
+ * stranger gets a 404 from `requireOwner`.
  */
 const NOT_MATCHED_BY_PROXY = new Set(['/some-user']);
 

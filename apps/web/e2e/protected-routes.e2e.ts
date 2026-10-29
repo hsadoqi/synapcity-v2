@@ -26,14 +26,14 @@ for (const path of [
 
 // The proxy does not match a bare `/<userId>`, which cannot be told apart from
 // a public one-segment page. The `(protected)` layout sends a signed-out
-// visitor to sign in instead. A layout cannot read the request path, so this
-// redirect carries no `next`; signing in then lands on the person's own home.
-test('sends a signed-out visitor from a bare /someone to sign in', async ({
+// visitor to sign in instead, with the path the proxy forwarded as `next`, so
+// signing in leads back to where they were going.
+test('sends a signed-out visitor from a bare /someone to sign in, keeping the way back', async ({
   page,
 }) => {
   await page.goto('/someone');
 
-  await expect(page).toHaveURL(/\/auth\/login$/);
+  await expect(page).toHaveURL(/\/auth\/login\?next=%2Fsomeone$/);
 });
 
 for (const path of [

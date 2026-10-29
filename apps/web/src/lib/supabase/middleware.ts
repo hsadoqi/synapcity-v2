@@ -4,10 +4,18 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { homePathFor } from '../routing/user-paths';
 import { safeNextPath } from '../routing/safe-next';
 import { fixtureModeEnabled } from '../access/dev-fixture';
+import { REQUEST_PATH_HEADER } from '../routing/request-path';
 import { getSupabaseEnv } from './env';
 import { isGuestOnlyPath, isProtectedPath } from '../routing/route-access';
 
 export async function updateSession(request: NextRequest) {
+  // Always replaces a client-sent value, so server code can trust where it came
+  // from (its content is still validated by `safeNextPath` where it is used).
+  request.headers.set(
+    REQUEST_PATH_HEADER,
+    `${request.nextUrl.pathname}${request.nextUrl.search}`,
+  );
+
   // Development fixture mode has no session to refresh and must not reach
   // Supabase. Production and test never take this branch.
   if (fixtureModeEnabled()) return NextResponse.next({ request });

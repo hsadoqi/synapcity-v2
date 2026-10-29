@@ -74,7 +74,11 @@ Not run: a screen reader, forced-colors or reduced-motion passes, a real touch d
 
 ## Return path on a bare `/<userId>`
 
-Found while reviewing the split: a signed-out visit to `/<userId>` used to reach the page's `requireOwner` and be sent to `/auth/login?next=/<userId>/home`. After the split the `(protected)` layout's `requireSignedIn()` ran first, cannot read the request path, and redirected to `/auth/login` with no `next` (commit `af58422c`; the earlier amendment in ADR-0006 recorded this as accepted). The destination was recoverable, so it was treated as a regression. The redirect-only page now lives at `app/[userId]/page.tsx`, outside the group, so `requireOwner` runs first and uses the existing `homePathFor` and `/auth/login?next=` convention (the sign-in page validates `next` with `safeNextPath`). The `(public)`/`(auth)`/`(protected)` split and layout ownership are unchanged. Regression coverage: `app/[userId]/page.test.tsx` (redirect target, owner, stranger), `protected-routes.test.ts` (only that page sits beside the group, it calls `requireOwner`, it is not in the group), and the fixture end-to-end test asserting `next=%2Fsomeone%2Fhome`.
+Found while reviewing the split: a signed-out visit to `/<userId>` used to reach the page's `requireOwner` and be sent to `/auth/login?next=/<userId>/home`. After the split the `(protected)` layout's `requireSignedIn()` ran first, could not read the request path, and redirected to `/auth/login` with no `next` (commit `af58422c`; the earlier ADR-0006 amendment recorded this as accepted). The destination was recoverable, so it was treated as a regression.
+
+A first fix moved the redirect-only page out of the group so `requireOwner` ran first. It was rejected after a signed-in visit to an unknown single segment (`/nope`) rendered the public 404 shell instead of the workspace shell, and it broke the "every page in a group" test. It was reverted before publishing.
+
+The fix kept: the proxy forwards the request path in `x-synapcity-request-path` (always replacing a client value) and `requireSignedIn` uses it through `safeNextPath` and `signInHref`. The `(public)`/`(auth)`/`(protected)` split and layout ownership are unchanged. It is a new proxy-set request header and was not separately approved; see ADR-0006. Coverage: see the ADR.
 
 ## Final verification
 
