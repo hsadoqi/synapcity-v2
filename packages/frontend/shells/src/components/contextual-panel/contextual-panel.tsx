@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useId,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -77,14 +78,21 @@ const FIRST_OPEN_REM = 22;
 function useNarrow() {
   const ref = useRef<HTMLDivElement>(null);
   const [narrow, setNarrow] = useState(false);
-  useEffect(() => {
+  // A layout effect, so the first measurement lands before paint: a choice
+  // made before ResizeObserver first reports would otherwise open at a
+  // side-by-side size the container cannot hold, which the panel refuses.
+  useLayoutEffect(() => {
     const element = ref.current;
-    if (!element || typeof ResizeObserver === 'undefined') return;
-    const observer = new ResizeObserver(([entry]) => {
-      const width = entry?.contentRect.width ?? 0;
+    if (!element) return;
+    const measure = (width: number) => {
       // Zero means hidden or not laid out yet; that is not a narrow container.
       if (width > 0) setNarrow(width < SIDE_BY_SIDE_PX);
-    });
+    };
+    measure(element.getBoundingClientRect().width);
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(([entry]) =>
+      measure(entry?.contentRect.width ?? 0),
+    );
     observer.observe(element);
     return () => observer.disconnect();
   }, []);
