@@ -20,7 +20,7 @@ ADR-0013 item 9 requires context to come from the route. ADR-0014 keeps routes a
 ## Decision
 
 1. **Invariant: the primary navigable route owns the breadcrumb trail, and publishes at most one.** The primary navigable route is the route the URL resolves to through `children`. A route that shows a trail has exactly one publisher. A route may also be intentionally trail-free (Home and Settings today), in which case it has no publisher and the header shows its no-trail state. Resource views, contextual panel destinations, drawers and client-state tabs present or participate; they do not navigate, so they never publish a trail.
-2. **Convention: the route's `page.tsx` renders `SetBreadcrumbs` directly, once, or not at all.** This is today's enforcement boundary, not the invariant. A component that the route explicitly owns and renders to publish on its behalf may replace direct publication later, provided the at-most-one rule still holds. That change updates the convention and its guardrail together.
+2. **Convention: the route's `page.tsx` renders `SetBreadcrumbs` directly, once, or not at all.** This is today's enforcement boundary, not the invariant. A component or layout that the route explicitly owns may take over publication later, through the same bridge, provided the at-most-one rule still holds for every primary route. A layout persists while its child routes change beneath it, so a layout publisher must still leave each child route with exactly one trail (folding child crumbs into its items, or handing publication to the child), never two. That change updates the convention and its guardrail together. Server-rendering the trail from a layout is a different matter: it changes the composition mechanism (Decision 3) and reopens this ADR.
 3. **The trail reaches the header through the existing client bridge** (`BreadcrumbRootShell` and `SetBreadcrumbs`). Server-rendered composition of the trail is not adopted. This covers a parallel `@header` slot, resource layouts that render trails, and a pathname-derived trail.
 4. **`activeContext` stays derived from the same trail**, so the header and the sidebar's context switcher stay consistent. Consistency is not correctness: before hydration both are empty, so a Space route first shows "Global". That is a known, deferred UX limitation (see Unresolved), not a correct state. Contextual panel and drawer state is presentation, not navigation context.
 
@@ -43,7 +43,7 @@ How the breadcrumb trail is owned, carried to the header and read by the sidebar
 
 ## Governance boundary
 
-The repository owner approves changes to the invariant or to the composition mechanism. Changing the convention in Decision 2 within the invariant (introducing a route-owned publishing component) needs only ordinary review, with the guardrail updated in the same change. `frontend-shells` owns the bridge and `HeaderBreadcrumbs`; `apps/web` owns trail content (labels, hrefs, `kind`) as route policy.
+The repository owner approves changes to the invariant or to the composition mechanism. Changing the convention in Decision 2 within the invariant (introducing a route-owned publishing component or layout that uses the bridge) needs only ordinary review, with the guardrail updated in the same change. `frontend-shells` owns the bridge and `HeaderBreadcrumbs`; `apps/web` owns trail content (labels, hrefs, `kind`) as route policy.
 
 ## Integration expectations
 

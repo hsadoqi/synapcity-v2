@@ -26,9 +26,12 @@ import { describe, expect, it } from 'vitest';
  * - It scans `apps/web/src` and the `features` and `frontend` packages, where
  *   resource views live. Inside `frontend-shells` the bridge is reached by
  *   relative imports, which this does not read.
- * - A route-owned component that publishes on a page's behalf would be added
- *   to `ROUTE_OWNED_PUBLISHERS` in the change that introduces it, with its
- *   reason, so the guardrail follows the convention instead of blocking it.
+ * - The page-only rule is today's convention, not the invariant. A
+ *   route-owned component or layout that takes over publication would be
+ *   added to `ROUTE_OWNED_PUBLISHERS` in the change that introduces it, with
+ *   its reason, and the per-page count below would change with it (its pages
+ *   would then publish none), so the guardrail follows the convention instead
+ *   of blocking it.
  */
 
 const SRC = dirname(fileURLToPath(import.meta.url));
@@ -37,7 +40,7 @@ const GROUP = join(APP, '(protected)');
 const PACKAGES = join(SRC, '..', '..', '..', 'packages');
 
 const INVARIANT =
-  'ADR-0017: only the primary route publishes a breadcrumb trail, at most once; resource views, panel destinations, drawers and layouts never publish one';
+  'ADR-0017: the primary route publishes at most one breadcrumb trail; resource views, panel destinations and drawers never publish one. Today’s convention: the route’s page.tsx renders SetBreadcrumbs directly';
 
 /** Files, relative to `src`, that may publish for a route besides its page. None today. */
 const ROUTE_OWNED_PUBLISHERS = new Map<string, string>();
@@ -179,7 +182,7 @@ describe('breadcrumb trail ownership', () => {
       .map((path) => relative(join(SRC, '..', '..', '..'), path));
     expect(
       outside,
-      `${INVARIANT}. Publish from the route's page.tsx instead.`,
+      `${INVARIANT}. Publish from the route's page.tsx, or list a route-owned publisher in ROUTE_OWNED_PUBLISHERS with its reason.`,
     ).toEqual([]);
   });
 
