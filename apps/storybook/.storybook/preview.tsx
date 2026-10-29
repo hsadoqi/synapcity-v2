@@ -3,37 +3,18 @@ import addonTheme, { withThemeByClassName } from '@storybook/addon-themes';
 import addonDocs from '@storybook/addon-docs';
 import a11yAddOn from '@storybook/addon-a11y';
 import type { Renderer } from 'storybook/internal/types';
-import { Inter } from 'next/font/google';
-import localFont from 'next/font/local';
+import { fontVariableClasses } from '@synapcity/frontend-fonts/next';
 import { ThemedDocsContainer } from './docs-container';
 import { storyModeAction } from './story-mode';
 import { useEffect } from 'react';
 import { ModeProvider, useMode } from '@synapcity/frontend-preferences';
 import '../styles/globals.css';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
-
-// The same Geist files and variable names as the apps (apps/web/src/app/fonts.ts), so stories
-// render the type the app does. The names are the ones the typography tokens read
-// (shared-styles.css): --font-geist-sans for headings, not Google's --font-geist.
-const geist = localFont({
-  src: '../../web/src/lib/fonts/GeistVF.woff',
-  variable: '--font-geist-sans',
-});
-
-const geistMono = localFont({
-  src: '../../web/src/lib/fonts/GeistMonoVF.woff',
-  variable: '--font-geist-mono',
-  preload: false,
-});
-
-const fontVariables = [inter.variable, geist.variable, geistMono.variable];
-
 // On <html>, like the apps. The role tokens (--font-body and the rest) are declared on :root, and
 // a var() resolves where it is declared, so variables set on a wrapper below :root are invisible
 // to them and every control (font-ui reads --font-body) would fall back to system-ui.
 if (typeof document !== 'undefined') {
-  document.documentElement.classList.add(...fontVariables);
+  document.documentElement.classList.add(...fontVariableClasses);
 }
 type ToolbarTheme = 'light' | 'dark';
 

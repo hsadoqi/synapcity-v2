@@ -30,6 +30,7 @@
     "@synapcity/features-spaces": "workspace:*",
     "@synapcity/frontend-collection": "workspace:*",
     "@synapcity/frontend-error-reports": "workspace:*",
+    "@synapcity/frontend-fonts": "workspace:*",
     "@synapcity/frontend-preferences": "workspace:*",
     "@synapcity/frontend-shells": "workspace:*",
     "@synapcity/frontend-site": "workspace:*",

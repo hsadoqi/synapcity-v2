@@ -1,6 +1,6 @@
 # Shared Default Fonts
 
-**Status:** Proposed. Approved in direction by the repository owner on 2026-10-27. Reviewed 2026-10-27 (section 9): corrections applied; the owning package (section 5) and the default code face (O1) wait on the owner.  
+**Status:** Implemented 2026-10-29 as option B (section 10), on the repository owner's instruction of that date to implement the migration end to end; pending review in the pull request. Approved in direction by the repository owner on 2026-10-27. Reviewed 2026-10-27 (section 9).  
 **Date:** 2026-10-27  
 **Requested by:** Repository owner  
 **Scope:** Load the three default typefaces once, in a workspace package, and have `apps/web`, `apps/docs` and Storybook consume it. No change to the families, the typography roles or the user override variables.
@@ -40,7 +40,7 @@ A fourth source of font files exists on this branch. The candidate package `@syn
 - **Version:** `next` 16.4.3 (`apps/web/package.json`). The bundled docs (`next/dist/docs/01-app/03-api-reference/02-components/font.md`, "Using a font definitions file") recommend calling each loader once and importing the result. They say nothing about monorepos.
 - **Build time only:** `next/font` runs at build time; calls must be at module scope with literal arguments. So the variable names cannot be imported constants passed to the loaders.
 - **Relative paths:** `localFont`'s `src` is resolved relative to the file that calls it, so the `.woff` files must sit beside the definitions.
-- **Workspace packages:** a Next.js commit made `next/font` work for code compiled through `transpilePackages` and in auto-configured monorepos. Neither `next.config` here sets `transpilePackages`; other source-pointing workspace packages already compile without it. Whether `localFont` called inside a workspace package works under Turbopack in 16.4.3, in both `next build` and `next dev`, is **NOT VERIFIED**; the first task proves it before anything moves.
+- **Workspace packages:** a Next.js commit made `next/font` work for code compiled through `transpilePackages` and in auto-configured monorepos. Neither `next.config` here sets `transpilePackages`; other source-pointing workspace packages already compile without it. Whether `localFont` called inside a workspace package works under Turbopack in 16.4.3, in both `next build` and `next dev`, was **NOT VERIFIED** when this was drafted. Verified 2026-10-29: it does, in `next build` and `next dev` for web and docs and in a Storybook build (section 10).
 - **Storybook:** `@storybook/nextjs-vite` 10.6.3 handles `next/font` in stories; the same package import must work there. `classList.add` throws on a string that contains a space, so Storybook needs the classes as an array, not the joined `fontVariables` string.
 - **Boundaries, R11 (verified by reading `packages/dev/boundaries/src/rules/edge-rules/edge-rules.ts`):** in a frontend package, a production import of `next` must sit under `src/next/`. Legacy packages are not exempt from R11. A `fonts/next/` folder at a package root would be reported.
 - **Boundaries, matrix (verified in `matrix.ts` and its test):** `domain` may import only `domain`. `domain-preferences` therefore cannot read labels from a frontend package; a frontend package may read them from `domain-preferences`.
@@ -58,9 +58,9 @@ A fourth source of font files exists on this branch. The candidate package `@syn
 - Storybook drops its loaders and spreads `fontVariableClasses` into `classList.add`.
 - `domain-preferences` keeps `defaultFontLabels`. Its comment points at the fonts unit instead of `layout.tsx`.
 
-## 5. Unresolved: owning package
+## 5. Owning package
 
-Needs an owner decision before Task 3 of the plan.
+Resolved 2026-10-29: option B (section 10). The options and reasoning are kept as written.
 
 | Option                                                                                             | For                                                                                                | Against                                                                                                                                                                                                                                                                                      |
 | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -86,8 +86,8 @@ Amend ADR-0003 item 4 and the 2026-10-17 amendment: the loaders live in the chos
 
 ## 8. Open questions
 
-- **O1. Default code face.** `frontend-tokens` (from the Claude Design export) uses JetBrains Mono for code; ADR-0003 item 2 and this design keep Geist Mono. If the merge will change the default, decide that before this move, or the files move twice.
-- **O2.** Option A, B, C or D (section 5).
+- **O1. Default code face.** _Resolved 2026-10-29: Geist Mono stays, as ADR-0003 item 2 says; `frontend-tokens` is not adopted, so its JetBrains Mono does not change the default._ `frontend-tokens` (from the Claude Design export) uses JetBrains Mono for code; ADR-0003 item 2 and this design keep Geist Mono. If the merge will change the default, decide that before this move, or the files move twice.
+- **O2.** Option A, B, C or D (section 5). _Resolved 2026-10-29: B._
 
 ## 9. Review, 2026-10-27
 
@@ -96,3 +96,10 @@ Amend ADR-0003 item 4 and the 2026-10-17 amendment: the loaders live in the chos
 **Inferences, not checked:** that the `frontend-tokens` font files are not downloaded today; that `next/font` works from a workspace package (Task 1 decides).
 
 **Corrections applied:** the docs `.woff` copy was missing from the problem and the plan; option A's paths broke R11; the label direction was left open although the matrix already settles it; "one definition of the variable names" could not be met with imported constants; Storybook would throw on the joined string; option C, option D and O1 were missing; the ADR change also amended item 5, which belongs to the catalogue design; the verification steps were made concrete.
+
+## 10. Result, 2026-10-29
+
+- **Chosen:** option B. The instruction of 2026-10-29 allowed a dedicated package where it gives a clearer, enforceable ownership model; it does (rule R11 keeps `next/font` under `src/next/`, and `pnpm boundaries`, `pnpm deps` and the package's tests enforce the rest). Topology adoption under ADR-0014 is recorded in the workspace conventions inventory and the ownership map; the pull request is the place to object.
+- **Spike (plan Task 1):** done in place rather than on a scratch branch, because the real package was the smallest test. Production `next build` of web and docs and `pnpm build:storybook` pass with the loaders in the package; `next dev` for web and docs serves the same three variables and the same hashed files; Storybook emits the same hashed Geist assets as before.
+- **Found while verifying:** `frontend-tokens` declares an un-ranged `@font-face` for `Inter` (byte-identical to the latin subset `next/font` serves). Docs imported its fonts before its stylesheet, so that face came last and docs downloaded it as well; web did not. Importing the stylesheet first, as web does, removes that request in docs. `frontend-tokens` is unchanged; its README records the hazard and `src/ownership.test.ts` keeps the import order.
+- **Left alone:** families, weights, subsets, `preload`, variable names, roles, overrides, the labels in `domain-preferences`, and `frontend-tokens`' own fonts.

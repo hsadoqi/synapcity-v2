@@ -1,3 +1,12 @@
+## Active task: shared default fonts (2026-10-29)
+
+Owner request of 2026-10-29: one authoritative owner for the three default typefaces, with `apps/web`, `apps/docs` and Storybook consuming it, as an ownership refactor and not a typography redesign. Commit, push and a pull request against `main` were authorized; merging and deployment were not. Governing: [design](../docs/superpowers/specs/2026-10-27-shared-default-fonts-design.md) and [plan](../docs/superpowers/plans/2026-10-27-shared-default-fonts.md).
+
+- Goal and mode: implementing. Branch `shared-typography`, worktree `features/shared-typography`, base `main` at `6973edaf`.
+- Decided here: option B of the design, a new `@synapcity/frontend-fonts` (`packages/frontend/fonts`) with one entry, `./next`, holding the three `next/font` loaders with the arguments they have today, the two Geist `.woff` files (moved with `git mv` from `apps/web`) and `fontVariableClasses` and `fontVariables`; web, docs and Storybook import it; the second `.woff` pair in `apps/docs` (byte-identical, MD5 checked) is deleted. Default code face stays Geist Mono (design O1). The default font labels stay in `domain-preferences`.
+- Not changed: families, weights, subsets, `preload` settings, variable names, roles, `--font-preference-*`, the type scale, user font loading in `frontend-preferences`, `frontend-tokens` (including its self-hosted Inter and JetBrains Mono), brand geometry and assets, dependencies other than workspace links.
+- Recovery: revert the branch; the moved files are in history.
+
 ## Active task: frontend-brand package and brand-asset ownership (2026-10-29)
 
 Owner request of 2026-10-29: one explicit owner for brand geometry, React components, server-safe SVG strings and canonical SVG exports. No commits, pushes, pull requests or external changes were authorized.
