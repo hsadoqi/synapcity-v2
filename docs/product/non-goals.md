@@ -42,6 +42,10 @@ The following are outside the initial committed slice unless the MVP decision ex
 
 The product owner moved notifications into scope on 2026-10-17, as a track separate from the first slice in `first-slice.md` (which still excludes them from its hypothesis). Included: account and security alerts, product announcements, and reminders on user content; delivered in-app with an optional sound, by browser push, and by email. The design, the phases and the decisions still open are in [`docs/superpowers/specs/2026-10-17-notifications-design.md`](../superpowers/specs/2026-10-17-notifications-design.md). Each architecture choice it lists still needs its own approval.
 
+## Dashboards track (owner decision, 2026-10-27)
+
+On 2026-10-27 the product owner made Dashboards a track separate from the first slice in `first-slice.md`. That slice stays Quick Capture and is unchanged. The track's first slice is a Dashboard page whose layout is stored on the server and whose widgets only read information that other capabilities already own: pinned items, last-opened items and Spaces. The design is in [`docs/superpowers/specs/2026-10-27-dashboard-page-composition-design.md`](../superpowers/specs/2026-10-27-dashboard-page-composition-design.md), and its storage in [ADR-0016](../architecture/decisions/0016-dashboard-composition-storage.md) (Proposed). Widgets that create their own data, and the specialized Tasks, Goals and Habits below, stay deferred ([widget data design](../superpowers/specs/2026-10-27-dashboard-widget-data-design.md), blocked). Each architecture choice still needs its own approval.
+
 ## Deferred product directions
 
 The following are deliberately deferred rather than rejected:

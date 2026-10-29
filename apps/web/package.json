@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 8080",
+    "dev:local": "next dev --hostname 127.0.0.1 --port 3000",
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --cache --cache-strategy content --max-warnings 0",
@@ -19,6 +20,7 @@
   "dependencies": {
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.117.3",
+    "@synapcity/domain-dashboards": "workspace:*",
     "@synapcity/domain-identity": "workspace:*",
     "@synapcity/domain-preferences": "workspace:*",
     "@synapcity/domain-records": "workspace:*",

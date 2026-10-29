@@ -66,6 +66,27 @@ export type FeedWidget = WidgetBase & {
   query: { limit: number };
 };
 
+/*
+ * Link widgets (Slice 4): query-shaped views of the owner's own Spaces,
+ * documents and dashboards. Like the other query widgets they select, never
+ * point at one record, and own no data.
+ */
+/** Pinned records, newest pin first. */
+export type PinnedWidget = WidgetBase & {
+  type: 'pinned';
+  query: { limit: number };
+};
+/** Records by when they were last opened, most recent first. */
+export type LastOpenedWidget = WidgetBase & {
+  type: 'last-opened';
+  query: { limit: number };
+};
+/** The owner's Spaces. */
+export type SpacesWidget = WidgetBase & {
+  type: 'spaces';
+  query: { limit: number };
+};
+
 export type Widget =
   | StatWidget
   | ProgressWidget
@@ -74,7 +95,10 @@ export type Widget =
   | TasksWidget
   | CalendarWidget
   | AgendaWidget
-  | FeedWidget;
+  | FeedWidget
+  | PinnedWidget
+  | LastOpenedWidget
+  | SpacesWidget;
 
 export type WidgetType = Widget['type'];
 

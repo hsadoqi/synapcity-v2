@@ -1,4 +1,10 @@
-import { appendLayoutEntry, removeLayoutEntry } from '@synapcity/domain-grids';
+import {
+  appendLayoutEntry,
+  columnsFor,
+  packLayout,
+  removeLayoutEntry,
+  type Breakpoint,
+} from '@synapcity/domain-grids';
 import { createId } from '@synapcity/domain-prototypes';
 
 import type {
@@ -6,8 +12,20 @@ import type {
   Widget,
   WidgetPatch,
   WidgetStatus,
+  WidgetType,
 } from '../../types';
 import { WIDGET_SIZES } from '../widget-sizes';
+
+/**
+ * The widget types a dashboard saved on the server may hold (Slice 4): the
+ * link widgets, which own no data. The other types stay in the model for
+ * stories and for widgets that own data later.
+ */
+export const LINK_WIDGET_TYPES: readonly WidgetType[] = [
+  'pinned',
+  'last-opened',
+  'spaces',
+];
 
 export function activeWidgets(c: DashboardComposition): Widget[] {
   return c.widgets.filter((w) => w.status === 'active');
@@ -106,4 +124,35 @@ export function setWidgetStatus(
         ? appendLayoutEntry(c.layouts, widget.id, WIDGET_SIZES[widget.type])
         : removeLayoutEntry(c.layouts, widgetId),
   };
+}
+
+/**
+ * Moves a widget one place earlier or later in reading order (rows top to
+ * bottom, left to right) at one breakpoint, and packs that breakpoint's
+ * layout again with every widget's own size. For people who move widgets
+ * without pointing or spatial arrow keys. A locked or missing widget, or one
+ * already first or last, leaves the composition unchanged.
+ */
+export function moveWidgetInOrder(
+  c: DashboardComposition,
+  bp: Breakpoint,
+  widgetId: string,
+  direction: -1 | 1,
+): DashboardComposition {
+  const widget = c.widgets.find((w) => w.id === widgetId);
+  if (!widget || widget.locked) return c;
+  const ordered = [...c.layouts[bp]].sort((a, b) => a.y - b.y || a.x - b.x);
+  const from = ordered.findIndex((item) => item.i === widgetId);
+  const to = from + direction;
+  if (from < 0 || to < 0 || to >= ordered.length) return c;
+  const moved = ordered[from];
+  const other = ordered[to];
+  if (!moved || !other) return c;
+  ordered[from] = other;
+  ordered[to] = moved;
+  const packed = packLayout(
+    ordered.map((item) => ({ id: item.i, w: item.w, h: item.h })),
+    columnsFor(c.settings.columns, bp),
+  );
+  return { ...c, layouts: { ...c.layouts, [bp]: packed } };
 }

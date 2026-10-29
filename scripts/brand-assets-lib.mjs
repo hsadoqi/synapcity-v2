@@ -175,6 +175,7 @@ const SKIPPED = new Set([
   '.superpowers',
   '.impeccable',
   '.claude',
+  '.history',
 ]);
 const TEXT = /\.(svg|ts|tsx|mts|js|jsx|mjs|cjs|css|html)$/;
 

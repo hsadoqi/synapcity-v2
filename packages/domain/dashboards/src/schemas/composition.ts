@@ -35,6 +35,8 @@ function sourced<T extends string, K extends string>(type: T, kind: K) {
   });
 }
 
+const limitQuery = z.object({ limit: z.number().int().min(1).max(50) });
+
 const widgetSchema = z.discriminatedUnion('type', [
   sourced('stat', 'metric'),
   sourced('progress', 'goal'),
@@ -54,8 +56,15 @@ const widgetSchema = z.discriminatedUnion('type', [
   z.object({
     ...widgetBase,
     type: z.literal('feed'),
-    query: z.object({ limit: z.number().int().min(1).max(50) }),
+    query: limitQuery,
   }),
+  z.object({ ...widgetBase, type: z.literal('pinned'), query: limitQuery }),
+  z.object({
+    ...widgetBase,
+    type: z.literal('last-opened'),
+    query: limitQuery,
+  }),
+  z.object({ ...widgetBase, type: z.literal('spaces'), query: limitQuery }),
 ]);
 
 /**

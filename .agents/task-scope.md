@@ -7,6 +7,14 @@ Owner request of 2026-10-29: one authoritative owner for the three default typef
 - Not changed: families, weights, subsets, `preload` settings, variable names, roles, `--font-preference-*`, the type scale, user font loading in `frontend-preferences`, `frontend-tokens` (including its self-hosted Inter and JetBrains Mono), brand geometry and assets, dependencies other than workspace links.
 - Recovery: revert the branch; the moved files are in history.
 
+## Active task: dashboard page and composition persistence, slice 4 (2026-10-29)
+
+- Goal and mode: implementing, owner-authorized end to end (specify, plan, implement, verify) on 2026-10-29. Branch `feat/slice-4-dashboard-composition`, worktree `Projects/worktrees/synapcity/features/slice-4-dashboard-composition`, from `origin/main` at `ab4bcd54` (includes #83). The slice is spec A of the 2026-10-27 dashboard split ([spec](../docs/superpowers/specs/2026-10-27-dashboard-page-composition-design.md), [plan](../docs/superpowers/plans/2026-10-29-slice-4-dashboard-composition.md)); ADR-0016 accepted by the same authorization.
+- Changes: migration `20261029100000_create_dashboard_compositions.sql` (unapplied draft), SQL regression script and regenerated types; `server-data` `loadComposition`, `saveComposition` (conditional on a revision; a zero-row write is never saved) and `recordRecordView`; `domain-dashboards` link widgets (Pinned, Last opened, Spaces), `LINK_WIDGET_TYPES`, `parsePersistableComposition`, `moveWidgetInOrder`; `features-dashboards` port with base revision and `SaveOutcome`, save status with Retry and Reload, `beforeunload` instead of a `pagehide` flush, Undo for removal, a live region, Arrange (Move earlier and later), Add a widget from the empty state, focus management, breakpoint following the canvas width, the host configuration context; `apps/web` Server Actions `saveDashboardComposition` and `recordDashboardView`, the server adapter, loaders, the editable page, `domain-dashboards` as a workspace dependency, and `turbo.json` pass-through for two opt-in e2e variables. A latent bug is fixed: the grid never mounted when the first widget was added to an empty dashboard, because its width hook measures a container that did not yet exist.
+- Not changed: `public.dashboards`, any shared or hosted database (the migration was applied only to a disposable container), the shared local Supabase stack, widget-owned data and the Task, Agenda, Goal and Habit widgets (spec B), Document view recording, sharing, history, the nested Space route, dependencies outside the workspace.
+- Evidence: `pnpm verify` exit 0 on the final code (CI placeholder values): web 738, features-dashboards 193, server-data 70, domain-dashboards 49 unit tests, e2e 66 passed and 18 skipped, Storybook 540, build. SQL script on a disposable Postgres, with six of seven deliberate weakenings detected (the seventh, an open update policy, is shadowed by the select policy). Fixture e2e (`dashboard-edit`, `resource-views`) 12 of 12 with two workers. Server path (`dashboard-persistence.e2e.ts`) 1 of 1 against a disposable Postgres, GoTrue and PostgREST on a private Docker network: save, reload, a stale second tab refused as Changed elsewhere, a failed save recovered by Retry, and another account getting 404.
+- Not verified: the migration on a hosted or the shared local project; real PostgREST behaviour beyond that disposable stack; a screen-reader pass; `global-panel.e2e.ts` and `shared-look.e2e.ts` (the three global-panel failures also occur on the base commit under load).
+
 ## Active task: frontend-brand package and brand-asset ownership (2026-10-29)
 
 Owner request of 2026-10-29: one explicit owner for brand geometry, React components, server-safe SVG strings and canonical SVG exports. No commits, pushes, pull requests or external changes were authorized.
@@ -78,6 +86,31 @@ Owner request of 2026-10-29: one explicit owner for brand geometry, React compon
 - Visual status (owner direction, 2026-10-27): the workspace's visual composition (bounded frame, header hierarchy, panel and rail arrangement) is provisional, accepted as the working baseline for continued development, not finalized or adopted. The explorations and alternatives stay in the stories. Later UI slices build on this baseline and show functional results without per-detail visual approval; deeper visual exploration resumes once Document and Dashboard views work with the panel. Continuing development does not approve the workspace header, nested navigation, Space-specific layout (Space sidebar, tabs, header hierarchy, whether the panel appears in Spaces) or other exploratory features.
 - Evidence: `pnpm verify` exit 0 with CI's placeholder Supabase values (unit and component tests in every package, web 686; e2e 66 passed and 5 skipped, the existing authenticated-session skips; Storybook 523 with axe; build). Earlier runs on the way: one web test (`quick-create-dialog.dom.test.tsx`) failed once under full-suite load and passed alone three times and in the two later full runs; two exploration stories failed axe (scrollable placeholders without keyboard access), fixed. Manual, in Storybook, light and dark: header and switcher at 1440, 620 and 400px, the narrow sidebar sheet (Escape closes it, focus returns to the toggle), breadcrumb collapse. Not verified: the switcher in the running app with fixture Spaces, screen-reader output.
 - Deferred, not an approved task: an icon picker for Spaces (a visual and product exploration; ADR-0012 excludes it and requires any future picker to offer installed names only).
+
+## Active task: Dashboard MVP design split (2026-10-27)
+
+- Goal and mode: documentation only, no implementation (owner direction). Revise and split the Dashboard and Widget MVP design after its review. Branch `docs/dashboard-mvp-split`, from `main` at `7220291e` (#77). Worktree `synapcity.worktrees/dashboard-mvp-docs`.
+- Owner decisions (2026-10-27), each the review's recommendation:
+  - composition in a separate one-to-one table with a revision number (D2, option B2);
+  - first widgets are read-only views of existing data: Pinned, Last opened, Spaces (D3, option C2);
+  - Dashboards become a separate track, leaving the Quick Capture first slice unchanged;
+  - removing a widget deletes it, with Undo, and no hidden or archived status is persisted.
+- Created:
+  - `docs/superpowers/specs/2026-10-27-dashboard-widgets-mvp-review.md` (the review, saved verbatim apart from removed teaching notes and repository-relative links);
+  - `docs/superpowers/specs/2026-10-27-dashboard-page-composition-design.md` (spec A, Proposed);
+  - `docs/superpowers/specs/2026-10-27-dashboard-widget-data-design.md` (spec B, Blocked);
+  - `docs/architecture/decisions/0016-dashboard-composition-storage.md` (Proposed).
+- Updated:
+  - the superseded design's status line (its text is kept);
+  - the ADR index;
+  - `docs/product/non-goals.md` (Dashboards track section);
+  - this ledger.
+- Not changed: source, packages, migrations, dependencies, `first-slice.md`, `mvp.md`, `PRODUCT.md`, the glossary.
+- Still open for the owner:
+  - ADR-0016's durable names and its acceptance;
+  - the widget labels;
+  - everything in spec B, section 2 (first, whether Task, Goal or Habit may enter the product).
+- Verification: Prettier on the changed files; `pnpm verify` is not needed for documentation-only changes but runs in CI on the pull request.
 
 ## Active task: Quick Create remediation (2026-10-27)
 
