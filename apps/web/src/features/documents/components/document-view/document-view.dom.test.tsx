@@ -245,3 +245,24 @@ describe('DocumentView details', () => {
     container.remove();
   });
 });
+
+describe('DocumentView unavailable content', () => {
+  const note = () => screen.getByRole('note', { name: 'Document content' });
+
+  it('states the content is unavailable in a note region', async () => {
+    await setup();
+    expect(within(body()).getByRole('note')).toBe(note());
+    expect(note().textContent).toMatch(/can’t be shown yet/);
+  });
+
+  it('does not say the document is empty', async () => {
+    await setup({ description: undefined, tags: [] });
+    expect(body().textContent).not.toMatch(/empty|no content/i);
+  });
+
+  it('has no button or link inside the note', async () => {
+    await setup();
+    expect(within(note()).queryAllByRole('button')).toHaveLength(0);
+    expect(within(note()).queryAllByRole('link')).toHaveLength(0);
+  });
+});
