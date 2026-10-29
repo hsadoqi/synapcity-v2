@@ -1,6 +1,6 @@
 ## Task: unambiguous Playwright file filters (2026-10-29)
 
-- Goal and mode: implement a documentation correction noted in #114. Branch `docs/playwright-file-filters`, worktree `fixes/playwright-file-filters`, base `origin/main` at `db2c93d7`.
+- Goal and mode: implement a documentation correction noted in #114. Branch `docs/playwright-file-filters`, worktree `fixes/playwright-file-filters`, base `origin/main` at `c36551ab`.
 - Changes: the fixture-suite command in `docs/engineering/quality-gates.md` names the files (`global-panel.e2e` and so on) and says why a bare name can select every spec.
 - Not changed: Playwright configuration or test discovery, the archived and planning documents that show older commands, any test.
 - Evidence: `prettier --check` on the two files. No tests run; documentation only.
