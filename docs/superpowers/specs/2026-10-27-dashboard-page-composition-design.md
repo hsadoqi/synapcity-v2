@@ -1,6 +1,6 @@
 # Dashboard page and composition persistence (spec A, Slice 4)
 
-**Status:** Accepted for implementation (2026-10-29) as **Slice 4** of the resource-view sequence (slice 1 contextual panel, slice 2 `ResourceFrame`, slice 3 read-only Document and Dashboard pages, slice 4 this spec). The owner authorized the whole specify, plan, implement and verify workflow on 2026-10-29, including the persisted table in [ADR-0016](../../architecture/decisions/0016-dashboard-composition-storage.md) and its working names. Section 8 lists what changed since the 2026-10-27 draft; read it first.
+**Status:** Implemented (2026-10-29) as **Slice 4** of the resource-view sequence (slice 1 contextual panel, slice 2 `ResourceFrame`, slice 3 read-only Document and Dashboard pages, slice 4 this spec). The owner authorized the whole specify, plan, implement and verify workflow on 2026-10-29, including the persisted table in [ADR-0016](../../architecture/decisions/0016-dashboard-composition-storage.md) and its working names. Section 8 lists what changed since the 2026-10-27 draft; read it first.
 **Date:** 2026-10-27
 **Splits:** [Dashboard and Widget MVP](2026-10-27-dashboard-widgets-mvp-design.md) (superseded). Its widget-data half is [spec B](2026-10-27-dashboard-widget-data-design.md).
 **Evidence:** the [MVP review](2026-10-27-dashboard-widgets-mvp-review.md).
@@ -190,13 +190,13 @@ What changed since the 2026-10-27 draft, and the details the draft left to imple
 ### 8.3 Interaction and focus
 
 - **Edit layout** toggles edit mode as today. The widgets panel offers only Pinned, Last opened and Spaces, and its Hidden and Archived sections do not appear (no status is persisted).
-- Adding a widget moves focus to the new widget's content group. Removing one shows **Undo** in the toolbar for 8 seconds or until the next change, and moves focus to the next widget in reading order, else to **Add a widget**. Undo restores the widget and its layouts at every breakpoint and returns focus to that widget.
-- Keyboard: select with Space, arrows move, Shift+arrows resize, Escape deselects. Every move or resize is announced through one polite live region ("Pinned moved to column 2, row 1", "Pinned is now 2 wide, 3 tall"). The widgets panel lists active widgets with **Move earlier** and **Move later**, which reorder reading order and repack the current breakpoint, for people who cannot or do not want to use spatial moves.
+- Adding a widget moves focus to the new widget's grid cell, the focusable wrapper that also takes the keyboard moves. Removing one shows **Undo** in the toolbar for 8 seconds or until the next change, and moves focus to the next widget in reading order, else to **Add a widget**. Undo restores the widget and its layouts at every breakpoint and returns focus to that widget.
+- Keyboard: select with Space, arrows move, Shift+arrows resize, Escape deselects. Every move or resize is announced through one polite live region ("Pinned moved to column 2, row 1", "Pinned is now 2 wide, 3 tall"). The widgets panel lists active widgets with **Move earlier** and **Move later**, which reorder reading order and repack the current breakpoint, for people who cannot or do not want to use spatial moves. The list appears when there are two or more widgets.
 - Save status is a polite live region; Retry and Reload are ordinary buttons in the toolbar. `beforeunload` is armed while anything is unsaved or saving.
 
 ### 8.4 Responsive behavior
 
-The breakpoint follows the canvas's own width through the existing `useElementWidth`, in edit mode as well as read-only, so the contextual panel opening or the window narrowing switches layouts. Choosing a layout in the toolbar preview overrides this until the page is reloaded. The toolbar wraps below roughly 28rem; the panel beside the canvas is replaced by a stacked panel below the same width. No fixed pixel widths are added.
+The breakpoint follows the canvas's own width through the existing `useElementWidth`, in edit mode as well as read-only, so the contextual panel opening or the window narrowing switches layouts. Choosing a layout in the toolbar preview overrides this until the page is reloaded. The toolbar wraps, and the widgets panel sits under the canvas below the `md` breakpoint instead of beside it. No fixed pixel widths are added.
 
 ### 8.5 Data flow and permissions
 
@@ -205,3 +205,11 @@ Server Component → `getDashboard`, `loadComposition`, link items (RLS scopes e
 ### 8.6 Compatibility
 
 `public.dashboards` is unchanged. A Dashboard without a composition row loads as an empty composition at revision 0. Browser-stored compositions from earlier stories are not migrated to the server (they were never product data). Compositions saved earlier in this browser by slice 3 do not exist (slice 3 saved nothing). `schema_version` starts at 1; the reader refuses a version it does not know rather than guess.
+
+### 8.7 As built
+
+- The first insert uses revision 0 as its base; the database refuses a second row for the same Dashboard, which the action reports as a conflict.
+- The page reads the three link kinds once per load. A pin or a view made elsewhere shows after a reload.
+- Documents have a page (slice 3) but do not record views, so Last opened lists Spaces and Dashboards only, and its empty text says so.
+- The size cap is checked in `parsePersistableComposition` and again by the database.
+- Open from ADR-0016: how `schema_version` migrations are written, and whether a conflict should offer more than Reload.

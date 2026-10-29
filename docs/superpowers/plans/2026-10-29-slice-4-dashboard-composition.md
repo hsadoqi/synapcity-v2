@@ -4,6 +4,7 @@
 **Governing:** [ADR-0016](../../architecture/decisions/0016-dashboard-composition-storage.md) (Accepted 2026-10-29), ADR-0013, ADR-0014, ADR-0006.
 **Branch / worktree:** `feat/slice-4-dashboard-composition`, `Projects/worktrees/synapcity/features/slice-4-dashboard-composition`, from `origin/main` at `ab4bcd54`.
 **Mode:** implementing, owner-authorized end to end (2026-10-29). Local commits only; no merge, no deploy, no push unless asked.
+**Status:** all eight tasks done (2026-10-29). Evidence is in `.agents/task-scope.md`. Differences from the plan: the link-widget rules (`LINK_WIDGET_TYPES`, `parsePersistableComposition`) live in `domain-dashboards` rather than in the app, so `server-data` stays free of the dashboard domain and the app action stays thin; Undo restores the widget into the current composition instead of an older copy, because the grid reports a layout right after any removal.
 
 ## Grounding (inspected on `main`)
 
