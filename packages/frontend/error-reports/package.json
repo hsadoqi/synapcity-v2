@@ -13,7 +13,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@sentry/browser": "11.8.0",
+    "@sentry/browser": "11.9.0",
     "@synapcity/frontend-preferences": "workspace:*",
     "react": "19.3.1"
   },
