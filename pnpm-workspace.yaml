@@ -28,6 +28,7 @@ overrides:
   '@humanfs/node@<0.16.8': '^0.16.8'
   source-map-js@<1.2.2: '^1.2.2'
   sharp@<0.35.5: '^0.35.5'
+  qs@<6.16.1: '^6.16.1'
 
 # No patched release of braces exists (latest 3.0.3 is affected). It is reached only through
 # dev-time glob tooling (eslint-plugin-next's fast-glob, the shadcn CLI), never shipped to users.
