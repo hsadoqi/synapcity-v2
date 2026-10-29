@@ -4,6 +4,8 @@
 
 Owns: the shared React components (shadcn/ui, style `base-mira`, on Base UI), the `cn` class-merging helper, and the stylesheet entry that applies the shared theme.
 
+`components/logo-mark` is a transitional re-export of `@synapcity/frontend-brand/react`, which owns the logo components and geometry; new code imports the brand package.
+
 It owns no theme tokens. Tokens live in `@synapcity/frontend-tailwind-config` ([ADR-0002](../../../docs/architecture/decisions/0002-styling-foundation.md)).
 
 ## Entry points
