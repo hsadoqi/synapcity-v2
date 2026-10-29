@@ -1,3 +1,10 @@
+## Active task: CI hygiene and verification reliability (2026-10-29)
+
+- Goal and mode: implementing, owner-requested. Branch `fix/ci-hygiene`, worktree `synapcity.worktrees/ci-hygiene`, kept apart from Dependabot maintenance (no dependency or lockfile change).
+- Changes: `apps/web` coverage settings at the Vitest root (a project ignores them); `"type": "module"` in `frontend-tokens`; a dead `optimizeDeps` entry removed from Storybook; the widget-shell story no longer duplicates the shell's own Pin action; one form-renderer test no longer queries inside `act`; Supabase `[inbucket]` renamed to `[local_smtp]` and the local `project_id` set to `synapcity`; `no-html-link-for-pages` off for Storybook, which has no Next routes; the item-open-button test's host link stops jsdom navigating; the CI Playwright browser cache keyed on the Playwright version instead of the lockfile; the Turborepo cache restored on every run but saved only from `main`, without week-old entries; CI sets `SITE_URL` to the end-to-end server's address; the `global-panel` e2e locator follows the `shell-page` rename from pull request 54; skipped e2e tests and `metadataBase` behaviour documented.
+- Not changed: dependencies, coverage thresholds (none), accessibility checks, which tests CI skips, metadata inheritance, any production or preview address (deployment topology stays open).
+- Evidence: forced and cached `web#test:coverage` runs; served `og:image` URLs per environment; the eight fixture-gated e2e tests run against a fixture dev server; full `pnpm verify`.
+
 ## Active task: `(protected)` route group, protected route architecture (2026-10-29)
 
 - Goal and mode: implementing, after the owner approved decisions D1 (adopt the group, option B) and D2 (defer moving the shell) of [the plan](../docs/superpowers/plans/2026-10-29-protected-route-architecture.md). Branch `plan/protected-route-architecture`, worktree `protected-route-architecture`, base `main` at `a44316ed`. Nothing is committed or pushed; the owner has not authorized either.

@@ -35,12 +35,7 @@ const config = defineConfig({
           name: 'storybook',
         },
         optimizeDeps: {
-          include: [
-            'storybook/theming',
-            'react-dom',
-            'react/jsx-runtime',
-            '@synapcity/features-dashboards/frontend',
-          ],
+          include: ['storybook/theming', 'react-dom', 'react/jsx-runtime'],
         },
       },
     ],

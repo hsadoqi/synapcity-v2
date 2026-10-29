@@ -21,10 +21,10 @@
     "@synapcity/dev-vitest-config": "workspace:*",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "26.6.5",
-    "@vitest/coverage-v8": "4.1.12",
-    "postcss": "8.5.30",
+    "@vitest/coverage-v8": "5.0.5",
+    "postcss": "8.5.31",
     "tailwindcss": "^4.3.3",
     "typescript": "7.0.2",
-    "vitest": "4.1.12"
+    "vitest": "5.0.5"
   }
 }

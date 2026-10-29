@@ -7,6 +7,22 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: chore
+    # Packages that must share a version move in one PR; a lone bump of one
+    # of them fails CI (react and react-dom must match exactly, @playwright/test
+    # pins playwright exactly, @vitest/* plugins pin vitest exactly).
+    groups:
+      react:
+        patterns:
+          - react
+          - react-dom
+      playwright:
+        patterns:
+          - '@playwright/test'
+          - playwright
+      vitest:
+        patterns:
+          - vitest
+          - '@vitest/*'
   - package-ecosystem: github-actions
     directory: /
     schedule:

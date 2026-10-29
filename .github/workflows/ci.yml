@@ -22,9 +22,14 @@ jobs:
     # They are placeholders, not credentials: no CI step contacts Supabase, and
     # `.env.local`, where real values live, is not in the repository. NEXT_PUBLIC_*
     # is passed to the web tasks by Turborepo's Next.js framework inference.
+    # SITE_URL is the address the end-to-end server listens on, the same value
+    # as apps/web/.env.example, so the web app resolves `metadataBase` from its
+    # own setting instead of Next's localhost fallback. It is not a deployment
+    # address; this build is never deployed.
     env:
       NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ci-placeholder-key
+      SITE_URL: http://localhost:8080
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # The pnpm version comes from the `packageManager` field in package.json.
@@ -36,22 +41,27 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      # Turborepo's local task cache. A new key per commit with a prefix
-      # fallback restores the latest run's results, so unchanged tasks replay
-      # instead of re-running.
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      # Turborepo's local task cache. Every run restores the latest saved copy,
+      # so unchanged tasks replay instead of re-running. Only pushes to main
+      # save it (after `pnpm verify`): a pull request run's copy is visible only
+      # to that pull request, and each one was about 300 MB of the 10 GB limit.
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .turbo/cache
           key: turbo-${{ runner.os }}-${{ github.sha }}
           restore-keys: turbo-${{ runner.os }}-
 
-      # Chromium is downloaded on every run otherwise. The key follows the
-      # lockfile, which pins the Playwright version. System packages
-      # (`--with-deps`) are still installed each run.
+      # Chromium is downloaded on every run otherwise. The browser follows the
+      # Playwright version alone, so that is the key: keyed on the lockfile,
+      # every dependency change saved another copy of the same browser. System
+      # packages (`--with-deps`) are still installed each run.
+      - name: Read the Playwright version
+        id: playwright
+        run: echo "version=$(pnpm --filter web exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
 
       # `pnpm install` does not download browsers. `pnpm verify` runs the web
       # end-to-end tests and the Storybook story tests, and both drive Chromium.
@@ -60,6 +70,19 @@ jobs:
         run: pnpm --filter web exec playwright install --with-deps chromium
 
       - run: pnpm verify
+
+      # A restored copy is saved again with this run's entries added, so it
+      # would keep every entry ever made. Restored files keep the time they were
+      # first written: dropping those older than seven days bounds the copy, at
+      # the cost of one rebuild for a task whose inputs have not changed since.
+      - name: Drop week-old Turborepo cache entries
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: if [ -d .turbo/cache ]; then find .turbo/cache -type f -mtime +7 -delete; fi
+      - if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .turbo/cache
+          key: turbo-${{ runner.os }}-${{ github.sha }}
 
   # The committed database types must match what the migrations produce. Every
   # input is pinned: the migrations, the Supabase CLI (root devDependency, which
