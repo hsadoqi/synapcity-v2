@@ -41,6 +41,7 @@ export function DashboardCanvas({
   return (
     <div
       ref={ref}
+      data-slot="dashboard-canvas"
       className="scroll-fade-y flex min-w-0 flex-1 flex-col overflow-auto bg-muted px-5 pt-7 pb-16"
     >
       <div

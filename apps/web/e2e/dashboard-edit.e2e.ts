@@ -275,6 +275,114 @@ test.describe('editing a dashboard', () => {
     ).toHaveAttribute('aria-pressed', 'true');
   });
 
+  /**
+   * Both widths a frame decision depends on: the window's, and the canvas's
+   * own content width (what the canvas measures; its 40 px padding excluded).
+   */
+  async function widths(page: Page) {
+    return page.evaluate(() => {
+      const canvas = document.querySelector<HTMLElement>(
+        '[data-slot="dashboard-canvas"]',
+      );
+      if (!canvas) throw new Error('No dashboard canvas');
+      const style = getComputedStyle(canvas);
+      return {
+        viewport: window.innerWidth,
+        canvas:
+          canvas.clientWidth -
+          parseFloat(style.paddingLeft) -
+          parseFloat(style.paddingRight),
+      };
+    });
+  }
+
+  test('an unlocked tablet width draws no device frame', async ({ page }) => {
+    // Measured (S2 Task 1): at this window the canvas resolves to tablet and
+    // is wider than the 834 px frame plus its chrome, where a frame used to
+    // appear without anyone choosing it.
+    await page.setViewportSize({ width: 1350, height: 900 });
+    await openEmpty(page);
+    await expect(
+      page.getByRole('button', { name: 'Tablet layout' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    const { viewport, canvas } = await widths(page);
+    expect(viewport).toBe(1350);
+    expect(canvas).toBeGreaterThan(834 + 80);
+    expect(canvas).toBeLessThan(1024);
+    await expect(page.getByText('Tablet · 834px')).toHaveCount(0);
+  });
+
+  test('choosing Tablet layout on a wide window draws the frame, and a narrow window drops it', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await openEmpty(page);
+    await page.getByRole('button', { name: 'Tablet layout' }).click();
+    await expect(page.getByText('Tablet · 834px')).toBeVisible();
+    expect((await widths(page)).canvas).toBeGreaterThan(834 + 80);
+
+    await page.setViewportSize({ width: 700, height: 900 });
+    await expect(page.getByText('Tablet · 834px')).toHaveCount(0);
+    expect((await widths(page)).canvas).toBeLessThan(834 + 80);
+    // The preview stays chosen; only its frame went.
+    await expect(
+      page.getByRole('button', { name: 'Tablet layout' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  test('a locked preview survives opening and closing the Widgets panel', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await openEmpty(page);
+    await page.getByRole('button', { name: 'Add a widget' }).click();
+    await page.getByRole('button', { name: 'Pinned' }).click();
+    await expect(page.getByText('Saved', { exact: true })).toBeVisible();
+    const widgets = page
+      .getByRole('toolbar', { name: 'Contextual panel' })
+      .getByRole('button', { name: 'Widgets' });
+    // Closed, the canvas is wide enough for the desktop layout.
+    await widgets.click();
+    await expect(widgets).toHaveAttribute('aria-pressed', 'false');
+    await expect(
+      page.getByRole('button', { name: 'Desktop layout' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+
+    // Count every write to this browser's saved dashboards from here on.
+    await page.evaluate(() => {
+      const writes: string[] = [];
+      Object.assign(window, { dashboardWrites: writes });
+      const setItem = Storage.prototype.setItem;
+      Storage.prototype.setItem = function (key: string, value: string) {
+        if (key.startsWith('synapcity.dashboard.')) writes.push(key);
+        return setItem.call(this, key, value);
+      };
+    });
+
+    const tablet = page.getByRole('button', { name: 'Tablet layout' });
+    await tablet.click();
+    await expect(page.getByText('Tablet · 834px')).toBeVisible();
+    await widgets.click();
+    await expect(widgets).toHaveAttribute('aria-pressed', 'true');
+    await expect(tablet).toHaveAttribute('aria-pressed', 'true');
+    await widgets.click();
+    await expect(widgets).toHaveAttribute('aria-pressed', 'false');
+
+    // Back at a desktop width, the chosen preview is still the one shown.
+    await expect(tablet).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByText('Tablet · 834px')).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Pinned' })).toBeVisible();
+    // Past the 400 ms save debounce: choosing a preview and moving the panel
+    // saved nothing.
+    await page.waitForTimeout(800);
+    expect(
+      await page.evaluate(
+        () =>
+          (window as unknown as { dashboardWrites: string[] }).dashboardWrites,
+      ),
+    ).toEqual([]);
+  });
+
   test('leaving with an unsaved change asks first', async ({ page }) => {
     await openEmpty(page);
     let asked = false;
