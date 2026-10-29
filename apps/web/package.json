@@ -48,7 +48,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@playwright/test": "1.64.0",
+    "@playwright/test": "1.64.1",
     "@synapcity/dev-eslint-config": "workspace:*",
     "@synapcity/dev-fixtures": "workspace:*",
     "@synapcity/dev-playwright-config": "workspace:*",
