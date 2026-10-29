@@ -13,11 +13,13 @@ const FRAME_LABEL = { lg: 'Desktop', md: 'Tablet', sm: 'Mobile' } as const;
 const FRAME_CHROME = 80;
 
 /**
- * Desktop fills the canvas; tablet and mobile render inside a frame at the
- * device width, so the grid lays out exactly as it would there. On a screen
- * already that narrow, the frame is dropped: the canvas is the device. Without
- * `deviceFrame`, the breakpoint follows the canvas's own width, so the canvas
- * is always the device and no frame is drawn.
+ * The device frame presents a preview the person chose; it never follows the
+ * width. It is drawn only when the breakpoint is locked (`chooseBreakpoint`),
+ * that breakpoint has a device width (tablet, mobile), and the canvas has room
+ * for the frame. The grid then lays out exactly as it would on that device.
+ * Otherwise the canvas is the device: an unlocked layout fills the canvas at
+ * whatever width it resolved from, and a locked preview without room drops the
+ * frame but keeps the lock. Without `deviceFrame`, no frame is ever drawn.
  */
 export function DashboardCanvas({
   deviceFrame = true,
@@ -26,10 +28,12 @@ export function DashboardCanvas({
   deviceFrame?: boolean;
 }) {
   const breakpoint = useDashboardStore((s) => s.breakpoint);
+  const breakpointLocked = useDashboardStore((s) => s.breakpointLocked);
   const [ref, width] = useElementWidth<HTMLDivElement>();
   const frameWidth = DEVICE_FRAME_WIDTH[breakpoint];
   const framed =
     deviceFrame &&
+    breakpointLocked &&
     frameWidth !== null &&
     width !== null &&
     width > frameWidth + FRAME_CHROME;
@@ -37,6 +41,7 @@ export function DashboardCanvas({
   return (
     <div
       ref={ref}
+      data-slot="dashboard-canvas"
       className="scroll-fade-y flex min-w-0 flex-1 flex-col overflow-auto bg-muted px-5 pt-7 pb-16"
     >
       <div

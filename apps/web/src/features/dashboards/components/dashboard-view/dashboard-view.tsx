@@ -11,6 +11,7 @@ import type { BaseRecord } from '@synapcity/domain-records';
 import type {
   DashboardLinkItem,
   DashboardSnapshot,
+  DashboardStorage,
 } from '@synapcity/features-dashboards/contracts';
 import {
   browserDashboardStorage,
@@ -32,6 +33,7 @@ import {
 } from '@synapcity/frontend-ui/core/alert';
 
 import { saveDashboardComposition } from '../../server/actions/dashboard-composition-actions';
+import { fixtureComposition } from '../../lib/fixtures';
 import { serverDashboardStorage } from '../../lib/server-dashboard-storage';
 import { DASHBOARD_PANEL, WIDGETS_DESTINATION_ID } from '../dashboard-panel';
 
@@ -41,6 +43,23 @@ import { DASHBOARD_PANEL, WIDGETS_DESTINATION_ID } from '../dashboard-panel';
  * browser, so editing can still be tried.
  */
 export type DashboardPersistence = 'server' | 'browser';
+
+/**
+ * Fixture mode only: a dashboard with nothing saved in this browser reads as
+ * its fixture seed, if it has one. The seed is a read-time default and is not
+ * written; the first edit saves through the usual scheduler. Anything saved,
+ * an empty dashboard included, wins over the seed.
+ */
+function withFixtureSeeds(storage: DashboardStorage): DashboardStorage {
+  return {
+    ...storage,
+    load: async (dashboardId) => {
+      const saved = await storage.load(dashboardId);
+      if (saved.composition !== null) return saved;
+      return { ...saved, composition: fixtureComposition(dashboardId) };
+    },
+  };
+}
 
 /**
  * The canvas inside the frame. It is the only place that knows both owners:
@@ -117,7 +136,7 @@ export function DashboardView({
             revision,
             save: saveDashboardComposition,
           })
-        : browserDashboardStorage({ ownerId }),
+        : withFixtureSeeds(browserDashboardStorage({ ownerId })),
     [persistence, composition, revision, ownerId],
   );
   // Stable between renders: a different snapshot replaces the store.

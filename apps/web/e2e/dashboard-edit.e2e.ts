@@ -275,6 +275,202 @@ test.describe('editing a dashboard', () => {
     ).toHaveAttribute('aria-pressed', 'true');
   });
 
+  /**
+   * Both widths a frame decision depends on: the window's, and the canvas's
+   * own content width (what the canvas measures; its 40 px padding excluded).
+   */
+  async function widths(page: Page) {
+    return page.evaluate(() => {
+      const canvas = document.querySelector<HTMLElement>(
+        '[data-slot="dashboard-canvas"]',
+      );
+      if (!canvas) throw new Error('No dashboard canvas');
+      const style = getComputedStyle(canvas);
+      return {
+        viewport: window.innerWidth,
+        canvas:
+          canvas.clientWidth -
+          parseFloat(style.paddingLeft) -
+          parseFloat(style.paddingRight),
+      };
+    });
+  }
+
+  test('an unlocked tablet width draws no device frame', async ({ page }) => {
+    // Measured (S2 Task 1): at this window the canvas resolves to tablet and
+    // is wider than the 834 px frame plus its chrome, where a frame used to
+    // appear without anyone choosing it.
+    await page.setViewportSize({ width: 1350, height: 900 });
+    await openEmpty(page);
+    await expect(
+      page.getByRole('button', { name: 'Tablet layout' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    const { viewport, canvas } = await widths(page);
+    expect(viewport).toBe(1350);
+    expect(canvas).toBeGreaterThan(834 + 80);
+    expect(canvas).toBeLessThan(1024);
+    await expect(page.getByText('Tablet · 834px')).toHaveCount(0);
+  });
+
+  test('choosing Tablet layout on a wide window draws the frame, and a narrow window drops it', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await openEmpty(page);
+    await page.getByRole('button', { name: 'Tablet layout' }).click();
+    await expect(page.getByText('Tablet · 834px')).toBeVisible();
+    expect((await widths(page)).canvas).toBeGreaterThan(834 + 80);
+
+    await page.setViewportSize({ width: 700, height: 900 });
+    await expect(page.getByText('Tablet · 834px')).toHaveCount(0);
+    expect((await widths(page)).canvas).toBeLessThan(834 + 80);
+    // The preview stays chosen; only its frame went.
+    await expect(
+      page.getByRole('button', { name: 'Tablet layout' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  test('a locked preview survives opening and closing the Widgets panel', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await openEmpty(page);
+    await page.getByRole('button', { name: 'Add a widget' }).click();
+    await page.getByRole('button', { name: 'Pinned' }).click();
+    await expect(page.getByText('Saved', { exact: true })).toBeVisible();
+    const widgets = page
+      .getByRole('toolbar', { name: 'Contextual panel' })
+      .getByRole('button', { name: 'Widgets' });
+    // Closed, the canvas is wide enough for the desktop layout.
+    await widgets.click();
+    await expect(widgets).toHaveAttribute('aria-pressed', 'false');
+    await expect(
+      page.getByRole('button', { name: 'Desktop layout' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+
+    // Count every write to this browser's saved dashboards from here on.
+    await page.evaluate(() => {
+      const writes: string[] = [];
+      Object.assign(window, { dashboardWrites: writes });
+      const setItem = Storage.prototype.setItem;
+      Storage.prototype.setItem = function (key: string, value: string) {
+        if (key.startsWith('synapcity.dashboard.')) writes.push(key);
+        return setItem.call(this, key, value);
+      };
+    });
+
+    const tablet = page.getByRole('button', { name: 'Tablet layout' });
+    await tablet.click();
+    await expect(page.getByText('Tablet · 834px')).toBeVisible();
+    await widgets.click();
+    await expect(widgets).toHaveAttribute('aria-pressed', 'true');
+    await expect(tablet).toHaveAttribute('aria-pressed', 'true');
+    await widgets.click();
+    await expect(widgets).toHaveAttribute('aria-pressed', 'false');
+
+    // Back at a desktop width, the chosen preview is still the one shown.
+    await expect(tablet).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByText('Tablet · 834px')).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Pinned' })).toBeVisible();
+    // Past the 400 ms save debounce: choosing a preview and moving the panel
+    // saved nothing.
+    await page.waitForTimeout(800);
+    expect(
+      await page.evaluate(
+        () =>
+          (window as unknown as { dashboardWrites: string[] }).dashboardWrites,
+      ),
+    ).toEqual([]);
+  });
+
+  test('a seeded fixture dashboard opens with its widgets and writes nothing until edited', async ({
+    page,
+  }) => {
+    await page.goto(
+      '/fixture-user/home/dashboards/fixture-dashboard-project-status',
+    );
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
+    for (const name of ['Pinned', 'Last opened', 'Spaces']) {
+      await expect(page.getByRole('region', { name })).toBeVisible({
+        timeout: 15_000,
+      });
+    }
+    // Past the 400 ms save debounce, and across a width change that resolves
+    // another layout: rendering the seed saved nothing.
+    await page.setViewportSize({ width: 800, height: 900 });
+    await expect(
+      page.getByRole('button', { name: 'Tablet layout' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    await page.waitForTimeout(800);
+    const saved = await page.evaluate(() =>
+      Object.keys(localStorage).filter((key) =>
+        key.startsWith('synapcity.dashboard.'),
+      ),
+    );
+    expect(saved).toEqual([]);
+  });
+
+  test('at a 1280 px window with Widgets open, the canvas is under 640 px and lays out in one column, unframed', async ({
+    page,
+  }) => {
+    // D2-1 (approved 2026-10-29): the layout follows the canvas, with the 640
+    // and 1024 thresholds. Measured in S2 Task 1: about 580 px here.
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(
+      '/fixture-user/home/dashboards/fixture-dashboard-project-status',
+    );
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
+    await expect(page.locator('[data-widget-id]')).toHaveCount(3, {
+      timeout: 15_000,
+    });
+    await page
+      .getByRole('toolbar', { name: 'Contextual panel' })
+      .getByRole('button', { name: 'Widgets' })
+      .click();
+    // Wait out the panel's opening glide: the surface settles under 640 px.
+    const surface = () =>
+      page.evaluate(() => {
+        const canvas = document.querySelector<HTMLElement>(
+          '[data-slot="dashboard-canvas"]',
+        )!;
+        const style = getComputedStyle(canvas);
+        return {
+          viewport: window.innerWidth,
+          // The surface has no padding and nothing beside the canvas, so its
+          // width is the canvas's border box; the canvas content excludes 40 px.
+          surface: canvas.getBoundingClientRect().width,
+          canvas:
+            canvas.clientWidth -
+            parseFloat(style.paddingLeft) -
+            parseFloat(style.paddingRight),
+        };
+      });
+    await expect.poll(async () => (await surface()).surface).toBeLessThan(640);
+    const widths = await surface();
+    expect(widths.viewport).toBe(1280);
+    expect(widths.surface).toBeGreaterThan(500);
+    expect(widths.canvas).toBeLessThan(widths.surface);
+
+    await expect(
+      page.getByRole('button', { name: 'Mobile layout' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    // Nothing was chosen, so no device frame.
+    await expect(page.getByText(/· (834|390)px/)).toHaveCount(0);
+    // One column: every widget starts at the same left edge, one under another.
+    const boxes = await page.locator('[data-widget-id]').evaluateAll((cells) =>
+      cells.map((cell) => {
+        const r = cell.getBoundingClientRect();
+        return { left: Math.round(r.left), top: r.top, width: r.width };
+      }),
+    );
+    expect(new Set(boxes.map((box) => box.left)).size).toBe(1);
+    expect(new Set(boxes.map((box) => box.top)).size).toBe(3);
+    // And the column fills the canvas rather than a 390 px frame.
+    for (const box of boxes) expect(box.width).toBeGreaterThan(500);
+  });
+
   test('leaving with an unsaved change asks first', async ({ page }) => {
     await openEmpty(page);
     let asked = false;
