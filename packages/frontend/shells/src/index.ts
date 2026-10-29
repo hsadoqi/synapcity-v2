@@ -8,7 +8,7 @@ export {
   RootFooter,
   RootContent,
 } from './components/root-shell';
-export type { RootBreadcrumb } from './components/root-shell/root-header';
+export type { RootBreadcrumb } from './components/header-breadcrumbs';
 export {
   GlobalPanelShell,
   GlobalPanelToggle,

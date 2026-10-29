@@ -9,7 +9,7 @@ import {
 } from '../sidebar-shell/root-sidebar';
 import React from 'react';
 import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';
-import type { RootBreadcrumb } from './root-header';
+import type { RootBreadcrumb } from '../header-breadcrumbs';
 
 type ShellProps = {
   children: React.ReactNode;

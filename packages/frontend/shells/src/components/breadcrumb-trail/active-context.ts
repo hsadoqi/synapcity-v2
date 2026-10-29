@@ -1,4 +1,4 @@
-import type { RootBreadcrumb } from '../root-shell/root-header';
+import type { RootBreadcrumb } from '../header-breadcrumbs';
 
 /**
  * The Space a page's trail puts it in, so a document inside a Space keeps that

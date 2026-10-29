@@ -1,6 +1,7 @@
 // This page wrapper owns centring, width and the gutter around the card (the shell's
 // content column has no padding of its own); the feature AuthShell owns the card and heading.
-// TODO: Extend this to be an actual auth page shell and handle auth views properly (conditionally)
+// It is presentation only. Which view a page shows, and whether it wants a guest
+// or a session, is decided by the page in the app, never by this frame.
 export const AuthPageShell = ({
   children,
 }: Readonly<{ children: React.ReactNode }>) => {

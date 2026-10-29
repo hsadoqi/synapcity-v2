@@ -1,8 +1,5 @@
 'use client';
 
-// TODO: Again, duplicate/inefficient functionality/implementations/styles...also there's a lot of code that isn't necessarily tightly coupled with the root header yet is defined here alongsid it...why?
-
-import * as React from 'react';
 import type { ReactNode } from 'react';
 import { PanelLeftIcon } from 'lucide-react';
 import { SynapcityLogo, SynapcityMark } from '@synapcity/frontend-brand/react';
@@ -18,25 +15,9 @@ import {
 } from '@synapcity/frontend-ui/core/sidebar';
 import { IconButton } from '@synapcity/frontend-ui/components/icon-button';
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@synapcity/frontend-ui/core/breadcrumb';
-
-/** One level of the trail. The last item is the current page and takes no link. */
-export type RootBreadcrumb = {
-  label: string;
-  href?: string;
-  /**
-   * What the crumb stands for, when it is a place the sidebar can switch to:
-   * a collection (such as all Spaces) or one Space. The sidebar reads this to
-   * pick the active context without parsing labels.
-   */
-  kind?: 'collection' | 'space';
-};
+  HeaderBreadcrumbs,
+  type RootBreadcrumb,
+} from '../../header-breadcrumbs';
 
 type RootHeaderProps = {
   actions?: ReactNode;
@@ -61,7 +42,7 @@ export const RootHeaderContent = ({
       {/* Signed in, a page's trail shows here; without one, the brand does,
           leading to the person's home. */}
       {account && breadcrumbs?.length ? (
-        <RootBreadcrumbs items={breadcrumbs} />
+        <HeaderBreadcrumbs items={breadcrumbs} />
       ) : (
         <RootLogoLink homeHref={account?.homeHref ?? '/'} />
       )}
@@ -118,53 +99,6 @@ const HeaderSidebarTrigger = () => {
         </IconButton>
       }
     />
-  );
-};
-
-/**
- * The trail to the current page. Below the sm breakpoint only the current page
- * shows, since the sidebar already shows where you are.
- */
-const RootBreadcrumbs = ({ items }: { items?: RootBreadcrumb[] }) => {
-  if (!items?.length) {
-    return <div className="min-w-0 flex-1" />;
-  }
-
-  const lastIndex = items.length - 1;
-
-  return (
-    <Breadcrumb aria-label="Breadcrumb" className="min-w-0 flex-1">
-      <BreadcrumbList className="flex-nowrap text-sm">
-        {items.map((item, index) => {
-          const isLast = index === lastIndex;
-
-          return (
-            <React.Fragment key={`${item.href ?? ''}${item.label}`}>
-              {index > 0 && (
-                // Below sm only the current page shows, so no separator does.
-                <BreadcrumbSeparator className="hidden sm:inline-flex" />
-              )}
-              <BreadcrumbItem
-                className={cn('min-w-0', !isLast && 'hidden sm:inline-flex')}
-              >
-                {isLast || !item.href ? (
-                  <BreadcrumbPage className="truncate">
-                    {item.label}
-                  </BreadcrumbPage>
-                ) : (
-                  <BreadcrumbLink
-                    className="truncate"
-                    render={<ShellLink href={item.href} />}
-                  >
-                    {item.label}
-                  </BreadcrumbLink>
-                )}
-              </BreadcrumbItem>
-            </React.Fragment>
-          );
-        })}
-      </BreadcrumbList>
-    </Breadcrumb>
   );
 };
 

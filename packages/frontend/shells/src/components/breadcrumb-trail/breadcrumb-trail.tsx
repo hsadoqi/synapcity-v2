@@ -2,12 +2,16 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { ComponentProps } from 'react';
 import { RootShell } from '../root-shell';
-import type { RootBreadcrumb } from '../root-shell/root-header';
+import type { RootBreadcrumb } from '../header-breadcrumbs';
 import type { RootSidebarContent } from '../sidebar-shell/root-sidebar';
 
 type SetTrail = (items: RootBreadcrumb[]) => void;
 
 const SetTrailContext = createContext<SetTrail>(() => {});
+
+// One shared empty trail, so clearing an already empty trail is no change and
+// the shell does not render again.
+const NO_TRAIL: RootBreadcrumb[] = [];
 
 /**
  * The root shell, holding the breadcrumb trail for the page inside it. The
@@ -26,7 +30,7 @@ export function BreadcrumbRootShell({
   sidebar?:
     RootSidebarContent | ((trail: RootBreadcrumb[]) => RootSidebarContent);
 }) {
-  const [trail, setTrail] = useState<RootBreadcrumb[]>([]);
+  const [trail, setTrail] = useState<RootBreadcrumb[]>(NO_TRAIL);
   const sidebarContent =
     typeof sidebar === 'function' ? sidebar(trail) : sidebar;
 
@@ -42,6 +46,11 @@ export function BreadcrumbRootShell({
 /**
  * Tells the header where this page sits. Renders nothing, and clears the trail
  * when the page goes away so the next page never shows a stale one.
+ *
+ * One page publishes at a time. The shell keeps a single trail: if two of these
+ * are mounted, the last to run wins and either one unmounting clears it. Route
+ * layouts that need a crumb of their own should be folded into the page's items
+ * rather than publishing a second trail.
  */
 export function SetBreadcrumbs({ items }: { items: RootBreadcrumb[] }) {
   const setTrail = useContext(SetTrailContext);
@@ -51,7 +60,7 @@ export function SetBreadcrumbs({ items }: { items: RootBreadcrumb[] }) {
 
   useEffect(() => {
     setTrail(JSON.parse(key) as RootBreadcrumb[]);
-    return () => setTrail([]);
+    return () => setTrail(NO_TRAIL);
   }, [key, setTrail]);
 
   return null;
