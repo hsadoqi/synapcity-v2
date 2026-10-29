@@ -1,6 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { focusPalette, focusWidget, PALETTE_FOCUS_TIMEOUT_MS } from './index';
+import {
+  focusPalette,
+  focusWidget,
+  PALETTE_FOCUS_SETTLE_MS,
+  PALETTE_FOCUS_TIMEOUT_MS,
+} from './index';
 
 function mount(html: string) {
   const root = document.createElement('div');
@@ -84,13 +89,74 @@ describe('focusPalette', () => {
     mount(PALETTE);
     const remove = vi.spyOn(document, 'removeEventListener');
     focusPalette();
-    vi.advanceTimersByTime(20);
+    vi.advanceTimersByTime(300);
     expect(remove).toHaveBeenCalledWith('keydown', expect.any(Function), true);
     expect(remove).toHaveBeenCalledWith(
       'pointerdown',
       expect.any(Function),
       true,
     );
+  });
+});
+
+describe('focusPalette against a host that moves focus as its panel opens', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => {
+    vi.useRealTimers();
+    document.body.replaceChildren();
+  });
+
+  const PANEL =
+    '<section id="region" tabindex="-1">' +
+    PALETTE +
+    '</section><button id="other">Other</button>';
+
+  it('takes focus back from a tabindex=-1 container that grabs it after the palette', () => {
+    mount(PANEL);
+    focusPalette();
+    vi.advanceTimersByTime(20);
+    expect(document.activeElement?.id).toBe('a');
+    // The panel finishes opening and focuses its region.
+    document.getElementById('region')!.focus();
+    vi.advanceTimersByTime(40);
+    expect(document.activeElement?.id).toBe('a');
+  });
+
+  it('takes focus back from the page body', () => {
+    mount(PANEL);
+    focusPalette();
+    vi.advanceTimersByTime(20);
+    (document.activeElement as HTMLElement).blur();
+    vi.advanceTimersByTime(40);
+    expect(document.activeElement?.id).toBe('a');
+  });
+
+  it('leaves focus alone once the app moved it to a real control', () => {
+    mount(PANEL);
+    focusPalette();
+    vi.advanceTimersByTime(20);
+    document.getElementById('other')!.focus();
+    vi.advanceTimersByTime(PALETTE_FOCUS_SETTLE_MS * 2);
+    expect(document.activeElement?.id).toBe('other');
+  });
+
+  it('stops watching after the settle time', () => {
+    mount(PANEL);
+    focusPalette();
+    vi.advanceTimersByTime(PALETTE_FOCUS_SETTLE_MS + 100);
+    document.getElementById('region')!.focus();
+    vi.advanceTimersByTime(100);
+    expect(document.activeElement?.id).toBe('region');
+  });
+
+  it('does not take focus back after the person pressed a key', () => {
+    mount(PANEL);
+    focusPalette();
+    vi.advanceTimersByTime(20);
+    document.dispatchEvent(new Event('keydown'));
+    document.getElementById('region')!.focus();
+    vi.advanceTimersByTime(100);
+    expect(document.activeElement?.id).toBe('region');
   });
 });
 

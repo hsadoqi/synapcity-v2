@@ -66,6 +66,10 @@ test.describe('editing a dashboard', () => {
   test('moves a widget with the keyboard and hears where it went', async ({
     page,
   }) => {
+    // The canvas follows its own width, and the open Widgets panel takes room
+    // from it: a wide window keeps the desktop layout, where a move to the
+    // next column exists.
+    await page.setViewportSize({ width: 1920, height: 1000 });
     await openEmpty(page);
     await page.getByRole('button', { name: 'Add a widget' }).click();
     await page.getByRole('button', { name: 'Pinned' }).click();
@@ -168,6 +172,107 @@ test.describe('editing a dashboard', () => {
       () => document.documentElement.scrollWidth - window.innerWidth,
     );
     expect(overflow).toBeLessThanOrEqual(0);
+  });
+
+  test('Edit layout opens the Widgets panel, and closing the panel keeps editing and the widget', async ({
+    page,
+  }) => {
+    await openEmpty(page);
+    await page.getByRole('button', { name: 'Add a widget' }).click();
+    await page.getByRole('button', { name: 'Pinned' }).click();
+    await expect(page.getByRole('region', { name: 'Pinned' })).toBeVisible();
+
+    const rail = page.getByRole('toolbar', { name: 'Contextual panel' });
+    const widgets = rail.getByRole('button', { name: 'Widgets' });
+    await expect(widgets).toHaveAttribute('aria-pressed', 'true');
+    // Close the panel: editing, the widget and the save state are the store's, not the panel's.
+    await widgets.click();
+    await expect(widgets).toHaveAttribute('aria-pressed', 'false');
+    await expect(
+      page.getByRole('button', { name: 'Edit layout' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('region', { name: 'Pinned' })).toBeVisible();
+    await expect(page.getByText('Saved', { exact: true })).toBeVisible();
+
+    // Reopening shows the palette again, still editing.
+    await widgets.click();
+    await expect(
+      page.getByRole('region', { name: 'Add to dashboard' }),
+    ).toBeVisible();
+  });
+
+  test('switching the panel to Context and back keeps editing and the palette', async ({
+    page,
+  }) => {
+    await openEmpty(page);
+    await page.getByRole('button', { name: 'Add a widget' }).click();
+    await page.getByRole('button', { name: 'Pinned' }).click();
+    const rail = page.getByRole('toolbar', { name: 'Contextual panel' });
+    await rail.getByRole('button', { name: 'Context' }).click();
+    await expect(
+      page.getByRole('region', { name: 'Contextual panel: Context' }),
+    ).toBeVisible();
+    await rail.getByRole('button', { name: 'Widgets' }).click();
+    await expect(
+      page.getByRole('region', { name: 'Add to dashboard' }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Edit layout' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('region', { name: 'Pinned' })).toBeVisible();
+  });
+
+  test('choosing Widgets while not editing explains, and only its Edit layout button starts editing', async ({
+    page,
+  }) => {
+    await openEmpty(page);
+    const rail = page.getByRole('toolbar', { name: 'Contextual panel' });
+    await rail.getByRole('button', { name: 'Widgets' }).click();
+    await expect(
+      page.getByText(/Choose Edit layout to add widgets/),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('region', { name: 'Add to dashboard' }),
+    ).toHaveCount(0);
+    await page
+      .locator('[data-slot="widgets-destination-idle"]')
+      .getByRole('button', { name: 'Edit layout' })
+      .click();
+    await expect(
+      page.getByRole('region', { name: 'Add to dashboard' }),
+    ).toBeVisible();
+  });
+
+  test('on a phone-width screen the opened Widgets panel covers the canvas, the addition is announced, and closing it returns to the widget', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 414, height: 800 });
+    await openEmpty(page);
+    await page.getByRole('button', { name: 'Add a widget' }).click();
+    const palette = page.getByRole('region', { name: 'Add to dashboard' });
+    await expect(palette).toBeVisible();
+    await expect(palette.getByRole('button').first()).toBeFocused();
+
+    await palette.getByRole('button', { name: 'Pinned' }).click();
+    await expect(
+      page.getByRole('status').filter({ hasText: 'Pinned added' }),
+    ).toBeAttached();
+    // The panel stays open and keeps focus; nothing was pulled into the covered canvas.
+    await expect(palette).toBeVisible();
+    await expect(palette.getByRole('button', { name: 'Pinned' })).toBeFocused();
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - window.innerWidth,
+    );
+    expect(overflow).toBeLessThanOrEqual(0);
+
+    await page
+      .getByRole('toolbar', { name: 'Contextual panel' })
+      .getByRole('button', { name: 'Widgets' })
+      .click();
+    await expect(page.getByRole('region', { name: 'Pinned' })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Edit layout' }),
+    ).toHaveAttribute('aria-pressed', 'true');
   });
 
   test('leaving with an unsaved change asks first', async ({ page }) => {
