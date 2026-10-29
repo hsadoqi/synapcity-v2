@@ -104,4 +104,36 @@ export const DOCUMENT_FIXTURES: readonly OwnedRecordSummary[] = [
     lastViewedAt: null,
     spacesTotal: 0,
   },
+  // The reading page's edge cases. They are older than the rest, unpinned and
+  // never opened, so the sidebar, the collection highlights and the Pinned and
+  // Last opened widgets list what they did before.
+  {
+    // A name long enough to truncate in the header, a description with one
+    // unbroken string, and five tags.
+    id: 'fixture-document-long-reading',
+    ownerId: '11111111-1111-4111-8111-111111111111',
+    name: 'Field notes from the long winter of rewriting the onboarding guide, chapter by chapter, with every open question we could not settle before the spring release',
+    description:
+      'Source material: https://example.com/research/onboarding/2026/field-notes/interviews/transcripts/session-twelve-the-one-where-everything-changed-and-we-started-over-from-the-very-first-page',
+    icon: 'library',
+    tags: ['research', 'onboarding', 'writing', 'interviews', 'long-term'],
+    createdAt: '2026-08-10T09:00:00Z',
+    updatedAt: '2026-08-24T15:45:00Z',
+    pinnedAt: null,
+    lastViewedAt: null,
+    spacesTotal: 0,
+  },
+  {
+    // Nothing but a name: no description, no tags, never edited.
+    id: 'fixture-document-blank-page',
+    ownerId: '11111111-1111-4111-8111-111111111111',
+    name: 'Blank page',
+    icon: 'file-text',
+    tags: [],
+    createdAt: '2026-08-02T08:00:00Z',
+    updatedAt: '2026-08-02T08:00:00Z',
+    pinnedAt: null,
+    lastViewedAt: null,
+    spacesTotal: 0,
+  },
 ];
