@@ -1,3 +1,10 @@
+## Active task: ResourceFrame, slice 2 (2026-10-27)
+
+- Goal and mode: implementing, in the agreed sequence after the contextual panel (owner direction 2026-10-27: functional progress on the provisional layout baseline; show results without per-detail visual approval). Branch `feat/resource-frame`, stacked on `feat/contextual-panel` (pull request 78), worktree `synapcity.worktrees/contextual-panel`.
+- Changes: `ResourceFrame` and `ResourceHeader` in `frontend-shells` (component, stories at about 280, 480, 900 and 1400px, tests). The frame holds one resource's bounded view: an optional header, the body (scrolled by the frame as a focusable labelled region, or left to content that scrolls itself) and the contextual panel with the destinations the view passes. The header shows the icon and the title as the page heading, truncated, with actions through the existing `ActionsToolbar`, which folds them into More actions by its own width. The panel moves from the app shell to the resource view: the slice 1 `contextualPanel` slot and the `AppShell` placeholder are removed, so collection and Space pages have no panel (whether it appears in Spaces stays open). ADR-0011 amendment and the shells README updated.
+- Not changed: routes, breadcrumbs (still in the global header), the global panel, Spaces, dependencies.
+- Next: slice 3, read-only Document and Dashboard pages using the frame.
+
 ## Active task: Contextual panel, slice 1 (2026-10-27)
 
 - Goal and mode: implementing. The owner authorized the first slice of the shared resource-view foundation: a resizable, collapsible contextual panel on the right of the signed-in work area that collapses into an icon rail, with host-supplied destinations and container-measured layout. Branch `feat/contextual-panel` from `origin/main` at `7220291e`, worktree `synapcity.worktrees/contextual-panel`. The owner directed finishing this slice's normal integration (2026-10-27): commit, push and a pull request to `main`. Merging still needs a green CI and the owner's go-ahead.

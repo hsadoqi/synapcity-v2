@@ -216,7 +216,8 @@ export const NarrowContainer: Story = {
 
 /**
  * Inside the signed-in frame: the sidebar on the left, the app header and the
- * global panel above, and the contextual panel with its rail on the right.
+ * global panel above, and the contextual panel with its rail on the right,
+ * mounted inside the work area by the view that owns it.
  */
 export const InShell: Story = {
   render: (args) => (
@@ -229,9 +230,10 @@ export const InShell: Story = {
               <GlobalPanelToggle />
             </header>
           }
-          contextualPanel={args.destinations}
         >
-          {args.children}
+          <ContextualPanelShell destinations={args.destinations}>
+            {args.children}
+          </ContextualPanelShell>
         </SidebarShell>
       </div>
     </div>
