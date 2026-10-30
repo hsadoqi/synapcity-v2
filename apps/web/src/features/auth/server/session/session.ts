@@ -8,9 +8,11 @@ import {
   readClaims,
   type ClaimsResult,
 } from '@synapcity/server-supabase/claims';
+import { headers } from 'next/headers';
 import { cache } from 'react';
 
 import { createClient } from '@/lib/supabase/server';
+import { AUTH_UNAVAILABLE_HEADER } from '@/lib/routing/auth-unavailable';
 import { fixtureModeEnabled, fixtureUser } from '@/lib/access/dev-fixture';
 import {
   connectedAccountsFrom,
@@ -26,7 +28,7 @@ import {
  * Thrown by a page guard when the Auth service cannot answer. It is not a
  * sign-out: sending the person to sign in would read an outage as a lost
  * session. The error boundary shows it; the proxy normally answers first with
- * the 503 page, so this is the backstop for an outage that starts mid-request.
+ * the unavailable page, so this is the backstop for an outage that starts mid-request.
  */
 export class AuthUnavailableError extends Error {
   constructor() {
@@ -42,8 +44,24 @@ export class AuthUnavailableError extends Error {
  * repeating it (ADR-0006: `getClaims`, never `getSession`).
  */
 export const getClaimsResult = cache(async (): Promise<ClaimsResult> => {
+  // The proxy already found Auth unreachable for this request (it rewrote it to
+  // the unavailable page): take that, instead of waiting out the deadline again.
+  if (await proxyFoundAuthUnavailable()) {
+    return { status: 'unavailable', failure: { code: 'timeout' } };
+  }
   return readClaims(await createClient());
 });
+
+async function proxyFoundAuthUnavailable(): Promise<boolean> {
+  try {
+    const h = await headers();
+    if (h.get('x-synapcity-request-path')?.includes('/home')) console.error('[TMP] headers on a /home render:', [...h.keys()].filter((k) => k.startsWith('x-')).join(','));
+    return h.get(AUTH_UNAVAILABLE_HEADER) === '1';
+  } catch {
+    // Outside a request there is no proxy to have said anything.
+    return false;
+  }
+}
 
 /**
  * Verified JWT claims for this request, or null when there are none. Null

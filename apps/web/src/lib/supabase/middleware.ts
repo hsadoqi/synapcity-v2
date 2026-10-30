@@ -7,7 +7,10 @@ import { safeNextPath } from '../routing/safe-next';
 import { fixtureModeEnabled } from '../access/dev-fixture';
 import { REQUEST_PATH_HEADER } from '../routing/request-path';
 import { getSupabaseEnv } from './env';
-import { AUTH_UNAVAILABLE_PATH } from '../routing/auth-unavailable';
+import {
+  AUTH_UNAVAILABLE_HEADER,
+  AUTH_UNAVAILABLE_PATH,
+} from '../routing/auth-unavailable';
 import { isGuestOnlyPath, isProtectedPath } from '../routing/route-access';
 
 export async function updateSession(request: NextRequest) {
@@ -17,6 +20,9 @@ export async function updateSession(request: NextRequest) {
     REQUEST_PATH_HEADER,
     `${request.nextUrl.pathname}${request.nextUrl.search}`,
   );
+
+  // Only the proxy says Auth is unavailable; never take it from the client.
+  request.headers.delete(AUTH_UNAVAILABLE_HEADER);
 
   // Development fixture mode has no session to refresh and must not reach
   // Supabase. Production and test never take this branch.
@@ -74,14 +80,20 @@ export async function updateSession(request: NextRequest) {
 
   /**
    * The Auth service could not answer, so nothing is known about the session.
-   * A protected page then says so (503) instead of sending a signed-in person
-   * to sign in. The response keeps the cookies and cache headers of
-   * `supabaseResponse`, and is never stored.
+   * A protected page then says so instead of sending a signed-in person to
+   * sign in. The response keeps the cookies and cache headers of
+   * `supabaseResponse`, and is never stored. Next serves a rewrite with the
+   * destination page's own status, so this page is a 200 (checked on Next
+   * 16.4.3); the API routes, which set their own status, answer 503.
    */
   function unavailableResponse() {
+    // The rewritten request carries the finding, so its render does not ask
+    // the Auth service again.
+    const headers = new Headers(request.headers);
+    headers.set(AUTH_UNAVAILABLE_HEADER, '1');
     const rewrite = NextResponse.rewrite(
       new URL(AUTH_UNAVAILABLE_PATH, request.url),
-      { status: 503 },
+      { request: { headers } },
     );
     supabaseResponse.cookies
       .getAll()

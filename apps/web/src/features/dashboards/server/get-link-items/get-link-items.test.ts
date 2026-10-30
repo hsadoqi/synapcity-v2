@@ -57,6 +57,19 @@ describe('getDashboardLinkItems', () => {
     expect(unavailableKinds).toEqual([]);
   });
 
+  it('names the kinds it did not read, so a widget added later can ask for them', async () => {
+    const { unloadedKinds } = await getDashboardLinkItems(
+      'u1',
+      compositionWith('spaces'),
+    );
+    expect(unloadedKinds.sort()).toEqual(['dashboard', 'document']);
+
+    const none = await getDashboardLinkItems('u1', compositionWith('pinned'));
+    expect(none.unloadedKinds).toEqual([]);
+    const fixture = await getDashboardLinkItems('u1', null);
+    expect(fixture.unloadedKinds).toEqual([]);
+  });
+
   it('reads only the kinds the composition shows', async () => {
     await getDashboardLinkItems('u1', compositionWith('spaces'));
     expect(mocks.listSummaries).toHaveBeenCalledOnce();
@@ -66,7 +79,11 @@ describe('getDashboardLinkItems', () => {
 
   it('reads nothing when no link widget is on the dashboard', async () => {
     const result = await getDashboardLinkItems('u1', createComposition());
-    expect(result).toEqual({ items: [], unavailableKinds: [] });
+    expect(result).toEqual({
+      items: [],
+      unavailableKinds: [],
+      unloadedKinds: ['space', 'document', 'dashboard'],
+    });
     expect(mocks.listSummaries).not.toHaveBeenCalled();
     expect(mocks.getDocuments).not.toHaveBeenCalled();
     expect(mocks.getDashboards).not.toHaveBeenCalled();

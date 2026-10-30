@@ -49,7 +49,7 @@ async function readSource(kind: LinkSourceKind): Promise<LinkSourceOutcome> {
  * not be read. Only the kinds the composition's link widgets show are fetched
  * (a null composition, as in browser fixture mode, fetches all three). A failed
  * source is reported in `unavailableKinds`, so its widgets say so; the others
- * still render.
+ * still render. The kinds not read at all are `unloadedKinds`.
  */
 export async function getDashboardLinkItems(
   userId: string,
@@ -57,6 +57,7 @@ export async function getDashboardLinkItems(
 ): Promise<{
   items: DashboardLinkItem[];
   unavailableKinds: ItemKind[];
+  unloadedKinds: ItemKind[];
 }> {
   const needed: LinkSourceKind[] = composition
     ? [...neededLinkKinds(composition)]
@@ -74,5 +75,14 @@ export async function getDashboardLinkItems(
     if (outcome.ok) records[ITEM_KIND[kind]] = outcome.items;
     else unavailableKinds.push(ITEM_KIND[kind]);
   });
-  return { items: toLinkItems(userId, records), unavailableKinds };
+  // Kinds nothing on the dashboard lists yet. A widget added later that needs
+  // one loads after the next save (the workspace asks for a re-read).
+  const unloadedKinds = (Object.keys(ITEM_KIND) as LinkSourceKind[])
+    .filter((kind) => !needed.includes(kind))
+    .map((kind) => ITEM_KIND[kind]);
+  return {
+    items: toLinkItems(userId, records),
+    unavailableKinds,
+    unloadedKinds,
+  };
 }

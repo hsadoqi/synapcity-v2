@@ -132,13 +132,12 @@ describe('updateSession when the Auth service cannot answer', () => {
   ] as const;
 
   it.each(outages)(
-    'answers a protected page with a 503 and no redirect (%s)',
+    'rewrites a protected page to the unavailable page, with no redirect (%s)',
     async (_name, error) => {
       sdk.error = error;
 
       const response = await updateSession(request('/user-1/home'));
 
-      expect(response.status).toBe(503);
       expect(response.headers.get('location')).toBeNull();
       expect(response.headers.get('x-middleware-rewrite')).toBe(
         'https://app.test/auth/unavailable',
@@ -148,12 +147,42 @@ describe('updateSession when the Auth service cannot answer', () => {
     },
   );
 
-  it('answers 503 when getClaims throws', async () => {
+  it('tells the rewritten request that Auth is unavailable, so its render does not ask again', async () => {
+    sdk.error = new AuthRetryableFetchError('fetch failed', 0);
+
+    const response = await updateSession(request('/user-1/home'));
+
+    expect(response.headers.get('x-middleware-override-headers')).toContain(
+      'x-synapcity-auth-unavailable',
+    );
+    expect(
+      response.headers.get('x-middleware-request-x-synapcity-auth-unavailable'),
+    ).toBe('1');
+  });
+
+  it('never takes the finding from the client', async () => {
+    sdk.claims = { sub: 'user-1' };
+    const spoofed = new NextRequest(
+      new URL('/user-1/home', 'https://app.test'),
+      {
+        headers: { 'x-synapcity-auth-unavailable': '1' },
+      },
+    );
+
+    const response = await updateSession(spoofed);
+
+    expect(spoofed.headers.get('x-synapcity-auth-unavailable')).toBeNull();
+    expect(response.headers.get('x-middleware-rewrite')).toBeNull();
+  });
+
+  it('rewrites to the unavailable page when getClaims throws', async () => {
     sdk.throws = new TypeError('fetch failed');
 
     const response = await updateSession(request('/user-1/settings'));
 
-    expect(response.status).toBe(503);
+    expect(response.headers.get('x-middleware-rewrite')).toBe(
+      'https://app.test/auth/unavailable',
+    );
   });
 
   it.each(['/', '/auth/login', '/auth/unavailable', '/about'])(
@@ -163,7 +192,7 @@ describe('updateSession when the Auth service cannot answer', () => {
 
       const response = await updateSession(request(path));
 
-      expect(response.status).toBe(200);
+      expect(response.headers.get('x-middleware-rewrite')).toBeNull();
       expect(response.headers.get('location')).toBeNull();
     },
   );
