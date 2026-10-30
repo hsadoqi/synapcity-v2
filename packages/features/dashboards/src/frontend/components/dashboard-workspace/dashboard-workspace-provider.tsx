@@ -20,6 +20,7 @@ import {
   type DashboardLinkComponent,
 } from '../../config';
 import { ClockProvider } from '../../hooks/use-now';
+import { LinkItemsLoader } from '../link-items-loader';
 import { connectSaves } from '../../storage';
 import {
   createDashboardStore,
@@ -100,6 +101,7 @@ export function DashboardWorkspaceProvider({
   readOnly = false,
   items,
   unavailableKinds,
+  unloadedKinds,
   widgetTypes,
   persistsStatus,
   LinkComponent,
@@ -127,6 +129,8 @@ export function DashboardWorkspaceProvider({
   items?: readonly DashboardLinkItem[];
   /** The kinds of record the host could not read; their link widgets show a failure. @default [] */
   unavailableKinds?: readonly DashboardLinkItem['kind'][];
+  /** The kinds of record the host did not read; widgets added later that need them load after the next save. @default [] */
+  unloadedKinds?: readonly DashboardLinkItem['kind'][];
   widgetTypes?: readonly WidgetType[];
   persistsStatus?: boolean;
   LinkComponent?: DashboardLinkComponent;
@@ -226,12 +230,14 @@ export function DashboardWorkspaceProvider({
       <DashboardConfigProvider
         items={items}
         unavailableKinds={unavailableKinds}
+        unloadedKinds={unloadedKinds}
         widgetTypes={widgetTypes}
         persistsStatus={persistsStatus}
         LinkComponent={LinkComponent}
         onReload={onReload ?? (() => setReloads((count) => count + 1))}
       >
         <DashboardStoreScope store={active.store}>
+          <LinkItemsLoader />
           <ClockProvider now={now ?? DEFAULT_NOW}>{children}</ClockProvider>
         </DashboardStoreScope>
       </DashboardConfigProvider>

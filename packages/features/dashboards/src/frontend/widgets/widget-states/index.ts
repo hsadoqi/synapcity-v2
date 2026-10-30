@@ -1,1 +1,6 @@
-export { WidgetEmpty, WidgetFailed, WidgetUnavailable } from './widget-states';
+export {
+  WidgetEmpty,
+  WidgetFailed,
+  WidgetLoading,
+  WidgetUnavailable,
+} from './widget-states';

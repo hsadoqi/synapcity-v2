@@ -26,7 +26,7 @@ export function RouteErrorMessage({
   retry: () => void;
   /**
    * `unavailable` is the Auth service being unreachable, not a bug: the proxy
-   * answers a protected page with it (503) instead of a sign-in redirect, so
+   * answers a protected page with it instead of a sign-in redirect, so
    * it is not logged or reported as an unexpected error.
    */
   variant?: 'unexpected' | 'unavailable';

@@ -2,7 +2,7 @@ import type { WidgetType } from '@synapcity/domain-dashboards';
 
 import type { DashboardLinkItem } from '../../../contracts';
 import { useDashboardConfig } from '../../config';
-import { WidgetEmpty, WidgetFailed } from '../widget-states';
+import { WidgetEmpty, WidgetFailed, WidgetLoading } from '../widget-states';
 
 type LinkWidgetType = Extract<WidgetType, 'pinned' | 'last-opened' | 'spaces'>;
 
@@ -45,6 +45,13 @@ export function selectLinkItems(
   return chosen.slice(0, limit);
 }
 
+/** The kinds of record a link widget lists: Spaces only for Spaces, every kind otherwise. */
+export function kindsListedBy(
+  type: LinkWidgetType,
+): readonly DashboardLinkItem['kind'][] {
+  return type === 'spaces' ? ['space'] : ['space', 'document', 'dashboard'];
+}
+
 /**
  * Whether a widget lists a kind of record the host could not read. Spaces
  * lists Spaces only; Pinned and Last opened list every kind, so any failed
@@ -67,10 +74,14 @@ export function LinkBody({
   type: LinkWidgetType;
   limit: number;
 }) {
-  const { items, unavailableKinds, onReload, LinkComponent } =
+  const { items, unavailableKinds, unloadedKinds, onReload, LinkComponent } =
     useDashboardConfig();
   if (isDegraded(type, unavailableKinds)) {
     return <WidgetFailed onRetry={onReload} />;
+  }
+  // Records the host has not read yet: not "nothing pinned", just not here yet.
+  if (kindsListedBy(type).some((kind) => unloadedKinds.includes(kind))) {
+    return <WidgetLoading />;
   }
   const shown = selectLinkItems(type, items, limit);
   if (shown.length === 0) return <WidgetEmpty>{EMPTY[type]}</WidgetEmpty>;

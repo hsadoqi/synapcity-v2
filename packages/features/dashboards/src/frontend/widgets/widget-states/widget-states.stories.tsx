@@ -1,7 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { WidgetFrame } from '../../../testing';
-import { WidgetEmpty, WidgetFailed, WidgetUnavailable } from './index';
+import {
+  WidgetEmpty,
+  WidgetFailed,
+  WidgetLoading,
+  WidgetUnavailable,
+} from './index';
 
 const meta: Meta<typeof WidgetUnavailable> = {
   title: 'Dashboards/Widgets/States',
@@ -31,4 +36,8 @@ export const Failed: Story = {
 
 export const FailedWithoutRetry: Story = {
   render: () => <WidgetFailed />,
+};
+
+export const Loading: Story = {
+  render: () => <WidgetLoading />,
 };

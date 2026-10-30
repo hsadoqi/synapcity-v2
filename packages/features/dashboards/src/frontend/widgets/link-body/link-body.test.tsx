@@ -156,3 +156,33 @@ describe('LinkBody when a source could not be read', () => {
     expect(onReload).toHaveBeenCalledOnce();
   });
 });
+
+describe('LinkBody for records the host has not read yet', () => {
+  const renderUnloaded = (
+    type: 'pinned' | 'last-opened' | 'spaces',
+    unloadedKinds: readonly DashboardLinkItem['kind'][],
+  ) =>
+    render(
+      <DashboardConfigProvider items={ITEMS} unloadedKinds={unloadedKinds}>
+        <LinkBody type={type} limit={6} />
+      </DashboardConfigProvider>,
+    );
+
+  it.each(['pinned', 'last-opened'] as const)(
+    '%s says it is loading, never that nothing is pinned',
+    (type) => {
+      renderUnloaded(type, ['document']);
+      expect(screen.getByText('Loading items…')).toBeDefined();
+      expect(screen.queryByText('Nothing is pinned yet.')).toBeNull();
+      expect(screen.queryByRole('list')).toBeNull();
+    },
+  );
+
+  it('spaces loads only when Spaces were not read', () => {
+    const { unmount } = renderUnloaded('spaces', ['document', 'dashboard']);
+    expect(screen.getByRole('list')).toBeDefined();
+    unmount();
+    renderUnloaded('spaces', ['space']);
+    expect(screen.getByText('Loading items…')).toBeDefined();
+  });
+});

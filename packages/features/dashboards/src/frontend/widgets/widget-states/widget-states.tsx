@@ -40,3 +40,19 @@ export function WidgetFailed({
     </div>
   );
 }
+
+/**
+ * Shown while a widget waits for records the host has not read yet (it was
+ * added after the page loaded). Not "empty": there may well be items.
+ */
+export function WidgetLoading({
+  children = 'Loading items…',
+}: {
+  children?: ReactNode;
+}) {
+  return (
+    <p role="status" className="m-0 text-sm text-muted-foreground">
+      {children}
+    </p>
+  );
+}

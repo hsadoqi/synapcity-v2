@@ -1,1 +1,1 @@
-export { LinkBody, selectLinkItems } from './link-body';
+export { LinkBody, kindsListedBy, selectLinkItems } from './link-body';
