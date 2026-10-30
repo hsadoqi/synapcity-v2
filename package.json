@@ -32,6 +32,7 @@
     "db:test": "node scripts/db-test.mjs",
     "db:stack": "node scripts/db-test-stack.mjs",
     "db:parity": "node scripts/db-parity.mjs",
+    "db:seed-demo": "node scripts/db-seed-demo.mjs",
     "prepare": "git config core.hooksPath .githooks || echo 'git hooks not activated (not a git checkout)'",
     "ui:add": "pnpm dlx shadcn@latest add -c apps/web",
     "report": "vitest run --coverage"

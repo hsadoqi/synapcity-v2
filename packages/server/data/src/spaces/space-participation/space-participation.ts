@@ -1,5 +1,9 @@
 import type { BaseRecord } from '@synapcity/domain-records';
-import type { SupabaseServerClient } from '@synapcity/server-supabase';
+import {
+  toProviderFailure,
+  type ProviderFailure,
+  type SupabaseServerClient,
+} from '@synapcity/server-supabase';
 import { z } from 'zod';
 
 import { COLUMNS, recordFromRow, type OwnedRow } from '../../owned-row';
@@ -66,4 +70,62 @@ export function listSpaceDashboards(
   spaceId: string,
 ): Promise<BaseRecord[]> {
   return listParticipants(client, spaceId, 'dashboards');
+}
+
+/**
+ * What adding reports: done, or the failure by code and status. A failure
+ * without a code (a dropped connection) is not proof the row was not written.
+ */
+export type AddedOutcome = { ok: true } | { ok: false; error: ProviderFailure };
+
+/**
+ * Adds one participation row, idempotently: a pair already in the Space is
+ * left as it is (`on conflict do nothing` on the primary key), so a second add
+ * neither duplicates it nor resets its per-Space `pinned` and `position`.
+ * Row-level security checks the insert first: the caller must own the Space
+ * and the item, or the database refuses with an error, never a silent skip.
+ */
+async function addParticipant(
+  client: SupabaseServerClient,
+  spaceId: string,
+  itemId: string,
+  kind: ParticipantTable,
+): Promise<AddedOutcome> {
+  // One literal query per kind, so each insert is checked against the schema.
+  const { error, status } =
+    kind === 'documents'
+      ? await client
+          .from('space_documents')
+          .upsert(
+            { space_id: spaceId, document_id: itemId },
+            { onConflict: 'space_id,document_id', ignoreDuplicates: true },
+          )
+      : await client
+          .from('space_dashboards')
+          .upsert(
+            { space_id: spaceId, dashboard_id: itemId },
+            { onConflict: 'space_id,dashboard_id', ignoreDuplicates: true },
+          );
+
+  if (error)
+    return { ok: false, error: toProviderFailure({ ...error, status }) };
+  return { ok: true };
+}
+
+/** Adds one of the caller's documents to one of their Spaces. */
+export function addSpaceDocument(
+  client: SupabaseServerClient,
+  spaceId: string,
+  documentId: string,
+): Promise<AddedOutcome> {
+  return addParticipant(client, spaceId, documentId, 'documents');
+}
+
+/** Adds one of the caller's dashboards to one of their Spaces. */
+export function addSpaceDashboard(
+  client: SupabaseServerClient,
+  spaceId: string,
+  dashboardId: string,
+): Promise<AddedOutcome> {
+  return addParticipant(client, spaceId, dashboardId, 'dashboards');
 }

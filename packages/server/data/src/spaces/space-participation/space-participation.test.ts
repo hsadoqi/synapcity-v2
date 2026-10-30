@@ -1,7 +1,12 @@
 import type { SupabaseServerClient } from '@synapcity/server-supabase';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { listSpaceDashboards, listSpaceDocuments } from './space-participation';
+import {
+  addSpaceDashboard,
+  addSpaceDocument,
+  listSpaceDashboards,
+  listSpaceDocuments,
+} from './space-participation';
 
 const SPACE_ID = '9ab8c032-8759-44e9-808d-0573d13f290e';
 
@@ -124,6 +129,83 @@ describe.each(KINDS)('listSpace $kind', ({ kind, list, table, embedded }) => {
 
     await expect(list(client, SPACE_ID)).rejects.toMatchObject({
       name: 'ZodError',
+    });
+  });
+});
+
+const ITEM_ID = '5d1f7c0e-3b0a-4f3e-9d57-0a1b2c3d4e5f';
+
+/** A client whose insert resolves to `result`. */
+function upsertReturning(result: { error: unknown; status?: number }) {
+  const upsert = vi.fn(async () => result);
+  const from = vi.fn(() => ({ upsert }));
+  client = { from } as unknown as SupabaseServerClient;
+  return { from, upsert };
+}
+
+const ADDS = [
+  {
+    kind: 'document',
+    add: addSpaceDocument,
+    table: 'space_documents',
+    column: 'document_id',
+  },
+  {
+    kind: 'dashboard',
+    add: addSpaceDashboard,
+    table: 'space_dashboards',
+    column: 'dashboard_id',
+  },
+] as const;
+
+describe.each(ADDS)('addSpace $kind', ({ add, table, column }) => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it(`inserts only the pair into ${table}, leaving an existing row untouched`, async () => {
+    const { from, upsert } = upsertReturning({ error: null, status: 201 });
+
+    await expect(add(client, SPACE_ID, ITEM_ID)).resolves.toEqual({
+      ok: true,
+    });
+    expect(from).toHaveBeenCalledWith(table);
+    // Only the pair: the owner is the session's, and pinned/position keep
+    // their defaults on a new row and their values on an existing one.
+    expect(upsert).toHaveBeenCalledWith(
+      { space_id: SPACE_ID, [column]: ITEM_ID },
+      { onConflict: `space_id,${column}`, ignoreDuplicates: true },
+    );
+  });
+
+  it('reports a pair already in the Space as added', async () => {
+    // `on conflict do nothing` answers success with no row written.
+    upsertReturning({ error: null, status: 201 });
+
+    await expect(add(client, SPACE_ID, ITEM_ID)).resolves.toEqual({
+      ok: true,
+    });
+  });
+
+  it('returns a refusal by code and status, never the message', async () => {
+    upsertReturning({
+      error: {
+        code: '42501',
+        message: 'new row violates row-level security policy',
+      },
+      status: 403,
+    });
+
+    await expect(add(client, SPACE_ID, ITEM_ID)).resolves.toStrictEqual({
+      ok: false,
+      error: { code: '42501', status: 403 },
+    });
+  });
+
+  it('returns a failure without a code when the request was cut off', async () => {
+    upsertReturning({ error: { message: 'fetch failed' }, status: 0 });
+
+    await expect(add(client, SPACE_ID, ITEM_ID)).resolves.toStrictEqual({
+      ok: false,
+      error: { status: 0 },
     });
   });
 });

@@ -1,13 +1,24 @@
 import 'server-only';
 
 export {
+  addSpaceDashboard,
+  addSpaceDocument,
   findSpace,
+  getSpaceRelations,
   listSpaceDashboards,
   listSpaceDocuments,
+  listSpaceNavItems,
   listSpaces,
+  listSpacesWithRelations,
   listSpaceSummaries,
   recordSpaceView,
   setSpacePinned,
+  type AddedOutcome,
+  type SpaceDashboardLink,
+  type SpaceDocumentLink,
+  type SpaceNavItem,
+  type SpaceRelationsResult,
+  type SpaceRelationType,
 } from './spaces';
 export {
   COMPOSITION_SCHEMA_VERSION,

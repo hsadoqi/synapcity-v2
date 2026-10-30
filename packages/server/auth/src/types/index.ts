@@ -3,4 +3,4 @@ export type {
   IdentityVerification,
   ProviderFailure,
   ProviderOutcome,
-} from './identity-provider';
+} from './identity';

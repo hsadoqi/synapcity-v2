@@ -1,7 +1,4 @@
-import type {
-  IdentityProvider,
-  ProviderOutcome,
-} from '../../identity-provider';
+import type { IdentityProvider, ProviderOutcome } from '../../types';
 
 /**
  * A controlled identity provider for tests: it answers with the outcomes it
