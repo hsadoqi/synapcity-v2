@@ -3,6 +3,7 @@
 import {
   baseRecordCreateSchema,
   boundedNameSchema,
+  isRecordKind,
 } from '@synapcity/domain-records';
 import { serverSpaceSource } from '@synapcity/features-spaces/server';
 import {
@@ -18,11 +19,6 @@ import { logFailure } from '@/lib/log-failure';
 import { createClient } from '@/lib/supabase/server';
 
 const NAME_NEEDED = 'Give it a name.';
-type CreatableKind = keyof typeof RECORD_TABLES;
-
-const isCreatableKind = (kind: unknown): kind is CreatableKind =>
-  typeof kind === 'string' && Object.hasOwn(RECORD_TABLES, kind);
-
 /**
  * What Quick Create sends: a name only. The record contract's create input,
  * with this form's wording for a blank name; the database fills the rest.
@@ -59,7 +55,7 @@ export async function createRecord(
   name: unknown,
 ): Promise<CreateRecordResult> {
   if (fixtureModeEnabled()) return { ok: false, error: FIXTURE_MESSAGE };
-  if (!isCreatableKind(kind)) return { ok: false, error: SAVE_FAILED };
+  if (!isRecordKind(kind)) return { ok: false, error: SAVE_FAILED };
   const parsed = quickCreateSchema.safeParse({ name });
   if (!parsed.success) {
     // A string that fails the contract says why (blank, too long, a character

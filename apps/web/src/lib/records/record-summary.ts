@@ -1,4 +1,9 @@
-import type { BaseRecord } from '@synapcity/domain-records';
+import { baseRecordSchema } from '@synapcity/domain-records';
+import { z } from 'zod';
 
 /** The app's document/dashboard index projection. */
-export type RecordSummary = BaseRecord & { spacesTotal: number };
+export const recordSummarySchema = baseRecordSchema.extend({
+  spacesTotal: z.number().int().nonnegative(),
+});
+
+export type RecordSummary = z.infer<typeof recordSummarySchema>;
