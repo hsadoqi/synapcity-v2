@@ -118,12 +118,15 @@ export function DashboardView({
   composition,
   revision,
   items,
+  unavailableKinds = [],
   persistence,
 }: {
   dashboard: BaseRecord;
   composition: DashboardComposition | null;
   revision: number;
   items: readonly DashboardLinkItem[];
+  /** Kinds of record that could not be read; their link widgets show a failure. */
+  unavailableKinds?: readonly DashboardLinkItem['kind'][];
   persistence: DashboardPersistence;
 }) {
   const router = useRouter();
@@ -155,6 +158,7 @@ export function DashboardView({
       storage={storage}
       snapshot={snapshot}
       items={items}
+      unavailableKinds={unavailableKinds}
       widgetTypes={LINK_WIDGET_TYPES}
       persistsStatus={false}
       LinkComponent={Link}

@@ -99,6 +99,7 @@ export function DashboardWorkspaceProvider({
   breakpoint,
   readOnly = false,
   items,
+  unavailableKinds,
   widgetTypes,
   persistsStatus,
   LinkComponent,
@@ -124,6 +125,8 @@ export function DashboardWorkspaceProvider({
   /** Show without editing or saving. @default false */
   readOnly?: boolean;
   items?: readonly DashboardLinkItem[];
+  /** The kinds of record the host could not read; their link widgets show a failure. @default [] */
+  unavailableKinds?: readonly DashboardLinkItem['kind'][];
   widgetTypes?: readonly WidgetType[];
   persistsStatus?: boolean;
   LinkComponent?: DashboardLinkComponent;
@@ -222,6 +225,7 @@ export function DashboardWorkspaceProvider({
     <TooltipProvider>
       <DashboardConfigProvider
         items={items}
+        unavailableKinds={unavailableKinds}
         widgetTypes={widgetTypes}
         persistsStatus={persistsStatus}
         LinkComponent={LinkComponent}

@@ -22,6 +22,8 @@ export type {
 export {
   DEFAULT_SETTINGS,
   LINK_WIDGET_TYPES,
+  neededLinkKinds,
+  type LinkSourceKind,
   MAX_COMPOSITION_BYTES,
   WIDGET_SIZES,
   activeWidgets,

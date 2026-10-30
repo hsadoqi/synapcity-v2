@@ -10,6 +10,7 @@ import {
   duplicateWidget,
   LINK_WIDGET_TYPES,
   moveWidgetInOrder,
+  neededLinkKinds,
   removeWidget,
   setWidgetStatus,
   updateWidget,
@@ -155,5 +156,36 @@ describe('moveWidgetInOrder', () => {
     expect(moveWidgetInOrder(c, 'lg', 'nope', 1)).toBe(c);
     const locked = updateWidget(c, first!.id, { locked: true });
     expect(moveWidgetInOrder(locked, 'lg', first!.id, 1)).toBe(locked);
+  });
+});
+
+describe('neededLinkKinds', () => {
+  const kinds = (...types: WidgetType[]) =>
+    [...neededLinkKinds(compositionWith(...types).c)].sort();
+
+  it('needs nothing when there is no link widget', () => {
+    expect(kinds()).toEqual([]);
+    expect(kinds('notes', 'tasks')).toEqual([]);
+  });
+
+  it('needs Spaces only for the Spaces widget', () => {
+    expect(kinds('spaces')).toEqual(['spaces']);
+  });
+
+  it.each(['pinned', 'last-opened'] as const)(
+    'needs every kind for %s',
+    (type) => {
+      expect(kinds(type)).toEqual(['dashboards', 'documents', 'spaces']);
+    },
+  );
+
+  it('counts a hidden or archived widget, which can be restored without a reload', () => {
+    const { c } = compositionWith('pinned');
+    const id = c.widgets[0]!.id;
+    for (const status of ['hidden', 'archived'] as const) {
+      expect(
+        [...neededLinkKinds(setWidgetStatus(c, id, status))].sort(),
+      ).toEqual(['dashboards', 'documents', 'spaces']);
+    }
   });
 });

@@ -27,6 +27,26 @@ export const LINK_WIDGET_TYPES: readonly WidgetType[] = [
   'spaces',
 ];
 
+/** The kinds of record the link widgets list; one host fetch per kind. */
+export type LinkSourceKind = 'spaces' | 'documents' | 'dashboards';
+
+/**
+ * The record kinds a composition's link widgets list, so the host fetches only
+ * those. Pinned and Last opened list records of every kind; Spaces lists
+ * Spaces only. Every widget counts whatever its status: a hidden or archived
+ * widget can be restored without a reload, and must not find its data missing.
+ */
+export function neededLinkKinds(c: DashboardComposition): Set<LinkSourceKind> {
+  const kinds = new Set<LinkSourceKind>();
+  for (const widget of c.widgets) {
+    if (widget.type === 'spaces') kinds.add('spaces');
+    else if (widget.type === 'pinned' || widget.type === 'last-opened') {
+      kinds.add('spaces').add('documents').add('dashboards');
+    }
+  }
+  return kinds;
+}
+
 export function activeWidgets(c: DashboardComposition): Widget[] {
   return c.widgets.filter((w) => w.status === 'active');
 }

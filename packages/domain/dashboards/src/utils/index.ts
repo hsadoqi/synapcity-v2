@@ -11,6 +11,8 @@ export { createWidget } from './create-widget';
 export { WIDGET_SIZES } from './widget-sizes';
 export {
   LINK_WIDGET_TYPES,
+  neededLinkKinds,
+  type LinkSourceKind,
   activeWidgets,
   addWidget,
   duplicateWidget,
