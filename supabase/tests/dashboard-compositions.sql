@@ -137,10 +137,39 @@ begin
     raise exception 'revision below 1 must fail';
   exception when check_violation then null;
   end;
+end;
+$$;
 
-  -- updated_at moves on update.
-  select updated_at as u into r from public.dashboard_compositions
+-- updated_at moves on update. `now()` is fixed inside a transaction, so the
+-- stored value is first aged as the administrator (with triggers off, so the
+-- stamp trigger does not overwrite it), then an update as the owner must move it.
+reset role;
+set local session_replication_role = replica;
+update public.dashboard_compositions set updated_at = '2000-01-01'
+ where dashboard_id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+set local session_replication_role = origin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '11111111-1111-4111-8111-111111111111', true);
+
+do $$
+declare
+  before_update timestamptz;
+  after_update timestamptz;
+begin
+  select updated_at into before_update from public.dashboard_compositions
    where dashboard_id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+  if before_update <> '2000-01-01'::timestamptz then
+    raise exception 'the test could not age updated_at (got %)', before_update;
+  end if;
+
+  update public.dashboard_compositions
+     set composition = '{"widgets": [3]}', revision = 3
+   where dashboard_id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+  select updated_at into after_update from public.dashboard_compositions
+   where dashboard_id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+  if after_update <= before_update then
+    raise exception 'updated_at must move forward on update (% -> %)', before_update, after_update;
+  end if;
 end;
 $$;
 
