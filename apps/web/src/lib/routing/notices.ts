@@ -9,6 +9,8 @@
  * authorized by it.
  */
 
+import { PLACEHOLDER_ORIGIN } from './placeholder-origin';
+
 /** The kinds of notice, matching the toast types the UI package styles. */
 export type NoticeType = 'success' | 'info' | 'warning' | 'error';
 
@@ -88,8 +90,6 @@ export function isNoticeKey(
 export function noticeTimeout(notice: Notice): number {
   return notice.timeout ?? NOTICE_TIMEOUTS[notice.type];
 }
-
-const PLACEHOLDER_ORIGIN = 'http://placeholder.invalid';
 
 /**
  * A same-origin path with the notice added, keeping any query and fragment it

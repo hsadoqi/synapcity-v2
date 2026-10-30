@@ -1,13 +1,8 @@
 import { itemFromRecord } from '@synapcity/frontend-collection';
 import type { CollectionItem } from '@synapcity/frontend-collection';
+import { describeSpaceCount } from '@/lib/records/describe-space-count';
 import type { RecordSummary } from '@/lib/records/record-summary';
 import { documentPathFor } from '@/lib/routing/user-paths';
-
-/** Which spaces a document is in, in a few words: "In 2 spaces", or "Not in a space". */
-export function describeSpaces(spaces: number) {
-  if (spaces === 0) return 'Not in a space';
-  return `In ${spaces} ${spaces === 1 ? 'space' : 'spaces'}`;
-}
 
 /** A document as the browse feature lists it. */
 export function toCollectionItem(
@@ -16,6 +11,6 @@ export function toCollectionItem(
 ): CollectionItem {
   return itemFromRecord(record, {
     href: documentPathFor(userId, record.id),
-    detail: describeSpaces(record.spacesTotal),
+    detail: describeSpaceCount(record.spacesTotal),
   });
 }

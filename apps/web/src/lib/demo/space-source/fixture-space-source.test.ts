@@ -54,6 +54,62 @@ describe('fixtureSpaceSource', () => {
     });
   });
 
+  it('lists the sample Spaces as nav items: display fields only, pinned first, then most recently changed', async () => {
+    const items = await source.listNavItems();
+    const allowed = ['description', 'icon', 'id', 'name', 'tags', 'updatedAt'];
+
+    expect(items).toHaveLength(DEMO_SPACES.length);
+    for (const item of items) {
+      expect(Object.keys(item).filter((key) => !allowed.includes(key))).toEqual(
+        [],
+      );
+    }
+    const order = [...DEMO_SPACES]
+      .sort((a, b) =>
+        Boolean(a.pinnedAt) !== Boolean(b.pinnedAt)
+          ? a.pinnedAt
+            ? -1
+            : 1
+          : (b.pinnedAt ?? '').localeCompare(a.pinnedAt ?? '') ||
+            b.updatedAt.localeCompare(a.updatedAt),
+      )
+      .map((space) => space.id);
+    expect(items.map((item) => item.id)).toEqual(order);
+  });
+
+  it('lists every sample Space with no participation rows, as there is no participation data', async () => {
+    const spaces = await source.listWithRelations();
+
+    expect(spaces.map((space) => space.id)).toEqual(
+      DEMO_SPACES.map((space) => space.id),
+    );
+    for (const space of spaces) {
+      expect(space).toMatchObject({
+        space_documents: [],
+        space_dashboards: [],
+      });
+    }
+  });
+
+  it('reads one sample Space’s relations of the kind asked for, and null for anything else', async () => {
+    const id = DEMO_SPACES[0]!.id;
+
+    const documents = await source.getRelations(id, 'documents');
+    expect(documents?.space_documents).toEqual([]);
+    expect(documents).not.toHaveProperty('space_dashboards');
+
+    const dashboards = await source.getRelations(id, 'dashboards');
+    expect(dashboards?.space_dashboards).toEqual([]);
+    expect(dashboards).not.toHaveProperty('space_documents');
+
+    await expect(source.getRelations(id)).resolves.toMatchObject({
+      id,
+      space_documents: [],
+      space_dashboards: [],
+    });
+    await expect(source.getRelations('missing')).resolves.toBeNull();
+  });
+
   it('finds a sample Space by id and nothing else', async () => {
     const [first] = DEMO_SPACES;
 
@@ -74,6 +130,15 @@ describe('fixtureSpaceSource', () => {
       error: { code: 'fixture_mode' },
     });
   });
+
+  it.each(['addDocument', 'addDashboard'] as const)(
+    'does not save: %s comes back as a fixture-mode failure',
+    async (method) => {
+      await expect(
+        source[method](DEMO_SPACES[0]!.id, DEMO_DOCUMENTS[0]!.id),
+      ).resolves.toEqual({ ok: false, error: { code: 'fixture_mode' } });
+    },
+  );
 
   it('records no view and reports success', async () => {
     await expect(source.recordView(DEMO_SPACES[0]!.id)).resolves.toEqual({

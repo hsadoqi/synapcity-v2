@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { RecordSummary } from '@/lib/records/record-summary';
 
-import { describeSpaces, toCollectionItem } from './collection-item';
+import { toCollectionItem } from './collection-item';
 
 const record: RecordSummary = {
   id: 'document-1',
@@ -17,16 +17,6 @@ const record: RecordSummary = {
   lastViewedAt: null,
   spacesTotal: 2,
 };
-
-describe('describeSpaces', () => {
-  it.each([
-    [0, 'Not in a space'],
-    [1, 'In 1 space'],
-    [3, 'In 3 spaces'],
-  ])('describes %i spaces', (count, expected) => {
-    expect(describeSpaces(count)).toBe(expected);
-  });
-});
 
 describe('toCollectionItem', () => {
   it('maps a document onto the browse feature’s item, linked under the owner', () => {

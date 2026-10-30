@@ -3,7 +3,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const { getVerifiedIdentity } = vi.hoisted(() => ({
   getVerifiedIdentity: vi.fn(),
 }));
-const { list } = vi.hoisted(() => ({ list: vi.fn() }));
+const { list, writes } = vi.hoisted(() => ({
+  list: vi.fn(),
+  writes: {
+    create: vi.fn(),
+    setPinned: vi.fn(),
+    recordView: vi.fn(),
+    addDocument: vi.fn(),
+    addDashboard: vi.fn(),
+  },
+}));
 const { getSpaceSource } = vi.hoisted(() => ({
   getSpaceSource: vi.fn(),
 }));
@@ -21,7 +30,7 @@ describe('GET /api/spaces', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     fixtureModeEnabled.mockReturnValue(false);
-    getSpaceSource.mockResolvedValue({ list });
+    getSpaceSource.mockResolvedValue({ list, ...writes });
   });
 
   it('rejects a signed-out request without reading any spaces', async () => {
@@ -55,6 +64,25 @@ describe('GET /api/spaces', () => {
     expect(response.status).toBe(200);
     expect(response.headers.get('Cache-Control')).toBe('no-store');
     await expect(response.json()).resolves.toEqual([{ id: 's1' }]);
+  });
+
+  it('only reads: no space is created, pinned, viewed or added to', async () => {
+    getVerifiedIdentity.mockResolvedValue({
+      status: 'verified',
+      identity: { userId: 'u1' },
+    });
+    list.mockResolvedValue([]);
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    await GET();
+    await GET();
+
+    expect(list).toHaveBeenCalledTimes(2);
+    for (const write of Object.values(writes)) {
+      expect(write).not.toHaveBeenCalled();
+    }
+    expect(log).not.toHaveBeenCalled();
+    log.mockRestore();
   });
 
   it('serves the samples in fixture mode without a session', async () => {

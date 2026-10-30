@@ -1,5 +1,15 @@
 import { expect, test, type Page } from '@playwright/test';
 
+import {
+  escapeRegExp,
+  FIXTURE_DASHBOARD_PROJECT_STATUS,
+  FIXTURE_DOCUMENT_LAUNCH_PLAN,
+  FIXTURE_DOCUMENT_LONG_READING,
+  FIXTURE_DOCUMENTS,
+  FIXTURE_HOME,
+  FIXTURE_SPACE_WRITING,
+} from './support/fixture-paths';
+
 // Document and dashboard pages, against the existing read-only dev fixture
 // identity. Run with a dev server and SYNAPCITY_DEV_AUTH=fixture; production
 // CI skips this group, as it does the other signed-in tests.
@@ -12,10 +22,10 @@ test.describe('document and dashboard pages', () => {
   test('a document opens from its card, named in the heading and trail', async ({
     page,
   }) => {
-    await page.goto('/fixture-user/home/documents');
+    await page.goto(FIXTURE_DOCUMENTS);
     await page.getByRole('link', { name: 'Launch plan' }).first().click();
     await expect(page).toHaveURL(
-      /\/fixture-user\/home\/documents\/fixture-document-launch-plan$/,
+      new RegExp(`${escapeRegExp(FIXTURE_DOCUMENT_LAUNCH_PLAN)}$`),
     );
     await expect(
       page.getByRole('heading', { level: 1, name: 'Launch plan' }),
@@ -28,7 +38,7 @@ test.describe('document and dashboard pages', () => {
   // The reading page's edge cases, from the long-reading fixture: a name long
   // enough to truncate, a description with one unbroken string, five tags.
   const LONG = {
-    path: '/fixture-user/home/documents/fixture-document-long-reading',
+    path: FIXTURE_DOCUMENT_LONG_READING,
     name: 'Field notes from the long winter of rewriting the onboarding guide, chapter by chapter, with open questions unresolved',
   };
   const contents = (page: Page, name: string) =>
@@ -160,9 +170,7 @@ test.describe('document and dashboard pages', () => {
   test('a dashboard opens editable, with the contextual panel beside it', async ({
     page,
   }) => {
-    await page.goto(
-      '/fixture-user/home/dashboards/fixture-dashboard-project-status',
-    );
+    await page.goto(FIXTURE_DASHBOARD_PROJECT_STATUS);
     await expect(
       page.getByRole('heading', { level: 1, name: 'Project status' }),
     ).toBeVisible();
@@ -181,7 +189,7 @@ test.describe('document and dashboard pages', () => {
 
   for (const kind of ['documents', 'dashboards'] as const) {
     test(`an unknown record in ${kind} is not found`, async ({ page }) => {
-      const response = await page.goto(`/fixture-user/home/${kind}/no-such-id`);
+      const response = await page.goto(`${FIXTURE_HOME}/${kind}/no-such-id`);
       expect(response?.status()).toBe(404);
       // The workspace stays around the message, with no second shell nested in it.
       await expect(page.getByRole('main')).toHaveCount(1);
@@ -209,7 +217,7 @@ test.describe('breadcrumb trail across client navigation', () => {
     'Requires the existing development fixture identity and a development server',
   );
 
-  const DOCUMENT = '/fixture-user/home/documents/fixture-document-launch-plan';
+  const DOCUMENT = FIXTURE_DOCUMENT_LAUNCH_PLAN;
 
   // `next dev` compiles a route on its first visit, which can outlast the
   // default wait; Home took 5.2 s on a fresh server.
@@ -258,7 +266,10 @@ test.describe('breadcrumb trail across client navigation', () => {
     await expect(crumbs(page)).toHaveText(['Documents', 'Launch plan']);
 
     await sidebarLink(page, 'Home').click();
-    await expect(page).toHaveURL(/\/fixture-user\/home$/, NAVIGATION);
+    await expect(page).toHaveURL(
+      new RegExp(`${escapeRegExp(FIXTURE_HOME)}$`),
+      NAVIGATION,
+    );
     await expect(
       page.getByRole('navigation', { name: 'Breadcrumb' }),
     ).toHaveCount(0);
@@ -293,7 +304,7 @@ test.describe('breadcrumb trail across client navigation', () => {
 
     await sidebarLink(page, 'Writing').click();
     await expect(page).toHaveURL(
-      /\/spaces\/fixture-space-writing$/,
+      new RegExp(`${escapeRegExp(FIXTURE_SPACE_WRITING)}$`),
       NAVIGATION,
     );
     await expect(crumbs(page)).toHaveText(['Spaces', 'Writing']);

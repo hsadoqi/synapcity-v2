@@ -18,16 +18,18 @@ import {
   FieldLabel,
 } from '@synapcity/frontend-ui/core/field';
 import { Input } from '@synapcity/frontend-ui/core/input';
-import { boundedNameSchema, NAME_MAX } from '@synapcity/domain-records';
+import { NAME_MAX } from '@synapcity/domain-records';
 
 import { signInPathFor } from '../../lib/routing/user-paths';
 import {
   createRecord,
   type CreateRecordResult,
 } from '../../lib/records/create-record-action';
+import {
+  NAME_NEEDED,
+  quickCreateNameSchema,
+} from '../../lib/records/quick-create-name';
 import { collectionFor, type CollectionKind } from '../collections';
-
-const NAME_NEEDED = 'Give it a name.';
 
 const unconfirmedMessage = (singular: string, label: string) =>
   `We could not confirm that the ${singular} was created. Check ${label} in the sidebar before you try again.`;
@@ -89,7 +91,7 @@ export function QuickCreateDialog({
     if (!collection || pending || submitting.current) return;
     // The same rule the Server Action applies, so the message appears here
     // without a round trip: blank, over the limit, or unsavable text.
-    const checked = boundedNameSchema(NAME_NEEDED).safeParse(name);
+    const checked = quickCreateNameSchema.safeParse(name);
     if (!checked.success) {
       setFailure({
         message: checked.error.issues[0]?.message ?? NAME_NEEDED,

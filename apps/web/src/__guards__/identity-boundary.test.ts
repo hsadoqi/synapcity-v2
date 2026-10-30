@@ -15,19 +15,10 @@ import { describe, expect, it } from 'vitest';
  * stripped; it does not follow aliases such as `const { auth } = supabase`.
  */
 const ALLOWED: Record<string, { calls: number; reason: string }> = {
-  'features/auth/server/session/session.ts': {
-    calls: 1,
-    reason:
-      'The canonical claims read (getVerifiedClaims), memoized per request and reused by the boundary. Kept: it is the one place a page reads claims.',
-  },
   'features/auth/server/operations/operations.ts': {
     calls: 2,
     reason:
       'The account-deletion operations (provider user record and claims) stay until the delete-account flow moves (M7.5). The other operations moved to server-supabase in M7.2.',
-  },
-  'lib/supabase/middleware.ts': {
-    calls: 1,
-    reason: 'Session refresh in the proxy (M7, server-supabase).',
   },
 };
 

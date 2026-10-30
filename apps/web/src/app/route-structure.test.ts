@@ -66,8 +66,12 @@ describe('URLs are unchanged by the route groups', () => {
     );
   });
 
-  it('keeps everything under /auth in the (auth) group and nothing else there', () => {
-    for (const route of routes) {
+  it('serves the Auth-unavailable status page, and only it, from the (status) group', () => {
+    expect(urlsIn('(status)')).toEqual(['/auth/unavailable']);
+  });
+
+  it('keeps everything else under /auth in the (auth) group and nothing else there', () => {
+    for (const route of routes.filter((r) => r.group !== '(status)')) {
       expect(route.url.startsWith('/auth/'), route.url).toBe(
         route.group === '(auth)',
       );
@@ -109,8 +113,12 @@ describe('the proxy still decides by URL, not by group', () => {
     expect(config.matcher.join('')).not.toMatch(/\((public|auth|protected)\)/);
   });
 
-  it('never asks for a session on a public or auth URL', () => {
-    for (const url of [...urlsIn('(public)'), ...urlsIn('(auth)')]) {
+  it('never asks for a session on a public, auth or status URL', () => {
+    for (const url of [
+      ...urlsIn('(public)'),
+      ...urlsIn('(auth)'),
+      ...urlsIn('(status)'),
+    ]) {
       expect(isProtectedPath(sample(url)), url).toBe(false);
     }
   });

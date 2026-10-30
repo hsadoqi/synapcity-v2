@@ -2,7 +2,6 @@
 
 import {
   baseRecordCreateSchema,
-  boundedNameSchema,
   isRecordKind,
 } from '@synapcity/domain-records';
 import { serverSpaceSource } from '@synapcity/features-spaces/server';
@@ -18,13 +17,14 @@ import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import { logFailure } from '@/lib/log-failure';
 import { createClient } from '@/lib/supabase/server';
 
-const NAME_NEEDED = 'Give it a name.';
+import { NAME_NEEDED, quickCreateNameSchema } from './quick-create-name';
+
 /**
  * What Quick Create sends: a name only. The record contract's create input,
  * with this form's wording for a blank name; the database fills the rest.
  */
 const quickCreateSchema = baseRecordCreateSchema.pick({ name: true }).extend({
-  name: boundedNameSchema(NAME_NEEDED),
+  name: quickCreateNameSchema,
 });
 
 /**

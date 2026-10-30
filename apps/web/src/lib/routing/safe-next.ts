@@ -1,4 +1,4 @@
-const PLACEHOLDER_ORIGIN = 'http://placeholder.invalid';
+import { PLACEHOLDER_ORIGIN } from './placeholder-origin';
 
 /**
  * Last-resort destination when there is no valid `next` and no signed-in user to
