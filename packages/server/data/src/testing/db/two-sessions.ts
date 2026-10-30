@@ -117,10 +117,7 @@ export async function withSessions<T>(
 }
 
 /** The wait the backend `pid` is in right now, from a separate short connection. */
-function waitEventOf(
-  pid: number,
-  dbUrl: string = stackEnv().dbUrl,
-): string {
+function waitEventOf(pid: number, dbUrl: string = stackEnv().dbUrl): string {
   const result = spawnSync(
     'psql',
     [

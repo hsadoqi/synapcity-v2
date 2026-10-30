@@ -28,16 +28,19 @@ describe('stackEnv', () => {
       },
     ],
     ['API', { DB_TEST_API_URL: 'https://abcdefghijklmnopqrst.supabase.co' }],
-  ])('refuses a hosted %s address without printing its credentials', (_name, override) => {
-    try {
-      stackEnv({ ...FULL, ...override });
-      expect.unreachable();
-    } catch (error) {
-      const message = (error as Error).message;
-      expect(message).toMatch(/not a loopback address/);
-      expect(message).not.toContain('secret');
-    }
-  });
+  ])(
+    'refuses a hosted %s address without printing its credentials',
+    (_name, override) => {
+      try {
+        stackEnv({ ...FULL, ...override });
+        expect.unreachable();
+      } catch (error) {
+        const message = (error as Error).message;
+        expect(message).toMatch(/not a loopback address/);
+        expect(message).not.toContain('secret');
+      }
+    },
+  );
 
   it('says how to start the stack when it is not described', () => {
     expect(() => stackEnv({})).toThrow(/test:db/);

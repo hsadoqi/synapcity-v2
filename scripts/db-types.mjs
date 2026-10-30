@@ -15,12 +15,16 @@
 // before the CLI starts. The reviewed exception is
 // `--allow-remote-target <project-ref>`, whose ref must equal the one in the URL.
 //
-// Usage: pnpm db:types [--db-url <url>] [--allow-remote-target <project-ref>]
+// `--stack` reads this worktree's disposable stack (`pnpm db:stack start`), the
+// database a slice's migrations are checked on, instead of the shared default.
+//
+// Usage: pnpm db:types [--db-url <url> | --stack] [--allow-remote-target <project-ref>]
 import { execFileSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import prettier from 'prettier';
+import { status as isolatedStackStatus } from './db-test-stack.mjs';
 import {
   assertLocalTarget,
   flagValue,
@@ -34,8 +38,23 @@ const target = join(
   'packages/server/supabase/src/database-types/database.types.ts',
 );
 const argv = process.argv.slice(2);
+function stackDbUrl() {
+  if (!argv.includes('--stack')) return undefined;
+  const stack = isolatedStackStatus();
+  if (!stack) {
+    process.stderr.write(
+      'db:types: --stack needs a running stack (start one with `pnpm db:stack start`).\n',
+    );
+    process.exit(1);
+  }
+  // The local database does not offer TLS, and the CLI asks for it by default.
+  const url = new URL(stack.dbUrl);
+  url.searchParams.set('sslmode', 'disable');
+  return url.toString();
+}
 const dbUrl =
   flagValue(argv, 'db-url') ??
+  stackDbUrl() ??
   process.env.SUPABASE_DB_URL ??
   'postgresql://postgres:postgres@127.0.0.1:54322/postgres?sslmode=disable';
 

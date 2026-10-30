@@ -119,8 +119,9 @@ jobs:
       - name: Fail if the committed types differ
         run: git diff --exit-code -- packages/server/supabase/src/database-types/database.types.ts
 
-  # Every SQL test in supabase/tests, on a fresh local database built from the
-  # migrations. Like `db-types` it needs Docker, so it stays out of `pnpm verify`.
+  # Every SQL test in supabase/tests, then the two-user and concurrency tests of
+  # `@synapcity/server-data`, on a fresh local stack built from the migrations.
+  # Like `db-types` it needs Docker, so it stays out of `pnpm verify`.
   # Each job gets its own stack, so it cannot collide with another worktree's.
   # No secrets and no hosted project are involved: `pnpm db:test` refuses any
   # target that is not 127.0.0.1 or localhost.
@@ -136,12 +137,15 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Start the local database
-        run: pnpm exec supabase db start
-      - name: Apply the migrations
-        run: pnpm exec supabase migration up --local
+      # The same disposable stack a developer runs (`pnpm db:stack start`): its
+      # own project id and ports, the checked-out migrations applied at start,
+      # and only the containers the tests use (database, API, Auth, Storage).
+      - name: Start the disposable database stack
+        run: pnpm db:stack start
       - name: Run the SQL tests
         run: pnpm db:test
+      - name: Run the two-user and concurrency tests
+        run: pnpm --filter @synapcity/server-data test:db
 
   pr-hygiene:
     name: pr-hygiene

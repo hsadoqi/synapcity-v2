@@ -29,7 +29,7 @@ describe('two-session runner', () => {
         let secondDone = false;
         const waiting = second!
           .run(
-            `update public.spaces set name = 'second' where id = '${id}' and false returning name`,
+            `update public.spaces set name = 'second' where id = '${id}' returning name`,
           )
           .then((result) => {
             secondDone = true;
