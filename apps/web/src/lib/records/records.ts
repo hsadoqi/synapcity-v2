@@ -1,12 +1,15 @@
-import type { BaseRecord, OwnedRecordSummary } from '@synapcity/domain-records';
+import {
+  recordIdSchema,
+  type BaseRecord,
+  type OwnedRecordSummary,
+} from '@synapcity/domain-records';
 import {
   findRecord,
   listRecordSummaries,
   setRecordPinned,
-  type RecordKind,
+  type ParticipantTable,
 } from '@synapcity/server-data';
 import { cache } from 'react';
-import { z } from 'zod';
 
 import { getCallerIdentity, SAVE_FAILED } from '@/lib/access/caller';
 import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
@@ -18,8 +21,6 @@ export type SetRecordPinnedResult =
   | { ok: true; pinnedAt: string | null }
   | { ok: false; error: string; signedOut?: boolean };
 
-const idSchema = z.uuid();
-
 /**
  * The body of the document and dashboard pin Server Actions. The browser asks
  * for a change; the database stamps the time. The id and flag come from the
@@ -28,13 +29,13 @@ const idSchema = z.uuid();
  * `operation` names the action in the log.
  */
 export async function setRecordPinnedFor(
-  kind: RecordKind,
+  kind: ParticipantTable,
   operation: string,
   recordId: unknown,
   pinned: unknown,
 ): Promise<SetRecordPinnedResult> {
   if (fixtureModeEnabled()) return { ok: false, error: FIXTURE_MESSAGE };
-  const id = idSchema.safeParse(recordId);
+  const id = recordIdSchema.safeParse(recordId);
   if (!id.success || typeof pinned !== 'boolean') {
     return { ok: false, error: SAVE_FAILED };
   }
@@ -60,7 +61,7 @@ export async function setRecordPinnedFor(
  * sample records instead.
  */
 export async function loadRecordSummaries(
-  kind: RecordKind,
+  kind: ParticipantTable,
   fixtures: readonly OwnedRecordSummary[],
 ): Promise<OwnedRecordSummary[]> {
   if (fixtureModeEnabled()) return [...fixtures];
@@ -79,7 +80,7 @@ export async function loadRecordSummaries(
  */
 export const loadRecord = cache(
   async (
-    kind: RecordKind,
+    kind: ParticipantTable,
     id: string,
     fixtures: readonly OwnedRecordSummary[],
   ): Promise<BaseRecord | null> => {

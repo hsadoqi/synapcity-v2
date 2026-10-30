@@ -1,10 +1,14 @@
 'use server';
 
-import { baseRecordSchema } from '@synapcity/domain-records';
+import {
+  baseRecordCreateSchema,
+  boundedNameSchema,
+  isRecordKind,
+} from '@synapcity/domain-records';
 import { serverSpaceSource } from '@synapcity/features-spaces/server';
 import {
   createRecord as insertRecord,
-  type RecordKind,
+  RECORD_TABLES,
 } from '@synapcity/server-data';
 import type { ProviderFailure } from '@synapcity/server-supabase';
 import { revalidatePath } from 'next/cache';
@@ -14,18 +18,15 @@ import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import { logFailure } from '@/lib/log-failure';
 import { createClient } from '@/lib/supabase/server';
 
-/**
- * The kinds created straight in their table. Spaces go through the Space
- * source instead, the feature's port for reading and writing them.
- */
-const RECORD_TABLES = {
-  document: 'documents',
-  dashboard: 'dashboards',
-} as const satisfies Record<string, RecordKind>;
-
-type CreatableKind = 'space' | keyof typeof RECORD_TABLES;
-
 const NAME_NEEDED = 'Give it a name.';
+
+/**
+ * What Quick Create sends: a name only. The record contract's create input,
+ * with this form's wording for a blank name; the database fills the rest.
+ */
+const quickCreateSchema = baseRecordCreateSchema.pick({ name: true }).extend({
+  name: boundedNameSchema(NAME_NEEDED),
+});
 
 /**
  * What creating reports back: the new record's id, or the message to show.
@@ -37,30 +38,34 @@ export type CreateRecordResult =
   | { ok: true; id: string }
   | { ok: false; error: string; signedOut?: boolean; unconfirmed?: boolean };
 
-const isCreatableKind = (kind: unknown): kind is CreatableKind =>
-  kind === 'space' ||
-  (typeof kind === 'string' && Object.hasOwn(RECORD_TABLES, kind));
-
 /** A failure the database or PostgREST answered has a code; anything else is unknown. */
 const isUnconfirmed = (failure: ProviderFailure) => !failure.code;
 
 /**
  * Creates one of the caller's Spaces, documents or dashboards from its name.
- * The kind and name come from the browser, so both are checked, the name with
- * the record contract's own rule. The caller is verified with a fresh lookup
- * (ADR-0006); the owner is the session's user, set by the database.
+ * The kind and name come from the browser, so both are checked: the kind
+ * against the record kinds, the name with the record contract's create input.
+ * Spaces go through the Space source, the feature's port for them; the other
+ * kinds are inserted straight into their table. The caller is verified with a
+ * fresh lookup (ADR-0006); the owner is the session's user, set by the
+ * database.
  */
 export async function createRecord(
   kind: unknown,
   name: unknown,
 ): Promise<CreateRecordResult> {
   if (fixtureModeEnabled()) return { ok: false, error: FIXTURE_MESSAGE };
-  if (!isCreatableKind(kind)) return { ok: false, error: SAVE_FAILED };
-  const parsed = baseRecordSchema.shape.name.safeParse(name);
+  if (!isRecordKind(kind)) return { ok: false, error: SAVE_FAILED };
+  const parsed = quickCreateSchema.safeParse({ name });
   if (!parsed.success) {
+    // A string that fails the contract says why (blank, too long, a character
+    // that cannot be saved); anything else is not something a form sends.
     return {
       ok: false,
-      error: typeof name === 'string' ? NAME_NEEDED : SAVE_FAILED,
+      error:
+        typeof name === 'string'
+          ? (parsed.error.issues[0]?.message ?? NAME_NEEDED)
+          : SAVE_FAILED,
     };
   }
 
@@ -74,7 +79,7 @@ export async function createRecord(
     };
   }
 
-  const input = { name: parsed.data };
+  const input = parsed.data;
   const result =
     kind === 'space'
       ? await serverSpaceSource(supabase).create(input)

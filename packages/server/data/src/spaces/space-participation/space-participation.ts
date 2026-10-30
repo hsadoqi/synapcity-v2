@@ -1,17 +1,15 @@
-import type { BaseRecord } from '@synapcity/domain-records';
+import { recordIdSchema, type BaseRecord } from '@synapcity/domain-records';
 import type { SupabaseServerClient } from '@synapcity/server-supabase';
-import { z } from 'zod';
 
 import { COLUMNS, recordFromRow, type OwnedRow } from '../../owned-row';
 import { readError } from '../../read-error';
-
-type ParticipantKind = 'documents' | 'dashboards';
+import type { ParticipantTable } from '../../records';
 
 /** The embedded items of one Space's participation rows, newest addition first. */
 async function participantRows(
   client: SupabaseServerClient,
   spaceId: string,
-  kind: ParticipantKind,
+  kind: ParticipantTable,
 ): Promise<(OwnedRow | null)[]> {
   // One literal query per kind, so each embed is checked against the schema.
   if (kind === 'documents') {
@@ -42,10 +40,10 @@ async function participantRows(
 async function listParticipants(
   client: SupabaseServerClient,
   spaceId: string,
-  kind: ParticipantKind,
+  kind: ParticipantTable,
 ): Promise<BaseRecord[]> {
   // A malformed id cannot match a uuid column; PostgREST would error instead.
-  if (!z.uuid().safeParse(spaceId).success) return [];
+  if (!recordIdSchema.safeParse(spaceId).success) return [];
 
   const items = await participantRows(client, spaceId, kind);
   return items.flatMap((item) => (item ? [recordFromRow(item)] : []));

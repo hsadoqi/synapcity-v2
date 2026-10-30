@@ -1,4 +1,4 @@
-import type { BaseRecord } from '@synapcity/domain-records';
+import type { BaseRecord, BaseRecordCreate } from '@synapcity/domain-records';
 import type { SpaceEntity, SpaceSummary } from '@synapcity/domain-spaces';
 import type { ProviderFailure } from '@synapcity/server-supabase';
 
@@ -27,8 +27,11 @@ export interface SpaceSource {
   listSummaries(): Promise<SpaceSummary[]>;
   /** One Space, or null when it does not exist or is not the owner's. */
   find(spaceId: string): Promise<SpaceEntity | null>;
-  /** Creates one of the owner's Spaces from its name; the owner comes from the session. */
-  create(input: { name: string }): Promise<CreatedOutcome>;
+  /**
+   * Creates one of the owner's Spaces from a parsed create input; the owner
+   * and every omitted field come from the store.
+   */
+  create(input: BaseRecordCreate): Promise<CreatedOutcome>;
   setPinned(spaceId: string, pinned: boolean): Promise<SetPinnedOutcome>;
   /** Notes that the owner opened the Space; the outcome carries any error to log. */
   recordView(

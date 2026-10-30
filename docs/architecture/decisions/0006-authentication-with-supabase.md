@@ -44,6 +44,7 @@ How users authenticate to `apps/web` and how their session is held and refreshed
 
 ## Unresolved
 
+- **Superseded in part (2026-10-30).** How migrations are applied and recorded is now the [database release procedure](../../engineering/database-release.md) and the [deployment ledger](../../engineering/database-deployment-ledger.md); `supabase db push` after a reviewed dry run is the recommended mechanism, pending the owner's decision D14. Local Auth settings follow the hosted project's security semantics (owner decision D11), and where they differ is listed in [auth-configuration.md](../../engineering/auth-configuration.md). The first item below is kept as the 2026-10-13 record.
 - Applying the schema. `supabase/migrations/20261013162633_create_profiles.sql` (columns `display_name` and `avatar_url`, a signup trigger, owner-only RLS) is approved but is run by hand in the dashboard SQL editor. Whether to link the project and use `supabase db push`, and whether the repo adopts declarative schemas, is not yet chosen. The migration has been applied to the project.
 - Email delivery: Supabase's default sender is rate-limited and meant for development; the owner accepted it for now, and a custom SMTP provider is needed before real users.
 - Leaked password protection (checking passwords against HaveIBeenPwned) is unavailable on the Free plan. It should be enabled if the project moves to a paid plan; until then the minimum length of 8 and optional character-type rules are the only password-strength controls.

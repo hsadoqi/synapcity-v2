@@ -49,7 +49,7 @@ On `space_documents` and `space_dashboards`: `<t>_position_nonnegative check (po
 
 ## C. Domain contracts and validation
 
-`@synapcity/domain-records/src/base/schemas/limits.ts` (new, exported from the package root):
+`@synapcity/domain-records/src/constants/limits.ts` (exported from the package root; implemented 2026-10-30, `isStorableText` lives in `src/utils/is-storable-text.ts`):
 
 ```ts
 export const NAME_MAX = 120;
@@ -75,7 +75,7 @@ tags: z.array(z.string().trim().min(1).max(TAG_MAX).refine(isStorableText))
 - `createSpaceSchema` keeps its own messages and imports the constants.
 - **Read schemas** (`baseRecordSchema`, `spaceSchema`) must not reject legacy rows before `VALIDATE`. Limits are applied to input schemas only. Read schemas extend the base fields without `.max`; implementation splits `baseRecordInputSchema` (bounded) from a `baseRecordFieldsSchema` (unbounded, used by read schemas).
 - **Trimming tags** is normalization: D5 measures length after trimming, and the DB requires the trimmed form. It is not truncation.
-- **Boundary vectors:** a JSON file `packages/domain/records/src/base/schemas/limits.vectors.json` lists accept and reject cases. The zod tests and `supabase/tests/resource-metadata-bounds.sql` both consume it; the SQL side is generated into a temp table by the `db:test` runner, or copied by a test helper.
+- **Boundary vectors:** a JSON file `packages/domain/records/src/testing/limit-vectors.json` (exported through `@synapcity/domain-records/testing`) lists accept and reject cases. The zod tests and `supabase/tests/resource-metadata-bounds.sql` both consume it; the SQL side is generated into a temp table by the `db:test` runner, or copied by a test helper.
 - **V-12:** record how `server-account` measures the 16 KiB `user_preferences` check. Tracked only; no change.
 
 ## D. Data access and application integration

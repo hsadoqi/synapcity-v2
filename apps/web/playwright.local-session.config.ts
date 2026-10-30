@@ -13,7 +13,11 @@ if (!process.env.E2E_BASE_URL) {
 
 export default defineConfig({
   testDir: 'e2e',
-  testMatch: ['**/local-session.e2e.ts', '**/dashboard-persistence.e2e.ts'],
+  testMatch: [
+    '**/local-session.e2e.ts',
+    '**/dashboard-persistence.e2e.ts',
+    '**/account.e2e.ts',
+  ],
   workers: 1,
   reporter: 'list',
   use: {

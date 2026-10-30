@@ -77,6 +77,7 @@ The base record contract lives in [`domain-records`](records/README.md) (M5.1). 
 - `spaces` ----> Space create, update and saved contracts. Moved out of `records` on 2026-10-24 ([README](spaces/README.md))
 - `preferences` ----> Preference data, rules, scope and consent policy. Exists since M6.1 ([README](preferences/README.md))
 - `identity` ----> Credential, profile and verified-identity contracts. Exists since M4 with the verified-identity result ([README](identity/README.md))
+- `time` ----> Instant, calendar date, time of day and duration shapes shared by records, preferences and prototypes. Exists since 2026-10-30 ([README](time/README.md))
 
 The full list is the [package inventory](../../docs/architecture/workspace-conventions.md#package-inventory).
 

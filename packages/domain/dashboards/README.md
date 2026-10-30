@@ -32,3 +32,9 @@ Source: the `dashboard-core` dashboard module of the responsive-grid prototype.
 ## Scripts
 
 `lint`, `check-types`, `test`, `test:coverage`. Tests sit beside each unit.
+
+## Persistence contract (S1)
+
+`createComposition()` is the default composition of every Dashboard: the database creates it, at revision 1, with each new Dashboard (migration `composition_initialization`). The literal in that migration and this function must stay equal; a unit test in `apps/web` compares them, and changing either needs a new migration. `parsePersistableComposition` is the application contract (link widgets only, active widgets only, 64 KiB of compact JSON, and no U+0000 or unpaired surrogate in any string or key: `invalid-text`); the database holds only a 128 KiB text backstop. See [ADR-0016](../../../docs/architecture/decisions/0016-dashboard-composition-storage.md) (Amendment 1) and [ADR-0018](../../../docs/architecture/decisions/0018-revision-capture.md).
+
+`neededLinkKinds(composition)` says which kinds of record the link widgets list, so the host reads only those.

@@ -23,6 +23,8 @@ export {
   recordRecordView,
   setRecordPinned,
   type CreatedOutcome,
+  type ParticipantTable,
   type PinnedOutcome,
-  type RecordKind,
+  type RecordTable,
+  RECORD_TABLES,
 } from './records';

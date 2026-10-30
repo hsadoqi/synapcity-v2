@@ -1,5 +1,7 @@
 # Version History Across Canonical Information and Representations
 
+> **Superseded in part (2026-10-30).** The mechanism, cadence and retention it left open are now decided: see [ADR-0018](../../architecture/decisions/0018-revision-capture.md) (database-written immutable snapshots, a pre-image checkpoint policy, 500 automatic revisions per Dashboard). This document remains the record of the product intent and the restore and naming ideas, which are not yet decided.
+
 **Status:** Proposed; no implementation decision is accepted by this document  
 **Date:** 2026-10-24  
 **Requested by:** Repository owner  

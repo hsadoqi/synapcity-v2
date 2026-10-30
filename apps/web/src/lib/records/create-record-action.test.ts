@@ -1,3 +1,4 @@
+import { RECORD_MESSAGES } from '@synapcity/domain-records';
 import { AuthRetryableFetchError } from '@supabase/supabase-js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -17,7 +18,10 @@ vi.mock('@/lib/access/dev-fixture', () => ({
   FIXTURE_MESSAGE: 'Saving is off in fixture mode.',
   fixtureModeEnabled: mocks.fixtureModeEnabled,
 }));
-vi.mock('@synapcity/server-data', () => ({
+vi.mock('@synapcity/server-data', async (importOriginal) => ({
+  RECORD_TABLES: (
+    await importOriginal<typeof import('@synapcity/server-data')>()
+  ).RECORD_TABLES,
   createRecord: mocks.createRecord,
 }));
 
@@ -97,6 +101,34 @@ describe('createRecord', () => {
       ok: false,
       error: 'Give it a name.',
     });
+  });
+
+  it('says so when the name is over 120 characters, and writes nothing', async () => {
+    await expect(createRecord('dashboard', 'a'.repeat(121))).resolves.toEqual({
+      ok: false,
+      error: RECORD_MESSAGES.nameTooLong,
+    });
+    expect(mocks.getUser).not.toHaveBeenCalled();
+    expect(mocks.createRecord).not.toHaveBeenCalled();
+  });
+
+  it('counts characters, not UTF-16 units: 120 emoji are allowed, 121 are not', async () => {
+    mocks.createRecord.mockResolvedValue({ ok: true, id: 'new-id' });
+    await expect(
+      createRecord('dashboard', '😀'.repeat(120)),
+    ).resolves.toMatchObject({ ok: true });
+    await expect(
+      createRecord('dashboard', '😀'.repeat(121)),
+    ).resolves.toMatchObject({
+      ok: false,
+      error: RECORD_MESSAGES.nameTooLong,
+    });
+  });
+
+  it('refuses a character that cannot be saved instead of sending it', async () => {
+    const result = await createRecord('document', 'bad\u0000name');
+    expect(result).toMatchObject({ ok: false });
+    expect(mocks.createRecord).not.toHaveBeenCalled();
   });
 
   it('asks a signed-out caller to sign in again and writes nothing', async () => {

@@ -773,6 +773,9 @@ importers:
 
   packages/domain/preferences:
     dependencies:
+      '@synapcity/domain-time':
+        specifier: workspace:*
+        version: link:../time
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -804,6 +807,9 @@ importers:
       '@synapcity/domain-records':
         specifier: workspace:*
         version: link:../records
+      '@synapcity/domain-time':
+        specifier: workspace:*
+        version: link:../time
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -832,6 +838,9 @@ importers:
 
   packages/domain/records:
     dependencies:
+      '@synapcity/domain-time':
+        specifier: workspace:*
+        version: link:../time
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -863,6 +872,34 @@ importers:
       '@synapcity/domain-records':
         specifier: workspace:*
         version: link:../records
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
+    devDependencies:
+      '@synapcity/dev-eslint-config':
+        specifier: workspace:*
+        version: link:../../dev/eslint-config
+      '@synapcity/dev-typescript-config':
+        specifier: workspace:*
+        version: link:../../dev/typescript-config
+      '@synapcity/dev-vitest-config':
+        specifier: workspace:*
+        version: link:../../dev/vitest-config
+      '@vitest/coverage-v8':
+        specifier: 5.0.5
+        version: 5.0.5(@vitest/browser@5.0.5)(vitest@5.0.5)
+      eslint:
+        specifier: 10.13.0
+        version: 10.13.0(jiti@2.7.0)(supports-color@7.2.0)
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: 5.0.5
+        version: 5.0.5(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/browser-playwright@5.0.5)(@vitest/coverage-v8@5.0.5)(@vitest/ui@5.0.5)(jsdom@30.1.2(@noble/hashes@1.8.0))(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
+
+  packages/domain/time:
+    dependencies:
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -1040,6 +1077,9 @@ importers:
       '@synapcity/domain-prototypes':
         specifier: workspace:*
         version: link:../../domain/prototypes
+      '@synapcity/domain-records':
+        specifier: workspace:*
+        version: link:../../domain/records
       '@synapcity/frontend-forms':
         specifier: workspace:*
         version: link:../../frontend/forms
@@ -1998,9 +2038,6 @@ importers:
       server-only:
         specifier: 0.0.1
         version: 0.0.1
-      zod:
-        specifier: ^4.6.7
-        version: 4.6.7
     devDependencies:
       '@synapcity/dev-eslint-config':
         specifier: workspace:*

@@ -14,7 +14,12 @@
   - manual identity linking is off everywhere until a feature uses it (D11).
 - **Problem:**
   - No SQL or Storage tests cover `profiles`, `user_preferences`, `handle_new_user`, the avatars bucket or `delete_own_account` (DB-09).
-  - Local Auth config drifts from hosted (OP-08): a local nonce skip, an `https://127.0.0.1:3000` redirect typo, and the `localhost:8080` versus `127.0.0.1:3000` origin mismatch.
+  - **Already in the repository (checked 2026-10-30):** `supabase/config.toml` has `skip_nonce_check = false`, `enable_manual_linking = false`, `site_url` and the redirect on `http://127.0.0.1:3000`, with a D11 comment, and `apps/web/.env.example` documents the same local origin. This was not compared with hosted values.
+  - **Still outstanding:**
+    - whether every local setting equals the hosted security semantics (needs the hosted values from a read-only `supabase config diff`, run by the owner or operator behind D2);
+    - the `localhost:8080` (`dev` script) versus `127.0.0.1:3000` (`dev:local`) origin, which needs a README note;
+    - the configuration matrix document;
+    - nothing in this list is claimed verified until the matrix is complete.
 - **Exists:**
   - migrations 0001 to 0008;
   - `server-account` (`save-name`, `save-avatar`, `preferences`);
@@ -24,7 +29,7 @@
   - the local-session E2E runner.
 - **In scope:**
   1. SQL and Storage tests.
-  2. `config.toml` alignment.
+  2. `config.toml` verification against the hosted values, and alignment only where they differ.
   3. Local origin unification.
   4. A configuration matrix doc.
   5. Signup and profile E2E.

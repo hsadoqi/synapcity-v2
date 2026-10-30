@@ -31,6 +31,7 @@
     "db:types": "node scripts/db-types.mjs",
     "db:test": "node scripts/db-test.mjs",
     "db:stack": "node scripts/db-test-stack.mjs",
+    "db:parity": "node scripts/db-parity.mjs",
     "prepare": "git config core.hooksPath .githooks || echo 'git hooks not activated (not a git checkout)'",
     "ui:add": "pnpm dlx shadcn@latest add -c apps/web",
     "report": "vitest run --coverage"

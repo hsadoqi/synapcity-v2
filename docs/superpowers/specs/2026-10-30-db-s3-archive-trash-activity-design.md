@@ -119,7 +119,7 @@
 - **`@synapcity/domain-records`:**
   - `export type LifecycleState = 'active' | 'archived' | 'trashed'`;
   - `export function lifecycleStateOf(r: { archivedAt: string | null; deletedAt: string | null }): LifecycleState`, where trashed takes precedence;
-  - read schemas gain `archivedAt` and `deletedAt` (`timestampSchema.nullable().default(null)`).
+  - read schemas gain `archivedAt` and `deletedAt` (`instantSchema.nullable().default(null)`, the instant from `@synapcity/domain-time`; `timestampSchema` no longer exists, and its last meaning was a time of day).
 - **No TypeScript activity contract yet:** there is no reader until S7, and Knip rejects unused exports.
 - **Errors:** `trashed_read_only`, `not_trashed`, `not_found`, `conflict`.
 

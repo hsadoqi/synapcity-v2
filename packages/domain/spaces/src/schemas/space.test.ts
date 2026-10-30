@@ -1,6 +1,9 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 
 import type { CreateSpaceInput, SpaceEntity, UpdateSpaceInput } from '../types';
+import { editableFieldsOf, RECORD_MESSAGES } from '@synapcity/domain-records';
+import { limitVectorMismatches } from '@synapcity/domain-records/testing';
+
 import { createSpaceSchema, spaceSchema, updateSpaceSchema } from './index';
 
 const savedSpace = {
@@ -221,9 +224,52 @@ describe('Space input schemas', () => {
     );
   });
 
-  it('removes server-managed fields from parsed create and update inputs', () => {
+  it('refuses server-managed fields instead of dropping them', () => {
+    expect(createSpaceSchema.safeParse(savedSpace).success).toBe(false);
+    expect(updateSpaceSchema.safeParse(savedSpace).success).toBe(false);
+  });
+
+  it('accepts a saved Space once projected to its editable fields', () => {
     const editable = { name: 'Writing', icon: 'pen-line', tags: ['writing'] };
-    expect(createSpaceSchema.parse(savedSpace)).toEqual(editable);
-    expect(updateSpaceSchema.parse(savedSpace)).toEqual(editable);
+    expect(editableFieldsOf(savedSpace)).toEqual(editable);
+    expect(createSpaceSchema.parse(editableFieldsOf(savedSpace))).toEqual(
+      editable,
+    );
+  });
+
+  it('refuses an empty update', () => {
+    expect(updateSpaceSchema.safeParse({}).success).toBe(false);
+  });
+
+  it('reports one Space message for a blank name', () => {
+    expect(
+      createSpaceSchema
+        .safeParse({ name: '  ', icon: 'folder', tags: [] })
+        .error?.issues.map((i) => i.message),
+    ).toEqual(['Enter a space name.']);
+  });
+});
+
+describe('Space write schemas keep every shared record rule', () => {
+  it.each([
+    ['createSpaceSchema', createSpaceSchema],
+    ['updateSpaceSchema', updateSpaceSchema],
+  ])('%s answers every shared limit vector as the base does', (_n, schema) => {
+    expect(limitVectorMismatches(schema)).toEqual([]);
+  });
+});
+
+describe('spaceSchema id', () => {
+  it('keeps the base bound, so a corrupt id cannot be huge', () => {
+    const result = spaceSchema.safeParse({
+      ...savedSpace,
+      id: 'x'.repeat(201),
+    });
+    expect(result.error?.issues[0]?.path).toEqual(['id']);
+  });
+
+  it('says the record message for a missing id', () => {
+    const result = spaceSchema.safeParse({ ...savedSpace, id: '' });
+    expect(result.error?.issues[0]?.message).toBe(RECORD_MESSAGES.missingId);
   });
 });

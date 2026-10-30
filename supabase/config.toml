@@ -98,7 +98,10 @@ enabled = true
 # in emails.
 site_url = "http://127.0.0.1:3000"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["https://127.0.0.1:3000"]
+# The app sends `?next=...&flow=...` after the callback, so the entry is the callback path with
+# the wildcard Supabase documents for "any characters". Local auth flows run on this origin
+# (`pnpm dev:web:local`); see docs/engineering/auth-configuration.md.
+additional_redirect_urls = ["http://127.0.0.1:3000/auth/callback**"]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 # If disabled, the refresh token will never expire.
@@ -110,13 +113,17 @@ refresh_token_reuse_interval = 10
 enable_signup = true
 # Allow/disallow anonymous sign-ins to your project.
 enable_anonymous_sign_ins = false
-# Allow/disallow testing manual linking of accounts
+# Manual identity linking stays off until a feature needs it (owner decision D11). NOTE: the
+# Settings "Linked accounts" rows call `linkIdentity`, which needs this on; see the open item in
+# docs/engineering/auth-configuration.md.
 enable_manual_linking = false
 # Passwords shorter than this value will be rejected as weak. Minimum 6, recommended 8 or more.
-minimum_password_length = 6
+# 8 characters with lower, upper, digits and symbols: the project's documented password strength
+# (apps/web/README.md), so a password accepted locally is accepted by the hosted project.
+minimum_password_length = 8
 # Passwords that do not meet the following requirements will be rejected as weak. Supported values
 # are: `letters_digits`, `lower_upper_letters_digits`, `lower_upper_letters_digits_symbols`
-password_requirements = ""
+password_requirements = "lower_upper_letters_digits_symbols"
 
 [auth.email]
 # Allow/disallow new user signups via email to your project.
@@ -124,10 +131,12 @@ enable_signup = true
 # If enabled, a user will be required to confirm any email change on both the old, and new email
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
-# If enabled, users need to confirm their email address before signing in.
-enable_confirmations = false
+# If enabled, users need to confirm their email address before signing in. Required on the hosted
+# project (ADR-0006). Locally the confirmation mail arrives in Mailpit (http://127.0.0.1:54324).
+enable_confirmations = true
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
-secure_password_change = false
+# On, as on the hosted project (ADR-0006: a password change needs a sign-in within the last 24 hours).
+secure_password_change = true
 # Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
 max_frequency = "1s"
 # Number of characters used in the email OTP.
@@ -239,8 +248,9 @@ client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
 secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
 redirect_uri = ""
 url = ""
-# Required for local sign in with Google auth.
-skip_nonce_check = true
+# The nonce check is on, as on the hosted project (owner decision D11). It matters only for
+# ID-token sign-in, which the app does not use; the redirect flow is unaffected.
+skip_nonce_check = false
 
 # Use Firebase Auth as a third-party provider alongside Supabase Auth.
 [auth.third_party.firebase]

@@ -3,9 +3,11 @@
 **Status:** Proposed.
 
 - Persistence is implementation-ready: D12 is Decided; D4b and the Document retention values are agent parameters (AH §2, §7).
-- Two owner approvals are needed before the editor layer can be built:
-  - **(1)** adding Lexical as a dependency (AGENTS §5; no workspace depends on it today);
-  - **(2)** where the editor and the content contract live (a new package needs approval under ADR-0014).
+- Lexical is the accepted editor direction (`PRODUCT.md`, `docs/glossary.md`) and the owner gave a conditional approval on 2026-10-30. The outstanding gate for the editor layer is:
+  - selecting the exact version against the npm registry when the editor layer begins (AGENTS §7a);
+  - verifying compatibility (V-5);
+  - the editor implementation itself.
+- Package ownership follows the workspace conventions: the content contract in `domain-documents`, the editor runtime in `frontend-editor` (created when the editor and body are approved, which this slice's editor layer is). Re-opened only if implementation finds a genuine conflict.
 - V-4 to V-8, V-11, V-15 and V-16 do not block starting the slice. They block S5 IC, and V-6, V-8 and V-15 also block T3 (roadmap section 1).
 
 **Date:** 2026-10-30
@@ -28,7 +30,7 @@
 - **Dependencies:**
   - I: S1, S3, F5.
   - R: T2 RC before T3.
-  - G: the two owner approvals above, before the editor layer is built. The persistence layer and its tests can be built first on the same branch.
+  - G: Lexical version selection and compatibility (V-5), before the editor layer is built. The persistence layer and its tests can be built first on the same branch.
 
 ## B. Data model and persistence
 
@@ -93,7 +95,7 @@
 
 ## C. Domain contracts and validation
 
-Package location is pending approval (2). The recommended location is a new `@synapcity/domain-documents`. The alternative, if a package is not approved, is app-local `apps/web/src/features/documents/lib/content/`.
+The contract lives in `@synapcity/domain-documents`, named in the workspace conventions (owner decision 2026-10-24), created with this slice's contract.
 
 ```ts
 export const DOCUMENT_CONTENT_SCHEMA_VERSION = 1;
@@ -144,7 +146,7 @@ export function parsePersistableDocument(
 ## F. Frontend and user experience
 
 - **Editor:**
-  - Lexical, under the editor package or location approved in (2), with the node set needed for the rich sample.
+  - Lexical, in `frontend-editor` (the runtime, nodes and plugins), with the node set needed for the rich sample. `apps/web` keeps only the host composition: the Server Actions, the page and the save wiring.
   - Plain toolbar actions from `frontend-ui`.
   - Fonts follow ADR-0003 tokens (`--font-body`, `--font-code`); there are no font declarations in components.
 - **Placement:** the editor replaces the dashed note in `DocumentView`; the reading layout from S3 of the Document plan is kept.

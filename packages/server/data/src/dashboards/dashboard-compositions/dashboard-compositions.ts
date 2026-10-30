@@ -1,10 +1,10 @@
+import { recordIdSchema } from '@synapcity/domain-records';
 import {
   toProviderFailure,
   type Json,
   type ProviderFailure,
   type SupabaseServerClient,
 } from '@synapcity/server-supabase';
-import { z } from 'zod';
 
 import { readError } from '../../read-error';
 import { jsonEqual } from './json-equal';
@@ -33,8 +33,6 @@ export type SaveCompositionOutcome =
   | { ok: false; reason: 'conflict' }
   | { ok: false; reason: 'failed'; error: ProviderFailure };
 
-const idSchema = z.uuid();
-
 /** The SQLSTATE the database raises when `revision` does not rise by exactly 1. */
 const REVISION_CONFLICT_CODE = 'PT409';
 
@@ -52,7 +50,7 @@ export async function loadComposition(
   client: SupabaseServerClient,
   dashboardId: string,
 ): Promise<StoredComposition | null> {
-  if (!idSchema.safeParse(dashboardId).success) return null;
+  if (!recordIdSchema.safeParse(dashboardId).success) return null;
 
   const { data, error } = await client
     .from('dashboard_compositions')

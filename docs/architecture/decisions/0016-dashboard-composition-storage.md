@@ -91,3 +91,14 @@ Deliberately weaken a policy, grant or cascade to confirm each check detects it.
 ## Reconsideration conditions
 
 Revisit if compositions need history or restore, shared or collaborative editing, per-widget writes for performance, or if a widget lifecycle is adopted.
+
+## Amendment 1 (2026-10-30): initialization, integrity and history
+
+Records owner decisions D3, D4 and D8 ([database architecture handoff](../../superpowers/specs/2026-10-30-database-architecture-handoff.md)); implemented by the migrations `composition_integrity`, `dashboard_revisions` and `composition_initialization` (slice S1). It supersedes these provisions of the Decision section above and leaves the rest standing.
+
+- **Decision 1 (row created on first save; no row means empty) is superseded.** A trigger creates the composition, at revision 1 and equal to `createComposition()`, in the same transaction as every Dashboard insert, and existing Dashboards were backfilled. There is one save path, an update at `revision + 1`. A missing row is a visible failure (`composition_missing`), never an empty canvas.
+- **Decision 2 (clients may insert a composition) is superseded.** Clients can neither insert nor delete a composition; the insert policy and privilege are removed. Update stays limited to `composition`, `schema_version` and `revision`.
+- **Decision 3 (object check and a 64 KB `pg_column_size` cap) is superseded.** The database holds a 128 KiB backstop on the text form (`octet_length(composition::text) <= 131072`), `schema_version in (1)`, and the exact `revision + 1` rule (a conflict is SQLSTATE `PT409`, which PostgREST answers with HTTP 409 and supabase-js reports as `error.code`). The 64 KiB contract stays in the application, measured as compact JSON by `parsePersistableComposition`; `jsonb::text` adds spacing, so the two cannot match exactly. Measured: the largest valid composition is 1.155 times larger as `jsonb::text`, and the densest possible document 1.5 times, against a 2 times backstop.
+- **"Does NOT decide: history or restore" is superseded for history.** A Dashboard's complete state is captured as immutable revisions by the database: see [ADR-0018](0018-revision-capture.md). Restore stays out of scope until its own slice.
+
+Verification of the amendment is in the S1 specification, section G.

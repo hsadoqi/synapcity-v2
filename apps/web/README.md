@@ -33,6 +33,8 @@ Set these in `apps/web/.env.local` (git-ignored) and, for deployments, in the ho
 
 The app throws on the first sign-up, reset or OAuth call if `SITE_URL` is missing.
 
+**One local origin.** Sign-in, sign-up, reset and OAuth flows run on `http://127.0.0.1:3000` (`pnpm dev:web:local`): it is the local stack's `site_url` and its redirect allow-list entry (`supabase/config.toml`), so the emailed links return to it. `pnpm dev` (port 8080) is for development fixture mode only, which has no session and does not use auth.
+
 ### A worktree has no `.env.local`
 
 `.env.local` is git-ignored, so a new worktree starts without it and the server answers every page with 500. For `pnpm test:e2e` and `pnpm verify`, pass the same placeholders CI uses (they hold no credentials and nothing contacts Supabase):
@@ -92,7 +94,7 @@ Each environment has its own `SITE_URL`, and the emailed link only works if Supa
 
 | Environment | `SITE_URL`                             | Redirect URLs entry                              |
 | ----------- | -------------------------------------- | ------------------------------------------------ |
-| Local       | `http://localhost:8080`                | `http://localhost:8080/auth/callback**`          |
+| Local       | `http://127.0.0.1:3000`                | `http://127.0.0.1:3000/auth/callback**`          |
 | Preview     | that deployment's own URL              | one exact entry per deployment; no wildcard host |
 | Production  | the production domain (not chosen yet) | `https://<domain>/auth/callback**`               |
 

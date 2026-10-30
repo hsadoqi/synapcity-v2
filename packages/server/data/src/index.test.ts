@@ -6,6 +6,7 @@ describe('@synapcity/server-data root entry', () => {
 
     expect(Object.keys(entry).sort()).toEqual([
       'COMPOSITION_SCHEMA_VERSION',
+      'RECORD_TABLES',
       'createRecord',
       'findRecord',
       'findSpace',

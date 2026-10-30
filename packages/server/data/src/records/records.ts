@@ -1,16 +1,31 @@
-import type { BaseRecord, OwnedRecordSummary } from '@synapcity/domain-records';
+import {
+  recordIdSchema,
+  type BaseRecord,
+  type BaseRecordCreate,
+  type OwnedRecordSummary,
+  type RecordKind,
+} from '@synapcity/domain-records';
 import {
   toProviderFailure,
   type ProviderFailure,
   type SupabaseServerClient,
 } from '@synapcity/server-supabase';
-import { z } from 'zod';
 
 import { COLUMNS, countOf, recordFromRow, type OwnedRow } from '../owned-row';
 import { readError } from '../read-error';
 
-/** The record tables beside Spaces (ADR-0013): one table per kind. */
-export type RecordKind = 'documents' | 'dashboards';
+/** The table each persisted record kind lives in (ADR-0012, ADR-0013). */
+export const RECORD_TABLES = {
+  space: 'spaces',
+  document: 'documents',
+  dashboard: 'dashboards',
+} as const satisfies Record<RecordKind, string>;
+
+/** A table that holds one kind of persisted record. */
+export type RecordTable = (typeof RECORD_TABLES)[RecordKind];
+
+/** The record tables that take part in Spaces (ADR-0013): every one but `spaces`. */
+export type ParticipantTable = Exclude<RecordTable, 'spaces'>;
 
 /** What pinning reports: the database-stamped time, or the failure by code and status. */
 export type PinnedOutcome =
@@ -19,7 +34,7 @@ export type PinnedOutcome =
 /** The kind's rows with the count of Spaces each takes part in. */
 async function summaryRows(
   client: SupabaseServerClient,
-  kind: RecordKind,
+  kind: ParticipantTable,
 ): Promise<{ row: OwnedRow; spaces: { count: number }[] }[]> {
   // One literal query per kind, so each select is checked against the schema.
   if (kind === 'documents') {
@@ -44,7 +59,7 @@ async function summaryRows(
  */
 export async function listRecordSummaries(
   client: SupabaseServerClient,
-  kind: RecordKind,
+  kind: ParticipantTable,
 ): Promise<OwnedRecordSummary[]> {
   const rows = await summaryRows(client, kind);
   return rows.map(({ row, spaces }) => ({
@@ -54,7 +69,7 @@ export async function listRecordSummaries(
 }
 
 /** Singular names for read errors. */
-const SINGULAR: Record<RecordKind, string> = {
+const SINGULAR: Record<ParticipantTable, RecordKind> = {
   documents: 'document',
   dashboards: 'dashboard',
 };
@@ -66,11 +81,11 @@ const SINGULAR: Record<RecordKind, string> = {
  */
 export async function findRecord(
   client: SupabaseServerClient,
-  kind: RecordKind,
+  kind: ParticipantTable,
   id: string,
 ): Promise<BaseRecord | null> {
   // A malformed id cannot match a uuid column; PostgREST would error instead.
-  if (!z.uuid().safeParse(id).success) return null;
+  if (!recordIdSchema.safeParse(id).success) return null;
 
   const { data, error } = await client
     .from(kind)
@@ -90,7 +105,7 @@ export async function findRecord(
  */
 export async function setRecordPinned(
   client: SupabaseServerClient,
-  table: 'spaces' | RecordKind,
+  table: RecordTable,
   id: string,
   pinned: boolean,
 ): Promise<PinnedOutcome> {
@@ -116,18 +131,20 @@ export type CreatedOutcome =
   { ok: true; id: string } | { ok: false; error: ProviderFailure };
 
 /**
- * Creates one of the caller's Spaces, documents or dashboards with only its
- * name; every other column has a default. The owner is not passed: the column
- * defaults to the session's user, and row-level security refuses any other.
+ * Creates one of the caller's Spaces, documents or dashboards from a parsed
+ * create input (`baseRecordCreateSchema`). Fields the input leaves out (icon,
+ * tags, description), the id, the owner and the times come from the column
+ * defaults: the owner is the session's user, and row-level security refuses
+ * any other.
  */
 export async function createRecord(
   client: SupabaseServerClient,
-  table: 'spaces' | RecordKind,
-  input: { name: string },
+  table: RecordTable,
+  input: BaseRecordCreate,
 ): Promise<CreatedOutcome> {
   const { data, error, status } = await client
     .from(table)
-    .insert({ name: input.name })
+    .insert(input)
     .select('id')
     .single();
 
@@ -147,7 +164,7 @@ const VIEW_THROTTLE_MS = 60_000;
  */
 export async function recordRecordView(
   client: SupabaseServerClient,
-  table: 'spaces' | RecordKind,
+  table: RecordTable,
   id: string,
   now: Date,
 ): Promise<{ ok: true } | { ok: false; error: ProviderFailure }> {

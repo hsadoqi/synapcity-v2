@@ -18,6 +18,7 @@ import {
   FieldLabel,
 } from '@synapcity/frontend-ui/core/field';
 import { Input } from '@synapcity/frontend-ui/core/input';
+import { boundedNameSchema, NAME_MAX } from '@synapcity/domain-records';
 
 import { signInPathFor } from '../../lib/routing/user-paths';
 import {
@@ -86,8 +87,14 @@ export function QuickCreateDialog({
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!collection || pending || submitting.current) return;
-    if (name.trim() === '') {
-      setFailure({ message: NAME_NEEDED, signedOut: false });
+    // The same rule the Server Action applies, so the message appears here
+    // without a round trip: blank, over the limit, or unsavable text.
+    const checked = boundedNameSchema(NAME_NEEDED).safeParse(name);
+    if (!checked.success) {
+      setFailure({
+        message: checked.error.issues[0]?.message ?? NAME_NEEDED,
+        signedOut: false,
+      });
       return;
     }
     setFailure(null);
@@ -96,7 +103,8 @@ export function QuickCreateDialog({
       try {
         let result: CreateRecordResult;
         try {
-          result = await create(collection.kind, name);
+          // The parsed name: trimmed, as the server stores it.
+          result = await create(collection.kind, checked.data);
         } catch {
           // The request failed on the way or the action threw: the record
           // may or may not exist.
@@ -160,6 +168,10 @@ export function QuickCreateDialog({
                 name="name"
                 autoComplete="off"
                 autoFocus
+                // A hint only. It counts UTF-16 units and the check trims, so
+                // the exact limit is the schema's: an emoji is one character
+                // there and two units here. 2x never blocks a valid name.
+                maxLength={NAME_MAX * 2}
                 value={name}
                 readOnly={pending}
                 onChange={(event) => setName(event.target.value)}

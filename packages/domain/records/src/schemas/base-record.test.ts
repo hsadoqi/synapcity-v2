@@ -1,18 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { baseRecordSchema } from './index';
-
-const record = {
-  id: 'opaque/id',
-  ownerId: '11111111-1111-4111-8111-111111111111',
-  name: 'Launch plan',
-  icon: 'file-text',
-  tags: ['work'],
-  createdAt: '2026-10-01T09:00:00Z',
-  updatedAt: '2026-10-03T14:30:00Z',
-  pinnedAt: '2026-10-04T09:00:00Z',
-  lastViewedAt: '2026-10-05T18:00:00+00:00',
-};
+import { record } from '../defaults';
 
 describe('baseRecordSchema', () => {
   it('parses a full record and keeps the pinned and last-viewed times', () => {
@@ -55,6 +44,54 @@ describe('baseRecordSchema', () => {
 
     expect(result.error?.issues.map((i) => i.message)).not.toContain(
       'Enter a space name.',
+    );
+  });
+
+  it.each([
+    ['a Z timestamp', '2026-10-01T09:00:00Z'],
+    [
+      'the +00:00 form the database returns',
+      '2026-10-01T09:00:00.123456+00:00',
+    ],
+    ['a non-UTC offset', '2026-10-01T09:00:00+05:30'],
+  ])('reads %s in every time field', (_name, time) => {
+    const parsed = baseRecordSchema.parse({
+      ...record,
+      createdAt: time,
+      updatedAt: time,
+      pinnedAt: time,
+      lastViewedAt: time,
+    });
+    expect(parsed.createdAt).toBe(time);
+  });
+
+  it.each([
+    ['a time of day', '09:00:00'],
+    ['a date only', '2026-10-01'],
+    ['no zone', '2026-10-01T09:00:00'],
+    ['a local format', '10/30/2026, 9:00:00 AM'],
+  ])('rejects %s as a saved time', (_name, time) => {
+    for (const field of [
+      'createdAt',
+      'updatedAt',
+      'pinnedAt',
+      'lastViewedAt',
+    ]) {
+      expect(
+        baseRecordSchema.safeParse({ ...record, [field]: time }).success,
+      ).toBe(false);
+    }
+  });
+
+  it('bounds the opaque id', () => {
+    expect(
+      baseRecordSchema.safeParse({ ...record, id: 'a'.repeat(200) }).success,
+    ).toBe(true);
+    expect(
+      baseRecordSchema.safeParse({ ...record, id: 'a'.repeat(201) }).success,
+    ).toBe(false);
+    expect(baseRecordSchema.safeParse({ ...record, id: '' }).success).toBe(
+      false,
     );
   });
 });

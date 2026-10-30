@@ -1,6 +1,6 @@
+import { recordIdSchema } from '@synapcity/domain-records';
 import type { SpaceEntity, SpaceSummary } from '@synapcity/domain-spaces';
 import type { SupabaseServerClient } from '@synapcity/server-supabase';
-import { z } from 'zod';
 
 import {
   COLUMNS,
@@ -53,7 +53,7 @@ export async function findSpace(
   spaceId: string,
 ): Promise<SpaceEntity | null> {
   // A malformed id cannot match a uuid column; PostgREST would error instead.
-  if (!z.uuid().safeParse(spaceId).success) return null;
+  if (!recordIdSchema.safeParse(spaceId).success) return null;
 
   const { data, error } = await client
     .from('spaces')

@@ -375,6 +375,7 @@ export type Database = {
         Args: Record<PropertyKey, never>;
         Returns: undefined;
       };
+      resource_tags_valid: { Args: { p_tags: string[] }; Returns: boolean };
     };
     Enums: {
       [_ in never]: never;

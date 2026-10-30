@@ -54,6 +54,15 @@ describe('data privacy schema', () => {
       }).success,
     ).toBe(false);
   });
+
+  it('reads the time as an instant, with Z or a numeric offset', () => {
+    for (const updatedAt of [at, '2026-10-17T12:00:00+00:00']) {
+      expect(
+        dataPrivacySchema.safeParse({ sharing: { granted: true, updatedAt } })
+          .success,
+      ).toBe(true);
+    }
+  });
 });
 
 describe('choose', () => {

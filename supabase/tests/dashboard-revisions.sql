@@ -40,19 +40,19 @@ begin
 
   select * into r from public.dashboard_revisions
    where dashboard_id = current_setting('test.created')::uuid;
-  if r.sequence <> 1 or r.source <> 'initial' or r.schema_version <> 1 then
+  if r.sequence is distinct from 1 or r.source is distinct from 'initial' or r.schema_version is distinct from 1 then
     raise exception 'the first revision must be sequence 1, initial, version 1 (got %, %, %)',
       r.sequence, r.source, r.schema_version;
   end if;
-  if r.name <> 'Created' or r.description <> 'About it' or r.icon <> 'folder'
+  if r.name is distinct from 'Created' or r.description is distinct from 'About it' or r.icon is distinct from 'folder'
      or r.tags <> array['x', 'y'] then
     raise exception 'a revision must hold the Dashboard''s name, description, icon and tags';
   end if;
-  if r.owner_id <> '11111111-1111-4111-8111-111111111111'
-     or r.created_by <> '11111111-1111-4111-8111-111111111111' then
+  if r.owner_id is distinct from '11111111-1111-4111-8111-111111111111'
+     or r.created_by is distinct from '11111111-1111-4111-8111-111111111111' then
     raise exception 'owner and created_by must be the creating user';
   end if;
-  if r.content_bytes <> octet_length(r.composition::text) then
+  if r.content_bytes is distinct from octet_length(r.composition::text) then
     raise exception 'content_bytes must be octet_length(composition::text)';
   end if;
   if r.content_hash <> private.dashboard_state_hash(
@@ -125,8 +125,8 @@ begin
 
   select * into r from public.dashboard_revisions
    where dashboard_id = 'b2b2b2b2-0000-4000-8000-000000000002';
-  if not found or r.source <> 'backfill' or r.sequence <> 1
-     or r.created_by <> '11111111-1111-4111-8111-111111111111' then
+  if not found or r.source is distinct from 'backfill' or r.sequence is distinct from 1
+     or r.created_by is distinct from '11111111-1111-4111-8111-111111111111' then
     raise exception 'a backfilled composition must get one backfill revision authored by the owner';
   end if;
 end;
@@ -285,10 +285,10 @@ begin
   if n <> 2 then raise exception 'a save after the gap must freeze the head (saw % revisions)', n; end if;
   select * into r from public.dashboard_revisions
    where dashboard_id = 'c3c3c3c3-0000-4000-8000-000000000003' and sequence = 2;
-  if r.composition <> '{"v":"A"}'::jsonb or r.source <> 'checkpoint' then
+  if r.composition is distinct from '{"v":"A"}'::jsonb or r.source is distinct from 'checkpoint' then
     raise exception 'the checkpoint must hold the previous head ("A"), got % (%)', r.composition, r.source;
   end if;
-  if r.created_by <> '11111111-1111-4111-8111-111111111111' then
+  if r.created_by is distinct from '11111111-1111-4111-8111-111111111111' then
     raise exception 'a checkpoint is authored by the saving user';
   end if;
 end;
@@ -349,7 +349,7 @@ begin
    where dashboard_id = 'c3c3c3c3-0000-4000-8000-000000000003';
   select * into r from public.dashboard_revisions
    where dashboard_id = 'c3c3c3c3-0000-4000-8000-000000000003' and sequence = 4;
-  if n <> 4 or r.composition <> '{"v":"C"}'::jsonb then
+  if n <> 4 or r.composition is distinct from '{"v":"C"}'::jsonb then
     raise exception 'span: a differing head must be frozen once past the span (saw %, %)', n, r.composition;
   end if;
 end;
@@ -396,7 +396,7 @@ begin
    where dashboard_id = 'a7a7a7a7-0000-4000-8000-000000000007';
   select * into r from public.dashboard_revisions
    where dashboard_id = 'a7a7a7a7-0000-4000-8000-000000000007' and sequence = 2;
-  if n <> 2 or r.name <> 'Two' then
+  if n <> 2 or r.name is distinct from 'Two' then
     raise exception 'renaming twice must freeze the uncaptured interim state (saw %, %)', n, r.name;
   end if;
 end;
@@ -417,7 +417,7 @@ begin
    where dashboard_id = 'd4d4d4d4-0000-4000-8000-000000000004';
   select * into r from public.dashboard_revisions
    where dashboard_id = 'd4d4d4d4-0000-4000-8000-000000000004' and sequence = 2;
-  if n <> 2 or r.name <> 'Alpha' or r.composition <> '{"v":"A"}'::jsonb then
+  if n <> 2 or r.name is distinct from 'Alpha' or r.composition is distinct from '{"v":"A"}'::jsonb then
     raise exception 'a rename must freeze the old head under the old name (saw % revisions, %, %)',
       n, r.name, r.composition;
   end if;
@@ -443,7 +443,7 @@ begin
    where dashboard_id = 'd4d4d4d4-0000-4000-8000-000000000004' and sequence = 3;
   select count(*) into n from public.dashboard_revisions
    where dashboard_id = 'd4d4d4d4-0000-4000-8000-000000000004';
-  if n <> 3 or r.name <> 'Beta' or r.composition <> '{"v":"A"}'::jsonb then
+  if n <> 3 or r.name is distinct from 'Beta' or r.composition is distinct from '{"v":"A"}'::jsonb then
     raise exception 'rename then save must give revision 3 = (A, Beta) (saw %, %, %)', n, r.name, r.composition;
   end if;
 end;

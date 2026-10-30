@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { isStorableText } from './limits';
+import { isStorableText } from './is-storable-text';
 
 describe('isStorableText', () => {
   it.each([

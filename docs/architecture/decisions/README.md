@@ -41,6 +41,7 @@ ADRs are numbered sequentially (`0001-*.md`, `0002-*.md`, ...) and never renumbe
 | [0015](0015-forms-package-and-form-state.md)          | Forms package and form state (React Hook Form)               | Accepted |
 | [0016](0016-dashboard-composition-storage.md)         | Dashboard composition storage                                | Accepted |
 | [0017](0017-breadcrumb-trail-ownership.md)            | Breadcrumb trail ownership and composition                   | Accepted |
+| [0018](0018-revision-capture.md)                      | Revision capture                                             | Proposed |
 
 **Lineage.** The ADRs in `docs/archive/architecture/decisions/` (0001-0016) belong to the previous implementation. They are evidence under `docs/engineering/preservation-policy.md`, not authority, and their package layout must not be assumed to describe this repository (`packages/ui/core`, for example). This index restarted at 0001 for the current repository. When a current ADR needs an archived decision, it restates the decision it adopts rather than citing the archived number.
 

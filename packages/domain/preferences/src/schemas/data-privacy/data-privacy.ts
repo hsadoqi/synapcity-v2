@@ -1,3 +1,4 @@
+import { instantSchema } from '@synapcity/domain-time';
 import { z } from 'zod';
 
 /** Each reason data may be collected. A collector asks for one of these. */
@@ -25,7 +26,7 @@ const LEGACY_VERSION = 1;
 
 const consentSchema = z.object({
   granted: z.boolean(),
-  updatedAt: z.iso.datetime().nullable(),
+  updatedAt: instantSchema.nullable(),
   /** The wording it was chosen under; null when never chosen. */
   version: z.number().int().positive().nullable().default(null),
   /** Turned off because the wording changed; the tab asks again. */

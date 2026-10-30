@@ -1,3 +1,4 @@
+import { RECORD_MESSAGES } from '@synapcity/domain-records';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -50,6 +51,17 @@ describe('QuickCreateDialog', () => {
       await screen.findByRole('dialog', { name: 'New document' }),
     ).toBeTruthy();
     expect(screen.getByRole('textbox', { name: 'Name' })).toBeTruthy();
+  });
+
+  it('sends the trimmed name it checked, not the raw text', async () => {
+    renderDialog('document');
+    await typeName('  Garden plans  ');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Create' }));
+
+    await waitFor(() =>
+      expect(create).toHaveBeenCalledWith('document', 'Garden plans'),
+    );
   });
 
   it('creates a Space and opens it', async () => {
@@ -105,6 +117,33 @@ describe('QuickCreateDialog', () => {
     );
     expect(name.getAttribute('aria-invalid')).toBe('true');
     expect(create).not.toHaveBeenCalled();
+  });
+
+  it('says so when the name is over the limit, keeps it, and does not call the action', async () => {
+    renderDialog('document');
+    const name = await typeName('a'.repeat(121));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Create' }));
+
+    expect(await screen.findByRole('alert')).toHaveProperty(
+      'textContent',
+      RECORD_MESSAGES.nameTooLong,
+    );
+    expect(name.value).toBe('a'.repeat(121));
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it('counts characters: 120 emoji go through, and the field does not stop a valid name early', async () => {
+    renderDialog('document');
+    const name = await typeName('😀'.repeat(120));
+    // 240 UTF-16 units; a maxLength of 120 would have cut this valid name.
+    expect(name.maxLength).toBeGreaterThanOrEqual(240);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Create' }));
+
+    await waitFor(() =>
+      expect(create).toHaveBeenCalledWith('document', '😀'.repeat(120)),
+    );
   });
 
   it('keeps the typed name and shows the error when saving fails', async () => {

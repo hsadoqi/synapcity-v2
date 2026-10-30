@@ -1,0 +1,543 @@
+{
+  "about": "Boundary vectors for the D5 metadata limits. Each case is run through the zod input schema (limit-vectors.test.ts) and through PostgreSQL via the Data API (@synapcity/server-data, test:db), so the two cannot drift. `value` is a string, an array (tags), or a generator: {repeat, times, prefix, suffix} builds the repeated text; {distinct} builds that many different tags; {units} builds a string from UTF-16 code units (how an unpaired surrogate is written, which JSON tooling will not carry as an escape). `zod` is the outcome of the input schema (which trims names and tags; `zodOutput` is what it keeps when that differs from `value`); `db` is the outcome of inserting `value` as given. They differ only where the app normalizes first, or is deliberately stricter than the database (control characters, direction-changing characters, invisible-only text), and each such case says why in `note`. Lengths count code points. The file is ASCII-escaped on purpose: it holds invisible characters and unpaired surrogates.",
+  "cases": [
+    {
+      "id": "name-120",
+      "field": "name",
+      "value": {
+        "repeat": "a",
+        "times": 120
+      },
+      "zod": "accept",
+      "db": "accept"
+    },
+    {
+      "id": "name-121",
+      "field": "name",
+      "value": {
+        "repeat": "a",
+        "times": 121
+      },
+      "zod": "reject",
+      "db": "reject"
+    },
+    {
+      "id": "name-120-emoji",
+      "field": "name",
+      "value": {
+        "repeat": "\ud83d\ude00",
+        "times": 120
+      },
+      "zod": "accept",
+      "db": "accept",
+      "note": "240 UTF-16 units but 120 characters"
+    },
+    {
+      "id": "name-121-emoji",
+      "field": "name",
+      "value": {
+        "repeat": "\ud83d\ude00",
+        "times": 121
+      },
+      "zod": "reject",
+      "db": "reject"
+    },
+    {
+      "id": "name-120-accented",
+      "field": "name",
+      "value": {
+        "repeat": "\u00e9",
+        "times": 120
+      },
+      "zod": "accept",
+      "db": "accept",
+      "note": "precomposed e-acute: two bytes, one code point"
+    },
+    {
+      "id": "name-60-combining",
+      "field": "name",
+      "value": {
+        "repeat": "e\u0301",
+        "times": 60
+      },
+      "zod": "accept",
+      "db": "accept",
+      "note": "e + U+0301: two code points each, 120 in all"
+    },
+    {
+      "id": "name-61-combining",
+      "field": "name",
+      "value": {
+        "repeat": "e\u0301",
+        "times": 61
+      },
+      "zod": "reject",
+      "db": "reject",
+      "note": "122 code points; counting graphemes would wrongly accept"
+    },
+    {
+      "id": "name-1",
+      "field": "name",
+      "value": "a",
+      "zod": "accept",
+      "db": "accept"
+    },
+    {
+      "id": "name-blank",
+      "field": "name",
+      "value": "   ",
+      "zod": "reject",
+      "db": "reject"
+    },
+    {
+      "id": "name-empty",
+      "field": "name",
+      "value": "",
+      "zod": "reject",
+      "db": "reject"
+    },
+    {
+      "id": "name-nbsp-only",
+      "field": "name",
+      "value": "\u00a0",
+      "zod": "reject",
+      "db": "reject",
+      "note": "JS trim and the database's [:space:] class both treat U+00A0 as space"
+    },
+    {
+      "id": "name-padded-120",
+      "field": "name",
+      "value": {
+        "repeat": "a",
+        "times": 120,
+        "prefix": "  ",
+        "suffix": "  "
+      },
+      "zod": "accept",
+      "db": "reject",
+      "zodOutput": {
+        "repeat": "a",
+        "times": 120
+      },
+      "note": "the app trims to 120 and stores that; the database, given 124 untrimmed characters, refuses them"
+    },
+    {
+      "id": "name-nul",
+      "field": "name",
+      "value": "a\u0000b",
+      "zod": "reject",
+      "db": "reject",
+      "note": "U+0000 cannot be stored"
+    },
+    {
+      "id": "name-lone-surrogate",
+      "field": "name",
+      "value": {
+        "units": [97, 55357, 98]
+      },
+      "zod": "reject",
+      "db": "reject",
+      "note": "an unpaired surrogate cannot be stored"
+    },
+    {
+      "id": "description-2000",
+      "field": "description",
+      "value": {
+        "repeat": "d",
+        "times": 2000
+      },
+      "zod": "accept",
+      "db": "accept"
+    },
+    {
+      "id": "description-2001",
+      "field": "description",
+      "value": {
+        "repeat": "d",
+        "times": 2001
+      },
+      "zod": "reject",
+      "db": "reject"
+    },
+    {
+      "id": "description-2000-emoji",
+      "field": "description",
+      "value": {
+        "repeat": "\ud83d\ude00",
+        "times": 2000
+      },
+      "zod": "accept",
+      "db": "accept"
+    },
+    {
+      "id": "description-2001-emoji",
+      "field": "description",
+      "value": {
+        "repeat": "\ud83d\ude00",
+        "times": 2001
+      },
+      "zod": "reject",
+      "db": "reject"
+    },
+    {
+      "id": "description-empty",
+      "field": "description",
+      "value": "",
+      "zod": "accept",
+      "db": "accept"
+    },
+    {
+      "id": "description-nul",
+      "field": "description",
+      "value": "a\u0000b",
+      "zod": "reject",
+      "db": "reject"
+    },
+    {
+      "id": "description-lone-surrogate",
+      "field": "description",
+      "value": {
+        "units": [56832]
+      },
+      "zod": "reject",
+      "db": "reject"
+    },
+    {
+      "id": "icon-64",
+      "field": "icon",
+      "value": {
+        "repeat": "a",
+        "times": 64
+      },
+      "zod": "accept",
+      "db": "accept"
+    },
+    {
+      "id": "icon-65",
+      "field": "icon",
+      "value": {
+        "repeat": "a",
+        "times": 65
+      },
+      "zod": "reject",
+      "db": "reject"
+    },
+    {
+      "id": "icon-uppercase",
+      "field": "icon",
+      "value": "Folder",
+      "zod": "reject",
+      "db": "reject"
+    },
+    {
+      "id": "icon-kebab",
+      "field": "icon",
+      "value": "layout-dashboard",
+      "zod": "accept",
+      "db": "accept"
+    },
+    {
+      "id": "tags-none",
+      "field": "tags",
+      "value": [],
+      "zod": "accept",
+      "db": "accept"
+    },
+    {
+      "id": "tags-20",
+      "field": "tags",
+      "value": {
+        "distinct": 20
+      },
+      "zod": "accept",
+      "db": "accept"
+    },
+    {
+      "id": "tags-21",
+      "field": "tags",
+      "value": {
+        "distinct": 21
+      },
+      "zod": "reject",
+      "db": "reject"
+    },
+    {
+      "id": "tag-50",
+      "field": "tags",
+      "value": [
+        {
+          "repeat": "a",
+          "times": 50
+        }
+      ],
+      "zod": "accept",
+      "db": "accept"
+    },
+    {
+      "id": "tag-51",
+      "field": "tags",
+      "value": [
+        {
+          "repeat": "a",
+          "times": 51
+        }
+      ],
+      "zod": "reject",
+      "db": "reject"
+    },
+    {
+      "id": "tag-50-emoji",
+      "field": "tags",
+      "value": [
+        {
+          "repeat": "\ud83d\ude00",
+          "times": 50
+        }
+      ],
+      "zod": "accept",
+      "db": "accept"
+    },
+    {
+      "id": "tag-51-emoji",
+      "field": "tags",
+      "value": [
+        {
+          "repeat": "\ud83d\ude00",
+          "times": 51
+        }
+      ],
+      "zod": "reject",
+      "db": "reject"
+    },
+    {
+      "id": "tag-empty",
+      "field": "tags",
+      "value": [""],
+      "zod": "reject",
+      "db": "reject"
+    },
+    {
+      "id": "tag-blank",
+      "field": "tags",
+      "value": ["   "],
+      "zod": "reject",
+      "db": "reject",
+      "note": "trims to empty in the app; fails btrim equality in the database"
+    },
+    {
+      "id": "tag-two-words",
+      "field": "tags",
+      "value": ["two words"],
+      "zod": "accept",
+      "db": "accept"
+    },
+    {
+      "id": "tag-space-padded",
+      "field": "tags",
+      "value": [" padded "],
+      "zod": "accept",
+      "db": "reject",
+      "zodOutput": ["padded"],
+      "note": "the app trims and stores 'padded'; the database refuses an untrimmed tag"
+    },
+    {
+      "id": "tag-tab-padded",
+      "field": "tags",
+      "value": ["\tpadded"],
+      "zod": "accept",
+      "db": "accept",
+      "zodOutput": ["padded"],
+      "note": "JS trim removes a tab; PostgreSQL btrim removes only spaces, so the database accepts it as given. The app never sends it"
+    },
+    {
+      "id": "tag-nbsp-padded",
+      "field": "tags",
+      "value": ["\u00a0padded"],
+      "zod": "accept",
+      "db": "accept",
+      "zodOutput": ["padded"],
+      "note": "same: U+00A0 is trimmed by JS and not by btrim"
+    },
+    {
+      "id": "tags-duplicate",
+      "field": "tags",
+      "value": ["a", "a"],
+      "zod": "reject",
+      "db": "reject"
+    },
+    {
+      "id": "tags-duplicate-case",
+      "field": "tags",
+      "value": ["Work", "work"],
+      "zod": "reject",
+      "db": "reject"
+    },
+    {
+      "id": "tags-duplicate-accented-case",
+      "field": "tags",
+      "value": ["\u00c9", "\u00e9"],
+      "zod": "reject",
+      "db": "reject",
+      "note": "both fold case beyond ASCII (en_US.UTF-8 locally)"
+    },
+    {
+      "id": "tags-distinct",
+      "field": "tags",
+      "value": ["a", "b"],
+      "zod": "accept",
+      "db": "accept"
+    },
+    {
+      "id": "tag-nul",
+      "field": "tags",
+      "value": ["a\u0000b"],
+      "zod": "reject",
+      "db": "reject"
+    },
+    {
+      "id": "tag-lone-surrogate",
+      "field": "tags",
+      "value": [
+        {
+          "units": [55357]
+        }
+      ],
+      "zod": "reject",
+      "db": "reject"
+    },
+    {
+      "id": "name-newline",
+      "field": "name",
+      "value": "a\nb",
+      "zod": "reject",
+      "db": "accept",
+      "note": "a name is one line; PostgreSQL accepts the newline, the app does not"
+    },
+    {
+      "id": "name-tab",
+      "field": "name",
+      "value": "a\tb",
+      "zod": "reject",
+      "db": "accept",
+      "note": "same: a control character"
+    },
+    {
+      "id": "name-bell",
+      "field": "name",
+      "value": "a\u0007b",
+      "zod": "reject",
+      "db": "accept"
+    },
+    {
+      "id": "name-bidi-override",
+      "field": "name",
+      "value": "a\u202eb",
+      "zod": "reject",
+      "db": "accept",
+      "note": "a right-to-left override reorders what a reader sees"
+    },
+    {
+      "id": "name-bidi-isolate",
+      "field": "name",
+      "value": "a\u2066b",
+      "zod": "reject",
+      "db": "accept"
+    },
+    {
+      "id": "name-zero-width-only",
+      "field": "name",
+      "value": "\u200b\u200b\u200b",
+      "zod": "reject",
+      "db": "accept",
+      "note": "trim() leaves zero-width spaces, so the name would show as nothing"
+    },
+    {
+      "id": "name-invisible-only",
+      "field": "name",
+      "value": "\u200c\u2060\ufeff",
+      "zod": "reject",
+      "db": "accept"
+    },
+    {
+      "id": "name-zero-width-beside-text",
+      "field": "name",
+      "value": "ab\u200b",
+      "zod": "accept",
+      "db": "accept",
+      "note": "an invisible character next to visible ones is allowed"
+    },
+    {
+      "id": "name-zwj-emoji",
+      "field": "name",
+      "value": "\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67",
+      "zod": "accept",
+      "db": "accept",
+      "note": "joined emoji need the zero-width joiners"
+    },
+    {
+      "id": "description-newline",
+      "field": "description",
+      "value": "one\ntwo",
+      "zod": "accept",
+      "db": "accept"
+    },
+    {
+      "id": "description-crlf",
+      "field": "description",
+      "value": "one\r\ntwo",
+      "zod": "accept",
+      "db": "accept"
+    },
+    {
+      "id": "description-tab",
+      "field": "description",
+      "value": "a\tb",
+      "zod": "accept",
+      "db": "accept"
+    },
+    {
+      "id": "description-bell",
+      "field": "description",
+      "value": "a\u0007b",
+      "zod": "reject",
+      "db": "accept",
+      "note": "a control character other than newline, return and tab"
+    },
+    {
+      "id": "description-escape",
+      "field": "description",
+      "value": "a\u001bb",
+      "zod": "reject",
+      "db": "accept"
+    },
+    {
+      "id": "description-bidi-override",
+      "field": "description",
+      "value": "a\u202eb",
+      "zod": "reject",
+      "db": "accept"
+    },
+    {
+      "id": "tag-newline",
+      "field": "tags",
+      "value": ["a\nb"],
+      "zod": "reject",
+      "db": "accept",
+      "note": "a tag is one line"
+    },
+    {
+      "id": "tag-bidi-override",
+      "field": "tags",
+      "value": ["a\u202eb"],
+      "zod": "reject",
+      "db": "accept"
+    },
+    {
+      "id": "tag-zero-width-only",
+      "field": "tags",
+      "value": ["\u200b"],
+      "zod": "reject",
+      "db": "accept"
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import type { RecordKind } from '@synapcity/domain-records';
 import { FileText, Layers, LayoutDashboard } from 'lucide-react';
 
 import { COLLECTION_LABELS } from './collection-labels';
@@ -11,8 +12,8 @@ import {
   spacesPathFor,
 } from '../../lib/routing/user-paths';
 
-/** A kind of record someone can create and browse. */
-export type CollectionKind = 'space' | 'document' | 'dashboard';
+/** A kind of record someone can create and browse: every persisted kind. */
+export type CollectionKind = RecordKind;
 
 /** One collection as the sidebar, palette and quick-create dialog describe it. */
 export type Collection = {

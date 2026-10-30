@@ -31,7 +31,7 @@ begin
 
   select * into r from public.dashboard_compositions
    where dashboard_id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
-  if r.revision <> 1 or r.schema_version <> 1 or r.owner_id <> '11111111-1111-4111-8111-111111111111' then
+  if r.revision <> 1 or r.schema_version is distinct from 1 or r.owner_id is distinct from '11111111-1111-4111-8111-111111111111' then
     raise exception 'a new composition must be revision 1, version 1, owned by the Dashboard owner';
   end if;
   if r.composition <>
