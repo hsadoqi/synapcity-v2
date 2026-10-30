@@ -9,7 +9,10 @@ import { createRequestClient, type SupabaseServerClient } from './index';
 
 type CookieMethods = {
   getAll: () => { name: string; value: string }[];
-  setAll: (cookies: { name: string; value: string; options: object }[]) => void;
+  setAll: (
+    cookies: { name: string; value: string; options: object }[],
+    headers?: Record<string, string>,
+  ) => void;
 };
 
 function cookieMethods(): CookieMethods {
@@ -82,6 +85,70 @@ describe('createRequestClient', () => {
     expect(() =>
       cookieMethods().setAll([{ name: 'a', value: '1', options: {} }]),
     ).not.toThrow();
+  });
+
+  describe('response headers', () => {
+    const cacheHeaders = {
+      'Cache-Control': 'private, no-cache, no-store, must-revalidate, max-age=0',
+      Expires: '0',
+      Pragma: 'no-cache',
+    };
+
+    it('hands every header the SDK sends with a session write to the host', () => {
+      const onResponseHeaders = vi.fn();
+      createRequestClient({
+        url: 'u',
+        publishableKey: 'k',
+        cookies: { getAll: () => [], set: vi.fn() },
+        onResponseHeaders,
+      });
+
+      cookieMethods().setAll(
+        [{ name: 'a', value: '1', options: {} }],
+        cacheHeaders,
+      );
+
+      expect(onResponseHeaders).toHaveBeenCalledExactlyOnceWith(cacheHeaders);
+    });
+
+    it('still hands them over when the host cannot write cookies', () => {
+      const onResponseHeaders = vi.fn();
+      createRequestClient({
+        url: 'u',
+        publishableKey: 'k',
+        cookies: {
+          getAll: () => [],
+          set: () => {
+            throw new Error('Cookies can only be modified in a Server Action');
+          },
+        },
+        onResponseHeaders,
+      });
+
+      cookieMethods().setAll([{ name: 'a', value: '1', options: {} }], cacheHeaders);
+
+      expect(onResponseHeaders).toHaveBeenCalledExactlyOnceWith(cacheHeaders);
+    });
+
+    it('does not call the host when there are no headers, or no sink', () => {
+      const onResponseHeaders = vi.fn();
+      createRequestClient({
+        url: 'u',
+        publishableKey: 'k',
+        cookies: { getAll: () => [], set: vi.fn() },
+        onResponseHeaders,
+      });
+      cookieMethods().setAll([], {});
+      expect(onResponseHeaders).not.toHaveBeenCalled();
+
+      createServerClient.mockClear();
+      createRequestClient({
+        url: 'u',
+        publishableKey: 'k',
+        cookies: { getAll: () => [], set: vi.fn() },
+      });
+      expect(() => cookieMethods().setAll([], cacheHeaders)).not.toThrow();
+    });
   });
 });
 
