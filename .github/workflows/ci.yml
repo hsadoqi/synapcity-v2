@@ -119,6 +119,30 @@ jobs:
       - name: Fail if the committed types differ
         run: git diff --exit-code -- packages/server/supabase/src/database-types/database.types.ts
 
+  # Every SQL test in supabase/tests, on a fresh local database built from the
+  # migrations. Like `db-types` it needs Docker, so it stays out of `pnpm verify`.
+  # Each job gets its own stack, so it cannot collide with another worktree's.
+  # No secrets and no hosted project are involved: `pnpm db:test` refuses any
+  # target that is not 127.0.0.1 or localhost.
+  db-tests:
+    name: db-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Start the local database
+        run: pnpm exec supabase db start
+      - name: Apply the migrations
+        run: pnpm exec supabase migration up --local
+      - name: Run the SQL tests
+        run: pnpm db:test
+
   pr-hygiene:
     name: pr-hygiene
     if: github.event_name == 'pull_request'
