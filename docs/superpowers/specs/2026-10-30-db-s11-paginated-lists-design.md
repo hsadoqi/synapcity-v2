@@ -89,7 +89,7 @@ listRecordSummaries(client, kind, {
   view,
   after?: RecordCursor,
   limit = 100,
-}): Promise<Page<OwnedRecordSummary, RecordCursor>>;
+}): Promise<Page<RecordSummary, RecordCursor>>;
 
 listSpaceDocuments(client, spaceId, {
   after?: MemberCursor,

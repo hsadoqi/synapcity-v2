@@ -48,7 +48,7 @@
 ## C. Domain contracts and validation
 
 - All ids are UUIDs.
-- The name uses S2's `baseRecordInputSchema.shape.name`.
+- The name uses S2's `baseRecordCreateSchema.shape.name`.
 - `kind` is `'documents' | 'dashboards'`.
 - Errors: `already_member` (treated as success with no change), `not_found`, `conflict` (reorder), `trashed_read_only`.
 

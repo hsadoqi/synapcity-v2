@@ -9,10 +9,10 @@
 ## A. Identity and scope
 
 - **Capability:** names, descriptions, tags and icons of Spaces, Documents and Dashboards follow the same limits in forms, Server Actions and the database. Direct API writers get the same answers as the app.
-- **Problem:** no bounds exist (DB-03). `baseRecordInputSchema` checks only `name.trim().min(1)`.
+- **Problem:** no bounds existed (DB-03). The implemented neutral contract now applies the approved bounds consistently to saved metadata, create inputs and patches.
 - **Exists:**
   - DB checks for non-blank names, icon pattern, one-dimensional tags and no null tags;
-  - `baseRecordInputSchema` and `ICON_NAME_PATTERN` in `@synapcity/domain-records`;
+  - `baseRecordMetadataSchema` and `ICON_NAME_PATTERN` in `@synapcity/domain-records`;
   - `createSpaceSchema` and `spaceSchema` in `@synapcity/domain-spaces`;
   - `createRecord` validating the name with `baseRecordSchema.shape.name`;
   - the Quick Create dialog.
@@ -61,7 +61,7 @@ export function isStorableText(s: string): boolean;
 // false if s contains U+0000 or !s.isWellFormed()
 ```
 
-`baseRecordInputSchema`:
+`baseRecordMetadataSchema`:
 
 ```ts
 name: z.string().trim().min(1).max(NAME_MAX).refine(isStorableText);
@@ -73,14 +73,14 @@ tags: z.array(z.string().trim().min(1).max(TAG_MAX).refine(isStorableText))
 ```
 
 - `createSpaceSchema` keeps its own messages and imports the constants.
-- **Read schemas** (`baseRecordSchema`, `spaceSchema`) must not reject legacy rows before `VALIDATE`. Limits are applied to input schemas only. Read schemas extend the base fields without `.max`; implementation splits `baseRecordInputSchema` (bounded) from a `baseRecordFieldsSchema` (unbounded, used by read schemas).
+- **Read schemas** (`baseRecordSchema`, `spaceSchema`) enforce the same durable bounds as create and patch schemas. `NOT VALID` is a deployment sequencing tool for PostgreSQL constraints, not permission for the domain layer to type an invalid legacy row as a valid `BaseRecord`. Any violating hosted row blocks validation and requires an owner-approved repair before the app contract can read it.
 - **Trimming tags** is normalization: D5 measures length after trimming, and the DB requires the trimmed form. It is not truncation.
 - **Boundary vectors:** a JSON file `packages/domain/records/src/testing/limit-vectors.json` (exported through `@synapcity/domain-records/testing`) lists accept and reject cases. The zod tests and `supabase/tests/resource-metadata-bounds.sql` both consume it; the SQL side is generated into a temp table by the `db:test` runner, or copied by a test helper.
 - **V-12:** record how `server-account` measures the 16 KiB `user_preferences` check. Tracked only; no change.
 
 ## D. Data access and application integration
 
-- `createRecord` (`apps/web/src/lib/records/create-record-action.ts`) already validates the name through `baseRecordSchema.shape.name`. Switch it to `baseRecordInputSchema.shape.name`.
+- `createRecord` (`apps/web/src/lib/records/create-record-action.ts`) validates the name through `baseRecordCreateSchema`, with its form-specific blank wording.
 - Messages: an over-long name gets "Keep it to 120 characters or fewer." The existing `NAME_NEEDED` stays.
 - `server-data`: map a database `23514` to a `ProviderFailure` with code `check_violation`. The action shows the generic `SAVE_FAILED`, because zod catches valid cases first and the DB is a backstop.
 

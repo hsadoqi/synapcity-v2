@@ -54,7 +54,7 @@ Alternatives considered:
 
 ## C. Domain contracts and validation
 
-- `@synapcity/domain-records`: `baseRecordPatchSchema` (`recordPatchSchema(baseRecordInputSchema)`: strict, every field optional, at least one present), bounded by S2; implemented 2026-10-30.
+- `@synapcity/domain-records`: `baseRecordPatchSchema` (`recordPatchSchema(baseRecordMetadataSchema)`: strict, every field optional, at least one present), bounded by S2; implemented 2026-10-30.
 - `@synapcity/domain-spaces`: `updateSpaceSchema`, which exists, is aligned to the same bounds.
 - `updatedAt` round-trips as the exact database string, microseconds included. It is never passed through `Date`.
 
