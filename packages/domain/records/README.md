@@ -6,10 +6,11 @@ timestamps, and the distinct saved/create/patch validation boundaries. A kind
 extends this contract in its own domain package.
 
 This package does not know which record kinds exist, map kinds to tables, own
-route identifier rules, provide sample records, or define Space-specific read
+route identifier rules, provide sample records, or define kind-specific read
 models. It is not a universal entity table or relationship framework.
 
-Runtime: portable TypeScript. Runtime dependency: `zod`. Category rules:
+Runtime: portable TypeScript. Runtime dependencies: `zod` and
+`@synapcity/domain-time`, which owns the reusable instant value shape. Category rules:
 [domain README](../README.md) and
 [ADR-0014](../../../docs/architecture/decisions/0014-multi-app-package-boundaries.md).
 
@@ -26,6 +27,7 @@ Runtime: portable TypeScript. Runtime dependency: `zod`. Category rules:
 | `boundedNameSchema`, `boundedDescriptionSchema`, `boundedIconSchema`, `boundedTagsSchema` | Reusable validators for the four proven shared metadata fields. Name and tags normalize surrounding whitespace; values are never truncated                                                                                                                |
 | `BoundedName`, `BoundedDescription`, `BoundedIcon`, `BoundedTags`                         | Output types of the bounded field schemas                                                                                                                                                                                                                 |
 | `editableFieldsOf`                                                                        | Explicitly projects the editable metadata from a saved record without relying on a schema to erase server-owned fields                                                                                                                                    |
+| `RECORD_KINDS`, `RecordKind`, `recordKindSchema`, `isRecordKind`                          | The persisted record kinds, singular: `space`, `document`, `dashboard`. Table names are `server-data`'s mapping (`RECORD_TABLES`), not part of this list                                                                                                  |
 | `NAME_MAX`, `DESCRIPTION_MAX`, `ICON_MAX`, `TAGS_MAX`, `TAG_MAX`, `ICON_NAME_PATTERN`     | Shared metadata bounds (counted in Unicode code points) and the Lucide kebab-case icon pattern                                                                                                                                                            |
 | `RECORD_MESSAGES`, `RecordMessage`                                                        | Neutral validation wording; a kind may supply its own blank-name or bad-icon wording                                                                                                                                                                      |
 | `codePointLength`, `isStorableText`, `noCaseInsensitiveDuplicates`                        | Pure validation helpers used by the schemas                                                                                                                                                                                                               |
@@ -37,17 +39,17 @@ boundary cases.
 
 ## Rules
 
-- The base contract contains only fields proven common to the accepted Space,
-  Document, and Dashboard persistence contracts. Lifecycle, content,
-  participation, revisions, and relationships stay with their owners.
+- The base contract contains only fields proven common to the accepted
+  persisted record kinds. Lifecycle, content, participation, revisions, and
+  relationships stay with their owners.
 - Saved/read validation is not weaker than write validation. An out-of-bounds
   persisted value is a contract violation to migrate or repair, not a valid
   `BaseRecord`.
 - `id` is opaque at this boundary. A concrete persistence or transport adapter
   validates UUIDs or another durable identifier format where that rule applies.
-- Record timestamp semantics belong to this record contract. Unrelated calendar
-  dates, times of day, durations, and timestamps in other domains stay with
-  those domains.
+- Records own what `createdAt`, `updatedAt`, `pinnedAt`, and `lastViewedAt`
+  mean. Their shared ISO instant value shape comes from `domain-time`; that
+  package does not own record lifecycle or stamping policy.
 - Kind-specific contracts, wording, defaults, summaries, and registries do not
   live here.
 - Write schemas are strict. A kind composes with `.extend` on

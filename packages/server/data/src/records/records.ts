@@ -1,6 +1,7 @@
 import {
   type BaseRecord,
   type BaseRecordCreate,
+  type RecordKind,
 } from '@synapcity/domain-records';
 import {
   toProviderFailure,
@@ -12,10 +13,7 @@ import { z } from 'zod';
 import { COLUMNS, countOf, recordFromRow, type OwnedRow } from '../owned-row';
 import { readError } from '../read-error';
 
-/** The persisted kinds this adapter maps to concrete database tables. */
-export type RecordKind = 'space' | 'document' | 'dashboard';
-
-/** The table each persisted record kind lives in (ADR-0012, ADR-0013). */
+/** The table each persisted record kind (`RECORD_KINDS`) lives in (ADR-0012, ADR-0013). */
 export const RECORD_TABLES = {
   space: 'spaces',
   document: 'documents',

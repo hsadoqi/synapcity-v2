@@ -9,9 +9,13 @@ import type {
   boundedIconSchema,
   boundedNameSchema,
   boundedTagsSchema,
+  recordKindSchema,
 } from '../schemas';
 
 export type BaseRecord = z.infer<typeof baseRecordSchema>;
+
+/** One of the persisted record kinds: `space`, `document` or `dashboard`. */
+export type RecordKind = z.infer<typeof recordKindSchema>;
 
 export type BaseRecordMetadata = z.infer<typeof baseRecordMetadataSchema>;
 export type BaseRecordCreate = z.infer<typeof baseRecordCreateSchema>;

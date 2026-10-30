@@ -200,11 +200,11 @@ describe('Base Fields', () => {
       });
     });
 
-    it('says the blank wording for an invisible-only name, so a Space keeps its own copy', () => {
+    it('uses the caller’s blank wording for an invisible-only name', () => {
       expect(
-        boundedNameSchema('Enter a space name.').safeParse(ZWSP).error
+        boundedNameSchema('Give this record a title.').safeParse(ZWSP).error
           ?.issues[0]?.message,
-      ).toBe('Enter a space name.');
+      ).toBe('Give this record a title.');
       expect(
         boundedNameSchema().safeParse(ZWSP).error?.issues[0]?.message,
       ).toBe(RECORD_MESSAGES.invisible);
@@ -244,11 +244,11 @@ describe('Base Fields', () => {
     it('says what a blank name says: the default, or the caller’s own wording', () => {
       expect(
         boundedNameSchema().safeParse('  ').error?.issues[0]?.message,
-      ).not.toBe('Enter a space name.');
+      ).not.toBe('Give this record a title.');
       expect(
-        boundedNameSchema('Enter a space name.').safeParse('  ').error
+        boundedNameSchema('Give this record a title.').safeParse('  ').error
           ?.issues[0]?.message,
-      ).toBe('Enter a space name.');
+      ).toBe('Give this record a title.');
     });
 
     it('keeps the length limit and the storable-text rule whatever the blank wording', () => {
@@ -366,10 +366,12 @@ describe('Base Fields', () => {
 
     it('carries a kind\u2019s own wording through recordPatchSchema', () => {
       const kindInput = baseRecordMetadataSchema.extend({
-        name: boundedNameSchema('Enter a space name.'),
+        name: boundedNameSchema('Give this record a title.'),
       });
       const result = recordPatchSchema(kindInput).safeParse({ name: ' ' });
-      expect(result.error?.issues[0]?.message).toBe('Enter a space name.');
+      expect(result.error?.issues[0]?.message).toBe(
+        'Give this record a title.',
+      );
     });
   });
 });

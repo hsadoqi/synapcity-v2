@@ -9,8 +9,8 @@ import {
 /*
  * What the record schemas say when a value is refused. One place, so a form, a
  * Server Action and a test all quote the same words instead of repeating them.
- * A kind with its own wording for a case (a Space's "Enter a space name.") passes
- * it to the schema instead; the rest come from here.
+ * A kind with its own wording for a case passes it to the schema instead; the
+ * rest come from here.
  */
 export const RECORD_MESSAGES = {
   nameTooLong: `Keep it to ${NAME_MAX} characters or fewer.`,

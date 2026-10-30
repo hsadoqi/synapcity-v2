@@ -1,4 +1,5 @@
 export { baseRecordSchema } from './base-record';
+export { recordKindSchema } from './record-kind';
 
 export {
   baseRecordCreateSchema,

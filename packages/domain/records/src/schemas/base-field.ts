@@ -19,9 +19,9 @@ import { z } from 'zod';
 
 /**
  * A name after trimming: 1 to {@link NAME_MAX} characters of storable text.
- * `blankMessage` is what an empty name says; a kind with its own wording (a
- * Space) passes it, so the limit is added without changing its copy. A blank
- * name stops at the first check, so it reports one issue, not one per rule.
+ * `blankMessage` is what an empty name says; a kind with its own wording passes
+ * it, so the limit is added without changing its copy. A blank name stops at
+ * the first check, so it reports one issue, not one per rule.
  */
 export function boundedNameSchema(blankMessage?: string) {
   return (

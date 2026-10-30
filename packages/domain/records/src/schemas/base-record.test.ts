@@ -53,11 +53,11 @@ describe('baseRecordSchema', () => {
     }
   });
 
-  it('carries no Space copy: a blank name does not report the Space message', () => {
+  it('uses neutral wording for a blank name', () => {
     const result = baseRecordSchema.safeParse({ ...record, name: '  ' });
 
     expect(result.error?.issues.map((i) => i.message)).not.toContain(
-      'Enter a space name.',
+      'Give this record a title.',
     );
   });
 

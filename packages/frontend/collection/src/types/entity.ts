@@ -1,5 +1,8 @@
 /** The kinds the current collection presentation can show. */
-export type EntityKind = 'space' | 'document' | 'dashboard';
+import type { RecordKind } from '@synapcity/domain-records';
+
+/** The kind of record an entity block shows: one of the persisted kinds. */
+export type EntityKind = RecordKind;
 
 /**
  * What the entity blocks show of a record: the fields they read and nothing
