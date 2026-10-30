@@ -84,6 +84,17 @@ begin
     where sd.owner_id <> s.owner_id or sd.owner_id <> d.owner_id;
   if n <> 0 then raise exception '% dashboard participation rows have a mismatched owner', n; end if;
 
+  -- The seed inserts Dashboards only; the triggers give each one its
+  -- composition at revision 1 and its first revision.
+  select count(*) into n from public.dashboards d
+    where (select count(*) from public.dashboard_compositions c
+            where c.dashboard_id = d.id and c.revision = 1) <> 1
+       or (select count(*) from public.dashboard_revisions r
+            where r.dashboard_id = d.id) <> 1;
+  if n <> 0 then
+    raise exception '% seeded dashboards lack one composition at revision 1 and one revision', n;
+  end if;
+
   -- User C had a document already, so the seed adds nothing for them.
   select count(*) into n from public.documents
     where owner_id = '33333333-3333-4333-8333-333333333333';
