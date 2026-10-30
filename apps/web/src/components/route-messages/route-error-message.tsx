@@ -19,23 +19,42 @@ import { MESSAGE_HEADING_ID, MessagePage } from '@synapcity/frontend-shells';
 export function RouteErrorMessage({
   error,
   retry,
+  variant = 'unexpected',
 }: {
-  error: Error & { digest?: string };
+  /** The thrown error. An `unavailable` page has none: nothing threw. */
+  error?: Error & { digest?: string };
   retry: () => void;
+  /**
+   * `unavailable` is the Auth service being unreachable, not a bug: the proxy
+   * answers a protected page with it (503) instead of a sign-in redirect, so
+   * it is not logged or reported as an unexpected error.
+   */
+  variant?: 'unexpected' | 'unavailable';
 }) {
   useEffect(() => {
-    // The digest matches the server log entry; the message can hold details
-    // that must not be repeated here.
-    console.error('Unexpected error', { digest: error.digest });
-    // Sent only if the person turned error reports on; scrubbed first.
-    reportCaughtError(error);
+    if (variant === 'unexpected' && error) {
+      // The digest matches the server log entry; the message can hold details
+      // that must not be repeated here.
+      console.error('Unexpected error', { digest: error.digest });
+      // Sent only if the person turned error reports on; scrubbed first.
+      reportCaughtError(error);
+    }
     document.getElementById(MESSAGE_HEADING_ID)?.focus();
-  }, [error]);
+  }, [error, variant]);
 
+  const unavailable = variant === 'unavailable';
   return (
     <MessagePage
-      title="Something went wrong"
-      description="An unexpected problem stopped this page. Try again. If it keeps happening, wait a few minutes first."
+      title={
+        unavailable
+          ? "We can't reach the sign-in service"
+          : 'Something went wrong'
+      }
+      description={
+        unavailable
+          ? "You are not signed out. The service that checks your session isn't answering right now. Try again in a moment."
+          : 'An unexpected problem stopped this page. Try again. If it keeps happening, wait a few minutes first.'
+      }
     >
       <Button type="button" size="lg" onClick={() => retry()}>
         Try again
