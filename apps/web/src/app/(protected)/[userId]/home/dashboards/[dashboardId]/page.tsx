@@ -47,10 +47,8 @@ export default async function DashboardShowPage({
   // The composition first: it says which kinds of record the link widgets list,
   // so only those are read.
   const { composition, revision } = await getDashboardComposition(dashboardId);
-  const { items, unavailableKinds } = await getDashboardLinkItems(
-    userId,
-    composition,
-  );
+  const { items, unavailableKinds, unloadedKinds } =
+    await getDashboardLinkItems(userId, composition);
 
   return (
     <>
@@ -74,6 +72,7 @@ export default async function DashboardShowPage({
         revision={revision}
         items={items}
         unavailableKinds={unavailableKinds}
+        unloadedKinds={unloadedKinds}
         persistence={fixtureModeEnabled() ? 'browser' : 'server'}
       />
     </>

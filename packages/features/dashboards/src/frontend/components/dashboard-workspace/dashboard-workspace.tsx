@@ -83,6 +83,7 @@ export function DashboardWorkspace({
   readOnly = false,
   items,
   unavailableKinds,
+  unloadedKinds,
   widgetTypes,
   persistsStatus,
   LinkComponent,
@@ -107,6 +108,8 @@ export function DashboardWorkspace({
   items?: readonly DashboardLinkItem[];
   /** The kinds of record the host could not read; their link widgets show a failure. @default [] */
   unavailableKinds?: readonly DashboardLinkItem['kind'][];
+  /** The kinds of record the host did not read. @default [] */
+  unloadedKinds?: readonly DashboardLinkItem['kind'][];
   /** The widget types the palette offers. @default every type */
   widgetTypes?: readonly WidgetType[];
   /** Whether widgets can be hidden or archived. @default true */
@@ -129,6 +132,7 @@ export function DashboardWorkspace({
       readOnly={readOnly}
       items={items}
       unavailableKinds={unavailableKinds}
+      unloadedKinds={unloadedKinds}
       widgetTypes={widgetTypes}
       persistsStatus={persistsStatus}
       LinkComponent={LinkComponent}

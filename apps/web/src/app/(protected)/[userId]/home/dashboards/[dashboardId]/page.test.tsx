@@ -65,6 +65,7 @@ describe('the Dashboard page', () => {
     mocks.getDashboardLinkItems.mockResolvedValue({
       items: [],
       unavailableKinds: [],
+      unloadedKinds: [],
     });
     mocks.fixtureModeEnabled.mockReturnValue(false);
   });
@@ -100,6 +101,7 @@ describe('the Dashboard page', () => {
       revision: 0,
       items: [],
       unavailableKinds: [],
+      unloadedKinds: [],
       persistence: 'server',
     });
     expect(find(page, RecordDashboardView)?.props).toMatchObject({
@@ -142,6 +144,7 @@ describe('the Dashboard page', () => {
     mocks.getDashboardLinkItems.mockResolvedValue({
       items,
       unavailableKinds: ['document'],
+      unloadedKinds: ['space'],
     });
 
     const page = await DashboardShowPage({ params: params('x1') });
@@ -153,6 +156,7 @@ describe('the Dashboard page', () => {
       revision: 7,
       items,
       unavailableKinds: ['document'],
+      unloadedKinds: ['space'],
     });
   });
 
