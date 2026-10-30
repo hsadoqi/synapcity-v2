@@ -838,9 +838,6 @@ importers:
 
   packages/domain/records:
     dependencies:
-      '@synapcity/domain-time':
-        specifier: workspace:*
-        version: link:../time
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -1077,9 +1074,6 @@ importers:
       '@synapcity/domain-prototypes':
         specifier: workspace:*
         version: link:../../domain/prototypes
-      '@synapcity/domain-records':
-        specifier: workspace:*
-        version: link:../../domain/records
       '@synapcity/frontend-forms':
         specifier: workspace:*
         version: link:../../frontend/forms
@@ -2038,6 +2032,9 @@ importers:
       server-only:
         specifier: 0.0.1
         version: 0.0.1
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
     devDependencies:
       '@synapcity/dev-eslint-config':
         specifier: workspace:*

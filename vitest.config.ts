@@ -24,7 +24,6 @@ const projects = [
   'packages/domain/prototypes',
   'packages/domain/records',
   'packages/domain/spaces',
-  'packages/domain/time',
   'packages/dev/boundaries',
   'packages/dev/fixtures',
   'packages/dev/playwright-config',
