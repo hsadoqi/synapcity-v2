@@ -1,4 +1,6 @@
 import { z } from 'zod';
+
+import { isPlainObject } from '../is-plain-object';
 import {
   settingsDefaults,
   settingsSchema,
@@ -23,10 +25,6 @@ export function mergeSettings(value: Settings, patch: SettingsPatch): Settings {
   return { ...next, privacy: withCurrentPolicy(next.privacy) };
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
 /**
  * Earlier versions saved an `account` entry (name, email and a password) next
  * to the preferences. Preferences never hold account data, and a typed
@@ -41,7 +39,8 @@ export function withoutStoredAccount(saved: string): string | null | undefined {
   } catch {
     return undefined;
   }
-  if (!isRecord(parsed) || !Object.hasOwn(parsed, 'account')) return undefined;
+  if (!isPlainObject(parsed) || !Object.hasOwn(parsed, 'account'))
+    return undefined;
   const rest = { ...parsed };
   delete rest.account;
   return Object.keys(rest).length > 0 ? JSON.stringify(rest) : null;
@@ -64,7 +63,7 @@ const legacyPrivacyFields = {
 // Import and storage restoration share validation, including the old flat shape.
 // Account credentials and profile identity are never accepted as preferences.
 export function parseImportPatch(input: unknown) {
-  if (!isRecord(input))
+  if (!isPlainObject(input))
     throw new Error('Choose a JSON object containing preferences.');
   const patch: Record<string, Record<string, unknown>> = {};
   const ignored: string[] = [];
@@ -101,7 +100,7 @@ export function parseImportPatch(input: unknown) {
     if (key === 'account') {
       ignored.push(key);
     } else if (key === 'appearance' && typeof value === 'string') {
-      if (isRecord(input.theme) && Object.hasOwn(input.theme, 'mode')) {
+      if (isPlainObject(input.theme) && Object.hasOwn(input.theme, 'mode')) {
         ignored.push(key);
       } else {
         accept('theme', 'mode', value, key);
@@ -109,16 +108,25 @@ export function parseImportPatch(input: unknown) {
     } else if (Object.hasOwn(legacyFields, key)) {
       const [section, field] = legacyFields[key as keyof typeof legacyFields];
       // An explicit nested preference takes precedence over its legacy alias.
-      if (!isRecord(input[section]) || !Object.hasOwn(input[section], field)) {
+      if (
+        !isPlainObject(input[section]) ||
+        !Object.hasOwn(input[section], field)
+      ) {
         accept(section, field, value, key);
       } else {
         ignored.push(key);
       }
-    } else if (Object.hasOwn(transferSchema.shape, key) && isRecord(value)) {
+    } else if (
+      Object.hasOwn(transferSchema.shape, key) &&
+      isPlainObject(value)
+    ) {
       for (const [field, item] of Object.entries(value)) {
         if (key === 'appearance' && field === 'fontSize') {
           // As above, the current setting takes precedence over the old one.
-          if (isRecord(input.theme) && Object.hasOwn(input.theme, 'textSize')) {
+          if (
+            isPlainObject(input.theme) &&
+            Object.hasOwn(input.theme, 'textSize')
+          ) {
             ignored.push(`${key}.${field}`);
             continue;
           }

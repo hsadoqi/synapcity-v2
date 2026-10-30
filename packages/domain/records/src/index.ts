@@ -35,6 +35,7 @@ export type { RecordMessage } from './constants';
 export {
   codePointLength,
   editableFieldsOf,
+  initialsOf,
   isRecordKind,
   isStorableText,
   noCaseInsensitiveDuplicates,

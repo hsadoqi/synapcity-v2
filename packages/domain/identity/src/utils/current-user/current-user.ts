@@ -11,6 +11,11 @@ export type DisplayProfile = {
  */
 export type CurrentUser = DisplayProfile & { id: string; fixture?: true };
 
+export type User = Pick<DisplayProfile, 'name'> & {
+  avatar?: string;
+  email?: string;
+};
+
 type ClaimsLike = {
   email?: unknown;
   name?: unknown;

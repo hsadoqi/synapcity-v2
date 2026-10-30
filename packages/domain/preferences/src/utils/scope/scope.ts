@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { isPlainObject } from '../is-plain-object';
 import { mergeSettings, parseImportPatch } from '../merge-settings';
 import { appearanceSchema } from '../../schemas';
 import { dataPrivacyDefaults, dataPrivacySchema } from '../../schemas';
@@ -81,10 +82,6 @@ export const accountPreferencesSchema = z.object({
 });
 export type AccountPreferences = z.infer<typeof accountPreferencesSchema>;
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
 /** The display settings currently in effect. */
 export function displayOf(settings: Settings): DisplaySettings {
   return displaySchema.parse(settings.appearance);
@@ -131,7 +128,7 @@ export function touchesAccount(patch: Record<string, unknown>): boolean {
   return Object.entries(patch).some(
     ([section, fields]) =>
       Object.hasOwn(settingScope, section) &&
-      isRecord(fields) &&
+      isPlainObject(fields) &&
       Object.keys(fields).some(
         (field) =>
           (settingScope[section as keyof Settings] as Record<string, string>)[
@@ -147,7 +144,7 @@ export function touchesAccount(patch: Record<string, unknown>): boolean {
  * field that is still valid and falls back to defaults for the rest.
  */
 export function readAccountPreferences(raw: unknown): AccountPreferences {
-  const document = isRecord(raw) ? raw : {};
+  const document = isPlainObject(raw) ? raw : {};
   const { regional, notifications, privacy, theme } = document;
   let settings = settingsDefaults;
   try {
@@ -155,7 +152,7 @@ export function readAccountPreferences(raw: unknown): AccountPreferences {
       ...(regional !== undefined && { regional }),
       ...(notifications !== undefined && { notifications }),
       ...(privacy !== undefined && { privacy }),
-      ...(isRecord(theme) && {
+      ...(isPlainObject(theme) && {
         theme: {
           headingFont: theme.headingFont,
           bodyFont: theme.bodyFont,
@@ -206,17 +203,18 @@ export function toTransferFile(settings: Settings) {
  * other input (the flat files exported before version 2) passes through.
  */
 export function fromTransferFile(input: unknown): unknown {
-  if (!isRecord(input) || input.version !== TRANSFER_FILE_VERSION) return input;
-  const account = isRecord(input.account) ? input.account : {};
-  const device = isRecord(input.device) ? input.device : {};
+  if (!isPlainObject(input) || input.version !== TRANSFER_FILE_VERSION)
+    return input;
+  const account = isPlainObject(input.account) ? input.account : {};
+  const device = isPlainObject(input.device) ? input.device : {};
   const flat: Record<string, unknown> = {};
   for (const section of ['regional', 'notifications', 'privacy'] as const) {
     if (account[section] !== undefined) flat[section] = account[section];
   }
-  if (isRecord(account.theme) || isRecord(device.theme)) {
+  if (isPlainObject(account.theme) || isPlainObject(device.theme)) {
     flat.theme = {
-      ...(isRecord(account.theme) ? account.theme : {}),
-      ...(isRecord(device.theme) ? device.theme : {}),
+      ...(isPlainObject(account.theme) ? account.theme : {}),
+      ...(isPlainObject(device.theme) ? device.theme : {}),
     };
   }
   if (device.appearance !== undefined) flat.appearance = device.appearance;
