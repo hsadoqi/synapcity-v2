@@ -20,5 +20,6 @@
     "packages/frontend/tailwind-config": {
       "ignoreDependencies": ["tailwindcss"]
     }
-  }
+  },
+  "ignoreBinaries": ["psql"]
 }
