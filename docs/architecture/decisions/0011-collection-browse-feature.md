@@ -12,7 +12,7 @@ The home page grew a browsable list of spaces, documents and dashboards: search,
 
 Spaces, documents and dashboards are expected to become features of their own. Each will need the same browse mechanics. If the mechanics stay inside `home`, each resource feature either rebuilds them or depends on `home`. The mechanics are expected to grow (more filter kinds, saved or shareable views, more displays), which makes a single owner more valuable.
 
-[ADR-0007](0007-app-local-auth-and-account-ownership.md) sets the app-local feature layout, `apps/web/src/features/<name>/{shared,server,client,components}`, and the import rules `apps/web/src/architecture.test.ts` enforces. `docs/glossary.md` warns that a module name derived from a working label can become an accidental naming decision.
+[ADR-0007](0007-app-local-auth-and-account-ownership.md) sets the app-local feature layout, `apps/web/src/features/<name>/{shared,server,client,components}`, and the import rules `apps/web/src/__guards__/architecture.test.ts` enforces. `docs/glossary.md` warns that a module name derived from a working label can become an accidental naming decision.
 
 ## Decision
 

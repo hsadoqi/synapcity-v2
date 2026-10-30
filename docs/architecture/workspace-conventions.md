@@ -122,7 +122,7 @@ Accepted 2026-10-23 through the [Milestone 3.2 design](../superpowers/specs/2026
 
 `frontend-ui`'s broad `./lib/*`, `./hooks/*`, `./utils/*` and `./types/*` wildcards predate these rules and are narrowed by the migrations that touch them.
 
-Enforcement is `pnpm boundaries` (see [Boundary checks](#boundary-checks)). The existing [web architecture test](../../apps/web/src/architecture.test.ts) checks some direct imports within web; it is not a workspace-wide or transitive proof.
+Enforcement is `pnpm boundaries` (see [Boundary checks](#boundary-checks)). The existing [web architecture test](../../apps/web/src/__guards__/architecture.test.ts) checks some direct imports within web; it is not a workspace-wide or transitive proof.
 
 ## Runtime and platform integration
 
