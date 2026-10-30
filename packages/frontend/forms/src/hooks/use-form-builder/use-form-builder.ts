@@ -9,9 +9,9 @@ import {
 } from 'react-hook-form';
 
 import type { FieldState, FormDefinition } from '../../types';
-import { createFormResolver } from '../../utils/create-form-resolver';
-import { describeSchemaField } from '../../utils/describe-schema-field';
-import { resolveFieldStates } from '../../utils/resolve-field-states';
+import { createFormResolver } from '../../components/form-engine/create-form-resolver';
+import { describeSchemaField } from '../../components/form-engine/describe-schema-field';
+import { resolveFieldStates } from '../../components/form-engine/resolve-field-states';
 
 export interface UseFormBuilderOptions {
   readonly definition: FormDefinition;

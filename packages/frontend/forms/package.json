@@ -17,6 +17,9 @@
   "dependencies": {
     "@hookform/resolvers": "6.0.0",
     "@synapcity/frontend-ui": "workspace:*",
+    "@synapcity/frontend-blocks": "workspace:*",
+    "@synapcity/domain-time": "workspace:*",
+    "lucide-react": "^1.64.0",
     "react": "19.3.1",
     "react-hook-form": "7.90.0",
     "zod": "^4.6.7"

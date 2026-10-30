@@ -21,9 +21,7 @@ const PURE = [
   'utils/resolve-field-states',
   'utils/build-schema',
   'utils/async-check',
-  'utils/date-value',
   'utils/group-options',
-  'utils/time-value',
   'utils/define-form-from-schema',
 ];
 
