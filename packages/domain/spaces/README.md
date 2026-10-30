@@ -10,12 +10,12 @@ History: created in Milestone 5.1 as the `spaces` module of `domain-records`; mo
 
 `@synapcity/domain-spaces` (root entry):
 
-| Export                                  | Meaning                                                                                                                                                                                                                                                       |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `createSpaceSchema`, `CreateSpaceInput` | The editable Space fields with the D5 limits and the Space messages (`'Enter a space name.'`, `'Use a Lucide icon name.'`). Strict: server-managed fields are refused, not dropped; project a saved Space with `editableFieldsOf` from `domain-records` first |
-| `updateSpaceSchema`, `UpdateSpaceInput` | A partial edit of `createSpaceSchema` (`recordPatchSchema`): every field optional, at least one present, strict                                                                                                                                               |
-| `spaceSchema`, `SpaceEntity`            | A saved Space (ADR-0012): the base record with the Space messages for `name` and `icon`; `id` and the other fields are the base record's. Parsed key order is `name, description, icon, tags, id, ownerId, ...`, the `api/spaces` JSON order                  |
-| `SpaceSummary`                          | A saved Space plus its derived `documentsTotal` and `dashboardsTotal`; the counts are not stored on the Space                                                                                                                                                 |
+| Export                                  | Meaning                                                                                                                                                                                                |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `createSpaceSchema`, `CreateSpaceInput` | Space creation: bounded `name` with Space wording, plus optional `description`, `icon` and `tags`; concrete storage owns the approved defaults. Strict: server-managed fields are refused, not dropped |
+| `updateSpaceSchema`, `UpdateSpaceInput` | A partial edit of the complete Space metadata contract (`recordPatchSchema`): every field optional, at least one present, strict                                                                       |
+| `spaceSchema`, `SpaceEntity`            | A saved Space (ADR-0012), using the neutral bounded base read contract. Parsed key order is `name, description, icon, tags, id, ownerId, ...`, the existing JSON order                                 |
+| `SpaceSummary`                          | A saved Space plus its derived `documentsTotal` and `dashboardsTotal`; the counts are not stored on the Space                                                                                          |
 
 ## Rules
 

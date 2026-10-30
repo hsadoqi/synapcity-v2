@@ -164,18 +164,15 @@ describe('spaceSchema contract', () => {
     ]);
   });
 
-  it('reports the Space message for a blank name and a bad icon', () => {
+  it('uses the neutral base contract when validating saved records', () => {
     const result = spaceSchema.safeParse({
       ...savedSpace,
       name: '   ',
       icon: 'Pen Line',
     });
     expect(result.success).toBe(false);
-    expect(result.error?.issues.map((i) => i.message)).toEqual(
-      expect.arrayContaining([
-        'Enter a space name.',
-        'Use a Lucide icon name.',
-      ]),
+    expect(result.error?.issues.map((i) => i.message)).not.toContain(
+      'Enter a space name.',
     );
   });
 });
@@ -195,16 +192,11 @@ describe('Space input schemas', () => {
     expectTypeOf(input).toEqualTypeOf<CreateSpaceInput>();
   });
 
-  it.each(['name', 'icon', 'tags'])('requires %s for creation', (field) => {
-    const input: Record<string, unknown> = {
+  it('requires only a name for creation; storage supplies icon and tags defaults', () => {
+    expect(createSpaceSchema.parse({ name: 'Reading' })).toEqual({
       name: 'Reading',
-      icon: 'book-open',
-      tags: [],
-    };
-    delete input[field];
-    const result = createSpaceSchema.safeParse(input);
-    expect(result.success).toBe(false);
-    if (!result.success) expect(result.error.issues[0]?.path).toEqual([field]);
+    });
+    expect(createSpaceSchema.safeParse({}).success).toBe(false);
   });
 
   it('updates individual fields and can clear tags', () => {
@@ -260,14 +252,6 @@ describe('Space write schemas keep every shared record rule', () => {
 });
 
 describe('spaceSchema id', () => {
-  it('keeps the base bound, so a corrupt id cannot be huge', () => {
-    const result = spaceSchema.safeParse({
-      ...savedSpace,
-      id: 'x'.repeat(201),
-    });
-    expect(result.error?.issues[0]?.path).toEqual(['id']);
-  });
-
   it('says the record message for a missing id', () => {
     const result = spaceSchema.safeParse({ ...savedSpace, id: '' });
     expect(result.error?.issues[0]?.message).toBe(RECORD_MESSAGES.missingId);

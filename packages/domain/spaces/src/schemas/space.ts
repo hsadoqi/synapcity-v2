@@ -1,8 +1,6 @@
-import { z } from 'zod';
-
 import {
-  ICON_NAME_PATTERN,
-  baseRecordInputSchema,
+  baseRecordCreateSchema,
+  baseRecordMetadataSchema,
   baseRecordSchema,
   boundedIconSchema,
   boundedNameSchema,
@@ -17,28 +15,30 @@ const SPACE_MESSAGES = {
   badIcon: 'Use a Lucide icon name.',
 } as const;
 
-// What is read back keeps no limit, so a Space saved before the limits existed
-// still loads; what is written (`createSpaceSchema`) is bounded.
-const name = z.string().trim().min(1, SPACE_MESSAGES.blankName);
-// Store the Lucide identifier, never a React component or SVG markup.
-const icon = z.string().regex(ICON_NAME_PATTERN, SPACE_MESSAGES.badIcon);
+const spaceNameSchema = boundedNameSchema(SPACE_MESSAGES.blankName);
+const spaceIconSchema = boundedIconSchema(SPACE_MESSAGES.badIcon);
+
+const spaceMetadataSchema = baseRecordMetadataSchema.extend({
+  name: spaceNameSchema,
+  icon: spaceIconSchema,
+});
 
 /**
  * The editable Space fields, with the D5 limits and the Space wording. Strict
  * like the base input: server-managed fields (id, owner, times) are refused,
  * not dropped. To start from a saved Space, project it with `editableFieldsOf`.
  */
-export const createSpaceSchema = baseRecordInputSchema.extend({
-  name: boundedNameSchema(SPACE_MESSAGES.blankName),
-  icon: boundedIconSchema(SPACE_MESSAGES.badIcon),
+export const createSpaceSchema = baseRecordCreateSchema.extend({
+  name: spaceNameSchema,
+  icon: spaceIconSchema.optional(),
 });
 
 /** A partial edit of a Space: at least one field, Space wording, strict. */
-export const updateSpaceSchema = recordPatchSchema(createSpaceSchema);
+export const updateSpaceSchema = recordPatchSchema(spaceMetadataSchema);
 
 /**
  * Saved-record contract for ADR-0012. Database adapters must map owner_id,
  * created_at and updated_at to these camelCase fields. Space remains
  * a provisional label; content relationships and lifecycle stay undecided.
  */
-export const spaceSchema = baseRecordSchema.extend({ name, icon });
+export const spaceSchema = baseRecordSchema;
