@@ -17,7 +17,7 @@ import {
 import {
   deviceTimezone,
   onStoredPreferencesChange,
-  readStoredPreferences,
+  tryReadStoredPreferences,
 } from '../../store';
 
 type ServerRegional = {
@@ -60,14 +60,6 @@ export function RegionalProvider({
   );
 }
 
-function readStored() {
-  try {
-    return readStoredPreferences();
-  } catch {
-    return null;
-  }
-}
-
 /** Stands for "rendering on the server or hydrating": there is no browser copy to read yet. */
 const onServer = () => undefined;
 
@@ -90,7 +82,7 @@ export function useDateTimeFormatting(): DateTimeFormatting {
   const server = useContext(ServerRegionalContext);
   const stored = useSyncExternalStore(
     onStoredPreferencesChange,
-    readStored,
+    tryReadStoredPreferences,
     onServer,
   );
   return useMemo(() => {

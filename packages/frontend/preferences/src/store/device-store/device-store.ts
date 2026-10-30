@@ -25,6 +25,15 @@ export function readStoredPreferences(): string | null {
   return localStorage.getItem(PREFERENCES_STORAGE_KEY);
 }
 
+/** The stored document, or null when there is none or storage cannot be read. */
+export function tryReadStoredPreferences(): string | null {
+  try {
+    return readStoredPreferences();
+  } catch {
+    return null;
+  }
+}
+
 export function writeStoredPreferences(value: string): void {
   localStorage.setItem(PREFERENCES_STORAGE_KEY, value);
 }

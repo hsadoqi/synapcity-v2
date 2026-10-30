@@ -7,6 +7,7 @@ import {
   onStoredPreferencesChange,
   readDeviceDisplay,
   readStoredPreferences,
+  tryReadStoredPreferences,
   writeDeviceDisplay,
   writeStoredPreferences,
 } from './device-store';
@@ -20,6 +21,17 @@ describe('device store', () => {
     writeStoredPreferences('{"a":1}');
     expect(localStorage.getItem('synapcity-preferences')).toBe('{"a":1}');
     expect(readStoredPreferences()).toBe('{"a":1}');
+  });
+
+  it('reads null instead of throwing when storage cannot be read', () => {
+    writeStoredPreferences('{"a":1}');
+    expect(tryReadStoredPreferences()).toBe('{"a":1}');
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('storage blocked');
+    });
+    expect(() => readStoredPreferences()).toThrow('storage blocked');
+    expect(tryReadStoredPreferences()).toBeNull();
+    vi.restoreAllMocks();
   });
 
   it('clears it', () => {
