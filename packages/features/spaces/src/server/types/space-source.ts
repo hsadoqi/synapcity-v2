@@ -1,5 +1,10 @@
 import type { BaseRecord, BaseRecordCreate } from '@synapcity/domain-records';
 import type { SpaceEntity, SpaceSummary } from '@synapcity/domain-spaces';
+import type {
+  SpaceNavItem,
+  SpaceRelationsResult,
+  SpaceRelationType,
+} from '@synapcity/server-data';
 import type { ProviderFailure } from '@synapcity/server-supabase';
 
 /**
@@ -9,6 +14,36 @@ import type { ProviderFailure } from '@synapcity/server-supabase';
  */
 export type SetPinnedOutcome =
   { ok: true; pinnedAt: string | null } | { ok: false; error: ProviderFailure };
+
+/**
+ * What adding a document or dashboard to a Space reports: done (including when
+ * it was already there), or the failure to log.
+ */
+type AddedOutcome = { ok: true } | { ok: false; error: ProviderFailure };
+
+/**
+ * One Space's participation rows: of the kind asked for, or both kinds when
+ * none is given; null when there is no such Space for the owner. The result's
+ * type follows the kind passed.
+ */
+type GetRelations = {
+  (
+    spaceId: string,
+    type: 'documents',
+  ): Promise<SpaceRelationsResult<'documents'> | null>;
+  (
+    spaceId: string,
+    type: 'dashboards',
+  ): Promise<SpaceRelationsResult<'dashboards'> | null>;
+  (
+    spaceId: string,
+    type?: undefined,
+  ): Promise<SpaceRelationsResult<undefined> | null>;
+  (
+    spaceId: string,
+    type?: SpaceRelationType,
+  ): Promise<SpaceRelationsResult<SpaceRelationType | undefined> | null>;
+};
 
 /** What creating reports: the new Space's id, or the failure to log. */
 export type CreatedOutcome =
@@ -25,6 +60,17 @@ export interface SpaceSource {
   list(): Promise<SpaceEntity[]>;
   /** The same with the document and dashboard counts, for the index. */
   listSummaries(): Promise<SpaceSummary[]>;
+  /**
+   * The owner's Spaces as navigation lists them: display fields only, pinned
+   * first, then the most recently changed.
+   */
+  listNavItems(): Promise<SpaceNavItem[]>;
+  /**
+   * Every Space, newest first, with its participation rows (which items are
+   * in it, not the items themselves), newest addition first.
+   */
+  listWithRelations(): Promise<SpaceRelationsResult<undefined>[]>;
+  getRelations: GetRelations;
   /** One Space, or null when it does not exist or is not the owner's. */
   find(spaceId: string): Promise<SpaceEntity | null>;
   /**
@@ -41,4 +87,12 @@ export interface SpaceSource {
   listDocuments(spaceId: string): Promise<BaseRecord[]>;
   /** The dashboards taking part in the Space (ADR-0013). */
   listDashboards(spaceId: string): Promise<BaseRecord[]>;
+  /**
+   * Adds one of the owner's documents to one of their Spaces. Idempotent: a
+   * document already there is left as it is and reported as added. Ownership
+   * of the document does not move (ADR-0013).
+   */
+  addDocument(spaceId: string, documentId: string): Promise<AddedOutcome>;
+  /** The same for one of the owner's dashboards. */
+  addDashboard(spaceId: string, dashboardId: string): Promise<AddedOutcome>;
 }
