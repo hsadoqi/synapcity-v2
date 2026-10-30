@@ -1,15 +1,12 @@
-export {
-  baseRecordSchema,
-  recordIdSchema,
-  recordKindSchema,
-} from './base-record';
+export { baseRecordSchema } from './base-record';
 
 export {
   baseRecordCreateSchema,
-  baseRecordFieldsSchema,
-  baseRecordInputSchema,
+  baseRecordMetadataSchema,
   baseRecordPatchSchema,
+  boundedDescriptionSchema,
   boundedIconSchema,
   boundedNameSchema,
+  boundedTagsSchema,
   recordPatchSchema,
 } from './base-field';

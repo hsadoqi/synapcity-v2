@@ -1,5 +1,6 @@
-/** The editable fields every record shares (`BaseRecordFields`). */
-type EditableFields = {
+// Structural, not `BaseRecordMetadata` from `../types`: the types import the
+// schemas, which import these utils, and that would be a module cycle.
+type BaseRecordMetadata = {
   name: string;
   description?: string;
   icon: string;
@@ -12,7 +13,9 @@ type EditableFields = {
  * so a caller that holds a saved record projects it here instead of relying
  * on a schema to drop keys.
  */
-export function editableFieldsOf(record: EditableFields): EditableFields {
+export function editableFieldsOf(
+  record: BaseRecordMetadata,
+): BaseRecordMetadata {
   return {
     name: record.name,
     ...(record.description !== undefined && {

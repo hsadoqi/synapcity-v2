@@ -1,7 +1,18 @@
 import { describe, expect, it } from 'vitest';
 
 import { baseRecordSchema } from './index';
-import { record } from '../defaults';
+
+const record = {
+  id: 'opaque/id',
+  ownerId: '11111111-1111-4111-8111-111111111111',
+  name: 'Launch plan',
+  icon: 'file-text',
+  tags: ['work'],
+  createdAt: '2026-10-01T09:00:00Z',
+  updatedAt: '2026-10-03T14:30:00Z',
+  pinnedAt: '2026-10-04T09:00:00Z',
+  lastViewedAt: '2026-10-05T18:00:00+00:00',
+};
 
 describe('baseRecordSchema', () => {
   it('parses a full record and keeps the pinned and last-viewed times', () => {
@@ -27,7 +38,10 @@ describe('baseRecordSchema', () => {
 
   it.each([
     { name: '  ' },
+    { name: 'a'.repeat(121) },
+    { description: 'd'.repeat(2001) },
     { icon: 'Pen' },
+    { tags: ['Work', 'work'] },
     { ownerId: 'x' },
     { createdAt: '2026-10-01' },
   ])('rejects invalid fields: %j', (fields) => {
@@ -83,13 +97,10 @@ describe('baseRecordSchema', () => {
     }
   });
 
-  it('bounds the opaque id', () => {
+  it('keeps the id opaque while requiring one', () => {
     expect(
-      baseRecordSchema.safeParse({ ...record, id: 'a'.repeat(200) }).success,
+      baseRecordSchema.safeParse({ ...record, id: 'opaque/id' }).success,
     ).toBe(true);
-    expect(
-      baseRecordSchema.safeParse({ ...record, id: 'a'.repeat(201) }).success,
-    ).toBe(false);
     expect(baseRecordSchema.safeParse({ ...record, id: '' }).success).toBe(
       false,
     );

@@ -1,26 +1,19 @@
 import { describe, expect, it } from 'vitest';
 
-import { RECORD_KINDS } from '../constants';
-import { record } from '../defaults';
-import { baseRecordInputSchema, recordKindSchema } from '../schemas';
+import { baseRecordMetadataSchema } from '../schemas';
 import { editableFieldsOf } from './editable-fields-of';
-import { isRecordKind } from './is-record-kind';
 
-describe('record kinds', () => {
-  it('lists the three persisted kinds, singular', () => {
-    expect(RECORD_KINDS).toEqual(['space', 'document', 'dashboard']);
-  });
-
-  it.each(['space', 'document', 'dashboard'])('accepts %s', (kind) => {
-    expect(isRecordKind(kind)).toBe(true);
-    expect(recordKindSchema.parse(kind)).toBe(kind);
-  });
-
-  it.each(['spaces', 'task', '', null, 1])('refuses %j', (kind) => {
-    expect(isRecordKind(kind)).toBe(false);
-    expect(recordKindSchema.safeParse(kind).success).toBe(false);
-  });
-});
+const record = {
+  id: 'opaque/id',
+  ownerId: '11111111-1111-4111-8111-111111111111',
+  name: 'Launch plan',
+  icon: 'file-text',
+  tags: ['work'],
+  createdAt: '2026-10-01T09:00:00Z',
+  updatedAt: '2026-10-03T14:30:00Z',
+  pinnedAt: '2026-10-04T09:00:00Z',
+  lastViewedAt: '2026-10-05T18:00:00+00:00',
+};
 
 describe('editableFieldsOf', () => {
   it('keeps the editable fields of a saved record and drops the rest', () => {
@@ -42,7 +35,7 @@ describe('editableFieldsOf', () => {
 
   it('gives what the strict write schema accepts', () => {
     expect(
-      baseRecordInputSchema.safeParse(editableFieldsOf(record)).success,
+      baseRecordMetadataSchema.safeParse(editableFieldsOf(record)).success,
     ).toBe(true);
   });
 

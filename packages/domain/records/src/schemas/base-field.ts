@@ -18,19 +18,6 @@ import {
 import { z } from 'zod';
 
 /**
- * The fields of a record as stored, without the D5 limits. The read schemas
- * (`baseRecordSchema`, `spaceSchema`) extend this: a row written before the
- * limits existed must still load, so reading never applies them. Writes use
- * `baseRecordInputSchema`.
- */
-export const baseRecordFieldsSchema = z.object({
-  name: z.string().trim().min(1),
-  description: z.string().optional(),
-  icon: z.string().regex(ICON_NAME_PATTERN),
-  tags: z.array(z.string()),
-});
-
-/**
  * A name after trimming: 1 to {@link NAME_MAX} characters of storable text.
  * `blankMessage` is what an empty name says; a kind with its own wording (a
  * Space) passes it, so the limit is added without changing its copy. A blank
@@ -64,7 +51,7 @@ export function boundedIconSchema(patternMessage?: string) {
     });
 }
 
-const boundedDescriptionSchema = z
+export const boundedDescriptionSchema = z
   .string()
   .refine((value) => codePointLength(value) <= DESCRIPTION_MAX, {
     error: RECORD_MESSAGES.descriptionTooLong,
@@ -72,7 +59,7 @@ const boundedDescriptionSchema = z
   .refine(isStorableText, { error: RECORD_MESSAGES.storableText })
   .refine(isPlainText, { error: RECORD_MESSAGES.plainText });
 
-const boundedTagsSchema = z
+export const boundedTagsSchema = z
   .array(
     z
       .string()
@@ -89,12 +76,12 @@ const boundedTagsSchema = z
   .superRefine(noCaseInsensitiveDuplicates);
 
 /**
- * The editable fields every owned record shares, with the D5 limits: a
- * complete set, as an edit form holds it. Strict, so a caller cannot pass
- * server-managed fields (id, owner, times) through it. Tags are trimmed, which
- * is normalization, not truncation: nothing is ever cut to fit.
+ * The editable metadata every base record stores. These invariants apply on
+ * reads as well as writes: an invalid persisted value is a contract violation,
+ * not a valid legacy record. Strictness also keeps server-managed fields out
+ * of metadata-only inputs. Tags are trimmed, never truncated.
  */
-export const baseRecordInputSchema = z.strictObject({
+export const baseRecordMetadataSchema = z.strictObject({
   name: boundedNameSchema(),
   description: boundedDescriptionSchema.optional(),
   icon: boundedIconSchema(),
@@ -107,7 +94,7 @@ export const baseRecordInputSchema = z.strictObject({
  * default for that kind, never here, so the database stays the one source of
  * creation defaults. Strict, like the input it narrows.
  */
-export const baseRecordCreateSchema = baseRecordInputSchema.partial({
+export const baseRecordCreateSchema = baseRecordMetadataSchema.partial({
   description: true,
   icon: true,
   tags: true,
@@ -117,7 +104,7 @@ export const baseRecordCreateSchema = baseRecordInputSchema.partial({
  * A partial edit of a strict editable-field schema: every field optional, at
  * least one present, unknown keys refused. Kinds pass their own input schema
  * so their wording carries over; the base patch is
- * `recordPatchSchema(baseRecordInputSchema)`.
+ * `recordPatchSchema(baseRecordMetadataSchema)`.
  */
 export function recordPatchSchema<Shape extends z.ZodRawShape>(
   input: z.ZodObject<Shape, z.core.$strict>,
@@ -130,4 +117,6 @@ export function recordPatchSchema<Shape extends z.ZodRawShape>(
 }
 
 /** A partial edit of the shared editable fields. */
-export const baseRecordPatchSchema = recordPatchSchema(baseRecordInputSchema);
+export const baseRecordPatchSchema = recordPatchSchema(
+  baseRecordMetadataSchema,
+);

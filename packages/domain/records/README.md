@@ -1,41 +1,60 @@
 # @synapcity/domain-records
 
-Owns: the base record contract, the ten fields every owned record shares. Kinds extend it in their own packages: Space in [`domain-spaces`](../spaces/README.md) (moved out of this package by owner decision, 2026-10-24) and the prototype kinds in [`domain-prototypes`](../prototypes/README.md). In Milestone 8 the Document contract arrives in `domain-documents` and the Dashboard record contract in [`domain-dashboards`](../dashboards/README.md) (owner decision, 2026-10-24); their saved shape already uses the base contract.
+Owns: the neutral base contract shared by the currently persisted record
+domains. It defines identity, ownership, common editable metadata, record
+timestamps, and the distinct saved/create/patch validation boundaries. A kind
+extends this contract in its own domain package.
 
-Runtime: portable TypeScript. Runtime dependencies: `zod`, for the schemas, and `@synapcity/domain-time` for the instant. Temporal shapes (instant, calendar date, time of day, duration) are owned there, not here. Category rules: [domain README](../README.md) and [ADR-0014](../../../docs/architecture/decisions/0014-multi-app-package-boundaries.md).
+This package does not know which record kinds exist, map kinds to tables, own
+route identifier rules, provide sample records, or define Space-specific read
+models. It is not a universal entity table or relationship framework.
+
+Runtime: portable TypeScript. Runtime dependency: `zod`. Category rules:
+[domain README](../README.md) and
+[ADR-0014](../../../docs/architecture/decisions/0014-multi-app-package-boundaries.md).
 
 ## Public interface
 
 `@synapcity/domain-records` (root entry):
 
-| Export                                                                                | Meaning                                                                                                                                                                                                                                                                                                                         |
-| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `baseRecordSchema`, `BaseRecord`                                                      | The saved record, read side: the ten shared fields. `id` is opaque (1 to 200 characters, `'ID is missing.'` when empty), `ownerId` a uuid, the four times instants (`instantSchema` from `domain-time`); `pinnedAt` and `lastViewedAt` are nullable and default to `null`. No D5 limits, so rows written before them still load |
-| `baseRecordFieldsSchema`, `BaseRecordFields`                                          | The editable fields as stored (read side, no limits); `baseRecordSchema` extends it                                                                                                                                                                                                                                             |
-| `baseRecordInputSchema`, `BaseRecordInput`                                            | The complete editable fields with the D5 limits and text rules. Strict: unknown keys, including server-managed ones, are refused                                                                                                                                                                                                |
-| `baseRecordCreateSchema`, `BaseRecordCreate`                                          | What creating takes: `name`, and optionally `description`, `icon`, `tags`. Strict. Omitted fields, the id, owner and times come from the database's column defaults, never from here                                                                                                                                            |
-| `baseRecordPatchSchema`, `BaseRecordPatch`, `recordPatchSchema`                       | A partial edit: every field optional, at least one present (`'Change at least one field.'`), strict. `recordPatchSchema(kindInput)` builds the same from a kind's own strict input, keeping its wording                                                                                                                         |
-| `boundedNameSchema`, `boundedIconSchema`, `BoundedName`, `BoundedIcon`                | The bounded name and icon, with an optional kind-specific message for a blank name or a bad icon. A blank name reports one issue                                                                                                                                                                                                |
-| `editableFieldsOf`                                                                    | The editable fields of a saved record and nothing else: the explicit projection a form uses before a strict write schema                                                                                                                                                                                                        |
-| `RECORD_KINDS`, `RecordKind`, `recordKindSchema`, `isRecordKind`                      | The persisted record kinds, singular: `space`, `document`, `dashboard`. Table names are `server-data`'s mapping (`RECORD_TABLES`), not part of this list                                                                                                                                                                        |
-| `recordIdSchema`                                                                      | A persisted record id (a uuid) arriving from outside the server, checked before it reaches a uuid column                                                                                                                                                                                                                        |
-| `OwnedRecordSummary`                                                                  | A document or dashboard as an index reads it: `BaseRecord` plus `spacesTotal`, the number of Spaces it takes part in. The data read returns it (`server-data`), as `SpaceSummary` is for Spaces                                                                                                                                 |
-| `NAME_MAX`, `DESCRIPTION_MAX`, `ICON_MAX`, `TAGS_MAX`, `TAG_MAX`, `ICON_NAME_PATTERN` | The D5 limits (code points) and the Lucide kebab-case icon pattern; PostgreSQL holds the same numbers                                                                                                                                                                                                                           |
-| `RECORD_MESSAGES`, `RecordMessage`                                                    | The default wording of the record rules; a kind passes its own where it differs                                                                                                                                                                                                                                                 |
-| `codePointLength`, `isStorableText`, `noCaseInsensitiveDuplicates`                    | The length, storable-text and duplicate-tag rules behind the schemas                                                                                                                                                                                                                                                            |
+| Export                                                                                    | Meaning                                                                                                                                                                                                                                                   |
+| ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `baseRecordSchema`, `BaseRecord`                                                          | The saved/read contract: bounded `name`, `description`, `icon` and `tags`, plus opaque non-empty `id`, UUID `ownerId`, `createdAt`, `updatedAt`, nullable `pinnedAt` and nullable `lastViewedAt`. Timestamps are ISO instants with an explicit UTC offset |
+| `baseRecordMetadataSchema`, `BaseRecordMetadata`                                          | The complete shared editable metadata. Strict and bounded; persisted values and write inputs obey the same invariants                                                                                                                                     |
+| `baseRecordCreateSchema`, `BaseRecordCreate`                                              | Create input: `name` is required; `description`, `icon` and `tags` are optional so a concrete store may supply its approved defaults. Server-owned fields are refused                                                                                     |
+| `baseRecordPatchSchema`, `BaseRecordPatch`, `recordPatchSchema`                           | Patch input: every metadata field is optional, at least one must be present, and unknown/server-owned fields are refused. `recordPatchSchema(kindMetadata)` preserves a kind's wording                                                                    |
+| `boundedNameSchema`, `boundedDescriptionSchema`, `boundedIconSchema`, `boundedTagsSchema` | Reusable validators for the four proven shared metadata fields. Name and tags normalize surrounding whitespace; values are never truncated                                                                                                                |
+| `BoundedName`, `BoundedDescription`, `BoundedIcon`, `BoundedTags`                         | Output types of the bounded field schemas                                                                                                                                                                                                                 |
+| `editableFieldsOf`                                                                        | Explicitly projects the editable metadata from a saved record without relying on a schema to erase server-owned fields                                                                                                                                    |
+| `NAME_MAX`, `DESCRIPTION_MAX`, `ICON_MAX`, `TAGS_MAX`, `TAG_MAX`, `ICON_NAME_PATTERN`     | Shared metadata bounds (counted in Unicode code points) and the Lucide kebab-case icon pattern                                                                                                                                                            |
+| `RECORD_MESSAGES`, `RecordMessage`                                                        | Neutral validation wording; a kind may supply its own blank-name or bad-icon wording                                                                                                                                                                      |
+| `codePointLength`, `isStorableText`, `noCaseInsensitiveDuplicates`                        | Pure validation helpers used by the schemas                                                                                                                                                                                                               |
 
-`@synapcity/domain-records/testing` (tests only): `LIMIT_VECTORS` and `expandVectorValue`, the shared D5 boundary cases run through zod here and through PostgreSQL in `server-data`; and `limitVectorMismatches(schema)`, which every kind's write schema runs in its own tests, so a kind cannot drop or loosen a shared rule.
+`@synapcity/domain-records/testing` (tests only): `LIMIT_VECTORS`,
+`expandVectorValue`, and `limitVectorMismatches(schema)`. The shared vectors
+exercise the Zod contracts and the PostgreSQL constraints against the same
+boundary cases.
 
 ## Rules
 
-- The base fields change only with a matching schema change under ADR-0012 or ADR-0013.
-- A kind extends the base contract and keeps its own messages and semantics. The base contract is not a universal entity table or a relationship framework (non-goals in `PRODUCT.md`).
-- Screen-only shapes never live here.
-- Kind-specific contracts live in their own package, not here.
-- Write schemas are strict. A kind composes with `.extend` on `baseRecordInputSchema` (never by spreading `.shape` into a plain object, which drops strictness) and runs `limitVectorMismatches` on its write schemas.
-- Creation defaults (icon, tags) belong to the database's column defaults; this package adds none.
-- Content, revisions, participation and relationships are owned by their kinds and by `server-data`, not here.
+- The base contract contains only fields proven common to the accepted Space,
+  Document, and Dashboard persistence contracts. Lifecycle, content,
+  participation, revisions, and relationships stay with their owners.
+- Saved/read validation is not weaker than write validation. An out-of-bounds
+  persisted value is a contract violation to migrate or repair, not a valid
+  `BaseRecord`.
+- `id` is opaque at this boundary. A concrete persistence or transport adapter
+  validates UUIDs or another durable identifier format where that rule applies.
+- Record timestamp semantics belong to this record contract. Unrelated calendar
+  dates, times of day, durations, and timestamps in other domains stay with
+  those domains.
+- Kind-specific contracts, wording, defaults, summaries, and registries do not
+  live here.
+- Write schemas are strict. A kind composes with `.extend` on
+  `baseRecordMetadataSchema` or `baseRecordCreateSchema` and runs
+  `limitVectorMismatches` on its write schemas.
 
 ## Scripts
 
-`lint`, `check-types`, `test`, `test:coverage`. Tests sit beside the schema (`*.test.ts`).
+`lint`, `check-types`, `test`, `test:coverage`. Tests sit beside the contract
+they exercise (`*.test.ts`).

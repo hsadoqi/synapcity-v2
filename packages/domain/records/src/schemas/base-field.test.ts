@@ -4,8 +4,7 @@ import { RECORD_MESSAGES } from '../constants';
 
 import {
   baseRecordCreateSchema,
-  baseRecordFieldsSchema,
-  baseRecordInputSchema,
+  baseRecordMetadataSchema,
   baseRecordPatchSchema,
   boundedIconSchema,
   boundedNameSchema,
@@ -16,10 +15,10 @@ import {
 const fields = { name: 'Launch plan', icon: 'file-text', tags: ['work'] };
 
 describe('Base Fields', () => {
-  describe('baseRecordFieldsSchema (the read shape: no limits, so old rows still load)', () => {
+  describe('baseRecordMetadataSchema (the shared stored metadata)', () => {
     it('parses the stored fields and trims the name', () => {
       expect(
-        baseRecordFieldsSchema.parse({
+        baseRecordMetadataSchema.parse({
           ...fields,
           name: '  Launch plan  ',
           description: 'About',
@@ -28,7 +27,7 @@ describe('Base Fields', () => {
     });
 
     it('leaves the description optional', () => {
-      expect(baseRecordFieldsSchema.parse(fields)).not.toHaveProperty(
+      expect(baseRecordMetadataSchema.parse(fields)).not.toHaveProperty(
         'description',
       );
     });
@@ -39,24 +38,24 @@ describe('Base Fields', () => {
       ['tags that are not an array', { tags: 'work' }],
     ])('rejects %s', (_name, override) => {
       expect(
-        baseRecordFieldsSchema.safeParse({ ...fields, ...override }).success,
+        baseRecordMetadataSchema.safeParse({ ...fields, ...override }).success,
       ).toBe(false);
     });
 
-    it('applies none of the write limits: a 121-character name, 21 padded duplicate tags, a 5,000-character description', () => {
-      const legacy = {
+    it('rejects persisted metadata outside the same bounds as a write', () => {
+      const invalid = {
         name: 'a'.repeat(121),
         description: 'd'.repeat(5000),
         icon: 'a'.repeat(65),
         tags: Array.from({ length: 21 }, () => ' same '),
       };
-      expect(baseRecordFieldsSchema.safeParse(legacy).success).toBe(true);
+      expect(baseRecordMetadataSchema.safeParse(invalid).success).toBe(false);
     });
   });
 
-  describe('baseRecordInputSchema (the write shape: the D5 limits)', () => {
+  describe('baseRecordMetadataSchema bounds', () => {
     const parse = (override: object) =>
-      baseRecordInputSchema.safeParse({ ...fields, ...override });
+      baseRecordMetadataSchema.safeParse({ ...fields, ...override });
 
     it('accepts values at every limit', () => {
       expect(
@@ -143,7 +142,7 @@ describe('Base Fields', () => {
 
   describe('hardening of what a person can write', () => {
     const parse = (override: object) =>
-      baseRecordInputSchema.safeParse({ ...fields, ...override });
+      baseRecordMetadataSchema.safeParse({ ...fields, ...override });
     const ZWSP = '\u200B';
     const RLO = '\u202E';
 
@@ -162,10 +161,10 @@ describe('Base Fields', () => {
       },
     );
 
-    it('still reads a row that has more columns than the contract (the read shape ignores them)', () => {
+    it('refuses unknown metadata keys instead of silently erasing them', () => {
       expect(
-        baseRecordFieldsSchema.safeParse({ ...fields, extra: 1 }).success,
-      ).toBe(true);
+        baseRecordMetadataSchema.safeParse({ ...fields, extra: 1 }).success,
+      ).toBe(false);
     });
 
     describe.each([
@@ -301,7 +300,7 @@ describe('Base Fields', () => {
     });
 
     it('a blank tag reports one issue', () => {
-      const result = baseRecordInputSchema.safeParse({
+      const result = baseRecordMetadataSchema.safeParse({
         ...fields,
         tags: ['  '],
       });
@@ -366,7 +365,7 @@ describe('Base Fields', () => {
     });
 
     it('carries a kind\u2019s own wording through recordPatchSchema', () => {
-      const kindInput = baseRecordInputSchema.extend({
+      const kindInput = baseRecordMetadataSchema.extend({
         name: boundedNameSchema('Enter a space name.'),
       });
       const result = recordPatchSchema(kindInput).safeParse({ name: ' ' });

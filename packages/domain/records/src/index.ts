@@ -1,32 +1,29 @@
 export {
   baseRecordCreateSchema,
-  baseRecordFieldsSchema,
-  baseRecordInputSchema,
+  baseRecordMetadataSchema,
   baseRecordPatchSchema,
   baseRecordSchema,
+  boundedDescriptionSchema,
   boundedIconSchema,
   boundedNameSchema,
-  recordIdSchema,
-  recordKindSchema,
+  boundedTagsSchema,
   recordPatchSchema,
 } from './schemas';
 export type {
   BaseRecord,
   BaseRecordCreate,
-  BaseRecordFields,
-  BaseRecordInput,
+  BaseRecordMetadata,
   BaseRecordPatch,
+  BoundedDescription,
   BoundedIcon,
   BoundedName,
-  OwnedRecordSummary,
-  RecordKind,
+  BoundedTags,
 } from './types';
 export {
   DESCRIPTION_MAX,
   ICON_MAX,
   ICON_NAME_PATTERN,
   NAME_MAX,
-  RECORD_KINDS,
   RECORD_MESSAGES,
   TAG_MAX,
   TAGS_MAX,
@@ -35,7 +32,6 @@ export type { RecordMessage } from './constants';
 export {
   codePointLength,
   editableFieldsOf,
-  isRecordKind,
   isStorableText,
   noCaseInsensitiveDuplicates,
 } from './utils';

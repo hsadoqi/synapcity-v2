@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { RECORD_MESSAGES } from '../constants';
 import {
   baseRecordCreateSchema,
-  baseRecordInputSchema,
+  baseRecordMetadataSchema,
   baseRecordPatchSchema,
 } from '../schemas';
 import {
@@ -22,7 +22,7 @@ import {
 const VALID = { name: 'n', icon: 'folder', tags: [] as string[] };
 
 function parse(field: string, value: string | string[]) {
-  return baseRecordInputSchema.safeParse({ ...VALID, [field]: value });
+  return baseRecordMetadataSchema.safeParse({ ...VALID, [field]: value });
 }
 
 describe('limit vectors', () => {
@@ -78,7 +78,7 @@ describe('limit vectors', () => {
 
 describe('limitVectorMismatches (the conformance check each kind runs)', () => {
   it.each([
-    ['baseRecordInputSchema', baseRecordInputSchema],
+    ['baseRecordMetadataSchema', baseRecordMetadataSchema],
     ['baseRecordCreateSchema', baseRecordCreateSchema],
     ['baseRecordPatchSchema', baseRecordPatchSchema],
   ])('%s keeps every shared rule', (_name, schema) => {
