@@ -10,7 +10,7 @@
   },
   "scripts": {
     "check-types": "tsc --noEmit",
-    "generate": "node src/generate-seed.ts",
+    "generate": "SEED_GENERATE=1 vitest run src/generate-seed.test.ts",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage"
   },

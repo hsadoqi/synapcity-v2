@@ -12,9 +12,10 @@ const SEED_FILE_SEED = 42;
  */
 export const seedDefinitions = {
   users: (fx: Fixtures) => fx.list(10, fx.person),
-  workspaces: (fx: Fixtures) => fx.list(20, fx.workspace),
-  documents: (fx: Fixtures) => fx.list(20, fx.document),
-  dashboards: (fx: Fixtures) => fx.list(20, fx.dashboard),
+  // The file keeps its historical name; the rows are Space records.
+  workspaces: (fx: Fixtures) => fx.list(20, () => fx.space()),
+  documents: (fx: Fixtures) => fx.list(20, () => fx.documentRecord()),
+  dashboards: (fx: Fixtures) => fx.list(20, () => fx.dashboardRecord()),
 } satisfies Record<string, (fx: Fixtures) => unknown[]>;
 
 export type SeedName = keyof typeof seedDefinitions;
