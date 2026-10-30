@@ -290,9 +290,20 @@ async function main() {
         console.log(`DB_TEST_SERVICE_KEY=${state.serviceKey}`);
       }
     }
+  } else if (command === 'workdir') {
+    // The directory that holds this stack's copy of supabase/, for tools that
+    // take a `--workdir` (the signed-in browser run: E2E_STACK_WORKDIR).
+    const state = status();
+    if (!state) {
+      process.stderr.write('db-test-stack: not running\n');
+      process.exit(1);
+    }
+    console.log(state.workdir);
+  } else if (command === 'dir') {
+    console.log(stackDirectory(worktreeId(root)));
   } else {
     process.stderr.write(
-      'usage: db-test-stack.mjs start [--fresh] | stop | status | env\n',
+      'usage: db-test-stack.mjs start [--fresh] | stop | status | env | workdir | dir\n',
     );
     process.exit(2);
   }

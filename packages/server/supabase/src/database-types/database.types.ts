@@ -47,6 +47,69 @@ export type Database = {
           },
         ];
       };
+      dashboard_revisions: {
+        Row: {
+          composition: NonNullable<Json>;
+          content_bytes: number;
+          content_hash: string;
+          created_at: string;
+          created_by: string | null;
+          dashboard_id: string;
+          description: string | null;
+          icon: string;
+          id: string;
+          name: string;
+          owner_id: string;
+          schema_version: number;
+          sequence: number;
+          source: string;
+          tags: string[];
+        };
+        ComputedFields: never;
+        Insert: {
+          composition: NonNullable<Json>;
+          content_bytes: number;
+          content_hash: string;
+          created_at?: string;
+          created_by?: string | null;
+          dashboard_id: string;
+          description?: string | null;
+          icon: string;
+          id?: string;
+          name: string;
+          owner_id: string;
+          schema_version: number;
+          sequence: number;
+          source: string;
+          tags: string[];
+        };
+        Update: {
+          composition?: NonNullable<Json>;
+          content_bytes?: number;
+          content_hash?: string;
+          created_at?: string;
+          created_by?: string | null;
+          dashboard_id?: string;
+          description?: string | null;
+          icon?: string;
+          id?: string;
+          name?: string;
+          owner_id?: string;
+          schema_version?: number;
+          sequence?: number;
+          source?: string;
+          tags?: string[];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'dashboard_revisions_dashboard_id_fkey';
+            columns: ['dashboard_id'];
+            isOneToOne: false;
+            referencedRelation: 'dashboards';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       dashboards: {
         Row: {
           created_at: string;

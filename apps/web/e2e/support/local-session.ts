@@ -16,6 +16,7 @@ import { spawn } from 'node:child_process';
 import type { ChildProcess } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import {
+  appendFileSync,
   mkdirSync,
   readFileSync,
   rmSync,
@@ -195,6 +196,15 @@ export function startServer(options: {
   };
   child.stdout?.on('data', keep);
   child.stderr?.on('data', keep);
+  // Opt-in: the whole server log in a file, for debugging a failed run. Off by
+  // default, so a normal run keeps only the tail it reports on exit.
+  // eslint-disable-next-line turbo/no-undeclared-env-vars
+  const logFile = process.env.E2E_SERVER_LOG;
+  if (logFile) {
+    const append = (data: Buffer) => appendFileSync(logFile, data);
+    child.stdout?.on('data', append);
+    child.stderr?.on('data', append);
+  }
   const exited = new Promise<string>((resolve) => {
     child.once('exit', () => resolve(tail));
   });
