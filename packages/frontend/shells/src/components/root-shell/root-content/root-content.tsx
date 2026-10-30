@@ -6,11 +6,16 @@ export const RootContent = ({ children }: { children: ReactNode }) => {
     // would push it below the fold on every page. A page marked
     // data-fill-viewport (settings) may shrink to the space left, so it fills
     // the screen and scrolls inside itself instead of growing the column.
+    //
+    // main is a flex item in that row, so by default it is never narrower
+    // than its content's widest unbreakable line. min-w-0 holds it to the
+    // row's width instead: a long resource name then truncates in its header,
+    // and the contextual panel measures the real work area, not the title.
     <div className="relative flex w-full flex-1 justify-center has-data-fill-viewport:min-h-0">
       <main
         id="main-content"
         tabIndex={-1}
-        className="flex flex-1 outline-none transition-[padding] duration-200 ease-out group-data-[global-panel=open]/work-area:py-4 sm:group-data-[global-panel=open]/work-area:py-6 lg:group-data-[global-panel=open]/work-area:py-8"
+        className="flex min-w-0 flex-1 outline-none transition-[padding] duration-200 ease-out group-data-[global-panel=open]/work-area:py-4 sm:group-data-[global-panel=open]/work-area:py-6 lg:group-data-[global-panel=open]/work-area:py-8"
       >
         {children}
       </main>

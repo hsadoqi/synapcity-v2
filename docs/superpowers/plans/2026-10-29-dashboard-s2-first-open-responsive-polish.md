@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Plan and decisions D1, D3 and D4 approved by the owner on 2026-10-29; D2 deferred until Task 1's measurements. Implementation has not started and needs its own go-ahead once this plan is integrated on `main`. S2a, S2c and S2d are independent of D2 and may start from updated `main`; S2b stays gated on D2.
+**Status:** Plan and decisions D1, D2 (option D2-1), D3 (option a) and D4 approved by the owner on 2026-10-29; D2-1 was decided after Task 1's measurements. Implemented and integrated in pull request #125: S2a, S2b (regression tests only), S2c and S2d. No starter layout was built.
 
 **Goal:** Make the Dashboard feel right the first time it opens, at every width and in both themes, without changing what is saved, how it is saved, or how it is edited.
 

@@ -30,6 +30,15 @@ describe('RootContent', () => {
     expect(document.activeElement).toBe(main);
   });
 
+  // jsdom has no layout, so this pins the class contract; the geometry is
+  // checked in the LongResourceNameInNarrowContainer story and the
+  // shell-containment e2e.
+  it('may shrink below its content, so wide content cannot widen the work area', () => {
+    render(<RootContent>content</RootContent>);
+
+    expect(screen.getByRole('main').classList.contains('min-w-0')).toBe(true);
+  });
+
   it('is the only main landmark', () => {
     render(<RootContent>content</RootContent>);
 
