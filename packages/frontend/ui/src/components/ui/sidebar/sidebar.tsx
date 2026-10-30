@@ -79,7 +79,10 @@ function SidebarProvider({
    */
   contained?: boolean;
 }) {
-  const isMobile = useIsMobile();
+  // A contained sidebar sizes to its own box, so it never swaps to the
+  // viewport's off-canvas Sheet: it stays on screen and resizes with the box.
+  const isMobileViewport = useIsMobile();
+  const isMobile = isMobileViewport && !contained;
   const [openMobile, setOpenMobile] = React.useState(false);
 
   // This is the internal state of the sidebar.
@@ -234,7 +237,10 @@ function Sidebar({
 
   return (
     <div
-      className="group peer hidden text-sidebar-foreground md:block"
+      className={cn(
+        'group peer text-sidebar-foreground',
+        contained ? 'block' : 'hidden md:block',
+      )}
       data-state={state}
       data-collapsible={state === 'collapsed' ? collapsible : ''}
       data-variant={variant}
@@ -257,7 +263,8 @@ function Sidebar({
         data-slot="sidebar-container"
         data-side={side}
         className={cn(
-          'inset-y-0 z-10 hidden w-(--sidebar-width) transition-[left,right,width] duration-200 ease-out data-[side=left]:left-0 data-[side=left]:group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] data-[side=right]:right-0 data-[side=right]:group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)] md:flex',
+          'inset-y-0 z-10 w-(--sidebar-width) transition-[left,right,width] duration-200 ease-out data-[side=left]:left-0 data-[side=left]:group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] data-[side=right]:right-0 data-[side=right]:group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]',
+          contained ? 'flex' : 'hidden md:flex',
           contained ? 'absolute h-full' : 'fixed h-svh',
           // Adjust the padding for floating and inset variants.
           variant === 'floating' || variant === 'inset'

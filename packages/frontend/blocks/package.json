@@ -1,0 +1,56 @@
+{
+  "name": "@synapcity/frontend-blocks",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --build tsconfig.build.json",
+    "lint": "eslint . --cache --cache-strategy content --max-warnings 0",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest run --watch",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@storybook/nextjs-vite": "10.6.3",
+    "@synapcity/dev-eslint-config": "workspace:*",
+    "@synapcity/dev-fixtures": "workspace:*",
+    "@synapcity/dev-typescript-config": "workspace:*",
+    "@synapcity/dev-vitest-config": "workspace:*",
+    "@testing-library/dom": "10.4.2",
+    "@testing-library/react": "16.3.3",
+    "@types/node": "26.6.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitest/coverage-v8": "5.0.5",
+    "eslint": "10.13.0",
+    "jsdom": "30.1.2",
+    "react-dom": "19.3.1",
+    "storybook": "10.6.3",
+    "typescript": "7.0.2",
+    "vitest": "5.0.5"
+  },
+  "dependencies": {
+    "@synapcity/domain-identity": "workspace:*",
+    "@base-ui/react": "^1.9.0",
+    "@synapcity/frontend-ui": "workspace:*",
+    "@synapcity/domain-preferences": "workspace:*",
+    "@synapcity/frontend-brand": "workspace:*",
+    "@synapcity/frontend-preferences": "workspace:*",
+    "@synapcity/frontend-tailwind-config": "workspace:*",
+    "@synapcity/frontend-tokens": "workspace:*",
+    "chrono-node": "^2.10.3",
+    "class-variance-authority": "^0.7.1",
+    "cmdk": "^1.1.1",
+    "cn": "^0.5.0",
+    "date-fns": "^4.4.0",
+    "lucide-react": "^1.55.0",
+    "next": "16.4.3",
+    "react": "19.3.1",
+    "react-day-picker": "^10.0.2",
+    "react-resizable-panels": "4.14.5",
+    "shadcn": "^4.22.1"
+  }
+}
