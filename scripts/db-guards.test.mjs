@@ -1,7 +1,13 @@
 // Runs the real scripts with a recording stand-in for `supabase`, `pnpm` and
 // `psql` first on PATH. A refused target must exit 1 before any of them runs.
 import { spawnSync } from 'node:child_process';
-import { chmodSync, existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  chmodSync,
+  existsSync,
+  mkdtempSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -24,10 +30,14 @@ beforeEach(() => {
 afterEach(() => rmSync(dir, { recursive: true, force: true }));
 
 function run(script, args, env = {}) {
-  return spawnSync(process.execPath, [join(import.meta.dirname, script), ...args], {
-    env: { ...process.env, PATH: `${dir}:${process.env.PATH}`, ...env },
-    encoding: 'utf8',
-  });
+  return spawnSync(
+    process.execPath,
+    [join(import.meta.dirname, script), ...args],
+    {
+      env: { ...process.env, PATH: `${dir}:${process.env.PATH}`, ...env },
+      encoding: 'utf8',
+    },
+  );
 }
 
 describe.each([

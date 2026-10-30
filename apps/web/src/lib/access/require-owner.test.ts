@@ -1,3 +1,4 @@
+import { AuthApiError, AuthRetryableFetchError } from '@supabase/supabase-js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const getClaims = vi.fn();
@@ -42,14 +43,28 @@ describe('requireOwner', () => {
     expect(digest).toContain('/auth/login?next=%2Fu1%2Fhome');
   });
 
-  it('treats a failed claims check as signed out and sends them to sign in', async () => {
+  it('treats a session the Auth service refused as signed out and sends them to sign in', async () => {
     getClaims.mockResolvedValue({
       data: null,
-      error: { code: 'bad_jwt', status: 401 },
+      error: new AuthApiError('gone', 401, 'bad_jwt'),
     });
 
     expect(await failure('u1')).toContain('/auth/login?next=%2Fu1%2Fhome');
   });
+
+  it.each([
+    ['a dropped connection', new AuthRetryableFetchError('fetch failed', 0)],
+    ['a 5xx', new AuthApiError('boom', 500, 'unexpected_failure')],
+  ])(
+    'does not send anyone to sign in during an outage (%s)',
+    async (_name, error) => {
+      getClaims.mockResolvedValue({ data: null, error });
+
+      await expect(requireOwner('u1')).rejects.toMatchObject({
+        name: 'AuthUnavailableError',
+      });
+    },
+  );
 
   it('answers 404, not 403, for someone else’s id so ids are not confirmed', async () => {
     getClaims.mockResolvedValue({ data: { claims: { sub: 'someone-else' } } });

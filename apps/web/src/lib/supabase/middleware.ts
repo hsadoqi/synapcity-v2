@@ -1,4 +1,5 @@
 import { createServerClient } from '@supabase/ssr';
+import { readClaims } from '@synapcity/server-supabase/claims';
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { homePathFor } from '../routing/user-paths';
@@ -6,6 +7,7 @@ import { safeNextPath } from '../routing/safe-next';
 import { fixtureModeEnabled } from '../access/dev-fixture';
 import { REQUEST_PATH_HEADER } from '../routing/request-path';
 import { getSupabaseEnv } from './env';
+import { AUTH_UNAVAILABLE_PATH } from '../routing/auth-unavailable';
 import { isGuestOnlyPath, isProtectedPath } from '../routing/route-access';
 
 export async function updateSession(request: NextRequest) {
@@ -70,16 +72,49 @@ export async function updateSession(request: NextRequest) {
     return redirect;
   }
 
+  /**
+   * The Auth service could not answer, so nothing is known about the session.
+   * A protected page then says so (503) instead of sending a signed-in person
+   * to sign in. The response keeps the cookies and cache headers of
+   * `supabaseResponse`, and is never stored.
+   */
+  function unavailableResponse() {
+    const rewrite = NextResponse.rewrite(
+      new URL(AUTH_UNAVAILABLE_PATH, request.url),
+      { status: 503 },
+    );
+    supabaseResponse.cookies
+      .getAll()
+      .forEach((cookie) => rewrite.cookies.set(cookie));
+    Object.entries(cacheHeaders).forEach(([key, value]) =>
+      rewrite.headers.set(key, value),
+    );
+    rewrite.headers.set('Cache-Control', 'no-store');
+    return rewrite;
+  }
+
   // Do not run code between createServerClient and
   // supabase.auth.getClaims(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
 
   // IMPORTANT: If you remove getClaims() and you use server-side rendering
   // with the Supabase client, your users may be randomly logged out.
-  const { data } = await supabase.auth.getClaims();
-  const user = data?.claims;
+  // `readClaims` calls it and keeps the three answers apart: only an answered
+  // "no session" is signed out; an outage is not.
+  const result = await readClaims(supabase);
+  const user = result.status === 'verified' ? result.claims : null;
 
-  if (!user && isProtectedPath(request.nextUrl.pathname)) {
+  if (
+    result.status === 'unavailable' &&
+    isProtectedPath(request.nextUrl.pathname)
+  ) {
+    return unavailableResponse();
+  }
+
+  if (
+    result.status === 'signed-out' &&
+    isProtectedPath(request.nextUrl.pathname)
+  ) {
     const url = request.nextUrl.clone();
     url.pathname = '/auth/login';
     url.search = '';

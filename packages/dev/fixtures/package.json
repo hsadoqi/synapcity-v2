@@ -18,8 +18,8 @@
     "@faker-js/faker": "10.6.0",
     "@synapcity/domain-dashboards": "workspace:*",
     "@synapcity/domain-prototypes": "workspace:*",
-    "@synapcity/domain-spaces": "workspace:*",
-    "lucide-react": "^1.55.0"
+    "@synapcity/domain-records": "workspace:*",
+    "@synapcity/domain-spaces": "workspace:*"
   },
   "devDependencies": {
     "@synapcity/dev-typescript-config": "workspace:*",

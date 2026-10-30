@@ -34,7 +34,10 @@ type ClaimsResponse = {
  * code are `unavailable`: the service has not said the person is signed out.
  */
 function classifyError(error: AuthError): ClaimsResult {
-  if (isAuthSessionMissingError(error) || error instanceof AuthInvalidJwtError) {
+  if (
+    isAuthSessionMissingError(error) ||
+    error instanceof AuthInvalidJwtError
+  ) {
     return { status: 'signed-out' };
   }
   if (isAuthRetryableFetchError(error)) {

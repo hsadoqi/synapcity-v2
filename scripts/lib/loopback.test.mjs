@@ -23,13 +23,34 @@ describe('assertLocalTarget', () => {
   it.each([
     ['a hosted direct URL', HOSTED],
     ['a pooler URL', POOLED],
-    ['a loopback name used as the user', 'postgresql://127.0.0.1@db.example.co/postgres'],
-    ['a loopback name used as the password', 'postgresql://u:127.0.0.1@db.example.co/postgres'],
-    ['a loopback-looking subdomain', 'postgresql://u:p@127.0.0.1.example.co/postgres'],
-    ['localhost as a subdomain', 'postgresql://u:p@localhost.example.co/postgres'],
-    ['a host replaced in the query', 'postgresql://u:p@127.0.0.1/postgres?host=db.example.co'],
-    ['hostaddr in the query', 'postgresql://u:p@127.0.0.1/postgres?hostaddr=203.0.113.9'],
-    ['a service file in the query', 'postgresql://u:p@127.0.0.1/postgres?service=prod'],
+    [
+      'a loopback name used as the user',
+      'postgresql://127.0.0.1@db.example.co/postgres',
+    ],
+    [
+      'a loopback name used as the password',
+      'postgresql://u:127.0.0.1@db.example.co/postgres',
+    ],
+    [
+      'a loopback-looking subdomain',
+      'postgresql://u:p@127.0.0.1.example.co/postgres',
+    ],
+    [
+      'localhost as a subdomain',
+      'postgresql://u:p@localhost.example.co/postgres',
+    ],
+    [
+      'a host replaced in the query',
+      'postgresql://u:p@127.0.0.1/postgres?host=db.example.co',
+    ],
+    [
+      'hostaddr in the query',
+      'postgresql://u:p@127.0.0.1/postgres?hostaddr=203.0.113.9',
+    ],
+    [
+      'a service file in the query',
+      'postgresql://u:p@127.0.0.1/postgres?service=prod',
+    ],
     ['several hosts', 'postgresql://u:p@127.0.0.1:1,db.example.co:2/postgres'],
     ['a key=value string', 'host=db.example.co dbname=postgres'],
     ['another scheme', 'https://127.0.0.1/postgres'],
@@ -43,7 +64,9 @@ describe('assertLocalTarget', () => {
       remote: true,
       ref: REF,
     });
-    expect(assertLocalTarget(POOLED, { allowRemoteTarget: REF }).remote).toBe(true);
+    expect(assertLocalTarget(POOLED, { allowRemoteTarget: REF }).remote).toBe(
+      true,
+    );
   });
 
   it.each([

@@ -89,7 +89,8 @@ describe('createRequestClient', () => {
 
   describe('response headers', () => {
     const cacheHeaders = {
-      'Cache-Control': 'private, no-cache, no-store, must-revalidate, max-age=0',
+      'Cache-Control':
+        'private, no-cache, no-store, must-revalidate, max-age=0',
       Expires: '0',
       Pragma: 'no-cache',
     };
@@ -125,7 +126,10 @@ describe('createRequestClient', () => {
         onResponseHeaders,
       });
 
-      cookieMethods().setAll([{ name: 'a', value: '1', options: {} }], cacheHeaders);
+      cookieMethods().setAll(
+        [{ name: 'a', value: '1', options: {} }],
+        cacheHeaders,
+      );
 
       expect(onResponseHeaders).toHaveBeenCalledExactlyOnceWith(cacheHeaders);
     });

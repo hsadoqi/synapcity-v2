@@ -4,6 +4,10 @@ import {
   outcomeFromClaims,
   readProviderUser,
 } from '@synapcity/server-supabase';
+import {
+  readClaims,
+  type ClaimsResult,
+} from '@synapcity/server-supabase/claims';
 import { cache } from 'react';
 
 import { createClient } from '@/lib/supabase/server';
@@ -19,25 +23,52 @@ import {
 } from '@synapcity/domain-identity';
 
 /**
- * Verified JWT claims for this request, or null when signed out. `cache`
- * memoizes per request, so the layout, header and page share one verification
- * instead of repeating it (ADR-0006: `getClaims`, never `getSession`).
+ * Thrown by a page guard when the Auth service cannot answer. It is not a
+ * sign-out: sending the person to sign in would read an outage as a lost
+ * session. The error boundary shows it; the proxy normally answers first with
+ * the 503 page, so this is the backstop for an outage that starts mid-request.
+ */
+export class AuthUnavailableError extends Error {
+  constructor() {
+    super('The Auth service could not be reached.');
+    this.name = 'AuthUnavailableError';
+  }
+}
+
+/**
+ * The session check for this request in its three states: verified, signed
+ * out, or unavailable (the Auth service did not answer). `cache` memoizes per
+ * request, so the layout, header and page share one verification instead of
+ * repeating it (ADR-0006: `getClaims`, never `getSession`).
+ */
+export const getClaimsResult = cache(async (): Promise<ClaimsResult> => {
+  return readClaims(await createClient());
+});
+
+/**
+ * Verified JWT claims for this request, or null when there are none. Null
+ * covers both "signed out" and "unavailable": callers that must tell them
+ * apart (page guards, route handlers) use `getClaimsResult` or
+ * `getVerifiedIdentity`; the rest treat both as "no claims to show".
  */
 export const getVerifiedClaims = cache(async () => {
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getClaims();
-  return data?.claims ?? null;
+  const result = await getClaimsResult();
+  return result.status === 'verified' ? result.claims : null;
 });
 
 /**
  * Who the verified caller is, through the identity boundary, for deciding
- * access. It reads the same memoized claims as `getVerifiedClaims`, so a
- * request still verifies its token once. Development fixture mode never
- * changes it: a fixture is not a verified identity (ADR-0006).
+ * access. It reads the same memoized check as `getClaimsResult`, so a
+ * request still verifies its token once. `unavailable` means the Auth service
+ * did not answer; it is not a signed-out session. Development fixture mode
+ * never changes it: a fixture is not a verified identity (ADR-0006).
  */
 export const getVerifiedIdentity = cache(async (): Promise<IdentityResult> => {
+  const result = await getClaimsResult();
+  if (result.status === 'unavailable') return { status: 'unavailable' };
   const verification = await verifyIdentity({
-    claims: async () => outcomeFromClaims(await getVerifiedClaims()),
+    claims: async () =>
+      outcomeFromClaims(result.status === 'verified' ? result.claims : null),
   });
   return verification.result;
 });

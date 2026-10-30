@@ -33,7 +33,9 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { assertLocalTarget } from './lib/loopback.mjs';
 
-const root = realpathSync(resolve(dirname(fileURLToPath(import.meta.url)), '..'));
+const root = realpathSync(
+  resolve(dirname(fileURLToPath(import.meta.url)), '..'),
+);
 
 // Containers the database tests never use. Auth, Storage and the mail catcher
 // stay: the two-user tests sign in and the account tests upload avatars.
@@ -132,7 +134,8 @@ export function rewriteConfig(text, { projectId, ports }) {
       return `inspector_port = ${ports.inspector}`;
     }
     // A disposable database starts empty: the seed file is for `db reset`.
-    if (section === 'db.seed' && /^enabled\s*=/.test(line)) return 'enabled = false';
+    if (section === 'db.seed' && /^enabled\s*=/.test(line))
+      return 'enabled = false';
     return line;
   });
   return lines.join('\n');
@@ -198,7 +201,8 @@ export async function start({ fresh = false } = {}) {
       break;
     }
   }
-  if (base === undefined) throw new Error('No free block of ports for the test stack.');
+  if (base === undefined)
+    throw new Error('No free block of ports for the test stack.');
   const ports = portsFor(base);
 
   rmSync(workdir, { recursive: true, force: true });
@@ -208,7 +212,10 @@ export async function start({ fresh = false } = {}) {
     join(workdir, 'supabase/config.toml'),
     rewriteConfig(config, { projectId, ports }),
   );
-  symlinkSync(join(root, 'supabase/migrations'), join(workdir, 'supabase/migrations'));
+  symlinkSync(
+    join(root, 'supabase/migrations'),
+    join(workdir, 'supabase/migrations'),
+  );
   // An empty seed keeps the CLI from looking for a file that is not copied.
   writeFileSync(join(workdir, 'supabase/seed.sql'), '');
 
@@ -275,12 +282,17 @@ async function main() {
       console.log(`E2E_MAIL_URL=${state.mailUrl ?? ''}`);
     }
   } else {
-    process.stderr.write('usage: db-test-stack.mjs start [--fresh] | stop | status | env\n');
+    process.stderr.write(
+      'usage: db-test-stack.mjs start [--fresh] | stop | status | env\n',
+    );
     process.exit(2);
   }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
   main().catch((error) => {
     process.stderr.write(`db-test-stack: ${error.stderr ?? error.message}\n`);
     process.exit(1);

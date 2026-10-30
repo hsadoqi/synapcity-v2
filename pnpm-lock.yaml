@@ -589,12 +589,12 @@ importers:
       '@synapcity/domain-prototypes':
         specifier: workspace:*
         version: link:../../domain/prototypes
+      '@synapcity/domain-records':
+        specifier: workspace:*
+        version: link:../../domain/records
       '@synapcity/domain-spaces':
         specifier: workspace:*
         version: link:../../domain/spaces
-      lucide-react:
-        specifier: ^1.55.0
-        version: 1.55.0(@types/react@19.3.0)(react@19.3.1)
     devDependencies:
       '@synapcity/dev-typescript-config':
         specifier: workspace:*

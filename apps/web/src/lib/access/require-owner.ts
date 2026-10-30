@@ -8,6 +8,7 @@ import {
   FIXTURE_USER_ID,
 } from './dev-fixture';
 import {
+  AuthUnavailableError,
   getVerifiedClaims,
   getVerifiedIdentity,
 } from '../../features/auth/server/session';
@@ -41,6 +42,8 @@ export async function requireOwner(userId: string): Promise<OwnerAccess> {
 
   const identity = await getVerifiedIdentity();
 
+  // An outage is not a sign-out: do not send someone who may be signed in away.
+  if (identity.status === 'unavailable') throw new AuthUnavailableError();
   if (identity.status !== 'verified') {
     redirect(`/auth/login?next=${encodeURIComponent(homePathFor(userId))}`);
   }

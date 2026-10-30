@@ -1,3 +1,4 @@
+import { AuthApiError, AuthRetryableFetchError } from '@supabase/supabase-js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
@@ -101,14 +102,35 @@ describe('getVerifiedIdentity', () => {
     });
   });
 
-  it('is signed out, not unavailable, when the claims check fails', async () => {
+  it('is signed out, not unavailable, when the Auth service refused the session', async () => {
     mocks.getClaims.mockResolvedValue({
       data: null,
-      error: { code: 'bad_jwt', status: 401 },
+      error: new AuthApiError('gone', 401, 'bad_jwt'),
     });
 
     await expect(getVerifiedIdentity()).resolves.toEqual({
       status: 'signed-out',
+    });
+  });
+
+  it.each([
+    ['a dropped connection', new AuthRetryableFetchError('fetch failed', 0)],
+    ['a 503', new AuthApiError('down', 503, 'unexpected_failure')],
+    ['a failure without a code', new Error('boom')],
+  ])('is unavailable, not signed out, when %s', async (_name, error) => {
+    mocks.getClaims.mockResolvedValue({ data: null, error });
+
+    await expect(getVerifiedIdentity()).resolves.toEqual({
+      status: 'unavailable',
+    });
+    await expect(getVerifiedClaims()).resolves.toBeNull();
+  });
+
+  it('is unavailable when getClaims throws', async () => {
+    mocks.getClaims.mockRejectedValue(new TypeError('fetch failed'));
+
+    await expect(getVerifiedIdentity()).resolves.toEqual({
+      status: 'unavailable',
     });
   });
 

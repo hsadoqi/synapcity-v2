@@ -36,9 +36,7 @@ export function listTestFiles(dir) {
 
 /** The database URL for this run, before the loopback check. */
 export function resolveDbUrl(argv, env, statusReader) {
-  return (
-    flagValue(argv, 'db-url') ?? env.SUPABASE_DB_URL ?? statusReader(argv)
-  );
+  return flagValue(argv, 'db-url') ?? env.SUPABASE_DB_URL ?? statusReader(argv);
 }
 
 function readStatusDbUrl(argv) {
@@ -109,12 +107,17 @@ function main() {
   }
 
   console.log('\ndb:test summary');
-  for (const { name, ok } of results) console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${name}`);
+  for (const { name, ok } of results)
+    console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${name}`);
   const skipped = files.length - results.length;
-  if (skipped > 0) console.log(`  ${skipped} file(s) not run after the failure`);
+  if (skipped > 0)
+    console.log(`  ${skipped} file(s) not run after the failure`);
   process.exit(failed ? 1 : 0);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
   main();
 }

@@ -33,7 +33,9 @@ export function describeTarget(rawUrl) {
     );
   }
   if (url.protocol !== 'postgresql:' && url.protocol !== 'postgres:') {
-    throw new TargetRefusedError('The database target is not a postgresql:// URL.');
+    throw new TargetRefusedError(
+      'The database target is not a postgresql:// URL.',
+    );
   }
   for (const param of HOST_OVERRIDING_PARAMS) {
     if (url.searchParams.has(param)) {

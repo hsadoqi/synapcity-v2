@@ -51,9 +51,18 @@ describe('classifyClaimsResponse', () => {
   describe('outage shapes are never signed-out', () => {
     it.each([
       ['a dropped connection', new AuthRetryableFetchError('fetch failed', 0)],
-      ['a 503 from the service', new AuthRetryableFetchError('unavailable', 503)],
-      ['a 5xx with a code', new AuthApiError('boom', 500, 'unexpected_failure')],
-      ['a rate limit', new AuthApiError('slow down', 429, 'over_request_rate_limit')],
+      [
+        'a 503 from the service',
+        new AuthRetryableFetchError('unavailable', 503),
+      ],
+      [
+        'a 5xx with a code',
+        new AuthApiError('boom', 500, 'unexpected_failure'),
+      ],
+      [
+        'a rate limit',
+        new AuthApiError('slow down', 429, 'over_request_rate_limit'),
+      ],
       ['a 4xx without a code', new AuthApiError('odd', 400, undefined)],
       ['an unknown failure', new AuthUnknownError('???', new Error('x'))],
     ])('%s', (_name, error) => {
