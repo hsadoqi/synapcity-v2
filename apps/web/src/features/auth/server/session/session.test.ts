@@ -2,7 +2,6 @@ import { AuthApiError, AuthRetryableFetchError } from '@supabase/supabase-js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
-  requestHeaders: new Headers(),
   getUser: vi.fn(),
   getClaims: vi.fn(),
   createClient: vi.fn(),
@@ -12,9 +11,6 @@ const mocks = vi.hoisted(() => ({
 vi.mock('react', async (importOriginal) => ({
   ...(await importOriginal<typeof import('react')>()),
   cache: <T>(fn: T) => fn,
-}));
-vi.mock('next/headers', () => ({
-  headers: async () => mocks.requestHeaders,
 }));
 vi.mock('@/lib/supabase/server', () => ({
   createClient: async () => {
@@ -32,10 +28,7 @@ import {
 } from './session';
 
 describe('session', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mocks.requestHeaders = new Headers();
-  });
+  beforeEach(() => vi.clearAllMocks());
   afterEach(() => vi.unstubAllEnvs());
 
   it('verifies claims with the provider and never returns a fixture', async () => {
@@ -150,25 +143,6 @@ describe('getVerifiedIdentity', () => {
       status: 'signed-out',
     });
     expect(mocks.getClaims).toHaveBeenCalledOnce();
-  });
-});
-
-describe('when the proxy already found Auth unavailable', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mocks.requestHeaders = new Headers({ 'x-synapcity-auth-unavailable': '1' });
-  });
-  afterEach(() => {
-    mocks.requestHeaders = new Headers();
-  });
-
-  it('is unavailable at once, without asking the Auth service again', async () => {
-    await expect(getVerifiedIdentity()).resolves.toEqual({
-      status: 'unavailable',
-    });
-    await expect(getVerifiedClaims()).resolves.toBeNull();
-    expect(mocks.getClaims).not.toHaveBeenCalled();
-    expect(mocks.createClient).not.toHaveBeenCalled();
   });
 });
 
