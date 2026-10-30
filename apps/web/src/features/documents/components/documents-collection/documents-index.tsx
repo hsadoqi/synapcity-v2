@@ -11,7 +11,7 @@ import type {
   CollectionItem,
   CollectionItemAction,
 } from '@synapcity/frontend-collection';
-import type { OwnedRecordSummary } from '@synapcity/domain-records';
+import type { RecordSummary } from '@/lib/records/record-summary';
 import { homePathFor, signInPathFor } from '@/lib/routing/user-paths';
 
 import { toCollectionItem } from '../../lib/collection-item';
@@ -19,7 +19,7 @@ import { setDocumentPinned } from '../../server/actions/document-state-actions';
 import { DocumentPreview } from './document-preview';
 
 interface DocumentsIndexProps {
-  documents: OwnedRecordSummary[];
+  documents: RecordSummary[];
   userId: string;
   /** The moment the page was rendered, so server and browser label dates alike. */
   now: string;

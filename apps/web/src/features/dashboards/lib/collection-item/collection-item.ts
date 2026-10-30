@@ -1,6 +1,6 @@
 import { itemFromRecord } from '@synapcity/frontend-collection';
 import type { CollectionItem } from '@synapcity/frontend-collection';
-import type { OwnedRecordSummary } from '@synapcity/domain-records';
+import type { RecordSummary } from '@/lib/records/record-summary';
 import { dashboardPathFor } from '@/lib/routing/user-paths';
 
 /** Which spaces a dashboard is in, in a few words: "In 2 spaces", or "Not in a space". */
@@ -11,7 +11,7 @@ export function describeSpaces(spaces: number) {
 
 /** A dashboard as the browse feature lists it. */
 export function toCollectionItem(
-  record: OwnedRecordSummary,
+  record: RecordSummary,
   userId: string,
 ): CollectionItem {
   return itemFromRecord(record, {

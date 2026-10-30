@@ -1,7 +1,6 @@
 'use server';
 
 import { parsePersistableComposition } from '@synapcity/domain-dashboards';
-import { recordIdSchema } from '@synapcity/domain-records';
 import type { SaveOutcome } from '@synapcity/features-dashboards/contracts';
 import { recordRecordView, saveComposition } from '@synapcity/server-data';
 import type { Json } from '@synapcity/server-supabase';
@@ -13,6 +12,7 @@ import { getVerifiedIdentity } from '@/features/auth/server/session';
 import { logFailure } from '@/lib/log-failure';
 import { createClient } from '@/lib/supabase/server';
 
+const dashboardIdSchema = z.uuid();
 // At least 1: the database creates the composition at revision 1 with the
 // Dashboard, so there is no first save to base on revision 0.
 const revisionSchema = z.number().int().min(1);
@@ -39,7 +39,7 @@ export async function saveDashboardComposition(
   baseRevision: unknown,
 ): Promise<SaveOutcome> {
   if (fixtureModeEnabled()) return failed(FIXTURE_MESSAGE);
-  const id = recordIdSchema.safeParse(dashboardId);
+  const id = dashboardIdSchema.safeParse(dashboardId);
   const revision = revisionSchema.safeParse(baseRevision);
   const checked = parsePersistableComposition(composition);
   if (!id.success || !revision.success || !checked.ok) {
@@ -78,7 +78,7 @@ export async function saveDashboardComposition(
  */
 export async function recordDashboardView(dashboardId: unknown): Promise<void> {
   if (fixtureModeEnabled()) return;
-  const id = recordIdSchema.safeParse(dashboardId);
+  const id = dashboardIdSchema.safeParse(dashboardId);
   if (!id.success) return;
   if ((await getVerifiedIdentity()).status !== 'verified') return;
 

@@ -16,7 +16,7 @@ vi.mock('../../server/actions/document-state-actions', () => ({
   setDocumentPinned: mocks.setDocumentPinned,
 }));
 
-import type { OwnedRecordSummary } from '@synapcity/domain-records';
+import type { RecordSummary } from '@/lib/records/record-summary';
 
 import { CollectionNavigationProvider } from '@synapcity/frontend-collection';
 import { DOCUMENT_FIXTURES } from '../../lib/fixtures';
@@ -37,7 +37,7 @@ function HostNavigation({ children }: { children: React.ReactNode }) {
 const render = (ui: React.ReactElement) =>
   renderInto(ui, { wrapper: HostNavigation });
 
-const MANY: OwnedRecordSummary[] = [...DOCUMENT_FIXTURES];
+const MANY: RecordSummary[] = [...DOCUMENT_FIXTURES];
 // Three of them: the first two pinned (see the fixtures), the third not.
 const FEW = MANY.slice(0, 3);
 const unpinned = MANY.find((record) => record.pinnedAt === null)!;
