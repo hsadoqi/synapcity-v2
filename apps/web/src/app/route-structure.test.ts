@@ -4,8 +4,8 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
-import { config } from './proxy';
-import { isGuestOnlyPath, isProtectedPath } from './lib/routing/route-access';
+import { config } from '../proxy';
+import { isGuestOnlyPath, isProtectedPath } from '../lib/routing/route-access';
 
 /**
  * The `(public)`, `(auth)` and `(protected)` route groups split page chrome by
@@ -13,11 +13,11 @@ import { isGuestOnlyPath, isProtectedPath } from './lib/routing/route-access';
  * change when routes move between them or new ones are added: the URLs people
  * and email links rely on, where each family lives, and what the proxy does
  * with it. How the layouts and boundaries behave when rendered is in
- * `route-groups.dom.test.tsx`; the effective metadata and landmarks in a
- * browser are in `e2e/route-groups.e2e.ts`.
+ * `route-layouts.dom.test.tsx`; the effective metadata and landmarks in a
+ * browser are in `e2e/route-layouts.e2e.ts`.
  */
 
-const APP = join(dirname(fileURLToPath(import.meta.url)), 'app');
+const APP = dirname(fileURLToPath(import.meta.url));
 const GROUP = /^\(.*\)$/;
 
 function filesIn(dir: string): string[] {

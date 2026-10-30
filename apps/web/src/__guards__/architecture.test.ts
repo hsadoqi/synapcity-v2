@@ -41,7 +41,7 @@ import { afterAll, describe, expect, it } from 'vitest';
  *   not resolved. The latter is rejected in protected layers outright.
  */
 
-const SRC = join(dirname(fileURLToPath(import.meta.url)));
+const SRC = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 /** Server-only no matter where they live: request APIs, server clients, the owner guard. */
 const ALWAYS_SERVER_ONLY = [

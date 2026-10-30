@@ -31,7 +31,7 @@ const ALLOWED: Record<string, { calls: number; reason: string }> = {
   },
 };
 
-const SRC = dirname(fileURLToPath(import.meta.url));
+const SRC = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DIRECT_CALL = /\bauth\s*\.\s*(?:getClaims|getUser)\s*\(/g;
 const TEST_FILE = /\.(?:dom\.)?test\.tsx?$/;
 

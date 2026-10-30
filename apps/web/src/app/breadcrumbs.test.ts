@@ -34,8 +34,8 @@ import { describe, expect, it } from 'vitest';
  *   of blocking it.
  */
 
-const SRC = dirname(fileURLToPath(import.meta.url));
-const APP = join(SRC, 'app');
+const APP = dirname(fileURLToPath(import.meta.url));
+const SRC = join(APP, '..');
 const GROUP = join(APP, '(protected)');
 const PACKAGES = join(SRC, '..', '..', '..', 'packages');
 

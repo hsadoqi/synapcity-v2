@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
-import { isProtectedPath } from './lib/routing/route-access';
+import { isProtectedPath } from '../../lib/routing/route-access';
 
 /**
  * The `(protected)` route group is route organization, not a security
@@ -25,8 +25,8 @@ import { isProtectedPath } from './lib/routing/route-access';
  * calls a guard, not that the call is reached on every path.
  */
 
-const APP = join(dirname(fileURLToPath(import.meta.url)), 'app');
-const GROUP = join(APP, '(protected)');
+const GROUP = dirname(fileURLToPath(import.meta.url));
+const APP = join(GROUP, '..');
 
 /** Guards for pages not addressed by an owner. Empty calls are not enough: each is an identity check. */
 const OTHER_ACCESS_GUARDS = ['getVerifiedIdentity(', 'requireSignedIn('];

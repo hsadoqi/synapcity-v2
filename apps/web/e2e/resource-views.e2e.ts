@@ -29,7 +29,7 @@ test.describe('document and dashboard pages', () => {
   // enough to truncate, a description with one unbroken string, five tags.
   const LONG = {
     path: '/fixture-user/home/documents/fixture-document-long-reading',
-    name: 'Field notes from the long winter of rewriting the onboarding guide, chapter by chapter, with every open question we could not settle before the spring release',
+    name: 'Field notes from the long winter of rewriting the onboarding guide, chapter by chapter, with open questions unresolved',
   };
   const contents = (page: Page, name: string) =>
     page.getByRole('group', { name: `${name} contents` });
