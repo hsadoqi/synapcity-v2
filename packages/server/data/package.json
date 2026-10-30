@@ -11,7 +11,8 @@
     "check-types": "tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:db": "node ../../../scripts/db-with-stack.mjs -- vitest run --config vitest.db.config.ts"
+    "test:db": "node ../../../scripts/db-with-stack.mjs -- vitest run --config vitest.db.config.ts",
+    "test:db:budgets": "node ../../../scripts/db-with-stack.mjs -- vitest run --config vitest.budgets.config.ts"
   },
   "dependencies": {
     "@synapcity/domain-records": "workspace:*",

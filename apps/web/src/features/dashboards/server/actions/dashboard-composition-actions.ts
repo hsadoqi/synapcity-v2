@@ -13,7 +13,9 @@ import { logFailure } from '@/lib/log-failure';
 import { createClient } from '@/lib/supabase/server';
 
 const idSchema = z.uuid();
-const revisionSchema = z.number().int().min(0);
+// At least 1: the database creates the composition at revision 1 with the
+// Dashboard, so there is no first save to base on revision 0.
+const revisionSchema = z.number().int().min(1);
 
 const failed = (message: string): SaveOutcome => ({
   ok: false,

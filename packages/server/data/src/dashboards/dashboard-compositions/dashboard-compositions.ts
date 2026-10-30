@@ -7,6 +7,7 @@ import {
 import { z } from 'zod';
 
 import { readError } from '../../read-error';
+import { jsonEqual } from './json-equal';
 
 /** The only document version this code reads and writes (ADR-0016, decision 3). */
 export const COMPOSITION_SCHEMA_VERSION = 1;
@@ -23,8 +24,9 @@ export type StoredComposition = {
 
 /**
  * What a save reports. `conflict` means the stored revision is not the one the
- * write was based on: nothing was written and the caller should reload.
- * `failed` carries the database's code and status, never its message.
+ * write was based on: nothing was written (or another writer's state holds the
+ * next revision) and the caller should reload. `failed` carries the database's
+ * code and status, never its message.
  */
 export type SaveCompositionOutcome =
   | { ok: true; revision: number }
@@ -33,12 +35,18 @@ export type SaveCompositionOutcome =
 
 const idSchema = z.uuid();
 
+/** The SQLSTATE the database raises when `revision` does not rise by exactly 1. */
+const REVISION_CONFLICT_CODE = 'PT409';
+
 /**
- * One dashboard's stored composition, or null when none was saved yet (the
- * first save creates the row). Row-level security scopes the query to the
- * session, so another person's dashboard reads as no composition. Throws on a
- * failed read, and on a document version this code does not know, rather than
- * guess at its shape.
+ * One dashboard's stored composition. Every Dashboard has exactly one from the
+ * moment it exists (the database creates it), so a missing row is a failure,
+ * never an empty canvas that a save would then overwrite: it throws. Null means
+ * only that `dashboardId` is not a uuid. Row-level security scopes the query to
+ * the session; the caller has already read the Dashboard, so a composition it
+ * cannot see is as unexpected as a missing one. Also throws on a failed read,
+ * and on a document version this code does not know, rather than guess at its
+ * shape.
  */
 export async function loadComposition(
   client: SupabaseServerClient,
@@ -53,7 +61,11 @@ export async function loadComposition(
     .maybeSingle();
 
   if (error) throw readError(`composition of dashboard ${dashboardId}`, error);
-  if (!data) return null;
+  if (!data) {
+    throw readError(`composition of dashboard ${dashboardId}`, {
+      code: 'composition_missing',
+    });
+  }
   if (data.schema_version !== COMPOSITION_SCHEMA_VERSION) {
     throw readError(`composition of dashboard ${dashboardId}`, {
       code: 'unsupported_schema_version',
@@ -63,12 +75,18 @@ export async function loadComposition(
 }
 
 /**
- * Saves a composition, based on `expectedRevision` (0 when none exists yet).
- * The write is conditional: the first save inserts at revision 1, and a later
- * one updates only the row still at `expectedRevision`, setting the next
- * revision. A write that affects no row is never reported as saved: a
- * follow-up read tells a revision that moved (`conflict`) from a row the
- * caller cannot see or change (`failed`).
+ * Saves a composition, based on `expectedRevision` (at least 1: the database
+ * creates the row at revision 1 with the Dashboard). The one write path is a
+ * conditional update that matches only the row still at `expectedRevision` and
+ * sets the next one; the database also refuses any revision that is not exactly
+ * the next. A write that affects no row is never reported as saved. A read-back
+ * tells the cases apart:
+ *
+ *   - the stored revision is the next one and its document equals the one
+ *     submitted: the write already happened (a retry after a lost response), so
+ *     it is a success;
+ *   - the revision moved otherwise: another writer got there first (`conflict`);
+ *   - the row is not visible or still at the expected revision: `failed`.
  */
 export async function saveComposition(
   client: SupabaseServerClient,
@@ -76,28 +94,10 @@ export async function saveComposition(
   composition: NonNullable<Json>,
   expectedRevision: number,
 ): Promise<SaveCompositionOutcome> {
-  const next = expectedRevision + 1;
-
-  if (expectedRevision === 0) {
-    const { error, status } = await client
-      .from('dashboard_compositions')
-      .insert({
-        dashboard_id: dashboardId,
-        composition,
-        schema_version: COMPOSITION_SCHEMA_VERSION,
-        revision: next,
-      });
-    // A row appeared since the page was read: the other tab saved first.
-    if (error?.code === '23505') return { ok: false, reason: 'conflict' };
-    if (error) {
-      return {
-        ok: false,
-        reason: 'failed',
-        error: toProviderFailure({ ...error, status }),
-      };
-    }
-    return { ok: true, revision: next };
+  if (!Number.isInteger(expectedRevision) || expectedRevision < 1) {
+    return { ok: false, reason: 'failed', error: { code: 'invalid_revision' } };
   }
+  const next = expectedRevision + 1;
 
   const { data, error, status } = await client
     .from('dashboard_compositions')
@@ -110,18 +110,18 @@ export async function saveComposition(
     .eq('revision', expectedRevision)
     .select('revision');
 
-  if (error) {
+  if (error && error.code !== REVISION_CONFLICT_CODE) {
     return {
       ok: false,
       reason: 'failed',
       error: toProviderFailure({ ...error, status }),
     };
   }
-  if (data.length) return { ok: true, revision: next };
+  if (!error && data.length) return { ok: true, revision: next };
 
   const current = await client
     .from('dashboard_compositions')
-    .select('revision')
+    .select('composition, revision')
     .eq('dashboard_id', dashboardId)
     .maybeSingle();
   if (current.error) {
@@ -131,8 +131,18 @@ export async function saveComposition(
       error: toProviderFailure({ ...current.error, status: current.status }),
     };
   }
-  if (current.data && current.data.revision !== expectedRevision) {
+  const stored = current.data;
+  if (
+    stored &&
+    stored.revision === next &&
+    jsonEqual(stored.composition, composition)
+  ) {
+    return { ok: true, revision: next };
+  }
+  if (stored && stored.revision !== expectedRevision) {
     return { ok: false, reason: 'conflict' };
   }
+  // The conflict code means the stored revision was not the one expected.
+  if (error) return { ok: false, reason: 'conflict' };
   return { ok: false, reason: 'failed', error: { code: 'row_not_written' } };
 }

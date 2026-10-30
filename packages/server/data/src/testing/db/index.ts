@@ -1,2 +1,6 @@
 export { harnessUserEmails, withTwoUsers, type TestUser } from './two-users';
-export { waitUntilBlocked, withSessions } from './two-sessions';
+export {
+  waitUntilBlocked,
+  withSessions,
+  type PsqlSession,
+} from './two-sessions';

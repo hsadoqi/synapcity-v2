@@ -34,12 +34,22 @@ describe('getDashboardComposition', () => {
     expect(mocks.loadComposition).toHaveBeenCalledWith({ client: true }, 'd1');
   });
 
-  it('reads as empty at revision 0 when nothing was saved', async () => {
-    mocks.loadComposition.mockResolvedValue(null);
-    await expect(getDashboardComposition('d1')).resolves.toEqual({
-      composition: null,
-      revision: 0,
+  it('throws, never reads as empty, when the composition is missing', async () => {
+    mocks.loadComposition.mockRejectedValue(
+      Object.assign(new Error('Failed to load'), {
+        code: 'composition_missing',
+      }),
+    );
+    await expect(getDashboardComposition('d1')).rejects.toMatchObject({
+      code: 'composition_missing',
     });
+  });
+
+  it('throws when the loader has nothing to return for the id', async () => {
+    mocks.loadComposition.mockResolvedValue(null);
+    await expect(getDashboardComposition('d1')).rejects.toThrow(
+      /no composition/,
+    );
   });
 
   it('throws on a stored document that fails the contract, never reading it as empty', async () => {
