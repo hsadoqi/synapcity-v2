@@ -1,5 +1,3 @@
-import type { RecordKind } from '@synapcity/domain-records';
-
 /**
  * One of the owner's records as the link widgets list it: the host reads them
  * (its own data, its own routes) and passes them in, so the feature package
@@ -7,7 +5,7 @@ import type { RecordKind } from '@synapcity/domain-records';
  */
 export type DashboardLinkItem = {
   id: string;
-  kind: RecordKind;
+  kind: 'space' | 'document' | 'dashboard';
   name: string;
   /** A Lucide icon name, as stored on the record. */
   icon: string;
