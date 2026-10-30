@@ -7,7 +7,7 @@ const FEATURE_GRAPHS: Record<string, Graph> = {
   testing: 'testing',
 };
 
-const TEST_OR_STORY = /\.(test|dom\.test|stories)\.[cm]?[jt]sx?$/;
+const TEST_OR_STORY = /\.(dbtest|budget|test|dom\.test|stories)\.[cm]?[jt]sx?$/;
 const CONFIG = /\.config\.[cm]?[jt]sx?$/;
 const NON_PRODUCTION_HOSTS = new Set(['storybook']);
 

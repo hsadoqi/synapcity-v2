@@ -1,38 +1,84 @@
-import { existsSync } from 'node:fs';
+import { expect, test, type Page } from '@playwright/test';
 
-import { expect, test } from '@playwright/test';
+import {
+  createTemporaryUser,
+  localStack,
+  removeTemporaryUser,
+  type LocalStack,
+  type TemporaryUser,
+} from './support/local-stack';
 
-// The server path of dashboard editing (Slice 4): a real session, the Server
-// Actions and the database. It cannot run on the development fixture identity
-// or in production CI, so it is skipped unless a saved session and a
-// dashboard to use are supplied:
-//
-//   E2E_AUTH_STATE      path to a Playwright storage state of a signed-in
-//                       dedicated test account (default e2e/.auth/account.json,
-//                       git-ignored)
-//   E2E_DASHBOARD_PATH  path of an EMPTY dashboard that account owns, such as
-//                       /<userId>/home/dashboards/<dashboardId>
-//
-// The test adds and removes widgets on that dashboard and leaves it empty.
-const STATE = process.env.E2E_AUTH_STATE ?? 'e2e/.auth/account.json';
-const DASHBOARD = process.env.E2E_DASHBOARD_PATH;
-const ready = existsSync(STATE) && Boolean(DASHBOARD);
+/*
+ * The server path of Dashboard editing: a real session, the Server Actions and
+ * the database. It runs under `pnpm test:e2e:local-session` and is skipped in a
+ * normal run (no stack, no account). It provisions what it needs: one temporary
+ * user and one pinned Dashboard (so the Pinned widget has something to list),
+ * both removed afterwards; the Dashboard goes with its owner. The database
+ * creates the Dashboard's composition itself (revision 1), so the page opens
+ * without any first-save special case.
+ */
+const stack = localStack();
+test.skip(
+  !stack,
+  'Needs the local Supabase stack: pnpm test:e2e:local-session',
+);
+test.describe.configure({ mode: 'serial' });
 
-test.use({ storageState: existsSync(STATE) ? STATE : undefined });
+let user: TemporaryUser;
+let dashboardPath: string;
+
+/** A pinned, empty Dashboard for the user, made with the service key (provisioning only). */
+async function createDashboard(
+  s: LocalStack,
+  owner: TemporaryUser,
+): Promise<string> {
+  const response = await fetch(`${s.apiUrl}/rest/v1/dashboards`, {
+    method: 'POST',
+    headers: {
+      apikey: s.serviceKey,
+      Authorization: `Bearer ${s.serviceKey}`,
+      'content-type': 'application/json',
+      Prefer: 'return=representation',
+    },
+    body: JSON.stringify({
+      owner_id: owner.id,
+      name: 'Persistence check',
+      pinned_at: new Date().toISOString(),
+    }),
+  });
+  if (!response.ok)
+    throw new Error(`Creating the dashboard failed: ${response.status}`);
+  const [created] = (await response.json()) as { id: string }[];
+  if (!created) throw new Error('The dashboard was not returned.');
+  return `/${owner.id}/home/dashboards/${created.id}`;
+}
+
+async function signIn(page: Page) {
+  await page.goto('/auth/login');
+  await page.locator('input[name="email"]').fill(user.email);
+  await page.locator('input[name="password"]').fill(user.password);
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  await page.waitForURL(`**/${user.id}/home`);
+}
+
+test.beforeAll(async () => {
+  if (!stack) return;
+  user = await createTemporaryUser(stack);
+  dashboardPath = await createDashboard(stack, user);
+});
+test.afterAll(async () => {
+  if (stack && user) await removeTemporaryUser(stack, user);
+});
 
 test.describe('dashboard composition on the server', () => {
-  test.skip(
-    !ready,
-    'Needs E2E_DASHBOARD_PATH and a saved session of a dedicated test account (see this file)',
-  );
-
   test('saves, survives a reload, refuses to overwrite newer work, and recovers from a failed save', async ({
     page,
     context,
   }) => {
-    const path = DASHBOARD as string;
+    await signIn(page);
+    const path = dashboardPath;
 
-    await test.step('opens the empty dashboard and adds a widget that lists real records', async () => {
+    await test.step('opens the new dashboard (the database made its composition) and adds a widget that lists real records', async () => {
       await page.goto(path);
       await expect(page.getByText('No widgets yet')).toBeVisible();
       await page.getByRole('button', { name: 'Add a widget' }).click();

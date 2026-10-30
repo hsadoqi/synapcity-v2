@@ -5,9 +5,13 @@ import {
   AuthSessionMissingError,
   AuthUnknownError,
 } from '@supabase/supabase-js';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { classifyClaimsResponse, readClaims } from './classify-claims';
+import {
+  CLAIMS_DEADLINE_MS,
+  classifyClaimsResponse,
+  readClaims,
+} from './classify-claims';
 
 const claims = { sub: 'user-1' } as never;
 
@@ -102,5 +106,49 @@ describe('readClaims', () => {
       },
     } as never);
     expect(result).toEqual({ status: 'unavailable', failure: {} });
+  });
+});
+
+describe('readClaims deadline', () => {
+  afterEach(() => vi.useRealTimers());
+
+  it('calls the Auth service unavailable when it has not answered in time', async () => {
+    vi.useFakeTimers();
+    const never = new Promise<never>(() => undefined);
+    const result = readClaims({ auth: { getClaims: () => never } } as never);
+
+    await vi.advanceTimersByTimeAsync(CLAIMS_DEADLINE_MS - 1);
+    let settled = false;
+    void result.then(() => (settled = true));
+    await Promise.resolve();
+    expect(settled).toBe(false);
+
+    await vi.advanceTimersByTimeAsync(1);
+    await expect(result).resolves.toEqual({
+      status: 'unavailable',
+      failure: { code: 'timeout' },
+    });
+  });
+
+  it('does not wait for the deadline when the answer comes sooner', async () => {
+    vi.useFakeTimers();
+    const result = await readClaims({
+      auth: { getClaims: async () => ({ data: null, error: null }) },
+    } as never);
+    expect(result).toEqual({ status: 'signed-out' });
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('a late rejection after the deadline is not an unhandled rejection', async () => {
+    vi.useFakeTimers();
+    let reject!: (e: unknown) => void;
+    const late = new Promise<never>((_, r) => (reject = r));
+    const result = readClaims({ auth: { getClaims: () => late } } as never, {
+      deadlineMs: 10,
+    });
+    await vi.advanceTimersByTimeAsync(10);
+    await expect(result).resolves.toMatchObject({ status: 'unavailable' });
+    reject(new TypeError('fetch failed'));
+    await vi.advanceTimersByTimeAsync(0);
   });
 });

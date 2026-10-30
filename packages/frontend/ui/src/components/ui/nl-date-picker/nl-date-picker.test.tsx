@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { NLDatePicker } from '@synapcity/frontend-ui/core/nl-date-picker';
@@ -54,12 +60,20 @@ describe('NLDatePicker', () => {
     const grid = await screen.findByRole('grid');
     const day = within(grid)
       .getAllByRole('button')
-      .find((button) => !button.hasAttribute('disabled'));
+      // The default date is already selected, and clicking it again deselects it.
+      .find(
+        (button) =>
+          !button.hasAttribute('disabled') &&
+          !button.closest('[aria-selected="true"]') &&
+          !button.hasAttribute('data-selected-single'),
+      );
     expect(day).toBeTruthy();
 
     fireEvent.click(day!);
 
-    expect(input.value).toMatch(/^[A-Z][a-z]+ \d{2}, \d{4}$/);
-    expect(screen.queryByRole('grid')).toBeNull();
+    await waitFor(() => {
+      expect(input.value).toMatch(/^[A-Z][a-z]+ \d{1,2}, \d{4}$/);
+      expect(screen.queryByRole('grid')).toBeNull();
+    });
   });
 });

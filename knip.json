@@ -21,7 +21,12 @@
       "ignoreDependencies": ["tailwindcss"]
     },
     "packages/server/data": {
-      "entry": ["src/testing/db/**/*.dbtest.ts", "vitest.db.config.ts"]
+      "entry": [
+        "src/**/*.dbtest.ts",
+        "vitest.db.config.ts",
+        "src/**/*.budget.ts",
+        "vitest.budgets.config.ts"
+      ]
     }
   },
   "ignoreBinaries": ["psql"]

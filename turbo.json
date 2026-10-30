@@ -76,6 +76,7 @@
     },
     "test:e2e": {
       "dependsOn": ["build"],
+      "env": ["E2E_STACK_WORKDIR"],
       "cache": false,
       "outputs": ["playwright-report/**", "test-results/**"]
     },
@@ -91,6 +92,10 @@
     "test:watch": {
       "cache": false,
       "persistent": true
+    },
+    "test:db": {
+      "env": ["DB_BUDGET_REPORT"],
+      "outputs": []
     },
     "transit": {
       "dependsOn": ["^transit"]

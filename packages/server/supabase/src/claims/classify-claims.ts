@@ -63,19 +63,46 @@ export function classifyClaimsResponse(response: ClaimsResponse): ClaimsResult {
 }
 
 /**
+ * How long a request waits for the Auth service before it is called
+ * unavailable. The SDK retries a dead service with backoff for about a minute;
+ * a page or an API call must not hang that long to say "try again". Each step
+ * of a request that asks (the proxy, then the render) waits its own deadline,
+ * so a page can take a few multiples of this.
+ */
+export const CLAIMS_DEADLINE_MS = 4000;
+
+/**
  * Calls `getClaims()` and classifies the answer. A thrown error (the SDK
  * rethrows what it cannot wrap, such as a failed key fetch) is `unavailable`
- * too, never an unhandled rejection that turns into a 500 or a sign-out.
+ * too, never an unhandled rejection that turns into a 500 or a sign-out. So is
+ * an answer that has not come within `deadlineMs`: the call is left to finish
+ * on its own, and its result is ignored.
  */
-export async function readClaims(client: {
-  auth: Pick<SupabaseClient['auth'], 'getClaims'>;
-}): Promise<ClaimsResult> {
+export async function readClaims(
+  client: { auth: Pick<SupabaseClient['auth'], 'getClaims'> },
+  { deadlineMs = CLAIMS_DEADLINE_MS }: { deadlineMs?: number } = {},
+): Promise<ClaimsResult> {
+  // A synchronous throw becomes a rejection like any other failure.
+  const pending = Promise.resolve().then(() => client.auth.getClaims());
+  // If the deadline wins, a later rejection must not become an unhandled one.
+  pending.catch(() => undefined);
+
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<'deadline'>((resolve) => {
+    timer = setTimeout(() => resolve('deadline'), deadlineMs);
+  });
   try {
-    return classifyClaimsResponse(await client.auth.getClaims());
+    const first = await Promise.race([pending, deadline]);
+    if (first === 'deadline') {
+      return { status: 'unavailable', failure: { code: 'timeout' } };
+    }
+    return classifyClaimsResponse(first);
   } catch (thrown) {
     return {
       status: 'unavailable',
       failure: toProviderFailure(isAuthError(thrown) ? thrown : {}),
     };
+  } finally {
+    clearTimeout(timer);
   }
 }
