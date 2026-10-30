@@ -158,7 +158,10 @@ function main() {
     }
   } finally {
     // Always removed, so a failed run leaves no helper functions behind.
-    runSqlCommand(dbUrl, 'drop schema if exists test_helpers cascade');
+    runSqlCommand(
+      dbUrl,
+      'set client_min_messages = warning; drop schema if exists test_helpers cascade',
+    );
     release();
   }
 

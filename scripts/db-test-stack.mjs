@@ -281,6 +281,7 @@ async function main() {
     } else {
       console.log(`SUPABASE_DB_URL=${state.dbUrl}`);
       console.log(`E2E_API_URL=${state.apiUrl}`);
+      console.log(`DB_TEST_API_URL=${state.apiUrl}`);
       console.log(`E2E_MAIL_URL=${state.mailUrl ?? ''}`);
       // Local development keys of this disposable stack, for the two-user
       // harness. Only on request: nothing prints them by default.
