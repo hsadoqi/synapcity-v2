@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { UserMenu } from '@synapcity/frontend-ui/components/user-menu';
+import { UserMenu } from '@synapcity/frontend-blocks';
 import { DropdownMenuItem } from '@synapcity/frontend-ui/core/dropdown-menu';
 import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
 

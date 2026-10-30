@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { LoadingRegion } from '@synapcity/frontend-ui/components/loading-region';
+import { LoadingRegion } from '@synapcity/frontend-blocks';
 import { Skeleton } from '@synapcity/frontend-ui/core/skeleton';
 
 const meta: Meta<typeof LoadingRegion> = {

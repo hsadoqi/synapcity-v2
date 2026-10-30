@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { PasswordInput } from '@synapcity/frontend-ui/components/password-input';
+import { PasswordInput } from '@synapcity/frontend-blocks';
 
 describe('PasswordInput', () => {
   it('hides the password until asked', () => {

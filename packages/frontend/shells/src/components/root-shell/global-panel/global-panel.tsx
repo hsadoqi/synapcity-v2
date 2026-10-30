@@ -24,8 +24,8 @@ import {
   ActionsToolbar,
   type ToolbarAction,
   type ToolbarSettings,
-} from '@synapcity/frontend-ui/blocks/actions-toolbar';
-import { SettingsView } from '@synapcity/frontend-ui/blocks/settings-view';
+} from '@synapcity/frontend-blocks';
+import { SettingsView } from '@synapcity/frontend-blocks';
 import { Button } from '@synapcity/frontend-ui/core/button';
 import {
   ResizableHandle,
@@ -33,12 +33,7 @@ import {
   ResizablePanelGroup,
 } from '@synapcity/frontend-ui/core/resizable';
 
-/**
- * Opening and closing glide for this long. It is a CSS transition on the
- * panel's flex-grow, switched on only around a button, Escape or outside-click
- * toggle: a drag must follow the pointer, so it never animates.
- */
-const GLIDE_MS = 200;
+import { GLIDE_MS } from '../../../utils/panel-motion';
 
 const OVERLAYS =
   '[role="menu"], [role="dialog"], [role="alertdialog"], [role="listbox"], [data-slot="popover-content"]';

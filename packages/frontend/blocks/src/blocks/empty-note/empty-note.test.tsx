@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { EmptyNote } from '@synapcity/frontend-ui/components/empty-note';
+import { EmptyNote } from '@synapcity/frontend-blocks';
 
 describe('EmptyNote', () => {
   it('shows its message as a paragraph', () => {

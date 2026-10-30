@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { ConfirmDialog } from '@synapcity/frontend-ui/components/confirm-dialog';
+import { ConfirmDialog } from '@synapcity/frontend-blocks';
 
 function renderDialog(
   // Handlers stay mocks so tests can inspect them; only the data is overridable.

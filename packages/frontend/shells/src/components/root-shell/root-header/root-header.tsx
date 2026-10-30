@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 import { PanelLeftIcon } from 'lucide-react';
 import { SynapcityLogo, SynapcityMark } from '@synapcity/frontend-brand/react';
-import { ModeToggle } from '@synapcity/frontend-ui/components/mode-toggle';
+import { ModeToggle } from '@synapcity/frontend-blocks';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';
 import { Separator } from '@synapcity/frontend-ui/core/separator';
@@ -13,7 +13,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from '@synapcity/frontend-ui/core/sidebar';
-import { IconButton } from '@synapcity/frontend-ui/components/icon-button';
+import { IconButton } from '@synapcity/frontend-ui/core/icon-button';
 import {
   HeaderBreadcrumbs,
   type RootBreadcrumb,

@@ -3,8 +3,8 @@ import { site } from './site';
 
 export const openGraphSize = { width: 1200, height: 630 } as const;
 
-const LOGO_WIDTH = 800;
-const LOGO_HEIGHT = 150;
+const OG_LOGO_WIDTH = 800;
+const OG_LOGO_HEIGHT = 150;
 
 /*
  * The monochrome logo as an SVG string from the brand package: the same
@@ -43,8 +43,8 @@ export function OpenGraphCard() {
       {/* An <img> on purpose: ImageResponse renders this tree, not the DOM. */}
       <img
         src={LOGO_SRC}
-        width={LOGO_WIDTH}
-        height={LOGO_HEIGHT}
+        width={OG_LOGO_WIDTH}
+        height={OG_LOGO_HEIGHT}
         alt={site.name}
       />
     </div>

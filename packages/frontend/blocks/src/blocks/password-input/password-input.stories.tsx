@@ -1,7 +1,7 @@
 import { expect, userEvent, within } from 'storybook/test';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { PasswordInput } from '@synapcity/frontend-ui/components/password-input';
+import { PasswordInput } from '@synapcity/frontend-blocks';
 
 const meta: Meta<typeof PasswordInput> = {
   title: 'Components/PasswordInput',

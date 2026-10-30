@@ -1,4 +1,4 @@
-import { SkipLinkButton } from '@synapcity/frontend-ui/components/skip-link';
+import { SkipLinkButton } from '@synapcity/frontend-ui/core/skip-link';
 import { RootHeader } from './root-header';
 import { RootFooter } from './root-footer';
 import { RootContent } from './root-content';

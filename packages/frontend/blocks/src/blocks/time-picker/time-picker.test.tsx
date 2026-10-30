@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { TimePicker } from '@/packages/frontend/ui/time-picker';
+import { TimePicker } from '@synapcity/frontend-blocks';
 
 describe('TimePicker', () => {
   it('labels its date and time controls', () => {

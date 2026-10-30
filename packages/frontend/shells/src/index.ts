@@ -42,7 +42,6 @@ export {
   ContextSwitcher,
   type ContextOption,
 } from './components/context-switcher';
-export { SearchForm } from './components/search-form';
 export {
   CommandPalette,
   type CommandPaletteGroup,

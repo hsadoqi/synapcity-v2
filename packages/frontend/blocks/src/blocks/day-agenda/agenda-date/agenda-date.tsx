@@ -7,10 +7,6 @@ import {
   formatCalendarDay,
   parseCalendarDate,
 } from '@synapcity/frontend-ui/lib/calendar-utils';
-
-// Kept here so existing imports of it from this component still work.
-export { parseCalendarDate };
-
 export interface AgendaDateProps {
   /** Calendar date as `yyyy-MM-dd`. */
   date: string;

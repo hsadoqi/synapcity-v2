@@ -22,7 +22,7 @@ import React from 'react';
 import type { User } from '@synapcity/domain-identity';
 import { UserAvatar } from './user-avatar';
 import { useIsMobile } from '@synapcity/frontend-ui/hooks/use-mobile';
-import { cn } from 'cn';
+import { cn } from '@synapcity/frontend-ui/lib/utils';
 
 export type MenuGroupItem = Omit<MenuItem, 'label'> & {
   heading?: string;

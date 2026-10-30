@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, userEvent, within } from 'storybook/test';
 
-import { NLDatePicker } from '@/packages/frontend/blocks/src/nl-date-picker';
+import { NLDatePicker } from '@synapcity/frontend-blocks';
 
 const meta: Meta<typeof NLDatePicker> = {
   title: 'Components/NLDatePicker',

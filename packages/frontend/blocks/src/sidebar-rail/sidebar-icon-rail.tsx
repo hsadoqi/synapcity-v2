@@ -1,3 +1,5 @@
+'use client';
+
 import { Command, type LucideIcon } from 'lucide-react';
 import { NamedIcon } from '../icon-by-name';
 import { Workspace } from '../types';

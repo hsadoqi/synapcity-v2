@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { LoadingRegion } from '@synapcity/frontend-ui/components/loading-region';
+import { LoadingRegion } from '@synapcity/frontend-blocks';
 
 describe('LoadingRegion', () => {
   it('announces its label and marks itself busy', () => {

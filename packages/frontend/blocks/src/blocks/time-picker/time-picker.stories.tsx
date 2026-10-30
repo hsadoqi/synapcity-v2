@@ -8,7 +8,7 @@ import {
   within,
 } from 'storybook/test';
 
-import { TimePicker } from '@/packages/frontend/ui/time-picker';
+import { TimePicker } from '@synapcity/frontend-blocks';
 
 const meta: Meta<typeof TimePicker> = {
   title: 'Components/TimePicker',

@@ -2,11 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { mockViewport } from '@synapcity/dev-vitest-config/viewport';
-import {
-  ModeButton,
-  ModeMenu,
-  ModeToggle,
-} from '@/packages/frontend/blocks/src/blocks/mode-toggle';
+import { ModeButton, ModeMenu, ModeToggle } from '@synapcity/frontend-blocks';
 import {
   DropdownMenu,
   DropdownMenuContent,

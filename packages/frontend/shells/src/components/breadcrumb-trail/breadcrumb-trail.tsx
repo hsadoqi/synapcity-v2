@@ -1,13 +1,14 @@
 'use client';
+
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { ComponentProps } from 'react';
 import { RootShell } from '../root-shell';
 import type { RootBreadcrumb } from '../header-breadcrumbs';
 import type { RootSidebarContent } from '../sidebar-shell/root-sidebar';
 
-type SetTrail = (items: RootBreadcrumb[]) => void;
+type BreadcrumbTrail = (items: RootBreadcrumb[]) => void;
 
-const SetTrailContext = createContext<SetTrail>(() => {});
+const BreadcrumbTrailContext = createContext<BreadcrumbTrail>(() => {});
 
 // One shared empty trail, so clearing an already empty trail is no change and
 // the shell does not render again.
@@ -18,7 +19,7 @@ const NO_TRAIL: RootBreadcrumb[] = [];
  * header sits in the root layout, above every page, so a page cannot pass it
  * props; it renders <SetBreadcrumbs> instead and this keeps what it said.
  */
-export function BreadcrumbRootShell({
+export function BreadcrumbProvider({
   children,
   sidebar,
   ...shellProps
@@ -35,11 +36,11 @@ export function BreadcrumbRootShell({
     typeof sidebar === 'function' ? sidebar(trail) : sidebar;
 
   return (
-    <SetTrailContext value={setTrail}>
+    <BreadcrumbTrailContext value={setTrail}>
       <RootShell {...shellProps} breadcrumbs={trail} sidebar={sidebarContent}>
         {children}
       </RootShell>
-    </SetTrailContext>
+    </BreadcrumbTrailContext>
   );
 }
 
@@ -55,16 +56,16 @@ export function BreadcrumbRootShell({
  * their own should be folded into the page's items rather than publishing a
  * second trail.
  */
-export function SetBreadcrumbs({ items }: { items: RootBreadcrumb[] }) {
-  const setTrail = useContext(SetTrailContext);
+export function useBreadcrumbs({ items }: { items: RootBreadcrumb[] }) {
+  const context = useContext(BreadcrumbTrailContext);
   // A new array arrives on every render; compare by value so the effect runs
   // only when the trail actually changes.
   const key = JSON.stringify(items);
 
   useEffect(() => {
-    setTrail(JSON.parse(key) as RootBreadcrumb[]);
-    return () => setTrail(NO_TRAIL);
-  }, [key, setTrail]);
+    context(JSON.parse(key) as RootBreadcrumb[]);
+    return () => context(NO_TRAIL);
+  }, [key, context]);
 
   return null;
 }

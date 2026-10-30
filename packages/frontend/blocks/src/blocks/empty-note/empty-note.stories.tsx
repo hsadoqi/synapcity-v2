@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { EmptyNote } from '@synapcity/frontend-ui/components/empty-note';
+import { EmptyNote } from '@synapcity/frontend-blocks';
 
 const meta: Meta<typeof EmptyNote> = {
   title: 'Components/EmptyNote',

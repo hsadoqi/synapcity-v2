@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { RootHeader } from '.';
 import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
-import { UserMenu } from '@synapcity/frontend-ui/components/user-menu';
+import { UserMenu } from '@synapcity/frontend-blocks';
 import { ModeProvider } from '@synapcity/frontend-preferences';
 import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
 import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';

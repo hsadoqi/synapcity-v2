@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 
-import { EmptyNote } from '@synapcity/frontend-ui/components/empty-note';
-import { SectionHeading } from '@synapcity/frontend-ui/components/section-heading';
+import { EmptyNote } from '@synapcity/frontend-blocks';
+import { SectionHeading } from '@synapcity/frontend-blocks';
 
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 

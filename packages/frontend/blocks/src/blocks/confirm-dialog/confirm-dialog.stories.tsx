@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { fn } from 'storybook/test';
 import { useArgs } from 'storybook/preview-api';
 
-import { ConfirmDialog } from '@synapcity/frontend-ui/components/confirm-dialog';
+import { ConfirmDialog } from '@synapcity/frontend-blocks';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
 const meta: Meta<typeof ConfirmDialog> = {

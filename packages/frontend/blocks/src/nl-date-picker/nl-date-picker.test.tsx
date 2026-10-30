@@ -7,7 +7,7 @@ import {
 } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { NLDatePicker } from '@/packages/frontend/blocks/src/nl-date-picker';
+import { NLDatePicker } from '@synapcity/frontend-blocks';
 
 describe('NLDatePicker', () => {
   it('labels the natural-language input and describes the parsed date', () => {

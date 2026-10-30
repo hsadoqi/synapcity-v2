@@ -1,9 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import {
-  ModeToggle,
-  ModeButton,
-  ModeMenu,
-} from '@/packages/frontend/blocks/src/blocks/mode-toggle';
+import { ModeToggle, ModeButton, ModeMenu } from '@synapcity/frontend-blocks';
 import {
   DropdownMenu,
   DropdownMenuContent,
