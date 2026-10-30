@@ -17,6 +17,7 @@
     "typecheck": "turbo run check-types",
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage --concurrency=1",
+    "test:scripts": "vitest run scripts",
     "test:e2e": "turbo run test:e2e --filter=web",
     "test:storybook": "turbo run test:storybook --filter=storybook",
     "test:watch": "turbo run test:watch",
@@ -28,6 +29,7 @@
     "brand:sync": "node scripts/sync-brand-assets.mjs",
     "brand:check": "node scripts/check-brand-assets.mjs",
     "db:types": "node scripts/db-types.mjs",
+    "db:test": "node scripts/db-test.mjs",
     "prepare": "git config core.hooksPath .githooks || echo 'git hooks not activated (not a git checkout)'",
     "ui:add": "pnpm dlx shadcn@latest add -c apps/web",
     "report": "vitest run --coverage"
