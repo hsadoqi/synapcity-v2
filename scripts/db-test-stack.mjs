@@ -15,7 +15,8 @@
 //   node scripts/db-test-stack.mjs start [--fresh]   start (or reuse) the stack
 //   node scripts/db-test-stack.mjs stop              stop it and delete its data
 //   node scripts/db-test-stack.mjs status            print its connection details as JSON
-//   node scripts/db-test-stack.mjs env               print KEY=value lines for a shell
+//   node scripts/db-test-stack.mjs env [--keys]      print KEY=value lines for a shell
+//   node scripts/db-test-stack.mjs dir               print the stack's state directory (it holds the run lock)
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import {
@@ -246,6 +247,7 @@ export function stop() {
   rmSync(dir, { recursive: true, force: true });
 }
 
+/** The isolated stack's connection details when it is running, else null. */
 export function status() {
   const id = worktreeId(root);
   const state = readState(id);
@@ -280,6 +282,12 @@ async function main() {
       console.log(`SUPABASE_DB_URL=${state.dbUrl}`);
       console.log(`E2E_API_URL=${state.apiUrl}`);
       console.log(`E2E_MAIL_URL=${state.mailUrl ?? ''}`);
+      // Local development keys of this disposable stack, for the two-user
+      // harness. Only on request: nothing prints them by default.
+      if (flags.includes('--keys')) {
+        console.log(`DB_TEST_PUBLISHABLE_KEY=${state.publishableKey}`);
+        console.log(`DB_TEST_SERVICE_KEY=${state.serviceKey}`);
+      }
     }
   } else {
     process.stderr.write(

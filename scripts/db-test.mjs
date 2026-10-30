@@ -7,10 +7,15 @@
 // cannot pass with a failed assertion. Files whose name starts with `_` are
 // support files, not tests.
 //
-// The database comes from `--db-url`, or SUPABASE_DB_URL, or else
+// The database comes from `--db-url`, or SUPABASE_DB_URL, or else this
+// worktree's disposable stack (`pnpm db:stack start`), or else
 // `supabase status -o json` (`DB_URL`) for the stack in this checkout. The
 // target must be on 127.0.0.1 or localhost; there is no override for tests,
 // because they create their own users in the target.
+//
+// `supabase/tests/_helpers.sql` is loaded first (the `test_helpers` schema) and
+// dropped at the end, even after a failure. On the worktree's own stack the run
+// holds a lock, so two runs in one worktree cannot share its containers.
 //
 // Usage: pnpm db:test [--db-url <url>] [--workdir <dir containing supabase/>]
 import { execFileSync, spawnSync } from 'node:child_process';
@@ -23,6 +28,12 @@ import {
   redactUrl,
   TargetRefusedError,
 } from './lib/loopback.mjs';
+import { acquireStackLock, StackLockHeldError } from './lib/stack-lock.mjs';
+import {
+  stackDirectory,
+  status as isolatedStackStatus,
+  worktreeId,
+} from './db-test-stack.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -34,9 +45,16 @@ export function listTestFiles(dir) {
     .map((name) => join(dir, name));
 }
 
-/** The database URL for this run, before the loopback check. */
-export function resolveDbUrl(argv, env, statusReader) {
-  return flagValue(argv, 'db-url') ?? env.SUPABASE_DB_URL ?? statusReader(argv);
+/**
+ * The database URL for this run, before the loopback check, and whether it is
+ * this worktree's own disposable stack (which the run then locks).
+ */
+export function resolveDbUrl(argv, env, { isolated, statusReader }) {
+  const explicit = flagValue(argv, 'db-url') ?? env.SUPABASE_DB_URL;
+  if (explicit) return { url: explicit, ownStack: false };
+  const own = isolated();
+  if (own) return { url: own.dbUrl, ownStack: true };
+  return { url: statusReader(argv), ownStack: false };
 }
 
 function readStatusDbUrl(argv) {
@@ -68,26 +86,54 @@ export function runSqlFile(dbUrl, file) {
   return result.status ?? 1;
 }
 
+/** Runs one statement. Returns the exit status. */
+function runSqlCommand(dbUrl, sql) {
+  const result = spawnSync(
+    'psql',
+    ['-X', '-q', '-v', 'ON_ERROR_STOP=1', '-c', sql, dbUrl],
+    { stdio: 'inherit' },
+  );
+  if (result.error) throw result.error;
+  return result.status ?? 1;
+}
+
 function main() {
   const argv = process.argv.slice(2);
-  let dbUrl;
+  let target;
   try {
-    dbUrl = resolveDbUrl(argv, process.env, readStatusDbUrl);
-    assertLocalTarget(dbUrl);
+    target = resolveDbUrl(argv, process.env, {
+      isolated: isolatedStackStatus,
+      statusReader: readStatusDbUrl,
+    });
+    assertLocalTarget(target.url);
   } catch (error) {
     if (error instanceof TargetRefusedError) {
       process.stderr.write(`db:test: ${error.message}\n`);
     } else {
       process.stderr.write(
         `db:test: could not resolve the local database (${error.message}). ` +
-          'Start it with `pnpm exec supabase db start`.\n',
+          'Start one with `pnpm db:stack start`.\n',
       );
     }
     process.exit(1);
   }
+  const dbUrl = target.url;
 
-  const files = listTestFiles(join(root, 'supabase/tests'));
+  let release = () => {};
+  if (target.ownStack) {
+    try {
+      release = acquireStackLock(stackDirectory(worktreeId(root)));
+    } catch (error) {
+      if (!(error instanceof StackLockHeldError)) throw error;
+      process.stderr.write(`db:test: ${error.message}\n`);
+      process.exit(1);
+    }
+  }
+
+  const testsDir = join(root, 'supabase/tests');
+  const files = listTestFiles(testsDir);
   if (files.length === 0) {
+    release();
     process.stderr.write('db:test: no SQL tests found.\n');
     process.exit(1);
   }
@@ -95,15 +141,25 @@ function main() {
 
   const results = [];
   let failed = false;
-  for (const file of files) {
-    const name = file.slice(root.length + 1);
-    console.log(`\n--- ${name}`);
-    const status = runSqlFile(dbUrl, file);
-    results.push({ name, ok: status === 0 });
-    if (status !== 0) {
+  try {
+    if (runSqlFile(dbUrl, join(testsDir, '_helpers.sql')) !== 0) {
+      console.error('db:test: the helper schema could not be created.');
       failed = true;
-      break;
     }
+    for (const file of failed ? [] : files) {
+      const name = file.slice(root.length + 1);
+      console.log(`\n--- ${name}`);
+      const status = runSqlFile(dbUrl, file);
+      results.push({ name, ok: status === 0 });
+      if (status !== 0) {
+        failed = true;
+        break;
+      }
+    }
+  } finally {
+    // Always removed, so a failed run leaves no helper functions behind.
+    runSqlCommand(dbUrl, 'drop schema if exists test_helpers cascade');
+    release();
   }
 
   console.log('\ndb:test summary');

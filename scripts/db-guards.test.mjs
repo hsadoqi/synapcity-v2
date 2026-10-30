@@ -5,6 +5,7 @@ import {
   chmodSync,
   existsSync,
   mkdtempSync,
+  readFileSync,
   rmSync,
   writeFileSync,
 } from 'node:fs';
@@ -96,8 +97,12 @@ describe('db-test.mjs has no override', () => {
 
 describe('db-test.mjs on a loopback target', () => {
   it('reaches psql for each test file and stops at the first failure', () => {
+    // Helper setup and teardown succeed; every test file fails.
     const failing = join(dir, 'psql');
-    writeFileSync(failing, `#!/bin/sh\necho "$@" >> "${marker}"\nexit 3\n`);
+    writeFileSync(
+      failing,
+      `#!/bin/sh\necho "$@" >> "${marker}"\ncase "$*" in *_helpers.sql*|*"drop schema"*) exit 0;; esac\nexit 3\n`,
+    );
     chmodSync(failing, 0o755);
     const result = run('db-test.mjs', [
       '--db-url',
@@ -106,5 +111,9 @@ describe('db-test.mjs on a loopback target', () => {
     expect(result.status).toBe(1);
     expect(result.stdout).toContain('FAIL');
     expect(result.stdout).toContain('not run after the failure');
+    // The helper schema is dropped even though a test failed.
+    expect(readFileSync(marker, 'utf8')).toContain(
+      'drop schema if exists test_helpers',
+    );
   });
 });
