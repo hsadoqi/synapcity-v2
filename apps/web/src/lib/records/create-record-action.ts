@@ -3,7 +3,6 @@
 import {
   baseRecordCreateSchema,
   boundedNameSchema,
-  isRecordKind,
 } from '@synapcity/domain-records';
 import { serverSpaceSource } from '@synapcity/features-spaces/server';
 import {
@@ -19,6 +18,10 @@ import { logFailure } from '@/lib/log-failure';
 import { createClient } from '@/lib/supabase/server';
 
 const NAME_NEEDED = 'Give it a name.';
+type CreatableKind = keyof typeof RECORD_TABLES;
+
+const isCreatableKind = (kind: unknown): kind is CreatableKind =>
+  typeof kind === 'string' && Object.hasOwn(RECORD_TABLES, kind);
 
 /**
  * What Quick Create sends: a name only. The record contract's create input,
@@ -44,7 +47,8 @@ const isUnconfirmed = (failure: ProviderFailure) => !failure.code;
 /**
  * Creates one of the caller's Spaces, documents or dashboards from its name.
  * The kind and name come from the browser, so both are checked: the kind
- * against the record kinds, the name with the record contract's create input.
+ * against this app's creatable table map, the name with the record contract's
+ * create input.
  * Spaces go through the Space source, the feature's port for them; the other
  * kinds are inserted straight into their table. The caller is verified with a
  * fresh lookup (ADR-0006); the owner is the session's user, set by the
@@ -55,7 +59,7 @@ export async function createRecord(
   name: unknown,
 ): Promise<CreateRecordResult> {
   if (fixtureModeEnabled()) return { ok: false, error: FIXTURE_MESSAGE };
-  if (!isRecordKind(kind)) return { ok: false, error: SAVE_FAILED };
+  if (!isCreatableKind(kind)) return { ok: false, error: SAVE_FAILED };
   const parsed = quickCreateSchema.safeParse({ name });
   if (!parsed.success) {
     // A string that fails the contract says why (blank, too long, a character

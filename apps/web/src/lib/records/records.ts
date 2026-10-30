@@ -1,8 +1,4 @@
-import {
-  recordIdSchema,
-  type BaseRecord,
-  type OwnedRecordSummary,
-} from '@synapcity/domain-records';
+import type { BaseRecord } from '@synapcity/domain-records';
 import {
   findRecord,
   listRecordSummaries,
@@ -10,11 +6,15 @@ import {
   type ParticipantTable,
 } from '@synapcity/server-data';
 import { cache } from 'react';
+import { z } from 'zod';
 
 import { getCallerIdentity, SAVE_FAILED } from '@/lib/access/caller';
 import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import { logFailure } from '@/lib/log-failure';
 import { createClient } from '@/lib/supabase/server';
+import type { RecordSummary } from './record-summary';
+
+const recordIdSchema = z.uuid();
 
 /** What pinning a record reports back; `pinnedAt` is the server's own time. */
 export type SetRecordPinnedResult =
@@ -62,8 +62,8 @@ export async function setRecordPinnedFor(
  */
 export async function loadRecordSummaries(
   kind: ParticipantTable,
-  fixtures: readonly OwnedRecordSummary[],
-): Promise<OwnedRecordSummary[]> {
+  fixtures: readonly RecordSummary[],
+): Promise<RecordSummary[]> {
   if (fixtureModeEnabled()) return [...fixtures];
   return listRecordSummaries(await createClient(), kind);
 }
@@ -82,7 +82,7 @@ export const loadRecord = cache(
   async (
     kind: ParticipantTable,
     id: string,
-    fixtures: readonly OwnedRecordSummary[],
+    fixtures: readonly RecordSummary[],
   ): Promise<BaseRecord | null> => {
     if (fixtureModeEnabled()) {
       return fixtures.find((record) => record.id === id) ?? null;

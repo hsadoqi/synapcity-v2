@@ -26,5 +26,7 @@ export {
   type ParticipantTable,
   type PinnedOutcome,
   type RecordTable,
+  type RecordKind,
+  type RecordSummary,
   RECORD_TABLES,
 } from './records';

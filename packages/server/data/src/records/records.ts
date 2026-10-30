@@ -1,18 +1,19 @@
 import {
-  recordIdSchema,
   type BaseRecord,
   type BaseRecordCreate,
-  type OwnedRecordSummary,
-  type RecordKind,
 } from '@synapcity/domain-records';
 import {
   toProviderFailure,
   type ProviderFailure,
   type SupabaseServerClient,
 } from '@synapcity/server-supabase';
+import { z } from 'zod';
 
 import { COLUMNS, countOf, recordFromRow, type OwnedRow } from '../owned-row';
 import { readError } from '../read-error';
+
+/** The persisted kinds this adapter maps to concrete database tables. */
+export type RecordKind = 'space' | 'document' | 'dashboard';
 
 /** The table each persisted record kind lives in (ADR-0012, ADR-0013). */
 export const RECORD_TABLES = {
@@ -26,6 +27,11 @@ export type RecordTable = (typeof RECORD_TABLES)[RecordKind];
 
 /** The record tables that take part in Spaces (ADR-0013): every one but `spaces`. */
 export type ParticipantTable = Exclude<RecordTable, 'spaces'>;
+
+/** A document or dashboard index row with its contextual participation count. */
+export type RecordSummary = BaseRecord & { spacesTotal: number };
+
+const persistedRecordIdSchema = z.uuid();
 
 /** What pinning reports: the database-stamped time, or the failure by code and status. */
 export type PinnedOutcome =
@@ -60,7 +66,7 @@ async function summaryRows(
 export async function listRecordSummaries(
   client: SupabaseServerClient,
   kind: ParticipantTable,
-): Promise<OwnedRecordSummary[]> {
+): Promise<RecordSummary[]> {
   const rows = await summaryRows(client, kind);
   return rows.map(({ row, spaces }) => ({
     ...recordFromRow(row),
@@ -85,7 +91,7 @@ export async function findRecord(
   id: string,
 ): Promise<BaseRecord | null> {
   // A malformed id cannot match a uuid column; PostgREST would error instead.
-  if (!recordIdSchema.safeParse(id).success) return null;
+  if (!persistedRecordIdSchema.safeParse(id).success) return null;
 
   const { data, error } = await client
     .from(kind)

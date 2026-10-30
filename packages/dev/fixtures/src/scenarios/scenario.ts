@@ -1,8 +1,4 @@
-import {
-  baseRecordSchema,
-  type BaseRecord,
-  type RecordKind,
-} from '@synapcity/domain-records';
+import { baseRecordSchema, type BaseRecord } from '@synapcity/domain-records';
 import { spaceSchema, type SpaceEntity } from '@synapcity/domain-spaces';
 
 /*
@@ -21,7 +17,8 @@ import { spaceSchema, type SpaceEntity } from '@synapcity/domain-spaces';
 export type ScenarioUser = { id: string; email: string; name: string };
 
 /** The record kinds that take part in Spaces (ADR-0013): every kind but Space. */
-type ParticipantKind = Exclude<RecordKind, 'space'>;
+type ParticipantKind = 'document' | 'dashboard';
+type ScenarioRecordKind = 'space' | ParticipantKind;
 
 /** One record filed in a Space; both ends belong to `ownerId`. */
 export type Membership = {
@@ -77,7 +74,7 @@ export function stableId(label: string): string {
 type RecordInput = {
   scenario: string;
   owner: ScenarioUser;
-  kind: RecordKind;
+  kind: ScenarioRecordKind;
   key: string;
   name: string;
   description?: string;

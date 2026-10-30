@@ -6,9 +6,11 @@ import { getVerifiedIdentity } from '@/features/auth/server/session';
 import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import { createClient } from '@/lib/supabase/server';
 
-import { recordIdSchema } from '@synapcity/domain-records';
 import type { SetSpacePinnedResult } from '@synapcity/features-spaces/contracts';
 import { serverSpaceSource } from '@synapcity/features-spaces/server';
+import { z } from 'zod';
+
+const spaceIdSchema = z.uuid();
 
 /**
  * Pins or unpins one of the caller's spaces. The browser asks for a change; the
@@ -21,7 +23,7 @@ export async function setSpacePinned(
   pinned: unknown,
 ): Promise<SetSpacePinnedResult> {
   if (fixtureModeEnabled()) return { ok: false, error: FIXTURE_MESSAGE };
-  const id = recordIdSchema.safeParse(spaceId);
+  const id = spaceIdSchema.safeParse(spaceId);
   if (!id.success || typeof pinned !== 'boolean') {
     return { ok: false, error: SAVE_FAILED };
   }
@@ -53,7 +55,7 @@ export async function setSpacePinned(
  */
 export async function recordSpaceView(spaceId: unknown): Promise<void> {
   if (fixtureModeEnabled()) return;
-  const id = recordIdSchema.safeParse(spaceId);
+  const id = spaceIdSchema.safeParse(spaceId);
   if (!id.success) return;
 
   if ((await getVerifiedIdentity()).status !== 'verified') return;

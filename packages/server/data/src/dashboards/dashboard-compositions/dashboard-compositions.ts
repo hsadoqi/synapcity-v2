@@ -1,10 +1,10 @@
-import { recordIdSchema } from '@synapcity/domain-records';
 import {
   toProviderFailure,
   type Json,
   type ProviderFailure,
   type SupabaseServerClient,
 } from '@synapcity/server-supabase';
+import { z } from 'zod';
 
 import { readError } from '../../read-error';
 import { jsonEqual } from './json-equal';
@@ -35,6 +35,7 @@ export type SaveCompositionOutcome =
 
 /** The SQLSTATE the database raises when `revision` does not rise by exactly 1. */
 const REVISION_CONFLICT_CODE = 'PT409';
+const dashboardIdSchema = z.uuid();
 
 /**
  * One dashboard's stored composition. Every Dashboard has exactly one from the
@@ -50,7 +51,7 @@ export async function loadComposition(
   client: SupabaseServerClient,
   dashboardId: string,
 ): Promise<StoredComposition | null> {
-  if (!recordIdSchema.safeParse(dashboardId).success) return null;
+  if (!dashboardIdSchema.safeParse(dashboardId).success) return null;
 
   const { data, error } = await client
     .from('dashboard_compositions')
