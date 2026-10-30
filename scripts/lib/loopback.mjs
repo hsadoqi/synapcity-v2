@@ -21,7 +21,7 @@ export class TargetRefusedError extends Error {
 }
 
 /** The pieces of a Postgres URL that decide whether it is local; never the password. */
-export function describeTarget(rawUrl) {
+function describeTarget(rawUrl) {
   let url;
   try {
     url = new URL(rawUrl);

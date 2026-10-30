@@ -16,7 +16,7 @@ import { getDashboards } from '../get-dashboards';
 type ItemKind = DashboardLinkItem['kind'];
 
 /** One source's outcome: its records, or a recorded failure. Never an empty list standing in for one. */
-export type LinkSourceOutcome =
+type LinkSourceOutcome =
   { ok: true; items: readonly BaseRecord[] } | { ok: false };
 
 const ITEM_KIND: Record<LinkSourceKind, ItemKind> = {

@@ -9,8 +9,7 @@ import {
   type SupabaseClient,
 } from '@supabase/supabase-js';
 
-import { toProviderFailure } from '../provider-failure/provider-failure';
-import type { ProviderFailure } from '../provider-failure/provider-failure';
+import { toProviderFailure, type ProviderFailure } from '../provider-failure';
 
 /**
  * What `getClaims()` means for access. `unavailable` is its own state: an

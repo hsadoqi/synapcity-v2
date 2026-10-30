@@ -5,6 +5,7 @@ import {
   setRecordPinned,
   type RecordKind,
 } from '@synapcity/server-data';
+import { cache } from 'react';
 import { z } from 'zod';
 
 import { getCallerIdentity, SAVE_FAILED } from '@/lib/access/caller';
@@ -70,14 +71,21 @@ export async function loadRecordSummaries(
  * One of the signed-in owner's records of one kind, or null when it does not
  * exist or is not theirs (row-level security makes the two look the same).
  * Development fixture mode reads the sample records instead.
+ *
+ * Memoized with React's `cache`, which lasts for one request only: a page and
+ * its `generateMetadata` read the same record once, and nothing is shared
+ * between requests or people. The key is the arguments, so `fixtures` must be a
+ * stable module constant (every caller passes one).
  */
-export async function loadRecord(
-  kind: RecordKind,
-  id: string,
-  fixtures: readonly OwnedRecordSummary[],
-): Promise<BaseRecord | null> {
-  if (fixtureModeEnabled()) {
-    return fixtures.find((record) => record.id === id) ?? null;
-  }
-  return findRecord(await createClient(), kind, id);
-}
+export const loadRecord = cache(
+  async (
+    kind: RecordKind,
+    id: string,
+    fixtures: readonly OwnedRecordSummary[],
+  ): Promise<BaseRecord | null> => {
+    if (fixtureModeEnabled()) {
+      return fixtures.find((record) => record.id === id) ?? null;
+    }
+    return findRecord(await createClient(), kind, id);
+  },
+);
