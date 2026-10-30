@@ -2,7 +2,7 @@ import type { WidgetType } from '@synapcity/domain-dashboards';
 
 import type { DashboardLinkItem } from '../../../contracts';
 import { useDashboardConfig } from '../../config';
-import { WidgetEmpty } from '../widget-states';
+import { WidgetEmpty, WidgetFailed } from '../widget-states';
 
 type LinkWidgetType = Extract<WidgetType, 'pinned' | 'last-opened' | 'spaces'>;
 
@@ -45,6 +45,20 @@ export function selectLinkItems(
   return chosen.slice(0, limit);
 }
 
+/**
+ * Whether a widget lists a kind of record the host could not read. Spaces
+ * lists Spaces only; Pinned and Last opened list every kind, so any failed
+ * source makes them incomplete.
+ */
+function isDegraded(
+  type: LinkWidgetType,
+  unavailable: readonly DashboardLinkItem['kind'][],
+): boolean {
+  return type === 'spaces'
+    ? unavailable.includes('space')
+    : unavailable.length > 0;
+}
+
 /** The body of the Pinned, Last opened and Spaces widgets: a short list of links. */
 export function LinkBody({
   type,
@@ -53,7 +67,11 @@ export function LinkBody({
   type: LinkWidgetType;
   limit: number;
 }) {
-  const { items, LinkComponent } = useDashboardConfig();
+  const { items, unavailableKinds, onReload, LinkComponent } =
+    useDashboardConfig();
+  if (isDegraded(type, unavailableKinds)) {
+    return <WidgetFailed onRetry={onReload} />;
+  }
   const shown = selectLinkItems(type, items, limit);
   if (shown.length === 0) return <WidgetEmpty>{EMPTY[type]}</WidgetEmpty>;
   return (

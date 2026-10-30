@@ -62,7 +62,10 @@ describe('the Dashboard page', () => {
       composition: null,
       revision: 0,
     });
-    mocks.getDashboardLinkItems.mockResolvedValue([]);
+    mocks.getDashboardLinkItems.mockResolvedValue({
+      items: [],
+      unavailableKinds: [],
+    });
     mocks.fixtureModeEnabled.mockReturnValue(false);
   });
 
@@ -96,6 +99,7 @@ describe('the Dashboard page', () => {
       composition: null,
       revision: 0,
       items: [],
+      unavailableKinds: [],
       persistence: 'server',
     });
     expect(find(page, RecordDashboardView)?.props).toMatchObject({
@@ -135,16 +139,20 @@ describe('the Dashboard page', () => {
       composition,
       revision: 7,
     });
-    mocks.getDashboardLinkItems.mockResolvedValue(items);
+    mocks.getDashboardLinkItems.mockResolvedValue({
+      items,
+      unavailableKinds: ['document'],
+    });
 
     const page = await DashboardShowPage({ params: params('x1') });
 
     expect(mocks.getDashboardComposition).toHaveBeenCalledWith('x1');
-    expect(mocks.getDashboardLinkItems).toHaveBeenCalledWith('u1');
+    expect(mocks.getDashboardLinkItems).toHaveBeenCalledWith('u1', composition);
     expect(find(page, DashboardView)?.props).toMatchObject({
       composition,
       revision: 7,
       items,
+      unavailableKinds: ['document'],
     });
   });
 

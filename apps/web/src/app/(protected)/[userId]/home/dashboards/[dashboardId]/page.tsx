@@ -44,10 +44,13 @@ export default async function DashboardShowPage({
   await requireOwner(userId);
   const dashboard = await getDashboard(dashboardId);
   if (!dashboard) notFound();
-  const [{ composition, revision }, items] = await Promise.all([
-    getDashboardComposition(dashboardId),
-    getDashboardLinkItems(userId),
-  ]);
+  // The composition first: it says which kinds of record the link widgets list,
+  // so only those are read.
+  const { composition, revision } = await getDashboardComposition(dashboardId);
+  const { items, unavailableKinds } = await getDashboardLinkItems(
+    userId,
+    composition,
+  );
 
   return (
     <>
@@ -70,6 +73,7 @@ export default async function DashboardShowPage({
         composition={composition}
         revision={revision}
         items={items}
+        unavailableKinds={unavailableKinds}
         persistence={fixtureModeEnabled() ? 'browser' : 'server'}
       />
     </>

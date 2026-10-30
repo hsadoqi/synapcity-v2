@@ -1,5 +1,5 @@
-import { render, screen, within } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { fireEvent, render, screen, within } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 
 import type { DashboardLinkItem } from '../../../contracts';
 import { DashboardConfigProvider } from '../../config';
@@ -109,5 +109,50 @@ describe('LinkBody', () => {
   ] as const)('says so when %s has nothing', (type, message) => {
     renderBody(type, []);
     expect(screen.getByText(message)).toBeDefined();
+  });
+});
+
+describe('LinkBody when a source could not be read', () => {
+  const renderWith = (
+    type: 'pinned' | 'last-opened' | 'spaces',
+    unavailableKinds: readonly DashboardLinkItem['kind'][],
+    onReload: (() => void) | null = null,
+  ) =>
+    render(
+      <DashboardConfigProvider
+        items={ITEMS}
+        unavailableKinds={unavailableKinds}
+        onReload={onReload}
+      >
+        <LinkBody type={type} limit={6} />
+      </DashboardConfigProvider>,
+    );
+
+  it.each(['pinned', 'last-opened'] as const)(
+    '%s says it could not load when any kind failed, not that it is empty',
+    (type) => {
+      renderWith(type, ['document']);
+      expect(screen.getByText("Couldn't load these items.")).toBeDefined();
+      expect(screen.queryByRole('list')).toBeNull();
+      expect(screen.queryByText('Nothing is pinned yet.')).toBeNull();
+    },
+  );
+
+  it('spaces fails only when Spaces failed', () => {
+    const { unmount } = renderWith('spaces', ['document', 'dashboard']);
+    expect(screen.getByRole('list')).toBeDefined();
+    unmount();
+    renderWith('spaces', ['space']);
+    expect(screen.getByText("Couldn't load these items.")).toBeDefined();
+  });
+
+  it('offers Retry only when the host can re-read, and calls it', () => {
+    const { unmount } = renderWith('pinned', ['space']);
+    expect(screen.queryByRole('button', { name: 'Retry' })).toBeNull();
+    unmount();
+    const onReload = vi.fn();
+    renderWith('pinned', ['space'], onReload);
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
+    expect(onReload).toHaveBeenCalledOnce();
   });
 });
