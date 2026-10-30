@@ -55,11 +55,36 @@ test.describe('resource page containment in the shell', () => {
    * to half a pixel.
    */
   async function expectContained(page: Page, selector: string, within: string) {
-    const [inner, outer, viewport] = await Promise.all([
-      box(page, selector),
-      box(page, within),
-      page.evaluate(() => window.innerWidth),
-    ]);
+    // Both boxes in one read, so they come from the same frame, and only once
+    // two consecutive frames agree: the sidebar and panels animate their
+    // widths, and a read mid-animation would pair boxes from different moments.
+    const { inner, outer, viewport } = await page.evaluate(
+      async ([innerSelector, outerSelector]) => {
+        const read = (selector: string) => {
+          const element = document.querySelector(selector);
+          if (!element) throw new Error(`Nothing matches ${selector}`);
+          const rect = element.getBoundingClientRect();
+          return { left: rect.left, right: rect.right };
+        };
+        const snapshot = () => ({
+          inner: read(innerSelector),
+          outer: read(outerSelector),
+          viewport: window.innerWidth,
+        });
+        const frame = () =>
+          new Promise((resolve) => requestAnimationFrame(resolve));
+        let last = snapshot();
+        // About two seconds at 60 frames a second, then measure what is there.
+        for (let i = 0; i < 120; i++) {
+          await frame();
+          const next = snapshot();
+          if (JSON.stringify(next) === JSON.stringify(last)) return next;
+          last = next;
+        }
+        return last;
+      },
+      [selector, within] as const,
+    );
     const where = `${selector} (${inner.left}..${inner.right})`;
     expect(
       inner.left,
@@ -83,8 +108,13 @@ test.describe('resource page containment in the shell', () => {
     const heading = page.getByRole('heading', { level: 1 });
     await expect(heading).toBeVisible(FIRST_VISIT);
     // A dashboard renders its header again once its composition loads in the
-    // browser; renaming before then would be undone.
+    // browser; renaming before then would be undone. That load reads browser
+    // storage, not the network, so wait for its skeleton to go.
     await page.waitForLoadState('networkidle');
+    await expect(page.locator('[aria-busy="true"]')).toHaveCount(
+      0,
+      FIRST_VISIT,
+    );
     await page.waitForFunction(() => {
       const h1 = document.querySelector('h1');
       return !!h1 && Object.keys(h1).some((key) => key.startsWith('__react'));
@@ -156,11 +186,13 @@ test.describe('resource page containment in the shell', () => {
             'data-contextual-panel',
             'closed',
           );
-          await expectFrameContained(page);
           // Truncation is visual only: the heading keeps the complete name.
+          // Checked first, so a heading that was rendered again (and lost the
+          // long name) fails here instead of being measured with its short one.
           await expect(
             page.getByRole('heading', { level: 1, name, exact: true }),
           ).toBeVisible();
+          await expectFrameContained(page);
           await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
 
           // Open.
@@ -173,10 +205,10 @@ test.describe('resource page containment in the shell', () => {
           });
           await expect(region).toBeVisible();
           await glideEnded(page);
-          await expectFrameContained(page);
           await expect(
             page.getByRole('heading', { level: 1, name, exact: true }),
           ).toBeAttached();
+          await expectFrameContained(page);
 
           const shellBox = await box(
             page,
