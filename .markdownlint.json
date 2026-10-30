@@ -4,5 +4,8 @@
   },
   "MD013": {
     "enabled": false
+  },
+  "MD024": {
+    "enabled": false
   }
 }
