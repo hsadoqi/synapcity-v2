@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useTransition, type ReactNode } from 'react';
-import Link from 'next/link';
 
 import {
   ChevronsUpDown,
@@ -39,6 +38,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@synapcity/frontend-ui/core/tooltip';
+import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 
 type UserMenuProps = AccountLinks & {
   name: string | null;
@@ -159,11 +159,15 @@ function UserMenu({
         {children}
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuLinkItem render={<Link href={homeHref} />}>
+          <DropdownMenuLinkItem
+            render={<LinkButton variant="ghost" href={homeHref} />}
+          >
             <HomeIcon aria-hidden />
             Home
           </DropdownMenuLinkItem>
-          <DropdownMenuLinkItem render={<Link href={settingsHref} />}>
+          <DropdownMenuLinkItem
+            render={<LinkButton variant="ghost" href={settingsHref} />}
+          >
             <Cog aria-hidden />
             Settings
           </DropdownMenuLinkItem>

@@ -9,7 +9,7 @@ import {
   FileTextIcon,
   LayersIcon,
 } from 'lucide-react';
-import { Workspace, NavItem, Deployment } from './types';
+import { Workspace, NavItem, Deployment } from '../types';
 
 // person, a real route or an invented endpoint.
 export const WORKSPACES: Workspace[] = [

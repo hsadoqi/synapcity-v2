@@ -3,7 +3,7 @@
 import { Sidebar, SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
 import { useState } from 'react';
 import { Workspace, WorkspaceResource } from './types';
-import { WorkbenchHeader } from './main-header/workbench-header';
+import { WorkbenchHeader } from './main-header';
 import { WorkbenchContent } from './workbench-content';
 import type { User } from '@synapcity/domain-identity';
 /** The resource the panel shows for a workspace: the one chosen there, else its first document. */

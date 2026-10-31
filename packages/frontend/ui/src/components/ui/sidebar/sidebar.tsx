@@ -34,7 +34,6 @@ const SIDEBAR_WIDTH_MOBILE = '90svw';
 // parents are), held between a readable minimum and a maximum.
 const SIDEBAR_WIDTH_CONTAINED = 'clamp(13rem, 22cqw, 20rem)';
 const SIDEBAR_WIDTH_ICON = '3rem';
-const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
 
 type SidebarContextProps = {
   state: 'expanded' | 'collapsed';
@@ -109,21 +108,8 @@ function SidebarProvider({
     return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open);
   }, [isMobile, setOpen, setOpenMobile]);
 
-  // Adds a keyboard shortcut to toggle the sidebar.
-  React.useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (
-        event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
-        (event.metaKey || event.ctrlKey)
-      ) {
-        event.preventDefault();
-        toggleSidebar();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [toggleSidebar]);
+  // No keyboard shortcut here: the shell that places the sidebar owns one, so
+  // a sidebar in a story, a panel or a test does not listen to the window.
 
   // We add a state so that we can do data-state="expanded" or "collapsed".
   // This makes it easier to style the sidebar with Tailwind classes.
@@ -302,7 +288,6 @@ function SidebarTrigger({
       variant="ghost"
       size="icon-sm"
       label={label}
-      aria-keyshortcuts="Control+B Meta+B"
       className={cn(className)}
       onClick={(event) => {
         onClick?.(event);

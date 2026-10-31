@@ -1,13 +1,26 @@
 'use client';
 
-import { Workbench } from './main-content/workbench';
-import { MainSidebar } from './main-sidebar/main-sidebar';
-import { SidebarIconRail } from './sidebar-rail/sidebar-icon-rail';
-import { Sidebar } from '@synapcity/frontend-ui/core/sidebar';
-import { Workspace, WorkspaceResource } from './types';
 import type { User } from '@synapcity/domain-identity';
+import { Sidebar } from '@synapcity/frontend-ui/core/sidebar';
+import { Workbench } from './main-content';
+import { MainCombinedSidebar } from './main-sidebar';
+import type {
+  MainSidebarGroup,
+  MainSidebarItem,
+} from './main-sidebar/main-sidebar/main-sidebar-content';
+import { UserAvatar } from './main-sidebar';
+import type { ResourceKind, Workspace, WorkspaceResource } from './types';
 
-export const WorkbenchContent = ({
+const RESOURCE_GROUPS: Array<{ kind: ResourceKind; label: string }> = [
+  { kind: 'document', label: 'Documents' },
+  { kind: 'dashboard', label: 'Dashboards' },
+];
+
+/**
+ * Compatibility adapter for the existing WorkbenchShell preview. The generic
+ * sidebar stays unaware of the older workspace/resource demonstration model.
+ */
+export function WorkbenchContent({
   workspace,
   workspaces,
   activeResourceId,
@@ -26,28 +39,52 @@ export const WorkbenchContent = ({
   onSelectResource: (resource: WorkspaceResource) => void;
   children?: React.ReactNode;
   user?: User;
-}) => {
+}) {
+  const railItems: MainSidebarItem[] = workspaces.map((item) => ({
+    id: item.id,
+    label: item.name,
+    icon: item.icon,
+  }));
+  const panelGroups: MainSidebarGroup[] = RESOURCE_GROUPS.map(
+    ({ kind, label }) => ({
+      id: kind,
+      label,
+      items: (workspace.resources ?? [])
+        .filter((resource) => resource.kind === kind)
+        .map((resource) => ({
+          id: resource.id,
+          label: resource.name,
+          icon: resource.icon,
+          badge: resource.alsoIn ? `+${resource.alsoIn}` : undefined,
+        })),
+      empty: `No ${label.toLowerCase()} yet`,
+    }),
+  );
+
   return (
-    <div className="relative flex flex-1">
-      <Sidebar
-        collapsible="icon"
-        className="overflow-hidden min-h-0 *:data-[sidebar=sidebar]:flex-row"
+    <div className="relative flex min-h-0 flex-1">
+      <MainCombinedSidebar
         {...props}
-      >
-        <SidebarIconRail
-          workspaces={workspaces}
-          activeId={workspace.id}
-          onSelect={onSelectWorkspace}
-          setOpen={setOpen}
-          item={workspace}
-        />
-        <MainSidebar
-          workspace={workspace}
-          activeResourceId={activeResourceId}
-          onSelectResource={onSelectResource}
-          user={user}
-        />
-      </Sidebar>
+        railItems={railItems}
+        activeRailItemId={workspace.id}
+        railLabel="Workspaces"
+        onSelectRailItem={(item) => {
+          const selected = workspaces.find(({ id }) => id === item.id);
+          if (!selected) return;
+          onSelectWorkspace(selected);
+          setOpen(true);
+        }}
+        panelLabel={workspace.name}
+        panelGroups={panelGroups}
+        activePanelItemId={activeResourceId}
+        onSelectPanelItem={(item) => {
+          const selected = workspace.resources?.find(
+            ({ id }) => id === item.id,
+          );
+          if (selected) onSelectResource(selected);
+        }}
+        panelFooter={user ? <UserAvatar user={user} /> : undefined}
+      />
       <Workbench
         empty={workspace.resources?.length === 0 ? workspace : undefined}
       >
@@ -55,4 +92,4 @@ export const WorkbenchContent = ({
       </Workbench>
     </div>
   );
-};
+}

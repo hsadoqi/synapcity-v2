@@ -1,8 +1,6 @@
 'use client';
 
-import { Command, type LucideIcon } from 'lucide-react';
-import { NamedIcon } from '../icon-by-name';
-import { Workspace } from '../types';
+import type { ReactNode } from 'react';
 import {
   Sidebar,
   SidebarContent,
@@ -14,124 +12,62 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@synapcity/frontend-ui/core/sidebar';
-import { UserAvatar } from '../main-sidebar/user-avatar';
-import Link from 'next/link';
-import React from 'react';
+import { NamedIcon } from '../icon-by-name';
+import type { MainSidebarItem } from '../main-sidebar/main-sidebar/main-sidebar-content';
 
-export const user = {
-  name: 'shadcn',
-  email: 'm@example.com',
-  avatar: 'https://github.com/shadcn.png',
-};
-
-type MenuItem = {
-  name?: string;
-  label?: string;
-  subtitle?: string;
-  className?: string;
-  icon?: string | LucideIcon;
-};
-
-export const SidebarIconHeading = ({
-  label,
-  icon: Icon,
-  subtitle,
-}: {
-  icon?: string | LucideIcon;
-  label: string;
-  subtitle?: string;
-}) => (
-  <Link href="#">
-    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-      {Icon && typeof Icon !== 'string' && <Icon className="size-4" />}
-    </div>
-    <div className="grid flex-1 text-left text-sm leading-tight">
-      <span className="truncate font-medium">{label}</span>
-
-      {subtitle && <span className="truncate text-xs">{subtitle}</span>}
-    </div>
-  </Link>
-);
-
+/**
+ * The always-visible level of the two-part sidebar. It knows only generic
+ * destinations; a host decides what kind of product context they represent.
+ */
 export function SidebarIconRail({
-  workspaces,
-  activeId,
-  onSelect,
-  setOpen,
-  item,
+  items,
+  activeItemId,
+  label,
+  onSelectItem,
+  header,
+  footer,
 }: {
-  workspaces: Workspace[];
-  activeId: string;
-  onSelect: (workspace: Workspace) => void;
-  setOpen: (open: boolean) => void;
-  item: MenuItem;
+  items: MainSidebarItem[];
+  activeItemId?: string;
+  label: string;
+  onSelectItem: (item: MainSidebarItem) => void;
+  header?: ReactNode;
+  footer?: ReactNode;
 }) {
-  const ResolvedIcon = (
-    typeof item.icon === 'string' ? NamedIcon : (item.icon ?? Command)
-  ) as React.ElementType;
-  const iconProps = typeof item.icon === 'string' ? { name: item.icon } : {};
-
   return (
     <Sidebar
       collapsible="none"
-      className="h-full w-[calc(var(--sidebar-width-icon)+1px)]! shrink-0 border-r"
+      className="w-(--sidebar-width-icon) shrink-0 border-r"
     >
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              size="lg"
-              className="h-8 p-0"
-              render={
-                <Link href="#">
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                    <ResolvedIcon {...iconProps} />
-                  </div>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">{item.label}</span>
-
-                    {item.subtitle && (
-                      <span className="truncate text-xs">{item.subtitle}</span>
-                    )}
-                  </div>
-                </Link>
-              }
-            />
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>
+      {header ? <SidebarHeader>{header}</SidebarHeader> : null}
+      <SidebarContent role="navigation" aria-label={label}>
         <SidebarGroup>
           <SidebarGroupContent className="px-0">
             <SidebarMenu>
-              {workspaces.map((item) => {
-                return (
-                  <SidebarMenuItem key={item.id}>
-                    <SidebarMenuButton
-                      tooltip={{
-                        children: item.name,
-                        hidden: false,
-                      }}
-                      onClick={() => {
-                        onSelect(item);
-                        setOpen(true);
-                      }}
-                      isActive={activeId === item.id}
-                      className="px-2"
-                    >
+              {items.map((item) => (
+                <SidebarMenuItem key={item.id}>
+                  <SidebarMenuButton
+                    type="button"
+                    tooltip={{ children: item.label, hidden: false }}
+                    onClick={() => onSelectItem(item)}
+                    isActive={activeItemId === item.id}
+                    aria-current={activeItemId === item.id ? 'page' : undefined}
+                    className="px-2"
+                  >
+                    {item.icon ? (
                       <NamedIcon name={item.icon} aria-hidden="true" />
-                      <span>{item.name}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
+                    ) : (
+                      <span aria-hidden="true">{item.label.slice(0, 1)}</span>
+                    )}
+                    <span className="sr-only">{item.label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
-        <UserAvatar user={user} />
-      </SidebarFooter>
+      {footer ? <SidebarFooter>{footer}</SidebarFooter> : null}
     </Sidebar>
   );
 }
