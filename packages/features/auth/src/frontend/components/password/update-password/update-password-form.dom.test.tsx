@@ -57,6 +57,37 @@ describe('UpdatePasswordForm', () => {
     expect(document.activeElement).toBe(field('Confirm new password'));
   });
 
+  it('keeps the button reachable but inert while updating', async () => {
+    // Settled at the end: React entangles pending actions, so one left
+    // hanging would hold back the next test's form reset.
+    let settle!: (state: AuthState) => void;
+    mocks.updatePassword.mockReturnValue(
+      new Promise<AuthState>((resolve) => (settle = resolve)),
+    );
+    render(
+      <UpdatePasswordForm updatePassword={mocks.updatePassword} next="" />,
+    );
+
+    try {
+      await submit();
+
+      const button = screen.getByRole('button', { name: 'Updating…' });
+      expect(button.hasAttribute('disabled')).toBe(false);
+      expect(button.getAttribute('aria-disabled')).toBe('true');
+      expect(button.getAttribute('aria-busy')).toBe('true');
+      button.focus();
+      expect(document.activeElement).toBe(button);
+      expect(fireEvent.keyDown(button, { key: 'Enter' })).toBe(false);
+      expect(fireEvent.keyDown(button, { key: ' ' })).toBe(false);
+      await act(async () => {
+        fireEvent.click(button);
+      });
+      expect(mocks.updatePassword).toHaveBeenCalledTimes(1);
+    } finally {
+      await act(async () => settle({}));
+    }
+  });
+
   it('never refills a password after a refusal', async () => {
     mocks.updatePassword.mockResolvedValue({
       error: 'Use a password of at least 8 characters.',

@@ -72,7 +72,28 @@ describe('RegisterForm', () => {
       (container.querySelector('input[name="next"]') as HTMLInputElement).value,
     ).toBe('/after');
     const button = screen.getByRole('button', { name: 'Creating account…' });
-    expect(button.hasAttribute('disabled')).toBe(true);
+    expect(button.hasAttribute('disabled')).toBe(false);
+    expect(button.getAttribute('aria-disabled')).toBe('true');
+    expect(button.getAttribute('aria-busy')).toBe('true');
+  });
+
+  it('keeps the button reachable but inert while creating', async () => {
+    const action = vi.fn();
+    show({}, true, action);
+    // Valid fields, so only the pending state can hold the submit back.
+    fireEvent.change(field('Name'), { target: { value: 'Ada' } });
+    fireEvent.change(field('Email'), { target: { value: 'ada@example.com' } });
+    fireEvent.change(field('Password'), { target: { value: 'Analytical1!' } });
+
+    const button = screen.getByRole('button', { name: 'Creating account…' });
+    button.focus();
+    expect(document.activeElement).toBe(button);
+    expect(fireEvent.keyDown(button, { key: 'Enter' })).toBe(false);
+    expect(fireEvent.keyDown(button, { key: ' ' })).toBe(false);
+    await act(async () => {
+      fireEvent.click(button);
+    });
+    expect(action).not.toHaveBeenCalled();
   });
 
   it('hands a valid submit to the action it was given', async () => {

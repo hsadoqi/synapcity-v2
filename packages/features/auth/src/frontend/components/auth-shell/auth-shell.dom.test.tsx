@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { AUTH_HEADING_ID, AuthShell } from './auth-shell';
+import { AuthShell } from './auth-shell';
 
 describe('AuthShell', () => {
   it('has exactly one h1, the title, which can take focus but is not a tab stop', () => {
@@ -9,7 +9,6 @@ describe('AuthShell', () => {
 
     const heading = screen.getByRole('heading', { level: 1, name: 'Sign in' });
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-    expect(heading.id).toBe(AUTH_HEADING_ID);
     expect(heading.getAttribute('tabindex')).toBe('-1');
     heading.focus();
     expect(document.activeElement).toBe(heading);
