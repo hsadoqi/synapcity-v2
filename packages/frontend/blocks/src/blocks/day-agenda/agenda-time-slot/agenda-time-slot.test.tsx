@@ -1,10 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import {
-  AgendaTimeSlot,
-  toneClasses,
-} from '@/blocks/day-agenda/agenda-time-slot';
+import { AgendaTimeSlot, toneClasses } from '.';
 
 describe('AgendaTimeSlot', () => {
   it('renders its time and label as a list item in its tone', () => {

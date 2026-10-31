@@ -13,7 +13,7 @@ import { SidebarSeparator } from '@synapcity/frontend-ui/core/sidebar';
 import { ChevronsUpDownIcon, CheckIcon, PlusIcon } from 'lucide-react';
 import { NamedIcon } from '../icon-by-name';
 import { Workspace } from '../types';
-import { UserAvatar } from '../main-sidebar';
+import { UserAvatarActions } from '../main-sidebar';
 
 export function WorkspaceDropdown({
   workspace,
@@ -36,7 +36,7 @@ export function WorkspaceDropdown({
           {workspaces.map((item) => (
             <DropdownMenuItem key={item.id} onClick={() => onSelect(item)}>
               {item.avatar && (
-                <UserAvatar
+                <UserAvatarActions
                   user={{
                     name: item.name,
                     avatar: item.avatar,

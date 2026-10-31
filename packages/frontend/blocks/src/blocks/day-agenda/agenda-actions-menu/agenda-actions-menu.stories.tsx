@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { Button } from '@synapcity/frontend-ui/core/button';
-import { AgendaActionsMenu } from '@/blocks/day-agenda/agenda-actions-menu';
+import { AgendaActionsMenu } from '.';
 import { CalendarPlus, Pin, Share2 } from 'lucide-react';
 import { expect, within } from 'storybook/test';
 

@@ -4,10 +4,6 @@
     "outDir": "dist",
     "rootDir": "src",
     "strictNullChecks": true,
-    "paths": {
-      "@/*": ["./src/*"],
-      "@/blocks/*": ["./src/blocks/*"]
-    },
     "module": "preserve",
     "moduleResolution": "bundler",
     "resolvePackageJsonImports": true

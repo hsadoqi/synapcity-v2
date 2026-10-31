@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { Pin } from 'lucide-react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { ActionsToolbar } from '@/blocks/actions-toolbar';
+import { ActionsToolbar } from '.';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
 const slot = (container: HTMLElement, name: string) =>

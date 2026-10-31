@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { Button } from '@synapcity/frontend-ui/core/button';
-import { AgendaDialog } from '@/blocks/day-agenda/agenda-dialog';
+import { AgendaDialog } from '.';
 
 const renderDialog = (children?: React.ReactNode) =>
   render(

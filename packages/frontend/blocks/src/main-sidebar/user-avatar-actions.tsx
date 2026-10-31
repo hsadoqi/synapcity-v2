@@ -9,7 +9,7 @@ export type UserAction = {
   icon?: string;
   onAction?: (props: any) => void;
 };
-export const UserAvatar = ({
+export const UserAvatarActions = ({
   user,
   actions,
 }: {

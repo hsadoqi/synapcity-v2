@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { AgendaSettingsView } from '@/blocks/day-agenda/agenda-settings-view';
+import { AgendaSettingsView } from './agenda-settings-view';
 
 describe('AgendaSettingsView', () => {
   it('is a region named by its title, focused on open, with its body', () => {

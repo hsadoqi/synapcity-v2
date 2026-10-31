@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, fn, screen, userEvent, waitFor, within } from 'storybook/test';
 
-import { EntityDialog } from '@/blocks/entity-dialog';
+import { EntityDialog } from '.';
 import { Button } from '@synapcity/frontend-ui/core/button';
 import { Input } from '@synapcity/frontend-ui/core/input';
 import { Label } from '@synapcity/frontend-ui/core/label';

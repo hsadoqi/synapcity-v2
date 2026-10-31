@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { AgendaDateNav } from '@/blocks/day-agenda/agenda-date-nav';
+import { AgendaDateNav } from '.';
 
 describe('AgendaDateNav', () => {
   it('moves one day back and forward', () => {

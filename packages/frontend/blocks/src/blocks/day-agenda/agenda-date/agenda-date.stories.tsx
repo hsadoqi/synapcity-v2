@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { AgendaDate } from '@/blocks/day-agenda/agenda-date';
+import { AgendaDate } from '.';
 
 const meta = {
   title: 'Blocks/Day Agenda/AgendaDate',

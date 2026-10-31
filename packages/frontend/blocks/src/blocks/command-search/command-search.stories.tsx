@@ -11,7 +11,7 @@ const defaultDoc = {
 };
 
 const meta: Meta<typeof CommandSearch> = {
-  title: 'Blocks/Command Search',
+  title: 'Navigation/Command Search',
   component: CommandSearch,
   args: {
     groups: [

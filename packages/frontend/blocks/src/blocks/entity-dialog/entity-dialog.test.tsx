@@ -7,7 +7,7 @@ import {
 } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { EntityDialog, type EntityDialogProps } from '@/blocks/entity-dialog';
+import { EntityDialog, type EntityDialogProps } from '.';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
 const fields = (
