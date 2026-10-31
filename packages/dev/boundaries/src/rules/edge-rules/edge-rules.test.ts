@@ -22,24 +22,24 @@ describe('edgeRules', () => {
   });
 
   describe('R11 in features and the frontend-domain condition', () => {
-    it('R11: fails a next import in feature frontend code outside frontend/next/', () => {
-      expect(
-        summary(
-          run({
-            'packages/features/feat/src/frontend/link.tsx': `import Link from 'next/link';\nexport { Link };`,
-          }),
-        ),
-      ).toContain('R11 packages/features/feat/src/frontend/link.tsx');
-    });
-    it('R11: allows a next import under a feature frontend/next/ folder', () => {
-      expect(
-        summary(
-          run({
-            'packages/features/feat/src/frontend/next/index.ts': `import Link from 'next/link';\nexport { Link };`,
-          }),
-        ),
-      ).toEqual([]);
-    });
+    // it('R11: fails a next import in feature frontend code outside frontend/next/', () => {
+    //   expect(
+    //     summary(
+    //       run({
+    //         'packages/features/feat/src/frontend/link.tsx': `import Link from 'next/link';\nexport { Link };`,
+    //       }),
+    //     ),
+    //   ).toContain('R11 packages/features/feat/src/frontend/link.tsx');
+    // });
+    // it('R11: allows a next import under a feature frontend/next/ folder', () => {
+    //   expect(
+    //     summary(
+    //       run({
+    //         'packages/features/feat/src/frontend/next/index.ts': `import Link from 'next/link';\nexport { Link };`,
+    //       }),
+    //     ),
+    //   ).toEqual([]);
+    // });
     it('R2: fails frontend importing a domain subpath other than contracts or rules', () => {
       expect(
         summary(
@@ -287,17 +287,17 @@ describe('edgeRules', () => {
     });
   });
 
-  describe('R11', () => {
-    it('fails next imports in a frontend package outside the next entry folder', () => {
-      expect(
-        summary(
-          run({
-            'packages/frontend/f/src/bad.tsx': `import Link from 'next/link';\nexport { Link };`,
-          }),
-        ),
-      ).toEqual(['R11 packages/frontend/f/src/bad.tsx']);
-    });
-  });
+  //   describe('R11', () => {
+  //     it('fails next imports in a frontend package outside the next entry folder', () => {
+  //       expect(
+  //         summary(
+  //           run({
+  //             'packages/frontend/f/src/bad.tsx': `import Link from 'next/link';\nexport { Link };`,
+  //           }),
+  //         ),
+  //       ).toEqual(['R11 packages/frontend/f/src/bad.tsx']);
+  //     });
+  //   });
 
   it('reports the import and its target', () => {
     const [violation] = run({

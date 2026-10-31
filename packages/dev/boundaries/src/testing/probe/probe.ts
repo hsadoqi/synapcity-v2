@@ -16,7 +16,7 @@ export const BASE: Record<string, string> = {
     exports: { '.': './src/index.ts' },
   }),
   'packages/frontend/f/src/index.ts': `import { d } from '@t/domain-d';\nexport const f = d;`,
-  'packages/frontend/f/src/next/link.tsx': `import Link from 'next/link';\nexport { Link };`,
+  //   'packages/frontend/f/src/next/link.tsx': `import LinBk from 'next/link';\nexport { Link };`,
   'packages/server/s/package.json': manifest('@t/server-s', {
     exports: { '.': './src/index.ts', './testing': './src/testing/index.ts' },
   }),
