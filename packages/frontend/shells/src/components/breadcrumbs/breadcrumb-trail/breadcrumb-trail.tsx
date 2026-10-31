@@ -2,13 +2,13 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { ComponentProps } from 'react';
-import { RootShell } from '../root-shell';
-import type { RootBreadcrumb } from '../header-breadcrumbs';
-import type { RootSidebarContent } from '../sidebar-shell/root-sidebar';
+import { RootShell } from '../../root-shell';
+import type { RootBreadcrumb } from '../breadcrumb-menu';
+import type { RootSidebarContent } from '../../sidebar-shell/root-sidebar';
 
-type BreadcrumbTrail = (items: RootBreadcrumb[]) => void;
+export type BreadcrumbTrail = (items: RootBreadcrumb[]) => void;
 
-const BreadcrumbTrailContext = createContext<BreadcrumbTrail>(() => {});
+export const BreadcrumbTrailContext = createContext<BreadcrumbTrail>(() => {});
 
 // One shared empty trail, so clearing an already empty trail is no change and
 // the shell does not render again.

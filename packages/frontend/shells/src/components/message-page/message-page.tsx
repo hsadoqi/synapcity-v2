@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect, useRef } from 'react';
 import {
   Card,
   CardDescription,
@@ -5,9 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@synapcity/frontend-ui/core/card';
-
-/** The heading's id, so a page that appears after a failure can move focus to it. */
-export const MESSAGE_HEADING_ID = 'message-heading';
 
 /**
  * A page that is just a message and a way out: an unexpected error, a page that
@@ -17,13 +17,27 @@ export const MESSAGE_HEADING_ID = 'message-heading';
 export function MessagePage({
   title,
   description,
+  focusKey,
   children,
 }: {
   title: string;
   description: string;
+  /**
+   * Given, the heading takes focus when the page appears and again whenever
+   * this changes, such as a new error. A page that appears after a failure
+   * passes it; one reached by navigation leaves it out.
+   */
+  focusKey?: unknown;
   /** The ways forward, such as a retry button or a link home. */
   children: React.ReactNode;
 }) {
+  // This page's own heading, so another message on the page is never focused.
+  const headingRef = useRef<HTMLDivElement>(null);
+  const takesFocus = focusKey !== undefined;
+  useEffect(() => {
+    if (takesFocus) headingRef.current?.focus();
+  }, [takesFocus, focusKey]);
+
   return (
     <div className="flex flex-1 items-start justify-center sm:items-center">
       <div className="flex w-full max-w-md flex-col gap-6">
@@ -32,7 +46,7 @@ export function MessagePage({
             <CardTitle
               as="h1"
               size="lg"
-              id={MESSAGE_HEADING_ID}
+              ref={headingRef}
               tabIndex={-1}
               className="outline-none"
             >

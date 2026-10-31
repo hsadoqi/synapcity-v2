@@ -8,7 +8,6 @@ export {
   RootFooter,
   RootContent,
 } from './components/root-shell';
-export type { RootBreadcrumb } from './components/header-breadcrumbs';
 export {
   GlobalPanelShell,
   GlobalPanelToggle,
@@ -32,12 +31,16 @@ export {
   type ShellNavigation,
 } from './providers/shell-navigation';
 export {
-  BreadcrumbRootShell,
-  SetBreadcrumbs,
+  BreadcrumbProvider,
+  useBreadcrumbs,
+  BreadcrumbTrailContext,
+  type BreadcrumbTrail,
+  BreadcrumbMenu,
+  type RootBreadcrumb,
   activeContext,
-} from './components/breadcrumb-trail';
+} from './components/breadcrumbs';
 export { AuthPageShell } from './components/auth-page-shell';
-export { MESSAGE_HEADING_ID, MessagePage } from './components/message-page';
+export { MessagePage } from './components/message-page';
 export {
   ContextSwitcher,
   type ContextOption,

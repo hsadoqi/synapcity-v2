@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { HeaderBreadcrumbs } from '.';
+import { BreadcrumbMenu } from '.';
 
 const trail = [
   { label: 'Spaces', href: '/u/home/spaces' },
@@ -9,9 +9,9 @@ const trail = [
   { label: 'Plan' },
 ];
 
-describe('HeaderBreadcrumbs', () => {
+describe('BreadcrumbMenu', () => {
   it('links each parent and ends on the current page without a link', () => {
-    render(<HeaderBreadcrumbs items={trail} />);
+    render(<BreadcrumbMenu items={trail} />);
 
     expect(
       screen.getByRole('link', { name: 'Spaces' }).getAttribute('href'),
@@ -21,13 +21,13 @@ describe('HeaderBreadcrumbs', () => {
   });
 
   it('shows a parent without a href as plain text', () => {
-    render(<HeaderBreadcrumbs items={[{ label: 'Home' }, { label: 'Now' }]} />);
+    render(<BreadcrumbMenu items={[{ label: 'Home' }, { label: 'Now' }]} />);
 
     expect(screen.getByText('Home').closest('a')).toBeNull();
   });
 
   it('hides every parent below sm so only the current page shows', () => {
-    render(<HeaderBreadcrumbs items={trail} />);
+    render(<BreadcrumbMenu items={trail} />);
 
     expect(screen.getByText('Spaces').closest('li')?.className).toContain(
       'hidden sm:inline-flex',
@@ -38,7 +38,7 @@ describe('HeaderBreadcrumbs', () => {
   });
 
   it('renders a spacer, not a landmark, when there is no trail', () => {
-    const { container } = render(<HeaderBreadcrumbs items={[]} />);
+    const { container } = render(<BreadcrumbMenu items={[]} />);
 
     expect(screen.queryByRole('navigation')).toBeNull();
     expect(container.firstElementChild?.className).toContain('flex-1');

@@ -1,16 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { BreadcrumbRootShell, SetBreadcrumbs } from '.';
-
+import { BreadcrumbProvider } from './breadcrumb-trail';
+import { BreadcrumbMenu } from '../breadcrumb-menu';
 const account = { homeHref: '/u/home', settingsHref: '/u/settings' };
 
-/** A page sets its trail with `SetBreadcrumbs`; the shell's header shows it. */
+/** A page sets its trail with `Breadcrumb`; the shell's header shows it. */
 const meta = {
-  title: 'Blocks/BreadcrumbRootShell',
-  component: BreadcrumbRootShell,
+  title: 'Blocks/BreadcrumbProvider',
+  component: BreadcrumbProvider,
   parameters: { layout: 'fullscreen' },
   args: { account, children: null },
-} satisfies Meta<typeof BreadcrumbRootShell>;
+} satisfies Meta<typeof BreadcrumbProvider>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -19,7 +19,7 @@ export const InASpace: Story = {
   args: {
     children: (
       <>
-        <SetBreadcrumbs
+        <BreadcrumbMenu
           items={[
             { label: 'Spaces', href: '/u/home/spaces' },
             { label: 'Garden plans' },

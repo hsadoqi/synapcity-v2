@@ -6,7 +6,8 @@ vi.mock('next/navigation', () => ({ usePathname: () => '/' }));
 
 import { ModeProvider } from '@synapcity/frontend-preferences';
 
-import { BreadcrumbRootShell, SetBreadcrumbs } from '.';
+import { BreadcrumbProvider } from '.';
+import { BreadcrumbMenu } from '../breadcrumb-menu';
 
 beforeEach(() => {
   vi.stubGlobal(
@@ -24,13 +25,13 @@ const account = { homeHref: '/u/home', settingsHref: '/u/settings' };
 const renderShell = (page: React.ReactNode) =>
   render(
     <ModeProvider>
-      <BreadcrumbRootShell account={account}>{page}</BreadcrumbRootShell>
+      <BreadcrumbProvider account={account}>{page}</BreadcrumbProvider>
     </ModeProvider>,
   );
 
 const trail = () => screen.queryByRole('navigation', { name: 'Breadcrumb' });
 
-describe('BreadcrumbRootShell', () => {
+describe('BreadcrumbProvider', () => {
   it('shows no trail until a page sets one', () => {
     renderShell(<p>Page</p>);
 
@@ -39,7 +40,7 @@ describe('BreadcrumbRootShell', () => {
 
   it('shows the trail a page sets, linking parents and ending on the page', () => {
     renderShell(
-      <SetBreadcrumbs
+      <BreadcrumbMenu
         items={[
           { label: 'Spaces', href: '/u/home/spaces' },
           { label: 'Fitness' },
@@ -57,18 +58,18 @@ describe('BreadcrumbRootShell', () => {
   it('clears the trail when the page that set it goes away', () => {
     const view = render(
       <ModeProvider>
-        <BreadcrumbRootShell account={account}>
-          <SetBreadcrumbs items={[{ label: 'Spaces' }]} />
-        </BreadcrumbRootShell>
+        <BreadcrumbProvider account={account}>
+          <BreadcrumbMenu items={[{ label: 'Spaces' }]} />
+        </BreadcrumbProvider>
       </ModeProvider>,
     );
     expect(trail()).not.toBeNull();
 
     view.rerender(
       <ModeProvider>
-        <BreadcrumbRootShell account={account}>
+        <BreadcrumbProvider account={account}>
           <p>Elsewhere</p>
-        </BreadcrumbRootShell>
+        </BreadcrumbProvider>
       </ModeProvider>,
     );
 
@@ -76,13 +77,13 @@ describe('BreadcrumbRootShell', () => {
   });
 
   it('follows the page when it changes the trail', () => {
-    const view = renderShell(<SetBreadcrumbs items={[{ label: 'Spaces' }]} />);
+    const view = renderShell(<BreadcrumbMenu items={[{ label: 'Spaces' }]} />);
 
     view.rerender(
       <ModeProvider>
-        <BreadcrumbRootShell account={account}>
-          <SetBreadcrumbs items={[{ label: 'Dashboards' }]} />
-        </BreadcrumbRootShell>
+        <BreadcrumbProvider account={account}>
+          <BreadcrumbMenu items={[{ label: 'Dashboards' }]} />
+        </BreadcrumbProvider>
       </ModeProvider>,
     );
 
@@ -101,9 +102,9 @@ describe('BreadcrumbRootShell', () => {
     });
     render(
       <ModeProvider>
-        <BreadcrumbRootShell account={account} sidebar={sidebar}>
-          <SetBreadcrumbs items={[{ label: 'Spaces', kind: 'collection' }]} />
-        </BreadcrumbRootShell>
+        <BreadcrumbProvider account={account} sidebar={sidebar}>
+          <BreadcrumbMenu items={[{ label: 'Spaces', kind: 'collection' }]} />
+        </BreadcrumbProvider>
       </ModeProvider>,
     );
     const nav = document.querySelector('[data-slot="sidebar"]')!;
@@ -113,14 +114,14 @@ describe('BreadcrumbRootShell', () => {
   });
 });
 
-describe('SetBreadcrumbs stability', () => {
-  /** A page that re-renders itself, handing SetBreadcrumbs a new equal array. */
+describe('BreadcrumbMenu stability', () => {
+  /** A page that re-renders itself, handing BreadcrumbMenu a new equal array. */
   const Page = () => {
     const [, setCount] = useState(0);
     return (
       <>
         <button onClick={() => setCount((n) => n + 1)}>Render again</button>
-        <SetBreadcrumbs items={[{ label: 'Spaces' }]} />
+        <BreadcrumbMenu items={[{ label: 'Spaces' }]} />
       </>
     );
   };
@@ -129,9 +130,9 @@ describe('SetBreadcrumbs stability', () => {
     const sidebar = vi.fn(() => ({ groups: [] }));
     render(
       <ModeProvider>
-        <BreadcrumbRootShell account={account} sidebar={sidebar}>
+        <BreadcrumbProvider account={account} sidebar={sidebar}>
           <Page />
-        </BreadcrumbRootShell>
+        </BreadcrumbProvider>
       </ModeProvider>,
     );
     const calls = sidebar.mock.calls.length;
@@ -142,10 +143,10 @@ describe('SetBreadcrumbs stability', () => {
   });
 });
 
-describe('SetBreadcrumbs lifecycle', () => {
+describe('BreadcrumbMenu lifecycle', () => {
   const inShell = (page: React.ReactNode) => (
     <ModeProvider>
-      <BreadcrumbRootShell account={account}>{page}</BreadcrumbRootShell>
+      <BreadcrumbProvider account={account}>{page}</BreadcrumbProvider>
     </ModeProvider>
   );
 
@@ -153,11 +154,11 @@ describe('SetBreadcrumbs lifecycle', () => {
     // Different keys: the old publisher unmounts as the new one mounts, as on
     // a route change. Cleanups run before the new effect, so the new trail wins.
     const view = render(
-      inShell(<SetBreadcrumbs key="a" items={[{ label: 'Spaces' }]} />),
+      inShell(<BreadcrumbMenu key="a" items={[{ label: 'Spaces' }]} />),
     );
 
     view.rerender(
-      inShell(<SetBreadcrumbs key="b" items={[{ label: 'Documents' }]} />),
+      inShell(<BreadcrumbMenu key="b" items={[{ label: 'Documents' }]} />),
     );
 
     expect(within(trail()!).getByText('Documents')).toBeTruthy();
@@ -166,10 +167,10 @@ describe('SetBreadcrumbs lifecycle', () => {
 
   it('shows no trail for a page that sets an empty one', () => {
     const view = render(
-      inShell(<SetBreadcrumbs key="a" items={[{ label: 'Spaces' }]} />),
+      inShell(<BreadcrumbMenu key="a" items={[{ label: 'Spaces' }]} />),
     );
 
-    view.rerender(inShell(<SetBreadcrumbs key="b" items={[]} />));
+    view.rerender(inShell(<BreadcrumbMenu key="b" items={[]} />));
 
     expect(trail()).toBeNull();
   });
@@ -177,7 +178,7 @@ describe('SetBreadcrumbs lifecycle', () => {
   it('keeps the trail through Strict Mode mounting its effects twice', () => {
     render(
       <StrictMode>
-        {inShell(<SetBreadcrumbs items={[{ label: 'Spaces' }]} />)}
+        {inShell(<BreadcrumbMenu items={[{ label: 'Spaces' }]} />)}
       </StrictMode>,
     );
 

@@ -8,7 +8,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@synapcity/frontend-ui/core/breadcrumb';
-import { ShellLink } from '../../providers/shell-navigation';
+import { ShellLink } from '../../../providers/shell-navigation';
 
 /** One level of the trail. The last item is the current page and takes no link. */
 export type RootBreadcrumb = {
@@ -26,7 +26,7 @@ export type RootBreadcrumb = {
  * The trail to the current page. Below the sm breakpoint only the current page
  * shows, since the sidebar already shows where you are.
  */
-export const HeaderBreadcrumbs = ({ items }: { items?: RootBreadcrumb[] }) => {
+export const BreadcrumbMenu = ({ items }: { items?: RootBreadcrumb[] }) => {
   if (!items?.length) {
     return <div className="min-w-0 flex-1" />;
   }

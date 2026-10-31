@@ -1,18 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { HeaderBreadcrumbs } from '.';
+import { BreadcrumbMenu } from '.';
 
 /** The path to the current page, as the signed-in header shows it. */
 const meta = {
-  title: 'Blocks/HeaderBreadcrumbs',
-  component: HeaderBreadcrumbs,
+  title: 'Blocks/BreadcrumbMenu',
+  component: BreadcrumbMenu,
   args: {
     items: [
       { label: 'Spaces', href: '/u/home/spaces' },
       { label: 'Garden plans' },
     ],
   },
-} satisfies Meta<typeof HeaderBreadcrumbs>;
+} satisfies Meta<typeof BreadcrumbMenu>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

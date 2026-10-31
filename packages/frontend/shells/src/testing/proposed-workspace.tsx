@@ -21,7 +21,7 @@ import {
   ContextualPanelShell,
   type ContextualPanelDestination,
 } from '../components/contextual-panel';
-import type { RootBreadcrumb } from '../components/header-breadcrumbs';
+import type { RootBreadcrumb } from '../components/breadcrumbs/breadcrumb-menu';
 
 /**
  * Story content only, for visual review: a PROPOSED workspace, not a built

@@ -1,0 +1,5 @@
+export {
+  CLOSE_PANEL_SHORTCUT,
+  COMMAND_PALETTE_SHORTCUT,
+  SIDEBAR_SHORTCUT,
+} from './shortcuts';

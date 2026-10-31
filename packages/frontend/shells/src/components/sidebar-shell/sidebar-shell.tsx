@@ -7,7 +7,9 @@ import {
   SidebarProvider,
 } from '@synapcity/frontend-ui/core/sidebar';
 import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
+import { useKeyboardShortcut } from '@synapcity/frontend-ui/hooks/use-keyboard-shortcut';
 import { GlobalPanelShell } from '../root-shell/global-panel';
+import { SIDEBAR_SHORTCUT } from '../../utils/shortcuts';
 
 /** Below this container width the sidebar folds to icons; at or above it, it opens. */
 const WIDE_ENOUGH_PX = 1024;
@@ -57,6 +59,9 @@ export const SidebarShell = ({
   globalPanel?: React.ReactNode;
 }) => {
   const { ref, open, setOpen } = useFitToContainer();
+  // The sidebar is contained, so it never swaps to the phone sheet; the
+  // shortcut only opens and folds it.
+  useKeyboardShortcut(SIDEBAR_SHORTCUT, () => setOpen((value) => !value));
 
   return (
     <TooltipProvider>

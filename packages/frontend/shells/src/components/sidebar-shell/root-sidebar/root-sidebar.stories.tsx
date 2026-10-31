@@ -6,7 +6,7 @@ import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
 import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
 import { ModeProvider } from '@synapcity/frontend-preferences';
 import { ContextSwitcher } from '../../context-switcher';
-import { SearchForm } from '@synapcity/frontend-forms';
+import { SearchForm } from '@synapcity/frontend-blocks';
 import { sampleSidebarGroups } from '../../../testing/sidebar-sample';
 
 const meta: Meta<typeof RootSidebar> = {
