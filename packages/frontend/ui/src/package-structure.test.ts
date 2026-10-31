@@ -21,12 +21,7 @@ const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as {
 };
 
 /** Directories whose children are component folders. */
-const COMPONENT_ROOTS = [
-  'components',
-  'components/ui',
-  'blocks',
-  'next',
-] as const;
+const COMPONENT_ROOTS = ['components', 'components/ui', 'next'] as const;
 
 const list = (dir: string) => readdirSync(dir).sort();
 // Hidden folders (editor or tool state such as `.claude/`) are never components.
@@ -190,7 +185,6 @@ describe('package.json exports', () => {
     const prefixes: Record<string, string> = {
       components: './components/',
       'components/ui': './core/',
-      blocks: './blocks/',
       next: './next/',
     };
 
