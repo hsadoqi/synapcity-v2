@@ -1,5 +1,5 @@
-import { SettingRow } from '../../../shared/setting-row';
-import { SettingsSelect } from '../../../shared/settings-select';
+import { SettingRow } from '../../shared/setting-row';
+import { SettingsSelect } from '../../shared/settings-select';
 import {
   bodyFonts,
   codeFonts,

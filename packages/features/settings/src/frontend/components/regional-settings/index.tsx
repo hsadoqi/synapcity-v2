@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { FieldGroup } from '@synapcity/frontend-ui/core/field';
-import { useSettingsDraft } from '../../hooks/use-settings-draft';
+import { useSettingsDraft } from '../../hooks/use-settings-lifecycle/use-settings-draft';
 import {
   LanguageRow,
   TimezoneRow,
@@ -12,11 +12,11 @@ import {
   NumberFormatRow,
 } from './regional-rows';
 import { RegionalPreview } from './regional-preview';
-import { SettingsTabShell } from '../../shared/settings-tabs/settings-tab-shell';
+import { SettingsTabShell } from '../shared/settings-tabs/settings-tab-shell';
 import {
   SettingsAccordion,
   SettingsAccordionItem,
-} from '../../shared/settings-accordion';
+} from '../shared/settings-accordion';
 
 export function RegionalSettings() {
   const draft = useSettingsDraft('regional');

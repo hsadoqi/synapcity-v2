@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { ModeProvider } from '@synapcity/frontend-preferences';
 
 import { SettingsProvider } from '..';
-import { useSettings } from '../../../hooks/use-settings';
+import { useSettings } from '../../../hooks/use-settings-lifecycle/use-settings';
 
 const KEY = 'synapcity-preferences';
 

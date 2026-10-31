@@ -1,1 +1,1 @@
-export type { AccountSync, SavePreferencesResult } from './account-sync';
+export type * from './account-sync';

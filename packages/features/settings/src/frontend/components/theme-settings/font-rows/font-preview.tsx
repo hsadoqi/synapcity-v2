@@ -8,7 +8,7 @@ import {
   type FontChoice,
   type FontRole,
 } from '@synapcity/domain-preferences';
-import { usePreviewFont } from '../../../hooks/use-preview-font';
+import { usePreviewFont } from '../../../hooks/use-visuals/use-preview-font';
 import { PreviewFigure } from '../preview-figure';
 
 const roleStyles: Record<FontRole, string> = {

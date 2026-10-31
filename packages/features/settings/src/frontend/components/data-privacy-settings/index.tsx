@@ -2,7 +2,7 @@
 
 import { FieldGroup } from '@synapcity/frontend-ui/core/field';
 import { Separator } from '@synapcity/frontend-ui/core/separator';
-import { SettingsTabShell } from '../../shared/settings-tabs/settings-tab-shell';
+import { SettingsTabShell } from '../shared/settings-tabs/settings-tab-shell';
 import { canCollect, isBlockedBySignals } from '@synapcity/domain-preferences';
 import {
   choose,
@@ -13,7 +13,7 @@ import { PrivacyConsentRow } from './data-privacy-rows';
 import { DataPrivacyAskAgain } from './data-privacy-ask-again';
 import { DataPrivacyDisclaimer } from './data-privacy-disclaimer';
 import { useGlobalPrivacyControl } from '@synapcity/frontend-preferences';
-import { useSettingsDraft } from '../../hooks/use-settings-draft';
+import { useSettingsDraft } from '../../hooks/use-settings-lifecycle/use-settings-draft';
 
 // Each choice records when it was made, so two records mean the same choice
 // when both grant or both refuse.

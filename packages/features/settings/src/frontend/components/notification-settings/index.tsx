@@ -5,12 +5,12 @@ import {
   useNotificationPermission,
   type NotificationPermissionState,
 } from '../../hooks/use-notification-permission';
-import { useSettingsDraft } from '../../hooks/use-settings-draft';
+import { useSettingsDraft } from '../../hooks/use-settings-lifecycle/use-settings-draft';
 import {
   notificationKinds,
   type NotificationKind,
 } from '@synapcity/domain-preferences';
-import { SettingsTabShell } from '../../shared/settings-tabs/settings-tab-shell';
+import { SettingsTabShell } from '../shared/settings-tabs/settings-tab-shell';
 import { NotificationRow } from './notification-row';
 
 const pushBlockedReason: Partial<Record<NotificationPermissionState, string>> =

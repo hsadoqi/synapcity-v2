@@ -1,13 +1,13 @@
 'use client';
 
 import { FieldGroup } from '@synapcity/frontend-ui/core/field';
-import { useSettingsDraft } from '../../hooks/use-settings-draft';
-import { useSettings } from '../../hooks/use-settings';
+import { useSettingsDraft } from '../../hooks/use-settings-lifecycle/use-settings-draft';
+import { useSettings } from '../../hooks/use-settings-lifecycle/use-settings';
 import {
   SettingsAccordion,
   SettingsAccordionItem,
-} from '../../shared/settings-accordion';
-import { SettingsTabShell } from '../../shared/settings-tabs/settings-tab-shell';
+} from '../shared/settings-accordion';
+import { SettingsTabShell } from '../shared/settings-tabs/settings-tab-shell';
 import {
   AllDevicesRow,
   ContrastModeRow,

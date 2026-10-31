@@ -9,7 +9,7 @@ import {
   previewShapeAttributes,
   previewTextScaleStyle,
 } from '@synapcity/frontend-preferences';
-import { usePreviewFont } from '../../../hooks/use-preview-font';
+import { usePreviewFont } from '../../../hooks/use-visuals/use-preview-font';
 import type { ThemeSettings } from '@synapcity/domain-preferences';
 
 /**
