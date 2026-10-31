@@ -10,8 +10,8 @@ import {
   ActionsToolbar,
   type ToolbarAction,
   type ToolbarSettings,
-} from '@synapcity/frontend-ui/blocks/actions-toolbar';
-import { SettingsView } from '@synapcity/frontend-ui/blocks/settings-view';
+} from '@synapcity/frontend-blocks';
+import { SettingsView } from '@synapcity/frontend-blocks';
 import { Button } from '@synapcity/frontend-ui/core/button';
 import {
   Popover,

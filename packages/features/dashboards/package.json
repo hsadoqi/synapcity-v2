@@ -23,6 +23,7 @@
     "@synapcity/domain-grids": "workspace:*",
     "@synapcity/domain-prototypes": "workspace:*",
     "@synapcity/frontend-forms": "workspace:*",
+    "@synapcity/frontend-blocks": "workspace:*",
     "@synapcity/frontend-ui": "workspace:*",
     "lucide-react": "^1.55.0",
     "react": "19.3.1",

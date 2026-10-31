@@ -4,13 +4,9 @@ import {
   type PrototypeRecords,
 } from '@synapcity/domain-prototypes';
 
+import { eventTimeFormat } from '../../utils/time-format';
 import { WEEKDAY_SHORT } from '../../utils/weekdays';
 import { WidgetEmpty } from '../widget-states';
-
-const timeFormat = new Intl.DateTimeFormat(undefined, {
-  hour: 'numeric',
-  minute: '2-digit',
-});
 
 export function CalendarBody({
   events,
@@ -40,7 +36,7 @@ export function CalendarBody({
                 className="text-xs text-muted-foreground"
                 dateTime={event.startsAt}
               >
-                {timeFormat.format(startsAt)}
+                {eventTimeFormat.format(startsAt)}
               </time>
             </div>
           </li>
