@@ -1,1 +1,1 @@
-export { buildSchema, createSchemaBuilder } from './build-schema';
+export * from './build-schema';

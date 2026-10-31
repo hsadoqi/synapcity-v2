@@ -16,4 +16,3 @@ export * from './field-renderers/time-renderer';
 export * from './field-renderers/toggle-renderer';
 export * from './form-parts/form-renderer';
 export * from './form-parts/form-dialog';
-export * from './search-field';

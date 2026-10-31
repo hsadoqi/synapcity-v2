@@ -12,8 +12,8 @@ import {
   SelectValue,
 } from '@synapcity/frontend-ui/core/select';
 
-import type { FieldOption, FieldRendererProps } from '../../../../types';
-import { groupOptions } from '../../../../utils/group-options';
+import type { FieldOption, FieldRendererProps } from '../../../types';
+import { groupOptions } from '../../../utils/group-options';
 import { ComboboxRenderer, shouldVirtualize } from '../combobox-renderer';
 
 /**

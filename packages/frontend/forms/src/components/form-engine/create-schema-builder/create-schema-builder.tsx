@@ -1,11 +1,7 @@
 import z from 'zod';
 import { FormDefinition } from '../../../types';
 import { buildSchema } from '../build-schema';
-import {
-  SchemaMessages,
-  States,
-  requiredByEffect,
-} from '../build-schema/build-schema';
+import { SchemaMessages, States, requiredByEffect } from '../build-schema';
 
 /**
  * A `buildSchema` that remembers its results. The schema depends only on which

@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { FieldRendererProps } from '../../../../types';
+import type { FieldRendererProps } from '../../../types';
 import { TimeRenderer } from './time-renderer';
 
 const props = (

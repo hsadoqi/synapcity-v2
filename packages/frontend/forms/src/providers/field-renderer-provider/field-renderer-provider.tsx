@@ -2,8 +2,8 @@
 
 import { createContext, useContext, useState, type ReactNode } from 'react';
 
-import { createDefaultRegistry } from '../default-registry/create-default-registry';
-import type { FieldRendererRegistry } from '../field-renderer-registry/field-renderer-registry';
+import { createDefaultRegistry } from '../default-registry';
+import type { FieldRendererRegistry } from '../field-renderer-registry';
 
 const FieldRendererContext = createContext<FieldRendererRegistry | null>(null);
 

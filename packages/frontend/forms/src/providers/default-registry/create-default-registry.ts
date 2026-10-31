@@ -11,7 +11,7 @@ import { SelectRenderer } from '../../components/field-renderers/select-renderer
 import { TagsRenderer } from '../../components/field-renderers/tags-renderer';
 import { TimeRenderer } from '../../components/field-renderers/time-renderer';
 import { ToggleRenderer } from '../../components/field-renderers/toggle-renderer';
-import { FieldRendererRegistry } from '../field-renderer-registry/field-renderer-registry';
+import { FieldRendererRegistry } from '../field-renderer-registry';
 
 /** A registry with the built-in renderers; a new one each call, so it can be extended safely. */
 export function createDefaultRegistry(): FieldRendererRegistry {

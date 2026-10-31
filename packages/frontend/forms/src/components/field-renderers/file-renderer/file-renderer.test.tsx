@@ -1,8 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { FieldConfig } from '../../../../types';
-import type { FieldRendererProps } from '../../../../types';
+import type { FieldConfig } from '../../../types';
+import type { FieldRendererProps } from '../../../types';
 import { FileRenderer } from './file-renderer';
 
 const png = new File(['a'], 'a.png', { type: 'image/png' });

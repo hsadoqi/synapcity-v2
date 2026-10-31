@@ -1,10 +1,4 @@
-import { FieldBase, FieldOption } from './field-renderer';
-
-export type ConditionOperator =
-  'equals' | 'notEquals' | 'contains' | 'gt' | 'lt' | 'isEmpty';
-
-export type DependencyEffect =
-  'show' | 'hide' | 'enable' | 'disable' | 'require';
+import type { FieldBase, FieldOption } from './field-base';
 
 /**
  * Opt-in windowing for a long option list: only the rows in view are

@@ -7,7 +7,7 @@ import { createDefaultRegistry } from './create-default-registry';
 import {
   FieldRendererProvider,
   useFieldRendererRegistry,
-} from '../field-renderer-provider/field-renderer-provider';
+} from '../field-renderer-provider';
 
 const TYPES = [
   'text',

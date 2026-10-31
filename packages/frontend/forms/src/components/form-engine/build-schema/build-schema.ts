@@ -3,7 +3,7 @@ import { z } from 'zod';
 import type { FieldState, FormDefinition } from '../../../types';
 import { isEmptyValue } from '../../../utils/is-empty-value';
 
-export const DEFAULT_REQUIRED_MESSAGE = 'This field is required';
+const DEFAULT_REQUIRED_MESSAGE = 'This field is required';
 
 export interface SchemaMessages {
   readonly required?: string;

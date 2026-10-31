@@ -12,16 +12,14 @@ export type {
 } from '../components/form-engine/describe-schema-field';
 export { isEmptyValue } from './is-empty-value';
 export { resolveFieldStates } from '../components/form-engine/resolve-field-states';
-export {
-  buildSchema,
-  createSchemaBuilder,
-} from '../components/form-engine/build-schema';
+export { buildSchema } from '../components/form-engine/build-schema';
+export { createSchemaBuilder } from '../components/form-engine/create-schema-builder';
+export { createFormResolver } from '../components/form-engine/create-form-resolver';
 export { groupOptions } from './group-options';
 export type { GroupedOptions } from './group-options';
 export * from '../components/form-engine/form-feedback';
 export { firstFieldRefusal } from './first-field-refusal';
 export type { ActionFormRefusal } from './first-field-refusal';
-export { createFormResolver } from '../components/form-engine/create-form-resolver';
 export {
   ASYNC_DEFAULTS,
   asyncCheckKey,

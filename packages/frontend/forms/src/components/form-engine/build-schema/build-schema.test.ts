@@ -4,7 +4,8 @@ import { z } from 'zod';
 import type { FieldConfig, FieldDependency, FormRule } from '../../../types';
 import { defineForm } from '../define-form';
 import { resolveFieldStates } from '../resolve-field-states';
-import { buildSchema, createSchemaBuilder } from './build-schema';
+import { buildSchema } from './build-schema';
+import { createSchemaBuilder } from '../create-schema-builder';
 
 const schema = z.object({
   name: z.string().min(3, 'Too short'),

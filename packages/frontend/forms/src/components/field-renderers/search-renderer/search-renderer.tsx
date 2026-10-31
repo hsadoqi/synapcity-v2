@@ -3,7 +3,7 @@
 import type { Ref } from 'react';
 
 import type { FieldRendererProps } from '../../../types';
-import { SearchInput } from '../../search-field';
+import { SearchInput } from '@synapcity/frontend-blocks';
 
 /**
  * A search box as a form field: the search input with its magnifier. The

@@ -1,7 +1,14 @@
 export type {
+  AsyncFieldCheckContext,
+  AsyncFieldValidation,
   ConditionOperator,
-  CustomFieldConfig,
   DependencyEffect,
+  FieldCondition,
+  FieldDependency,
+  FieldOption,
+} from './field-base';
+export type {
+  CustomFieldConfig,
   FieldConfig,
   DateRangeFieldConfig,
   DateTimeFieldConfig,
@@ -28,11 +35,6 @@ export type {
   FieldRendererProps,
   FieldNamesOf,
   FieldState,
-  AsyncFieldCheckContext,
-  AsyncFieldValidation,
-  FieldCondition,
-  FieldDependency,
   FieldGroup,
-  FieldOption,
   FormRule,
 } from './field-renderer';

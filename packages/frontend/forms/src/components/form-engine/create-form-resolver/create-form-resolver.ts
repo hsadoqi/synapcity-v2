@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import type { FieldValues, Resolver } from 'react-hook-form';
 
 import type { FormDefinition } from '../../../types';
-import { createSchemaBuilder } from '../build-schema';
+import { createSchemaBuilder } from '../create-schema-builder';
 import { resolveFieldStates } from '../resolve-field-states';
 
 /**

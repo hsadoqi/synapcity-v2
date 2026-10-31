@@ -8,7 +8,7 @@ import {
   useFieldRendererRegistry,
 } from './field-renderer-provider';
 import type { FieldRenderer, FieldRendererProps } from '../../types';
-import { FieldRendererRegistry } from '../field-renderer-registry/field-renderer-registry';
+import { FieldRendererRegistry } from '../field-renderer-registry';
 
 const field: FieldConfig = { type: 'text', name: 'a', label: 'A' };
 const props: FieldRendererProps = {
