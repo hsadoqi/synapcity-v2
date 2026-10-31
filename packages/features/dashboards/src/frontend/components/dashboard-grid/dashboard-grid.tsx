@@ -16,6 +16,7 @@ import ReactGridLayout, {
 
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 
+import { usePaletteOpener } from '../../config';
 import {
   keyboardDelta,
   useDashboardStore,
@@ -79,9 +80,12 @@ export function DashboardGrid() {
   const composition = useDashboardStore((s) => s.composition);
   const breakpoint = useDashboardStore((s) => s.breakpoint);
   const editMode = useDashboardStore((s) => s.editMode);
+  const readOnly = useDashboardStore((s) => s.readOnly);
   const selectedWidgetId = useDashboardStore((s) => s.selectedWidgetId);
   const selectWidget = useDashboardStore((s) => s.selectWidget);
   const nudgeWidget = useDashboardStore((s) => s.nudgeWidget);
+  const toggleEditMode = useDashboardStore((s) => s.toggleEditMode);
+  const openPalette = usePaletteOpener();
   const applyLayoutChange = useDashboardStore((s) => s.applyLayoutChange);
   const { width, containerRef, mounted } = useContainerWidth({
     measureBeforeMount: true,
@@ -95,8 +99,6 @@ export function DashboardGrid() {
     [composition, breakpoint],
   );
   const minWidth = minGridWidth(cols);
-
-  if (layout.length === 0) return <DashboardEmptyState />;
 
   /**
    * Keyboard select and move, edit mode only. Acts only when the wrapper
@@ -126,8 +128,20 @@ export function DashboardGrid() {
   };
 
   return (
+    // The container is always rendered, even when empty: the width hook
+    // measures it once, on mount, so a container that first appears with the
+    // first widget would never be measured and the grid would never show.
     <div ref={containerRef} className="w-full">
-      {mounted && (
+      {layout.length === 0 && (
+        <DashboardEmptyState
+          readOnly={readOnly}
+          onAdd={() => {
+            if (!editMode) toggleEditMode();
+            openPalette();
+          }}
+        />
+      )}
+      {layout.length > 0 && mounted && (
         <ReactGridLayout
           className="dashboard-grid"
           width={Math.max(width, minWidth)}
@@ -156,6 +170,7 @@ export function DashboardGrid() {
             return (
               <div
                 key={item.i}
+                data-widget-id={item.i}
                 role="group"
                 tabIndex={editMode ? 0 : undefined}
                 aria-label={

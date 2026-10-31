@@ -8,11 +8,11 @@ Category rules: [features README](../README.md) and [ADR-0014](../../../docs/arc
 
 No root entry (workspace conventions, Entry points 3).
 
-| Entry                                  | Runtime                                          | Exports                                                                                                                                                             |
-| -------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@synapcity/features-spaces/contracts` | Portable types                                   | `Space`, `DocumentItem`, `DashboardItem`, `SetSpacePinnedResult`                                                                                                    |
-| `@synapcity/features-spaces/frontend`  | React; Server and Client Components              | `SpacesCollection`, `SpacesCollectionSkeleton`, `SpaceContent`, `RecordSpaceView`                                                                                   |
-| `@synapcity/features-spaces/server`    | Server only (starts with `import 'server-only'`) | `SpaceSource` and `SetPinnedOutcome` (the port), `serverSpaceSource(client)` (over `server-data`), `getSpace(source, spaceId, { onItemsError })`, `GetSpaceOptions` |
+| Entry                                  | Runtime                                          | Exports                                                                                                                                                                               |
+| -------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@synapcity/features-spaces/contracts` | Portable types                                   | `Space`, `DocumentItem`, `DashboardItem`, `SetSpacePinnedResult`                                                                                                                      |
+| `@synapcity/features-spaces/frontend`  | React; Server and Client Components              | `SpacesCollection`, `SpacesCollectionSkeleton`, `SpaceContent`, `RecordSpaceView`                                                                                                     |
+| `@synapcity/features-spaces/server`    | Server only (starts with `import 'server-only'`) | `SpaceSource`, `SetPinnedOutcome` and `CreatedOutcome` (the port), `serverSpaceSource(client)` (over `server-data`), `getSpace(source, spaceId, { onItemsError })`, `GetSpaceOptions` |
 
 ## What the host supplies
 

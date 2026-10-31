@@ -1,1 +1,5 @@
-export type { SetPinnedOutcome, SpaceSource } from './space-source';
+export type {
+  CreatedOutcome,
+  SetPinnedOutcome,
+  SpaceSource,
+} from './space-source';

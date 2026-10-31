@@ -68,6 +68,13 @@ describe('fixtureSpaceSource', () => {
     });
   });
 
+  it('does not create: a new Space comes back as a fixture-mode failure', async () => {
+    await expect(source.create({ name: 'Garden plans' })).resolves.toEqual({
+      ok: false,
+      error: { code: 'fixture_mode' },
+    });
+  });
+
   it('records no view and reports success', async () => {
     await expect(source.recordView(DEMO_SPACES[0]!.id)).resolves.toEqual({
       ok: true,

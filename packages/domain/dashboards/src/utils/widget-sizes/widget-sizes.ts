@@ -2,6 +2,13 @@ import type { BreakpointSizes } from '@synapcity/domain-grids';
 
 import type { WidgetType } from '../../types';
 
+/** Link widgets list a few rows; the same size at every breakpoint. */
+const LINK_SIZES: BreakpointSizes = {
+  lg: { w: 1, h: 4, minW: 1, minH: 3 },
+  md: { w: 1, h: 4, minW: 1, minH: 3 },
+  sm: { w: 1, h: 5, minW: 1, minH: 3 },
+};
+
 /** Default and minimum size of each widget type per breakpoint, from the prototype. */
 export const WIDGET_SIZES: Record<WidgetType, BreakpointSizes> = {
   stat: {
@@ -45,4 +52,7 @@ export const WIDGET_SIZES: Record<WidgetType, BreakpointSizes> = {
     md: { w: 1, h: 5, minW: 1, minH: 3 },
     sm: { w: 1, h: 6, minW: 1, minH: 4 },
   },
+  pinned: LINK_SIZES,
+  'last-opened': LINK_SIZES,
+  spaces: LINK_SIZES,
 };

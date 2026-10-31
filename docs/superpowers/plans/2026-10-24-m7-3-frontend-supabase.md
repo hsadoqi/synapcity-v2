@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Planned (2026-10-24). Not implemented. Needs the owner's go-ahead for the task scope and an answer to the thin-package question below.
+**Status:** Implemented on `refactor/m7-3-frontend-supabase` (2026-10-25). The owner chose option (a) of the thin-package question and approved the scope. Task 1 is done; Task 2 steps 1 to 3 are done (the repository gate passed locally and in CI on pull request #71) and the manual check in step 4 is open.
 
 **Goal:** The browser Supabase client factory and the auth-event rule leave `apps/web` for a new `@synapcity/frontend-supabase` package, the only frontend package importing `@supabase/*`. No behavior changes.
 
@@ -31,18 +31,19 @@ This package would hold about 35 lines of source. ADR-0015 lists a thin wrapper 
 
 ### Task 1: Create the package with its first code
 
-- [ ] **Step 1: Write the failing tests:** `createBrowserSupabaseClient({ url, publishableKey })` returns a client built by `createBrowserClient` with those values (mock the SDK); `shouldRefreshOnAuthEvent` keeps the existing `auth-events.test.ts` cases unchanged.
-- [ ] **Step 2: Create the package** (manifest, tsconfig, eslint and vitest configs, README with `Owns:`, `src/index.ts`, unit folders with `index.ts`); add the Vitest project to the root config; `pnpm install`.
-- [ ] **Step 3: Move `auth-events` and its test; add `createBrowserSupabaseClient`.** Keep the function bodies byte for byte.
-- [ ] **Step 4: Re-point the host.** `lib/supabase/client.ts` becomes `createClient()` calling the package with `getSupabaseEnv()`; `user-provider.tsx` imports `shouldRefreshOnAuthEvent` from the package; delete `features/auth/client/auth-events/` and its export in `client/index.ts`. Remove the auth-client barrel cycle only if this move resolves it (the R9 exception for `auth/client` is removed in M7.5, not here).
-- [ ] **Step 5: Run the checks** one script at a time: package `test`, `lint`, `check-types`; web `check-types`, `lint`, and the auth and `lib/supabase` tests; `pnpm boundaries`; `pnpm deps`. Expected: pass; `rg -n "@supabase/" apps/web/src` lists only server-side files and `lib/supabase/{client,env}`-level host code.
-- [ ] **Step 6: Checkpoint commit** (if authorized): `feat(frontend-supabase): add the package with the browser client and the auth-event rule`.
+- [x] **Step 1: Write the failing tests:** `createBrowserSupabaseClient({ url, publishableKey })` returns a client built by `createBrowserClient` with those values (mock the SDK); `shouldRefreshOnAuthEvent` keeps the existing `auth-events.test.ts` cases unchanged.
+- [x] **Step 2: Create the package** (manifest, tsconfig, eslint and vitest configs, README with `Owns:`, `src/index.ts`, unit folders with `index.ts`); add the Vitest project to the root config; `pnpm install`.
+- [x] **Step 3: Move `auth-events` and its test; add `createBrowserSupabaseClient`.** Keep the function bodies byte for byte.
+- [x] **Step 4: Re-point the host.** `lib/supabase/client.ts` becomes `createClient()` calling the package with `getSupabaseEnv()`; `user-provider.tsx` imports `shouldRefreshOnAuthEvent` from the package; delete `features/auth/client/auth-events/` and its export in `client/index.ts`. Remove the auth-client barrel cycle only if this move resolves it (the R9 exception for `auth/client` is removed in M7.5, not here).
+- [x] **Step 5: Run the checks** one script at a time: package `test`, `lint`, `check-types`; web `check-types`, `lint`, and the auth and `lib/supabase` tests; `pnpm boundaries`; `pnpm deps`. Expected: pass; `rg -n "@supabase/" apps/web/src` lists only server-side files and `lib/supabase/{client,env}`-level host code.
+- [x] **Step 6: Checkpoint commit** (if authorized): `feat(frontend-supabase): add the package with the browser client and the auth-event rule`.
 
 ### Task 2: Records and verification
 
-- [ ] **Step 1: Update the records:** the package README, the workspace-conventions inventory row (`frontend-supabase`: M7.3, exists), the ownership map `lib/supabase` row, the M7 design status, and `.agents/task-scope.md`. No owner quotes.
-- [ ] **Step 2: Boundary probe** (planted, then removed): `import 'next/link'` in the package should report R11; a server import should report R3.
-- [ ] **Step 3: Repository gate.** `pnpm verify` with nothing else running (or CI on the pull request).
+- [x] **Step 1: Update the records:** the package README, the workspace-conventions inventory row (`frontend-supabase`: M7.3, exists), the ownership map `lib/supabase` row, the M7 design status, and `.agents/task-scope.md`. No owner quotes.
+- [x] **Step 2: Boundary probe** (planted, then removed): `import 'next/link'` in the package should report R11; a server import should report R3.
+  - Result (2026-10-25): both planted imports were reported, but as R0 (import does not resolve), because the package declares neither `next` nor a server package. R3 and R11 did not fire, so those rules were not exercised here; the undeclared dependency is the guard.
+- [x] **Step 3: Repository gate.** `pnpm verify` with nothing else running (or CI on the pull request).
 - [ ] **Step 4: Report** per AGENTS.md section 9. Manual: sign in, open Settings in two tabs, sign out in one, and see the other refresh; change an email address and see the pending state.
 
 ## Calls made (owner to check)

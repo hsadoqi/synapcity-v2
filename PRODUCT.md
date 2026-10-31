@@ -193,7 +193,7 @@ Unresolved. Final product positioning and initial-user framing are on the Open p
 
 ## Brand commitments
 
-The owner has confirmed two identity commitments, both held in `apps/web/public/brand-assets`:
+The owner has confirmed two identity commitments, both held in `@synapcity/frontend-brand` (`packages/frontend/brand`, the canonical owner; `apps/web/public/brand-assets` carries its stable public outputs):
 
 - the wordmark is the lowercase word "synapcity";
 - the mark is two overlapping rounded squares with a solid inner rectangle, with the `*-monochrome.svg` files (`logo-monochrome.svg`, `wordmark-monochrome.svg`) as the single-colour variants that do not depend on any accent.
@@ -202,7 +202,7 @@ No other brand fact is committed here. Type families, accent colour and any othe
 
 ## Evidence on hand
 
-- Brand assets: `apps/web/public/brand-assets` (mark, wordmark and logo, in colour-scheme-aware and monochrome variants). The favicon and app icons live in each app's `src/app` directory (`apps/web`, `apps/docs`), and the Open Graph card is the shared `OpenGraphCard` in `@synapcity/frontend-site`, drawn from an embedded copy of `logo-monochrome.svg`.
+- Brand assets: `@synapcity/frontend-brand` owns the geometry, components and canonical SVGs (mark, wordmark and logo, in colour-scheme-aware and monochrome variants); `apps/web/public/brand-assets` serves them at stable public URLs as generated outputs. The favicon and app icons live in each app's `src/app` directory (`apps/web`, `apps/docs`), and the Open Graph card is the shared `OpenGraphCard` in `@synapcity/frontend-site`, which draws the logo with the brand package's server-safe SVG builder.
 - No testimonials, customers, benchmarks, pricing or usage data are recorded in this repository. Future work must not fabricate them.
 
 ## Product principles

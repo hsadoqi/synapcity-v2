@@ -86,7 +86,7 @@ export const SelectsADate: Story = {
     await expect(args.onValueChange).toHaveBeenLastCalledWith(
       new Date(2026, 4, 11),
     );
-    await expect(trigger).toHaveTextContent('May 11th, 2026');
+    await expect(trigger).toHaveTextContent('May 11, 2026');
     await waitFor(() => expect(screen.queryByRole('grid')).toBeNull());
   },
 };

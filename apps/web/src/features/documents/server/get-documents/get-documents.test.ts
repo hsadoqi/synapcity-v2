@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   createClient: vi.fn(),
-  listOwnedRecordSummaries: vi.fn(),
+  listRecordSummaries: vi.fn(),
+  findRecord: vi.fn(),
   fixtureModeEnabled: vi.fn(() => false),
 }));
 
@@ -10,12 +11,13 @@ vi.mock('@/lib/supabase/server', () => ({ createClient: mocks.createClient }));
 vi.mock('@/lib/access/dev-fixture', () => ({
   fixtureModeEnabled: mocks.fixtureModeEnabled,
 }));
-vi.mock('@/lib/owned-records', () => ({
-  listOwnedRecordSummaries: mocks.listOwnedRecordSummaries,
+vi.mock('@synapcity/server-data', () => ({
+  listRecordSummaries: mocks.listRecordSummaries,
+  findRecord: mocks.findRecord,
 }));
 
 import { DOCUMENT_FIXTURES } from '../../lib/fixtures';
-import { getDocuments } from './get-documents';
+import { getDocument, getDocuments } from './get-documents';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -25,10 +27,10 @@ beforeEach(() => {
 
 describe('getDocuments', () => {
   it('reads the owner’s documents from the database', async () => {
-    mocks.listOwnedRecordSummaries.mockResolvedValue([...DOCUMENT_FIXTURES]);
+    mocks.listRecordSummaries.mockResolvedValue([...DOCUMENT_FIXTURES]);
 
     await expect(getDocuments()).resolves.toEqual([...DOCUMENT_FIXTURES]);
-    expect(mocks.listOwnedRecordSummaries).toHaveBeenCalledWith(
+    expect(mocks.listRecordSummaries).toHaveBeenCalledWith(
       'client',
       'documents',
     );
@@ -36,7 +38,7 @@ describe('getDocuments', () => {
 
   it('propagates failures', async () => {
     const error = new Error('Connection failed');
-    mocks.listOwnedRecordSummaries.mockRejectedValue(error);
+    mocks.listRecordSummaries.mockRejectedValue(error);
 
     await expect(getDocuments()).rejects.toBe(error);
   });
@@ -45,6 +47,29 @@ describe('getDocuments', () => {
     mocks.fixtureModeEnabled.mockReturnValue(true);
 
     await expect(getDocuments()).resolves.toEqual([...DOCUMENT_FIXTURES]);
+    expect(mocks.createClient).not.toHaveBeenCalled();
+  });
+});
+
+describe('getDocument', () => {
+  const sample = DOCUMENT_FIXTURES[0]!;
+
+  it('reads one of the owner’s documents from the database', async () => {
+    mocks.findRecord.mockResolvedValue(sample);
+
+    await expect(getDocument(sample.id)).resolves.toBe(sample);
+    expect(mocks.findRecord).toHaveBeenCalledWith(
+      'client',
+      'documents',
+      sample.id,
+    );
+  });
+
+  it('reads the sample record in fixture mode, and null for an unknown id', async () => {
+    mocks.fixtureModeEnabled.mockReturnValue(true);
+
+    await expect(getDocument(sample.id)).resolves.toEqual(sample);
+    await expect(getDocument('missing')).resolves.toBeNull();
     expect(mocks.createClient).not.toHaveBeenCalled();
   });
 });

@@ -2,7 +2,7 @@
 
 Owns: the facts the apps share about the site (name, description, language), the root `Metadata` builder, and the Open Graph card.
 
-It owns no logo geometry (that is `SynapcityLogo` in `@synapcity/frontend-ui`), no theme tokens, and no page-specific titles or descriptions; each app passes its own. It sets no `metadataBase` or production URL, which waits on the deployment topology decision ([decisions index](../../../docs/architecture/decisions/README.md)).
+It owns no logo geometry (that is `@synapcity/frontend-brand`; the card draws the logo with its `svg` entry), no theme tokens, and no page-specific titles or descriptions; each app passes its own. It sets no `metadataBase` or production URL, which waits on the deployment topology decision ([decisions index](../../../docs/architecture/decisions/README.md)).
 
 ## Entry points
 
@@ -37,4 +37,4 @@ Each app declares `alt`, `size` and `contentType` itself: the Next docs show the
 ## Rules
 
 - No `next/og`, routing, request APIs, Server Actions or imports from `apps/*`. The only Next reference is the `Metadata` type, imported as a type ([workspace conventions](../../../docs/architecture/workspace-conventions.md)).
-- Icons (`icon.svg`, `apple-icon.png`, `favicon.ico`) stay in each app's `app/` directory; Next only recognises them there. They are exports of the logo in `logo-mark.tsx`, as are the SVG string in `src/open-graph.tsx` and `apps/web/public/brand-assets`. `pnpm brand:check` (part of `pnpm verify`) fails when the SVGs drift from the geometry or the apps' icon files differ; it cannot check the PNG and ICO rasters, so re-export those by hand.
+- Icons (`icon.svg`, `apple-icon.png`, `favicon.ico`) stay in each app's `app/` directory; Next only recognises them there. `icon.svg` is generated from `@synapcity/frontend-brand`, and `pnpm brand:check` (part of `pnpm verify`) fails when it, the web public brand files or the logo the card embeds drift; it cannot check the PNG and ICO rasters, which have no generator ([brand README](../brand/README.md)).

@@ -61,6 +61,9 @@ export const Sizes: Story = {
       <Button {...args} size="lg">
         Large
       </Button>
+      <Button {...args} size="xl">
+        Extra large
+      </Button>
     </div>
   ),
 };
@@ -77,16 +80,16 @@ export const IconOnly: Story = {
 
 export const Disabled: Story = { args: { disabled: true } };
 
-/** `toggle` makes the button report pressed state with `aria-pressed`. */
-export const Toggle: Story = {
-  args: { toggle: true, variant: 'outline', children: 'Pin' },
-};
-
-export const TogglePressed: Story = {
-  args: {
-    toggle: true,
-    defaultPressed: true,
-    variant: 'outline',
-    children: 'Pin',
-  },
+/**
+ * `iconOnly` turns a text size into its square icon size (`sm` to
+ * `icon-sm`). Hover or focus shows `label` in a tooltip. Anything with an
+ * on/off state is a Toggle, not a Button.
+ */
+export const IconOnlyFromSize: Story = {
+  args: { label: 'Add item', size: 'sm', iconOnly: true, variant: 'ghost' },
+  render: (args) => (
+    <Button {...args}>
+      <PlusIcon aria-hidden />
+    </Button>
+  ),
 };

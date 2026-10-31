@@ -1,7 +1,7 @@
-import { fixtureModeEnabled } from '@/lib/access/dev-fixture';
-import { createClient } from '@/lib/supabase/server';
+import { fixtureModeEnabled } from '../access/dev-fixture';
+import { createClient } from '../supabase/server';
 
-import { fixtureSpaceSource } from '@/lib/demo/space-source';
+import { fixtureSpaceSource } from '../demo/space-source';
 import {
   serverSpaceSource,
   type SpaceSource,

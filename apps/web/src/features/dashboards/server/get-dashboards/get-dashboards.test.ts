@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   createClient: vi.fn(),
-  listOwnedRecordSummaries: vi.fn(),
+  listRecordSummaries: vi.fn(),
+  findRecord: vi.fn(),
   fixtureModeEnabled: vi.fn(() => false),
 }));
 
@@ -10,12 +11,13 @@ vi.mock('@/lib/supabase/server', () => ({ createClient: mocks.createClient }));
 vi.mock('@/lib/access/dev-fixture', () => ({
   fixtureModeEnabled: mocks.fixtureModeEnabled,
 }));
-vi.mock('@/lib/owned-records', () => ({
-  listOwnedRecordSummaries: mocks.listOwnedRecordSummaries,
+vi.mock('@synapcity/server-data', () => ({
+  listRecordSummaries: mocks.listRecordSummaries,
+  findRecord: mocks.findRecord,
 }));
 
 import { DASHBOARD_FIXTURES } from '../../lib/fixtures';
-import { getDashboards } from './get-dashboards';
+import { getDashboard, getDashboards } from './get-dashboards';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -25,10 +27,10 @@ beforeEach(() => {
 
 describe('getDashboards', () => {
   it('reads the owner’s dashboards from the database', async () => {
-    mocks.listOwnedRecordSummaries.mockResolvedValue([...DASHBOARD_FIXTURES]);
+    mocks.listRecordSummaries.mockResolvedValue([...DASHBOARD_FIXTURES]);
 
     await expect(getDashboards()).resolves.toEqual([...DASHBOARD_FIXTURES]);
-    expect(mocks.listOwnedRecordSummaries).toHaveBeenCalledWith(
+    expect(mocks.listRecordSummaries).toHaveBeenCalledWith(
       'client',
       'dashboards',
     );
@@ -36,7 +38,7 @@ describe('getDashboards', () => {
 
   it('propagates failures', async () => {
     const error = new Error('Connection failed');
-    mocks.listOwnedRecordSummaries.mockRejectedValue(error);
+    mocks.listRecordSummaries.mockRejectedValue(error);
 
     await expect(getDashboards()).rejects.toBe(error);
   });
@@ -45,6 +47,29 @@ describe('getDashboards', () => {
     mocks.fixtureModeEnabled.mockReturnValue(true);
 
     await expect(getDashboards()).resolves.toEqual([...DASHBOARD_FIXTURES]);
+    expect(mocks.createClient).not.toHaveBeenCalled();
+  });
+});
+
+describe('getDashboard', () => {
+  const sample = DASHBOARD_FIXTURES[0]!;
+
+  it('reads one of the owner’s dashboards from the database', async () => {
+    mocks.findRecord.mockResolvedValue(sample);
+
+    await expect(getDashboard(sample.id)).resolves.toBe(sample);
+    expect(mocks.findRecord).toHaveBeenCalledWith(
+      'client',
+      'dashboards',
+      sample.id,
+    );
+  });
+
+  it('reads the sample record in fixture mode, and null for an unknown id', async () => {
+    mocks.fixtureModeEnabled.mockReturnValue(true);
+
+    await expect(getDashboard(sample.id)).resolves.toEqual(sample);
+    await expect(getDashboard('missing')).resolves.toBeNull();
     expect(mocks.createClient).not.toHaveBeenCalled();
   });
 });

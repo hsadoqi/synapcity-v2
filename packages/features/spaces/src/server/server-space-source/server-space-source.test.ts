@@ -2,6 +2,7 @@ import type { SupabaseServerClient } from '@synapcity/server-supabase';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const data = vi.hoisted(() => ({
+  createRecord: vi.fn(),
   findSpace: vi.fn(),
   listSpaceDashboards: vi.fn(),
   listSpaceDocuments: vi.fn(),
@@ -41,6 +42,18 @@ describe('serverSpaceSource', () => {
       expect(data[fn]).toHaveBeenCalledWith(client, ...args);
     },
   );
+
+  it('creates a Space through createRecord with only its name', async () => {
+    const result = { ok: true, id: ID };
+    data.createRecord.mockResolvedValue(result);
+
+    await expect(
+      serverSpaceSource(client).create({ name: 'Garden plans' }),
+    ).resolves.toBe(result);
+    expect(data.createRecord).toHaveBeenCalledWith(client, 'spaces', {
+      name: 'Garden plans',
+    });
+  });
 
   it('records a view with the current time', async () => {
     data.recordSpaceView.mockResolvedValue({ ok: true });

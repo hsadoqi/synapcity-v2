@@ -8,7 +8,8 @@ import {
   fromRow,
   type OwnedRow,
   type SpaceSummaryRow,
-} from '../space-row';
+} from '../../owned-row';
+import { readError } from '../../read-error';
 
 /**
  * The signed-in owner's spaces, newest first. Row-level security scopes the
@@ -22,7 +23,7 @@ export async function listSpaces(
     .select(COLUMNS)
     .order('created_at', { ascending: false });
 
-  if (error) throw new Error(`Failed to load spaces: ${error.message}`);
+  if (error) throw readError('spaces', error);
   return (data satisfies OwnedRow[]).map(fromRow);
 }
 
@@ -38,8 +39,8 @@ export async function listSpaceSummaries(
     .select(`${COLUMNS}, space_documents(count), space_dashboards(count)`)
     .order('created_at', { ascending: false });
 
-  if (error) throw new Error(`Failed to load spaces: ${error.message}`);
-  return (data as unknown as SpaceSummaryRow[]).map((row) => ({
+  if (error) throw readError('spaces', error);
+  return (data satisfies SpaceSummaryRow[]).map((row) => ({
     ...fromRow(row),
     documentsTotal: countOf(row.space_documents),
     dashboardsTotal: countOf(row.space_dashboards),
@@ -60,7 +61,6 @@ export async function findSpace(
     .eq('id', spaceId)
     .maybeSingle();
 
-  if (error)
-    throw new Error(`Failed to load space ${spaceId}: ${error.message}`);
+  if (error) throw readError(`space ${spaceId}`, error);
   return data ? fromRow(data satisfies OwnedRow) : null;
 }

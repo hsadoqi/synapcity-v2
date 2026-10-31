@@ -1,4 +1,5 @@
 import {
+  createRecord,
   findSpace,
   listSpaceDashboards,
   listSpaceDocuments,
@@ -17,6 +18,7 @@ export function serverSpaceSource(client: SupabaseServerClient): SpaceSource {
     list: () => listSpaces(client),
     listSummaries: () => listSpaceSummaries(client),
     find: (spaceId) => findSpace(client, spaceId),
+    create: (input) => createRecord(client, 'spaces', input),
     setPinned: (spaceId, pinned) => setSpacePinned(client, spaceId, pinned),
     recordView: (spaceId) => recordSpaceView(client, spaceId, new Date()),
     listDocuments: (spaceId) => listSpaceDocuments(client, spaceId),

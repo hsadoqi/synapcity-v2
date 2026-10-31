@@ -26,8 +26,8 @@ describe('DateRangeRenderer', () => {
       />,
     );
 
-    expect(screen.getByRole('button').textContent).toContain('Jan 01, 2026');
-    expect(screen.getByRole('button').textContent).toContain('Jan 05, 2026');
+    expect(screen.getByRole('button').textContent).toContain('Jan 1, 2026');
+    expect(screen.getByRole('button').textContent).toContain('Jan 5, 2026');
     const hidden = Object.fromEntries(
       [...container.querySelectorAll('input[type="hidden"]')].map((input) => [
         (input as HTMLInputElement).name,

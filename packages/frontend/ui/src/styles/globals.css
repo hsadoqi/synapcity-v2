@@ -2,4 +2,4 @@
 @import '@synapcity/frontend-tailwind-config';
 @import '@synapcity/frontend-tokens/tokens.css';
 
-@source '../';
+@source '../../src';

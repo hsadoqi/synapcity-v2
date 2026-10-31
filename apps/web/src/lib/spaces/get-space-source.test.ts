@@ -13,7 +13,7 @@ vi.mock('@synapcity/features-spaces/server', () => ({
   serverSpaceSource: mocks.serverSpaceSource,
 }));
 
-import { DEMO_SPACES } from '@/lib/demo/space-source';
+import { DEMO_SPACES } from '../demo/space-source';
 import { getSpaceSource } from './get-space-source';
 
 describe('getSpaceSource', () => {

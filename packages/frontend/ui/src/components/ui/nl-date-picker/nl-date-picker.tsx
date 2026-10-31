@@ -4,6 +4,8 @@ import * as React from 'react';
 import { parseDate } from 'chrono-node';
 import { CalendarIcon } from 'lucide-react';
 
+import type { DateTimeFormatting } from '@synapcity/domain-preferences';
+import { useDateTimeFormatting } from '@synapcity/frontend-preferences';
 import { Calendar } from '@synapcity/frontend-ui/core/calendar';
 import { Field, FieldLabel } from '@synapcity/frontend-ui/core/field';
 import {
@@ -17,20 +19,22 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@synapcity/frontend-ui/core/popover';
+import { formatCalendarDay } from '@synapcity/frontend-ui/lib/calendar-utils';
 
-function formatDate(date: Date | undefined) {
+function formatDate(date: Date | undefined, formatting: DateTimeFormatting) {
   if (!date) {
     return '';
   }
 
-  return date.toLocaleDateString('en-US', {
-    day: '2-digit',
+  return formatCalendarDay(date, formatting, {
+    weekday: false,
+    year: true,
     month: 'long',
-    year: 'numeric',
   });
 }
 
 export function NLDatePicker() {
+  const formatting = useDateTimeFormatting();
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState('In 2 days');
   const [date, setDate] = React.useState<Date | undefined>(
@@ -86,7 +90,7 @@ export function NLDatePicker() {
                 defaultMonth={date}
                 onSelect={(date) => {
                   setDate(date);
-                  setValue(formatDate(date));
+                  setValue(formatDate(date, formatting));
                   setOpen(false);
                 }}
               />
@@ -96,7 +100,7 @@ export function NLDatePicker() {
       </InputGroup>
       <div className="px-1 text-sm text-muted-foreground">
         Your post will be published on{' '}
-        <span className="font-medium">{formatDate(date)}</span>.
+        <span className="font-medium">{formatDate(date, formatting)}</span>.
       </div>
     </Field>
   );

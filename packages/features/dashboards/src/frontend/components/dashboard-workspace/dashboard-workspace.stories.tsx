@@ -103,3 +103,130 @@ export const LiveData: Story = {
     );
   },
 };
+
+const LINK_ITEMS = [
+  {
+    id: 'space-1',
+    kind: 'space' as const,
+    name: 'Research',
+    icon: 'folder',
+    href: '/home/spaces/space-1',
+    pinnedAt: '2026-10-20T09:00:00Z',
+    lastViewedAt: '2026-10-28T09:00:00Z',
+  },
+  {
+    id: 'dash-2',
+    kind: 'dashboard' as const,
+    name: 'Weekly review',
+    icon: 'layout-dashboard',
+    href: '/home/dashboards/dash-2',
+    pinnedAt: null,
+    lastViewedAt: '2026-10-27T09:00:00Z',
+  },
+];
+
+/** A storage that behaves like the server adapter: revisioned, one outcome per save. */
+function revisionedStorage(
+  outcome: (
+    base: number,
+  ) => Awaited<
+    ReturnType<import('../../../contracts').DashboardStorage['saveComposition']>
+  >,
+) {
+  return {
+    load: async () => ({ composition: null, records: null, revision: 0 }),
+    saveComposition: async (_id: string, _c: unknown, base: number) =>
+      outcome(base),
+    saveRecords: async () => {},
+  };
+}
+
+const serverArgs = {
+  items: LINK_ITEMS,
+  widgetTypes: ['pinned', 'last-opened', 'spaces'] as const,
+  persistsStatus: false,
+};
+
+/** An empty dashboard on the server adapter, with Add a widget. */
+export const EmptyEditable: Story = {
+  args: serverArgs,
+  render: (args) => (
+    <DashboardWorkspace
+      {...args}
+      storage={revisionedStorage((base) => ({ ok: true, revision: base + 1 }))}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    await expect(
+      await within(canvasElement).findByRole('button', {
+        name: 'Add a widget',
+      }),
+    ).toBeVisible();
+  },
+};
+
+/** Add a widget, and the save is confirmed. */
+export const AddedAndSaved: Story = {
+  args: serverArgs,
+  render: (args) => (
+    <DashboardWorkspace
+      {...args}
+      storage={revisionedStorage((base) => ({ ok: true, revision: base + 1 }))}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      await canvas.findByRole('button', { name: 'Add a widget' }),
+    );
+    await userEvent.click(canvas.getByRole('button', { name: 'Pinned' }));
+    await expect(await canvas.findByText('Research')).toBeVisible();
+    await expect(await canvas.findByText('Saved')).toBeVisible();
+  },
+};
+
+/** The save fails: the status says Not saved and offers Retry. */
+export const SaveFailed: Story = {
+  args: serverArgs,
+  render: (args) => (
+    <DashboardWorkspace
+      {...args}
+      storage={revisionedStorage(() => ({
+        ok: false,
+        reason: 'failed',
+        message: 'Could not save your changes. Try again.',
+      }))}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      await canvas.findByRole('button', { name: 'Add a widget' }),
+    );
+    await userEvent.click(canvas.getByRole('button', { name: 'Pinned' }));
+    await expect(
+      await canvas.findByRole('button', { name: 'Retry' }, { timeout: 4000 }),
+    ).toBeVisible();
+  },
+};
+
+/** The stored dashboard moved on: Changed elsewhere, with Reload. */
+export const Conflict: Story = {
+  args: serverArgs,
+  render: (args) => (
+    <DashboardWorkspace
+      {...args}
+      storage={revisionedStorage(() => ({ ok: false, reason: 'conflict' }))}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      await canvas.findByRole('button', { name: 'Add a widget' }),
+    );
+    await userEvent.click(canvas.getByRole('button', { name: 'Pinned' }));
+    await expect(
+      await canvas.findByRole('button', { name: 'Reload' }),
+    ).toBeVisible();
+  },
+};

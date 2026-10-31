@@ -18,6 +18,7 @@ export function fixtureSpaceSource(): SpaceSource {
       })),
     find: async (spaceId) =>
       DEMO_SPACES.find((space) => space.id === spaceId) ?? null,
+    create: async () => ({ ok: false, error: { code: 'fixture_mode' } }),
     setPinned: async () => ({ ok: false, error: { code: 'fixture_mode' } }),
     recordView: async () => ({ ok: true }),
     listDocuments: async () => [...DEMO_DOCUMENTS],

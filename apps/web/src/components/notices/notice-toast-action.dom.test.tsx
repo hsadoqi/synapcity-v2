@@ -20,7 +20,8 @@ vi.mock('@synapcity/frontend-ui/core/toast', () => ({
   toast: { add: mocks.add, close: mocks.close },
 }));
 vi.mock('@/lib/routing/notices', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/lib/routing/notices')>();
+  const actual =
+    await importOriginal<typeof import('../../lib/routing/notices')>();
   const NOTICES = {
     'with-action': {
       type: 'success',

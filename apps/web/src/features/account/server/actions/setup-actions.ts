@@ -3,19 +3,22 @@
 import { revalidatePath } from 'next/cache';
 
 import { checkName } from '@synapcity/domain-identity';
-import type { ProfileState } from '@/features/account/types';
+import type { ProfileState } from '@synapcity/features-account/contracts';
 import {
   getCaller,
   mirrorToSession,
-  SAVE_FAILED,
   SHOWS_LATER,
   type MetadataPatch,
 } from '../caller';
+import { SAVE_FAILED } from '@/lib/access/caller';
 import { saveAvatar } from '../save-avatar';
 import { saveName } from '../save-name';
-import { withProfileConfirmed } from '../profile-metadata';
-import { createClient } from '@/lib/supabase/server';
-import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
+import { withProfileConfirmed } from '@synapcity/server-account';
+import { createClient } from '../../../../lib/supabase/server';
+import {
+  FIXTURE_MESSAGE,
+  fixtureModeEnabled,
+} from '../../../../lib/access/dev-fixture';
 
 /**
  * Confirms the name and photo a new account starts with. The name may come

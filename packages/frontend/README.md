@@ -83,18 +83,19 @@ The host supplies where a link leads and how an action is invoked. A callback ex
 - `collection` ----> Browse behavior and DOM collection views
 - `settings` ----> Reusable settings presentation (rows, sections, editor controls); the editing workflow is `features/settings`
 - `auth` ----> Reusable authentication presentation (form pieces, status and confirmation views); auth workflows are `features/auth`
-- `supabase` ----> Browser Supabase client adapter
+- `supabase` ----> Browser Supabase client adapter: the browser client factory and the auth-event rule. Exists since M7.3 ([README](supabase/README.md))
 - `editor` ----> Future document editor runtime (Lexical), once the editor is approved
 - `preferences` ----> Browser preference runtime: device store, applying theme/mode/fonts, consent state. Exists since M6.2 ([README](preferences/README.md))
 - `error-reports` ----> Consent-gated browser error reporting. Exists since M6.5 ([README](error-reports/README.md))
 - `site` ----> Existing site metadata/brand concerns
+- `fonts` ----> The default typefaces and their `next/font` loaders; hosts put the variable classes on `<html>`. Exists since 2026-10-29 ([README](fonts/README.md))
 - `tailwind-config` ----> Existing styling foundation
 
 ## Current implementation and migration inputs
 
 Existing packages are [UI](ui/README.md), [collection](collection/README.md), [Tailwind configuration and tokens](tailwind-config/README.md), and [site metadata/brand support](site/README.md). Their documented current exports remain usable until a scoped migration changes them.
 
-[RootShell](ui/src/blocks/root-shell/root-shell.tsx), [RootSidebar](ui/src/blocks/sidebar-shell/root-sidebar/root-sidebar.tsx), and the [web authentication page shell](../../apps/web/src/components/shells/auth-page-shell/auth-page-shell.tsx) are inputs to the shells ownership review. Product schemas currently in UI should move to their domain owner.
+[RootShell](shells/src/components/root-shell/root-shell.tsx) and [RootSidebar](shells/src/components/sidebar-shell/root-sidebar/root-sidebar.tsx) now live in [`frontend-shells`](shells/README.md) (moved 2026-10-25); the [web authentication page shell](../../apps/web/src/components/shells/auth-page-shell/auth-page-shell.tsx) follows in that package's plan. Product schemas currently in UI should move to their domain owner.
 
 Collection's generic controls, display mechanics, and interaction belong to a cohesive frontend collection family. Resource-specific projections, actions, and copy belong to resource features. The ownership map records that split; migration will assign individual files according to responsibility rather than current folder names. M5.3 moved the generic part into [`frontend-collection`](collection/README.md); resource-specific projections and copy stay with Spaces, Documents and Dashboards.
 

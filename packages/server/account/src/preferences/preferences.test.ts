@@ -1,3 +1,4 @@
+import { accountPreferencesSchema } from '@synapcity/domain-preferences';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -12,6 +13,17 @@ const from = vi.fn(() => ({ select, upsert }));
 const writeSelect = vi.fn();
 const upsert = vi.fn((..._args: unknown[]) => ({ select: writeSelect }));
 const client = { from } as never;
+
+/** A complete, valid preferences document: the schema's defaults. */
+const DEFAULTS = accountPreferencesSchema.parse({});
+
+/** A PostgREST error as the client returns it; only the code may leave. */
+const postgrestError = {
+  message: 'permission denied for table user_preferences',
+  details: 'Failing row contains (secret)',
+  hint: 'check the policy',
+  code: '42501',
+};
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -67,13 +79,26 @@ describe('readAccountPreferenceRow', () => {
   });
 });
 
+describe('readAccountPreferenceRow failures', () => {
+  it('keeps only the code of a PostgREST error', async () => {
+    maybeSingle.mockResolvedValue({ data: null, error: postgrestError });
+
+    const result = await readAccountPreferenceRow(client, 'user-1');
+
+    expect(result).toStrictEqual({ ok: false, failure: { code: '42501' } });
+  });
+});
+
 describe('writeAccountPreferenceRow', () => {
   it('upserts only for the supplied verified caller and includes the timezone', async () => {
     writeSelect.mockResolvedValue({
       data: [{ user_id: 'user-1' }],
       error: null,
     });
-    const preferences = { regional: { language: 'fr' } };
+    const preferences = {
+      ...DEFAULTS,
+      regional: { ...DEFAULTS.regional, language: 'fr' as const },
+    };
 
     await expect(
       writeAccountPreferenceRow(client, 'user-1', preferences, 'Europe/Paris'),
@@ -96,7 +121,7 @@ describe('writeAccountPreferenceRow', () => {
       error: null,
     });
 
-    await writeAccountPreferenceRow(client, 'user-1', {});
+    await writeAccountPreferenceRow(client, 'user-1', DEFAULTS);
 
     expect(upsert.mock.calls[0]?.[0]).not.toHaveProperty('device_timezone');
   });
@@ -112,7 +137,17 @@ describe('writeAccountPreferenceRow', () => {
     writeSelect.mockResolvedValue(response);
 
     await expect(
-      writeAccountPreferenceRow(client, 'user-1', {}),
+      writeAccountPreferenceRow(client, 'user-1', DEFAULTS),
     ).resolves.toEqual({ ok: false, failure });
+  });
+});
+
+describe('writeAccountPreferenceRow failures', () => {
+  it('keeps only the code of a PostgREST error', async () => {
+    writeSelect.mockResolvedValue({ data: null, error: postgrestError });
+
+    const result = await writeAccountPreferenceRow(client, 'user-1', DEFAULTS);
+
+    expect(result).toStrictEqual({ ok: false, failure: { code: '42501' } });
   });
 });

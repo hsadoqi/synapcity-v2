@@ -2,7 +2,35 @@ import type { BaseRecord } from '@synapcity/domain-records';
 import type { SupabaseServerClient } from '@synapcity/server-supabase';
 import { z } from 'zod';
 
-import { COLUMNS, recordFromRow, type OwnedRow } from '../space-row';
+import { COLUMNS, recordFromRow, type OwnedRow } from '../../owned-row';
+import { readError } from '../../read-error';
+
+type ParticipantKind = 'documents' | 'dashboards';
+
+/** The embedded items of one Space's participation rows, newest addition first. */
+async function participantRows(
+  client: SupabaseServerClient,
+  spaceId: string,
+  kind: ParticipantKind,
+): Promise<(OwnedRow | null)[]> {
+  // One literal query per kind, so each embed is checked against the schema.
+  if (kind === 'documents') {
+    const { data, error } = await client
+      .from('space_documents')
+      .select(`documents(${COLUMNS})`)
+      .eq('space_id', spaceId)
+      .order('added_at', { ascending: false });
+    if (error) throw readError(`documents of space ${spaceId}`, error);
+    return data.map((row) => row.documents);
+  }
+  const { data, error } = await client
+    .from('space_dashboards')
+    .select(`dashboards(${COLUMNS})`)
+    .eq('space_id', spaceId)
+    .order('added_at', { ascending: false });
+  if (error) throw readError(`dashboards of space ${spaceId}`, error);
+  return data.map((row) => row.dashboards);
+}
 
 /**
  * The items taking part in one Space, newest addition first (ADR-0013:
@@ -14,28 +42,13 @@ import { COLUMNS, recordFromRow, type OwnedRow } from '../space-row';
 async function listParticipants(
   client: SupabaseServerClient,
   spaceId: string,
-  table: 'space_documents' | 'space_dashboards',
-  embedded: 'documents' | 'dashboards',
+  kind: ParticipantKind,
 ): Promise<BaseRecord[]> {
   // A malformed id cannot match a uuid column; PostgREST would error instead.
   if (!z.uuid().safeParse(spaceId).success) return [];
 
-  const { data, error } = await client
-    .from(table)
-    .select(`${embedded}(${COLUMNS})`)
-    .eq('space_id', spaceId)
-    .order('added_at', { ascending: false });
-
-  if (error) {
-    throw new Error(
-      `Failed to load ${embedded} of space ${spaceId}: ${error.message}`,
-    );
-  }
-  const rows = data as unknown as Record<string, OwnedRow | null>[];
-  return rows.flatMap((row) => {
-    const item = row[embedded];
-    return item ? [recordFromRow(item)] : [];
-  });
+  const items = await participantRows(client, spaceId, kind);
+  return items.flatMap((item) => (item ? [recordFromRow(item)] : []));
 }
 
 /** The documents taking part in one Space. */
@@ -43,7 +56,7 @@ export function listSpaceDocuments(
   client: SupabaseServerClient,
   spaceId: string,
 ): Promise<BaseRecord[]> {
-  return listParticipants(client, spaceId, 'space_documents', 'documents');
+  return listParticipants(client, spaceId, 'documents');
 }
 
 /** The dashboards taking part in one Space. */
@@ -51,5 +64,5 @@ export function listSpaceDashboards(
   client: SupabaseServerClient,
   spaceId: string,
 ): Promise<BaseRecord[]> {
-  return listParticipants(client, spaceId, 'space_dashboards', 'dashboards');
+  return listParticipants(client, spaceId, 'dashboards');
 }

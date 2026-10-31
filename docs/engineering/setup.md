@@ -30,7 +30,8 @@ pnpm verify
 | `pnpm check-types`                  | `tsc --noEmit` in every workspace, including unused locals and parameters (Next apps run `next typegen` first)                                                        |
 | `pnpm deps`                         | Knip: unused files, exports and dependencies                                                                                                                          |
 | `pnpm boundaries`                   | Workspace import boundaries (ADR-0014): dependency matrix, browser reachability, `exports`, cycles, `server-only` guard                                               |
-| `pnpm brand:check`                  | Static brand exports match the logo geometry in `logo-mark.tsx` (not the rasters)                                                                                     |
+| `pnpm brand:sync`                   | Regenerates every brand output from `@synapcity/frontend-brand` (SVGs, web public files, Storybook alias, app `icon.svg`)                                             |
+| `pnpm brand:check`                  | Every brand output equals what `@synapcity/frontend-brand` builds; no stray copies; rasters identical (not proven against the geometry)                               |
 | `pnpm test`                         | Vitest unit tests in every workspace that has them, through Turbo                                                                                                     |
 | `pnpm test:coverage`                | The same tests with v8 coverage (no thresholds)                                                                                                                       |
 | `pnpm test:e2e`                     | Playwright smoke test of `apps/web` against a production build (Chromium)                                                                                             |
@@ -69,7 +70,7 @@ When the address of `apps/web` changes (for example a custom domain), change the
 3. **Google and GitHub consoles:** nothing to change. They hold only Supabase's own callback address.
 4. **Email:** a custom SMTP provider needs SPF and DKIM records on the sending domain.
 
-`SITE_URL` also sets `metadataBase`, so share images resolve against the real address. If it is unset, Next falls back to `http://localhost:3000` and warns at build.
+`SITE_URL` also sets `metadataBase` for `apps/web`, so share images resolve against the real address. If it is unset, Next falls back to the deployment address on Vercel and to `http://localhost:<port>` elsewhere (3000 during `next build`), and warns outside Vercel. CI sets it to `http://localhost:8080`, where the end-to-end server listens. `apps/docs` has no `SITE_URL` and sets no `metadataBase`: on Vercel its share images resolve to the deployment address, and in CI its build and end-to-end server print the localhost warning, which is expected until the deployment topology is decided.
 
 ## Generated files and caches
 

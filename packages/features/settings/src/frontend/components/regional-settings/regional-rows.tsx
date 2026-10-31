@@ -5,10 +5,15 @@ import { SettingRow } from '../../shared/setting-row';
 import { SettingsCombobox } from '../../shared/settings-combobox';
 import { SettingsSelect } from '../../shared/settings-select';
 import {
-  resolveTimezone,
+  formatDate,
+  formatTime,
+  regionalDefaults,
+  resolveDateTimeFormatting,
   SYSTEM_TIMEZONE,
+  type DateTimeFormatting,
   type RegionalSettings,
 } from '@synapcity/domain-preferences';
+import { deviceTimezone as browserTimezone } from '@synapcity/frontend-preferences';
 
 type RowProps<Key extends keyof RegionalSettings> = {
   value: RegionalSettings[Key];
@@ -119,7 +124,10 @@ export function TimeFormatRow({
   previewDate: Date | null;
 }) {
   const preview = previewDate
-    ? formatTime(previewDate, { timeFormat: value, timezone, language })
+    ? formatTime(
+        previewDate,
+        draftFormatting({ timeFormat: value, timezone, language }),
+      )
     : '…';
   return (
     <SettingRow
@@ -151,7 +159,7 @@ export function DateFormatRow({
   previewDate: Date | null;
 }) {
   const preview = previewDate
-    ? formatDate(previewDate, { dateFormat: value, timezone })
+    ? formatDate(previewDate, draftFormatting({ dateFormat: value, timezone }))
     : '…';
   return (
     <SettingRow
@@ -235,42 +243,18 @@ export function NumberFormatRow({ value, onChange }: RowProps<'numberFormat'>) {
   );
 }
 
-/** The time as the chosen format writes it, in the chosen timezone. */
-export function formatTime(
-  date: Date,
-  {
-    timeFormat,
-    timezone,
-    language,
-  }: Pick<RegionalSettings, 'timeFormat' | 'timezone' | 'language'>,
-): string {
-  return new Intl.DateTimeFormat(language, {
-    timeZone: resolveTimezone(timezone),
-    hour: 'numeric',
-    minute: '2-digit',
-    hourCycle: timeFormat === '12-hour' ? 'h12' : 'h23',
-  }).format(date);
-}
-
-/** The calendar date in the chosen order, as it falls in the chosen timezone. */
-export function formatDate(
-  date: Date,
-  { dateFormat, timezone }: Pick<RegionalSettings, 'dateFormat' | 'timezone'>,
-): string {
-  const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone: resolveTimezone(timezone),
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).formatToParts(date);
-  const month = parts.find((part) => part.type === 'month')?.value;
-  const day = parts.find((part) => part.type === 'day')?.value;
-  const year = parts.find((part) => part.type === 'year')?.value;
-  return dateFormat === 'MM/DD/YYYY'
-    ? `${month}/${day}/${year}`
-    : dateFormat === 'DD/MM/YYYY'
-      ? `${day}/${month}/${year}`
-      : `${year}-${month}-${day}`;
+/**
+ * The draft's formatting, with `system` meaning this browser's zone. The rows
+ * and the preview write through the same formatters as the rest of the app,
+ * so what this tab shows is what every page will show.
+ */
+export function draftFormatting(
+  regional: Partial<RegionalSettings>,
+): DateTimeFormatting {
+  return resolveDateTimeFormatting(
+    { ...regionalDefaults, ...regional },
+    browserTimezone(),
+  );
 }
 
 /** A sample number written with the chosen grouping and decimal marks. */

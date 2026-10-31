@@ -12,6 +12,7 @@ import {
   type Locale,
 } from 'react-day-picker';
 
+import { useDateTimeFormatting } from '@synapcity/frontend-preferences';
 import { Button, buttonVariants } from '@synapcity/frontend-ui/core/button';
 import {
   ChevronLeftIcon,
@@ -29,11 +30,14 @@ function Calendar({
   formatters,
   labels,
   components,
+  weekStartsOn,
   ...props
 }: React.ComponentProps<typeof DayPicker> & {
   buttonVariant?: React.ComponentProps<typeof Button>['variant'];
 }) {
   const defaultClassNames = getDefaultClassNames();
+  // The week starts on the person's chosen day unless a caller sets one.
+  const formatting = useDateTimeFormatting();
 
   return (
     <DayPicker
@@ -45,6 +49,7 @@ function Calendar({
         className,
       )}
       captionLayout={captionLayout}
+      weekStartsOn={weekStartsOn ?? formatting.weekStartsOn}
       locale={locale}
       formatters={{
         formatMonthDropdown: (date) =>

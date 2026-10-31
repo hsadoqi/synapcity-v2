@@ -1,6 +1,6 @@
 'use client';
 
-import { useCurrentUser } from '@/features/auth/client/user-provider/user-provider';
+import { useCurrentUser } from '@synapcity/features-auth/frontend';
 
 /** Today's date, a greeting and the quick ways to create something. */
 export function HomePageHeader({
@@ -17,7 +17,7 @@ export function HomePageHeader({
         <time dateTime={dateTime}>{dateLabel}</time>
       </p>
       <h1 className="text-2xl font-semibold tracking-tight">
-        Welcome back, {user?.name || 'User'}
+        {user?.name ? `Welcome back, ${user.name}` : 'Welcome back'}
       </h1>
     </header>
   );

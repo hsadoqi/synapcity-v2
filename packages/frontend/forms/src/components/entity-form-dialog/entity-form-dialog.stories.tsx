@@ -53,10 +53,11 @@ export const Create: Story = {
     await userEvent.click(
       within(dialog).getByRole('button', { name: 'Create' }),
     );
-    // The form refuses an empty name and the dialog stays.
-    await expect(
-      await within(dialog).findByText('Enter a name.'),
-    ).toBeVisible();
+    // The form refuses an empty name and the dialog stays. Retried: the dialog
+    // may still be fading in, and visibility counts its opacity.
+    await waitFor(() =>
+      expect(within(dialog).getByText('Enter a name.')).toBeVisible(),
+    );
     await userEvent.type(within(dialog).getByLabelText('Name'), 'Standup');
     await userEvent.click(
       within(dialog).getByRole('button', { name: 'Create' }),

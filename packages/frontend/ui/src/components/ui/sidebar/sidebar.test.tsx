@@ -105,6 +105,38 @@ describe('Sidebar', () => {
     ).toBe('20svw');
   });
 
+  it('sizes to the window by default', () => {
+    renderShell();
+    const wrapper = document.querySelector('[data-slot="sidebar-wrapper"]')!;
+    const container = document.querySelector(
+      '[data-slot="sidebar-container"]',
+    )!;
+
+    expect(wrapper.className).toContain('min-h-svh');
+    expect(container.className).toContain('fixed');
+    expect(container.className).toContain('h-svh');
+  });
+
+  it('sizes to its own box when contained', () => {
+    renderShell({ contained: true });
+    const wrapper = document.querySelector(
+      '[data-slot="sidebar-wrapper"]',
+    ) as HTMLElement;
+    const container = document.querySelector(
+      '[data-slot="sidebar-container"]',
+    )!;
+
+    expect(wrapper.className).toContain('relative');
+    expect(wrapper.className).toContain('@container');
+    expect(wrapper.className).toContain('h-full');
+    expect(wrapper.className).not.toContain('min-h-svh');
+    expect(wrapper.style.getPropertyValue('--sidebar-width')).toBe(
+      'clamp(13rem, 22cqw, 20rem)',
+    );
+    expect(container.className).toContain('absolute');
+    expect(container.className).not.toContain('fixed');
+  });
+
   it('renders the desktop sidebar with state, side and variant', () => {
     renderShell({}, { side: 'right', variant: 'floating' });
     const sidebar = document.querySelector('[data-slot="sidebar"]')!;
@@ -147,13 +179,12 @@ describe('Sidebar', () => {
     renderShell();
 
     expect(trigger().getAttribute('aria-label')).toBe('Close navigation');
-    expect(trigger().getAttribute('aria-pressed')).toBe('true');
+    expect(trigger().hasAttribute('aria-pressed')).toBe(false);
     expect(trigger().getAttribute('aria-keyshortcuts')).toBe(
       'Control+B Meta+B',
     );
     fireEvent.click(trigger());
     expect(trigger().getAttribute('aria-label')).toBe('Open navigation');
-    expect(trigger().getAttribute('aria-pressed')).toBe('false');
   });
 
   it('toggles with Ctrl+B and Cmd+B but not plain b', () => {

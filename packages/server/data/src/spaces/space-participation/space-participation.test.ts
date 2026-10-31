@@ -109,10 +109,10 @@ describe.each(KINDS)('listSpace $kind', ({ kind, list, table, embedded }) => {
   });
 
   it('reports a database error with the space id', async () => {
-    queryReturning({ data: null, error: { message: 'boom' } });
+    queryReturning({ data: null, error: { code: '42501', message: 'boom' } });
 
     await expect(list(client, SPACE_ID)).rejects.toThrow(
-      `Failed to load ${kind} of space ${SPACE_ID}: boom`,
+      `Failed to load ${kind} of space ${SPACE_ID} (code 42501)`,
     );
   });
 

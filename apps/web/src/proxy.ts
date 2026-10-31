@@ -1,7 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { refreshedLookCookie } from '@synapcity/domain-preferences';
 
-import { updateSession } from '@/lib/supabase/middleware';
+import { updateSession } from './lib/supabase/middleware';
 
 export async function proxy(request: NextRequest) {
   const response = await updateSession(request);

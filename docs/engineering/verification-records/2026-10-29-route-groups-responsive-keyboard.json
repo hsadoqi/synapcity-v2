@@ -1,0 +1,294 @@
+[
+  {
+    "vp": "phone 360",
+    "path": "/",
+    "overflowPx": 0,
+    "wideEls": [],
+    "maxContentW": 240,
+    "card": null,
+    "banner": 1,
+    "mains": 1,
+    "tab": "a[Skip to main content] > a[Synapcity home] > button[Theme] > a[Sign in] > a[Sign up] > a[Sign in] > a[Sign up] > BODY > a[Skip to main content] > a[Synapcity home] > button[Theme] > a[Sign in]"
+  },
+  {
+    "vp": "phone 360",
+    "path": "/privacy",
+    "overflowPx": 0,
+    "wideEls": [],
+    "maxContentW": 312,
+    "card": null,
+    "banner": 1,
+    "mains": 1,
+    "tab": "a[Skip to main content] > a[Synapcity home] > button[Theme] > a[Sign in] > a[Sign up]"
+  },
+  {
+    "vp": "phone 360",
+    "path": "/auth/login",
+    "overflowPx": 0,
+    "wideEls": [],
+    "maxContentW": 328,
+    "card": {
+      "left": 16,
+      "right": 16
+    },
+    "banner": 1,
+    "mains": 1,
+    "tab": "a[Skip to main content] > a[Synapcity home] > button[Theme] > a[Sign in] > a[Sign up] > button[Continue with Google] > button[Continue with GitHub] > input[Email] > a[Forgot password?] > input[Password] > button[Show password] > button[Sign in]"
+  },
+  {
+    "vp": "phone 360",
+    "path": "/auth/register",
+    "overflowPx": 0,
+    "wideEls": [],
+    "maxContentW": 328,
+    "card": {
+      "left": 16,
+      "right": 16
+    },
+    "banner": 1,
+    "mains": 1,
+    "tab": "a[Skip to main content] > a[Synapcity home] > button[Theme] > a[Sign in] > a[Sign up] > button[Continue with Google] > button[Continue with GitHub] > input[Name] > input[Email] > input[Password] > button[Show password] > button[Create account]"
+  },
+  {
+    "vp": "phone 360",
+    "path": "/auth/forgot-password",
+    "overflowPx": 0,
+    "wideEls": [],
+    "maxContentW": 328,
+    "card": {
+      "left": 16,
+      "right": 16
+    },
+    "banner": 1,
+    "mains": 1,
+    "tab": "a[Skip to main content] > a[Synapcity home] > button[Theme] > a[Sign in] > a[Sign up] > input[Email] > button[Send reset link] > a[Back to sign in] > BODY > a[Skip to main content] > a[Synapcity home] > button[Theme]"
+  },
+  {
+    "vp": "phone 360",
+    "path": "/auth/error?reason=reset",
+    "overflowPx": 0,
+    "wideEls": [],
+    "maxContentW": 328,
+    "card": {
+      "left": 16,
+      "right": 16
+    },
+    "banner": 1,
+    "mains": 1,
+    "tab": "a[Skip to main content] > a[Synapcity home] > button[Theme] > a[Sign in] > a[Sign up] > a[Request a new link] > a[Sign in] > BODY > a[Skip to main content] > a[Synapcity home] > button[Theme] > a[Sign in]"
+  },
+  {
+    "vp": "phone 360 signed-in",
+    "path": "/auth/welcome",
+    "overflowPx": 0,
+    "wideEls": [],
+    "maxContentW": 328,
+    "card": {
+      "left": 16,
+      "right": 16
+    },
+    "banner": 1,
+    "mains": 1,
+    "tab": "a[Skip to main content] > a[Synapcity home] > button[Theme] > button[Account menu] > input[Name] > input[Photo] > button[Continue] > button[Skip for now] > BODY > a[Skip to main content]"
+  },
+  {
+    "vp": "phone 360 signed-in",
+    "path": "/auth/update-password",
+    "overflowPx": 0,
+    "wideEls": [],
+    "maxContentW": 328,
+    "card": {
+      "left": 16,
+      "right": 16
+    },
+    "banner": 1,
+    "mains": 1,
+    "tab": "a[Skip to main content] > a[Synapcity home] > button[Theme] > button[Account menu] > input[New password] > button[Show password] > input[Confirm new password] > button[Show password] > button[Update password] > BODY"
+  },
+  {
+    "vp": "phone 360 signed-in",
+    "path": "/auth/delete-account",
+    "overflowPx": 0,
+    "wideEls": [],
+    "maxContentW": 328,
+    "card": {
+      "left": 16,
+      "right": 16
+    },
+    "banner": 1,
+    "mains": 1,
+    "tab": "a[Skip to main content] > a[Synapcity home] > button[Theme] > button[Account menu] > a[Back to settings] > BODY > a[Skip to main content] > a[Synapcity home] > button[Theme] > button[Account menu]"
+  },
+  {
+    "vp": "phone 360 signed-in",
+    "path": "/privacy",
+    "overflowPx": 0,
+    "wideEls": [],
+    "maxContentW": 312,
+    "card": null,
+    "banner": 1,
+    "mains": 1,
+    "tab": "a[Skip to main content] > a[Synapcity home] > button[Theme] > button[Account menu] > BODY > a[Skip to main content] > a[Synapcity home] > button[Theme] > button[Account menu] > BODY"
+  },
+  {
+    "vp": "phone 360",
+    "path": "login empty submit",
+    "errors": [
+      "INPUT[invalid]: described-by=_R_slubsnniumlb_",
+      "INPUT[invalid]: described-by=_R_slubsnniumlb_",
+      "P[role=alert]:Enter your email and password."
+    ],
+    "focused": "email"
+  },
+  {
+    "vp": "phone 360",
+    "path": "register empty submit",
+    "errors": ["INPUT[invalid]:", "P[role=alert]:Enter your email."]
+  },
+  {
+    "vp": "desktop 1280",
+    "path": "/",
+    "overflowPx": 0,
+    "wideEls": [],
+    "maxContentW": 300,
+    "card": null,
+    "banner": 1,
+    "mains": 1,
+    "tab": "a[Skip to main content] > a[Synapcity home] > button[Theme] > a[Sign in] > a[Sign up] > a[Sign in] > a[Sign up] > BODY > a[Skip to main content] > a[Synapcity home] > button[Theme] > a[Sign in]"
+  },
+  {
+    "vp": "desktop 1280",
+    "path": "/privacy",
+    "overflowPx": 0,
+    "wideEls": [],
+    "maxContentW": 768,
+    "card": null,
+    "banner": 1,
+    "mains": 1,
+    "tab": "a[Skip to main content] > a[Synapcity home] > button[Theme] > a[Sign in] > a[Sign up]"
+  },
+  {
+    "vp": "desktop 1280",
+    "path": "/auth/login",
+    "overflowPx": 0,
+    "wideEls": [],
+    "maxContentW": 448,
+    "card": {
+      "left": 416,
+      "right": 416
+    },
+    "banner": 1,
+    "mains": 1,
+    "tab": "a[Skip to main content] > a[Synapcity home] > button[Theme] > a[Sign in] > a[Sign up] > button[Continue with Google] > button[Continue with GitHub] > input[Email] > a[Forgot password?] > input[Password] > button[Show password] > button[Sign in]"
+  },
+  {
+    "vp": "desktop 1280",
+    "path": "/auth/register",
+    "overflowPx": 0,
+    "wideEls": [],
+    "maxContentW": 448,
+    "card": {
+      "left": 416,
+      "right": 416
+    },
+    "banner": 1,
+    "mains": 1,
+    "tab": "a[Skip to main content] > a[Synapcity home] > button[Theme] > a[Sign in] > a[Sign up] > button[Continue with Google] > button[Continue with GitHub] > input[Name] > input[Email] > input[Password] > button[Show password] > button[Create account]"
+  },
+  {
+    "vp": "desktop 1280",
+    "path": "/auth/forgot-password",
+    "overflowPx": 0,
+    "wideEls": [],
+    "maxContentW": 448,
+    "card": {
+      "left": 416,
+      "right": 416
+    },
+    "banner": 1,
+    "mains": 1,
+    "tab": "a[Skip to main content] > a[Synapcity home] > button[Theme] > a[Sign in] > a[Sign up] > input[Email] > button[Send reset link] > a[Back to sign in] > BODY > a[Skip to main content] > a[Synapcity home] > button[Theme]"
+  },
+  {
+    "vp": "desktop 1280",
+    "path": "/auth/error?reason=reset",
+    "overflowPx": 0,
+    "wideEls": [],
+    "maxContentW": 448,
+    "card": {
+      "left": 416,
+      "right": 416
+    },
+    "banner": 1,
+    "mains": 1,
+    "tab": "a[Skip to main content] > a[Synapcity home] > button[Theme] > a[Sign in] > a[Sign up] > a[Request a new link] > a[Sign in] > BODY > a[Skip to main content] > a[Synapcity home] > button[Theme] > a[Sign in]"
+  },
+  {
+    "vp": "desktop 1280 signed-in",
+    "path": "/auth/welcome",
+    "overflowPx": 0,
+    "wideEls": [],
+    "maxContentW": 448,
+    "card": {
+      "left": 416,
+      "right": 416
+    },
+    "banner": 1,
+    "mains": 1,
+    "tab": "a[Skip to main content] > a[Synapcity home] > button[Theme] > button[Account menu] > input[Name] > input[Photo] > button[Continue] > button[Skip for now] > BODY > a[Skip to main content]"
+  },
+  {
+    "vp": "desktop 1280 signed-in",
+    "path": "/auth/update-password",
+    "overflowPx": 0,
+    "wideEls": [],
+    "maxContentW": 448,
+    "card": {
+      "left": 416,
+      "right": 416
+    },
+    "banner": 1,
+    "mains": 1,
+    "tab": "a[Skip to main content] > a[Synapcity home] > button[Theme] > button[Account menu] > input[New password] > button[Show password] > input[Confirm new password] > button[Show password] > button[Update password] > BODY"
+  },
+  {
+    "vp": "desktop 1280 signed-in",
+    "path": "/auth/delete-account",
+    "overflowPx": 0,
+    "wideEls": [],
+    "maxContentW": 448,
+    "card": {
+      "left": 416,
+      "right": 416
+    },
+    "banner": 1,
+    "mains": 1,
+    "tab": "a[Skip to main content] > a[Synapcity home] > button[Theme] > button[Account menu] > a[Back to settings] > BODY > a[Skip to main content] > a[Synapcity home] > button[Theme] > button[Account menu]"
+  },
+  {
+    "vp": "desktop 1280 signed-in",
+    "path": "/privacy",
+    "overflowPx": 0,
+    "wideEls": [],
+    "maxContentW": 768,
+    "card": null,
+    "banner": 1,
+    "mains": 1,
+    "tab": "a[Skip to main content] > a[Synapcity home] > button[Theme] > button[Account menu] > BODY > a[Skip to main content] > a[Synapcity home] > button[Theme] > button[Account menu] > BODY"
+  },
+  {
+    "vp": "desktop 1280",
+    "path": "login empty submit",
+    "errors": [
+      "INPUT[invalid]: described-by=_R_slubsnniumlb_",
+      "INPUT[invalid]: described-by=_R_slubsnniumlb_",
+      "P[role=alert]:Enter your email and password."
+    ],
+    "focused": "email"
+  },
+  {
+    "vp": "desktop 1280",
+    "path": "register empty submit",
+    "errors": ["INPUT[invalid]:", "P[role=alert]:Enter your email."]
+  }
+]

@@ -16,8 +16,12 @@ import {
  * document is parsed, before React hydrates, so the server-rendered attributes and the
  * no-cookie/system-mode boot fallback are what can prevent a flash here.
  */
-const WEB = 'http://localhost:8080';
-const DOCS = 'http://localhost:4000';
+// The origins this run serves, set by the shared Playwright config while it
+// loads; not inputs to any Turborepo task.
+/* eslint-disable turbo/no-undeclared-env-vars */
+const WEB = process.env.E2E_WEB_URL!;
+const DOCS = process.env.E2E_DOCS_URL!;
+/* eslint-enable turbo/no-undeclared-env-vars */
 const STORAGE_KEY = 'synapcity-preferences';
 const COOKIE = 'synapcity-look';
 const AUTH_STATE = resolve(process.cwd(), 'e2e/.auth/account.json');
@@ -66,14 +70,15 @@ test('a look saved in web shows in docs with no flash', async ({ page }) => {
   // A returning visitor whose look was saved before the cookie existed. Loading web migrates
   // it into the shared cookie (a web page mounts the account sync that does it).
   await page.addInitScript(
-    ([key, value]) => {
-      if (location.port === '8080') localStorage.setItem(key, value);
+    ([key, value, origin]) => {
+      if (location.origin === origin) localStorage.setItem(key, value);
     },
     [
       STORAGE_KEY,
       JSON.stringify({
         theme: { mode: 'dark', textSize: 120, density: 'compact' },
       }),
+      WEB,
     ] as const,
   );
   await page.goto(`${WEB}/auth/register`);

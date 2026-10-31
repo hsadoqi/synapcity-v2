@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Approved for planning (owner decision, 2026-10-24: design Q1 to Q5 accepted; "whatever you suggest" for call C5). Task A is implemented on `refactor/m7-2-server-packages` (local commits, not pushed); Task B is deliberately not done (see its Decision); Task C is designed and waits for owner review. Call C1 below amends the M7 design.
+**Status:** Tasks A and C are merged (#69 and #71). Task B is deliberately not done (see its Decision). The full repository gate and manual checks remain open. Call C1 below amends the M7 design.
 
 **Goal:** The provider-facing auth operations, the session refresh helper and the profile operations leave `apps/web` for the server packages, behind typed outcomes, with no change in behavior. Server Actions, redirects, fixture mode and logging stay in the web app.
 
@@ -57,6 +57,8 @@
 
 ### Task B: Session refresh helper
 
+_Superseded (owner, 2026-10-27): session refresh moves to `server-supabase` as `refreshProxySession`, after a spike proves the `server-only` import in the proxy. See the [web Supabase leftovers design](../specs/2026-10-27-web-supabase-leftovers-design.md), D2, and its [plan](2026-10-27-web-supabase-leftovers.md), Task 1. The decision below is kept as the record._
+
 **Decision (owner, 2026-10-24, on the recommendation): not done in M7.2.** Session refresh stays in `apps/web/src/lib/supabase/middleware.ts`. Most of the file is Next.js response handling that must stay in the app; the portable part is about five lines; and importing a `server-only` package from the proxy is NOT VERIFIED. Revisit only if the end-to-end suite is run with the proxy importing the package. The design's `server-supabase` mention of "session refresh helpers" and the M7 exceptions list are unaffected (this file has no boundary exception).
 
 **Why (recorded when the blocker was found, 2026-10-24):** `server-supabase`'s root entry starts with `import 'server-only'` (rule R10), and `proxy.ts` would then import it. Nothing imported by the proxy does that today, and the installed Next.js 16.4.3 docs say the proxy runs on the Node.js runtime but do not say whether `server-only` is safe there. NOT VERIFIED. If it throws at module load, every request fails. Do not implement until one of these is shown by running it: (a) `next start` with the proxy importing the package answers a request, or (b) a dedicated proxy-safe entry is agreed, which needs an owner decision because R10 requires the guard on every server entry. The end-to-end suite (`pnpm test:e2e`) would exercise (a); it was not run here because of machine load.
@@ -70,7 +72,7 @@
 
 ### Task C: Profile operations into `server-account` and `server-supabase`
 
-**Status: designed, not implemented. Needs owner review of the split below before code (it changes what the packages return, not what people see).**
+**Status: implemented and merged in #71 (2026-10-25). The split below was followed with both recommendations (reason codes in the package, wording in the app; `ProviderUser` in `server-supabase`).**
 
 **What is in `features/account/server` today (evidence, read at `ba00942c`):**
 
@@ -104,11 +106,11 @@
 1. Is it right that `saveAvatar`'s outcome uses reason codes and the app owns the message text (`Use a PNG, JPEG or WebP image.` appears both in the domain schema and the unsupported-type branch; the app mapping would reuse the domain constant)?
 2. `ProviderUser` lives in `server-supabase`. Acceptable, or should it be a `domain-identity` type? (Recommendation: `server-supabase`; it mirrors a provider record and is not a portable contract.)
 
-- [ ] **Step 1: Owner reviews the table above.**
-- [ ] **Step 2: Tests first** for `readProviderUser`, `saveName`, `saveAvatar`, `mirrorToSession` (outcomes above).
-- [ ] **Step 3: Move and re-point;** keep the actions' replies and logs identical.
-- [ ] **Step 4: Run the checks** as in Task A, plus the `actions.test.ts` log assertions. Update the ratchets.
-- [ ] **Step 5: Checkpoint commit** (local only): `refactor(server-account): move the profile operations into the package`.
+- [x] **Step 1: Owner reviews the table above.**
+- [x] **Step 2: Tests first** for `readProviderUser`, `saveName`, `saveAvatar`, `mirrorToSession` (outcomes above).
+- [x] **Step 3: Move and re-point;** keep the actions' replies and logs identical.
+- [x] **Step 4: Run the checks** as in Task A, plus the `actions.test.ts` log assertions. Update the ratchets.
+- [x] **Step 5: Checkpoint commit** (local only): `refactor(server-account): move the profile operations into the package`.
 
 ### Task D: Records and verification
 

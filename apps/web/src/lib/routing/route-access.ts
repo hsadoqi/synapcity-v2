@@ -9,7 +9,7 @@
  * Protected: `/<userId>/home` and `/<userId>/settings` and everything under
  * them (see `homePathFor`). The
  * proxy only checks that someone is signed in; that the id is *theirs* is
- * checked by `app/[userId]/layout.tsx`.
+ * checked by `app/(protected)/[userId]/layout.tsx`.
  */
 const USER_AREA_PATH = /^\/(?!auth(?:\/|$))[^/]+\/(?:home|settings)(?:\/|$)/;
 

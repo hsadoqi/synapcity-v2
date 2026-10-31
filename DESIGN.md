@@ -65,7 +65,7 @@ spacing:
   xs: '4px'
   sm: '8px'
   md: '16px'
-  header: '56px'
+  header: '64px'
   sidebar: '256px'
   sidebar-icon: '48px'
 ---
@@ -184,7 +184,9 @@ The shell is a left sidebar, a header and a main area. Each region (sidebar, con
 
 The **Global panel** is a collapsible, resizable panel under the header. It starts collapsed, can be locked open, reflows the work instead of covering it, and exposes its lock state accessibly. Dismissal: outside click and Escape close an unlocked panel; the resize handle and open menus never dismiss it. (A 20%-60% height range and remembered size are **Not re-verified**.)
 
-The **global sidebar** is hidden until opened (the toggle in the header, or Cmd/Ctrl+B) and pushes the content instead of covering it. On nested routes a **space sidebar** rail sits beside the content; `/home` has none. Only one sidebar is open at a time. An unlocked sidebar closes on an outside click or Escape and a lock keeps it open; that dismissal is still a trial (two-layer navigation shell brief). **Verified** in `root-shell.tsx` and `root-routes.ts`.
+The **sidebar** sits beside the work area and pushes it rather than covering it. It follows the width of the shell's container, not the window: at 1024px or wider it opens, narrower it folds to icons, and it decides again only when the width crosses that line, so the person's own toggle (the brand-mark button in the header, or Cmd/Ctrl+B) holds until the room changes. Folded, sections that would show a column of identical icons (the record lists) hide. On phones it is a sheet that Escape closes (checked in a browser). There is no lock, no outside-click dismissal and no separate space rail; an earlier two-layer design with those is not what ships. **Verified** in `sidebar-shell.tsx` and `root-sidebar.tsx`.
+
+The sidebar's top is the **context switcher**: Global (working across Synapcity) or one of the latest Spaces, then a link to all Spaces. It names the active context from the page's Space breadcrumb; collection pages (Spaces, Documents, Dashboards) are surfaces, not contexts, so they leave it on Global. Below it: Home, Search (opens the command palette, also Cmd/Ctrl+K), Inbox (shown disabled with "Soon" until capture is decided) and Settings, then one section per collection with its latest records. A record whose page is not built yet is listed disabled, never as a link to a missing page. Rows are 32px on a mouse and 44px on touch. **Verified** in `app-sidebar.tsx` and its tests.
 
 Spacing is a 4-based rhythm; related things sit tight, groups are separated by space and a hairline, not boxes. Container-query breakpoints (`@sm`, `@md`) are **Proposed**, not re-verified.
 
@@ -232,7 +234,7 @@ Compact and exact: small controls, strict focus, state-only motion.
 
 ### Inputs, badges, navigation
 
-Input 28px on a mouse (44px with 16px text on touch), `md` radius: **Verified** in `e2e/touch-fields.e2e.ts`. Badge 20px / `sm` radius, sidebar 16rem / 18rem sheet / 3rem collapsed, header 56px: carried over from the previous `DESIGN.md`, **Not re-verified**. Input border contrast is in the Neutral list above (3.8:1 light, 3.3:1 dark).
+Input 28px on a mouse (44px with 16px text on touch), `md` radius: **Verified** in `e2e/touch-fields.e2e.ts`. Header 64px (`h-16`, matched by the Global panel's own header row): **Verified** in `root-header.tsx` and `global-panel.tsx`. Badge 20px / `sm` radius, sidebar 16rem / 18rem sheet / 3rem collapsed: carried over from the previous `DESIGN.md`, **Not re-verified**. Input border contrast is in the Neutral list above (3.8:1 light, 3.3:1 dark).
 
 ## 8. Do's and Don'ts
 
@@ -278,7 +280,7 @@ Input 28px on a mouse (44px with 16px text on touch), `md` radius: **Verified** 
 | Focus outline                                      | `outline-2 outline-offset-2 outline-ring`            | Button, LinkButton, Input, Textarea, InputGroup, Toggle use it; other shadcn components still use ring halos                                                                 | Partly aligned                                                                                |
 | Muted, card, popover and input tokens              | solid mixes and literals                             | `color-mix` solids and literals in `tokens/colors.css` and `utilities.css`; guarded by `e2e/theme-tokens.e2e.ts`                                                             | **Aligned** (Verified)                                                                        |
 | Button/icon-button 44px on touch                   | text buttons 44px                                    | `xs`, `sm`, `icon-xs`, `icon-sm` extend a 44px hit area (class-tested); `default`, `lg`, `icon`, `icon-lg` do not                                                            | **Proposed** for the unextended sizes; code lags                                              |
-| Inputs, badges, sidebar, header specifics          | as listed                                            | not re-checked                                                                                                                                                               | Open Question                                                                                 |
+| Inputs, badges, sidebar widths                     | as listed                                            | not re-checked; header height (64px) and sidebar behaviour (§4) re-checked against source                                                                                    | Open Question                                                                                 |
 | Out-of-gamut state colours                         | n/a                                                  | destructive, success, info exceed sRGB                                                                                                                                       | **Known Problem**; decision for token review                                                  |
 | Header auto-hide on home routes                    | slides away for fine pointers, always shown on touch | implemented in `root-header.tsx` and `use-root-header-reveal.ts`, **switched off** by `HEADER_AUTO_HIDE_ENABLED`; the earlier browser check predates the reliability problem | **Off** (not enabled)                                                                         |
 | Press-to-reveal on handle and top edge             | reveals at once; hover waits 500ms                   | unit-tested and browser-checked on desktop                                                                                                                                   | **Aligned** (Verified)                                                                        |

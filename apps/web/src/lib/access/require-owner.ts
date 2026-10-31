@@ -46,8 +46,8 @@ export async function requireOwner(userId: string): Promise<OwnerAccess> {
   }
   if (!isOwner(identity, userId)) notFound();
 
-  // Display readers (the settings page) still need the provider's claims
-  // until Milestone 7; this is the same memoized read, not a second check.
+  // Display readers (the settings page) take the claims from here. This is
+  // the same memoized read, not a second check.
   const claims = await getVerifiedClaims();
   if (!claims) notFound();
 

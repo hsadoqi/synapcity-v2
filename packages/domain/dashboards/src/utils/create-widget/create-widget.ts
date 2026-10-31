@@ -18,7 +18,8 @@ const base = (title: string) => ({
 
 /**
  * Creates a widget of `type` plus the record it shows. Query widgets
- * (calendar, agenda, feed) select existing records and create none.
+ * (calendar, agenda, feed, pinned, last opened, spaces) select existing
+ * records and create none.
  */
 export function createWidget(
   type: WidgetType,
@@ -117,6 +118,21 @@ export function createWidget(
     case 'feed':
       return {
         widget: { ...base('Recent activity'), type, query: { limit: 6 } },
+        records,
+      };
+    case 'pinned':
+      return {
+        widget: { ...base('Pinned'), type, query: { limit: 6 } },
+        records,
+      };
+    case 'last-opened':
+      return {
+        widget: { ...base('Last opened'), type, query: { limit: 6 } },
+        records,
+      };
+    case 'spaces':
+      return {
+        widget: { ...base('Spaces'), type, query: { limit: 6 } },
         records,
       };
   }

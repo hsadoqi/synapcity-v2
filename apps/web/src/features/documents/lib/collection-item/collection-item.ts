@@ -1,6 +1,6 @@
 import { itemFromRecord } from '@synapcity/frontend-collection';
 import type { CollectionItem } from '@synapcity/frontend-collection';
-import type { OwnedRecordSummary } from '@/lib/owned-records';
+import type { OwnedRecordSummary } from '@synapcity/domain-records';
 import { documentPathFor } from '@/lib/routing/user-paths';
 
 /** Which spaces a document is in, in a few words: "In 2 spaces", or "Not in a space". */

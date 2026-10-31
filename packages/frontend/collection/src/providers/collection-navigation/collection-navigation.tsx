@@ -26,6 +26,7 @@ const PlainLink: CollectionLink = ({ href, ...props }) => (
 /** Without a host: a plain anchor and a full page load. Stories and tests need no router. */
 const plainNavigation: CollectionNavigation = {
   Link: PlainLink,
+  //   prefer prefetching; use with dynamic determinaim
   push: (href) => window.location.assign(href),
 };
 

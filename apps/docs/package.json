@@ -12,13 +12,15 @@
   },
   "dependencies": {
     "@synapcity/domain-preferences": "workspace:*",
+    "@synapcity/frontend-fonts": "workspace:*",
     "@synapcity/frontend-preferences": "workspace:*",
+    "@synapcity/frontend-shells": "workspace:*",
     "@synapcity/frontend-site": "workspace:*",
     "@synapcity/frontend-ui": "workspace:*",
     "@tailwindcss/postcss": "^4.3.3",
     "next": "16.4.3",
-    "react": "19.3.0",
-    "react-dom": "19.3.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "shadcn": "^4.22.1",
     "tailwindcss": "^4.3.3"
   },
@@ -29,7 +31,7 @@
     "@types/node": "26.6.5",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
-    "eslint": "10.9.1",
+    "eslint": "10.13.0",
     "typescript": "7.0.2"
   }
 }

@@ -15,3 +15,6 @@ docs/archive
 storybook-static
 .impeccable
 .superpowers
+
+# Accepted secret-scan fingerprints. Formatters must not rewrite the comment block or the entries.
+.gitleaksignore

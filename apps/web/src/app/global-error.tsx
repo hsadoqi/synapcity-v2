@@ -7,11 +7,8 @@ import { reportCaughtError } from '@synapcity/frontend-error-reports';
 import { Button, buttonVariants } from '@synapcity/frontend-ui/core/button';
 import { ModeProvider } from '@synapcity/frontend-preferences';
 
-import {
-  MESSAGE_HEADING_ID,
-  MessagePage,
-} from '@/components/shells/message-page';
-import { fontVariables } from './fonts';
+import { MESSAGE_HEADING_ID, MessagePage } from '@synapcity/frontend-shells';
+import { fontVariables } from '@synapcity/frontend-fonts/next';
 
 /**
  * The last resort: what shows when the root layout itself fails, which

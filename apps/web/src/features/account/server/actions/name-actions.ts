@@ -3,16 +3,15 @@
 import { revalidatePath } from 'next/cache';
 
 import { checkName } from '@synapcity/domain-identity';
-import type { ProfileState } from '@/features/account/types';
-import {
-  getCaller,
-  mirrorToSession,
-  SAVE_FAILED,
-  SHOWS_LATER,
-} from '../caller';
+import type { ProfileState } from '@synapcity/features-account/contracts';
+import { getCaller, mirrorToSession, SHOWS_LATER } from '../caller';
+import { SAVE_FAILED } from '@/lib/access/caller';
 import { saveName } from '../save-name';
-import { createClient } from '@/lib/supabase/server';
-import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
+import { createClient } from '../../../../lib/supabase/server';
+import {
+  FIXTURE_MESSAGE,
+  fixtureModeEnabled,
+} from '../../../../lib/access/dev-fixture';
 
 /**
  * Updates the signed-in user's display name. A name change needs no

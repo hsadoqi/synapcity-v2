@@ -28,7 +28,7 @@ Re-inventory every AuthButtons consumer before execution. New consumers require 
 
 - [x] Add required `signInHref` and `signUpHref` string props and render them through existing LinkButton. _(2026-10-17: evidence: `auth-buttons.tsx` props are required strings.)_
 - [x] Remove the shared component's hardcoded app destinations under the approved API scope; preserve current active-link/quiet-header behavior, variants, labels, semantic styling and layout. The live component currently reads pathname; reconcile any adapter/prop needs with the selected runtime contract before changing that behavior. _(2026-10-17: evidence: the component holds no app destinations; `auth-buttons.test.tsx`.)_
-- [x] Supply the existing login/register destinations from the app's AuthStatus. _(2026-10-17: evidence: `features/auth/components/auth-status.tsx`.)_
+- [x] Supply the existing login/register destinations from the app's AuthActions. _(2026-10-17: evidence: `features/auth/components/auth-status.tsx`.)_
 - [x] Supply example destinations in both component stories and the root-header story; update existing test renders for the required props. _(2026-10-17: evidence: `auth-buttons.stories.tsx` and `root-header.stories.tsx`.)_
 - [x] Type-check all consumers in the same change, so no intermediate missing-prop state is left at the checkpoint. _(2026-10-17: evidence: `pnpm typecheck` passes; CI `verify` on PR #41 (run 39027783915, commit 8ea886a) runs the full `pnpm verify` chain and passed.)_
 

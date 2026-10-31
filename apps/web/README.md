@@ -13,9 +13,9 @@ pnpm install
 pnpm dev:web      # http://localhost:8080
 ```
 
-Per-app checks run through the root scripts (`pnpm lint`, `pnpm check-types`, `pnpm build`); `pnpm verify` runs everything.
+Per-app checks run through the root scripts (`pnpm lint`, `pnpm check-types`, `pnpm build`); `pnpm verify` runs everything. Start `pnpm verify` from the repository root: inside `apps/web`, `pnpm verify` is this package's own script (`lint`, `check-types`, `build` only) and skips the tests, end-to-end run, Storybook tests, `deps` and `boundaries`.
 
-Tests: Vitest unit tests sit beside the code they cover as `*.test.ts` (`pnpm test` from the root, or `pnpm --filter web test`). They cover the pure auth helpers and route policy in `src/lib`, the auth and profile server actions (with the Supabase client replaced), the auth callback route handler, the session proxy (`src/lib/supabase/middleware.ts`) and an import-boundary check (`src/architecture.test.ts`). Component and hook tests that need a DOM are named `*.dom.test.tsx` and run in jsdom; everything else runs in Node. `pnpm test:e2e` runs the Playwright tests against a production build. The authenticated shared-look case is opt-in: save a session for an account with saved preferences to `e2e/.auth/account.json` (ignored by Git); the test reads account preferences and does not change them.
+Tests: Vitest unit tests sit beside the code they cover as `*.test.ts` (`pnpm test` from the root, or `pnpm --filter web test`). They cover the pure auth helpers and route policy in `src/lib`, the auth and profile server actions (with the Supabase client replaced), the auth callback route handler, the session proxy (`src/lib/supabase/middleware.ts`) and an import-boundary check (`src/architecture.test.ts`). Component and hook tests that need a DOM are named `*.dom.test.tsx` and run in jsdom; everything else runs in Node. `pnpm test:e2e` runs the Playwright tests against a production build. The authenticated shared-look case is opt-in: save a session for an account with saved preferences to `e2e/.auth/account.json` (ignored by Git); the test reads account preferences and does not change them. The dashboard server-path case (`e2e/dashboard-persistence.e2e.ts`) is opt-in the same way: it needs that saved session of a dedicated test account (or `E2E_AUTH_STATE`) and `E2E_DASHBOARD_PATH`, the path of an empty dashboard the account owns, and it adds and removes widgets on it. `e2e/dashboard-edit.e2e.ts` runs on the development fixture identity (`SYNAPCITY_DEV_AUTH=fixture` with a dev server) and keeps the composition in the browser, so it covers the interface, not the database.
 
 These tests replace the Supabase client, so they do not prove live email delivery, OAuth round trips, cookie behavior across tabs or database policies (RLS). Those need a live run against a real project. Pages are covered only by the end-to-end tests.
 
@@ -32,6 +32,37 @@ Set these in `apps/web/.env.local` (git-ignored) and, for deployments, in the ho
 | `NEXT_PUBLIC_PREFERENCES_COOKIE_DOMAIN` | yes                    | Optional. Valid parent DNS domain for the shared look cookie (for example `.example.com`). Empty means host-only. Set the same value in the web and docs production builds |
 
 The app throws on the first sign-up, reset or OAuth call if `SITE_URL` is missing.
+
+### A worktree has no `.env.local`
+
+`.env.local` is git-ignored, so a new worktree starts without it and the server answers every page with 500. For `pnpm test:e2e` and `pnpm verify`, pass the same placeholders CI uses (they hold no credentials and nothing contacts Supabase):
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321 \
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=ci-placeholder-key \
+SITE_URL=http://localhost:8080 \
+pnpm verify
+```
+
+Do not copy another checkout's `.env.local` into a worktree; it may hold real project values.
+
+### Running Playwright from several worktrees
+
+`pnpm test:e2e` (and `pnpm --filter web exec playwright test`) picks a free port for web and docs on every run, starts both servers from the checkout it runs in, sets `SITE_URL` to the web origin it serves, prints the addresses (`[e2e] web: http://localhost:<port>`) and stops the servers when it ends. Nothing listens on a fixed port, an already-running server is never reused, and two worktrees can run it at the same time. Both apps must be built in that checkout first (`pnpm build` does this; `test:e2e` depends on it). `E2E_WEB_PORT` and `E2E_DOCS_PORT` pin a port to reproduce a run; a taken port fails the run. `E2E_WEB_MODE=dev` serves `next dev` instead of the build, for the fixture-identity specs (`SYNAPCITY_DEV_AUTH=fixture`, see `docs/engineering/quality-gates.md`); the dev server is also started and stopped by the run, and a fixture run needs `--workers=2` or fewer to avoid a cold-compile timeout. The local-session suite below starts its own server too, but only one such run can use the local stack at a time.
+
+### Signed-in checks against the local Supabase stack
+
+`pnpm test:e2e:local-session` (from `apps/web`) runs `e2e/local-session.e2e.ts`: sign-in, the account menu, public and auth pages signed in, 404 shells, protected-page metadata, sign-out and a real `/auth/callback` code exchange from a password-reset mail. It needs only the local stack running (`supabase start`; project `synapcity`, API on `127.0.0.1:54321`, mail on `54324`). The runner reads the keys from `supabase status` into its own environment and refuses a non-loopback address; nothing is printed or written.
+
+The run owns its server, so it cannot test another checkout's:
+
+1. It takes a machine-wide lock (a `synapcity-local-session-*.lock` directory in the temp directory, naming the holder's pid and checkout). A second run, from this or another checkout, fails at once and names the first. One run at a time is the rule: the stack mails sign-in links to its `site_url` (`supabase/config.toml`, `http://127.0.0.1:3000`) and the callback checks only work when the app is served on exactly that origin. Giving each run its own port would need a wildcard loopback entry in the stack's `additional_redirect_urls` and a restart of the shared auth container, and an isolated stack per run would need a second set of containers; neither is adopted, so the machine-wide lock is the accepted concurrency boundary.
+2. It fails if anything already listens on that address. It never attaches to a server.
+3. It builds the app from this checkout against the stack (`NEXT_PUBLIC_SUPABASE_URL` is inlined at build time) into `.next/local-session`, so the ordinary build in `.next` is untouched, and starts `next start` itself in its own process group.
+4. It proves the answering server is that build by fetching the build's own static manifest (the build id is random per build), then prints `[local-session] web: <origin> (pid, checkout, build)`.
+5. It runs Playwright, then stops only the server it started, removes any temporary user the run left, and releases the lock, also on failure and on Ctrl-C or SIGTERM.
+
+The run creates one `route-groups-e2e-…@example.test` user in the local stack (random per run, so runs never share one; the mailbox is searched by that address) and removes it and its mail afterwards. Users of that shape older than 15 minutes, left by a run that was killed, are removed at the start of the next run. A run killed with SIGKILL cannot clean up: its server keeps the port (the next run says so and names the `lsof` command to find it), and its lock is taken over automatically because its pid is gone. In an ordinary `pnpm test:e2e` the file is skipped. The browser follows the mailed link's redirects itself; nothing is mapped to another host.
 
 ### Shared-look production domains
 
@@ -90,12 +121,12 @@ Not verified against a real project at the time of writing: the avatars and Goog
 
 ## Structure
 
-| Path                     | Contains                                                             |
-| ------------------------ | -------------------------------------------------------------------- |
-| `src/app/`               | Routes and the root layout, which loads Inter, Geist, Geist Mono     |
-| `src/styles/globals.css` | Imports and `@source` lines only; no tokens                          |
-| `src/lib/`               | App-level helpers, including the `cn` re-export                      |
-| `components.json`        | shadcn config; routes added components into `@synapcity/frontend-ui` |
+| Path                     | Contains                                                                                    |
+| ------------------------ | ------------------------------------------------------------------------------------------- |
+| `src/app/`               | Routes in `(public)`, `(auth)` and `(protected)` groups; the root layout (fonts, providers) |
+| `src/styles/globals.css` | Imports and `@source` lines only; no tokens                                                 |
+| `src/lib/`               | App-level helpers, including the `cn` re-export                                             |
+| `components.json`        | shadcn config; routes added components into `@synapcity/frontend-ui`                        |
 
 ## Styling
 

@@ -3,11 +3,9 @@ import {
   type AuthError,
   type SupabaseClient,
 } from '@supabase/supabase-js';
-import type {
-  IdentityProvider,
-  ProviderFailure,
-  ProviderOutcome,
-} from '@synapcity/server-auth';
+import type { IdentityProvider, ProviderOutcome } from '@synapcity/server-auth';
+
+import { toProviderFailure } from '../provider-failure';
 
 /** The part of a Supabase client the identity provider uses. */
 type AuthClient = {
@@ -21,17 +19,10 @@ export function outcomeFromClaims(
   return claims ? { kind: 'user', userId: claims.sub } : { kind: 'none' };
 }
 
-function detail(error: AuthError): ProviderFailure {
-  return {
-    ...(error.code !== undefined && { code: error.code }),
-    ...(error.status !== undefined && { status: error.status }),
-  };
-}
-
 function failed(error: AuthError): ProviderOutcome {
   return isAuthRetryableFetchError(error)
-    ? { kind: 'unreachable', ...detail(error) }
-    : { kind: 'refused', ...detail(error) };
+    ? { kind: 'unreachable', ...toProviderFailure(error) }
+    : { kind: 'refused', ...toProviderFailure(error) };
 }
 
 /**

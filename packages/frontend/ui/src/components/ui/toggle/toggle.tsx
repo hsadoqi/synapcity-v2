@@ -1,6 +1,6 @@
 'use client';
 
-import { Toggle as TogglePrimitive } from '@base-ui/react/toggle';
+import { Toggle as TogglePrimitive } from '@base-ui/react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from 'cn';
 
@@ -18,9 +18,21 @@ const toggleVariants = cva(
       },
       size: {
         default:
-          'h-7 min-w-7 pointer-coarse:h-11 pointer-coarse:min-w-11 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2',
+          'h-7 min-w-7 pointer-coarse:h-11 pointer-coarse:min-w-11 px-2.5 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-2',
+        xs: "h-5 min-w-5 pointer-coarse:h-10 pointer-coarse:min-w-10 px-2 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-2.5",
         sm: "h-6 min-w-6 pointer-coarse:h-11 pointer-coarse:min-w-11 rounded-sm px-2 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
         lg: "h-8 min-w-8 pointer-coarse:h-12 pointer-coarse:min-w-12 px-3 has-data-[icon=inline-end]:pr-2.5 has-data-[icon=inline-start]:pl-2.5 [&_svg:not([class*='size-'])]:size-4",
+        xl: "h-9 min-w-9 pointer-coarse:h-12 pointer-coarse:min-w-12 px-3.5 has-data-[icon=inline-end]:pr-2.5 has-data-[icon=inline-start]:pl-2.5 [&_svg:not([class*='size-'])]:size-4.5",
+        // Square sizes for a toggle that shows only an icon, matching Button's.
+        'icon-xs':
+          "size-5 pointer-coarse:size-11 rounded-sm [&_svg:not([class*='size-'])]:size-2.5",
+        'icon-sm':
+          "size-6 pointer-coarse:size-11 [&_svg:not([class*='size-'])]:size-3",
+        icon: "size-7 pointer-coarse:size-11 [&_svg:not([class*='size-'])]:size-3.5",
+        'icon-lg':
+          "size-8 pointer-coarse:size-12 [&_svg:not([class*='size-'])]:size-4",
+        'icon-xl':
+          "size-10 pointer-coarse:size-12 [&_svg:not([class*='size-'])]:size-5",
       },
     },
     defaultVariants: {

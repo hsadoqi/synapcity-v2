@@ -1,6 +1,10 @@
 import { cn } from '@synapcity/frontend-ui/lib/utils';
-import type { RegionalSettings } from '@synapcity/domain-preferences';
-import { formatDate, formatNumber, formatTime } from './regional-rows';
+import {
+  formatDate,
+  formatTime,
+  type RegionalSettings,
+} from '@synapcity/domain-preferences';
+import { draftFormatting, formatNumber } from './regional-rows';
 
 const week = [
   ['sunday', 'Sunday'],
@@ -36,13 +40,13 @@ export function RegionalPreview({
       <div>
         <dt className="text-xs text-muted-foreground">Now</dt>
         <dd className="text-lg font-medium tabular-nums">
-          {now ? formatTime(now, regional) : '…'}
+          {now ? formatTime(now, draftFormatting(regional)) : '…'}
         </dd>
       </div>
       <div>
         <dt className="text-xs text-muted-foreground">Today</dt>
         <dd className="text-lg font-medium tabular-nums">
-          {now ? formatDate(now, regional) : '…'}
+          {now ? formatDate(now, draftFormatting(regional)) : '…'}
         </dd>
       </div>
       <div>

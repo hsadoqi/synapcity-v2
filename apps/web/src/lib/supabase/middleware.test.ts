@@ -55,6 +55,7 @@ vi.mock('@supabase/ssr', () => ({
   },
 }));
 
+import { REQUEST_PATH_HEADER } from '../routing/request-path';
 import { updateSession } from './middleware';
 
 const request = (path: string) =>
@@ -136,5 +137,46 @@ describe('updateSession in development fixture mode', () => {
 
     expect(response.headers.get('location')).toContain('/auth/login');
     expect(sdk.clients).toBe(1);
+  });
+
+  describe('the request path header', () => {
+    // Next passes the headers a proxy sets on the request to the app as
+    // `x-middleware-request-<name>` on the proxy's response.
+    const forwarded = (response: Response) =>
+      response.headers.get(`x-middleware-request-${REQUEST_PATH_HEADER}`);
+
+    it('carries the path and query to the app on a page that passes through', async () => {
+      sdk.claims = { sub: 'user-1' };
+
+      const response = await updateSession(request('/user-1?tab=a'));
+
+      expect(forwarded(response)).toBe('/user-1?tab=a');
+    });
+
+    it('replaces a value the client sent, so it cannot choose the way back', async () => {
+      sdk.claims = { sub: 'user-1' };
+      const spoofed = new NextRequest(new URL('/user-1', 'https://app.test'), {
+        headers: { [REQUEST_PATH_HEADER]: '//evil.example/steal' },
+      });
+
+      const response = await updateSession(spoofed);
+
+      expect(spoofed.headers.get(REQUEST_PATH_HEADER)).toBe('/user-1');
+      expect(forwarded(response)).toBe('/user-1');
+    });
+
+    it('replaces it when the proxy redirects, too', async () => {
+      const spoofed = new NextRequest(
+        new URL('/user-1/home', 'https://app.test'),
+        { headers: { [REQUEST_PATH_HEADER]: '/elsewhere' } },
+      );
+
+      const response = await updateSession(spoofed);
+
+      expect(response.headers.get('location')).toContain(
+        'next=%2Fuser-1%2Fhome',
+      );
+      expect(spoofed.headers.get(REQUEST_PATH_HEADER)).toBe('/user-1/home');
+    });
   });
 });

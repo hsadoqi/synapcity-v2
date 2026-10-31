@@ -1,30 +1,29 @@
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
-import '../styles/globals.css';
-import { fontVariables } from './fonts';
+import '@/styles/globals.css';
+import { fontVariables } from '@synapcity/frontend-fonts/next';
 import RootProviders from '../components/providers/root-providers';
-import { AuthStatus } from '@/features/auth/components/auth-status';
-import { BreadcrumbRootShell } from '@/components/breadcrumbs';
+import { NextShellNavigation } from '@synapcity/frontend-shells/next';
 import { createMetadata } from '@synapcity/frontend-site/metadata';
-import { UserProvider } from '@/features/auth/client';
-import { getCurrentUser } from '@/features/auth/server';
+import { UserProvider } from '@/providers/user-provider';
+import { getCurrentUser } from '../features/auth/server';
 import {
   appearanceBootScript,
   fontBootScript,
   modeBootScript,
   themeShapeBootScript,
   lookHtmlAttributes,
+  RegionalProvider,
 } from '@synapcity/frontend-preferences';
 import { AccountPreferencesSync } from '@synapcity/features-settings/frontend';
-import { getAccountPreferences } from '@/features/settings/server/account-preferences';
+import { getAccountPreferences } from '../features/settings/server/account-preferences';
 import {
   LOOK_COOKIE_NAME,
   lookWithAccount,
   pageLanguage,
   parseLookCookieValue,
 } from '@synapcity/domain-preferences';
-import { accountLinksFor } from '@/lib/routing/user-paths';
-import { cn } from '@/lib/utils';
+import { cn } from '../lib/utils';
 
 export const metadata: Metadata = createMetadata({
   title: 'Synapcity',
@@ -32,6 +31,12 @@ export const metadata: Metadata = createMetadata({
   siteUrl: process.env.SITE_URL,
 });
 
+/**
+ * The document, the global styles and the providers every page needs. The page
+ * chrome belongs to the route group: `(public)` and `(auth)` use the public
+ * shell, `(protected)` the workspace shell. Root `error` and `not-found` bring
+ * their own.
+ */
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -67,16 +72,18 @@ export default async function RootLayout({
       </head>
       <body>
         <AccountPreferencesSync preferences={account} />
-        <RootProviders>
-          <UserProvider user={user}>
-            <BreadcrumbRootShell
-              account={user ? accountLinksFor(user.id) : null}
-              headerActions={<AuthStatus variant="header" />}
-            >
-              {children}
-            </BreadcrumbRootShell>
-          </UserProvider>
-        </RootProviders>
+        {/* Dates written on the server use the account's settings and its last
+            device zone, so they match the browser's first render. */}
+        <RegionalProvider
+          regional={account?.regional ?? null}
+          deviceTimeZone={stored?.deviceTimezone ?? null}
+        >
+          <RootProviders>
+            <UserProvider user={user}>
+              <NextShellNavigation>{children}</NextShellNavigation>
+            </UserProvider>
+          </RootProviders>
+        </RegionalProvider>
       </body>
     </html>
   );

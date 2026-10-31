@@ -18,6 +18,19 @@ export function spacesPathFor(userId: string): string {
   return `${homePathFor(userId)}/spaces`;
 }
 
+/** One Space's page; the same shape the Spaces package links to. */
+export function spacePathFor(userId: string, spaceId: string): string {
+  return `${spacesPathFor(userId)}/${spaceId}`;
+}
+
+export function documentsPathFor(userId: string): string {
+  return `${homePathFor(userId)}/documents`;
+}
+
+export function dashboardsPathFor(userId: string): string {
+  return `${homePathFor(userId)}/dashboards`;
+}
+
 /** A document's top-level route (ADR-0013, item 9); its page arrives with Milestone 8. */
 export function documentPathFor(userId: string, documentId: string): string {
   return `${homePathFor(userId)}/documents/${documentId}`;

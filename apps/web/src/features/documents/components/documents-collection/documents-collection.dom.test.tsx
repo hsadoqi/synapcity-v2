@@ -16,7 +16,7 @@ vi.mock('../../server/actions/document-state-actions', () => ({
   setDocumentPinned: mocks.setDocumentPinned,
 }));
 
-import type { OwnedRecordSummary } from '@/lib/owned-records';
+import type { OwnedRecordSummary } from '@synapcity/domain-records';
 
 import { CollectionNavigationProvider } from '@synapcity/frontend-collection';
 import { DOCUMENT_FIXTURES } from '../../lib/fixtures';

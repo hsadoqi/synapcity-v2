@@ -4,8 +4,13 @@ import * as React from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 
 import { cn } from '@synapcity/frontend-ui/lib/utils';
-import { Button } from '@synapcity/frontend-ui/core/button';
 import { Input } from '@synapcity/frontend-ui/core/input';
+import { Toggle } from '@synapcity/frontend-ui/core/toggle';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@synapcity/frontend-ui/core/tooltip';
 
 type PasswordInputProps = Omit<React.ComponentProps<'input'>, 'type'>;
 
@@ -24,19 +29,24 @@ function PasswordInput({ className, ...props }: PasswordInputProps) {
         className={cn('pr-10', className)}
         {...props}
       />
-      <Button
-        toggle
-        type="button"
-        variant="ghost"
-        size="icon-sm"
-        label="Show password"
-        pressed={visible}
-        onPressedChange={setVisible}
-        disabled={props.disabled}
-        className="absolute top-1/2 right-1 -translate-y-1/2"
-      >
-        {visible ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
-      </Button>
+      <Tooltip>
+        <TooltipTrigger
+          render={
+            <Toggle
+              variant="ghost"
+              size="icon-sm"
+              aria-label="Show password"
+              pressed={visible}
+              onPressedChange={setVisible}
+              disabled={props.disabled}
+              className="absolute top-1/2 right-1 -translate-y-1/2"
+            />
+          }
+        >
+          {visible ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
+        </TooltipTrigger>
+        <TooltipContent>Show password</TooltipContent>
+      </Tooltip>
     </div>
   );
 }

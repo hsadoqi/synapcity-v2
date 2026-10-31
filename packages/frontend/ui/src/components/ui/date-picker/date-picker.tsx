@@ -5,7 +5,9 @@ import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import type { DateRange, Matcher } from 'react-day-picker';
 
+import { useDateTimeFormatting } from '@synapcity/frontend-preferences';
 import { Button } from '@synapcity/frontend-ui/core/button';
+import { formatCalendarDay } from '@synapcity/frontend-ui/lib/calendar-utils';
 import { Calendar } from '@synapcity/frontend-ui/core/calendar';
 import {
   Popover,
@@ -16,6 +18,23 @@ import {
 /** How a date is written into a hidden input for a plain form post. */
 const toFormValue = (date: Date | undefined) =>
   date ? format(date, 'yyyy-MM-dd') : '';
+
+/**
+ * The trigger's default text, in the person's date order: "October 24, 2026"
+ * or "24 October 2026" for one date, "Oct 24, 2026" for each end of a range.
+ */
+function useDefaultFormat(month: 'short' | 'long') {
+  const formatting = useDateTimeFormatting();
+  return React.useCallback(
+    (date: Date) =>
+      formatCalendarDay(date, formatting, {
+        weekday: false,
+        year: true,
+        month,
+      }),
+    [formatting, month],
+  );
+}
 
 /** Days outside `min` and `max` cannot be chosen. */
 function outside(min?: Date, max?: Date, step?: number): Matcher[] {
@@ -83,7 +102,7 @@ export interface DatePickerProps extends PickerTriggerProps {
   readonly value?: Date;
   readonly defaultValue?: Date;
   readonly onValueChange?: (date: Date | undefined) => void;
-  /** The trigger's text for a chosen date. Defaults to date-fns `PPP`. */
+  /** The trigger's text for a chosen date. Defaults to the person's date order with a full month. */
   readonly formatValue?: (date: Date) => string;
 }
 
@@ -100,7 +119,7 @@ export function DatePicker({
   min,
   max,
   step,
-  formatValue = (date) => format(date, 'PPP'),
+  formatValue,
   className,
   ref,
   onBlur,
@@ -117,6 +136,8 @@ export function DatePicker({
     onValueChange,
   );
   const [open, setOpen] = React.useState(false);
+  const defaultFormat = useDefaultFormat('long');
+  const writeDate = formatValue ?? defaultFormat;
 
   return (
     <>
@@ -133,7 +154,7 @@ export function DatePicker({
               {...aria}
             >
               <CalendarIcon data-icon="inline-start" />
-              {date ? formatValue(date) : <span>{placeholder}</span>}
+              {date ? writeDate(date) : <span>{placeholder}</span>}
             </Button>
           }
         />
@@ -166,7 +187,7 @@ export interface DateRangePickerProps extends PickerTriggerProps {
   readonly defaultValue?: DateRange;
   readonly onValueChange?: (range: DateRange | undefined) => void;
   readonly numberOfMonths?: number;
-  /** The trigger's text for one end. Defaults to `LLL dd, y`. */
+  /** The trigger's text for one end. Defaults to the person's date order with a short month. */
   readonly formatValue?: (date: Date) => string;
 }
 
@@ -182,7 +203,7 @@ export function DateRangePicker({
   max,
   step,
   numberOfMonths = 2,
-  formatValue = (date) => format(date, 'LLL dd, y'),
+  formatValue,
   className,
   ref,
   onBlur,
@@ -199,10 +220,12 @@ export function DateRangePicker({
     onValueChange,
   );
 
+  const defaultFormat = useDefaultFormat('short');
+  const writeDate = formatValue ?? defaultFormat;
   const label = range?.from
     ? range.to
-      ? `${formatValue(range.from)} – ${formatValue(range.to)}`
-      : formatValue(range.from)
+      ? `${writeDate(range.from)} – ${writeDate(range.to)}`
+      : writeDate(range.from)
     : undefined;
 
   return (

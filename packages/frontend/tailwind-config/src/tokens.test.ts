@@ -347,11 +347,9 @@ describe('the font variables the tokens read', () => {
   // What an app has to provide: referenced by the tokens, defined by no token.
   const fromApps = [...referenced].filter((n) => !definedHere.has(n)).sort();
 
-  const loaders: Record<string, string> = {
-    web: 'apps/web/src/app/fonts.ts',
-    docs: 'apps/docs/src/app/layout.tsx',
-    storybook: 'apps/storybook/.storybook/preview.tsx',
-  };
+  // One loader file serves every host (@synapcity/frontend-fonts); its own
+  // tests check that web, docs and Storybook all consume it.
+  const loader = 'packages/frontend/fonts/src/next/fonts.ts';
 
   it('are the three the apps are expected to load', () => {
     expect(fromApps).toEqual([
@@ -361,13 +359,11 @@ describe('the font variables the tokens read', () => {
     ]);
   });
 
-  for (const [app, file] of Object.entries(loaders)) {
-    it(`are all defined by ${app}`, () => {
-      const loader = readFileSync(join(repo, file), 'utf8');
-      const defined = [
-        ...loader.matchAll(/variable:\s*'(--font-[\w-]+)'/g),
-      ].map((m) => m[1]);
-      expect(defined).toEqual(expect.arrayContaining(fromApps));
-    });
-  }
+  it('are all defined by the fonts package', () => {
+    const source = readFileSync(join(repo, loader), 'utf8');
+    const defined = [...source.matchAll(/variable:\s*'(--font-[\w-]+)'/g)].map(
+      (m) => m[1],
+    );
+    expect(defined).toEqual(expect.arrayContaining(fromApps));
+  });
 });

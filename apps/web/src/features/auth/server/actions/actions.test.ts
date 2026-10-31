@@ -422,6 +422,15 @@ describe('signOut', () => {
     expect(warn).not.toHaveBeenCalled();
   });
 
+  it('signs out of this browser only, leaving other devices signed in', async () => {
+    mocks.signOut.mockResolvedValue({});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    await redirectOf(signOut());
+
+    expect(mocks.signOut).toHaveBeenCalledWith({ scope: 'local' });
+  });
+
   describe('when the provider fails', () => {
     const LEAK_MARKER = 'sentinel-marker-9f3a';
     let warn: ReturnType<typeof vi.spyOn>;

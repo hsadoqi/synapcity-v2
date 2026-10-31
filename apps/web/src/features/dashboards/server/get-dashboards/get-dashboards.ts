@@ -1,9 +1,6 @@
-import { fixtureModeEnabled } from '@/lib/access/dev-fixture';
-import {
-  listOwnedRecordSummaries,
-  type OwnedRecordSummary,
-} from '@/lib/owned-records';
-import { createClient } from '@/lib/supabase/server';
+import type { BaseRecord, OwnedRecordSummary } from '@synapcity/domain-records';
+
+import { loadRecord, loadRecordSummaries } from '@/lib/records';
 
 import { DASHBOARD_FIXTURES } from '../../lib/fixtures';
 
@@ -12,8 +9,14 @@ import { DASHBOARD_FIXTURES } from '../../lib/fixtures';
  * security scopes the query to the session, so no owner id is passed.
  * Development fixture mode has no session or database and reads sample records.
  */
-export async function getDashboards(): Promise<OwnedRecordSummary[]> {
-  if (fixtureModeEnabled()) return [...DASHBOARD_FIXTURES];
+export function getDashboards(): Promise<OwnedRecordSummary[]> {
+  return loadRecordSummaries('dashboards', DASHBOARD_FIXTURES);
+}
 
-  return listOwnedRecordSummaries(await createClient(), 'dashboards');
+/**
+ * One of the signed-in owner's dashboards, or null when it does not exist or is
+ * not theirs. Fixture mode reads the sample records.
+ */
+export function getDashboard(id: string): Promise<BaseRecord | null> {
+  return loadRecord('dashboards', id, DASHBOARD_FIXTURES);
 }

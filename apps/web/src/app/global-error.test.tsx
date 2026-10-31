@@ -3,7 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockViewport } from '@synapcity/dev-vitest-config/viewport';
 
 // The font loaders only run inside Next's build; here they are replaced.
-vi.mock('./fonts', () => ({ fontVariables: 'font-inter-var font-geist-var' }));
+vi.mock('@synapcity/frontend-fonts/next', () => ({
+  fontVariables: 'font-inter-var font-geist-var',
+}));
 
 import GlobalError from './global-error';
 

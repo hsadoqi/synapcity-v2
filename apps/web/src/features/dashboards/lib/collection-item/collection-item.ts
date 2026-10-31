@@ -1,6 +1,6 @@
 import { itemFromRecord } from '@synapcity/frontend-collection';
 import type { CollectionItem } from '@synapcity/frontend-collection';
-import type { OwnedRecordSummary } from '@/lib/owned-records';
+import type { OwnedRecordSummary } from '@synapcity/domain-records';
 import { dashboardPathFor } from '@/lib/routing/user-paths';
 
 /** Which spaces a dashboard is in, in a few words: "In 2 spaces", or "Not in a space". */

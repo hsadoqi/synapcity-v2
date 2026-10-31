@@ -43,6 +43,19 @@
 
   html {
     min-height: 100%;
+    /* Every scroller's bar: a quiet thumb from the theme on a clear track. The colour is
+       inherited, so this one declaration styles them all and follows light and dark. */
+    scrollbar-color: color-mix(
+        in oklab,
+        var(--muted-foreground) 40%,
+        transparent
+      )
+      transparent;
+  }
+
+  /* Width is not inherited, so it is set on every element; `scrollbar-hidden` still wins. */
+  * {
+    scrollbar-width: thin;
   }
 
   body {

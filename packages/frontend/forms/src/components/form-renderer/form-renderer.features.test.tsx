@@ -636,9 +636,10 @@ describe('FormRenderer list and range fields', () => {
     fireEvent.keyDown(screen.getByRole('combobox', { name: 'Skills' }), {
       key: 'ArrowDown',
     });
-    await act(async () =>
-      fireEvent.click(await screen.findByRole('option', { name: 'Design' })),
-    );
+    // Find the option before `act`: Testing Library's async queries turn the
+    // act environment off while they poll, so React warns inside the scope.
+    const design = await screen.findByRole('option', { name: 'Design' });
+    await act(async () => fireEvent.click(design));
     // A multiselect stays open after a pick; close it like a person would.
     fireEvent.keyDown(screen.getByRole('combobox', { name: 'Skills' }), {
       key: 'Escape',

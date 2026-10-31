@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { DEFAULT_SETTINGS } from '@synapcity/domain-dashboards';
-import { Pin, RefreshCw } from 'lucide-react';
+import { Download, RefreshCw } from 'lucide-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { SEED_NOW, seededWorkspace } from '../../../testing';
@@ -95,7 +95,8 @@ export const WithContentToolbar: Story = {
     toolbar: {
       actions: [
         { label: 'Refresh', icon: <RefreshCw />, onSelect: fn() },
-        { label: 'Pin', icon: <Pin />, onSelect: fn() },
+        // Not Pin: the shell always adds its own Pin action after these.
+        { label: 'Export', icon: <Download />, onSelect: fn() },
         { label: 'Help', onSelect: fn() },
       ],
       settings: {

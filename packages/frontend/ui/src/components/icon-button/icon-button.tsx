@@ -1,29 +1,30 @@
 'use client';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
-import type {
-  ButtonProps,
-  ButtonSize,
+import {
+  Button,
+  type ButtonProps,
+  type ButtonSize,
 } from '@synapcity/frontend-ui/core/button';
 
 type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 type IconButtonProps = Omit<ButtonProps, 'size'> & { size?: IconSize };
 
+const iconSizeMap: Record<IconSize, ButtonSize> = {
+  xs: 'icon-xs',
+  sm: 'icon-sm',
+  md: 'icon',
+  lg: 'icon-lg',
+  xl: 'icon-xl',
+};
+
 const IconButton = ({
   className,
-  size,
+  size = 'md',
   variant = 'default',
   ...props
 }: IconButtonProps) => {
-  const iconSizes: Record<IconSize, ButtonSize> = {
-    xs: 'icon-xs',
-    sm: 'icon-sm',
-    md: 'icon',
-    lg: 'icon-lg',
-    xl: 'icon-xl',
-  };
-  const iconSize = size ? iconSizes[size] : 'icon';
+  const iconSize = size ? iconSizeMap[size] : 'icon';
   return (
     <Button
       data-slot="icon-button"

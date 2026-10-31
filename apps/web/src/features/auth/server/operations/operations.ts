@@ -1,7 +1,7 @@
 import { isAuthRetryableFetchError } from '@supabase/supabase-js';
 import { isRateLimited } from '@synapcity/domain-identity';
 
-import { hasRecentLinkSignIn } from '@/features/auth/shared/recent-link-sign-in';
+import { hasRecentLinkSignIn } from '@synapcity/features-auth/contracts';
 import { createClient } from '@/lib/supabase/server';
 
 /*

@@ -5,7 +5,10 @@ import {
   CalendarIcon,
   FileTextIcon,
   FlameIcon,
+  FoldersIcon,
+  HistoryIcon,
   ListChecksIcon,
+  PinIcon,
   RepeatIcon,
   TargetIcon,
   type LucideIcon,
@@ -25,4 +28,7 @@ export const WIDGET_CATALOG: readonly {
   { type: 'notes', label: 'Notes', Icon: FileTextIcon },
   { type: 'habit', label: 'Habit tracker', Icon: RepeatIcon },
   { type: 'progress', label: 'Goal tracker', Icon: TargetIcon },
+  { type: 'pinned', label: 'Pinned', Icon: PinIcon },
+  { type: 'last-opened', label: 'Last opened', Icon: HistoryIcon },
+  { type: 'spaces', label: 'Spaces', Icon: FoldersIcon },
 ];

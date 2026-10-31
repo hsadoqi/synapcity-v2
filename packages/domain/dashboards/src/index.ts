@@ -1,3 +1,4 @@
+export type { PersistableResult } from './utils';
 export type {
   AgendaWidget,
   CalendarWidget,
@@ -5,8 +6,11 @@ export type {
   DashboardSettings,
   FeedWidget,
   HabitWidget,
+  LastOpenedWidget,
   NotesWidget,
+  PinnedWidget,
   ProgressWidget,
+  SpacesWidget,
   StatWidget,
   TasksWidget,
   Widget,
@@ -17,6 +21,8 @@ export type {
 } from './types';
 export {
   DEFAULT_SETTINGS,
+  LINK_WIDGET_TYPES,
+  MAX_COMPOSITION_BYTES,
   WIDGET_SIZES,
   activeWidgets,
   addWidget,
@@ -27,6 +33,8 @@ export {
   duplicateWidget,
   gridLayoutFor,
   layoutsForWidgets,
+  moveWidgetInOrder,
+  parsePersistableComposition,
   removeWidget,
   setWidgetStatus,
   updateSettings,

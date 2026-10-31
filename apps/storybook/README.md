@@ -1,6 +1,6 @@
 # Storybook
 
-Component workshop for `@synapcity/frontend-ui`. It owns the Storybook configuration (`.storybook/`), the theme addon wiring and the brand assets in `public/`. It does not own components or stories: stories live beside the component in `packages/frontend/ui/src/{components,blocks}/**/*.stories.tsx`.
+Component workshop for `@synapcity/frontend-ui`. It owns the Storybook configuration (`.storybook/`), the theme addon wiring and the `/brand-assets` mount. It is a brand host, not an owner: `@synapcity/frontend-brand` owns the files, and `public/brand-assets` holds generated compatibility aliases only ([brand README](../../packages/frontend/brand/README.md)). It does not own components or stories: stories live beside the component in `packages/frontend/ui/src/{components,blocks}/**/*.stories.tsx`.
 
 Framework: `@storybook/nextjs-vite` (Storybook 10, Vite, React 19). Styling comes from `@synapcity/frontend-tailwind-config` through `@synapcity/frontend-ui/styles.css`; the theme addon toggles the `light` and `dark` classes on `<html>`.
 

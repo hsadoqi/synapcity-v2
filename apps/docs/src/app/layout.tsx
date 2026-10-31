@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
-import localFont from 'next/font/local';
 import '../styles/globals.css';
-import { Inter } from 'next/font/google';
+import { fontVariables } from '@synapcity/frontend-fonts/next';
 import { cn } from '@/lib/utils';
 import RootProviders from './providers';
-import { RootShell } from '@synapcity/frontend-ui/blocks/root-shell';
+import { RootShell } from '@synapcity/frontend-shells';
+import { NextShellNavigation } from '@synapcity/frontend-shells/next';
 import { createMetadata } from '@synapcity/frontend-site/metadata';
 import {
   appearanceBootScript,
@@ -18,19 +18,6 @@ import {
   LOOK_COOKIE_NAME,
   parseLookCookieValue,
 } from '@synapcity/domain-preferences';
-
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
-
-const geistSans = localFont({
-  src: '../lib/fonts/GeistVF.woff',
-  variable: '--font-geist-sans',
-});
-const geistMono = localFont({
-  src: '../lib/fonts/GeistMonoVF.woff',
-  variable: '--font-geist-mono',
-  // Code only: fetch it when a code element first renders, not on every page.
-  preload: false,
-});
 
 export const metadata: Metadata = createMetadata({ title: 'Synapcity Docs' });
 
@@ -47,12 +34,7 @@ export default async function RootLayout({
     <html
       lang="en"
       {...lookAttributes}
-      className={cn(
-        inter.variable,
-        geistSans.variable,
-        geistMono.variable,
-        lookAttributes?.className,
-      )}
+      className={cn(fontVariables, lookAttributes?.className)}
       style={lookAttributes?.style}
       suppressHydrationWarning
     >
@@ -68,7 +50,9 @@ export default async function RootLayout({
       </head>
       <body>
         <RootProviders>
-          <RootShell>{children}</RootShell>
+          <NextShellNavigation>
+            <RootShell>{children}</RootShell>
+          </NextShellNavigation>
         </RootProviders>
       </body>
     </html>
