@@ -25,8 +25,8 @@ import { createClient } from '../../../../lib/supabase/client';
 import {
   SettingsAccordion,
   SettingsAccordionItem,
-  SettingsTabShell,
 } from '@synapcity/features-settings/frontend';
+import { SettingsTabShell } from '../../../../../../../packages/features/settings/src/frontend/components/shared/settings-tabs';
 
 /**
  * The signed-in person's profile. The name and photo belong to the account

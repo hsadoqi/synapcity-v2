@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 import { SpacesCollection } from '@synapcity/features-spaces/frontend';
-import { SetBreadcrumbs } from '@synapcity/frontend-shells';
+import { BreadcrumbMenu } from '@synapcity/frontend-shells';
 import { COLLECTION_LABELS } from '@/components/collections';
 import { requireOwner } from '@/lib/access/require-owner';
 import {
@@ -25,7 +25,7 @@ export default async function SpacesPage({
 
   return (
     <>
-      <SetBreadcrumbs
+      <BreadcrumbMenu
         items={[{ label: COLLECTION_LABELS.spaces, kind: 'collection' }]}
       />
       <SpacesCollection

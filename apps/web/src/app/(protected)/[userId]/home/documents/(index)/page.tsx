@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 import { DocumentsCollection } from '@/features/documents/components/documents-collection';
 import { getDocuments } from '@/features/documents/server/get-documents';
-import { SetBreadcrumbs } from '@synapcity/frontend-shells';
+import { BreadcrumbMenu } from '@synapcity/frontend-shells';
 import { COLLECTION_LABELS } from '@/components/collections';
 import { requireOwner } from '@/lib/access/require-owner';
 
@@ -19,7 +19,7 @@ export default async function DocumentsPage({
 
   return (
     <>
-      <SetBreadcrumbs
+      <BreadcrumbMenu
         items={[{ label: COLLECTION_LABELS.documents, kind: 'collection' }]}
       />
       <DocumentsCollection documents={documents} userId={userId} />

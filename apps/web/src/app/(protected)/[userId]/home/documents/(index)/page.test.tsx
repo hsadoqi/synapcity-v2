@@ -13,7 +13,7 @@ vi.mock('@/features/documents/server/get-documents', () => ({
 }));
 
 import { isValidElement, type ReactElement, type ReactNode } from 'react';
-import { SetBreadcrumbs } from '@synapcity/frontend-shells';
+import { BreadcrumbMenu } from '@synapcity/frontend-shells';
 
 import DocumentsPage from './page';
 
@@ -37,7 +37,7 @@ describe('the Documents page', () => {
       params: Promise.resolve({ userId: 'u1' }),
     });
     const crumbs = elements(page).find(
-      (element) => element.type === SetBreadcrumbs,
+      (element) => element.type === BreadcrumbMenu,
     );
 
     expect(mocks.requireOwner).toHaveBeenCalledWith('u1');

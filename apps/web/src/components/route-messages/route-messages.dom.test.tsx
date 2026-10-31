@@ -28,6 +28,25 @@ describe('the route messages', () => {
     expect(container.querySelector('[data-slot$="shell"]')).toBeNull();
     expect(container.querySelector('main')).toBeNull();
   });
+
+  it('moves focus to the error heading that appeared, never another message on the page', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    render(
+      <>
+        <NotFoundMessage />
+        <RouteErrorMessage error={new Error('x')} retry={() => {}} />
+      </>,
+    );
+
+    expect(document.activeElement).toBe(
+      screen.getByRole('heading', { name: 'Something went wrong' }),
+    );
+  });
+
+  it('leaves focus alone for a page that was navigated to', () => {
+    render(<NotFoundMessage />);
+    expect(document.activeElement).toBe(document.body);
+  });
 });
 
 describe('the collection load error', () => {

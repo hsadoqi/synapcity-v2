@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMemo, type ReactNode } from 'react';
 import {
@@ -36,6 +35,7 @@ import { saveDashboardComposition } from '../../server/actions/dashboard-composi
 import { fixtureComposition } from '../../lib/fixtures';
 import { serverDashboardStorage } from '../../lib/server-dashboard-storage';
 import { DASHBOARD_PANEL, WIDGETS_DESTINATION_ID } from '../dashboard-panel';
+import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 
 /**
  * Where this dashboard's composition lives: the database through Server
@@ -165,7 +165,7 @@ export function DashboardView({
       unloadedKinds={unloadedKinds}
       widgetTypes={LINK_WIDGET_TYPES}
       persistsStatus={false}
-      LinkComponent={Link}
+      LinkComponent={LinkButton}
       onReload={() => router.refresh()}
       fallback={
         <PlainFrame dashboard={dashboard}>

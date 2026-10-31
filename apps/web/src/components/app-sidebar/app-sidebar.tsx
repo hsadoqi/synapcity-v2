@@ -1,29 +1,19 @@
-import { Globe, HomeIcon, Inbox, Search, Settings } from 'lucide-react';
+'use client';
+
 import type { ReactNode } from 'react';
-import { EntityIcon } from '@synapcity/frontend-collection';
 import {
-  activeContext,
-  ContextSwitcher,
-  type CommandPaletteGroup,
   type RootBreadcrumb,
   type RootSidebarContent,
-  type RootSidebarItem,
 } from '@synapcity/frontend-shells';
 
 import type { SidebarRecords } from '../../lib/sidebar-records';
-import {
-  homePathFor,
-  settingsPathFor,
-  spacePathFor,
-  spacesPathFor,
-} from '../../lib/routing/user-paths';
+import { homePathFor, settingsPathFor } from '../../lib/routing/user-paths';
 
 import { COLLECTIONS, type CollectionKind } from '../collections';
-
-const HOME_LABEL = 'Home';
-
-/** The context switcher's name for working across Synapcity, outside any Space. */
-const GLOBAL_LABEL = 'Global';
+import { HOME_LABEL } from './app-palette-groups';
+import { recordItem } from './utils';
+import { contextSwitcher } from './context-switcher';
+import { HomeIcon, Search, Inbox, Settings } from 'lucide-react';
 
 /** What the sidebar needs from the app shell besides the trail. */
 export type AppSidebarOptions = {
@@ -33,70 +23,6 @@ export type AppSidebarOptions = {
   /** The account menu, rendered on the server and pinned to the sidebar's foot. */
   footer?: ReactNode;
 };
-
-/** Whether the page at `pathname` is `href` or a page under it. */
-const within = (pathname: string, href: string) =>
-  pathname === href || pathname.startsWith(`${href}/`);
-
-/**
- * The context switcher: working globally, or inside one of the latest Spaces,
- * with a link to every Space. The active one comes from the trail's Space
- * crumb, matched by path, since two Spaces can share a name. A Space shows its
- * stored icon; one that is missing, unknown or not among the latest Spaces
- * shows the folder (ADR-0012). Global is not a Space, so it has its own icon.
- */
-function contextSwitcher(
-  userId: string,
-  trail: RootBreadcrumb[],
-  pathname: string,
-  spaces: SidebarRecords['spaces'],
-) {
-  const space = activeContext(trail);
-  let activeIcon: string | undefined;
-  const options = spaces.map((record) => {
-    const href = spacePathFor(userId, record.id);
-    const active = space !== null && within(pathname, href);
-    if (active) activeIcon = record.icon;
-    return { label: record.name, href, active };
-  });
-  const current = space?.label ?? GLOBAL_LABEL;
-  return (
-    <ContextSwitcher
-      current={current}
-      icon={
-        space ? (
-          <EntityIcon name={activeIcon ?? ''} className="size-4" />
-        ) : (
-          <Globe className="size-4" />
-        )
-      }
-      options={[
-        { label: GLOBAL_LABEL, href: homePathFor(userId), active: !space },
-        ...options,
-      ]}
-      more={{ label: 'All spaces', href: spacesPathFor(userId) }}
-    />
-  );
-}
-
-/** One record in its collection's section: a link, or shown disabled while its page is not built. */
-function recordItem(
-  userId: string,
-  record: { id: string; name: string },
-  collection: (typeof COLLECTIONS)[number],
-  pathname: string,
-): RootSidebarItem {
-  if (!collection.itemHref) {
-    return { title: record.name, icon: collection.icon, disabled: true };
-  }
-  const href = collection.itemHref(userId, record.id);
-  return {
-    title: record.name,
-    href,
-    icon: collection.icon,
-    isActive: href === pathname,
-  };
-}
 
 /**
  * The signed-in sidebar: the context switcher (Global or a Space), then the
@@ -149,44 +75,4 @@ export function appSidebar(
     ],
     footer,
   };
-}
-
-/** The command palette's groups: places to go, the latest records, and creating. */
-export function appPaletteGroups(
-  userId: string,
-  records: SidebarRecords,
-  onCreate: (kind: CollectionKind) => void,
-): CommandPaletteGroup[] {
-  return [
-    {
-      heading: 'Go to',
-      items: [
-        { label: HOME_LABEL, href: homePathFor(userId), icon: HomeIcon },
-        ...COLLECTIONS.map((c) => ({
-          label: c.label,
-          href: c.indexHref(userId),
-          icon: c.icon,
-        })),
-        { label: 'Settings', href: settingsPathFor(userId), icon: Settings },
-      ],
-    },
-    ...COLLECTIONS.map((collection) => ({
-      heading: collection.label,
-      items: records[collection.records].map((record) => ({
-        label: record.name,
-        icon: collection.icon,
-        ...(collection.itemHref
-          ? { href: collection.itemHref(userId, record.id) }
-          : { disabled: true }),
-      })),
-    })),
-    {
-      heading: 'Create',
-      items: COLLECTIONS.map((collection) => ({
-        label: `New ${collection.singular}`,
-        onSelect: () => onCreate(collection.kind),
-        icon: collection.icon,
-      })),
-    },
-  ];
 }

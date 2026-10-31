@@ -1,6 +1,6 @@
 import { AuthButtons } from '@synapcity/features-auth/frontend';
 import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
-import { UserMenu } from '@synapcity/frontend-ui/components/user-menu';
+import { UserMenu } from '@synapcity/frontend-blocks';
 
 import { signOut } from '@/features/auth/server/actions/actions';
 import { accountLinksFor, homePathFor } from '@/lib/routing/user-paths';

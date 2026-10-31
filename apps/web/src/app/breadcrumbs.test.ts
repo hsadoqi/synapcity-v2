@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest';
  * trail and publishes at most one: exactly one when it shows a trail, none
  * when it is trail-free. Resource views, panel destinations and drawers never
  * publish. Today's convention is that the route's `page.tsx` renders
- * `SetBreadcrumbs` directly, so this test allows the import only there.
+ * `BreadcrumbMenu` directly, so this test allows the import only there.
  *
  * Limits, so this is not read as more than it is:
  * - It guards the convention; it is not proof of ownership at run time. It
@@ -20,7 +20,7 @@ import { describe, expect, it } from 'vitest';
  *   namespace imports and re-exports from `@synapcity/frontend-shells`; a
  *   `require()` or dynamic import is not followed.
  * - It reads source text, not the rendered tree. A page with two
- *   `<SetBreadcrumbs>` in different branches counts as two, even if only one
+ *   `<BreadcrumbMenu>` in different branches counts as two, even if only one
  *   renders: build the items conditionally and render one. A tag inside a
  *   comment counts too.
  * - It scans `apps/web/src` and the `features` and `frontend` packages, where
@@ -40,7 +40,7 @@ const GROUP = join(APP, '(protected)');
 const PACKAGES = join(SRC, '..', '..', '..', 'packages');
 
 const INVARIANT =
-  'ADR-0017: the primary route publishes at most one breadcrumb trail; resource views, panel destinations and drawers never publish one. Today’s convention: the route’s page.tsx renders SetBreadcrumbs directly';
+  'ADR-0017: the primary route publishes at most one breadcrumb trail; resource views, panel destinations and drawers never publish one. Today’s convention: the route’s page.tsx renders BreadcrumbMenu directly';
 
 /** Files, relative to `src`, that may publish for a route besides its page. None today. */
 const ROUTE_OWNED_PUBLISHERS = new Map<string, string>();
@@ -65,8 +65,8 @@ const TRAIL_FREE = new Map<string, string>([
 const SHELLS = String.raw`['"]@synapcity/frontend-shells['"]`;
 
 /**
- * The names a module renders `SetBreadcrumbs` under (`SetBreadcrumbs`, an
- * alias, or `Namespace.SetBreadcrumbs`), and whether it re-exports it.
+ * The names a module renders `BreadcrumbMenu` under (`BreadcrumbMenu`, an
+ * alias, or `Namespace.BreadcrumbMenu`), and whether it re-exports it.
  */
 export function publisherBindings(source: string): {
   names: string[];
@@ -79,10 +79,10 @@ export function publisherBindings(source: string): {
   );
   for (const [, specifiers] of source.matchAll(named)) {
     for (const specifier of specifiers!.split(',')) {
-      const match = /^\s*(?:type\s+)?SetBreadcrumbs(?:\s+as\s+(\w+))?\s*$/.exec(
+      const match = /^\s*(?:type\s+)?BreadcrumbMenu(?:\s+as\s+(\w+))?\s*$/.exec(
         specifier,
       );
-      if (match) names.push(match[1] ?? 'SetBreadcrumbs');
+      if (match) names.push(match[1] ?? 'BreadcrumbMenu');
     }
   }
   const namespace = new RegExp(
@@ -90,17 +90,17 @@ export function publisherBindings(source: string): {
     'g',
   );
   for (const [, alias] of source.matchAll(namespace)) {
-    if (new RegExp(String.raw`\b${alias}\.SetBreadcrumbs\b`).test(source)) {
-      names.push(`${alias}.SetBreadcrumbs`);
+    if (new RegExp(String.raw`\b${alias}\.BreadcrumbMenu\b`).test(source)) {
+      names.push(`${alias}.BreadcrumbMenu`);
     }
   }
   const reexported = new RegExp(
-    String.raw`export\s+(?:\*|\{[^}]*\bSetBreadcrumbs\b[^}]*\})\s*from\s*${SHELLS}`,
+    String.raw`export\s+(?:\*|\{[^}]*\bBreadcrumbMenu\b[^}]*\})\s*from\s*${SHELLS}`,
   ).test(source);
   return { names, reexported };
 }
 
-/** How many times a module renders `SetBreadcrumbs` as JSX. */
+/** How many times a module renders `BreadcrumbMenu` as JSX. */
 export function publishCount(source: string): number {
   return publisherBindings(source).names.reduce((count, name) => {
     const tag = new RegExp(`<${name.replace('.', String.raw`\.`)}\\b`, 'g');
@@ -132,9 +132,9 @@ const imports = (path: string) => {
 
 describe('reading a module for breadcrumb publishers', () => {
   it('finds a plain, aliased or namespaced import and counts its renders', () => {
-    const plain = `import { RootShell, SetBreadcrumbs } from '@synapcity/frontend-shells';\n<SetBreadcrumbs items={[]} />`;
-    const aliased = `import { SetBreadcrumbs as Trail } from "@synapcity/frontend-shells";\n<Trail items={a} /><Trail items={b} />`;
-    const namespaced = `import * as shells from '@synapcity/frontend-shells';\n<shells.SetBreadcrumbs items={[]} />`;
+    const plain = `import { RootShell, BreadcrumbMenu } from '@synapcity/frontend-shells';\n<BreadcrumbMenu items={[]} />`;
+    const aliased = `import { BreadcrumbMenu as Trail } from "@synapcity/frontend-shells";\n<Trail items={a} /><Trail items={b} />`;
+    const namespaced = `import * as shells from '@synapcity/frontend-shells';\n<shells.BreadcrumbMenu items={[]} />`;
     expect(publishCount(plain)).toBe(1);
     expect(publishCount(aliased)).toBe(2);
     expect(publishCount(namespaced)).toBe(1);
@@ -143,7 +143,7 @@ describe('reading a module for breadcrumb publishers', () => {
   it('finds a re-export, and ignores other shell imports and other packages', () => {
     expect(
       publisherBindings(
-        `export { SetBreadcrumbs } from '@synapcity/frontend-shells';`,
+        `export { BreadcrumbMenu } from '@synapcity/frontend-shells';`,
       ).reexported,
     ).toBe(true);
     expect(
@@ -152,7 +152,7 @@ describe('reading a module for breadcrumb publishers', () => {
       ).names,
     ).toEqual([]);
     expect(
-      publisherBindings(`import { SetBreadcrumbs } from './elsewhere';`).names,
+      publisherBindings(`import { BreadcrumbMenu } from './elsewhere';`).names,
     ).toEqual([]);
   });
 });
@@ -172,7 +172,7 @@ describe('breadcrumb trail ownership', () => {
     expect(pages.filter(imports).length).toBeGreaterThan(0);
   });
 
-  it('imports SetBreadcrumbs only in signed-in route pages', () => {
+  it('imports BreadcrumbMenu only in signed-in route pages', () => {
     const allowed = new Set([
       ...pages,
       ...[...ROUTE_OWNED_PUBLISHERS.keys()].map((path) => join(SRC, path)),
@@ -199,7 +199,7 @@ describe('breadcrumb trail ownership', () => {
       } else {
         expect(
           count,
-          `${INVARIANT}. ${name} must render SetBreadcrumbs exactly once, or be listed in TRAIL_FREE with its reason.`,
+          `${INVARIANT}. ${name} must render BreadcrumbMenu exactly once, or be listed in TRAIL_FREE with its reason.`,
         ).toBe(1);
       }
     },

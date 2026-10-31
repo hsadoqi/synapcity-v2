@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { SetBreadcrumbs } from '@synapcity/frontend-shells';
+import { BreadcrumbMenu } from '@synapcity/frontend-shells';
 
 import { COLLECTION_LABELS } from '@/components/collections';
 import { DashboardView } from '@/features/dashboards/components/dashboard-view';
@@ -52,7 +52,7 @@ export default async function DashboardShowPage({
 
   return (
     <>
-      <SetBreadcrumbs
+      <BreadcrumbMenu
         items={[
           {
             label: COLLECTION_LABELS.dashboards,

@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useId, useRef, useState, useTransition, type FormEvent } from 'react';
 import { Button, buttonVariants } from '@synapcity/frontend-ui/core/button';
 import {
@@ -30,6 +29,7 @@ import {
   quickCreateNameSchema,
 } from '../../lib/records/quick-create-name';
 import { collectionFor, type CollectionKind } from '../collections';
+import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 
 const unconfirmedMessage = (singular: string, label: string) =>
   `We could not confirm that the ${singular} was created. Check ${label} in the sidebar before you try again.`;
@@ -186,7 +186,7 @@ export function QuickCreateDialog({
                   {failure.signedOut && (
                     <>
                       {' '}
-                      <Link
+                      <LinkButton
                         href={signInPathFor(collection.indexHref(userId))}
                         className={buttonVariants({
                           variant: 'link',
@@ -194,7 +194,7 @@ export function QuickCreateDialog({
                         })}
                       >
                         Sign in again
-                      </Link>
+                      </LinkButton>
                     </>
                   )}
                 </FieldError>

@@ -27,7 +27,7 @@ import {
   RecordSpaceView,
   SpaceContent,
 } from '@synapcity/features-spaces/frontend';
-import { SetBreadcrumbs } from '@synapcity/frontend-shells';
+import { BreadcrumbMenu } from '@synapcity/frontend-shells';
 
 import SpaceShowPage from './page';
 
@@ -79,7 +79,7 @@ describe('the Space detail page', () => {
       spaceId: 's1',
       recordSpaceView: mocks.recordSpaceView,
     });
-    expect(find(page, SetBreadcrumbs)?.props).toEqual({
+    expect(find(page, BreadcrumbMenu)?.props).toEqual({
       items: [
         { label: 'Spaces', href: '/u1/home/spaces', kind: 'collection' },
         { label: 'Writing', kind: 'space' },

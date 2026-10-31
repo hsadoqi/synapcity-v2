@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { reportCaughtError } from '@synapcity/frontend-error-reports';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
-import { MESSAGE_HEADING_ID, MessagePage } from '@synapcity/frontend-shells';
+import { MessagePage } from '@synapcity/frontend-shells';
 
 /**
  * What a collection page shows when it fails to load: the same words for every
@@ -28,13 +28,13 @@ export function CollectionLoadError({
     // that must not be repeated here.
     console.error(`${name} failed to load`, { digest: error.digest });
     reportCaughtError(error);
-    document.getElementById(MESSAGE_HEADING_ID)?.focus();
   }, [collection, error]);
 
   return (
     <MessagePage
       title={`Your ${collection} didn't load`}
       description="Nothing in them has changed. Try again; if it keeps failing, wait a few minutes first."
+      focusKey={error}
     >
       <Button type="button" size="lg" onClick={() => retry()}>
         Try again

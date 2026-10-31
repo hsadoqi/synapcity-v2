@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { SetBreadcrumbs } from '@synapcity/frontend-shells';
+import { BreadcrumbMenu } from '@synapcity/frontend-shells';
 
 import { COLLECTION_LABELS } from '@/components/collections';
 import { DocumentView } from '@/features/documents/components/document-view';
@@ -36,7 +36,7 @@ export default async function DocumentShowPage({ params }: { params: Params }) {
 
   return (
     <>
-      <SetBreadcrumbs
+      <BreadcrumbMenu
         items={[
           {
             label: COLLECTION_LABELS.documents,

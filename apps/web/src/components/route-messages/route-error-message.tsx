@@ -5,7 +5,7 @@ import { reportCaughtError } from '@synapcity/frontend-error-reports';
 import { Button } from '@synapcity/frontend-ui/core/button';
 import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 
-import { MESSAGE_HEADING_ID, MessagePage } from '@synapcity/frontend-shells';
+import { MessagePage } from '@synapcity/frontend-shells';
 
 /**
  * What a route shows when something unexpected throws while it renders or runs
@@ -39,12 +39,13 @@ export function RouteErrorMessage({
       // Sent only if the person turned error reports on; scrubbed first.
       reportCaughtError(error);
     }
-    document.getElementById(MESSAGE_HEADING_ID)?.focus();
   }, [error, variant]);
 
   const unavailable = variant === 'unavailable';
   return (
     <MessagePage
+      // An unavailable page has no error; its variant is what appeared.
+      focusKey={error ?? variant}
       title={
         unavailable
           ? "We can't reach the sign-in service"
