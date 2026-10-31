@@ -2,11 +2,8 @@
 
 import type { ReactNode } from 'react';
 import { Sidebar, SidebarSeparator } from '@synapcity/frontend-ui/core/sidebar';
-import {
-  MainSidebarContent,
-  type MainSidebarGroup,
-  type MainSidebarItem,
-} from './main-sidebar-content';
+import { MainSidebarContent } from './main-sidebar-content';
+import type { MainSidebarGroup, MainSidebarItem } from '../../types';
 import { MainSidebarFooter } from './main-sidebar-footer';
 import { MainSidebarHeader } from './main-sidebar-header';
 

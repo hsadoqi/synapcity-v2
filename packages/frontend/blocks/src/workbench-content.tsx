@@ -3,13 +3,14 @@
 import type { User } from '@synapcity/domain-identity';
 import { Sidebar } from '@synapcity/frontend-ui/core/sidebar';
 import { Workbench } from './main-content';
-import { MainCombinedSidebar } from './main-sidebar';
+import { MainCombinedSidebar, UserAvatar } from './main-sidebar';
 import type {
   MainSidebarGroup,
   MainSidebarItem,
-} from './main-sidebar/main-sidebar/main-sidebar-content';
-import { UserAvatar } from './main-sidebar';
-import type { ResourceKind, Workspace, WorkspaceResource } from './types';
+  ResourceKind,
+  Workspace,
+  WorkspaceResource,
+} from './types';
 
 const RESOURCE_GROUPS: Array<{ kind: ResourceKind; label: string }> = [
   { kind: 'document', label: 'Documents' },

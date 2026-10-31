@@ -40,3 +40,22 @@ export interface Deployment {
   time: string;
   failed?: boolean;
 }
+
+/** A presentation-only destination. Product records are mapped to this in their host. */
+export interface MainSidebarItem {
+  id: string;
+  label: string;
+  href?: string;
+  /** A Lucide name resolved by the existing icon registry. */
+  icon?: string;
+  badge?: string | number;
+  disabled?: boolean;
+}
+
+/** A labelled set of destinations in the wider sidebar panel. */
+export interface MainSidebarGroup {
+  id: string;
+  label: string;
+  items: MainSidebarItem[];
+  empty?: string;
+}

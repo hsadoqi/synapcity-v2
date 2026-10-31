@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import React from 'react';
 import type { User } from '@synapcity/domain-identity';
-import { UserAvatar } from './user-avatar';
+import { UserAvatarContent } from './user-avatar-content';
 import { useIsMobile } from '@synapcity/frontend-ui/hooks/use-mobile';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 
@@ -146,7 +146,7 @@ const DropdownActionsMenuLabel = ({
       {children}
       {user && (
         <>
-          <UserAvatar user={user} />
+          <UserAvatarContent user={user} />
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-medium">{user.name}</span>
             <span className="truncate text-xs">{user.email}</span>

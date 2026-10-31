@@ -7,7 +7,7 @@ import {
   SidebarProvider,
 } from '@synapcity/frontend-ui/core/sidebar';
 import { MainCombinedSidebar } from './main-combined';
-import type { MainSidebarGroup, MainSidebarItem } from './main-sidebar-content';
+import type { MainSidebarGroup, MainSidebarItem } from '../../types';
 
 export function MainSidebarShell({
   railItems,

@@ -11,25 +11,7 @@ import {
   SidebarMenuItem,
 } from '@synapcity/frontend-ui/core/sidebar';
 import { NamedIcon } from '../../icon-by-name';
-
-/** A presentation-only destination. Product records are mapped to this in their host. */
-export interface MainSidebarItem {
-  id: string;
-  label: string;
-  href?: string;
-  /** A Lucide name resolved by the existing icon registry. */
-  icon?: string;
-  badge?: string | number;
-  disabled?: boolean;
-}
-
-/** A labelled set of destinations in the wider sidebar panel. */
-export interface MainSidebarGroup {
-  id: string;
-  label: string;
-  items: MainSidebarItem[];
-  empty?: string;
-}
+import type { MainSidebarGroup, MainSidebarItem } from '../../types';
 
 export interface MainSidebarContentProps {
   groups: MainSidebarGroup[];
