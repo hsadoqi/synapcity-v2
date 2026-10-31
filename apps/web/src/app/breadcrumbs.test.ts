@@ -60,6 +60,10 @@ const TRAIL_FREE = new Map<string, string>([
     '[userId]/settings/page.tsx',
     'Settings sits outside the collections and shows the logo',
   ],
+  [
+    '[userId]/home/playground/page.tsx',
+    'a contained sidebar prototype, not a navigable product surface',
+  ],
 ]);
 
 const SHELLS = String.raw`['"]@synapcity/frontend-shells['"]`;
