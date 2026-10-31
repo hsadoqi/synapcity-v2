@@ -30,7 +30,7 @@ import {
   PinOffIcon,
   Settings2Icon,
 } from 'lucide-react';
-import { useId, useState, type ReactNode } from 'react';
+import { useCallback, useId, useRef, useState, type ReactNode } from 'react';
 
 /**
  * What the widget's content offers the shell's toolbar: its own actions and
@@ -92,6 +92,18 @@ function WidgetTitle({
   onRename: (title: string) => void;
 }) {
   const [draft, setDraft] = useState<string | null>(null);
+  /*
+   * Set when the keyboard ends a rename. The input unmounts with focus in it,
+   * so the rename button takes focus back when it mounts again. A rename ended
+   * by blur leaves focus where it went.
+   */
+  const returnFocus = useRef(false);
+  const renameButtonRef = useCallback((button: HTMLButtonElement | null) => {
+    if (button && returnFocus.current) {
+      returnFocus.current = false;
+      button.focus();
+    }
+  }, []);
   // In edit mode the title always shows, so its rename button is never focusable but invisible.
   const heading = cn(
     'm-0 truncate text-base font-semibold text-foreground',
@@ -114,8 +126,20 @@ function WidgetTitle({
           onChange={(event) => setDraft(event.target.value)}
           onBlur={commit}
           onKeyDown={(event) => {
-            if (event.key === 'Enter') commit();
-            if (event.key === 'Escape') setDraft(null);
+            // Enter also confirms an IME composition; that is not a rename.
+            if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
+              event.preventDefault();
+              returnFocus.current = true;
+              commit();
+            }
+            if (event.key === 'Escape') {
+              // Consumed: shell shortcuts check defaultPrevented, and an
+              // enclosing Base UI overlay would otherwise close on it too.
+              event.preventDefault();
+              event.stopPropagation();
+              returnFocus.current = true;
+              setDraft(null);
+            }
           }}
           className="w-full border-0 bg-transparent p-0 text-base font-semibold text-foreground outline-none"
         />
@@ -127,6 +151,7 @@ function WidgetTitle({
     <h2 id={id} className={heading}>
       {editMode ? (
         <button
+          ref={renameButtonRef}
           type="button"
           aria-label={`Rename ${title}`}
           onClick={() => setDraft(title)}

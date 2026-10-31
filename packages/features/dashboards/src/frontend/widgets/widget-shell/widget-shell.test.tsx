@@ -83,6 +83,77 @@ describe('WidgetShell', () => {
     expect(actions.update).not.toHaveBeenCalled();
   });
 
+  it('returns focus to the rename button after Enter', () => {
+    setup();
+    fireEvent.click(screen.getByRole('button', { name: 'Rename Steps today' }));
+    const input = screen.getByRole('textbox', { name: 'Widget title' });
+    expect(document.activeElement).toBe(input);
+    fireEvent.change(input, { target: { value: 'Daily steps' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(document.activeElement).toBe(
+      screen.getByRole('button', { name: 'Rename Steps today' }),
+    );
+  });
+
+  it('returns focus to the rename button after Escape', () => {
+    const actions = setup();
+    fireEvent.click(screen.getByRole('button', { name: 'Rename Steps today' }));
+    fireEvent.keyDown(screen.getByRole('textbox', { name: 'Widget title' }), {
+      key: 'Escape',
+    });
+    expect(actions.update).not.toHaveBeenCalled();
+    expect(document.activeElement).toBe(
+      screen.getByRole('button', { name: 'Rename Steps today' }),
+    );
+  });
+
+  it('does not rename on an Enter that confirms an IME composition', () => {
+    const actions = setup();
+    fireEvent.click(screen.getByRole('button', { name: 'Rename Steps today' }));
+    const input = screen.getByRole('textbox', { name: 'Widget title' });
+    fireEvent.change(input, { target: { value: '歩数' } });
+    fireEvent.keyDown(input, { key: 'Enter', isComposing: true });
+    expect(actions.update).not.toHaveBeenCalled();
+    expect(screen.getByRole('textbox', { name: 'Widget title' })).toBe(input);
+  });
+
+  it('keeps the Escape it consumes from reaching an enclosing overlay or shell', () => {
+    // Base UI dismisses overlays from a document keydown listener, which does
+    // not check defaultPrevented; shell shortcuts check it instead.
+    const documentHandler = vi.fn();
+    document.addEventListener('keydown', documentHandler);
+    try {
+      setup();
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Rename Steps today' }),
+      );
+      const input = screen.getByRole('textbox', { name: 'Widget title' });
+      const escape = new KeyboardEvent('keydown', {
+        key: 'Escape',
+        bubbles: true,
+        cancelable: true,
+      });
+      input.dispatchEvent(escape);
+      expect(escape.defaultPrevented).toBe(true);
+      expect(documentHandler).not.toHaveBeenCalled();
+    } finally {
+      document.removeEventListener('keydown', documentHandler);
+    }
+  });
+
+  it('commits on blur without pulling focus back from where the pointer went', () => {
+    const actions = setup();
+    fireEvent.click(screen.getByRole('button', { name: 'Rename Steps today' }));
+    const input = screen.getByRole('textbox', { name: 'Widget title' });
+    fireEvent.change(input, { target: { value: 'Daily steps' } });
+    const collapse = screen.getByRole('button', {
+      name: 'Collapse Steps today',
+    });
+    collapse.focus();
+    expect(actions.update).toHaveBeenCalledWith({ title: 'Daily steps' });
+    expect(document.activeElement).toBe(collapse);
+  });
+
   it('lets the keyboard reach the body, which scrolls when it overflows', () => {
     setup({}, { editMode: false });
     const body = screen.getByRole('group', { name: 'Steps today content' });
