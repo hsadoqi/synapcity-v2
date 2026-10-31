@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useMemo, type ReactNode } from 'react';
 
 import { CollectionNavigationProvider } from '../providers';
+import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 
 /** The Next.js binding: mount once above the pages that show collections. */
 export function NextCollectionNavigation({
@@ -14,7 +15,11 @@ export function NextCollectionNavigation({
 }) {
   const router = useRouter();
   const value = useMemo(
-    () => ({ Link, push: (href: string) => router.push(href) }),
+    () => ({
+      Link,
+      LinkButton,
+      push: (href: string) => router.push(href),
+    }),
     [router],
   );
   return (
