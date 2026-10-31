@@ -1,46 +1,52 @@
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { render } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 
 import { BreadcrumbMenu } from '.';
+import { BreadcrumbTrailContext } from '../breadcrumb-trail';
 
 const trail = [
-  { label: 'Spaces', href: '/u/home/spaces' },
-  { label: 'Fitness', href: '/u/home/spaces/fitness' },
-  { label: 'Plan' },
+  { label: 'Spaces', href: '/u/home/spaces', kind: 'collection' as const },
+  { label: 'Fitness', kind: 'space' as const },
 ];
 
+const publishTo = (setTrail: (items: unknown[]) => void, items = trail) =>
+  render(
+    <BreadcrumbTrailContext value={setTrail}>
+      <BreadcrumbMenu items={items} />
+    </BreadcrumbTrailContext>,
+  );
+
 describe('BreadcrumbMenu', () => {
-  it('links each parent and ends on the current page without a link', () => {
-    render(<BreadcrumbMenu items={trail} />);
+  it('publishes the page trail to the shell', () => {
+    const setTrail = vi.fn();
+    publishTo(setTrail);
 
-    expect(
-      screen.getByRole('link', { name: 'Spaces' }).getAttribute('href'),
-    ).toBe('/u/home/spaces');
-    expect(screen.getByText('Plan').getAttribute('aria-current')).toBe('page');
-    expect(screen.getByText('Plan').closest('a')).toBeNull();
+    expect(setTrail).toHaveBeenLastCalledWith(trail);
   });
 
-  it('shows a parent without a href as plain text', () => {
-    render(<BreadcrumbMenu items={[{ label: 'Home' }, { label: 'Now' }]} />);
+  it('renders nothing where the page places it', () => {
+    const { container } = publishTo(vi.fn());
 
-    expect(screen.getByText('Home').closest('a')).toBeNull();
+    expect(container.innerHTML).toBe('');
   });
 
-  it('hides every parent below sm so only the current page shows', () => {
-    render(<BreadcrumbMenu items={trail} />);
+  it('clears the trail when the page goes away', () => {
+    const setTrail = vi.fn();
+    const view = publishTo(setTrail);
 
-    expect(screen.getByText('Spaces').closest('li')?.className).toContain(
-      'hidden sm:inline-flex',
+    view.unmount();
+
+    expect(setTrail).toHaveBeenLastCalledWith([]);
+  });
+
+  it('publishes an empty trail when given no items', () => {
+    const setTrail = vi.fn();
+    render(
+      <BreadcrumbTrailContext value={setTrail}>
+        <BreadcrumbMenu />
+      </BreadcrumbTrailContext>,
     );
-    expect(screen.getByText('Plan').closest('li')?.className).not.toContain(
-      'hidden',
-    );
-  });
 
-  it('renders a spacer, not a landmark, when there is no trail', () => {
-    const { container } = render(<BreadcrumbMenu items={[]} />);
-
-    expect(screen.queryByRole('navigation')).toBeNull();
-    expect(container.firstElementChild?.className).toContain('flex-1');
+    expect(setTrail).toHaveBeenLastCalledWith([]);
   });
 });

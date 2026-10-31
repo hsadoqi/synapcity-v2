@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { ComponentProps } from 'react';
 import { RootShell } from '../../root-shell';
-import type { RootBreadcrumb } from '../breadcrumb-menu';
+import type { RootBreadcrumb } from '../header-breadcrumbs';
 import type { RootSidebarContent } from '../../sidebar-shell/root-sidebar';
 
 export type BreadcrumbTrail = (items: RootBreadcrumb[]) => void;
