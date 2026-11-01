@@ -6,7 +6,7 @@ Decisions it relies on: migrations are forward-only and immutable once merged (D
 
 ## Who may do what
 
-- **An agent** may run `pnpm db:parity` against a local target, the SQL and database tests, and `pnpm db:types`. It never runs a command against a hosted project, links one, or applies a migration.
+- **An agent** may run `pnpm db:parity` against a local target, the SQL and database tests, and `pnpm db:types --stack` against its worktree's disposable stack. It never runs a command against a hosted project, links one, or applies a migration.
 - **The owner or an operator** performs the hosted steps. Hosted credentials are never put in a repository file, a CI secret used by an agent, or a command that is logged.
 - Development tools refuse a non-loopback database. `pnpm db:types` accepts `--allow-remote-target <project-ref>` for a reviewed read; the other tools have no override.
 
@@ -16,7 +16,7 @@ Decisions it relies on: migrations are forward-only and immutable once merged (D
 2. **Backups and recovery** (decision D2): backups and point-in-time recovery are confirmed, and the recovery point, RPO and RTO are recorded in the ledger.
 3. **Preview isolation** is in effect (PI-1 to PI-4 in the database execution roadmap, section 5a), verified by the owner.
 4. **The migration list.** `pnpm db:parity --environment production --expect-pending <versions of this train>` must show the pending (`local-only`) set equal to exactly the train's migrations, and no `remote-only` version (drift, always actionable).
-5. **A fresh-database run.** `pnpm db:stack start --fresh`, then `pnpm db:test`, `pnpm --filter @synapcity/server-data test:db` and `pnpm db:types` with no diff.
+5. **A fresh-database run.** `pnpm db:stack start --fresh`, then `pnpm db:test` and `pnpm db:types --stack` with no diff (plain `pnpm db:types` reads the machine's shared default stack, which only CI's `db-types` job uses), from a clean checkout of the commit the train's migrations are on. The application's database and budget tests (`pnpm --filter @synapcity/server-data test:db` and `test:db:budgets`) exist only where that application code lives: they run on the application branch after `main`, with the train's exact migration files, has been merged into it, before any hosted step.
 6. **Hosted pre-checks** the train needs, as counts and length aggregates only, never row contents: for example the number of Dashboards, and the number of names, descriptions and tags over the new limits, with the advisor output and the `ensure_rls` event trigger.
 7. **Lock behaviour** (handoff M-9): any change to a populated table is checked against `lock_timeout`; additive changes and `NOT VALID` constraints take brief locks.
 8. **The dry run.** `supabase db push --dry-run`, reviewed against the train's migrations.
@@ -28,9 +28,21 @@ Decisions it relies on: migrations are forward-only and immutable once merged (D
 ## After
 
 10. **Post-migration check.** `pnpm db:parity --environment production` again: no `remote-only` version, no actionable schema difference, and the `avatars` bucket and `storage.objects` policy comparison clean. Counts agree with the train's expectations. The Supabase advisors are run and triaged (handoff M-8); new `SECURITY DEFINER` functions and the public tag-validation function are expected to be listed.
-11. **Application release** only after step 10 passes.
-12. **Smoke.** The slice's production check with a throwaway account.
-13. **Ledger entry:** the apply, the check, the deployment id, the smoke, and each risk acceptance.
+11. **Hosted deletion budget (V-8), on an isolated scratch restore by default.** The heavy-account measurement never runs on production unless the owner separately authorizes it. Each step is separately authorized hosted work:
+    1. create an isolated scratch restore through the backup and recovery gate (step 2), where the plan permits;
+    2. confirm its compute tier and the role timeouts that apply (`authenticated` statement timeout included) are equivalent to production's;
+    3. apply the train's exact schema;
+    4. create one unique throwaway heavy account, and record the exact seeded counts and approximate storage;
+    5. measure the account-deletion budget;
+    6. verify the cleanup is complete;
+    7. record the result in the ledger;
+    8. remove or retire the scratch environment under the approved recovery procedure.
+
+    If no scratch restore is available, or it cannot reproduce production's compute and timeout behavior, stop and ask the owner for a new decision. A failed budget blocks the application release.
+
+12. **Application release** only after steps 10 and 11 pass.
+13. **Smoke.** The slice's production check with a small throwaway account, never the heavy fixture.
+14. **Ledger entry:** the apply, the check, the deletion-budget result, the deployment id, the smoke, and each risk acceptance.
 
 A slice stays "deployed: incomplete" until step 10 passes.
 

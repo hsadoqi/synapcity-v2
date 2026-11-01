@@ -1,9 +1,10 @@
 -- Dashboard revisions: immutable, complete, restorable snapshots of a
 -- Dashboard's state, written by the database in the same transaction as the
--- change (owner decision D8). "Revision" in `dashboard_revisions` and
--- `private.capture_dashboard_revision` is a working label until the glossary
--- naming step runs; the compare-and-swap counter on `dashboard_compositions`
--- is a different number and keeps its column name.
+-- change (owner decision D8). `dashboard_revisions`, its `sequence` and the
+-- `private.capture_*` functions use the names accepted in ADR-0018 and the
+-- glossary's accepted database terms (docs/glossary.md); the compare-and-swap
+-- counter on `dashboard_compositions` is a different number, the Dashboard
+-- composition revision, and keeps its column name.
 --
 -- A revision holds the whole state: composition, schema_version, and the
 -- Dashboard's name, description, icon and tags. It is never written by a
@@ -32,6 +33,7 @@
 -- Dashboard row, so the lock order is fixed and the two cannot deadlock.
 
 begin;
+set local lock_timeout = '5s';
 
 create table public.dashboard_revisions (
   id             uuid primary key default gen_random_uuid(),

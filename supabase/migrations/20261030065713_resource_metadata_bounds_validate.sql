@@ -7,6 +7,7 @@
 -- no-op beyond marking the constraints validated.
 
 begin;
+set local lock_timeout = '5s';
 
 alter table public.spaces validate constraint spaces_name_length;
 alter table public.spaces validate constraint spaces_description_length;

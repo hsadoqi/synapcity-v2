@@ -1,10 +1,10 @@
 # ADR-0018: Revision capture
 
-**Status:** Proposed (2026-10-30). Records owner decisions D3, D4 and D8 as implemented by slice S1; the owner has not yet accepted it as an ADR, so it is not authority beyond the decisions it records.
-**Date:** 2026-10-30
-**Deciders:** Hanaa Sadoqi (repository owner) for D3, D4 and D8 (2026-10-29 and 2026-10-30). The mechanism details below are the implementing agent's parameters, which the owner may overrule.
+**Status:** Accepted (2026-11-01). Proposed on 2026-10-30; records owner decisions D3, D4 and D8 as implemented by slice S1.
+**Date:** 2026-10-30; accepted 2026-11-01
+**Deciders:** Hanaa Sadoqi (repository owner): D3, D4 and D8 (2026-10-29 and 2026-10-30); acceptance of this ADR, its policy values and its names (2026-11-01).
 
-Names used here (`dashboard_revisions`, `capture_dashboard_revision`, "revision", "sequence") are working labels until the glossary naming step runs ([glossary](../../glossary.md)); the compare-and-swap counter on `dashboard_compositions.revision` is a different number from a revision's `sequence`.
+The names are accepted terms ([glossary](../../glossary.md#accepted-database-terms)): a **Dashboard revision** is a row of `dashboard_revisions`, and its **revision sequence** (`dashboard_revisions.sequence`) orders one Dashboard's immutable snapshots. The **Dashboard composition revision** (`dashboard_compositions.revision`) is a different number: the compare-and-swap version of the current, mutable composition.
 
 ## Context
 
@@ -24,12 +24,28 @@ A Dashboard's work was a single overwritten document. [ADR-0016](0016-dashboard-
 6. **One lock protocol:** both capture paths take the composition row `FOR UPDATE` before choosing a `sequence`; the composition path never locks the Dashboard row, so lock order is fixed and the two cannot deadlock.
 7. **Functions:** trigger and capture functions are `SECURITY DEFINER` only where they write a table clients may not (the capture functions), in `private`, with an empty `search_path` and `EXECUTE` revoked from public roles.
 
+## Acceptance (2026-11-01)
+
+The owner accepted this mechanism and these values and names. They become durable on the hosted database with release T1, so a later change needs a forward migration.
+
+- **Policy values:** a quiet gap of 5 minutes; a maximum continuous editing span of 30 minutes; at most 500 revisions per Dashboard.
+- **Names, final:** the table `dashboard_revisions`; its column `sequence`; the policy function `private.dashboard_revision_policy()`; the capture functions `private.capture_checkpoint_revision`, `private.capture_dashboard_revision`, `private.capture_initial_revision` and `private.capture_metadata_preimage`.
+- **No per-account revision quota for T1.** Accepted as a bounded, recorded risk (G-quota-T1), not a permanent product-policy commitment, on these conditions:
+  - the production Dashboard count and its distribution across owners are recorded before T1 (preflight P3);
+  - the hosted role timeouts that apply are recorded (P6);
+  - the account-deletion budget (V-8) passes on hosted infrastructure before the application is deployed, and a failed budget blocks that deployment;
+  - the release ledger records this risk explicitly.
+
+Accepting this ADR does not authorize applying it to production. That follows the [database release procedure](../../engineering/database-release.md) and its gates.
+
 ## Consequences
 
-- Cost grows per Dashboard and is capped at 500 revisions; there is no per-account quota (a recorded risk, G-quota-T1). Measured on a development machine: a checkpointing, pruning save adds 7.6 ms at p95 over one that does neither (budget 50 ms), and deleting the heavy account (50 Dashboards, 500 revisions each of 16 KiB) took at most 2.2 s against a 4 s limit (half the 8 s local `authenticated` statement timeout). Hosted timeouts are read separately and not measured.
+- Cost grows per Dashboard and is capped at 500 revisions; there is no per-account quota (a recorded risk, G-quota-T1, accepted for T1 on the conditions above). Measured on a development machine: a checkpointing, pruning save adds 7.6 ms at p95 over one that does neither (budget 50 ms), and deleting the heavy account (50 Dashboards, 500 revisions each of 16 KiB) took at most 2.2 s against a 4 s limit (half the 8 s local `authenticated` statement timeout). Hosted timeouts are read separately and not measured.
 - History and restore UI are a later slice (S7). A restore will create a new revision and never rewrite history.
 - The same shape is meant for Document content (S5), which will extract the `+1` rule into a shared function.
 
 ## Reconsideration conditions
 
 Revisit if usage shows the gap or span values are wrong for real editing, if the per-Dashboard cap is hit routinely, or if a chunked or deferred account deletion is needed (a budget miss).
+
+Reconsider an account-level revision quota before broad public scale, before any paid-plan enforcement, or on evidence of storage abuse.

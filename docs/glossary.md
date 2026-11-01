@@ -102,6 +102,16 @@ The following terms may be valid in implementation contexts but carry no automat
 - experimental identifiers such as `EntityRef`, `synapcity://`, `regionCount`, and `dataSourceId`.
 - `collection`, the internal name of `apps/web/src/features/collection` (search, filter, sort and display mechanics for any list of items, per [ADR-0011](architecture/decisions/0011-collection-browse-feature.md)), and its item field `group`. Neither is a product term: do not derive user-facing copy, routes or schemas from them.
 
+## Accepted database terms
+
+Accepted by the owner on 2026-11-01 with [ADR-0018](architecture/decisions/0018-revision-capture.md). They name database schema and internal code; the user-facing wording for Dashboard history is not decided here.
+
+| Term                           | Definition                                                                                                                       | Identifier                        | Term status                                    | Guardrail                                                                                                              |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Dashboard composition revision | The compare-and-swap version of a Dashboard's current, mutable composition. Every accepted save raises it by exactly 1           | `dashboard_compositions.revision` | Accepted term (database schema, internal code) | A concurrency counter for the one mutable row; it is not a historical snapshot and never orders history                |
+| Dashboard revision             | An immutable, complete historical snapshot of a Dashboard's state, written by the database in the same transaction as the change | a row of `dashboard_revisions`    | Accepted term (database schema, internal code) | Never written, updated or deleted by a client; a restore creates a new revision and never rewrites history             |
+| Revision sequence              | The per-Dashboard ordering number of its immutable historical snapshots                                                          | `dashboard_revisions.sequence`    | Accepted term (database schema, internal code) | Orders one Dashboard's snapshots only; it is unrelated to `dashboard_compositions.revision` and never compared with it |
+
 ## Naming decision process
 
 Before adopting a controlled term:

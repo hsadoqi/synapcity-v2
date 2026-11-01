@@ -23,8 +23,8 @@
 // Exit: 0 clean, 1 an actionable difference or a refused target, 2 bad usage or an
 // unexpected CLI output format.
 //
-// For tests only, and never as a flag: the environment variables
-// SYNAPCITY_PARITY_LEDGER, SYNAPCITY_PARITY_ALLOWLIST and
+// The ledger and the allowlist are always the checked-in files; no flag or
+// environment variable replaces them. For tests only, and never as a flag:
 // SYNAPCITY_PARITY_TARGET_DB_URL (loopback only, environment `local` only).
 import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
@@ -202,9 +202,8 @@ export async function run(argv, env = process.env, deps = {}) {
   }
 
   try {
-    const ledgerPath = env.SYNAPCITY_PARITY_LEDGER ?? join(root, LEDGER);
-    const allowlistPath =
-      env.SYNAPCITY_PARITY_ALLOWLIST ?? join(root, ALLOWLIST);
+    const ledgerPath = join(root, LEDGER);
+    const allowlistPath = join(root, ALLOWLIST);
     const expectedRef = expectedRefFor(d.readFile(ledgerPath), environment);
     if (!expectedRef) {
       d.err(

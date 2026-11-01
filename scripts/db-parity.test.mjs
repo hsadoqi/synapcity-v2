@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { fileURLToPath } from 'node:url';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { assertReadOnlyCommand, assertReadOnlySql, run } from './db-parity.mjs';
 
 const REF = 'abcdefghijklmnopqrst';
@@ -180,6 +181,76 @@ describe('a matching linked project', () => {
       ),
     ).toBe(1);
     expect(h.err.join('\n')).toContain('not exactly the train');
+  });
+});
+
+describe('the checked-in ledger and allowlist', () => {
+  const ledgerPath = fileURLToPath(
+    new URL(
+      '../docs/engineering/database-deployment-ledger.md',
+      import.meta.url,
+    ),
+  );
+  const allowlistPath = fileURLToPath(
+    new URL(
+      '../docs/engineering/database-parity-allowlist.md',
+      import.meta.url,
+    ),
+  );
+  const OTHER_REF = 'zzzzzzzzzzzzzzzzzzzz';
+  const replacements = {
+    SYNAPCITY_PARITY_LEDGER: '/elsewhere/ledger.md',
+    SYNAPCITY_PARITY_ALLOWLIST: '/elsewhere/allowlist.md',
+  };
+
+  /** The harness, recording every path read, with a ledger elsewhere that names another ref. */
+  function recording(opts) {
+    const h = harness(opts);
+    const read = [];
+    const base = h.deps.readFile;
+    h.deps.readFile = (p) => {
+      read.push(p);
+      return p === replacements.SYNAPCITY_PARITY_LEDGER
+        ? LEDGER.replace(REF, OTHER_REF)
+        : base(p);
+    };
+    const exists = h.deps.exists;
+    h.deps.exists = (p) => {
+      read.push(p);
+      return exists(p);
+    };
+    return { ...h, read };
+  }
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('ignores ledger and allowlist paths passed in the environment', async () => {
+    const h = recording();
+    const code = await run(
+      ['--environment', 'production'],
+      replacements,
+      h.deps,
+    );
+    expect(code).toBe(0);
+    expect(h.read).toContain(ledgerPath);
+    expect(h.read).toContain(allowlistPath);
+    expect(h.read.filter((p) => p.startsWith('/elsewhere/'))).toEqual([]);
+  });
+
+  it('ignores them in the process environment, so another ref cannot be substituted', async () => {
+    for (const [name, value] of Object.entries(replacements)) {
+      vi.stubEnv(name, value);
+    }
+    // Linked to the ref only the ledger elsewhere names: refused, nothing run.
+    const h = recording({ linked: OTHER_REF });
+    const code = await run(['--environment', 'production'], undefined, h.deps);
+    expect(code).toBe(1);
+    expect(h.calls).toEqual([]);
+    expect(h.out.join('\n')).toContain(`expected ref (ledger): ${REF}`);
+    expect(h.read).toContain(ledgerPath);
+    expect(h.read.filter((p) => p.startsWith('/elsewhere/'))).toEqual([]);
   });
 });
 

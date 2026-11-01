@@ -21,6 +21,7 @@
 -- VALIDATE, after a read-only count shows no violator. Nothing is truncated.
 
 begin;
+set local lock_timeout = '5s';
 
 -- A pure boolean on the tag array, kept in a function because a CHECK cannot
 -- hold a subquery. It reads no table, so SECURITY INVOKER with an empty

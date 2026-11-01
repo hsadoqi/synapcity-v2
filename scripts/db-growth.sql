@@ -6,8 +6,13 @@
 --   psql -X -f scripts/db-growth.sql "$DATABASE_URL"
 --
 -- Tables a later release adds are included when they exist, so the same file
--- serves every train. The thresholds that trigger an owner review are in
--- docs/engineering/database-release.md.
+-- serves every train: a table that is not there yet is reported as not
+-- present, and a query that needs it is not sent. The thresholds that trigger
+-- an owner review are in docs/engineering/database-release.md.
+
+\set ON_ERROR_STOP on
+-- Every statement below is a read; this makes the session refuse a write too.
+set default_transaction_read_only = on;
 
 \echo == Table row counts and total size (table, indexes and TOAST)
 select t.name as relation,
@@ -24,12 +29,11 @@ select t.name as relation,
  where to_regclass(t.name) is not null
  order by total_bytes desc;
 
-\echo == Per owner: resources and revisions (median, 99th percentile, maximum)
+\echo == Per owner: resources (median, 99th percentile, maximum)
 with per_owner as (
   select owner_id, 'spaces' as kind, count(*) as n from public.spaces group by owner_id
   union all select owner_id, 'documents', count(*) from public.documents group by owner_id
   union all select owner_id, 'dashboards', count(*) from public.dashboards group by owner_id
-  union all select owner_id, 'dashboard_revisions', count(*) from public.dashboard_revisions group by owner_id
 )
 select kind,
        count(*) as owners,
@@ -40,6 +44,16 @@ select kind,
  group by kind
  order by kind;
 
+select to_regclass('public.dashboard_revisions') is not null as has_dashboard_revisions \gset
+\if :has_dashboard_revisions
+\echo == Per owner: Dashboard revisions (median, 99th percentile, maximum)
+select 'dashboard_revisions' as kind,
+       count(*) as owners,
+       percentile_cont(0.5) within group (order by n) as p50,
+       percentile_cont(0.99) within group (order by n) as p99,
+       max(n) as max
+  from (select owner_id, count(*) as n from public.dashboard_revisions group by owner_id) per_owner;
+
 \echo == Largest revision footprint per Dashboard (bytes of composition text)
 select max(total_bytes) as max_dashboard_bytes,
        percentile_cont(0.5) within group (order by total_bytes) as p50_dashboard_bytes,
@@ -49,6 +63,9 @@ select max(total_bytes) as max_dashboard_bytes,
       from public.dashboard_revisions
      group by dashboard_id
   ) per_dashboard;
+\else
+\echo == Dashboard revisions: public.dashboard_revisions is not present; revision metrics skipped
+\endif
 
 \echo == Activity events per owner, when the table exists
 select case when to_regclass('public.activity_events') is null then 'activity_events: not present yet'

@@ -15,6 +15,7 @@
 -- migration.
 
 begin;
+set local lock_timeout = '5s';
 
 create function private.create_default_composition()
 returns trigger

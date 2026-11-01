@@ -20,6 +20,7 @@
 -- 20261029100000 is undeployed), so the new checks are validated immediately.
 
 begin;
+set local lock_timeout = '5s';
 
 alter table public.dashboard_compositions
   drop constraint dashboard_compositions_size,
