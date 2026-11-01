@@ -37,6 +37,16 @@ overrides:
 auditConfig:
   ignoreGhsas:
     - GHSA-vfj7-8cjw-p6xm
+    # TEMPORARY, accepted residual risk (owner, 2026-11-01; review by 2026-11-15; ADR-0001).
+    # minimatch 10.2.6 < 11.0.1. Patched only in 11, which eslint, @eslint/config-array and
+    # @ts-morph/common (shadcn CLI) do not accept yet. Dev-time tooling on repository patterns only.
+    # Remove when those parents accept minimatch >= 11.0.1.
+    - GHSA-g3hv-75wg-m249
+    # TEMPORARY, accepted residual risk (owner, 2026-11-01; review by 2026-11-15; ADR-0001).
+    # glob 13.0.6 <= 14.0.1. Reached only through Storybook's react-docgen-typescript plugin,
+    # which this repository does not enable, so it never runs. Patched only in 14, which the
+    # plugin does not accept yet. Remove when it accepts glob >= 14.0.2 or leaves the tree.
+    - GHSA-3g3m-2fjr-6pw4
 
 minimumReleaseAgeExclude:
   - postcss@8.5.30
