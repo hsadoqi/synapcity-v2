@@ -282,6 +282,9 @@ describe('DashboardView composition', () => {
     }
 
     it('closing the panel keeps edit mode, the widget and the unsaved status', async () => {
+      // Hold the 400 ms save on a fake clock: the change stays unsaved however
+      // slowly the machine runs, so this checks the panel, not the scheduler.
+      vi.useFakeTimers();
       await editedWithPinned();
       await press(railButton('Widgets'));
       expect(region().hasAttribute('inert')).toBe(true);
@@ -291,6 +294,9 @@ describe('DashboardView composition', () => {
     });
 
     it('switching to Context and back keeps editing, the widget and the palette', async () => {
+      // Hold the 400 ms save on a fake clock: the change stays unsaved however
+      // slowly the machine runs, so this checks the panel, not the scheduler.
+      vi.useFakeTimers();
       await editedWithPinned();
       await press(railButton('Context'));
       expect(editToggle().getAttribute('aria-pressed')).toBe('true');
