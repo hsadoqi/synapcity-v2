@@ -86,7 +86,7 @@ export const SettingsTabShell = ({
       <aside
         aria-label="Preview"
         className={cn(
-          'flex shrink-0 flex-col gap-4 border-s border-border px-6',
+          'scrollbar-hidden flex shrink-0 flex-col gap-4 overflow-auto border-s border-border px-6',
           preview.wide ? 'w-md' : 'w-80',
         )}
       >
@@ -100,7 +100,7 @@ export const SettingsTabShell = ({
   return (
     // Not clipped on a small screen: there the page shell scrolls, and a
     // clipping card would hold the sticky footer inside itself instead.
-    <Card className="flex-1 roomy:overflow-hidden">
+    <Card className="flex-1 overflow-visible roomy:overflow-hidden">
       {/* The rule splits the tab's identity from its settings. */}
       <CardHeader className="border-b">
         <CardTitle as="h2">{title}</CardTitle>

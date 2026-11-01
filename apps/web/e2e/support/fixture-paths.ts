@@ -8,6 +8,7 @@
 const FIXTURE_USER_ID = 'fixture-user';
 
 export const FIXTURE_HOME = `/${FIXTURE_USER_ID}/home`;
+export const FIXTURE_SETTINGS = `/${FIXTURE_USER_ID}/settings`;
 export const FIXTURE_DOCUMENTS = `${FIXTURE_HOME}/documents`;
 const FIXTURE_DASHBOARDS = `${FIXTURE_HOME}/dashboards`;
 const FIXTURE_SPACES = `${FIXTURE_HOME}/spaces`;
