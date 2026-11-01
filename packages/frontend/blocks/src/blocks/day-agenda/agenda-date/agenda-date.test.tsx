@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { AgendaDate } from '@/blocks/day-agenda/agenda-date';
+import { AgendaDate } from '.';
 
 describe('AgendaDate', () => {
   it('formats the date and keeps it machine-readable', () => {

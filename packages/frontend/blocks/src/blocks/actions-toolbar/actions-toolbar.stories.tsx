@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { CalendarPlus, Pin, Share2 } from 'lucide-react';
 import { expect, fn, screen, userEvent, within } from 'storybook/test';
 
-import { ActionsToolbar } from '@/blocks/actions-toolbar';
+import { ActionsToolbar } from '.';
 
 const actions = [
   { label: 'New item', icon: <CalendarPlus />, onSelect: fn() },

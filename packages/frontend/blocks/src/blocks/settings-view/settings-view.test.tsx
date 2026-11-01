@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { SettingsView } from '@/blocks/settings-view';
+import { SettingsView } from '.';
 
 describe('SettingsView', () => {
   it('is a region named by its title, focused on open, with its body', () => {

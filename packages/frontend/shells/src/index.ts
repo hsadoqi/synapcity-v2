@@ -32,10 +32,7 @@ export {
 } from './providers/shell-navigation';
 export {
   BreadcrumbProvider,
-  useBreadcrumbs,
-  BreadcrumbTrailContext,
-  type BreadcrumbTrail,
-  BreadcrumbMenu,
+  PublishBreadcrumbs,
   type RootBreadcrumb,
   activeContext,
 } from './components/breadcrumbs';

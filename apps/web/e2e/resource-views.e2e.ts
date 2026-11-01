@@ -240,8 +240,12 @@ test.describe('breadcrumb trail across client navigation', () => {
       .locator('[data-slot="sidebar-container"]')
       .getByRole('link', { name, exact: true });
 
+  // The trail belongs to the global header (the banner), never the page body.
   const crumbs = (page: Page) =>
-    page.getByRole('navigation', { name: 'Breadcrumb' }).getByRole('listitem');
+    page
+      .getByRole('banner')
+      .getByRole('navigation', { name: 'Breadcrumb' })
+      .getByRole('listitem');
 
   const switcher = (page: Page, context: string) =>
     page.getByRole('button', { name: `Switch context: ${context}` });
@@ -251,6 +255,10 @@ test.describe('breadcrumb trail across client navigation', () => {
   }) => {
     await open(page, DOCUMENT);
     await expect(crumbs(page)).toHaveText(['Documents', 'Launch plan']);
+    // The page publishes its trail; it draws none itself.
+    await expect(
+      page.getByRole('main').getByRole('navigation', { name: 'Breadcrumb' }),
+    ).toHaveCount(0);
 
     await sidebarLink(page, 'Project status').click();
     await expect(page).toHaveURL(

@@ -1,6 +1,6 @@
 # ADR-0017: Breadcrumb trail ownership and composition
 
-**Status:** Accepted
+**Status:** Accepted; amended 2026-10-31 ([implemented names](#amendment-2026-10-31-implemented-names-and-publication-path)) and 2026-11-01 ([publisher renamed, internals closed](#amendment-2026-11-01-publishbreadcrumbs-and-a-closed-bridge))
 **Date:** 2026-10-29
 **Deciders:** Repository owner (accepted 2026-10-29, with refinements recorded below)
 
@@ -67,3 +67,53 @@ Implemented after acceptance, in the same #99 pull request as this ADR (the inve
 - The global header is proposed to carry route-specific server-rendered content beyond the trail, such as per-route actions.
 - Measured hydration delay on target devices makes the swap noticeable, or the owner decides the first-paint limitation must be fixed.
 - Next.js adds a supported way for a child segment to contribute server output to an ancestor layout.
+
+## Amendment 2026-10-31: implemented names and publication path
+
+The decision above is unchanged: the invariant (Decision 1), the client bridge (Decision 3) and the trail-derived `activeContext` (Decision 4) still hold. The owner renamed the bridge's parts in `frontend-shells` on 2026-10-30 and 2026-10-31. Partway through, pages rendered the header's presenter instead of a publisher, so nothing published and the trail showed in the page body, the header showed none, and `activeContext` was always empty. On 2026-10-31 the owner chose to keep `BreadcrumbMenu` as the name pages render and to make it the publisher. This section records the result. The text above keeps the names that were current when it was accepted.
+
+**Names.**
+
+| Role                                                    | Accepted 2026-10-29    | Implemented 2026-10-31                              | Public |
+| ------------------------------------------------------- | ---------------------- | --------------------------------------------------- | ------ |
+| Publisher a route's page renders                        | `SetBreadcrumbs`       | `BreadcrumbMenu`                                    | yes    |
+| Holder of the trail, wrapping the root shell            | `BreadcrumbRootShell`  | `BreadcrumbProvider`                                | yes    |
+| Header presenter                                        | `HeaderBreadcrumbs`    | `HeaderBreadcrumbs` (internal to `frontend-shells`) | no     |
+| The hook behind the publisher, and the setter's context | (inside the publisher) | `useBreadcrumbs`, `BreadcrumbTrailContext`          | yes    |
+| One crumb                                               | `RootBreadcrumb`       | `RootBreadcrumb`                                    | yes    |
+
+**State ownership.** `BreadcrumbProvider` holds the one trail in React state and puts its setter in `BreadcrumbTrailContext`. It renders `RootShell` with that trail, and calls the host's `sidebar` function with it. `apps/web`'s `AppShell` renders the provider from the `(protected)` layout, so the trail outlives every page beneath it. `frontend-shells` owns the bridge; `apps/web` owns trail content (labels, hrefs, `kind`) as route policy.
+
+**Publication.** A signed-in route's `page.tsx` renders `<BreadcrumbMenu items={...} />` once, or not at all when the route is trail-free. It is a client component that renders nothing; through `useBreadcrumbs` it stores the items, compared by value so an equal trail on re-render changes nothing, and clears the trail when it unmounts. `src/app/breadcrumbs.test.ts` guards this convention (Decision 2) under the new name.
+
+**Header.** `RootShell` passes the trail to `RootHeaderContent`, which renders `HeaderBreadcrumbs` when someone is signed in and the trail is not empty, and the logo otherwise. Below the `sm` breakpoint only the current page shows.
+
+**Sidebar context.** The host's `sidebar` function receives the same trail; `apps/web` passes it through `activeContext`, which returns the first crumb with `kind: 'space'`. The header and the context switcher read one value, so they cannot disagree.
+
+**Navigation and hydration.** Unchanged from the Context and Unresolved sections. Effects do not run on the server, so the first HTML of a trail-bearing page shows the logo, and on a Space page the switcher shows Global, until hydration. Client navigation unmounts the old page's publisher (clearing) and mounts the new one (setting) in one commit, so no empty trail is painted between them. A route that publishes nothing leaves the trail empty.
+
+**Tradeoffs of the client publication model.** It keeps `frontend-shells` free of route, auth and resource knowledge and needs no mirrored route tree, at the cost of the first-paint limitation above. A trail exists only on the client; a test that reads server HTML for it would be wrong.
+
+**Name assessment.** `BreadcrumbMenu` names a component that draws nothing. A reader can expect it to render a menu, which is what happened in the change that broke publication. A name that says what it does (`SetBreadcrumbs`, the accepted name, or `PublishBreadcrumbs`) would read correctly. A rename is terminology (gated by the glossary, which has no breadcrumb entry) and touches every signed-in page, the page tests and the guardrail, so it is left to the owner and not made here.
+
+**Open, not changed.** `useBreadcrumbs` and `BreadcrumbTrailContext` are exported from the package entry and have no consumer outside `frontend-shells`. Either is a second way to publish that the guardrail, which reads `BreadcrumbMenu` imports only, does not see. Making them internal is a public API change for the owner.
+
+**Verification.** `frontend-shells` tests prove that `BreadcrumbMenu` publishes and renders nothing in place, that the provider's header shows the trail and clears it, and that the sidebar function receives it (`In Spaces`). The fixture e2e in `resource-views.e2e.ts` checks the trail in the header across client navigation and its agreement with the context switcher.
+
+## Amendment 2026-11-01: `PublishBreadcrumbs` and a closed bridge
+
+Owner decisions of 2026-11-01, on the two open points of the amendment above. The invariant, the client bridge and the trail-derived `activeContext` are unchanged, and so are run-time behavior and the first-paint limitation.
+
+**Rename.** The publisher a route's page renders is `PublishBreadcrumbs` (folder `frontend-shells/src/components/breadcrumbs/publish-breadcrumbs/`). It says what the component does: it publishes the trail and draws nothing. `BreadcrumbMenu` is gone, with no alias, since nothing outside this repository consumes the package. Every signed-in page, its page test and the guardrail use the new name.
+
+**Internals closed.** `useBreadcrumbs`, `BreadcrumbTrailContext` and the setter type `BreadcrumbTrail` are no longer exported from `@synapcity/frontend-shells`; `PublishBreadcrumbs` uses them through a relative import. The package's breadcrumb exports are now `BreadcrumbProvider`, `PublishBreadcrumbs`, `RootBreadcrumb` and `activeContext`. A unit test fails if the entry exposes either internal again.
+
+**Guardrail.** `apps/web/src/app/breadcrumbs.test.ts` keeps reading publishers lexically, as defense in depth behind the closed exports. It finds `PublishBreadcrumbs` and the two internals through named, aliased, namespace, re-export (aliased or not), dynamic `import()` and `require()` forms, and fails when a module outside a signed-in route page publishes, when a page publishes more than once, or when any scanned module uses an internal. Its limits are listed in the file.
+
+| Role                                         | Implemented 2026-11-01                     | Public |
+| -------------------------------------------- | ------------------------------------------ | ------ |
+| Publisher a route's page renders             | `PublishBreadcrumbs`                       | yes    |
+| Holder of the trail, wrapping the root shell | `BreadcrumbProvider`                       | yes    |
+| Header presenter                             | `HeaderBreadcrumbs`                        | no     |
+| The publisher's hook and the setter context  | `useBreadcrumbs`, `BreadcrumbTrailContext` | no     |
+| One crumb                                    | `RootBreadcrumb`                           | yes    |

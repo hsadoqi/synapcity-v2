@@ -7,7 +7,7 @@ vi.mock('next/navigation', () => ({ usePathname: () => '/' }));
 import { ModeProvider } from '@synapcity/frontend-preferences';
 
 import { BreadcrumbProvider } from '.';
-import { BreadcrumbMenu } from '../breadcrumb-menu';
+import { PublishBreadcrumbs } from '../publish-breadcrumbs';
 
 beforeEach(() => {
   vi.stubGlobal(
@@ -40,7 +40,7 @@ describe('BreadcrumbProvider', () => {
 
   it('shows the trail a page sets, linking parents and ending on the page', () => {
     renderShell(
-      <BreadcrumbMenu
+      <PublishBreadcrumbs
         items={[
           { label: 'Spaces', href: '/u/home/spaces' },
           { label: 'Fitness' },
@@ -59,7 +59,7 @@ describe('BreadcrumbProvider', () => {
     const view = render(
       <ModeProvider>
         <BreadcrumbProvider account={account}>
-          <BreadcrumbMenu items={[{ label: 'Spaces' }]} />
+          <PublishBreadcrumbs items={[{ label: 'Spaces' }]} />
         </BreadcrumbProvider>
       </ModeProvider>,
     );
@@ -77,12 +77,14 @@ describe('BreadcrumbProvider', () => {
   });
 
   it('follows the page when it changes the trail', () => {
-    const view = renderShell(<BreadcrumbMenu items={[{ label: 'Spaces' }]} />);
+    const view = renderShell(
+      <PublishBreadcrumbs items={[{ label: 'Spaces' }]} />,
+    );
 
     view.rerender(
       <ModeProvider>
         <BreadcrumbProvider account={account}>
-          <BreadcrumbMenu items={[{ label: 'Dashboards' }]} />
+          <PublishBreadcrumbs items={[{ label: 'Dashboards' }]} />
         </BreadcrumbProvider>
       </ModeProvider>,
     );
@@ -103,7 +105,9 @@ describe('BreadcrumbProvider', () => {
     render(
       <ModeProvider>
         <BreadcrumbProvider account={account} sidebar={sidebar}>
-          <BreadcrumbMenu items={[{ label: 'Spaces', kind: 'collection' }]} />
+          <PublishBreadcrumbs
+            items={[{ label: 'Spaces', kind: 'collection' }]}
+          />
         </BreadcrumbProvider>
       </ModeProvider>,
     );
@@ -114,14 +118,14 @@ describe('BreadcrumbProvider', () => {
   });
 });
 
-describe('BreadcrumbMenu stability', () => {
-  /** A page that re-renders itself, handing BreadcrumbMenu a new equal array. */
+describe('PublishBreadcrumbs stability', () => {
+  /** A page that re-renders itself, handing PublishBreadcrumbs a new equal array. */
   const Page = () => {
     const [, setCount] = useState(0);
     return (
       <>
         <button onClick={() => setCount((n) => n + 1)}>Render again</button>
-        <BreadcrumbMenu items={[{ label: 'Spaces' }]} />
+        <PublishBreadcrumbs items={[{ label: 'Spaces' }]} />
       </>
     );
   };
@@ -143,7 +147,7 @@ describe('BreadcrumbMenu stability', () => {
   });
 });
 
-describe('BreadcrumbMenu lifecycle', () => {
+describe('PublishBreadcrumbs lifecycle', () => {
   const inShell = (page: React.ReactNode) => (
     <ModeProvider>
       <BreadcrumbProvider account={account}>{page}</BreadcrumbProvider>
@@ -154,11 +158,11 @@ describe('BreadcrumbMenu lifecycle', () => {
     // Different keys: the old publisher unmounts as the new one mounts, as on
     // a route change. Cleanups run before the new effect, so the new trail wins.
     const view = render(
-      inShell(<BreadcrumbMenu key="a" items={[{ label: 'Spaces' }]} />),
+      inShell(<PublishBreadcrumbs key="a" items={[{ label: 'Spaces' }]} />),
     );
 
     view.rerender(
-      inShell(<BreadcrumbMenu key="b" items={[{ label: 'Documents' }]} />),
+      inShell(<PublishBreadcrumbs key="b" items={[{ label: 'Documents' }]} />),
     );
 
     expect(within(trail()!).getByText('Documents')).toBeTruthy();
@@ -167,10 +171,10 @@ describe('BreadcrumbMenu lifecycle', () => {
 
   it('shows no trail for a page that sets an empty one', () => {
     const view = render(
-      inShell(<BreadcrumbMenu key="a" items={[{ label: 'Spaces' }]} />),
+      inShell(<PublishBreadcrumbs key="a" items={[{ label: 'Spaces' }]} />),
     );
 
-    view.rerender(inShell(<BreadcrumbMenu key="b" items={[]} />));
+    view.rerender(inShell(<PublishBreadcrumbs key="b" items={[]} />));
 
     expect(trail()).toBeNull();
   });
@@ -178,7 +182,7 @@ describe('BreadcrumbMenu lifecycle', () => {
   it('keeps the trail through Strict Mode mounting its effects twice', () => {
     render(
       <StrictMode>
-        {inShell(<BreadcrumbMenu items={[{ label: 'Spaces' }]} />)}
+        {inShell(<PublishBreadcrumbs items={[{ label: 'Spaces' }]} />)}
       </StrictMode>,
     );
 

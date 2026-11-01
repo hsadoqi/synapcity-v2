@@ -15,9 +15,9 @@ import {
 } from '@synapcity/frontend-ui/core/sidebar';
 import { IconButton } from '@synapcity/frontend-ui/core/icon-button';
 import {
-  BreadcrumbMenu,
+  HeaderBreadcrumbs,
   type RootBreadcrumb,
-} from '../../breadcrumbs/breadcrumb-menu';
+} from '../../breadcrumbs/header-breadcrumbs';
 
 type RootHeaderProps = {
   actions?: ReactNode;
@@ -42,7 +42,7 @@ export const RootHeaderContent = ({
       {/* Signed in, a page's trail shows here; without one, the brand does,
           leading to the person's home. */}
       {account && breadcrumbs?.length ? (
-        <BreadcrumbMenu items={breadcrumbs} />
+        <HeaderBreadcrumbs items={breadcrumbs} />
       ) : (
         <RootLogoLink homeHref={account?.homeHref ?? '/'} />
       )}

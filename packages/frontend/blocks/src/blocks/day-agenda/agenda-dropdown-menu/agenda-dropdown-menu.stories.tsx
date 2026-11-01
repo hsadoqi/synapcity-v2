@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, fn, screen, userEvent, waitFor, within } from 'storybook/test';
 
-import { AgendaDropdownMenu } from '@/blocks/day-agenda/agenda-dropdown-menu';
+import { AgendaDropdownMenu } from '.';
 
 const meta = {
   title: 'Blocks/Day Agenda/AgendaDropdownMenu',

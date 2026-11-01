@@ -26,7 +26,7 @@ export type RootBreadcrumb = {
  * The trail to the current page. Below the sm breakpoint only the current page
  * shows, since the sidebar already shows where you are.
  */
-export const BreadcrumbMenu = ({ items }: { items?: RootBreadcrumb[] }) => {
+export const HeaderBreadcrumbs = ({ items }: { items?: RootBreadcrumb[] }) => {
   if (!items?.length) {
     return <div className="min-w-0 flex-1" />;
   }

@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { ComponentProps } from 'react';
 import { RootShell } from '../../root-shell';
-import type { RootBreadcrumb } from '../breadcrumb-menu';
+import type { RootBreadcrumb } from '../header-breadcrumbs';
 import type { RootSidebarContent } from '../../sidebar-shell/root-sidebar';
 
 export type BreadcrumbTrail = (items: RootBreadcrumb[]) => void;
@@ -47,6 +47,9 @@ export function BreadcrumbProvider({
 /**
  * Tells the header where this page sits. Renders nothing, and clears the trail
  * when the page goes away so the next page never shows a stale one.
+ *
+ * Internal to `frontend-shells`: pages publish through `PublishBreadcrumbs`,
+ * the one public publisher, so the app's guardrail sees every publisher.
  *
  * The primary navigable route owns the trail and publishes at most one
  * (ADR-0017): exactly one when it shows a trail, none when it is trail-free.

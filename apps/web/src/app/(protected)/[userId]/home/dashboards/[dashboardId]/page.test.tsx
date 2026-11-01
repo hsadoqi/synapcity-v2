@@ -35,7 +35,7 @@ vi.mock('@/lib/access/dev-fixture', () => ({
 }));
 
 import { isValidElement, type ReactElement, type ReactNode } from 'react';
-import { BreadcrumbMenu } from '@synapcity/frontend-shells';
+import { PublishBreadcrumbs } from '@synapcity/frontend-shells';
 
 import { DashboardView } from '@/features/dashboards/components/dashboard-view';
 import { RecordDashboardView } from '@/features/dashboards/components/record-dashboard-view';
@@ -107,7 +107,7 @@ describe('the Dashboard page', () => {
     expect(find(page, RecordDashboardView)?.props).toMatchObject({
       dashboardId: 'x1',
     });
-    expect(find(page, BreadcrumbMenu)?.props).toEqual({
+    expect(find(page, PublishBreadcrumbs)?.props).toEqual({
       items: [
         {
           label: 'Dashboards',

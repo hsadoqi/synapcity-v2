@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { fn } from 'storybook/test';
 
-import { AgendaSettingsView } from '@/blocks/day-agenda/agenda-settings-view';
+import { AgendaSettingsView } from '.';
 
 const meta = {
   title: 'Blocks/Day Agenda/AgendaSettingsView',

@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from '@synapcity/frontend-ui/core/button';
 import { Pin } from 'lucide-react';
-import { AgendaActionsMenu } from '@/blocks/day-agenda/agenda-actions-menu';
+import { AgendaActionsMenu } from '.';
 
 describe('AgendaActionsMenu', () => {
   it('opens settings from the default cog and offers the add menu', async () => {

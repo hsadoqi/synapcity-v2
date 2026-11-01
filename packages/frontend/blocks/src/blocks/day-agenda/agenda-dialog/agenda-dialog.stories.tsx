@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { Button } from '@synapcity/frontend-ui/core/button';
-import { AgendaDialog } from '@/blocks/day-agenda/agenda-dialog';
+import { AgendaDialog } from '.';
 
 const meta = {
   title: 'Blocks/Day Agenda/AgendaDialog',

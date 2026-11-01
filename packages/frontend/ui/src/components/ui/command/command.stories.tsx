@@ -15,7 +15,7 @@ import {
 } from '@synapcity/frontend-ui/core/command';
 
 const meta = {
-  title: 'Components/Command',
+  title: 'Navigation/Command',
   component: Command,
 } satisfies Meta<typeof Command>;
 

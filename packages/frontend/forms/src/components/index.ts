@@ -1,6 +1,6 @@
 export * from './form-parts/form-field';
 export * from './form-parts/form-message';
-export * from './form-engine/field-frame';
+export * from './form-engine';
 export * from './field-renderers/color-renderer';
 export * from './field-renderers/combobox-renderer';
 export * from './field-renderers/date-picker-renderer';

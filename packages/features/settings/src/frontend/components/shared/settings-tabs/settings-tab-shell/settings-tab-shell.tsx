@@ -66,7 +66,7 @@ export const SettingsTabShell = ({
   const rail = preview && wide;
   const inlinePreview = preview && !wide && preview.inline !== false;
   const settings = (
-    <CardContent className="scroll-fade-y min-w-0 flex-1 roomy:overflow-auto">
+    <CardContent className="scroll-fade-y min-w-0 flex-1 roomy:overflow-auto scrollbar-hidden">
       <div className="flex flex-col gap-8">
         {inlinePreview && (
           <SettingsAccordion>
@@ -86,7 +86,7 @@ export const SettingsTabShell = ({
       <aside
         aria-label="Preview"
         className={cn(
-          'flex shrink-0 flex-col gap-4 overflow-auto border-s border-border px-6',
+          'scrollbar-hidden flex shrink-0 flex-col gap-4 overflow-auto border-s border-border px-6',
           preview.wide ? 'w-md' : 'w-80',
         )}
       >

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { fn } from 'storybook/test';
 
-import { SettingsView } from '@/blocks/settings-view';
+import { SettingsView } from '.';
 
 const meta = {
   title: 'Blocks/SettingsView',

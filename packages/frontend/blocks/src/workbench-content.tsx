@@ -3,7 +3,7 @@
 import type { User } from '@synapcity/domain-identity';
 import { Sidebar } from '@synapcity/frontend-ui/core/sidebar';
 import { Workbench } from './main-content';
-import { MainCombinedSidebar, UserAvatar } from './main-sidebar';
+import { MainCombinedSidebar, UserAvatarActions } from './main-sidebar';
 import type {
   MainSidebarGroup,
   MainSidebarItem,
@@ -84,7 +84,7 @@ export function WorkbenchContent({
           );
           if (selected) onSelectResource(selected);
         }}
-        panelFooter={user ? <UserAvatar user={user} /> : undefined}
+        panelFooter={user ? <UserAvatarActions user={user} /> : undefined}
       />
       <Workbench
         empty={workspace.resources?.length === 0 ? workspace : undefined}

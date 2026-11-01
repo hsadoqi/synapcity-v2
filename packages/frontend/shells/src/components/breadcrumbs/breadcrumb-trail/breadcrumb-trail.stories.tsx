@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { BreadcrumbProvider } from './breadcrumb-trail';
-import { BreadcrumbMenu } from '../breadcrumb-menu';
+import { PublishBreadcrumbs } from '../publish-breadcrumbs';
 const account = { homeHref: '/u/home', settingsHref: '/u/settings' };
 
 /** A page sets its trail with `Breadcrumb`; the shell's header shows it. */
@@ -19,7 +19,7 @@ export const InASpace: Story = {
   args: {
     children: (
       <>
-        <BreadcrumbMenu
+        <PublishBreadcrumbs
           items={[
             { label: 'Spaces', href: '/u/home/spaces' },
             { label: 'Garden plans' },

@@ -1,4 +1,12 @@
-export default function PlaygroundPage() {
+import { requireOwner } from '@/lib/access/require-owner';
+
+export default async function PlaygroundPage({
+  params,
+}: {
+  params: Promise<{ userId: string }>;
+}) {
+  await requireOwner((await params).userId);
+
   return (
     <section className="mx-auto flex max-w-2xl flex-col gap-3">
       <p className="text-muted-foreground text-sm">Sidebar prototype</p>
