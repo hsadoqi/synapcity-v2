@@ -1,2 +1,2 @@
-export * from './breadcrumb-menu';
+export * from './publish-breadcrumbs';
 export * from './breadcrumb-trail';

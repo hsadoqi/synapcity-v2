@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { BreadcrumbMenu } from '.';
+import { PublishBreadcrumbs } from '.';
 import { BreadcrumbTrailContext } from '../breadcrumb-trail';
 
 const trail = [
@@ -12,11 +12,11 @@ const trail = [
 const publishTo = (setTrail: (items: unknown[]) => void, items = trail) =>
   render(
     <BreadcrumbTrailContext value={setTrail}>
-      <BreadcrumbMenu items={items} />
+      <PublishBreadcrumbs items={items} />
     </BreadcrumbTrailContext>,
   );
 
-describe('BreadcrumbMenu', () => {
+describe('PublishBreadcrumbs', () => {
   it('publishes the page trail to the shell', () => {
     const setTrail = vi.fn();
     publishTo(setTrail);
@@ -39,11 +39,19 @@ describe('BreadcrumbMenu', () => {
     expect(setTrail).toHaveBeenLastCalledWith([]);
   });
 
+  it('is the only publisher the package entry exposes', async () => {
+    const entry = await import('../../../index');
+
+    expect(entry).toHaveProperty('PublishBreadcrumbs');
+    expect(entry).not.toHaveProperty('useBreadcrumbs');
+    expect(entry).not.toHaveProperty('BreadcrumbTrailContext');
+  });
+
   it('publishes an empty trail when given no items', () => {
     const setTrail = vi.fn();
     render(
       <BreadcrumbTrailContext value={setTrail}>
-        <BreadcrumbMenu />
+        <PublishBreadcrumbs />
       </BreadcrumbTrailContext>,
     );
 

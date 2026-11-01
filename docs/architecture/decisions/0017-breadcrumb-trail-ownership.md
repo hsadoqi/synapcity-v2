@@ -1,6 +1,6 @@
 # ADR-0017: Breadcrumb trail ownership and composition
 
-**Status:** Accepted; amended 2026-10-31 (see [Amendment](#amendment-2026-10-31-implemented-names-and-publication-path))
+**Status:** Accepted; amended 2026-10-31 ([implemented names](#amendment-2026-10-31-implemented-names-and-publication-path)) and 2026-11-01 ([publisher renamed, internals closed](#amendment-2026-11-01-publishbreadcrumbs-and-a-closed-bridge))
 **Date:** 2026-10-29
 **Deciders:** Repository owner (accepted 2026-10-29, with refinements recorded below)
 
@@ -99,3 +99,21 @@ The decision above is unchanged: the invariant (Decision 1), the client bridge (
 **Open, not changed.** `useBreadcrumbs` and `BreadcrumbTrailContext` are exported from the package entry and have no consumer outside `frontend-shells`. Either is a second way to publish that the guardrail, which reads `BreadcrumbMenu` imports only, does not see. Making them internal is a public API change for the owner.
 
 **Verification.** `frontend-shells` tests prove that `BreadcrumbMenu` publishes and renders nothing in place, that the provider's header shows the trail and clears it, and that the sidebar function receives it (`In Spaces`). The fixture e2e in `resource-views.e2e.ts` checks the trail in the header across client navigation and its agreement with the context switcher.
+
+## Amendment 2026-11-01: `PublishBreadcrumbs` and a closed bridge
+
+Owner decisions of 2026-11-01, on the two open points of the amendment above. The invariant, the client bridge and the trail-derived `activeContext` are unchanged, and so are run-time behavior and the first-paint limitation.
+
+**Rename.** The publisher a route's page renders is `PublishBreadcrumbs` (folder `frontend-shells/src/components/breadcrumbs/publish-breadcrumbs/`). It says what the component does: it publishes the trail and draws nothing. `BreadcrumbMenu` is gone, with no alias, since nothing outside this repository consumes the package. Every signed-in page, its page test and the guardrail use the new name.
+
+**Internals closed.** `useBreadcrumbs`, `BreadcrumbTrailContext` and the setter type `BreadcrumbTrail` are no longer exported from `@synapcity/frontend-shells`; `PublishBreadcrumbs` uses them through a relative import. The package's breadcrumb exports are now `BreadcrumbProvider`, `PublishBreadcrumbs`, `RootBreadcrumb` and `activeContext`. A unit test fails if the entry exposes either internal again.
+
+**Guardrail.** `apps/web/src/app/breadcrumbs.test.ts` keeps reading publishers lexically, as defense in depth behind the closed exports. It finds `PublishBreadcrumbs` and the two internals through named, aliased, namespace, re-export (aliased or not), dynamic `import()` and `require()` forms, and fails when a module outside a signed-in route page publishes, when a page publishes more than once, or when any scanned module uses an internal. Its limits are listed in the file.
+
+| Role                                         | Implemented 2026-11-01                     | Public |
+| -------------------------------------------- | ------------------------------------------ | ------ |
+| Publisher a route's page renders             | `PublishBreadcrumbs`                       | yes    |
+| Holder of the trail, wrapping the root shell | `BreadcrumbProvider`                       | yes    |
+| Header presenter                             | `HeaderBreadcrumbs`                        | no     |
+| The publisher's hook and the setter context  | `useBreadcrumbs`, `BreadcrumbTrailContext` | no     |
+| One crumb                                    | `RootBreadcrumb`                           | yes    |

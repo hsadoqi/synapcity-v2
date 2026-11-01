@@ -1,17 +1,17 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { BreadcrumbMenu } from '.';
+import { PublishBreadcrumbs } from '.';
 import { BreadcrumbProvider } from '../breadcrumb-trail';
 
 const account = { homeHref: '/u/home', settingsHref: '/u/settings' };
 
 /**
- * A page renders `BreadcrumbMenu` with its trail; it draws nothing itself, and
+ * A page renders `PublishBreadcrumbs` with its trail; it draws nothing itself, and
  * the shell's header shows the trail.
  */
 const meta = {
-  title: 'Blocks/BreadcrumbMenu',
-  component: BreadcrumbMenu,
+  title: 'Blocks/PublishBreadcrumbs',
+  component: PublishBreadcrumbs,
   parameters: { layout: 'fullscreen' },
   args: {
     items: [
@@ -27,7 +27,7 @@ const meta = {
       </BreadcrumbProvider>
     ),
   ],
-} satisfies Meta<typeof BreadcrumbMenu>;
+} satisfies Meta<typeof PublishBreadcrumbs>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

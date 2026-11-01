@@ -10,5 +10,5 @@ import type { RootBreadcrumb } from '../header-breadcrumbs';
  * the same trail through `activeContext`, so the two cannot disagree. The trail
  * clears when the page goes away.
  */
-export const BreadcrumbMenu = ({ items }: { items?: RootBreadcrumb[] }) =>
+export const PublishBreadcrumbs = ({ items }: { items?: RootBreadcrumb[] }) =>
   useBreadcrumbs({ items: items ?? [] });
