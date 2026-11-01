@@ -10,7 +10,7 @@
 - Permitted sources: Supabase project-list and branch metadata available to the authenticated owner; the GitHub Supabase integration's metadata and check links; Vercel project-linkage and integration metadata; repository documentation; existing local Supabase CLI metadata that holds no credential; earlier audit evidence, labelled with its date.
 - Forbidden: `supabase link`, `db query`, `migration list --linked`, `db dump`, parity, connection strings, any key or token, Vercel environment-variable values, and any change to hosted state.
 - Stop conditions: a baseline SHA or PR #135 moves; another task owns the ledger path; a source would expose a credential or need a forbidden command; candidates conflict and the evidence cannot decide between them.
-- Git and hosted boundaries: publication is limited to the two-file manifest, one commit, one pushed branch and one draft pull request to `main`; marking ready and merging require separate owner authorization. No change to the foundation, planning or delivery worktrees, and no hosted write.
+- Git and hosted boundaries: publication is limited to the two-file manifest, the `chore/t1-environment-ledger` branch and one draft pull request to `main`; marking ready and merging require separate owner authorization. No change to the foundation, planning or delivery worktrees, and no hosted write.
 
 ## Active task: T1 release foundation, local and uncommitted (2026-11-01)
 
