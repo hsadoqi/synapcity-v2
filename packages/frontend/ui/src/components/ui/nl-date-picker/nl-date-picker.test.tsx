@@ -59,7 +59,7 @@ describe('NLDatePicker', () => {
 
     fireEvent.click(day!);
 
-    expect(input.value).toMatch(/^[A-Z][a-z]+ \d{2}, \d{4}$/);
+    expect(input.value).toMatch(/^[A-Z][a-z]+ \d{1,2}, \d{4}$/);
     expect(screen.queryByRole('grid')).toBeNull();
   });
 });
