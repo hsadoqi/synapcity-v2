@@ -17,7 +17,7 @@ vi.mock('@/features/documents/server/get-documents', () => ({
 }));
 
 import { isValidElement, type ReactElement, type ReactNode } from 'react';
-import { BreadcrumbMenu } from '@synapcity/frontend-shells';
+import { PublishBreadcrumbs } from '@synapcity/frontend-shells';
 
 import { DocumentView } from '@/features/documents/components/document-view';
 import DocumentShowPage, { generateMetadata } from './page';
@@ -67,7 +67,7 @@ describe('the Document page', () => {
     const page = await DocumentShowPage({ params: params('x1') });
 
     expect(find(page, DocumentView)?.props).toEqual({ document });
-    expect(find(page, BreadcrumbMenu)?.props).toEqual({
+    expect(find(page, PublishBreadcrumbs)?.props).toEqual({
       items: [
         {
           label: 'Documents',

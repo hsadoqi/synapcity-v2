@@ -5,7 +5,7 @@ import {
 } from '@synapcity/features-spaces/frontend';
 import { getSpace } from '@synapcity/features-spaces/server';
 
-import { BreadcrumbMenu } from '@synapcity/frontend-shells';
+import { PublishBreadcrumbs } from '@synapcity/frontend-shells';
 import { COLLECTION_LABELS } from '@/components/collections';
 import { logFailure } from '@/lib/log-failure';
 import { requireOwner } from '@/lib/access/require-owner';
@@ -29,7 +29,7 @@ export default async function SpaceShowPage({
 
   return (
     <>
-      <BreadcrumbMenu
+      <PublishBreadcrumbs
         items={[
           {
             label: COLLECTION_LABELS.spaces,
