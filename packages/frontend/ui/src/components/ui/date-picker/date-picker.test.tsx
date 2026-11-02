@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { StaticPreferences } from '@synapcity/frontend-preferences';
 
 import {
   DatePicker,
@@ -115,13 +116,12 @@ describe('DatePicker', () => {
   });
 
   it('writes the date in the saved day-first order', () => {
-    localStorage.setItem(
-      'synapcity-preferences',
-      JSON.stringify({ regional: { dateFormat: 'DD/MM/YYYY' } }),
+    render(
+      <StaticPreferences settings={{ regional: { dateFormat: 'DD/MM/YYYY' } }}>
+        <DatePicker value={may4} />
+      </StaticPreferences>,
     );
-    render(<DatePicker value={may4} />);
     expect(screen.getByRole('button').textContent).toContain('4 May 2026');
-    localStorage.clear();
   });
 
   it('formats the label with formatValue when given', () => {
