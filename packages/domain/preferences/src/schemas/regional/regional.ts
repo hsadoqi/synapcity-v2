@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 const languages = ['en', 'es', 'fr', 'de', 'zh', 'ja'] as const;
 
-const numberFormats = [
+export const numberFormats = [
   '1,000.00',
   '1.000,00',
   '1 000,00',
