@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { regionalDefaults } from '@synapcity/domain-preferences';
 import type { BaseRecord } from '@synapcity/domain-records';
-import { RegionalProvider } from '@synapcity/frontend-preferences';
+import { StaticPreferences } from '@synapcity/frontend-preferences';
 import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
 import { DocumentDetails } from './document-details';
 import { DocumentView } from './document-view';
@@ -221,13 +221,16 @@ describe('DocumentView details', () => {
     // Tokyo, so a zone mismatch would change the text.
     const regional = { ...regionalDefaults, timezone: 'Asia/Tokyo' };
     const ui = (
-      <RegionalProvider regional={regional} deviceTimeZone={null}>
+      <StaticPreferences
+        settings={{ regional: regional }}
+        deviceTimeZone={null}
+      >
         <DocumentDetails
           createdAt="2026-10-14T23:30:00Z"
           updatedAt="2026-10-17T23:30:00Z"
           tags={['work']}
         />
-      </RegionalProvider>
+      </StaticPreferences>
     );
     const html = renderToString(ui);
     expect(html).toContain('Oct 15, 2026');

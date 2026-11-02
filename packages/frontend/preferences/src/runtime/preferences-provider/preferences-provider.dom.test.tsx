@@ -55,10 +55,7 @@ const granted = {
 const owner = () => JSON.parse(localStorage.getItem(PREFERENCES_OWNER_KEY)!);
 const stored = () => JSON.parse(localStorage.getItem(KEY)!);
 
-function wrapper(
-  session: PreferencesSession,
-  save?: SaveAccountPreferences,
-) {
+function wrapper(session: PreferencesSession, save?: SaveAccountPreferences) {
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
       <ModeProvider attribute="class" defaultTheme="system" enableSystem>
@@ -106,7 +103,9 @@ describe('without a runtime', () => {
   });
 
   it('never allows collection, whatever the browser holds', () => {
-    writeStoredPreferences(JSON.stringify({ privacy: { errorReports: granted } }));
+    writeStoredPreferences(
+      JSON.stringify({ privacy: { errorReports: granted } }),
+    );
     expect(renderHook(() => useCanCollect('errorReports')).result.current).toBe(
       false,
     );
@@ -179,9 +178,7 @@ describe('PreferencesProvider on the server', () => {
     function Probe() {
       return <>{String(useCanCollect('errorReports'))}</>;
     }
-    const Wrapper = wrapper(
-      account({ privacy: { errorReports: granted } }),
-    );
+    const Wrapper = wrapper(account({ privacy: { errorReports: granted } }));
     expect(
       renderToString(
         <Wrapper>
@@ -262,7 +259,9 @@ describe('PreferencesProvider in the browser', () => {
     function Probe() {
       const renders = useRef(0);
       renders.current++;
-      return <span data-testid="language">{useRegionalPreferences().language}</span>;
+      return (
+        <span data-testid="language">{useRegionalPreferences().language}</span>
+      );
     }
     function App() {
       return (
@@ -355,7 +354,9 @@ describe('PreferencesProvider in the browser', () => {
     function Probe() {
       const { snapshot, actions } = useRuntime();
       return (
-        <button onClick={() => actions.update({ regional: { language: 'fr' } })}>
+        <button
+          onClick={() => actions.update({ regional: { language: 'fr' } })}
+        >
           {snapshot.status.kind}
         </button>
       );
@@ -381,7 +382,9 @@ describe('PreferencesProvider in the browser', () => {
     });
     expect(result.current).toBe(false);
     act(() => {
-      writeStoredPreferences(JSON.stringify({ privacy: { errorReports: granted } }));
+      writeStoredPreferences(
+        JSON.stringify({ privacy: { errorReports: granted } }),
+      );
       window.dispatchEvent(new StorageEvent('storage', { key: KEY }));
     });
     expect(result.current).toBe(true);
@@ -428,7 +431,9 @@ describe('PreferencesProvider in the browser', () => {
 
   it('applies the display override and restores this device’s own values when it is turned off', async () => {
     const save = vi.fn<SaveAccountPreferences>(async () => ({ ok: true }));
-    writeStoredPreferences(JSON.stringify({ appearance: { showBorders: true } }));
+    writeStoredPreferences(
+      JSON.stringify({ appearance: { showBorders: true } }),
+    );
     const { result } = renderHook(() => useRuntime(), {
       wrapper: wrapper(
         account({
@@ -442,7 +447,9 @@ describe('PreferencesProvider in the browser', () => {
       ),
     });
     expect(result.current.snapshot.displayOnAllDevices).toBe(true);
-    expect(result.current.snapshot.settings.appearance.contrastMode).toBe('high');
+    expect(result.current.snapshot.settings.appearance.contrastMode).toBe(
+      'high',
+    );
     expect(result.current.snapshot.settings.appearance.showBorders).toBe(false);
 
     act(() => result.current.actions.setDisplayOnAllDevices(false));

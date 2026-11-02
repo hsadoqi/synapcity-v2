@@ -2,11 +2,7 @@ import { z } from 'zod';
 
 import { settingsDefaults, type Settings } from '../../schemas';
 import { reconcile, type StoredAccountPreferences } from '../reconcile';
-import {
-  accountPart,
-  isDefaultAccount,
-  type DisplaySettings,
-} from '../scope';
+import { accountPart, isDefaultAccount, type DisplaySettings } from '../scope';
 
 /**
  * Who the preferences in effect belong to. A guest is anyone signed out; an
@@ -31,8 +27,7 @@ export type PreferencesSession =
  * legacy one, so first sign-in adoption never uploads data of unknown origin.
  */
 export type CacheOwner =
-  | { kind: 'guest'; adoptable: boolean }
-  | { kind: 'account'; userId: string };
+  { kind: 'guest'; adoptable: boolean } | { kind: 'account'; userId: string };
 
 export const CACHE_OWNER_VERSION = 1;
 

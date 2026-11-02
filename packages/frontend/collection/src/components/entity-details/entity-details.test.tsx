@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { regionalDefaults } from '@synapcity/domain-preferences';
-import { RegionalProvider } from '@synapcity/frontend-preferences';
+import { StaticPreferences } from '@synapcity/frontend-preferences';
 
 import { EntityDetails } from './entity-details';
 import type { EntityItem } from '../../types';
@@ -28,17 +28,19 @@ describe('EntityDetails', () => {
 
   it("writes when it was created in the person's date order, time format and zone", () => {
     render(
-      <RegionalProvider
-        regional={{
-          ...regionalDefaults,
-          dateFormat: 'DD/MM/YYYY',
-          timeFormat: '24-hour',
-          timezone: 'Asia/Tokyo',
+      <StaticPreferences
+        settings={{
+          regional: {
+            ...regionalDefaults,
+            dateFormat: 'DD/MM/YYYY',
+            timeFormat: '24-hour',
+            timezone: 'Asia/Tokyo',
+          },
         }}
         deviceTimeZone={null}
       >
         <EntityDetails entity={document} />
-      </RegionalProvider>,
+      </StaticPreferences>,
     );
 
     const created = screen.getByText(/^1 Oct 2026/, { selector: 'time' });

@@ -103,11 +103,10 @@ export function PreferencesProvider({
 
   // Layout effects run after hydration but before paint, so the browser's
   // saved copy replaces the server's view without a visible frame between.
-  useLayoutEffect(() => store.bindMode(nativeMode, setMode), [
-    store,
-    nativeMode,
-    setMode,
-  ]);
+  useLayoutEffect(
+    () => store.bindMode(nativeMode, setMode),
+    [store, nativeMode, setMode],
+  );
   useLayoutEffect(() => store.start(), [store]);
   useEffect(() => store.setSession(session), [store, session]);
   useEffect(
@@ -219,8 +218,7 @@ export function useCanCollect(purpose: PrivacyPurpose): boolean {
   const ready = usePreferences((s) => s.phase === 'ready');
   const globalPrivacyControl = useGlobalPrivacyControl();
   return useMemo(
-    () =>
-      ready && canCollect(privacy, purpose, { globalPrivacyControl }),
+    () => ready && canCollect(privacy, purpose, { globalPrivacyControl }),
     [ready, privacy, purpose, globalPrivacyControl],
   );
 }

@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { regionalDefaults } from '@synapcity/domain-preferences';
-import { RegionalProvider } from '@synapcity/frontend-preferences';
+import { StaticPreferences } from '@synapcity/frontend-preferences';
 import { seededWorkspace } from '../../../testing';
 import { StatBody } from './index';
 
@@ -21,12 +21,14 @@ describe('StatBody', () => {
       value: 1234567.5,
     };
     render(
-      <RegionalProvider
-        regional={{ ...regionalDefaults, numberFormat: '1.000,00' }}
+      <StaticPreferences
+        settings={{
+          regional: { ...regionalDefaults, numberFormat: '1.000,00' },
+        }}
         deviceTimeZone={null}
       >
         <StatBody metric={metric} />
-      </RegionalProvider>,
+      </StaticPreferences>,
     );
     expect(screen.getByText('1.234.567,5')).toBeDefined();
   });

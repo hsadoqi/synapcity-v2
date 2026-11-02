@@ -1,7 +1,7 @@
 import { emptyRecords } from '@synapcity/domain-prototypes';
 import { render, screen } from '@testing-library/react';
 import { regionalDefaults } from '@synapcity/domain-preferences';
-import { RegionalProvider } from '@synapcity/frontend-preferences';
+import { StaticPreferences } from '@synapcity/frontend-preferences';
 import { describe, expect, it } from 'vitest';
 
 import { SEED_NOW, seededWorkspace } from '../../../testing';
@@ -23,12 +23,12 @@ describe('CalendarBody', () => {
 
   it("writes times in the person's hour cycle", () => {
     const { container } = render(
-      <RegionalProvider
-        regional={{ ...regionalDefaults, timeFormat: '24-hour' }}
+      <StaticPreferences
+        settings={{ regional: { ...regionalDefaults, timeFormat: '24-hour' } }}
         deviceTimeZone={null}
       >
         <CalendarBody events={seededWorkspace().records.event} now={SEED_NOW} />
-      </RegionalProvider>,
+      </StaticPreferences>,
     );
     for (const time of container.querySelectorAll('time[datetime]')) {
       expect(time.textContent).toMatch(/^\d{2}:\d{2}$/);

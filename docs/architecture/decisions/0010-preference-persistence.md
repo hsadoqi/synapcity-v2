@@ -155,3 +155,14 @@ Owner decision, 2026-10-24: the web and docs apps show the same look, so the loo
 - **Reset:** Settings offers a confirmed “Reset shared look” action. It writes the default theme and appearance through the normal provider, so the shared cookie and local document agree, while regional, notification and privacy preferences remain unchanged. Merely deleting the cookie would be incorrect because the migration fallback would recreate the old look from `localStorage`.
 
 Implementation: [M6.3 plan](../../superpowers/plans/2026-10-24-m6-3-shared-look.md).
+
+## Implementation note, 2026-11-02: one preferences runtime
+
+Owner-approved implementation (2026-11-02, see `.agents/task-scope.md`). Scope, precedence, the account row and storage keys are unchanged; what changed is who owns the state in the browser.
+
+- **One runtime.** `PreferencesProvider` in `@synapcity/frontend-preferences` is the only owner of the preferences in effect. It replaces `AccountPreferencesSync` (every page), the state, storage and account logic inside `SettingsProvider` (Settings page), and `RegionalProvider` with the hooks that each re-read `localStorage`. `SettingsProvider` keeps the drafts, the explicit Save and the status wording, over the runtime. `features-settings/contracts` is removed; `SavePreferencesResult` is a domain type.
+- **Session.** The root layout passes a `PreferencesSession`: a guest, or an account with the row it read, or with `null` when the read failed. The resolution rules are pure domain code (`resolveSession`).
+- **Account-aware cache.** A marker, `synapcity-preferences-owner`, beside the unchanged `synapcity-preferences` document, records whose choices it holds. A document of another account is reset to the account defaults (device fields kept) before it is shown; a legacy unmarked document is never adopted and, for a guest, is left byte for byte; only a guest document that did not start from a legacy one is adopted at first sign-in. This tightens section 3's "first sign-in adoption", which uploaded whatever the browser held.
+- **Where adoption and zone reporting run.** Section 3 limited both to the Settings page because only that page could save. The runtime holds the save action on every page, so both now run on the first signed-in page load.
+- **Concurrency.** Account saves are serialized, newest last, and results for a person no longer signed in are ignored; a failed save is retried when the browser comes back online. A refreshed row is not applied while a save is pending.
+- **Consent.** `useCanCollect` is false until the browser's saved choice is known and outside the runtime; `ErrorReports` sits inside it.

@@ -30,6 +30,15 @@ const save = (granted: boolean) => {
 
 let sentry: FakeSentry;
 let ErrorReports: typeof import('./error-reports').ErrorReports;
+let PreferencesProvider: typeof import('@synapcity/frontend-preferences').PreferencesProvider;
+
+/** As in the app: the collector reads consent from the preferences runtime. */
+const mount = () =>
+  render(
+    <PreferencesProvider session={{ kind: 'guest' }}>
+      <ErrorReports {...config} />
+    </PreferencesProvider>,
+  );
 const config = {
   dsn: 'https://key@o1.ingest.sentry.io/1',
   environment: 'test',
@@ -42,18 +51,19 @@ beforeEach(async () => {
   sentry = createFakeSentry();
   fake.current = sentry;
   ({ ErrorReports } = await import('./error-reports'));
+  ({ PreferencesProvider } = await import('@synapcity/frontend-preferences'));
 });
 afterEach(() => vi.unstubAllEnvs());
 
 describe('ErrorReports', () => {
   it('loads nothing while error reports are off', async () => {
-    render(<ErrorReports {...config} />);
+    mount();
     await new Promise((resolve) => setTimeout(resolve));
     expect(sentry.imported).toBe(0);
   });
 
   it('starts when they are turned on and stops when turned off', async () => {
-    render(<ErrorReports {...config} />);
+    mount();
 
     act(() => save(true));
     await vi.waitFor(() => expect(sentry.init).toHaveBeenCalledOnce());
@@ -64,7 +74,7 @@ describe('ErrorReports', () => {
 
   it('keeps reporting after it unmounts, for global-error', async () => {
     save(true);
-    const view = render(<ErrorReports {...config} />);
+    const view = mount();
     await vi.waitFor(() => expect(sentry.init).toHaveBeenCalledOnce());
 
     view.unmount();
