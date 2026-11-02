@@ -1,3 +1,8 @@
+'use client';
+
+import { formatTime, formatWrittenDate } from '@synapcity/domain-preferences';
+import { useDateTimeFormatting } from '@synapcity/frontend-preferences';
+
 import type { EntityItem } from '../../types';
 
 export function EntityDetails({
@@ -7,6 +12,8 @@ export function EntityDetails({
   user?: { name: string };
   entity: EntityItem;
 }) {
+  const formatting = useDateTimeFormatting();
+  const created = new Date(entity.createdAt);
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
@@ -28,9 +35,13 @@ export function EntityDetails({
           <span className="text-sm font-medium text-muted-foreground">
             Created at
           </span>
-          <span className="text-sm font-medium">
-            {new Date(entity.createdAt).toLocaleString()}
-          </span>
+          <time dateTime={entity.createdAt} className="text-sm font-medium">
+            {formatWrittenDate(created, formatting, {
+              weekday: false,
+              year: true,
+            })}
+            , {formatTime(created, formatting)}
+          </time>
         </div>
       </div>
     </div>

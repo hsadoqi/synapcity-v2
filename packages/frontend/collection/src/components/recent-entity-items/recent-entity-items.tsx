@@ -3,6 +3,7 @@
 import { useCollectionNavigation } from '../../providers';
 import type { EntityItem } from '../../types';
 import { EntityIcon } from '../entity-icon';
+import { useDateTimeFormatting } from '@synapcity/frontend-preferences';
 import { formatEntityDate } from '../../utils';
 
 interface RecentEntityItemsProps {
@@ -18,6 +19,7 @@ export function RecentEntityItems({
   prefix,
 }: RecentEntityItemsProps) {
   const { Link } = useCollectionNavigation();
+  const formatting = useDateTimeFormatting();
   if (items.length === 0) return null;
 
   return (
@@ -49,7 +51,7 @@ export function RecentEntityItems({
                 className="shrink-0 text-xs text-muted-foreground"
                 suppressHydrationWarning
               >
-                {formatEntityDate(item.updatedAt)}
+                {formatEntityDate(item.updatedAt, formatting)}
               </time>
             </>
           );

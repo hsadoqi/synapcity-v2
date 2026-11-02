@@ -7,7 +7,7 @@ import { EntityDate } from './entity-date';
 const at = '2025-10-02T09:30:00.000Z';
 
 describe('EntityDate', () => {
-  it('renders a time-zone-free date on the server', () => {
+  it('renders a written date on the server, in UTC when no zone is known', () => {
     const html = renderToString(<EntityDate at={at} />);
 
     expect(html).toContain('Oct 2, 2025');

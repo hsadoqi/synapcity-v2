@@ -1,5 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { regionalDefaults } from '@synapcity/domain-preferences';
+import { RegionalProvider } from '@synapcity/frontend-preferences';
 
 import { EntityDetails } from './entity-details';
 import type { EntityItem } from '../../types';
@@ -22,6 +24,26 @@ describe('EntityDetails', () => {
     expect(screen.getByText('Milestones and owners.')).toBeTruthy();
     expect(screen.getByText('Created by')).toBeTruthy();
     expect(screen.getByText('Ada')).toBeTruthy();
+  });
+
+  it("writes when it was created in the person's date order, time format and zone", () => {
+    render(
+      <RegionalProvider
+        regional={{
+          ...regionalDefaults,
+          dateFormat: 'DD/MM/YYYY',
+          timeFormat: '24-hour',
+          timezone: 'Asia/Tokyo',
+        }}
+        deviceTimeZone={null}
+      >
+        <EntityDetails entity={document} />
+      </RegionalProvider>,
+    );
+
+    const created = screen.getByText(/^1 Oct 2026/, { selector: 'time' });
+    expect(created.textContent).toBe('1 Oct 2026, 21:00');
+    expect(created.getAttribute('dateTime')).toBe(document.createdAt);
   });
 
   it('omits the description when there is none', () => {

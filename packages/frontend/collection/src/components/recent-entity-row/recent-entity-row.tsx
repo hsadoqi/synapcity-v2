@@ -3,6 +3,7 @@
 import { useCollectionNavigation } from '../../providers';
 import type { EntityItem } from '../../types';
 import { EntityIcon } from '../entity-icon';
+import { useDateTimeFormatting } from '@synapcity/frontend-preferences';
 import { formatEntityDate } from '../../utils';
 
 export const RecentEntityRow = ({
@@ -13,7 +14,8 @@ export const RecentEntityRow = ({
   slug: string;
 }) => {
   const { Link } = useCollectionNavigation();
-  const updatedLabel = formatEntityDate(entity.updatedAt);
+  const formatting = useDateTimeFormatting();
+  const updatedLabel = formatEntityDate(entity.updatedAt, formatting);
   return (
     <li key={entity.id}>
       <Link

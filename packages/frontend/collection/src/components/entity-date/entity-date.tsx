@@ -1,6 +1,8 @@
 'use client';
 
 import { useSyncExternalStore } from 'react';
+import { formatWrittenDate } from '@synapcity/domain-preferences';
+import { useDateTimeFormatting } from '@synapcity/frontend-preferences';
 
 import { formatEntityDate } from '../../utils';
 
@@ -17,9 +19,9 @@ interface EntityDateProps {
 const subscribe = () => () => {};
 
 /**
- * A plain date the server and the viewer agree on ("Oct 2", in UTC), replaced
- * once the page is running by words in the viewer's own time zone ("Yesterday").
- * Rendering the relative words on the server would use the server's clock and
+ * A written date the server and the viewer agree on ("Oct 2, 2025", in the
+ * person's zone and date order), replaced once the page is running by words
+ * ("Yesterday"). Rendering the relative words on the server would use the server's clock and
  * zone, and hydration would keep them.
  */
 export function EntityDate({
@@ -33,7 +35,13 @@ export function EntityDate({
     () => true,
     () => false,
   );
-  const label = inBrowser ? formatEntityDate(at) : formatUtcDate(at);
+  const formatting = useDateTimeFormatting();
+  const label = inBrowser
+    ? formatEntityDate(at, formatting)
+    : formatWrittenDate(new Date(at), formatting, {
+        weekday: false,
+        year: true,
+      });
 
   return (
     <Tag className={className}>
@@ -41,13 +49,4 @@ export function EntityDate({
       <time dateTime={at}>{label}</time>
     </Tag>
   );
-}
-
-function formatUtcDate(at: string) {
-  return new Date(at).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    timeZone: 'UTC',
-  });
 }
