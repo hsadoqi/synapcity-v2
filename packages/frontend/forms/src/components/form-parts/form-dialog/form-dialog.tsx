@@ -5,6 +5,7 @@ import {
   type EntityDialogMessages,
   type EntityDialogProps,
 } from '@synapcity/frontend-blocks';
+import { useEffect, useRef, useState } from 'react';
 import type { z } from 'zod';
 
 import type { FormDefinition } from '../../../types';
@@ -15,6 +16,7 @@ type Values<TSchema extends z.ZodObject> = Partial<z.infer<TSchema>>;
 export type FormDialogProps<TSchema extends z.ZodObject> = Omit<
   EntityDialogProps,
   | 'children'
+  | 'busy'
   | 'onSubmit'
   | 'submitLabel'
   | 'cancelLabel'
@@ -51,7 +53,8 @@ export type FormDialogProps<TSchema extends z.ZodObject> = Omit<
  * definition and a handler, and gets create, edit and a confirmed delete as a
  * dialog, a sheet or inline. `FormRenderer` brings its own `<form>`, buttons
  * and validation, so the shell supplies only the title, presentation and
- * delete.
+ * delete. The form tells the shell while it saves, so nothing dismisses the
+ * dialog mid-save.
  */
 export function FormDialog<TSchema extends z.ZodObject>({
   definition,
@@ -63,9 +66,18 @@ export function FormDialog<TSchema extends z.ZodObject>({
   messages,
   ...shell
 }: FormDialogProps<TSchema>) {
+  const [saving, setSaving] = useState(false);
+  // A save that settles after the owner has removed the dialog closes nothing.
+  const mounted = useRef(false);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
   return (
-    <EntityDialog {...shell} messages={messages}>
-      {({ close }) => (
+    <EntityDialog {...shell} busy={saving} messages={messages}>
+      {({ close, complete }) => (
         <FormRenderer
           definition={definition}
           initialValues={initialValues}
@@ -79,9 +91,11 @@ export function FormDialog<TSchema extends z.ZodObject>({
             submitFailed: messages?.failed,
           }}
           onCancel={close}
+          onPendingChange={setSaving}
           onSubmit={async (values) => {
             await onSubmit(values);
-            if (closeOnSuccess) close();
+            // Still saving until this returns, so `close` would be refused.
+            if (closeOnSuccess && mounted.current) complete();
           }}
         />
       )}
