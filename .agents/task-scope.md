@@ -1,3 +1,13 @@
+## Active task: unified preferences runtime implementation (2026-11-02)
+
+- Goal: implement the owner-approved unified preferences runtime, cache ownership, and integration using the existing domain/frontend/settings/server package boundaries.
+- Interaction mode: implementation under explicit owner approval (2026-11-02). Worktree changes are owner-authored and authorized for integration; preserve unrelated changes.
+- In scope: `packages/domain/preferences/**`, `packages/frontend/preferences/**`, `packages/features/settings/**`, `packages/server/account/src/preferences/**`, `apps/web/src/app/layout.tsx`, `apps/web/src/app/root-head.tsx`, `apps/web/src/components/providers/**`, `apps/web/src/providers/root-preferences-provider/**`, `apps/web/src/features/settings/server/**`, `apps/web/src/features/settings/settings-content.tsx`, `apps/web/src/app/(protected)/[userId]/settings/**`, relevant preference consumers and tests, package docs, and this scoped task entry.
+- Out of scope: hosted operations, database migrations, dependencies, notification delivery, privacy enforcement, cross-device synchronization, unrelated route/file removals, and unrelated worktree changes.
+- Approved decisions: provider-scoped runtime owner is `@synapcity/frontend-preferences`; domain rules remain in `@synapcity/domain-preferences`; Settings drafts and explicit Save remain in `@synapcity/features-settings`; account persistence remains in `@synapcity/server-account`; one-object `appearanceOverride`; account-aware cache must isolate users, preserve legacy bytes, never adopt unmarked data, and only adopt eligible guest-origin data.
+- Verification: focused domain/frontend/settings/server tests and type checks, then `pnpm boundaries`, formatting/lint/type checks and proportionate integration verification. No commit, push, merge, or hosted operation.
+- Recovery: retain unrelated dirty paths; revert only task-authored scoped diffs if the owner requests rollback. Existing user-authored changes are eligible to integrate or supersede per direct approval.
+
 ## Active task: T1 release closeout for PR #135 (2026-11-02)
 
 - Goal: close Gate 0 for the controlled development baseline. Merge updated `main` (`755a2a9c`, PR #139's `delete_own_account` grant repair) into `refactor/supabase-database` with an ordinary merge commit, record the single deployment-ledger incident and recovery entry, and merge PR #135 by merge commit after owner authorization.

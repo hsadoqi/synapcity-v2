@@ -1077,6 +1077,9 @@ importers:
       '@synapcity/domain-grids':
         specifier: workspace:*
         version: link:../../domain/grids
+      '@synapcity/domain-preferences':
+        specifier: workspace:*
+        version: link:../../domain/preferences
       '@synapcity/domain-prototypes':
         specifier: workspace:*
         version: link:../../domain/prototypes
@@ -1086,6 +1089,9 @@ importers:
       '@synapcity/frontend-forms':
         specifier: workspace:*
         version: link:../../frontend/forms
+      '@synapcity/frontend-preferences':
+        specifier: workspace:*
+        version: link:../../frontend/preferences
       '@synapcity/frontend-ui':
         specifier: workspace:*
         version: link:../../frontend/ui
@@ -1457,12 +1463,18 @@ importers:
 
   packages/frontend/collection:
     dependencies:
+      '@synapcity/domain-preferences':
+        specifier: workspace:*
+        version: link:../../domain/preferences
       '@synapcity/domain-records':
         specifier: workspace:*
         version: link:../../domain/records
       '@synapcity/frontend-blocks':
         specifier: workspace:*
         version: link:../blocks
+      '@synapcity/frontend-preferences':
+        specifier: workspace:*
+        version: link:../preferences
       '@synapcity/frontend-ui':
         specifier: workspace:*
         version: link:../ui
