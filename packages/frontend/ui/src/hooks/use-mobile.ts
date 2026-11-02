@@ -1,4 +1,4 @@
-import { useMediaQuery } from './use-media-query';
+import { useMediaQuery } from './use-media-query/use-media-query';
 
 const MOBILE_BREAKPOINT = 768;
 const QUERY = `(max-width: ${MOBILE_BREAKPOINT - 1}px)`;

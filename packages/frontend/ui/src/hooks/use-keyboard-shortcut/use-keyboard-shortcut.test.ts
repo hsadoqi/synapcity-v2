@@ -5,7 +5,7 @@ import {
   ariaKeyShortcuts,
   useKeyboardShortcut,
   type KeyboardShortcut,
-} from './use-keyboard-shortcut';
+} from '.';
 
 const MOD_K: KeyboardShortcut = { key: 'k', mod: true };
 

@@ -10,7 +10,7 @@ import {
   formatCalendarDay,
   parseCalendarDate,
   toCalendarDate,
-} from '@synapcity/frontend-ui/lib/calendar-utils';
+} from '@/lib/calendar-utils/calendar-utils';
 
 describe('parseCalendarDate', () => {
   it('reads yyyy-MM-dd as that day in local time', () => {
