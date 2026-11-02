@@ -1,3 +1,15 @@
+## Active task: R4 · pin toggle race, reproduce first (I2) (2026-11-02)
+
+- Outcome: two quick pin toggles on a collection index end in the second toggle's state when the first save fails and the second succeeds; the error `Alert` and sign-in link stay as they are.
+- Interaction mode: test-first reproduction, then, only if it fails, the bounded fix (owner go-ahead, 2026-11-02, with both outcomes preauthorized: a passing reproduction ships as a test-only PR; a failing one gets the planned fix). Commit, push and a draft pull request are authorized; merging is not.
+- Base: `main` at `8376fca6baecc56d1b92f1f4e847920e66e7b6f5` (R3 merged; R2 open as a draft), branch `fix/r4-pin-toggle-race`, worktree clean at creation. This entry is the first edit on the branch.
+- Reproduction: one `collection-index` test with two controlled `onSetPinned` promises: toggle, toggle, the first reports failure, the second reports success; the final pin is the second toggle's. Its result on unchanged code is recorded here before any source edit.
+- Result on unchanged code (2026-11-02): the planned test passes (9 of 9 in the file), so I2 is not reproduced by the planned scenario and R4 is test-only, as preauthorized; `collection-index.tsx` is unchanged. The pass is a coincidence of two toggles: the failed first save rolls back to the `pinned` it captured (`false`), which is also what the second toggle asked for. A throwaway three-toggle probe (Pin, Unpin, Pin; the second and third saves succeed, then the first fails) does fail on unchanged code: the item ends unpinned although the last successful save pinned it. So the stale rollback I2 describes is real for three or more overlapping toggles. The probe was deleted and is not committed; whether to fix it (the planned `useOptimistic` step) is left to the owner.
+- Fix (only if the reproduction fails): derive optimistic pins with `useOptimistic` inside the existing `startTransition`; server results stay the source of truth; the error `Alert` and sign-in link are unchanged. C4b's result-type work is not absorbed.
+- Manifest: this file; `packages/frontend/collection/src/components/collection-index/collection-index.test.tsx`; `collection-index.tsx` beside it only if the reproduction fails. Any other path is reported first.
+- Not in scope: C4b and DEC-8; R2, Q4 and later slices; the four consolidated-audit plans.
+- Verification: Prettier and `git diff --check` on the changed paths; lint, typecheck and tests for `frontend-collection` and its direct consumers; root `pnpm verify` (with CI's non-secret placeholder Supabase variables if this worktree has no `apps/web/.env.local`), never at the same time as another root run.
+
 ## Active task: R3 · one loading announcement (D11 only; I1 deferred) (2026-11-02)
 
 - Outcome: the dashboard canvas skeleton and the collection loading skeleton each expose exactly one status announcement with meaningful generic text, inside one busy region, with the dashboard skeleton's layout unchanged.
