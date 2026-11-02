@@ -139,7 +139,7 @@ describe('CollectionView', () => {
   it('announces loading instead of a count', () => {
     renderView({ items: [], state: 'loading' });
 
-    expect(screen.getByRole('status', { name: 'Loading' })).toBeTruthy();
+    expect(screen.getByRole('status').textContent).toBe('Loading items');
     expect(screen.queryByText(/\d+ recipes?/)).toBeNull();
   });
 

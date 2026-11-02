@@ -1,5 +1,6 @@
 'use client';
 
+import { LoadingRegion } from '@synapcity/frontend-blocks';
 import { Skeleton } from '@synapcity/frontend-ui/core/skeleton';
 
 import type { CollectionLayout } from '../../types';
@@ -7,16 +8,16 @@ import type { CollectionLayout } from '../../types';
 const PLACEHOLDERS = Array.from({ length: 6 }, (_, index) => index);
 
 export function CollectionLoading({ layout }: { layout: CollectionLayout }) {
-  return layout === 'list' ? <ListSkeleton /> : <GridSkeleton />;
+  return (
+    <LoadingRegion label="Loading items">
+      {layout === 'list' ? <ListSkeleton /> : <GridSkeleton />}
+    </LoadingRegion>
+  );
 }
 
 function ListSkeleton() {
   return (
-    <div
-      role="status"
-      aria-label="Loading"
-      className="flex flex-col divide-y divide-border rounded-md border border-border bg-card"
-    >
+    <div className="flex flex-col divide-y divide-border rounded-md border border-border bg-card">
       {PLACEHOLDERS.map((index) => (
         <div key={index} className="flex items-center gap-3 px-3 py-2">
           <Skeleton className="size-8 rounded-md" />
@@ -31,11 +32,7 @@ function ListSkeleton() {
 
 function GridSkeleton() {
   return (
-    <div
-      role="status"
-      aria-label="Loading"
-      className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3"
-    >
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
       {PLACEHOLDERS.map((index) => (
         <div
           key={index}
