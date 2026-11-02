@@ -43,6 +43,12 @@ interface FormRendererBaseProps<TSchema extends z.ZodObject> {
   /** Seeds the form once; a later change is ignored. */
   readonly initialValues?: Readonly<Values<TSchema>>;
   readonly onCancel?: () => void;
+  /**
+   * Told when a submit starts and when it ends (success, failure or unmount),
+   * once per change, never during render. For a shell that must not close
+   * while the form is saving; the form still owns its pending state.
+   */
+  readonly onPendingChange?: (pending: boolean) => void;
   readonly submitLabel?: string;
   readonly cancelLabel?: string;
   readonly messages?: {
@@ -294,6 +300,19 @@ function FormRendererWith<TSchema extends z.ZodObject>({
     ? props.pending === true
     : form.formState.isSubmitting;
 
+  // Report only the changes, from an effect: true when a submit starts, false
+  // from the cleanup when it ends or the form unmounts. The latest callback is
+  // read through a ref, so a new one each render does not re-report.
+  const onPendingChange = useRef(props.onPendingChange);
+  useEffect(() => {
+    onPendingChange.current = props.onPendingChange;
+  });
+  useEffect(() => {
+    if (!pending) return;
+    onPendingChange.current?.(true);
+    return () => onPendingChange.current?.(false);
+  }, [pending]);
+
   // A server refusal names fields; their groups stay unfolded while it is shown.
   const forcedOpen = new Set(
     isAction && shown.error
@@ -424,7 +443,13 @@ function FormRendererWith<TSchema extends z.ZodObject>({
       <FormMessage id={messageId} state={{ error: formError }} />
       <div className="flex justify-end gap-2">
         {props.onCancel ? (
-          <Button type="button" variant="outline" onClick={props.onCancel}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={props.onCancel}
+            disabled={pending}
+            focusableWhenDisabled
+          >
             {props.cancelLabel ?? 'Cancel'}
           </Button>
         ) : null}

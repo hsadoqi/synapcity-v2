@@ -1,4 +1,11 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
+import { StrictMode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 
@@ -471,5 +478,118 @@ describe('FormRenderer with a server action', () => {
     expect(
       screen.getByRole('button', { name: 'Save' }).getAttribute('aria-busy'),
     ).toBe('true');
+  });
+});
+
+describe('FormRenderer reporting pending', () => {
+  const one = defineForm({
+    schema: z.object({ name: z.string().min(1, 'Enter a name.') }),
+    fields: [{ type: 'text', name: 'name', label: 'Name' }],
+  });
+  /** An `onSubmit` the test settles by hand. */
+  function deferred() {
+    let settle!: { resolve: () => void; reject: (error: Error) => void };
+    const onSubmit = vi.fn(
+      () =>
+        new Promise<void>((resolve, reject) => {
+          settle = { resolve, reject };
+        }),
+    );
+    return { onSubmit, settle: () => settle };
+  }
+  const start = async () => {
+    type('Name', 'Standup');
+    await submit();
+  };
+
+  it.each([
+    ['Strict Mode', true],
+    ['a plain render', false],
+  ])('reports each change once, under %s', async (_, strict) => {
+    const onPendingChange = vi.fn();
+    const { onSubmit, settle } = deferred();
+    const form = (
+      <FormRenderer
+        definition={one}
+        onSubmit={onSubmit}
+        onPendingChange={onPendingChange}
+      />
+    );
+    render(strict ? <StrictMode>{form}</StrictMode> : form);
+    expect(onPendingChange).not.toHaveBeenCalled();
+
+    await start();
+    await waitFor(() => expect(onPendingChange).toHaveBeenLastCalledWith(true));
+    await act(async () => settle().resolve());
+    await waitFor(() =>
+      expect(onPendingChange).toHaveBeenLastCalledWith(false),
+    );
+    expect(onPendingChange.mock.calls).toEqual([[true], [false]]);
+  });
+
+  it('reports not pending after a failed save', async () => {
+    const onPendingChange = vi.fn();
+    const { onSubmit, settle } = deferred();
+    render(
+      <FormRenderer
+        definition={one}
+        onSubmit={onSubmit}
+        onPendingChange={onPendingChange}
+      />,
+    );
+    await start();
+    await act(async () => settle().reject(new Error('no')));
+    await waitFor(() =>
+      expect(onPendingChange).toHaveBeenLastCalledWith(false),
+    );
+  });
+
+  it('reports not pending when it unmounts mid-save, then nothing more', async () => {
+    const onPendingChange = vi.fn();
+    const { onSubmit, settle } = deferred();
+    const { unmount } = render(
+      <FormRenderer
+        definition={one}
+        onSubmit={onSubmit}
+        onPendingChange={onPendingChange}
+      />,
+    );
+    await start();
+    await waitFor(() => expect(onPendingChange).toHaveBeenLastCalledWith(true));
+    unmount();
+    expect(onPendingChange).toHaveBeenLastCalledWith(false);
+    const calls = onPendingChange.mock.calls.length;
+    await act(async () => settle().resolve());
+    expect(onPendingChange).toHaveBeenCalledTimes(calls);
+  });
+
+  it('keeps Cancel focusable but inert while pending', async () => {
+    const onCancel = vi.fn();
+    const { onSubmit, settle } = deferred();
+    render(
+      <FormRenderer definition={one} onSubmit={onSubmit} onCancel={onCancel} />,
+    );
+    const cancel = screen.getByRole('button', { name: 'Cancel' });
+    expect(cancel.getAttribute('aria-disabled')).not.toBe('true');
+    await start();
+    await waitFor(() =>
+      expect(cancel.getAttribute('aria-disabled')).toBe('true'),
+    );
+    expect(cancel.hasAttribute('disabled')).toBe(false);
+    fireEvent.click(cancel);
+    fireEvent.keyDown(cancel, { key: 'Enter' });
+    fireEvent.keyDown(cancel, { key: ' ' });
+    fireEvent.keyUp(cancel, { key: ' ' });
+    expect(onCancel).not.toHaveBeenCalled();
+    expect(
+      screen.getByRole('button', { name: 'Save' }).getAttribute('aria-busy'),
+    ).toBe('true');
+
+    await act(async () => settle().resolve());
+    await waitFor(() =>
+      expect(cancel.getAttribute('aria-disabled')).not.toBe('true'),
+    );
+    fireEvent.click(cancel);
+    expect(onCancel).toHaveBeenCalledTimes(1);
   });
 });

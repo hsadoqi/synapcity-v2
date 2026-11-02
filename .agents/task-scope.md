@@ -1,3 +1,14 @@
+## Active task: R2 · `FormDialog` honors the no-dismissal-while-saving rule (2026-11-02)
+
+- Outcome: a form dialog cannot be dismissed (Escape, outside press, close button, Cancel) and cannot submit twice while its save or delete is pending; success, failure and focus behavior stay as they are.
+- Interaction mode: test-first implementation and local verification of the third audit-remediation slice (owner go-ahead, 2026-11-02). Commit, push and pull request wait for owner review of the diff.
+- Decision: DEC-5 confirmed by the owner (2026-11-02): no form dialog may be dismissed while its save or delete operation is pending. This confirms the existing `EntityDialog` and `QuickCreateDialog` rule and authorizes R2 to make `FormDialog` honor it. It does not authorize C6 (DEC-6) or any broader focus-strategy refactor.
+- Base: `main` at `8376fca6baecc56d1b92f1f4e847920e66e7b6f5` (R3 merged), branch `fix/r2-form-dialog-pending-dismissal`, worktree clean at creation. This entry is the first edit on the branch.
+- Ownership: `FormRenderer` stays the sole owner of submission pending and reports it through an additive `onPendingChange`; `FormDialog` forwards it to `EntityDialog` as an additive external `busy`; `EntityDialog` stays the owner of dismissal and refuses to close while its own pending or `busy` is true. No second submission state machine in the dialog shell. Callers that pass neither prop keep their behavior.
+- Planned paths (revalidated against `main` before editing): `FormRenderer`, `FormDialog` and `EntityDialog` sources and their tests. The manifest is final only after the code is re-read; any path outside these is reported first.
+- Not in scope: `QuickCreateDialog` (compared, not changed); the agenda dialog's behavior and tests; C6, DEC-6 and the general focus strategy; unrelated dialog APIs; I1, R4, Q4 and later slices; the four consolidated-audit plans.
+- Verification: Prettier and `git diff --check` on the changed paths; lint, typecheck and tests for `frontend-forms`, `frontend-blocks` and any directly affected consumer; the dialog and agenda tests; root `pnpm verify` (with CI's non-secret placeholder Supabase variables if this worktree has no `apps/web/.env.local`).
+
 ## Active task: R3 · one loading announcement (D11 only; I1 deferred) (2026-11-02)
 
 - Outcome: the dashboard canvas skeleton and the collection loading skeleton each expose exactly one status announcement with meaningful generic text, inside one busy region, with the dashboard skeleton's layout unchanged.
