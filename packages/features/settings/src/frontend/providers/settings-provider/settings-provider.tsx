@@ -4,7 +4,6 @@ import {
   createContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type ReactNode,
 } from 'react';
@@ -100,9 +99,9 @@ export function SettingsProvider({
   }
 
   // Reports from before this page opened are old news, unless they still hold.
-  const openedAt = useRef(statusId);
+  const [openedAt] = useState(statusId);
   const [clearedId, setClearedId] = useState(-1);
-  const fresh = statusId > openedAt.current || lasting(reported);
+  const fresh = statusId > openedAt || lasting(reported);
   const status = fresh && statusId !== clearedId ? statusMessage(reported) : '';
 
   useEffect(() => {

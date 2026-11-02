@@ -1,6 +1,6 @@
 import { act, render, renderHook, waitFor } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
-import { useRef, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -257,8 +257,6 @@ describe('PreferencesProvider in the browser', () => {
     const save = vi.fn<SaveAccountPreferences>(async () => ({ ok: true }));
     let session = account({ regional: { language: 'de' } });
     function Probe() {
-      const renders = useRef(0);
-      renders.current++;
       return (
         <span data-testid="language">{useRegionalPreferences().language}</span>
       );
