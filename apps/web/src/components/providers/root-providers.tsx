@@ -1,51 +1,48 @@
 'use client';
 
-import { Suspense } from 'react';
-import {
-  configureLookCookie,
-  ModeProvider,
-} from '@synapcity/frontend-preferences';
-import { Toaster } from '@synapcity/frontend-ui/core/toast';
-
-import { NoticeToast } from '../notices/notice-toast';
+import { configureLookCookie } from '@synapcity/frontend-preferences';
 import { ErrorReports } from '@synapcity/frontend-error-reports';
-import { TooltipProvider } from '@synapcity/frontend-ui/components';
+import { RootUiProviders } from '@/providers/root-ui-providers/root-ui-providers';
+import { UserProvider } from '@/providers/user-provider';
+import { RootPreferencesProvider } from '@/providers/root-preferences-provider/root-preferences-provider';
+import { type CurrentUser } from '@synapcity/domain-identity';
+import { type AccountPreferences } from '@synapcity/domain-preferences';
 
 // One parent domain lets web and docs show the same look; unset keeps it host-only.
 configureLookCookie({
   domain: process.env.NEXT_PUBLIC_PREFERENCES_COOKIE_DOMAIN,
 });
 
-export default function RootProviders({
-  children,
-}: {
+type RootProvidersProps = {
   children: React.ReactNode;
-}) {
+  user: CurrentUser | null;
+  account: AccountPreferences | null;
+  deviceTimeZone: string | null;
+};
+/**
+ * Every client provider the app needs, fed by the server layout. The user is
+ * outermost because anything below may read it with `useCurrentUser`.
+ */
+export function RootProviders({
+  children,
+  user,
+  account,
+  deviceTimeZone,
+}: RootProvidersProps) {
   return (
-    <ModeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-      shareLook
-    >
-      <TooltipProvider>
-        {children}
-        {/* No manager prop: Toaster uses the shared `toast`, so any module can call
-          toast.add(...) and reach this one viewport. */}
-        <Toaster limit={5} timeout={5000} />
-        {/* useSearchParams needs a Suspense boundary or it opts the route out of
-          static rendering. Nothing is shown while it waits. */}
-        <Suspense fallback={null}>
-          <NoticeToast />
-        </Suspense>
-      </TooltipProvider>
+    <UserProvider user={user}>
+      <RootPreferencesProvider
+        account={account}
+        deviceTimeZone={deviceTimeZone}
+      >
+        <RootUiProviders>{children}</RootUiProviders>
+      </RootPreferencesProvider>
       {/* Loads nothing unless the person has turned error reports on. */}
       <ErrorReports
         dsn={process.env.NEXT_PUBLIC_SENTRY_DSN}
         environment={process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.NODE_ENV}
         release={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA}
       />
-    </ModeProvider>
+    </UserProvider>
   );
 }
