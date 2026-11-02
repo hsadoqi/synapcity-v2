@@ -13,6 +13,7 @@ import type {
 import type { SaveAccountPreferences } from '@synapcity/frontend-preferences';
 
 import { AppearanceSettings } from '../../../components/appearance-settings';
+import { SettingsHeader } from '../../../components/shared/settings-page/settings-header';
 import { useSettings } from '../../../hooks/use-settings-lifecycle/use-settings';
 import type { StoredAccountPreferences } from '@synapcity/domain-preferences';
 import {
@@ -318,5 +319,55 @@ describe('display settings on all devices', () => {
     await mount(account);
     expect(currentSettings().appearance.contrastMode).toBe('low');
     expect(localStorage.getItem(SET_ASIDE_KEY)).toBeNull();
+  });
+});
+
+describe('trying a failed account save again', () => {
+  async function mountWithHeader(account: {
+    session: PreferencesSession;
+    save: SaveAccountPreferences;
+  }) {
+    render(
+      <SettingsTestProviders session={account.session} save={account.save}>
+        <SettingsHeader />
+        <Status />
+      </SettingsTestProviders>,
+    );
+    await waitFor(() =>
+      expect(screen.getByTestId('ready').textContent).toBe('true'),
+    );
+  }
+  const statusLine = () =>
+    screen.getAllByRole('status').find((el) => !el.hasAttribute('aria-label'))!
+      .textContent;
+
+  it('is offered after a failure, sends the change again, and clears the failure', async () => {
+    const { account, save } = sync({
+      preferences: accountPart(settingsDefaults),
+    });
+    save.mockResolvedValueOnce({ ok: false, error: 'x' });
+    await mountWithHeader(account);
+    expect(screen.queryByRole('button', { name: 'Try again' })).toBeNull();
+
+    fireEvent.click(screen.getByText('Change language'));
+    const retry = await screen.findByRole('button', { name: 'Try again' });
+    expect(statusLine()).toContain('could not be saved to your account');
+
+    fireEvent.click(retry);
+    await waitFor(() => expect(save).toHaveBeenCalledTimes(2));
+    expect(save.mock.calls[1]![0].regional.language).toBe('ja');
+    await waitFor(() => expect(statusLine()).toBe('Saved'));
+    expect(screen.queryByRole('button', { name: 'Try again' })).toBeNull();
+  });
+
+  it('is not offered when the session has ended', async () => {
+    const { account } = sync(
+      { preferences: accountPart(settingsDefaults) },
+      { ok: false, error: 'Sign in again.', signedOut: true },
+    );
+    await mountWithHeader(account);
+    fireEvent.click(screen.getByText('Change language'));
+    await waitFor(() => expect(statusLine()).toBe('Sign in again.'));
+    expect(screen.queryByRole('button', { name: 'Try again' })).toBeNull();
   });
 });

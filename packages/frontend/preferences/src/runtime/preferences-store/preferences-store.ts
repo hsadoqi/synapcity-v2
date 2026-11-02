@@ -355,9 +355,15 @@ export function createPreferencesStore(initial: {
       void flush();
       return;
     }
+    const recovered = failed && result.ok;
     failed = !result.ok;
     if (result.ok) {
-      emit({ accountSave: 'idle' });
+      // A save that follows a failure replaces its report, so the failure
+      // does not stay on screen after the account caught up.
+      emit({
+        accountSave: 'idle',
+        ...(recovered && { status: { kind: 'saved' } }),
+      });
     } else {
       emit({
         accountSave: 'failed',

@@ -57,6 +57,12 @@ type SettingsContextType = {
   /** Whether display settings apply on all the person's devices. */
   displayOnAllDevices: boolean;
   setDisplayOnAllDevices: (on: boolean) => void;
+  /**
+   * Whether the last account save failed in a way trying again can fix. A
+   * sign-out is not one: its message asks the person to sign in instead.
+   */
+  canRetryAccountSave: boolean;
+  retryAccountSave: () => void;
   draftScope?: string;
 };
 
@@ -85,8 +91,12 @@ export function SettingsProvider({
   const displayOnAllDevices = usePreferences((s) => s.displayOnAllDevices);
   const reported = usePreferences((s) => s.status);
   const statusId = usePreferences((s) => s.statusId);
-  const { update: updateSettings, setDisplayOnAllDevices } =
-    usePreferenceActions();
+  const accountSave = usePreferences((s) => s.accountSave);
+  const {
+    update: updateSettings,
+    setDisplayOnAllDevices,
+    retryAccountSave,
+  } = usePreferenceActions();
 
   const [name, updateName] = useState(initialName);
   // The page re-renders with the saved name after a profile edit. Follow it,
@@ -111,6 +121,9 @@ export function SettingsProvider({
   }, [reported, statusId]);
 
   const syncsToAccount = sync === 'synced';
+  const canRetryAccountSave =
+    accountSave === 'failed' &&
+    !(reported.kind === 'account-save-failed' && reported.signedOut);
   const value = useMemo(
     () => ({
       settings,
@@ -122,6 +135,8 @@ export function SettingsProvider({
       syncsToAccount,
       displayOnAllDevices,
       setDisplayOnAllDevices,
+      canRetryAccountSave,
+      retryAccountSave,
       draftScope,
     }),
     [
@@ -133,6 +148,8 @@ export function SettingsProvider({
       syncsToAccount,
       displayOnAllDevices,
       setDisplayOnAllDevices,
+      canRetryAccountSave,
+      retryAccountSave,
       draftScope,
     ],
   );

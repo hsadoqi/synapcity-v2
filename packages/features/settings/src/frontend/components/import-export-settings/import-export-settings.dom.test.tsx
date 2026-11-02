@@ -334,6 +334,8 @@ describe('ImportExportSettings with extracted utilities', () => {
           syncsToAccount: false,
           displayOnAllDevices: false,
           setDisplayOnAllDevices: () => {},
+          canRetryAccountSave: false,
+          retryAccountSave: () => {},
         }}
       >
         <ImportExportSettings />
@@ -598,6 +600,8 @@ describe('ImportExportSettings with extracted utilities', () => {
           syncsToAccount: false,
           displayOnAllDevices: false,
           setDisplayOnAllDevices: () => {},
+          canRetryAccountSave: false,
+          retryAccountSave: () => {},
         }}
       >
         <ImportExportSettings />

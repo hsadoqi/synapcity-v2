@@ -366,6 +366,8 @@ describe('regional previews', () => {
       syncsToAccount: false,
       displayOnAllDevices: false,
       setDisplayOnAllDevices: () => {},
+      canRetryAccountSave: false,
+      retryAccountSave: () => {},
     };
     const content = (
       <SettingsContext.Provider value={context}>
