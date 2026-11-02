@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 const reportCaughtError = vi.hoisted(() => vi.fn());
 vi.mock('@synapcity/frontend-error-reports', () => ({ reportCaughtError }));
 
-import RouteError from './error';
+import RouteError from '../error';
 
 const fail = (message = 'internal detail', digest = 'abc123') =>
   Object.assign(new Error(message), { digest });

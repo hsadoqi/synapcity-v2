@@ -35,7 +35,8 @@ import { describe, expect, it } from 'vitest';
  *   of blocking it.
  */
 
-const APP = dirname(fileURLToPath(import.meta.url));
+// These tests live in app/tests/; APP is the app directory they inspect.
+const APP = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = join(APP, '..');
 const GROUP = join(APP, '(protected)');
 const PACKAGES = join(SRC, '..', '..', '..', 'packages');

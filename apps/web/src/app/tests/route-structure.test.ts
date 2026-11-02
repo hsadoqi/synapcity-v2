@@ -4,8 +4,11 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
-import { config } from '../proxy';
-import { isGuestOnlyPath, isProtectedPath } from '../lib/routing/route-access';
+import { config } from '../../proxy';
+import {
+  isGuestOnlyPath,
+  isProtectedPath,
+} from '../../lib/routing/route-access';
 
 /**
  * The `(public)`, `(auth)` and `(protected)` route groups split page chrome by
@@ -17,7 +20,8 @@ import { isGuestOnlyPath, isProtectedPath } from '../lib/routing/route-access';
  * browser are in `e2e/route-layouts.e2e.ts`.
  */
 
-const APP = dirname(fileURLToPath(import.meta.url));
+// These tests live in app/tests/; APP is the app directory they inspect.
+const APP = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GROUP = /^\(.*\)$/;
 
 function filesIn(dir: string): string[] {

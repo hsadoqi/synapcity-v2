@@ -7,7 +7,7 @@ vi.mock('@synapcity/frontend-fonts/next', () => ({
   fontVariables: 'font-inter-var font-geist-var',
 }));
 
-import GlobalError from './global-error';
+import GlobalError from '../global-error';
 
 const render = (message = 'db password is hunter2') =>
   renderToStaticMarkup(

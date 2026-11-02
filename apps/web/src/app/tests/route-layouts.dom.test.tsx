@@ -30,12 +30,12 @@ vi.mock('@synapcity/frontend-error-reports', () => ({
   reportCaughtError: vi.fn(),
 }));
 
-import AuthLayout from './(auth)/layout';
-import AuthNotFound from './(auth)/not-found';
-import PublicLayout from './(public)/layout';
-import PublicNotFound from './(public)/not-found';
-import RootNotFound from './not-found';
-import RootError from './error';
+import AuthLayout from '../(auth)/layout';
+import AuthNotFound from '../(auth)/not-found';
+import PublicLayout from '../(public)/layout';
+import PublicNotFound from '../(public)/not-found';
+import RootNotFound from '../not-found';
+import RootError from '../error';
 
 const inLayout =
   (Layout: (props: { children: ReactNode }) => ReactNode) =>

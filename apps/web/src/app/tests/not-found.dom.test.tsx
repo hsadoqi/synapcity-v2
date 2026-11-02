@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import NotFound from './not-found';
+import NotFound from '../not-found';
 
 describe('the not-found page', () => {
   it('says the page could not be found and links home', () => {

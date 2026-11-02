@@ -1,29 +1,21 @@
 import type { Metadata } from 'next';
-import { cookies } from 'next/headers';
 import '@/styles/globals.css';
 import { fontVariables } from '@synapcity/frontend-fonts/next';
-import RootProviders from '../components/providers/root-providers';
+import { RootProviders } from '@/components/providers';
 import { NextShellNavigation } from '@synapcity/frontend-shells/next';
 import { createMetadata } from '@synapcity/frontend-site/metadata';
-import { UserProvider } from '@/providers/user-provider';
 import { getCurrentUser } from '../features/auth/server';
+import { cn } from '../lib/utils';
+import { RootHead } from './root-head';
+import { getAccountPreferences } from '@/features/settings/server/account-preferences';
 import {
-  appearanceBootScript,
-  fontBootScript,
-  modeBootScript,
-  themeShapeBootScript,
-  lookHtmlAttributes,
-  RegionalProvider,
-} from '@synapcity/frontend-preferences';
-import { AccountPreferencesSync } from '@synapcity/features-settings/frontend';
-import { getAccountPreferences } from '../features/settings/server/account-preferences';
-import {
+  parseLookCookieValue,
   LOOK_COOKIE_NAME,
   lookWithAccount,
   pageLanguage,
-  parseLookCookieValue,
 } from '@synapcity/domain-preferences';
-import { cn } from '../lib/utils';
+import { lookHtmlAttributes } from '@synapcity/frontend-preferences';
+import { cookies } from 'next/headers';
 
 export const metadata: Metadata = createMetadata({
   title: 'Synapcity',
@@ -57,33 +49,17 @@ export default async function RootLayout({
       lang={pageLanguage(account?.regional.language ?? 'en')}
       {...lookAttributes}
       className={cn(fontVariables, lookAttributes?.className)}
-      style={lookAttributes?.style}
       suppressHydrationWarning
     >
-      <head>
-        {/* Applies the mode chosen on any host before first paint, ahead of next-themes. */}
-        <script dangerouslySetInnerHTML={{ __html: modeBootScript }} />
-        {/* Applies saved contrast and motion before first paint. */}
-        <script dangerouslySetInnerHTML={{ __html: appearanceBootScript }} />
-        {/* Applies saved font choices, and fetches only those, before first paint. */}
-        <script dangerouslySetInnerHTML={{ __html: fontBootScript }} />
-        {/* Applies the saved text size, corner radius and density before first paint. */}
-        <script dangerouslySetInnerHTML={{ __html: themeShapeBootScript }} />
-      </head>
+      <RootHead />
       <body>
-        <AccountPreferencesSync preferences={account} />
-        {/* Dates written on the server use the account's settings and its last
-            device zone, so they match the browser's first render. */}
-        <RegionalProvider
-          regional={account?.regional ?? null}
+        <RootProviders
+          user={user}
+          account={account}
           deviceTimeZone={stored?.deviceTimezone ?? null}
         >
-          <RootProviders>
-            <UserProvider user={user}>
-              <NextShellNavigation>{children}</NextShellNavigation>
-            </UserProvider>
-          </RootProviders>
-        </RegionalProvider>
+          <NextShellNavigation>{children}</NextShellNavigation>
+        </RootProviders>
       </body>
     </html>
   );

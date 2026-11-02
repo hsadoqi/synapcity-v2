@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { openGraphSize } from '@synapcity/frontend-site/open-graph';
 import { site } from '@synapcity/frontend-site/site';
 
-import OpenGraphImage, { alt, contentType, size } from './opengraph-image';
+import OpenGraphImage, { alt, contentType, size } from '../opengraph-image';
 
 describe('opengraph-image route', () => {
   // Next reads these three exports statically, so they cannot be imported from

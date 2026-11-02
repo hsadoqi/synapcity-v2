@@ -8,7 +8,7 @@ vi.mock('@synapcity/frontend-fonts/next', () => ({
 const reportCaughtError = vi.hoisted(() => vi.fn());
 vi.mock('@synapcity/frontend-error-reports', () => ({ reportCaughtError }));
 
-import GlobalError from './global-error';
+import GlobalError from '../global-error';
 
 afterEach(() => vi.unstubAllGlobals());
 
