@@ -1,3 +1,13 @@
+## Active task: R1 · Documentation and barrel drift (2026-11-02)
+
+- Outcome: current code, exports and engineering governance documentation use the real component names, package ownership, test-suite description and hook state, without changing runtime behavior.
+- Interaction mode: implementation and local verification of the first audit-remediation slice (owner go-ahead, 2026-11-02). Commit, push and pull request wait for owner review of the diff.
+- Base: `main` at `6a980709350496fec996fae92d9795e66241a644` (the Gate 0 remediation baseline), branch `fix/r1-documentation-barrel-drift`.
+- Manifest (7 paths): this file; `packages/features/dashboards/src/frontend/widgets/agenda-body/agenda-event-dialog.tsx` (drop the `FormDialog as EntityFormDialog` alias and the old name in its comment); `packages/frontend/forms/README.md` (`EntityFormDialog` → `FormDialog`); `docs/architecture/reorganization-ownership-map.md` (`SearchForm` lives in `frontend-blocks`, not shells); `packages/features/settings/src/frontend/index.ts` (remove the three duplicated export lines); `AGENTS.md` §6 and `docs/engineering/quality-gates.md` (the end-to-end suite is 18 spec files, not one smoke test; the pre-push hook's `pnpm verify` line is commented out, so pushes are not checked automatically; what `pnpm verify` runs).
+- Facts re-read from the baseline: `FormDialog` is the `@synapcity/frontend-forms` export; `SearchForm` and `SearchInput` are in `packages/frontend/blocks/src/blocks/search-field/` and exported from the `@synapcity/frontend-blocks` root; `apps/web/e2e` holds 18 `*.e2e.ts` files; `.githooks/pre-push` runs `set -e` with `pnpm verify` commented out.
+- Not in scope: ADR-0004's `cn` 0.4.0 line (an owner-controlled ADR change; reported only); enabling the hook; Q4 and later slices; the four consolidated-audit plans.
+- Verification: format checks on the changed paths, `git diff --check`, a duplicate-line check on the settings barrel, `rg EntityFormDialog packages apps docs` with every remaining match classified, typecheck and tests for `features-dashboards` and `features-settings`.
+
 ## Active task: T1 release closeout for PR #135 (2026-11-02)
 
 - Goal: close Gate 0 for the controlled development baseline. Merge updated `main` (`755a2a9c`, PR #139's `delete_own_account` grant repair) into `refactor/supabase-database` with an ordinary merge commit, record the single deployment-ledger incident and recovery entry, and merge PR #135 by merge commit after owner authorization.
