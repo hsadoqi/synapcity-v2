@@ -142,7 +142,13 @@ export function resolveSession(
       };
     }
     return {
-      settings: cached,
+      // An unmarked document predates account-aware ownership. Keep its bytes
+      // for compatibility, but never act on consent that may belong to the
+      // last signed-in person who used this browser.
+      settings:
+        owner === null
+          ? { ...cached, privacy: settingsDefaults.privacy }
+          : cached,
       setAside,
       override: null,
       rewrite: false,

@@ -30,6 +30,8 @@ export function statusMessage(status: PreferencesStatus): string {
       return 'Preferences could not be updated. Check the selected values.';
     case 'stored-unreadable':
       return 'Saved preferences could not be loaded. Defaults are in use.';
+    case 'account-save-pending':
+      return 'Saving to your account…';
     case 'storage-unavailable':
       return status.during === 'load'
         ? 'Storage unavailable. Changes apply for this visit.'
@@ -62,6 +64,8 @@ type SettingsContextType = {
    * sign-out is not one: its message asks the person to sign in instead.
    */
   canRetryAccountSave: boolean;
+  /** A retry is running; keep its control mounted and disabled until it settles. */
+  isRetryingAccountSave: boolean;
   retryAccountSave: () => void;
   draftScope?: string;
 };
@@ -92,6 +96,8 @@ export function SettingsProvider({
   const reported = usePreferences((s) => s.status);
   const statusId = usePreferences((s) => s.statusId);
   const accountSave = usePreferences((s) => s.accountSave);
+  const accountFailure = usePreferences((s) => s.accountFailure);
+  const accountFailureMessage = usePreferences((s) => s.accountFailureMessage);
   const {
     update: updateSettings,
     setDisplayOnAllDevices,
@@ -112,7 +118,18 @@ export function SettingsProvider({
   const [openedAt] = useState(statusId);
   const [clearedId, setClearedId] = useState(-1);
   const fresh = statusId > openedAt || lasting(reported);
-  const status = fresh && statusId !== clearedId ? statusMessage(reported) : '';
+  const latest = fresh && statusId !== clearedId ? statusMessage(reported) : '';
+  // An unresolved account failure stays in the line whatever is reported
+  // after it (a device-only change, blocked storage), until a save resolves
+  // it or the session changes. While a retry runs, the pending report says so.
+  const failure =
+    accountFailure !== 'none' && accountSave !== 'saving'
+      ? accountFailureMessage || NOT_SAVED_TO_ACCOUNT
+      : '';
+  const status =
+    !failure || latest === failure
+      ? latest
+      : [latest, failure].filter(Boolean).join(' ');
 
   useEffect(() => {
     if (reported.kind !== 'saved') return;
@@ -121,9 +138,8 @@ export function SettingsProvider({
   }, [reported, statusId]);
 
   const syncsToAccount = sync === 'synced';
-  const canRetryAccountSave =
-    accountSave === 'failed' &&
-    !(reported.kind === 'account-save-failed' && reported.signedOut);
+  const canRetryAccountSave = accountFailure === 'retryable';
+  const isRetryingAccountSave = canRetryAccountSave && accountSave === 'saving';
   const value = useMemo(
     () => ({
       settings,
@@ -136,6 +152,7 @@ export function SettingsProvider({
       displayOnAllDevices,
       setDisplayOnAllDevices,
       canRetryAccountSave,
+      isRetryingAccountSave,
       retryAccountSave,
       draftScope,
     }),
@@ -149,6 +166,7 @@ export function SettingsProvider({
       displayOnAllDevices,
       setDisplayOnAllDevices,
       canRetryAccountSave,
+      isRetryingAccountSave,
       retryAccountSave,
       draftScope,
     ],

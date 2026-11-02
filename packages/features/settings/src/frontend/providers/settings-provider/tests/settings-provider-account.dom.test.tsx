@@ -346,6 +346,10 @@ describe('trying a failed account save again', () => {
       preferences: accountPart(settingsDefaults),
     });
     save.mockResolvedValueOnce({ ok: false, error: 'x' });
+    let finishRetry: (result: SavePreferencesResult) => void = () => {};
+    save.mockImplementationOnce(
+      () => new Promise((resolve) => (finishRetry = resolve)),
+    );
     await mountWithHeader(account);
     expect(screen.queryByRole('button', { name: 'Try again' })).toBeNull();
 
@@ -356,8 +360,19 @@ describe('trying a failed account save again', () => {
     fireEvent.click(retry);
     await waitFor(() => expect(save).toHaveBeenCalledTimes(2));
     expect(save.mock.calls[1]![0].regional.language).toBe('ja');
+    // Disabled for activation but still focusable, so focus is not dropped.
+    expect(retry.getAttribute('aria-disabled')).toBe('true');
+    expect(retry.getAttribute('aria-busy')).toBe('true');
+    expect(statusLine()).toBe('Saving to your account…');
+
+    await act(async () => finishRetry({ ok: true }));
     await waitFor(() => expect(statusLine()).toBe('Saved'));
     expect(screen.queryByRole('button', { name: 'Try again' })).toBeNull();
+    expect(document.activeElement).toBe(
+      screen
+        .getAllByRole('status')
+        .find((el) => !el.hasAttribute('aria-label')),
+    );
   });
 
   it('is not offered when the session has ended', async () => {

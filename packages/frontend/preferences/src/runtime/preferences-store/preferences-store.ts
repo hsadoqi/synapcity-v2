@@ -28,13 +28,13 @@ import {
   PREFERENCES_STORAGE_KEY,
 } from '../../scripts';
 import {
-  announcePreferencesSaved,
   clearStoredPreferences,
   deviceTimezone,
   migrateLookToCookie,
   PREFERENCES_OWNER_KEY,
   readCacheOwner,
   readDeviceDisplay,
+  readLookCookie,
   readStoredPreferences,
   saveLook,
   writeCacheOwner,
@@ -59,6 +59,7 @@ export type PreferencesStatus =
   | { kind: 'invalid-update' }
   | { kind: 'storage-unavailable'; during: 'load' | 'write' }
   | { kind: 'stored-unreadable' }
+  | { kind: 'account-save-pending' }
   | { kind: 'account-save-failed'; message: string | null; signedOut: boolean };
 
 export type PreferencesSnapshot = {
@@ -74,6 +75,14 @@ export type PreferencesSnapshot = {
   sync: 'none' | 'synced' | 'unavailable';
   displayOnAllDevices: boolean;
   accountSave: 'idle' | 'saving' | 'failed';
+  /**
+   * The unresolved account-save failure, kept apart from `status` so a later
+   * device-only report cannot erase it: `retryable` may be tried again;
+   * `signed-out` may not, because the session that would save has ended.
+   */
+  accountFailure: 'none' | 'retryable' | 'signed-out';
+  /** The server's wording for a `signed-out` failure, if it gave one. */
+  accountFailureMessage: string | null;
   status: PreferencesStatus;
   /** Grows with every status report, so the same status twice is still news. */
   statusId: number;
@@ -85,8 +94,11 @@ export type PreferencesStore = {
   getServerSnapshot: () => PreferencesSnapshot;
   /** Browser only: loads the saved copy and starts listening. Returns the stop. */
   start: () => () => void;
-  setSession: (session: PreferencesSession) => void;
-  setSaver: (save: SaveAccountPreferences | undefined) => void;
+  /** Replaces the request-bound session and its saver as one transition. */
+  setHost: (
+    session: PreferencesSession,
+    save: SaveAccountPreferences | undefined,
+  ) => void;
   /** The mode next-themes holds, and how to change it; it owns mode. */
   bindMode: (mode: string | undefined, setMode: (mode: Mode) => void) => void;
   /** Applies and saves a change. False when it was refused (see `status`). */
@@ -187,15 +199,18 @@ type Local = {
   owner: CacheOwner | null;
   setAside: DisplaySettings | null;
   problem: PreferencesStatus | null;
+  hasDocument: boolean;
 };
 
 /** Reads everything this browser holds. Never throws; a problem is reported. */
-function readLocal(): Local {
-  let settings: Settings | null = null;
+function readLocal(fallback: Settings | null = null): Local {
+  let settings: Settings | null = fallback;
   let owner: CacheOwner | null = null;
   let problem: PreferencesStatus | null = null;
+  let hasDocument = false;
   try {
     let saved = readStoredPreferences();
+    hasDocument = saved !== null;
     if (saved) {
       // Earlier versions stored an account entry (with a typed password)
       // beside the preferences; it must not stay in the browser.
@@ -221,7 +236,13 @@ function readLocal(): Local {
   } catch {
     problem = { kind: 'storage-unavailable', during: 'load' };
   }
-  return { settings, owner, setAside: readDeviceDisplay(), problem };
+  return {
+    settings,
+    owner,
+    setAside: readDeviceDisplay(),
+    problem,
+    hasDocument,
+  };
 }
 
 /**
@@ -238,6 +259,17 @@ export function createPreferencesStore(initial: {
 }): PreferencesStore {
   let session = initial.session;
   let saver = initial.save;
+  /**
+   * The device's visual fields when the browser document is missing,
+   * unreadable or blocked: the shared look cookie as it is now (it may have
+   * been rewritten since this request, by sign-out for example), else the
+   * request's own. It carries display choices only, so it is never a document
+   * anyone could adopt.
+   */
+  const lookFallback = (): Settings | null => {
+    const look = readLookCookie() ?? initial.look ?? null;
+    return look ? serverSettings({ kind: 'guest' }, look) : null;
+  };
   const listeners = new Set<() => void>();
 
   const serverSnapshot: PreferencesSnapshot = {
@@ -253,6 +285,8 @@ export function createPreferencesStore(initial: {
       session.stored?.preferences?.appearanceOverride,
     ),
     accountSave: 'idle',
+    accountFailure: 'none',
+    accountFailureMessage: null,
     status: { kind: 'idle' },
     statusId: 0,
   };
@@ -272,7 +306,7 @@ export function createPreferencesStore(initial: {
   let generation = 0;
   let inFlight = false;
   let queued = false;
-  let failed = false;
+  let activeFlush: Promise<void> | null = null;
 
   function emit(next: Partial<PreferencesSnapshot>) {
     const settings = next.settings
@@ -289,6 +323,23 @@ export function createPreferencesStore(initial: {
 
   function withModeIfKnown(settings: Settings) {
     return mode ? withMode(settings, mode) : settings;
+  }
+
+  /**
+   * Whether a local write's report may be shown. "Saved" is withheld while
+   * an account write is pending, failed, or about to start for this very
+   * change: the account outcome decides what is true then.
+   */
+  function shouldReportLocal(
+    status: PreferencesStatus,
+    sendsToAccount: boolean,
+  ) {
+    return (
+      status.kind !== 'saved' ||
+      (!sendsToAccount &&
+        snapshot.accountSave === 'idle' &&
+        snapshot.accountFailure === 'none')
+    );
   }
 
   /** Commits settings: state, document, then the browser's copies. */
@@ -318,18 +369,39 @@ export function createPreferencesStore(initial: {
       writeCacheOwner(nextOwner);
       owner = nextOwner;
       hasDocument = true;
-      announcePreferencesSaved();
       return { kind: 'saved' };
     } catch {
       return { kind: 'storage-unavailable', during: 'write' };
     }
   }
 
+  /** Whether an account change made now would be sent. */
+  function savesToAccount() {
+    return (
+      saver !== undefined &&
+      snapshot.sync === 'synced' &&
+      snapshot.accountFailure !== 'signed-out'
+    );
+  }
+
   function requestSave() {
-    if (!saver || snapshot.sync !== 'synced') return;
+    if (!savesToAccount()) return;
     queued = true;
-    if (!inFlight) void flush();
-    else if (snapshot.accountSave !== 'saving') emit({ accountSave: 'saving' });
+    if (!inFlight) runFlush();
+    else if (snapshot.accountSave !== 'saving') {
+      emit({
+        accountSave: 'saving',
+        status: { kind: 'account-save-pending' },
+      });
+    }
+  }
+
+  function runFlush() {
+    const task = flush();
+    activeFlush = task;
+    void task.finally(() => {
+      if (activeFlush === task) activeFlush = null;
+    });
   }
 
   async function flush() {
@@ -340,7 +412,12 @@ export function createPreferencesStore(initial: {
     inFlight = true;
     // Taken now, so the newest state is what is sent.
     const document = accountPart(snapshot.settings, override);
-    if (snapshot.accountSave !== 'saving') emit({ accountSave: 'saving' });
+    if (snapshot.accountSave !== 'saving') {
+      emit({
+        accountSave: 'saving',
+        status: { kind: 'account-save-pending' },
+      });
+    }
     let result: SavePreferencesResult;
     try {
       result = await save(document, deviceTimezone());
@@ -352,21 +429,21 @@ export function createPreferencesStore(initial: {
     inFlight = false;
     if (queued) {
       // A newer change supersedes this outcome.
-      void flush();
+      runFlush();
       return;
     }
-    const recovered = failed && result.ok;
-    failed = !result.ok;
     if (result.ok) {
-      // A save that follows a failure replaces its report, so the failure
-      // does not stay on screen after the account caught up.
       emit({
         accountSave: 'idle',
-        ...(recovered && { status: { kind: 'saved' } }),
+        accountFailure: 'none',
+        accountFailureMessage: null,
+        status: { kind: 'saved' },
       });
     } else {
       emit({
         accountSave: 'failed',
+        accountFailure: result.signedOut ? 'signed-out' : 'retryable',
+        accountFailureMessage: result.signedOut ? result.error : null,
         status: {
           kind: 'account-save-failed',
           message: result.signedOut ? result.error : null,
@@ -379,7 +456,7 @@ export function createPreferencesStore(initial: {
   /** Loads from storage and applies the current session. */
   function load(local: Local, report = true) {
     owner = local.owner;
-    hasDocument = local.settings !== null || local.problem !== null;
+    hasDocument = local.hasDocument;
     const resolution = resolveSession(session, local, deviceTimezone());
     setAside = resolution.setAside;
     override = resolution.override;
@@ -412,11 +489,19 @@ export function createPreferencesStore(initial: {
     owner = local.owner;
     hasDocument = true;
     setAside = local.setAside;
-    commit(local.settings, {}, false);
+    const nextSettings =
+      session.kind === 'guest'
+        ? resolveSession(session, local, deviceTimezone()).settings
+        : local.settings;
+    override =
+      session.kind === 'account' && local.setAside
+        ? displayOf(nextSettings)
+        : null;
+    commit(nextSettings, { displayOnAllDevices: override !== null }, false);
   }
 
   function onOnline() {
-    if (failed) requestSave();
+    if (snapshot.accountFailure === 'retryable') requestSave();
   }
 
   const store: PreferencesStore = {
@@ -432,7 +517,7 @@ export function createPreferencesStore(initial: {
         started = true;
         // A look saved before the shared cookie existed is carried over once.
         migrateLookToCookie();
-        load(readLocal());
+        load(readLocal(lookFallback()));
       }
       window.addEventListener('storage', onStorage);
       window.addEventListener('online', onOnline);
@@ -442,7 +527,11 @@ export function createPreferencesStore(initial: {
       };
     },
 
-    setSession(next) {
+    setHost(next, save) {
+      // The saver belongs to the same request-bound host state as the
+      // session. Install it first so sign-in adoption cannot be dropped.
+      const previousSaver = saver;
+      saver = save;
       if (sameJson(next, session)) return;
       const samePerson =
         next.kind === session.kind &&
@@ -453,15 +542,36 @@ export function createPreferencesStore(initial: {
         return;
       }
       if (!samePerson) {
+        // If a newer account change is waiting behind the active request,
+        // drain its captured payload in order. It is detached from the next
+        // session: the server action identifies the caller and may reject a
+        // completed sign-out, while this runtime ignores either outcome.
+        if (
+          session.kind === 'account' &&
+          queued &&
+          previousSaver &&
+          activeFlush
+        ) {
+          const pendingSave = previousSaver;
+          const pendingDocument = accountPart(snapshot.settings, override);
+          const pendingZone = deviceTimezone();
+          void activeFlush
+            .then(() => pendingSave(pendingDocument, pendingZone))
+            .catch(() => undefined);
+        }
         // Sign-in, sign-out or another account: drop the last person's saves
-        // and resolve again from what the browser holds.
+        // from this runtime and resolve again from what the browser holds.
         generation++;
         inFlight = false;
         queued = false;
-        failed = false;
         session = next;
-        emit({ accountSave: 'idle', status: { kind: 'idle' } });
-        load(readLocal(), false);
+        emit({
+          accountSave: 'idle',
+          accountFailure: 'none',
+          accountFailureMessage: null,
+          status: { kind: 'idle' },
+        });
+        load(readLocal(lookFallback()), false);
         return;
       }
       session = next;
@@ -474,13 +584,10 @@ export function createPreferencesStore(initial: {
           owner,
           setAside,
           problem: null,
+          hasDocument,
         },
         false,
       );
-    },
-
-    setSaver(next) {
-      saver = next;
     },
 
     bindMode(current, change) {
@@ -510,9 +617,14 @@ export function createPreferencesStore(initial: {
       // account change too.
       const displayChanged = Boolean(override && patch.appearance);
       if (displayChanged) override = displayOf(next);
+      const accountChange = displayChanged || touchesAccount(patch);
+      const sends = accountChange && savesToAccount();
       const status = commit(next);
-      emit({ status, displayOnAllDevices: override !== null });
-      if (displayChanged || touchesAccount(patch)) requestSave();
+      emit({
+        ...(shouldReportLocal(status, sends) && { status }),
+        displayOnAllDevices: override !== null,
+      });
+      if (accountChange) requestSave();
       return true;
     },
 
@@ -530,12 +642,12 @@ export function createPreferencesStore(initial: {
         setAside = null;
       }
       const status = commit(next, { displayOnAllDevices: on });
-      emit({ status });
+      if (shouldReportLocal(status, savesToAccount())) emit({ status });
       requestSave();
     },
 
     retryAccountSave() {
-      if (failed) requestSave();
+      if (snapshot.accountFailure === 'retryable') requestSave();
     },
   };
   return store;

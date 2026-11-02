@@ -20,6 +20,9 @@ import { SettingsProvider } from '../providers/settings-provider';
 /** jsdom has no ResizeObserver or getAnimations, which the providers and Base UI read. */
 export function stubBrowser() {
   localStorage.clear();
+  // The shared look cookie is the device's visual fallback when storage is
+  // empty, so a test must not inherit the last test's look through it.
+  document.cookie = 'synapcity-look=; Path=/; Max-Age=0';
   // The Theme tab keeps its unsaved draft here.
   sessionStorage.clear();
   // Appearance attributes live on <html>, which every test in a file shares.
@@ -111,3 +114,16 @@ export const currentSettings = () =>
  */
 export const saveTab = () =>
   fireEvent.click(screen.getByRole('button', { name: 'Save changes' }));
+
+/**
+ * Stores a preferences document the way this build does while signed out:
+ * with a current guest owner marker. Consent in an unmarked (legacy) document
+ * is never honoured, so a test of how saved choices are read seeds this.
+ */
+export function storeGuestPreferences(document: string) {
+  localStorage.setItem('synapcity-preferences', document);
+  localStorage.setItem(
+    'synapcity-preferences-owner',
+    JSON.stringify({ v: 1, owner: { kind: 'guest', adoptable: true } }),
+  );
+}

@@ -1,6 +1,6 @@
 import { act, render, renderHook, waitFor } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -17,6 +17,8 @@ import { ModeProvider } from '../../providers';
 import {
   PREFERENCES_OWNER_KEY,
   readLookCookie,
+  writeDeviceDisplay,
+  writeLookCookie,
   writeStoredPreferences,
 } from '../../store';
 import type { SaveAccountPreferences } from '../preferences-store';
@@ -51,15 +53,24 @@ const granted = {
   granted: true,
   updatedAt: '2026-01-01T00:00:00.000Z',
   version: PRIVACY_POLICY_VERSIONS.errorReports,
+  askAgain: false,
 };
 const owner = () => JSON.parse(localStorage.getItem(PREFERENCES_OWNER_KEY)!);
 const stored = () => JSON.parse(localStorage.getItem(KEY)!);
 
-function wrapper(session: PreferencesSession, save?: SaveAccountPreferences) {
+function wrapper(
+  session: PreferencesSession,
+  save?: SaveAccountPreferences,
+  look = null as ReturnType<typeof readLookCookie>,
+) {
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
       <ModeProvider attribute="class" defaultTheme="system" enableSystem>
-        <PreferencesProvider session={session} saveAccountPreferences={save}>
+        <PreferencesProvider
+          session={session}
+          look={look}
+          saveAccountPreferences={save}
+        >
           {children}
         </PreferencesProvider>
       </ModeProvider>
@@ -85,7 +96,10 @@ beforeEach(() => {
     delete document.documentElement.dataset[key];
   }
 });
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  vi.restoreAllMocks();
+  Reflect.deleteProperty(navigator, 'globalPrivacyControl');
+});
 
 describe('without a runtime', () => {
   it('formats with the defaults and this browser zone', () => {
@@ -209,6 +223,197 @@ describe('PreferencesProvider in the browser', () => {
     expect(document.documentElement.lang).toBe(pageLanguage('fr'));
   });
 
+  it('never treats consent from an unmarked legacy copy as this guest’s', () => {
+    const legacy = JSON.stringify({
+      regional: { language: 'fr' },
+      privacy: { errorReports: granted },
+    });
+    writeStoredPreferences(legacy);
+
+    const { result } = renderHook(
+      () => ({
+        allowed: useCanCollect('errorReports'),
+        privacy: usePreferences((state) => state.settings.privacy),
+      }),
+      { wrapper: wrapper(guest) },
+    );
+
+    expect(result.current.allowed).toBe(false);
+    expect(result.current.privacy).toEqual(settingsDefaults.privacy);
+    expect(localStorage.getItem(KEY)).toBe(legacy);
+    expect(localStorage.getItem(PREFERENCES_OWNER_KEY)).toBeNull();
+  });
+
+  it('treats an unreadable document as no consent', () => {
+    localStorage.setItem(KEY, '{not json');
+
+    const { result } = renderHook(() => useCanCollect('errorReports'), {
+      wrapper: wrapper(guest),
+    });
+
+    expect(result.current).toBe(false);
+  });
+
+  it('lets Global Privacy Control override a saved sharing grant', () => {
+    Object.defineProperty(navigator, 'globalPrivacyControl', {
+      configurable: true,
+      value: true,
+    });
+    const sharing = {
+      granted: true,
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      version: PRIVACY_POLICY_VERSIONS.sharing,
+      askAgain: false,
+    };
+    writeStoredPreferences(JSON.stringify({ privacy: { sharing } }));
+    localStorage.setItem(
+      PREFERENCES_OWNER_KEY,
+      JSON.stringify({
+        v: 1,
+        owner: { kind: 'guest', adoptable: true },
+      }),
+    );
+
+    const { result } = renderHook(() => useCanCollect('sharing'), {
+      wrapper: wrapper(guest),
+    });
+
+    expect(result.current).toBe(false);
+  });
+
+  it('uses the validated look cookie for device settings when storage is empty', () => {
+    writeLookCookie({
+      v: 1,
+      theme: {
+        ...settingsDefaults.theme,
+        density: 'compact',
+        textSize: 110,
+      },
+      appearance: {
+        ...settingsDefaults.appearance,
+        contrastMode: 'high',
+      },
+    });
+
+    const { result } = renderHook(() => useRuntime(), {
+      wrapper: wrapper(
+        account({ regional: { language: 'de' } }),
+        undefined,
+        readLookCookie(),
+      ),
+    });
+
+    expect(result.current.snapshot.settings.theme.density).toBe('compact');
+    expect(result.current.snapshot.settings.theme.textSize).toBe(110);
+    expect(result.current.snapshot.settings.appearance.contrastMode).toBe(
+      'high',
+    );
+    expect(result.current.snapshot.settings.regional.language).toBe('de');
+  });
+
+  it('reads the cookie as it is now, not as the request had it, after an in-place sign-out', async () => {
+    const lookWith = (
+      density: 'compact' | 'spacious',
+      bodyFont: 'lora' | 'default',
+    ) => ({
+      v: 1 as const,
+      theme: { ...settingsDefaults.theme, density, bodyFont },
+      appearance: {
+        animationsEnabled: true,
+        reducedMotion: false,
+        contrastMode: 'none' as const,
+        showBorders: false,
+      },
+    });
+    // The request carried the signed-in person's look; storage is empty.
+    writeLookCookie(lookWith('compact', 'lora'));
+    let session = account({ theme: { bodyFont: 'lora' } });
+    const requestLook = readLookCookie();
+    function Probe() {
+      const { theme } = usePreferences((s) => s.settings);
+      return <output>{`${theme.density} ${theme.bodyFont}`}</output>;
+    }
+    const App = () => (
+      <ModeProvider attribute="class">
+        <PreferencesProvider session={session} look={requestLook}>
+          <Probe />
+        </PreferencesProvider>
+      </ModeProvider>
+    );
+    const view = render(<App />);
+    expect(view.container.querySelector('output')!.textContent).toBe(
+      'compact lora',
+    );
+
+    // Sign-out rewrote the cookie, and storage was cleared meanwhile.
+    localStorage.clear();
+    writeLookCookie(lookWith('spacious', 'default'));
+    session = guest;
+    view.rerender(<App />);
+    await waitFor(() =>
+      expect(view.container.querySelector('output')!.textContent).toBe(
+        'spacious default',
+      ),
+    );
+  });
+
+  it('withholds "Saved" until the account write it depends on succeeds', async () => {
+    let finish: (result: SavePreferencesResult) => void = () => {};
+    const save = vi.fn<SaveAccountPreferences>(
+      () => new Promise((resolve) => (finish = resolve)),
+    );
+    const { result } = renderHook(() => useRuntime(), {
+      wrapper: wrapper(account({}), save),
+    });
+    act(() => {
+      result.current.actions.update({ regional: { language: 'fr' } });
+    });
+    expect(result.current.snapshot.status.kind).toBe('account-save-pending');
+
+    // A device-only change while the write runs is not reported as saved.
+    act(() => {
+      result.current.actions.update({ theme: { density: 'compact' } });
+    });
+    expect(result.current.snapshot.status.kind).toBe('account-save-pending');
+
+    await act(async () => finish({ ok: true }));
+    expect(result.current.snapshot.status.kind).toBe('saved');
+  });
+
+  it('keeps a signed-out failure and its wording through later device changes', async () => {
+    const save = vi.fn<SaveAccountPreferences>(async () => ({
+      ok: false,
+      error: 'Sign in again.',
+      signedOut: true,
+    }));
+    const { result } = renderHook(() => useRuntime(), {
+      wrapper: wrapper(account({}), save),
+    });
+    act(() => {
+      result.current.actions.update({ regional: { language: 'fr' } });
+    });
+    await waitFor(() =>
+      expect(result.current.snapshot.accountFailure).toBe('signed-out'),
+    );
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+    act(() => {
+      result.current.actions.update({ theme: { density: 'compact' } });
+    });
+    expect(result.current.snapshot.status.kind).toBe('storage-unavailable');
+    expect(result.current.snapshot.accountFailure).toBe('signed-out');
+    expect(result.current.snapshot.accountFailureMessage).toBe(
+      'Sign in again.',
+    );
+    // Nothing more is sent for a session that has ended.
+    act(() => {
+      result.current.actions.update({ regional: { language: 'de' } });
+      result.current.actions.retryAccountSave();
+    });
+    expect(save).toHaveBeenCalledOnce();
+  });
+
   it('lets the account win over a stale copy, and caches it as that account’s', () => {
     writeStoredPreferences(
       JSON.stringify({
@@ -240,6 +445,55 @@ describe('PreferencesProvider in the browser', () => {
     renderHook(() => useRuntime(), { wrapper: wrapper(account(null), save) });
     await waitFor(() => expect(save).toHaveBeenCalledOnce());
     expect(save.mock.calls[0]![0].regional.language).toBe('fr');
+  });
+
+  it('adopts guest choices and reports the zone when sign-in updates the provider in place', async () => {
+    const save = vi.fn<SaveAccountPreferences>(async () => ({ ok: true }));
+    let session: PreferencesSession = guest;
+    let saver: SaveAccountPreferences | undefined;
+    let mounts = 0;
+
+    function Probe() {
+      const { snapshot, actions } = useRuntime();
+      // Counts mounts: a remount would reset this subtree and the runtime.
+      useEffect(() => {
+        mounts++;
+      }, []);
+      return (
+        <button
+          onClick={() => actions.update({ regional: { language: 'fr' } })}
+        >
+          {snapshot.settings.regional.language}
+        </button>
+      );
+    }
+    function App() {
+      return (
+        <ModeProvider attribute="class" defaultTheme="system" enableSystem>
+          <PreferencesProvider session={session} saveAccountPreferences={saver}>
+            <Probe />
+          </PreferencesProvider>
+        </ModeProvider>
+      );
+    }
+
+    const view = render(<App />);
+    act(() => view.getByRole('button').click());
+    expect(owner().owner).toEqual({ kind: 'guest', adoptable: true });
+
+    session = account(null, 'u1', 'Pacific/Chatham');
+    saver = save;
+    view.rerender(<App />);
+
+    await waitFor(() => expect(save).toHaveBeenCalledOnce());
+    expect(save.mock.calls[0]![0].regional.language).toBe('fr');
+    // The current device zone, not the account's stale one.
+    expect(save.mock.calls[0]![1]).toBe(browserZone);
+    // Exactly once: nothing else is sent once the adoption has settled.
+    await act(async () => new Promise((resolve) => setTimeout(resolve)));
+    expect(save).toHaveBeenCalledOnce();
+    expect(mounts).toBe(1);
+    expect(owner().owner).toEqual({ kind: 'account', userId: 'u1' });
   });
 
   it('never adopts a legacy copy', async () => {
@@ -307,7 +561,7 @@ describe('PreferencesProvider in the browser', () => {
     // The failure is superseded by the newest change, which goes next.
     expect(save).toHaveBeenCalledTimes(2);
     expect(save.mock.calls[1]![0].regional.language).toBe('es');
-    expect(result.current.snapshot.status.kind).toBe('saved');
+    expect(result.current.snapshot.status.kind).toBe('account-save-pending');
 
     await act(async () =>
       pending[1]!({ ok: false, error: 'Sign in again.', signedOut: true }),
@@ -343,6 +597,50 @@ describe('PreferencesProvider in the browser', () => {
     expect(save).toHaveBeenCalledTimes(2);
   });
 
+  it('keeps a retryable failure visible through device-only changes', async () => {
+    const save = vi
+      .fn<SaveAccountPreferences>()
+      .mockResolvedValue({ ok: false, error: 'offline' });
+    const { result } = renderHook(() => useRuntime(), {
+      wrapper: wrapper(account({}), save),
+    });
+    act(() => {
+      result.current.actions.update({ regional: { language: 'fr' } });
+    });
+    await waitFor(() =>
+      expect(result.current.snapshot.accountFailure).toBe('retryable'),
+    );
+
+    act(() => {
+      result.current.actions.update({ theme: { density: 'compact' } });
+    });
+
+    expect(result.current.snapshot.status.kind).toBe('account-save-failed');
+    expect(result.current.snapshot.accountFailure).toBe('retryable');
+  });
+
+  it('does not retry a signed-out failure when the browser comes online', async () => {
+    const save = vi.fn<SaveAccountPreferences>().mockResolvedValue({
+      ok: false,
+      error: 'Sign in again.',
+      signedOut: true,
+    });
+    const { result } = renderHook(() => useRuntime(), {
+      wrapper: wrapper(account({}), save),
+    });
+    act(() => {
+      result.current.actions.update({ regional: { language: 'fr' } });
+    });
+    await waitFor(() =>
+      expect(result.current.snapshot.accountFailure).toBe('signed-out'),
+    );
+
+    act(() => window.dispatchEvent(new Event('online')));
+    await new Promise((resolve) => setTimeout(resolve));
+
+    expect(save).toHaveBeenCalledOnce();
+  });
+
   it('ignores the outcome of a save made for someone no longer signed in', async () => {
     let finish: (result: SavePreferencesResult) => void = () => {};
     const save = vi.fn<SaveAccountPreferences>(
@@ -374,6 +672,65 @@ describe('PreferencesProvider in the browser', () => {
     expect(view.getByRole('button').textContent).toBe('idle');
   });
 
+  it('drains the newest queued account change in order when sign-out arrives', async () => {
+    const pending: ((result: SavePreferencesResult) => void)[] = [];
+    const save = vi.fn<SaveAccountPreferences>(
+      () => new Promise((resolve) => pending.push(resolve)),
+    );
+    let session: PreferencesSession = account({});
+    let saver: SaveAccountPreferences | undefined = save;
+    function Probe() {
+      const { snapshot, actions } = useRuntime();
+      return (
+        <>
+          <button
+            onClick={() => {
+              actions.update({ regional: { language: 'fr' } });
+              actions.update({ regional: { language: 'de' } });
+            }}
+          >
+            Change twice
+          </button>
+          <output>
+            {`${snapshot.accountSave} ${snapshot.accountFailure} ${snapshot.status.kind} ${snapshot.settings.regional.language}`}
+          </output>
+        </>
+      );
+    }
+    function App() {
+      return (
+        <ModeProvider attribute="class">
+          <PreferencesProvider session={session} saveAccountPreferences={saver}>
+            <Probe />
+          </PreferencesProvider>
+        </ModeProvider>
+      );
+    }
+    const view = render(<App />);
+    act(() => view.getByRole('button').click());
+    expect(save).toHaveBeenCalledOnce();
+
+    session = guest;
+    saver = undefined;
+    view.rerender(<App />);
+    await act(async () => pending[0]!({ ok: true }));
+
+    await waitFor(() => expect(save).toHaveBeenCalledTimes(2));
+    expect(save.mock.calls[1]![0].regional.language).toBe('de');
+    await act(async () =>
+      pending[1]!({
+        ok: false,
+        error: 'Sign in again.',
+        signedOut: true,
+      }),
+    );
+    // Neither the first outcome nor the drained one reaches the guest.
+    expect(view.container.querySelector('output')!.textContent).toBe(
+      'idle none idle en',
+    );
+    expect(save).toHaveBeenCalledTimes(2);
+  });
+
   it('takes up another tab’s save only from the same person', () => {
     const { result } = renderHook(() => useCanCollect('errorReports'), {
       wrapper: wrapper(guest),
@@ -382,6 +739,13 @@ describe('PreferencesProvider in the browser', () => {
     act(() => {
       writeStoredPreferences(
         JSON.stringify({ privacy: { errorReports: granted } }),
+      );
+      localStorage.setItem(
+        PREFERENCES_OWNER_KEY,
+        JSON.stringify({
+          v: 1,
+          owner: { kind: 'guest', adoptable: true },
+        }),
       );
       window.dispatchEvent(new StorageEvent('storage', { key: KEY }));
     });
@@ -396,6 +760,72 @@ describe('PreferencesProvider in the browser', () => {
       window.dispatchEvent(new StorageEvent('storage', { key: KEY }));
     });
     expect(result.current).toBe(true);
+  });
+
+  it('does not honour consent arriving later from an unmarked document', () => {
+    const { result } = renderHook(() => useCanCollect('errorReports'), {
+      wrapper: wrapper(guest),
+    });
+
+    act(() => {
+      writeStoredPreferences(
+        JSON.stringify({ privacy: { errorReports: granted } }),
+      );
+      window.dispatchEvent(new StorageEvent('storage', { key: KEY }));
+    });
+
+    expect(result.current).toBe(false);
+  });
+
+  it('lets consent consumers follow live edits in this tab', () => {
+    const { result } = renderHook(
+      () => ({
+        allowed: useCanCollect('errorReports'),
+        actions: usePreferenceActions(),
+      }),
+      { wrapper: wrapper(guest) },
+    );
+    expect(result.current.allowed).toBe(false);
+
+    act(() => {
+      result.current.actions.update({
+        privacy: { errorReports: granted },
+      });
+    });
+
+    expect(result.current.allowed).toBe(true);
+  });
+
+  it('takes up another tab’s display override state for the same account', () => {
+    const { result } = renderHook(() => useRuntime(), {
+      wrapper: wrapper(account({})),
+    });
+    const sameAccount = JSON.stringify({
+      v: 1,
+      owner: { kind: 'account', userId: 'u1' },
+    });
+
+    act(() => {
+      writeStoredPreferences(
+        JSON.stringify({ appearance: { contrastMode: 'high' } }),
+      );
+      localStorage.setItem(PREFERENCES_OWNER_KEY, sameAccount);
+      writeDeviceDisplay(settingsDefaults.appearance);
+      window.dispatchEvent(new StorageEvent('storage', { key: KEY }));
+    });
+    expect(result.current.snapshot.displayOnAllDevices).toBe(true);
+    expect(result.current.snapshot.settings.appearance.contrastMode).toBe(
+      'high',
+    );
+
+    act(() => {
+      writeStoredPreferences(
+        JSON.stringify({ appearance: { contrastMode: 'none' } }),
+      );
+      writeDeviceDisplay(null);
+      window.dispatchEvent(new StorageEvent('storage', { key: KEY }));
+    });
+    expect(result.current.snapshot.displayOnAllDevices).toBe(false);
   });
 
   it('re-renders a category subscriber only when its category changes', () => {
@@ -480,5 +910,24 @@ describe('PreferencesProvider in the browser', () => {
       during: 'write',
     });
     expect(readLookCookie()?.theme.density).toBe('compact');
+  });
+
+  it('still applies and shares the account look when storage is blocked', () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+
+    const { result } = renderHook(() => useRuntime(), {
+      wrapper: wrapper(account({ theme: { bodyFont: 'lora' } })),
+    });
+
+    expect(result.current.snapshot.settings.theme.bodyFont).toBe('lora');
+    expect(
+      document.documentElement.style.getPropertyValue('--font-preference-body'),
+    ).not.toBe('');
+    expect(readLookCookie()?.theme.bodyFont).toBe('lora');
   });
 });

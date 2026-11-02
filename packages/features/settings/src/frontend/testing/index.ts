@@ -4,4 +4,5 @@ export {
   SettingsTestProviders,
   saveTab,
   stubBrowser,
+  storeGuestPreferences,
 } from './test-harness';

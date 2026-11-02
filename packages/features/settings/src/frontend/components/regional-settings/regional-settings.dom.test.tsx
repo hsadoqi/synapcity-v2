@@ -367,6 +367,7 @@ describe('regional previews', () => {
       displayOnAllDevices: false,
       setDisplayOnAllDevices: () => {},
       canRetryAccountSave: false,
+      isRetryingAccountSave: false,
       retryAccountSave: () => {},
     };
     const content = (

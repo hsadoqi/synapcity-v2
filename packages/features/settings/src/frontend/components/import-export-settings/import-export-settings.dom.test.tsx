@@ -25,6 +25,7 @@ import { parseImport } from '@synapcity/domain-preferences';
 import { transferSchema } from '@synapcity/domain-preferences';
 import { download } from '../../utils';
 import { importFile } from '../../utils';
+import { storeGuestPreferences } from '../../testing';
 
 const objectUrls = {
   create: vi.fn((_blob: Blob) => 'blob:settings-download'),
@@ -335,6 +336,7 @@ describe('ImportExportSettings with extracted utilities', () => {
           displayOnAllDevices: false,
           setDisplayOnAllDevices: () => {},
           canRetryAccountSave: false,
+          isRetryingAccountSave: false,
           retryAccountSave: () => {},
         }}
       >
@@ -490,8 +492,7 @@ describe('ImportExportSettings with extracted utilities', () => {
   });
 
   it('round trips an exported file through the actual import control', async () => {
-    localStorage.setItem(
-      'synapcity-preferences',
+    storeGuestPreferences(
       JSON.stringify({
         regional: {
           language: 'fr',
@@ -601,6 +602,7 @@ describe('ImportExportSettings with extracted utilities', () => {
           displayOnAllDevices: false,
           setDisplayOnAllDevices: () => {},
           canRetryAccountSave: false,
+          isRetryingAccountSave: false,
           retryAccountSave: () => {},
         }}
       >

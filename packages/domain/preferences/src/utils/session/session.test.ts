@@ -87,10 +87,31 @@ describe('resolveSession as a guest', () => {
       { settings: cached, owner: null, setAside: null },
       ZONE,
     );
-    expect(result.settings).toBe(cached);
+    expect(result.settings).toStrictEqual(cached);
     expect(result.rewrite).toBe(false);
     expect(result.owner).toBeNull();
     expect(result.sync).toBe('none');
+  });
+
+  it('does not honour consent from an unmarked legacy document', () => {
+    const legacy = {
+      ...cached,
+      privacy: {
+        ...settingsDefaults.privacy,
+        analytics: {
+          ...settingsDefaults.privacy.analytics,
+          granted: true,
+        },
+      },
+    };
+    const result = resolveSession(
+      guest,
+      { settings: legacy, owner: null, setAside: null },
+      ZONE,
+    );
+
+    expect(result.settings.privacy).toEqual(settingsDefaults.privacy);
+    expect(result.rewrite).toBe(false);
   });
 
   it('resets the account part an earlier sign-in left, keeping device fields', () => {

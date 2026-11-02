@@ -3,7 +3,6 @@
 import {
   createContext,
   useContext,
-  useEffect,
   useLayoutEffect,
   useMemo,
   useState,
@@ -43,6 +42,8 @@ function createStaticStore(
     sync: 'none',
     displayOnAllDevices: false,
     accountSave: 'idle',
+    accountFailure: 'none',
+    accountFailureMessage: null,
     status: { kind: 'idle' },
     statusId: 0,
   } as const;
@@ -61,8 +62,7 @@ function createStaticStore(
       (client ??= { ...base, phase: 'ready', timeZone: deviceTimezone() }),
     getServerSnapshot: () => server,
     start: () => nothing,
-    setSession: nothing,
-    setSaver: nothing,
+    setHost: nothing,
     bindMode: nothing,
     update: refused,
     setDisplayOnAllDevices: nothing,
@@ -108,10 +108,9 @@ export function PreferencesProvider({
     [store, nativeMode, setMode],
   );
   useLayoutEffect(() => store.start(), [store]);
-  useEffect(() => store.setSession(session), [store, session]);
-  useEffect(
-    () => store.setSaver(saveAccountPreferences),
-    [store, saveAccountPreferences],
+  useLayoutEffect(
+    () => store.setHost(session, saveAccountPreferences),
+    [store, session, saveAccountPreferences],
   );
 
   return (

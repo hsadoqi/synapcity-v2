@@ -5,6 +5,7 @@ import {
   currentSettings,
   renderWithSettings,
   saveTab,
+  storeGuestPreferences,
   stubBrowser,
 } from '../../testing';
 import { PRIVACY_POLICY_VERSIONS } from '@synapcity/domain-preferences';
@@ -61,8 +62,7 @@ describe('DataPrivacySettings', () => {
   );
 
   it('reads choices saved by an earlier version', async () => {
-    localStorage.setItem(
-      'synapcity-preferences',
+    storeGuestPreferences(
       JSON.stringify({ privacy: { dataSharing: true, tracking: true } }),
     );
     await renderWithSettings(<DataPrivacySettings />);
@@ -73,8 +73,7 @@ describe('DataPrivacySettings', () => {
   });
 
   it('asks again when the saved choices were made under other wording', async () => {
-    localStorage.setItem(
-      'synapcity-preferences',
+    storeGuestPreferences(
       JSON.stringify({
         privacy: {
           analytics: {
@@ -101,8 +100,7 @@ describe('DataPrivacySettings', () => {
   });
 
   it('stops asking once the person chooses again', async () => {
-    localStorage.setItem(
-      'synapcity-preferences',
+    storeGuestPreferences(
       JSON.stringify({
         privacy: {
           analytics: {
@@ -128,8 +126,7 @@ describe('DataPrivacySettings', () => {
         value: true,
         configurable: true,
       });
-      localStorage.setItem(
-        'synapcity-preferences',
+      storeGuestPreferences(
         JSON.stringify({ privacy: { dataSharing: true, tracking: true } }),
       );
     });

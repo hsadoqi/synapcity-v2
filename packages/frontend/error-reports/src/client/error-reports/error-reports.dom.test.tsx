@@ -12,6 +12,7 @@ vi.mock('@sentry/browser', async () =>
 );
 
 const KEY = 'synapcity-preferences';
+const OWNER_KEY = 'synapcity-preferences-owner';
 const save = (granted: boolean) => {
   localStorage.setItem(
     KEY,
@@ -23,6 +24,13 @@ const save = (granted: boolean) => {
           version: PRIVACY_POLICY_VERSIONS.errorReports,
         },
       },
+    }),
+  );
+  localStorage.setItem(
+    OWNER_KEY,
+    JSON.stringify({
+      v: 1,
+      owner: { kind: 'guest', adoptable: true },
     }),
   );
   window.dispatchEvent(new StorageEvent('storage', { key: KEY }));

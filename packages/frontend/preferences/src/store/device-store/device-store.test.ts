@@ -1,13 +1,10 @@
 import { displaySchema, settingsDefaults } from '@synapcity/domain-preferences';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  announcePreferencesSaved,
   clearStoredPreferences,
   deviceTimezone,
-  onStoredPreferencesChange,
   readDeviceDisplay,
   readStoredPreferences,
-  tryReadStoredPreferences,
   writeDeviceDisplay,
   writeStoredPreferences,
 } from './device-store';
@@ -23,14 +20,12 @@ describe('device store', () => {
     expect(readStoredPreferences()).toBe('{"a":1}');
   });
 
-  it('reads null instead of throwing when storage cannot be read', () => {
+  it('lets storage failures reach the runtime that reports them', () => {
     writeStoredPreferences('{"a":1}');
-    expect(tryReadStoredPreferences()).toBe('{"a":1}');
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
       throw new Error('storage blocked');
     });
     expect(() => readStoredPreferences()).toThrow('storage blocked');
-    expect(tryReadStoredPreferences()).toBeNull();
     vi.restoreAllMocks();
   });
 
@@ -38,20 +33,6 @@ describe('device store', () => {
     writeStoredPreferences('{"a":1}');
     clearStoredPreferences();
     expect(localStorage.getItem('synapcity-preferences')).toBeNull();
-  });
-
-  it('tells subscribers when another tab or this tab saves, and stops when unsubscribed', () => {
-    const listener = vi.fn();
-    const unsubscribe = onStoredPreferencesChange(listener);
-    window.dispatchEvent(
-      new StorageEvent('storage', { key: 'synapcity-preferences' }),
-    );
-    announcePreferencesSaved();
-    expect(listener).toHaveBeenCalledTimes(2);
-    unsubscribe();
-    window.dispatchEvent(new StorageEvent('storage'));
-    announcePreferencesSaved();
-    expect(listener).toHaveBeenCalledTimes(2);
   });
 
   it('keeps the device display apart under synapcity-device-display', () => {

@@ -5,10 +5,7 @@ import {
   type CacheOwner,
   type DisplaySettings,
 } from '@synapcity/domain-preferences';
-import {
-  PREFERENCES_SAVED_EVENT,
-  PREFERENCES_STORAGE_KEY,
-} from '../../scripts';
+import { PREFERENCES_STORAGE_KEY } from '../../scripts';
 
 /*
  * The one place the browser's saved preferences are read and written
@@ -34,39 +31,12 @@ export function readStoredPreferences(): string | null {
   return localStorage.getItem(PREFERENCES_STORAGE_KEY);
 }
 
-/** The stored document, or null when there is none or storage cannot be read. */
-export function tryReadStoredPreferences(): string | null {
-  try {
-    return readStoredPreferences();
-  } catch {
-    return null;
-  }
-}
-
 export function writeStoredPreferences(value: string): void {
   localStorage.setItem(PREFERENCES_STORAGE_KEY, value);
 }
 
 export function clearStoredPreferences(): void {
   localStorage.removeItem(PREFERENCES_STORAGE_KEY);
-}
-
-/** Tells collectors in this tab that the saved choices changed. */
-export function announcePreferencesSaved(): void {
-  window.dispatchEvent(new Event(PREFERENCES_SAVED_EVENT));
-}
-
-/**
- * Calls the listener when another tab writes the stored document (`storage`)
- * and when this tab saves. Returns the unsubscribe.
- */
-export function onStoredPreferencesChange(listener: () => void): () => void {
-  window.addEventListener('storage', listener);
-  window.addEventListener(PREFERENCES_SAVED_EVENT, listener);
-  return () => {
-    window.removeEventListener('storage', listener);
-    window.removeEventListener(PREFERENCES_SAVED_EVENT, listener);
-  };
 }
 
 /** The document's owner, or null when unmarked (legacy) or unreadable. Throws like localStorage. */
