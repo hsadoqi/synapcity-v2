@@ -8,11 +8,13 @@ import { getCurrentUser } from '../features/auth/server';
 import { cn } from '../lib/utils';
 import { RootHead } from './root-head';
 import { getAccountPreferences } from '@/features/settings/server/account-preferences';
+import { saveAccountPreferences } from '@/features/settings/server/actions/preferences-actions';
 import {
   parseLookCookieValue,
   LOOK_COOKIE_NAME,
   lookWithAccount,
   pageLanguage,
+  type PreferencesSession,
 } from '@synapcity/domain-preferences';
 import { lookHtmlAttributes } from '@synapcity/frontend-preferences';
 import { cookies } from 'next/headers';
@@ -39,8 +41,12 @@ export default async function RootLayout({
     (await cookies()).get(LOOK_COOKIE_NAME)?.value,
   );
   // ADR-0010: the account's preferences follow the person to every page, not
-  // only the settings page. A failed read leaves this browser's own copy.
+  // only the settings page. A failed read (`stored` undefined) is passed on as
+  // unknown, so the runtime neither shows nor saves another person's copy.
   const stored = user ? await getAccountPreferences(user.id) : undefined;
+  const session: PreferencesSession = user
+    ? { kind: 'account', userId: user.id, stored: stored ?? null }
+    : { kind: 'guest' };
   const account = stored?.preferences ?? null;
   const look = lookWithAccount(requestLook, account);
   const lookAttributes = look ? lookHtmlAttributes(look) : undefined;
@@ -55,8 +61,9 @@ export default async function RootLayout({
       <body>
         <RootProviders
           user={user}
-          account={account}
-          deviceTimeZone={stored?.deviceTimezone ?? null}
+          session={session}
+          look={requestLook}
+          saveAccountPreferences={user ? saveAccountPreferences : undefined}
         >
           <NextShellNavigation>{children}</NextShellNavigation>
         </RootProviders>

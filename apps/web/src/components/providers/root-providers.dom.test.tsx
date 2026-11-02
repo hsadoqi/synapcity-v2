@@ -28,7 +28,7 @@ function SignedInAs() {
 describe('RootProviders', () => {
   it('gives every provider and page below it the current user', () => {
     render(
-      <RootProviders user={null} account={null} deviceTimeZone={null}>
+      <RootProviders user={null} session={{ kind: 'guest' }} look={null}>
         <SignedInAs />
       </RootProviders>,
     );
@@ -38,7 +38,7 @@ describe('RootProviders', () => {
 
   it('renders the app inside it', () => {
     render(
-      <RootProviders user={null} account={null} deviceTimeZone={null}>
+      <RootProviders user={null} session={{ kind: 'guest' }} look={null}>
         <p>App</p>
       </RootProviders>,
     );
@@ -48,7 +48,7 @@ describe('RootProviders', () => {
 
   it('applies the colour mode to the document through a class', () => {
     render(
-      <RootProviders user={null} account={null} deviceTimeZone={null}>
+      <RootProviders user={null} session={{ kind: 'guest' }} look={null}>
         <p>App</p>
       </RootProviders>,
     );
@@ -61,7 +61,7 @@ describe('RootProviders', () => {
 
   it('provides one toast viewport', () => {
     render(
-      <RootProviders user={null} account={null} deviceTimeZone={null}>
+      <RootProviders user={null} session={{ kind: 'guest' }} look={null}>
         <p>App</p>
       </RootProviders>,
     );

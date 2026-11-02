@@ -4,8 +4,10 @@ import { getCallerIdentity, SAVE_FAILED } from '@/lib/access/caller';
 import { logFailure } from '@/lib/log-failure';
 import { createClient } from '@/lib/supabase/server';
 import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
-import type { SavePreferencesResult } from '@synapcity/features-settings/contracts';
-import { accountPreferencesSchema } from '@synapcity/domain-preferences';
+import {
+  accountPreferencesSchema,
+  type SavePreferencesResult,
+} from '@synapcity/domain-preferences';
 import { isSupportedTimezone } from '@synapcity/domain-preferences';
 import { writeAccountPreferenceRow } from '@synapcity/server-account';
 

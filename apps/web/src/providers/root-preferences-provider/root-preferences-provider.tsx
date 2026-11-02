@@ -1,24 +1,27 @@
 'use client';
 
-import { AccountPreferencesSync } from '@synapcity/features-settings/frontend';
 import {
   ModeProvider,
-  RegionalProvider,
+  PreferencesProvider,
+  type SaveAccountPreferences,
 } from '@synapcity/frontend-preferences';
-import type { AccountPreferences } from '@synapcity/domain-preferences';
+import type { Look, PreferencesSession } from '@synapcity/domain-preferences';
 
 /**
- * The person's preferences on every page (ADR-0010). The server layout reads
- * them and passes them in; nothing here fetches.
+ * The person's preferences on every page (ADR-0010): colour mode, and the one
+ * preferences runtime every consumer reads. The server layout reads the
+ * session and the request's look and passes them in; nothing here fetches.
  */
 export const RootPreferencesProvider = ({
   children,
-  account,
-  deviceTimeZone,
+  session,
+  look,
+  saveAccountPreferences,
 }: {
   children: React.ReactNode;
-  account: AccountPreferences | null;
-  deviceTimeZone: string | null;
+  session: PreferencesSession;
+  look: Look | null;
+  saveAccountPreferences?: SaveAccountPreferences;
 }) => {
   return (
     <ModeProvider
@@ -28,15 +31,13 @@ export const RootPreferencesProvider = ({
       disableTransitionOnChange
       shareLook
     >
-      <AccountPreferencesSync preferences={account} />
-      {/* Dates written on the server use the account's settings and its last
-          device zone, so they match the browser's first render. */}
-      <RegionalProvider
-        regional={account?.regional ?? null}
-        deviceTimeZone={deviceTimeZone}
+      <PreferencesProvider
+        session={session}
+        look={look}
+        saveAccountPreferences={saveAccountPreferences}
       >
         {children}
-      </RegionalProvider>
+      </PreferencesProvider>
     </ModeProvider>
   );
 };

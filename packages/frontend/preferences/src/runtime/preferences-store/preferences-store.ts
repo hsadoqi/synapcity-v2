@@ -266,6 +266,7 @@ export function createPreferencesStore(initial: {
   let mode: Mode | null = null;
   let setMode: ((mode: Mode) => void) | null = null;
   let started = false;
+  let applied = false;
 
   // Account saves.
   let generation = 0;
@@ -296,9 +297,12 @@ export function createPreferencesStore(initial: {
     extra: Partial<PreferencesSnapshot> = {},
     persistLocally = true,
   ): PreferencesStatus {
-    const before = snapshot.settings;
+    // The first commit applies everything: the server rendered the request's
+    // look, not necessarily what this browser has saved.
+    const before = applied ? snapshot.settings : null;
     emit({ ...extra, settings: next });
     applyToDocument(before, snapshot.settings);
+    applied = true;
     if (!persistLocally) return { kind: 'idle' };
     return writeLocal(snapshot.settings);
   }

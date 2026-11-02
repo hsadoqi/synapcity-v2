@@ -6,19 +6,19 @@ import { Toaster } from '@synapcity/frontend-ui/core/toast';
 import { NoticeToast } from '@/components/notices/notice-toast';
 
 export const RootUiProviders = ({
-    children,
+  children,
 }: {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }) => {
-    return (
-        <TooltipProvider>
-            {children}
-            <Toaster limit={5} timeout={5000} />
-            {/* useSearchParams needs a Suspense boundary or it opts the route out of
+  return (
+    <TooltipProvider>
+      {children}
+      <Toaster limit={5} timeout={5000} />
+      {/* useSearchParams needs a Suspense boundary or it opts the route out of
           static rendering. Nothing is shown while it waits. */}
-            <Suspense fallback={null}>
-                <NoticeToast />
-            </Suspense>
-        </TooltipProvider>
-    );
+      <Suspense fallback={null}>
+        <NoticeToast />
+      </Suspense>
+    </TooltipProvider>
+  );
 };

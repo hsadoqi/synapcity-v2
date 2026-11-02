@@ -1,12 +1,15 @@
 'use client';
 
-import { configureLookCookie } from '@synapcity/frontend-preferences';
+import {
+  configureLookCookie,
+  type SaveAccountPreferences,
+} from '@synapcity/frontend-preferences';
 import { ErrorReports } from '@synapcity/frontend-error-reports';
 import { RootUiProviders } from '@/providers/root-ui-providers/root-ui-providers';
 import { UserProvider } from '@/providers/user-provider';
 import { RootPreferencesProvider } from '@/providers/root-preferences-provider/root-preferences-provider';
 import { type CurrentUser } from '@synapcity/domain-identity';
-import { type AccountPreferences } from '@synapcity/domain-preferences';
+import type { Look, PreferencesSession } from '@synapcity/domain-preferences';
 
 // One parent domain lets web and docs show the same look; unset keeps it host-only.
 configureLookCookie({
@@ -16,9 +19,14 @@ configureLookCookie({
 type RootProvidersProps = {
   children: React.ReactNode;
   user: CurrentUser | null;
-  account: AccountPreferences | null;
-  deviceTimeZone: string | null;
+  /** Who the preferences belong to, with the account row the server read. */
+  session: PreferencesSession;
+  /** The request's validated look cookie, already rendered on <html>. */
+  look: Look | null;
+  /** The server action that saves the account part; absent when signed out. */
+  saveAccountPreferences?: SaveAccountPreferences;
 };
+
 /**
  * Every client provider the app needs, fed by the server layout. The user is
  * outermost because anything below may read it with `useCurrentUser`.
@@ -26,23 +34,28 @@ type RootProvidersProps = {
 export function RootProviders({
   children,
   user,
-  account,
-  deviceTimeZone,
+  session,
+  look,
+  saveAccountPreferences,
 }: RootProvidersProps) {
   return (
     <UserProvider user={user}>
       <RootPreferencesProvider
-        account={account}
-        deviceTimeZone={deviceTimeZone}
+        session={session}
+        look={look}
+        saveAccountPreferences={saveAccountPreferences}
       >
         <RootUiProviders>{children}</RootUiProviders>
+        {/* Loads nothing unless the person has turned error reports on; it
+            reads that consent from the preferences runtime above. */}
+        <ErrorReports
+          dsn={process.env.NEXT_PUBLIC_SENTRY_DSN}
+          environment={
+            process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.NODE_ENV
+          }
+          release={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA}
+        />
       </RootPreferencesProvider>
-      {/* Loads nothing unless the person has turned error reports on. */}
-      <ErrorReports
-        dsn={process.env.NEXT_PUBLIC_SENTRY_DSN}
-        environment={process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.NODE_ENV}
-        release={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA}
-      />
     </UserProvider>
   );
 }
