@@ -1,4 +1,5 @@
 import {
+  act,
   fireEvent,
   render as renderInto,
   screen,
@@ -12,7 +13,11 @@ const push = vi.hoisted(() => vi.fn());
 
 import { CollectionNavigationProvider } from '../../providers';
 import type { CollectionItem } from '../../types';
-import { CollectionIndex, type CollectionIndexProps } from './collection-index';
+import {
+  CollectionIndex,
+  type CollectionIndexProps,
+  type SetPinnedResult,
+} from './collection-index';
 
 const NOW = '2026-10-10T12:00:00Z';
 
@@ -132,6 +137,50 @@ describe('CollectionIndex', () => {
     expect(await screen.findByText('Not saved. Try again.')).toBeTruthy();
     const panel = screen.getByRole('region', { name: /Favourites/ });
     expect(within(panel).queryByRole('link', { name: 'a' })).toBeNull();
+  });
+
+  it('ends on the second toggle when the first save fails after it', async () => {
+    type Settle = (result: SetPinnedResult) => void;
+    const settles: Settle[] = [];
+    const onSetPinned = vi.fn(
+      () =>
+        new Promise<SetPinnedResult>((resolve) => {
+          settles.push(resolve);
+        }),
+    );
+    renderIndex({ highlightsFrom: 0, onSetPinned });
+    const panel = screen.getByRole('region', { name: /Favourites/ });
+
+    fireEvent.click(
+      screen.getAllByRole('button', { name: 'Actions for a' })[0]!,
+    );
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Pin' }));
+    await waitFor(() =>
+      expect(within(panel).getByRole('link', { name: 'a' })).toBeTruthy(),
+    );
+
+    fireEvent.click(
+      screen.getAllByRole('button', { name: 'Actions for a' })[0]!,
+    );
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Unpin' }));
+    expect(onSetPinned.mock.calls).toEqual([
+      ['a', true],
+      ['a', false],
+    ]);
+
+    await act(async () => {
+      settles[0]!({ ok: false, error: 'Not saved. Try again.' });
+    });
+    await act(async () => {
+      settles[1]!({ ok: true });
+    });
+
+    expect(await screen.findByText('Not saved. Try again.')).toBeTruthy();
+    expect(within(panel).queryByRole('link', { name: 'a' })).toBeNull();
+    fireEvent.click(
+      screen.getAllByRole('button', { name: 'Actions for a' })[0]!,
+    );
+    expect(await screen.findByRole('menuitem', { name: 'Pin' })).toBeTruthy();
   });
 
   it('opens an item from its menu by going to its address', async () => {
