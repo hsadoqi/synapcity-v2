@@ -1,0 +1,11 @@
+-- Restores the intended EXECUTE privilege on public.delete_own_account() for
+-- signed-in users. Forward-only repair: 20261017140000_delete_own_account.sql
+-- grants it, but on 2026-11-02 Production was found without it (its ACL held
+-- only postgres and service_role). No repository migration, test or script
+-- revokes it. The finding is in the T1 release evidence; the deployment-ledger
+-- entry is written at release closeout.
+--
+-- Idempotent: on a database that already has the grant (every fresh build),
+-- this changes nothing. It does not touch anon or public, which stay without
+-- EXECUTE, nor the function's owner, SECURITY DEFINER or search_path.
+grant execute on function public.delete_own_account() to authenticated;

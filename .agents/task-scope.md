@@ -1,3 +1,13 @@
+## Active task: restore EXECUTE on delete_own_account for signed-in users (2026-11-02)
+
+- Goal: a forward-only repair for a privilege found missing on Production during the T1 hosted preflight: `authenticated` lacked EXECUTE on `public.delete_own_account()`, so signed-in users could not delete their own account. `20261017140000_delete_own_account.sql` grants it; no repository migration, test or script revokes it. The finding is in the T1 release evidence; the deployment-ledger entry is written at release closeout on PR #135, not in this change.
+- Interaction mode: implementation and local verification of a narrow hotfix from `main` (owner decision, 2026-11-02). Publication, merge and the Production apply are separately authorized.
+- Base: `main` at `dd69b738700eb327e058e2fa87397a4d651a12d5`, branch `fix/delete-own-account-execute-grant`.
+- Manifest (3 paths): `supabase/migrations/20261102064038_restore_delete_own_account_execute.sql` (created with `supabase migration new`; one statement: `grant execute on function public.delete_own_account() to authenticated;`), `supabase/tests/delete-own-account-privileges.sql` (one overload; authenticated can execute; anon cannot; PUBLIC holds no EXECUTE; owner `postgres`; SECURITY DEFINER with an empty `search_path`; a deliberately weakened revoke is detected; the repair statement restores authenticated only and is idempotent), and this entry.
+- Not changed: every applied migration, including the five `20261030…` versions whose stored statements on Production are the earlier pre-review files; `supabase_migrations.schema_migrations`; generated types (a grant does not change them); `anon` and PUBLIC privileges; the function body, owner, SECURITY DEFINER and `search_path`.
+- Verification (local, disposable stack): Production's state reproduced (18 versions, grant revoked) makes the new test fail; the password-authenticated dry run proposes exactly this one migration with no seeds or roles; after the local push the test passes and a signed-in deletion succeeds (rolled back); `pnpm db:test`, `pnpm db:types --stack` with no diff, `pnpm db:parity --environment local`, `pnpm format:check`.
+- Not authorized here: a direct grant on Production, `migration repair`, editing an applied migration or its history row, applying an unmerged migration, PR #135, the scratch project, hosted V-8 and Vercel.
+
 ## Active task: T1 schema migrations, migration-only unit (2026-11-01)
 
 - Goal: place database release T1's schema on `main` as one reviewed migration-only unit, verified locally, published as one draft pull request. Merging it applies nothing to any hosted database. Gate 0, topology step 3 of the consolidated-audit release plan.
