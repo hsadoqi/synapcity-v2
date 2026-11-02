@@ -1,7 +1,7 @@
 'use client';
 
 import { localStartsAt } from '@synapcity/domain-prototypes';
-import { FormDialog as EntityFormDialog } from '@synapcity/frontend-forms';
+import { FormDialog } from '@synapcity/frontend-forms';
 
 import { agendaEventForm } from './agenda-event-form';
 
@@ -9,7 +9,7 @@ import { agendaEventForm } from './agenda-event-form';
 const DEFAULT_START = '09:00';
 
 /**
- * Adds an event: `EntityFormDialog` around the Add event form. The day it
+ * Adds an event: `FormDialog` around the Add event form. The day it
  * opens on is the one the agenda shows. A date and time that do not make a
  * real moment fail the save, which the form reports without the error's text.
  */
@@ -26,7 +26,7 @@ export function AgendaEventDialog({
   onAdd: (name: string, startsAt: string) => void;
 }) {
   return (
-    <EntityFormDialog
+    <FormDialog
       mode="create"
       entityName="event"
       submitLabel="Add event"
