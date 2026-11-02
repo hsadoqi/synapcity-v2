@@ -8,7 +8,7 @@ import { DayAgenda, type TimeSlot } from '@synapcity/frontend-blocks';
 import { toCalendarDate } from '@synapcity/frontend-ui/lib/calendar-utils';
 import { useState } from 'react';
 
-import { eventTimeFormat } from '../../utils/time-format';
+import { useEventTime } from '../../utils/time-format';
 import { WidgetEmpty } from '../widget-states';
 
 /**
@@ -29,6 +29,7 @@ export function AgendaBody({
   day?: string;
   onDayChange?: (day: string) => void;
 }) {
+  const eventTime = useEventTime();
   const [ownDay, setOwnDay] = useState(() => toCalendarDate(new Date(now)));
   const day = controlledDay ?? ownDay;
   const setDay = (next: string) => {
@@ -37,7 +38,7 @@ export function AgendaBody({
   };
   const slots: TimeSlot[] = eventsOnDay(events, day).map((event) => ({
     id: event.id,
-    start: eventTimeFormat.format(Date.parse(event.startsAt)),
+    start: eventTime(Date.parse(event.startsAt)),
     label: event.name,
     // Events carry no kind yet, so every one reads as a meeting.
     tone: 'meeting',

@@ -4,7 +4,7 @@ import {
   type PrototypeRecords,
 } from '@synapcity/domain-prototypes';
 
-import { eventTimeFormat } from '../../utils/time-format';
+import { useEventTime } from '../../utils/time-format';
 import { WEEKDAY_SHORT } from '../../utils/weekdays';
 import { WidgetEmpty } from '../widget-states';
 
@@ -15,6 +15,7 @@ export function CalendarBody({
   events: PrototypeRecords['event'];
   now: number;
 }) {
+  const eventTime = useEventTime();
   const week = eventsThisWeek(events, now);
   if (week.length === 0)
     return <WidgetEmpty>Nothing scheduled this week.</WidgetEmpty>;
@@ -36,7 +37,7 @@ export function CalendarBody({
                 className="text-xs text-muted-foreground"
                 dateTime={event.startsAt}
               >
-                {eventTimeFormat.format(startsAt)}
+                {eventTime(startsAt)}
               </time>
             </div>
           </li>

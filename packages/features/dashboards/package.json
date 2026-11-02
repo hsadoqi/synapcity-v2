@@ -21,8 +21,10 @@
   "dependencies": {
     "@synapcity/domain-dashboards": "workspace:*",
     "@synapcity/domain-grids": "workspace:*",
+    "@synapcity/domain-preferences": "workspace:*",
     "@synapcity/domain-prototypes": "workspace:*",
     "@synapcity/frontend-forms": "workspace:*",
+    "@synapcity/frontend-preferences": "workspace:*",
     "@synapcity/frontend-blocks": "workspace:*",
     "@synapcity/frontend-ui": "workspace:*",
     "lucide-react": "^1.55.0",

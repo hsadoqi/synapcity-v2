@@ -1,4 +1,6 @@
 import type { Metric } from '@synapcity/domain-prototypes';
+import { formatNumber } from '@synapcity/domain-preferences';
+import { useNumberFormat } from '@synapcity/frontend-preferences';
 import { Input } from '@synapcity/frontend-ui/core/input';
 
 /** Commits on blur or Enter; an empty or non-numeric entry is ignored. */
@@ -9,6 +11,7 @@ export function StatBody({
   metric: Metric;
   onValueChange?: (value: number) => void;
 }) {
+  const numberFormat = useNumberFormat();
   return (
     <div className="flex flex-col gap-1">
       <span className="text-xs text-muted-foreground">{metric.unit}</span>
@@ -35,7 +38,7 @@ export function StatBody({
               }}
             />
           ) : (
-            metric.value.toLocaleString()
+            formatNumber(metric.value, numberFormat)
           )}
         </span>
         <span className="text-sm text-success">{metric.note}</span>

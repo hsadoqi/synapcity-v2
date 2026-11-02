@@ -1,1 +1,1 @@
-export { eventTimeFormat } from './time-format';
+export { useEventTime } from './time-format';
