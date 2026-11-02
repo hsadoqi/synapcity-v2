@@ -272,7 +272,8 @@ describe('B-2: deleting the heavy account (V-8)', () => {
       await withTwoUsers(async (a) => {
         await withSessions(2, async ([admin, client]) => {
           fixture = await seedHeavyAccount(admin!, a);
-          await admin!.run('checkpoint'); // the seed's dirty pages are written out first
+          // No forced CHECKPOINT: the budget does not require one, and the
+          // postgres role cannot run it. Background checkpoints still happen.
           await asUser(client!, a, true);
 
           const started = performance.now();
@@ -305,8 +306,9 @@ describe('B-2: deleting the heavy account (V-8)', () => {
       standardDeviation: r(s.sd),
       limitMs: B2_LIMIT_MS,
       statementTimeoutMs: LOCAL_STATEMENT_TIMEOUT_MS,
+      checkpointMode: 'not-requested',
       stack:
-        'seeded and deleted within one stack lifetime; one warm-up run preceded; shared_buffers 128MB; pages recently written (warm), cold cache not measured',
+        'seeded and deleted within one stack lifetime; one warm-up run preceded; no forced PostgreSQL checkpoint is requested (background checkpoints are uncontrolled environment behavior); shared_buffers 128MB; cold cache not measured',
       environment: environment(await serverVersion()),
     });
     expect(s.max).toBeLessThanOrEqual(B2_LIMIT_MS);
