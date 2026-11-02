@@ -1,5 +1,8 @@
 import {
   displaySchema,
+  parseCacheOwner,
+  serializeCacheOwner,
+  type CacheOwner,
   type DisplaySettings,
 } from '@synapcity/domain-preferences';
 import {
@@ -19,6 +22,12 @@ import {
  * override is in effect, so turning the override off restores them.
  */
 const DEVICE_DISPLAY_KEY = 'synapcity-device-display';
+
+/**
+ * Whose choices the stored document holds (see `CacheOwner`). Kept beside the
+ * document, so the document's own bytes stay in the shape boot scripts read.
+ */
+export const PREFERENCES_OWNER_KEY = 'synapcity-preferences-owner';
 
 /** The stored preferences document as saved, or null when there is none. */
 export function readStoredPreferences(): string | null {
@@ -58,6 +67,15 @@ export function onStoredPreferencesChange(listener: () => void): () => void {
     window.removeEventListener('storage', listener);
     window.removeEventListener(PREFERENCES_SAVED_EVENT, listener);
   };
+}
+
+/** The document's owner, or null when unmarked (legacy) or unreadable. Throws like localStorage. */
+export function readCacheOwner(): CacheOwner | null {
+  return parseCacheOwner(localStorage.getItem(PREFERENCES_OWNER_KEY));
+}
+
+export function writeCacheOwner(owner: CacheOwner): void {
+  localStorage.setItem(PREFERENCES_OWNER_KEY, serializeCacheOwner(owner));
 }
 
 export function readDeviceDisplay(): DisplaySettings | null {

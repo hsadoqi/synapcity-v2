@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { FontChoice, Look } from '@synapcity/domain-preferences';
+import type { ResolvedMode } from '../../types';
 import {
   fontPreferenceVariables,
   fontStack,
@@ -9,7 +10,7 @@ type LookStyle = CSSProperties & Record<string, string | number | undefined>;
 
 export type LookHtmlAttributes = {
   'data-synapcity-look': string;
-  className?: 'light' | 'dark';
+  className?: ResolvedMode;
   'data-animations': string;
   'data-borders': string;
   'data-contrast': string;
