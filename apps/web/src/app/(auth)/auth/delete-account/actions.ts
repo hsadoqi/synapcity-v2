@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 import type { DeleteAccountState } from '@synapcity/features-auth/contracts';
 import { removeOldAvatars } from '@/features/account/server/save-avatar';
 import { deleteOwnAccount } from '@/features/auth/server/operations';
+import { clearAccountLook } from '@/features/settings/server/account-look';
 import { withNotice } from '@/lib/routing/notices';
 import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 
@@ -31,6 +32,8 @@ export async function confirmAccountDeletion(
 
   switch (outcome.kind) {
     case 'deleted':
+      // The account's fonts and radius leave with it.
+      await clearAccountLook();
       revalidatePath('/', 'layout');
       return redirect(withNotice('/auth/login', 'account-deleted'));
     case 'link-required':

@@ -14,7 +14,7 @@ import { settingsDefaults } from '../../schemas';
 import { mergeSettings } from '../merge-settings';
 import { reconcile } from '../reconcile';
 import type { AccountPreferences } from '../scope';
-import { displaySchema } from '../scope';
+import { accountPart, displaySchema, withAccount } from '../scope';
 
 /** Light, dark, or follow the system. */
 export const lookModes = themeSchema.shape.mode.options;
@@ -67,17 +67,33 @@ export function lookOf(settings: Settings): Look {
   };
 }
 
+/** The settings a look stands for, with every other field at its default. */
+function settingsOfLook(look: Look): Settings {
+  return mergeSettings(settingsDefaults, {
+    theme: look.theme,
+    appearance: { ...look.appearance, colorScheme: look.theme.mode },
+  });
+}
+
 /** Applies account-owned look fields over the device look for server rendering. */
 export function lookWithAccount(
   look: Look | null,
   account: AccountPreferences | null,
 ): Look | null {
   if (!look || !account) return look;
-  const local = mergeSettings(settingsDefaults, {
-    theme: look.theme,
-    appearance: { ...look.appearance, colorScheme: look.theme.mode },
-  });
-  return lookOf(reconcile(local, account, null).settings);
+  return lookOf(reconcile(settingsOfLook(look), account, null).settings);
+}
+
+/**
+ * The look with every account-owned field (fonts, radius) back at its
+ * default and the device's own fields kept: what a signed-out browser should
+ * carry, so the next page does not draw the last person's taste. The same
+ * reset the browser runtime applies to its cache (`resolveSession`).
+ */
+export function lookWithoutAccount(look: Look): Look {
+  return lookOf(
+    withAccount(settingsOfLook(look), accountPart(settingsDefaults)),
+  );
 }
 
 /** The look from untrusted input, or null for anything invalid or not version 1. */

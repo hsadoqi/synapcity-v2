@@ -31,6 +31,7 @@ import { field } from '@/features/auth/server/form-data';
 import { homePathFor, settingsPathFor } from '@/lib/routing/user-paths';
 import { withNotice } from '@/lib/routing/notices';
 import { getOrigin } from '@/features/auth/server/site-origin';
+import { clearAccountLook } from '@/features/settings/server/account-look';
 import { safeNextPath } from '@/lib/routing/safe-next';
 import { createClient } from '@/lib/supabase/server';
 import { logFailure } from '@/lib/log-failure';
@@ -297,6 +298,8 @@ export async function signOut(): Promise<void> {
       outcome.thrown ? { thrown: true } : undefined,
     );
   }
+  // The next page is drawn for a guest: without this person's fonts and radius.
+  await clearAccountLook();
 
   revalidatePath('/', 'layout');
   redirect('/');

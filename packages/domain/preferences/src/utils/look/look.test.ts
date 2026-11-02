@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { accountPart } from '../scope';
 import { settingsDefaults, type Settings } from '../../schemas';
-import { lookOf, lookWithAccount, parseLook } from './look';
+import { lookOf, lookWithAccount, lookWithoutAccount, parseLook } from './look';
 
 const withPrivateValues = (): Settings => ({
   ...settingsDefaults,
@@ -141,5 +141,37 @@ describe('look', () => {
   it('ignores keys it does not know', () => {
     const good = lookOf(settingsDefaults);
     expect(parseLook({ ...good, extra: 1 })).toEqual(good);
+  });
+});
+
+describe('lookWithoutAccount', () => {
+  it('resets the account-owned fields and keeps the device’s own', () => {
+    const signedIn: Settings = {
+      ...settingsDefaults,
+      theme: {
+        ...settingsDefaults.theme,
+        mode: 'dark',
+        density: 'compact',
+        textSize: 110,
+        radius: 'sharp',
+        headingFont: 'lora',
+        bodyFont: 'lora',
+        codeFont: 'fira-code',
+      },
+      appearance: { ...settingsDefaults.appearance, showBorders: true },
+    };
+    const guest = lookWithoutAccount(lookOf(signedIn));
+    expect(guest.theme).toEqual({
+      ...lookOf(settingsDefaults).theme,
+      mode: 'dark',
+      density: 'compact',
+      textSize: 110,
+    });
+    expect(guest.appearance.showBorders).toBe(true);
+  });
+
+  it('leaves a look that holds no account choice unchanged', () => {
+    const look = lookOf(settingsDefaults);
+    expect(lookWithoutAccount(look)).toEqual(look);
   });
 });
