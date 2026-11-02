@@ -1,3 +1,4 @@
+import { AuthApiError, AuthRetryableFetchError } from '@supabase/supabase-js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const getClaims = vi.fn();
@@ -77,11 +78,28 @@ describe('requireSignedIn', () => {
     expect(digest).not.toContain('next=');
   });
 
-  it('treats a failed claims read as signed out', async () => {
-    getClaims.mockResolvedValue({ data: null, error: new Error('expired') });
+  it('treats a refresh the Auth service refused as signed out', async () => {
+    getClaims.mockResolvedValue({
+      data: null,
+      error: new AuthApiError('gone', 400, 'refresh_token_not_found'),
+    });
 
     expect(await failure()).toContain('/auth/login');
   });
+
+  it.each([
+    ['a dropped connection', new AuthRetryableFetchError('fetch failed', 0)],
+    ['a failure without a code', new Error('expired')],
+  ])(
+    'does not redirect to sign in during an outage (%s)',
+    async (_n, error) => {
+      getClaims.mockResolvedValue({ data: null, error });
+
+      await expect(requireSignedIn()).rejects.toMatchObject({
+        name: 'AuthUnavailableError',
+      });
+    },
+  );
 
   describe('in development fixture mode', () => {
     beforeEach(() => {

@@ -24,8 +24,8 @@ import {
   ActionsToolbar,
   type ToolbarAction,
   type ToolbarSettings,
-} from '@synapcity/frontend-ui/blocks/actions-toolbar';
-import { SettingsView } from '@synapcity/frontend-ui/blocks/settings-view';
+} from '@synapcity/frontend-blocks';
+import { SettingsView } from '@synapcity/frontend-blocks';
 import { Button } from '@synapcity/frontend-ui/core/button';
 import {
   ResizableHandle,
@@ -33,12 +33,10 @@ import {
   ResizablePanelGroup,
 } from '@synapcity/frontend-ui/core/resizable';
 
-/**
- * Opening and closing glide for this long. It is a CSS transition on the
- * panel's flex-grow, switched on only around a button, Escape or outside-click
- * toggle: a drag must follow the pointer, so it never animates.
- */
-const GLIDE_MS = 200;
+import { useKeyboardShortcut } from '@synapcity/frontend-ui/hooks/use-keyboard-shortcut';
+
+import { GLIDE_MS } from '../../../utils/panel-motion';
+import { CLOSE_PANEL_SHORTCUT } from '../../../utils/shortcuts';
 
 const OVERLAYS =
   '[role="menu"], [role="dialog"], [role="alertdialog"], [role="listbox"], [data-slot="popover-content"]';
@@ -212,11 +210,17 @@ export function GlobalPanelShell({
         return;
       close();
     };
-    const escape = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape' || event.defaultPrevented || event.isComposing)
-        return;
-      // Capture observes open layers before their own handlers remove them.
-      // Menus/dialogs consume the first Escape; the panel gets the next one.
+    document.addEventListener('pointerdown', outside);
+    return () => document.removeEventListener('pointerdown', outside);
+  }, [open, locked, close]);
+
+  // Escape closes the panel only once nothing nearer has used it: a control
+  // in the panel, or a Base UI menu or dialog, which marks the Escape it
+  // closes on. A layer that does not mark it is still open in the DOM here,
+  // so the panel leaves that Escape to it too and waits for the next.
+  useKeyboardShortcut(
+    CLOSE_PANEL_SHORTCUT,
+    () => {
       const overlayOpen = [
         ...document.querySelectorAll<HTMLElement>(OVERLAYS),
       ].some(
@@ -227,17 +231,11 @@ export function GlobalPanelShell({
           getComputedStyle(element).display !== 'none' &&
           getComputedStyle(element).visibility !== 'hidden',
       );
-      if (overlayOpen) return;
-      event.preventDefault();
+      if (overlayOpen) return false;
       close();
-    };
-    document.addEventListener('pointerdown', outside);
-    document.addEventListener('keydown', escape, true);
-    return () => {
-      document.removeEventListener('pointerdown', outside);
-      document.removeEventListener('keydown', escape, true);
-    };
-  }, [open, locked, close]);
+    },
+    { enabled: open && !locked, allowInEditable: true },
+  );
 
   return (
     <PanelContext.Provider value={{ id: panelId, open, toggle, setTrigger }}>

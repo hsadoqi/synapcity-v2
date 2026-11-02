@@ -2,18 +2,18 @@ export type {
   AsyncFieldCheckContext,
   AsyncFieldValidation,
   ConditionOperator,
-  CustomFieldConfig,
   DependencyEffect,
   FieldCondition,
-  FieldConfig,
   FieldDependency,
-  FieldGroup,
+  FieldOption,
+} from './field-base';
+export type {
+  CustomFieldConfig,
+  FieldConfig,
   DateRangeFieldConfig,
   DateTimeFieldConfig,
-  FieldOption,
   FileFieldConfig,
   InputMode,
-  FormRule,
   MultiSelectFieldConfig,
   NumberFieldConfig,
   PasswordFieldConfig,
@@ -26,10 +26,15 @@ export type {
 } from './field-config';
 export type {
   DefineFormInput,
-  FieldNamesOf,
-  FieldState,
   FormDefinition,
   FormDefinitionIssue,
   FormDefinitionIssueCode,
 } from './form-definition';
-export type { FieldRenderer, FieldRendererProps } from './field-renderer';
+export type {
+  FieldRenderer,
+  FieldRendererProps,
+  FieldNamesOf,
+  FieldState,
+  FieldGroup,
+  FormRule,
+} from './field-renderer';

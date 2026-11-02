@@ -5,6 +5,7 @@ vi.mock('@synapcity/frontend-error-reports', () => ({
   reportCaughtError: vi.fn(),
 }));
 
+import { CollectionLoadError } from './collection-load-error';
 import { NotFoundMessage } from './not-found-message';
 import { RouteErrorMessage } from './route-error-message';
 
@@ -26,5 +27,44 @@ describe('the route messages', () => {
     ).toBeTruthy();
     expect(container.querySelector('[data-slot$="shell"]')).toBeNull();
     expect(container.querySelector('main')).toBeNull();
+  });
+
+  it('moves focus to the error heading that appeared, never another message on the page', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    render(
+      <>
+        <NotFoundMessage />
+        <RouteErrorMessage error={new Error('x')} retry={() => {}} />
+      </>,
+    );
+
+    expect(document.activeElement).toBe(
+      screen.getByRole('heading', { name: 'Something went wrong' }),
+    );
+  });
+
+  it('leaves focus alone for a page that was navigated to', () => {
+    render(<NotFoundMessage />);
+    expect(document.activeElement).toBe(document.body);
+  });
+});
+
+describe('the collection load error', () => {
+  it('names the collection that failed and offers a retry', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const retry = vi.fn();
+    render(
+      <CollectionLoadError
+        collection="dashboards"
+        error={new Error('x')}
+        retry={retry}
+      />,
+    );
+
+    expect(
+      screen.getByRole('heading', { name: "Your dashboards didn't load" }),
+    ).toBeTruthy();
+    screen.getByRole('button', { name: 'Try again' }).click();
+    expect(retry).toHaveBeenCalledTimes(1);
   });
 });

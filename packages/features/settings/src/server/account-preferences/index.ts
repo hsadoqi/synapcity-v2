@@ -1,1 +1,1 @@
-export { loadSettingsAccountPreferences } from './account-preferences';
+export * from './account-preferences';

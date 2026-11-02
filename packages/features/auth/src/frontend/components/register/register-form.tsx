@@ -76,7 +76,14 @@ export function RegisterForm({
         {...register('password')}
       />
       <FormMessage id={messageId} state={shown} />
-      <Button type="submit" size="lg" disabled={pending} aria-busy={pending}>
+      {/* Stays in the tab order while pending, announced as unavailable. */}
+      <Button
+        type="submit"
+        size="lg"
+        disabled={pending}
+        focusableWhenDisabled
+        aria-busy={pending}
+      >
         {pending ? 'Creating account…' : 'Create account'}
       </Button>
     </form>

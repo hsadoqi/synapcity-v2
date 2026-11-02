@@ -1,5 +1,10 @@
 import { expect, test, type Page } from '@playwright/test';
 
+import {
+  FIXTURE_DASHBOARD_PROJECT_STATUS,
+  FIXTURE_DOCUMENT_LAUNCH_PLAN,
+} from './support/fixture-paths';
+
 // Geometric containment of a resource page in the signed-in shell: each
 // box lies inside its parent's box and inside the window, not only "the page
 // does not scroll sideways", which a centred, clipped frame passes (GitHub
@@ -18,8 +23,8 @@ test.describe('resource page containment in the shell', () => {
   );
 
   const PAGES = {
-    Document: '/fixture-user/home/documents/fixture-document-launch-plan',
-    Dashboard: '/fixture-user/home/dashboards/fixture-dashboard-project-status',
+    Document: FIXTURE_DOCUMENT_LAUNCH_PLAN,
+    Dashboard: FIXTURE_DASHBOARD_PROJECT_STATUS,
   } as const;
 
   // The multi-word name is over 150 characters, as in the measured failure.

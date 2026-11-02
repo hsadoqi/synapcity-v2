@@ -6,7 +6,7 @@ import {
   renderWithSettings,
   stubBrowser,
 } from '../../testing';
-import { themeDraftStorageKey } from '../../hooks/use-theme-draft';
+import { themeDraftStorageKey } from '../../hooks/use-visuals/use-theme-draft';
 
 const THEME_DRAFT_STORAGE_KEY = themeDraftStorageKey();
 import { ThemeSettings } from './index';
@@ -176,7 +176,16 @@ describe('ThemeSettings', () => {
     await renderWithSettings(<ThemeSettings />);
     const leave = () => {
       const event = new Event('beforeunload', { cancelable: true });
+      // Chrome and Edge before 119, inside Next's default targets, ask only
+      // when returnValue is set; the rest ask on preventDefault.
+      let returnValueSet = false;
+      Object.defineProperty(event, 'returnValue', {
+        set: () => {
+          returnValueSet = true;
+        },
+      });
       window.dispatchEvent(event);
+      expect(returnValueSet).toBe(event.defaultPrevented);
       return event.defaultPrevented;
     };
     expect(leave()).toBe(false);

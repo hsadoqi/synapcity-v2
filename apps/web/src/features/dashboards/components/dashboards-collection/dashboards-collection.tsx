@@ -1,11 +1,11 @@
 import { CollectionPage } from '@synapcity/frontend-collection';
-import type { OwnedRecordSummary } from '@synapcity/domain-records';
+import type { RecordSummary } from '@/lib/records/record-summary';
 
 import { DASHBOARDS_INTRO, DASHBOARDS_TITLE } from './dashboards-copy';
 import { DashboardsIndex } from './dashboards-index';
 
 interface DashboardsCollectionProps {
-  dashboards: OwnedRecordSummary[];
+  dashboards: RecordSummary[];
   userId: string;
 }
 

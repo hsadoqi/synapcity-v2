@@ -1,7 +1,6 @@
 'use client';
 
-import { SectionHeading } from '@synapcity/frontend-ui/components/section-heading';
-import { EmptyNote } from '@synapcity/frontend-ui/components/empty-note';
+import { SectionHeading, EmptyNote } from '@synapcity/frontend-blocks';
 
 import type { CollectionItem } from '../../types';
 import { ItemActionsMenu } from '../item-actions-menu';

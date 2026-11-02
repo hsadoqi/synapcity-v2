@@ -332,6 +332,55 @@ describe('EmailChange', () => {
     });
     afterEach(() => {
       vi.useRealTimers();
+      // Back to jsdom's own value, so no test inherits a hidden tab.
+      delete (document as { visibilityState?: unknown }).visibilityState;
+    });
+
+    const setVisibility = (value: DocumentVisibilityState) =>
+      act(() => {
+        Object.defineProperty(document, 'visibilityState', {
+          configurable: true,
+          value,
+        });
+        document.dispatchEvent(new Event('visibilitychange'));
+      });
+
+    it('skips its regular look while the tab is hidden', () => {
+      show(NEW);
+      setVisibility('hidden');
+
+      act(() => {
+        vi.advanceTimersByTime(60_000);
+      });
+
+      expect(mocks.refresh).not.toHaveBeenCalled();
+    });
+
+    it('looks once on return, then keeps its regular pace without piling up timers', () => {
+      show(NEW);
+      setVisibility('hidden');
+      setVisibility('visible');
+      setVisibility('hidden');
+      setVisibility('visible');
+      expect(mocks.refresh).toHaveBeenCalledTimes(2);
+      mocks.refresh.mockClear();
+
+      act(() => {
+        vi.advanceTimersByTime(15_000);
+      });
+      expect(mocks.refresh).toHaveBeenCalledTimes(1);
+    });
+
+    it('stops looking when it goes away', () => {
+      const { unmount } = show(NEW);
+      unmount();
+
+      act(() => {
+        vi.advanceTimersByTime(60_000);
+      });
+      setVisibility('visible');
+
+      expect(mocks.refresh).not.toHaveBeenCalled();
     });
 
     it('looks again on its own while a change waits', () => {

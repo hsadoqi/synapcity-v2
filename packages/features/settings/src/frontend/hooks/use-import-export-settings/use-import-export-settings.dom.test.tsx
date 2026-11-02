@@ -14,7 +14,7 @@ import { stubBrowser } from '../../testing';
 import { SettingsProvider } from '../../providers/settings-provider';
 import { settingsDefaults } from '@synapcity/domain-preferences';
 import { useImportExportSettings } from './use-import-export-settings';
-import { useSettings } from '../use-settings';
+import { useSettings } from '../use-settings-lifecycle/use-settings';
 
 const wrapper = ({ children }: { children: ReactNode }) => (
   <ModeProvider attribute="class" defaultTheme="system" enableSystem>

@@ -1,13 +1,10 @@
 import {
   fromTransferFile,
+  isPlainObject,
   TRANSFER_FILE_VERSION,
 } from '@synapcity/domain-preferences';
 import { parseImportPatch } from '@synapcity/domain-preferences';
 import type { ImportResult } from '../../types';
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
 
 export async function importFile(
   file: Pick<File, 'name' | 'size' | 'text'>,
@@ -20,7 +17,7 @@ export async function importFile(
 
     const contents: unknown = JSON.parse(await file.text());
     if (
-      isRecord(contents) &&
+      isPlainObject(contents) &&
       typeof contents.version === 'number' &&
       contents.version > TRANSFER_FILE_VERSION
     ) {
@@ -32,7 +29,7 @@ export async function importFile(
     // Consent is given in the Data privacy tab, where its wording is shown. A
     // file can neither grant nor withdraw it.
     const input = fromTransferFile(contents);
-    const hadPrivacy = isRecord(input) && Object.hasOwn(input, 'privacy');
+    const hadPrivacy = isPlainObject(input) && Object.hasOwn(input, 'privacy');
     let preferences = input;
     if (hadPrivacy) {
       const { privacy: _privacy, ...rest } = input;

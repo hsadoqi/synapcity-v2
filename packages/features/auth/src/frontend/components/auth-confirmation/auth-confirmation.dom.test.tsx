@@ -2,34 +2,44 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { AuthConfirmation } from './auth-confirmation';
-import { AUTH_HEADING_ID } from '../auth-shell';
+import { AuthShell } from '../auth-shell';
 
 function Page({ message }: { message: string }) {
   return (
-    <>
-      <h1 id={AUTH_HEADING_ID} tabIndex={-1}>
-        Check your email
-      </h1>
+    <AuthShell title="Check your email">
       <AuthConfirmation message={message} email="a@b.co" />
-    </>
+    </AuthShell>
   );
 }
+
+const heading = () => screen.getByRole('heading', { name: 'Check your email' });
 
 describe('AuthConfirmation', () => {
   it('moves focus to the page heading when it appears', () => {
     render(<Page message="Link sent" />);
-    expect(document.activeElement).toBe(
-      document.getElementById(AUTH_HEADING_ID),
+    expect(document.activeElement).toBe(heading());
+  });
+
+  it('moves focus to the heading of its own card, not another on the page', () => {
+    render(
+      <>
+        <AuthShell title="Sign in" />
+        <Page message="Link sent" />
+      </>,
     );
+    expect(document.activeElement).toBe(heading());
+  });
+
+  it('moves no focus outside a card', () => {
+    render(<AuthConfirmation message="Link sent" email="a@b.co" />);
+    expect(document.activeElement).toBe(document.body);
   });
 
   it('moves focus back to the heading when a new message arrives', () => {
     const { rerender } = render(<Page message="Link sent" />);
     (document.activeElement as HTMLElement).blur();
     rerender(<Page message="Link sent again" />);
-    expect(document.activeElement).toBe(
-      document.getElementById(AUTH_HEADING_ID),
-    );
+    expect(document.activeElement).toBe(heading());
   });
 
   it('announces the message and the address as a status', () => {

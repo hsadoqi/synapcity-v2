@@ -6,11 +6,12 @@
   "exports": {
     ".": "./src/index.ts",
     "./prototype-workspace": "./src/prototype-workspace.ts",
-    "./data/*": "./seed/*.json"
+    "./data/*": "./seed/*.json",
+    "./scenarios": "./src/scenarios/index.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit",
-    "generate": "node src/generate-seed.ts",
+    "generate": "SEED_GENERATE=1 vitest run src/generate-seed.test.ts",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage"
   },
@@ -18,8 +19,8 @@
     "@faker-js/faker": "10.6.0",
     "@synapcity/domain-dashboards": "workspace:*",
     "@synapcity/domain-prototypes": "workspace:*",
-    "@synapcity/domain-spaces": "workspace:*",
-    "lucide-react": "^1.55.0"
+    "@synapcity/domain-records": "workspace:*",
+    "@synapcity/domain-spaces": "workspace:*"
   },
   "devDependencies": {
     "@synapcity/dev-typescript-config": "workspace:*",

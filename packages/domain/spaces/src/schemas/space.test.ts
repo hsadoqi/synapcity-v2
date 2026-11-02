@@ -1,6 +1,9 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 
 import type { CreateSpaceInput, SpaceEntity, UpdateSpaceInput } from '../types';
+import { editableFieldsOf, RECORD_MESSAGES } from '@synapcity/domain-records';
+import { limitVectorMismatches } from '@synapcity/domain-records/testing';
+
 import { createSpaceSchema, spaceSchema, updateSpaceSchema } from './index';
 
 const savedSpace = {
@@ -161,18 +164,15 @@ describe('spaceSchema contract', () => {
     ]);
   });
 
-  it('reports the Space message for a blank name and a bad icon', () => {
+  it('uses the neutral base contract when validating saved records', () => {
     const result = spaceSchema.safeParse({
       ...savedSpace,
       name: '   ',
       icon: 'Pen Line',
     });
     expect(result.success).toBe(false);
-    expect(result.error?.issues.map((i) => i.message)).toEqual(
-      expect.arrayContaining([
-        'Enter a space name.',
-        'Use a Lucide icon name.',
-      ]),
+    expect(result.error?.issues.map((i) => i.message)).not.toContain(
+      'Enter a space name.',
     );
   });
 });
@@ -192,16 +192,11 @@ describe('Space input schemas', () => {
     expectTypeOf(input).toEqualTypeOf<CreateSpaceInput>();
   });
 
-  it.each(['name', 'icon', 'tags'])('requires %s for creation', (field) => {
-    const input: Record<string, unknown> = {
+  it('requires only a name for creation; storage supplies icon and tags defaults', () => {
+    expect(createSpaceSchema.parse({ name: 'Reading' })).toEqual({
       name: 'Reading',
-      icon: 'book-open',
-      tags: [],
-    };
-    delete input[field];
-    const result = createSpaceSchema.safeParse(input);
-    expect(result.success).toBe(false);
-    if (!result.success) expect(result.error.issues[0]?.path).toEqual([field]);
+    });
+    expect(createSpaceSchema.safeParse({}).success).toBe(false);
   });
 
   it('updates individual fields and can clear tags', () => {
@@ -221,9 +216,44 @@ describe('Space input schemas', () => {
     );
   });
 
-  it('removes server-managed fields from parsed create and update inputs', () => {
+  it('refuses server-managed fields instead of dropping them', () => {
+    expect(createSpaceSchema.safeParse(savedSpace).success).toBe(false);
+    expect(updateSpaceSchema.safeParse(savedSpace).success).toBe(false);
+  });
+
+  it('accepts a saved Space once projected to its editable fields', () => {
     const editable = { name: 'Writing', icon: 'pen-line', tags: ['writing'] };
-    expect(createSpaceSchema.parse(savedSpace)).toEqual(editable);
-    expect(updateSpaceSchema.parse(savedSpace)).toEqual(editable);
+    expect(editableFieldsOf(savedSpace)).toEqual(editable);
+    expect(createSpaceSchema.parse(editableFieldsOf(savedSpace))).toEqual(
+      editable,
+    );
+  });
+
+  it('refuses an empty update', () => {
+    expect(updateSpaceSchema.safeParse({}).success).toBe(false);
+  });
+
+  it('reports one Space message for a blank name', () => {
+    expect(
+      createSpaceSchema
+        .safeParse({ name: '  ', icon: 'folder', tags: [] })
+        .error?.issues.map((i) => i.message),
+    ).toEqual(['Enter a space name.']);
+  });
+});
+
+describe('Space write schemas keep every shared record rule', () => {
+  it.each([
+    ['createSpaceSchema', createSpaceSchema],
+    ['updateSpaceSchema', updateSpaceSchema],
+  ])('%s answers every shared limit vector as the base does', (_n, schema) => {
+    expect(limitVectorMismatches(schema)).toEqual([]);
+  });
+});
+
+describe('spaceSchema id', () => {
+  it('says the record message for a missing id', () => {
+    const result = spaceSchema.safeParse({ ...savedSpace, id: '' });
+    expect(result.error?.issues[0]?.message).toBe(RECORD_MESSAGES.missingId);
   });
 });

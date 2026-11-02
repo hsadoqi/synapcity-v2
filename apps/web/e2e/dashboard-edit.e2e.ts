@@ -1,5 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
 
+import {
+  escapeRegExp,
+  FIXTURE_DASHBOARD_PROJECT_STATUS,
+  FIXTURE_DASHBOARD_READING_PROGRESS,
+  FIXTURE_HOME,
+} from './support/fixture-paths';
+
 // Editing a dashboard (Slice 4), against the development fixture identity.
 // Fixture mode has no database, so the canvas keeps its composition in this
 // browser: these tests prove the interface (adding, moving, removing,
@@ -13,8 +20,7 @@ test.describe('editing a dashboard', () => {
     'Requires the existing development fixture identity and a development server',
   );
 
-  const DASHBOARD =
-    '/fixture-user/home/dashboards/fixture-dashboard-reading-progress';
+  const DASHBOARD = FIXTURE_DASHBOARD_READING_PROGRESS;
 
   async function openEmpty(page: Page) {
     await page.goto(DASHBOARD);
@@ -51,7 +57,9 @@ test.describe('editing a dashboard', () => {
     // Pinned fixture records are linked, as pages the person can open.
     await expect(widget.getByRole('link').first()).toHaveAttribute(
       'href',
-      /\/fixture-user\/home\/(spaces|documents|dashboards)\//,
+      new RegExp(
+        `${escapeRegExp(FIXTURE_HOME)}/(spaces|documents|dashboards)/`,
+      ),
     );
     await expect(page.getByText('Saved', { exact: true })).toBeVisible();
 
@@ -386,9 +394,7 @@ test.describe('editing a dashboard', () => {
   test('a seeded fixture dashboard opens with its widgets and writes nothing until edited', async ({
     page,
   }) => {
-    await page.goto(
-      '/fixture-user/home/dashboards/fixture-dashboard-project-status',
-    );
+    await page.goto(FIXTURE_DASHBOARD_PROJECT_STATUS);
     await page.evaluate(() => localStorage.clear());
     await page.reload();
     for (const name of ['Pinned', 'Last opened', 'Spaces']) {
@@ -417,9 +423,7 @@ test.describe('editing a dashboard', () => {
     // D2-1 (approved 2026-10-29): the layout follows the canvas, with the 640
     // and 1024 thresholds. Measured in S2 Task 1: about 580 px here.
     await page.setViewportSize({ width: 1280, height: 900 });
-    await page.goto(
-      '/fixture-user/home/dashboards/fixture-dashboard-project-status',
-    );
+    await page.goto(FIXTURE_DASHBOARD_PROJECT_STATUS);
     await page.evaluate(() => localStorage.clear());
     await page.reload();
     await expect(page.locator('[data-widget-id]')).toHaveCount(3, {

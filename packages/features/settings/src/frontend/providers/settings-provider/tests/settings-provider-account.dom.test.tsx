@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ModeProvider } from '@synapcity/frontend-preferences';
 
 import { AppearanceSettings } from '../../../components/appearance-settings';
-import { useSettings } from '../../../hooks/use-settings';
+import { useSettings } from '../../../hooks/use-settings-lifecycle/use-settings';
 import type { StoredAccountPreferences } from '@synapcity/domain-preferences';
 import type { AccountSync, SavePreferencesResult } from '../../../../contracts';
 import {

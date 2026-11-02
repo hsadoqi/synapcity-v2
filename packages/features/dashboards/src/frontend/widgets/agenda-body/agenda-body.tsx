@@ -4,19 +4,12 @@ import {
   eventsOnDay,
   type PrototypeRecords,
 } from '@synapcity/domain-prototypes';
-import {
-  DayAgenda,
-  type TimeSlot,
-} from '@synapcity/frontend-ui/blocks/day-agenda';
+import { DayAgenda, type TimeSlot } from '@synapcity/frontend-blocks';
 import { toCalendarDate } from '@synapcity/frontend-ui/lib/calendar-utils';
 import { useState } from 'react';
 
+import { eventTimeFormat } from '../../utils/time-format';
 import { WidgetEmpty } from '../widget-states';
-
-const timeFormat = new Intl.DateTimeFormat(undefined, {
-  hour: 'numeric',
-  minute: '2-digit',
-});
 
 /**
  * One day's events, through the host-agnostic DayAgenda: no card or toolbar
@@ -44,7 +37,7 @@ export function AgendaBody({
   };
   const slots: TimeSlot[] = eventsOnDay(events, day).map((event) => ({
     id: event.id,
-    start: timeFormat.format(Date.parse(event.startsAt)),
+    start: eventTimeFormat.format(Date.parse(event.startsAt)),
     label: event.name,
     // Events carry no kind yet, so every one reads as a meeting.
     tone: 'meeting',

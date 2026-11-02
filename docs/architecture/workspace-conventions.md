@@ -55,6 +55,7 @@ Milestone numbers follow the reorganization roadmap (owner decision, 2026-10-23)
 | `domain-preferences`                  | Preference schemas, defaults, account/device scope, merging, import/transfer validation, consent policy                                                                                                                             | M6.1 (exists)                      |
 | `domain-identity`                     | Profile, name, avatar and credential schemas; pure display-user rules; verified-identity contract                                                                                                                                   | M4 (exists)                        |
 | `domain-grids`                        | Breakpoints, grid metrics and layout math (packing, placement, collapse, merge); no workspace dependencies                                                                                                                          | Responsive-grid prototype (exists) |
+| `domain-time`                         | Temporal value shapes shared across domains: instant, calendar date, time of day, duration (ISO strings, zod); no workspace dependencies. Zoned date-times, intervals and recurrence wait for a calendar scope decision             | 2026-10-30 (exists)                |
 | `domain-dashboards`                   | Dashboard composition: widget instances, default widget sizes, settings and layout operations. The ADR-0013 Dashboard record contract joins it in M8                                                                                | Responsive-grid prototype (exists) |
 | `domain-documents`                    | Document create, update and saved contracts on the base record contract                                                                                                                                                             | M8                                 |
 | `domain-prototypes`                   | Prototype record kinds (metric, goal, habit, project, task, event, activity, note, link, asset) on the base record contract, with their rules; provisional, outside the glossary                                                    | Responsive-grid prototype (exists) |
@@ -121,7 +122,7 @@ Accepted 2026-10-23 through the [Milestone 3.2 design](../superpowers/specs/2026
 
 `frontend-ui`'s broad `./lib/*`, `./hooks/*`, `./utils/*` and `./types/*` wildcards predate these rules and are narrowed by the migrations that touch them.
 
-Enforcement is `pnpm boundaries` (see [Boundary checks](#boundary-checks)). The existing [web architecture test](../../apps/web/src/architecture.test.ts) checks some direct imports within web; it is not a workspace-wide or transitive proof.
+Enforcement is `pnpm boundaries` (see [Boundary checks](#boundary-checks)). The existing [web architecture test](../../apps/web/src/__guards__/architecture.test.ts) checks some direct imports within web; it is not a workspace-wide or transitive proof.
 
 ## Runtime and platform integration
 

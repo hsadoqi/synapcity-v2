@@ -9,7 +9,7 @@ import {
 import { expect, vi } from 'vitest';
 import { ModeProvider } from '@synapcity/frontend-preferences';
 
-import { useSettings } from '../hooks/use-settings';
+import { useSettings } from '../hooks/use-settings-lifecycle/use-settings';
 import { SettingsProvider } from '../providers/settings-provider';
 
 /** jsdom has no ResizeObserver or getAnimations, which the providers and Base UI read. */

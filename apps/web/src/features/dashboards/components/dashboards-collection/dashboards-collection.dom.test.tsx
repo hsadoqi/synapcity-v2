@@ -16,7 +16,7 @@ vi.mock('../../server/actions/dashboard-state-actions', () => ({
   setDashboardPinned: mocks.setDashboardPinned,
 }));
 
-import type { OwnedRecordSummary } from '@synapcity/domain-records';
+import type { RecordSummary } from '@/lib/records/record-summary';
 
 import { CollectionNavigationProvider } from '@synapcity/frontend-collection';
 import { DASHBOARD_FIXTURES } from '../../lib/fixtures';
@@ -37,7 +37,7 @@ function HostNavigation({ children }: { children: React.ReactNode }) {
 const render = (ui: React.ReactElement) =>
   renderInto(ui, { wrapper: HostNavigation });
 
-const MANY: OwnedRecordSummary[] = [...DASHBOARD_FIXTURES];
+const MANY: RecordSummary[] = [...DASHBOARD_FIXTURES];
 // Three of them: the first two pinned (see the fixtures), the third not.
 const FEW = MANY.slice(0, 3);
 const unpinned = MANY.find((record) => record.pinnedAt === null)!;

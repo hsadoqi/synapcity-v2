@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@synapcity/domain-records": "workspace:*",
+    "@synapcity/domain-time": "workspace:*",
     "zod": "^4.6.7"
   },
   "devDependencies": {

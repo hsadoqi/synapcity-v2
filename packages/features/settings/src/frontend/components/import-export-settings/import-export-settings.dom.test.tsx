@@ -15,7 +15,7 @@ import {
   SettingsContext,
   SettingsProvider,
 } from '../../providers/settings-provider';
-import { useSettings } from '../../hooks/use-settings';
+import { useSettings } from '../../hooks/use-settings-lifecycle/use-settings';
 import { settingsDefaults, type Settings } from '@synapcity/domain-preferences';
 import { toTransferFile } from '@synapcity/domain-preferences';
 import { parseImport } from '@synapcity/domain-preferences';

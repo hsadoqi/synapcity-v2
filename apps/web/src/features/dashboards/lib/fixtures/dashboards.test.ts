@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { findEntityIcon } from '@synapcity/frontend-collection';
 
-import { baseRecordSchema } from '@synapcity/domain-records';
+import { recordSummarySchema } from '@/lib/records/record-summary';
 
 import { DASHBOARD_FIXTURES } from './dashboards';
 
@@ -11,7 +11,7 @@ describe('dashboard fixtures', () => {
       DASHBOARD_FIXTURES.length,
     );
     for (const record of DASHBOARD_FIXTURES) {
-      expect(baseRecordSchema.parse(record)).toMatchObject({ id: record.id });
+      expect(recordSummarySchema.parse(record)).toEqual(record);
     }
   });
 

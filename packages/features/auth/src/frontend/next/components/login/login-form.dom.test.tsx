@@ -103,7 +103,7 @@ describe('LoginForm', () => {
     ).toBeTruthy();
   });
 
-  it('disables the button while signing in', async () => {
+  it('keeps the button reachable but inert while signing in', async () => {
     mocks.signInWithPassword.mockReturnValue(new Promise(() => {}));
     render(
       <LoginForm
@@ -116,7 +116,16 @@ describe('LoginForm', () => {
     await submit();
 
     const button = screen.getByRole('button', { name: 'Signing in…' });
-    expect(button.hasAttribute('disabled')).toBe(true);
+    expect(button.hasAttribute('disabled')).toBe(false);
+    expect(button.getAttribute('aria-disabled')).toBe('true');
     expect(button.getAttribute('aria-busy')).toBe('true');
+    button.focus();
+    expect(document.activeElement).toBe(button);
+    expect(fireEvent.keyDown(button, { key: 'Enter' })).toBe(false);
+    expect(fireEvent.keyDown(button, { key: ' ' })).toBe(false);
+    await act(async () => {
+      fireEvent.click(button);
+    });
+    expect(mocks.signInWithPassword).toHaveBeenCalledTimes(1);
   });
 });

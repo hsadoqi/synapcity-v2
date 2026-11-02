@@ -1,3 +1,6 @@
+'use client';
+
+import { createContext, useCallback, useContext, useRef } from 'react';
 import {
   Card,
   CardContent,
@@ -7,8 +10,16 @@ import {
   CardTitle,
 } from '@synapcity/frontend-ui/core/card';
 
-/** The page heading's id, so a state change can move focus to it. */
-export const AUTH_HEADING_ID = 'auth-heading';
+const FocusHeadingContext = createContext<() => void>(() => {});
+
+/**
+ * Moves focus to the heading of the AuthShell this is rendered in, so a state
+ * change inside the card (a link sent) is announced from the top. Outside a
+ * card it does nothing.
+ */
+export function useFocusAuthHeading() {
+  return useContext(FocusHeadingContext);
+}
 
 interface AuthShellProps {
   title: string;
@@ -27,28 +38,35 @@ export function AuthShell({
   children,
   footer,
 }: AuthShellProps) {
+  // The card owns its heading, so a second card on the page is never focused.
+  const headingRef = useRef<HTMLDivElement>(null);
+  const focusHeading = useCallback(() => headingRef.current?.focus(), []);
   return (
-    <Card size="lg">
-      <CardHeader className="gap-2">
-        <CardTitle
-          as="h1"
-          size="lg"
-          id={AUTH_HEADING_ID}
-          tabIndex={-1}
-          className="outline-none"
-        >
-          {title}
-        </CardTitle>
-        {description ? <CardDescription>{description}</CardDescription> : null}
-      </CardHeader>
-      {children ? (
-        <CardContent className="flex flex-col gap-5">{children}</CardContent>
-      ) : null}
-      {footer ? (
-        <CardFooter className="justify-center gap-2 border-t">
-          {footer}
-        </CardFooter>
-      ) : null}
-    </Card>
+    <FocusHeadingContext.Provider value={focusHeading}>
+      <Card size="lg">
+        <CardHeader className="gap-2">
+          <CardTitle
+            as="h1"
+            size="lg"
+            ref={headingRef}
+            tabIndex={-1}
+            className="outline-none"
+          >
+            {title}
+          </CardTitle>
+          {description ? (
+            <CardDescription>{description}</CardDescription>
+          ) : null}
+        </CardHeader>
+        {children ? (
+          <CardContent className="flex flex-col gap-5">{children}</CardContent>
+        ) : null}
+        {footer ? (
+          <CardFooter className="justify-center gap-2 border-t">
+            {footer}
+          </CardFooter>
+        ) : null}
+      </Card>
+    </FocusHeadingContext.Provider>
   );
 }

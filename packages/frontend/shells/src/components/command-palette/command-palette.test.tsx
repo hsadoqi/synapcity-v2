@@ -65,6 +65,38 @@ describe('CommandPalette', () => {
     expect(screen.getByTestId('open').textContent).toBe('false');
   });
 
+  it('closes with ⌘K from its own search field', async () => {
+    render(<Harness onNavigate={() => {}} />);
+    const search = await openWithShortcut();
+    act(() => {
+      fireEvent.keyDown(search, { key: 'k', metaKey: true });
+    });
+    expect(screen.getByTestId('open').textContent).toBe('false');
+  });
+
+  it('leaves ⌘K that something nearer handled, a held key, and IME composition', () => {
+    render(
+      <>
+        <Harness onNavigate={() => {}} />
+        {/* An editor's link binding, at the element layer. */}
+        <div
+          data-testid="link-owner"
+          tabIndex={0}
+          onKeyDown={(event) => event.preventDefault()}
+        />
+      </>,
+    );
+    act(() => {
+      fireEvent.keyDown(screen.getByTestId('link-owner'), {
+        key: 'k',
+        metaKey: true,
+      });
+      fireEvent.keyDown(window, { key: 'k', metaKey: true, repeat: true });
+      fireEvent.keyDown(window, { key: 'k', metaKey: true, isComposing: true });
+    });
+    expect(screen.getByTestId('open').textContent).toBe('false');
+  });
+
   it('lists each group with items under its heading, skipping empty ones', async () => {
     render(<Harness onNavigate={() => {}} />);
     await openWithShortcut();

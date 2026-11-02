@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { startTransition, useState, type FormEvent } from 'react';
+import { startTransition, useState, type SubmitEvent } from 'react';
 import {
   useForm,
   type FieldValues,
@@ -10,11 +10,11 @@ import {
 } from 'react-hook-form';
 import type { z } from 'zod';
 
-import { unwrapSchema } from '../../utils/describe-schema-field';
+import { unwrapSchema } from '../../components/form-engine/describe-schema-field';
 import {
-  firstRefusal,
+  firstFieldRefusal,
   type ActionFormRefusal,
-} from '../../utils/first-refusal';
+} from '../../utils/first-field-refusal';
 
 /** What a form shows about a refused submit: a message and the fields it is about. */
 export interface FormFeedback {
@@ -47,7 +47,7 @@ export interface UseActionFormResult<
   readonly formProps: {
     readonly action: (formData: FormData) => void;
     readonly noValidate: true;
-    readonly onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+    readonly onSubmit: (event: SubmitEvent<HTMLFormElement>) => void;
   };
   readonly register: (name: FieldName<TSchema>) => UseFormRegisterReturn;
   /** The browser's refusal while there is one, otherwise the server's state. */
@@ -112,7 +112,7 @@ export function useActionForm<
   const [refusal, setRefusal] =
     useState<ActionFormRefusal<FieldName<TSchema>>>();
 
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const onSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     const element = event.currentTarget;
     for (const [name, value] of Object.entries(
       valuesOf(schema, new FormData(element)),
@@ -124,7 +124,7 @@ export function useActionForm<
         setRefusal(undefined);
         startTransition(() => action(new FormData(element)));
       },
-      (errors) => setRefusal(firstRefusal<FieldName<TSchema>>(errors)),
+      (errors) => setRefusal(firstFieldRefusal<FieldName<TSchema>>(errors)),
     )(event);
   };
 

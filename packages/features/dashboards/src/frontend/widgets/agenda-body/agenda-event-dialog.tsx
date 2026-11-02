@@ -1,7 +1,7 @@
 'use client';
 
 import { localStartsAt } from '@synapcity/domain-prototypes';
-import { EntityFormDialog } from '@synapcity/frontend-forms';
+import { FormDialog as EntityFormDialog } from '@synapcity/frontend-forms';
 
 import { agendaEventForm } from './agenda-event-form';
 
@@ -34,7 +34,15 @@ export function AgendaEventDialog({
       onOpenChange={onOpenChange}
       definition={agendaEventForm}
       initialValues={{ name: '', date: day, time: DEFAULT_START }}
-      onSubmit={({ name, date, time }) => {
+      onSubmit={({
+        name,
+        date,
+        time,
+      }: {
+        name?: string;
+        date?: string;
+        time?: string;
+      }) => {
         const startsAt = localStartsAt(date ?? '', time ?? '');
         if (!name || !startsAt) throw new Error('Not a real event');
         onAdd(name, startsAt);

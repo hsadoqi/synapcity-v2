@@ -17,7 +17,7 @@ import {
   SettingsContext,
   SettingsProvider,
 } from '../../providers/settings-provider';
-import { useSettings } from '../../hooks/use-settings';
+import { useSettings } from '../../hooks/use-settings-lifecycle/use-settings';
 import { settingsDefaults } from '@synapcity/domain-preferences';
 import type { RegionalSettings as RegionalSettingsType } from '@synapcity/domain-preferences';
 import { RegionalSettings } from './index';

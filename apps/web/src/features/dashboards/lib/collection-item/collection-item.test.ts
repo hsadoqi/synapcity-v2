@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import type { OwnedRecordSummary } from '@synapcity/domain-records';
+import type { RecordSummary } from '@/lib/records/record-summary';
 
-import { describeSpaces, toCollectionItem } from './collection-item';
+import { toCollectionItem } from './collection-item';
 
-const record: OwnedRecordSummary = {
+const record: RecordSummary = {
   id: 'dashboard-1',
   ownerId: '11111111-1111-4111-8111-111111111111',
   name: 'Launch plan',
@@ -17,16 +17,6 @@ const record: OwnedRecordSummary = {
   lastViewedAt: null,
   spacesTotal: 2,
 };
-
-describe('describeSpaces', () => {
-  it.each([
-    [0, 'Not in a space'],
-    [1, 'In 1 space'],
-    [3, 'In 3 spaces'],
-  ])('describes %i spaces', (count, expected) => {
-    expect(describeSpaces(count)).toBe(expected);
-  });
-});
 
 describe('toCollectionItem', () => {
   it('maps a dashboard onto the browse feature’s item, linked under the owner', () => {

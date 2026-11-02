@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
-import { AUTH_HEADING_ID } from '../auth-shell';
+import { useFocusAuthHeading } from '../auth-shell';
 
 /**
  * What a form turns into once its request is accepted. Focus moves to the page
@@ -24,9 +24,10 @@ export function AuthConfirmation({
   /** Follow-up actions, such as resending the link. */
   children?: React.ReactNode;
 }) {
+  const focusHeading = useFocusAuthHeading();
   useEffect(() => {
-    document.getElementById(AUTH_HEADING_ID)?.focus();
-  }, [message]);
+    focusHeading();
+  }, [message, focusHeading]);
 
   return (
     <>

@@ -1,7 +1,7 @@
 'use client';
 
 import { Upload, Download, RotateCcw } from 'lucide-react';
-import { SettingRow } from '../../shared/setting-row';
+import { SettingRow } from '../shared/setting-row';
 import { useRef, useState } from 'react';
 
 import { Button } from '@synapcity/frontend-ui/core/button';

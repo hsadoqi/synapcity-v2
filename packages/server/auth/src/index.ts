@@ -5,7 +5,7 @@ export type {
   IdentityVerification,
   ProviderFailure,
   ProviderOutcome,
-} from './identity-provider';
+} from './types';
 export { isOwner } from './utils/is-owner';
 export {
   verifyIdentity,

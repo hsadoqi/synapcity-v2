@@ -1,1 +1,1 @@
-export type { ImportResult, TransferFeedback } from './import-export';
+export type * from './import-export';

@@ -5,7 +5,7 @@ import { FileText, HomeIcon, Plus, Settings } from 'lucide-react';
 import { CommandPalette } from '.';
 
 const meta = {
-  title: 'Blocks/CommandPalette',
+  title: 'Navigation/CommandPalette',
   component: CommandPalette,
   args: {
     open: true,

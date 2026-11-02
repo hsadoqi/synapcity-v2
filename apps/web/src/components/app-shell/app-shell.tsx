@@ -2,10 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, type ReactNode } from 'react';
-import {
-  BreadcrumbRootShell,
-  CommandPalette,
-} from '@synapcity/frontend-shells';
+import { BreadcrumbProvider, CommandPalette } from '@synapcity/frontend-shells';
 
 import { appPaletteGroups, appSidebar } from '../app-sidebar';
 import type { CollectionKind } from '../collections';
@@ -61,7 +58,7 @@ export function AppShell({
   };
 
   return (
-    <BreadcrumbRootShell
+    <BreadcrumbProvider
       account={userId ? accountLinksFor(userId) : null}
       headerActions={headerActions}
       sidebar={
@@ -101,6 +98,6 @@ export function AppShell({
           />
         </>
       )}
-    </BreadcrumbRootShell>
+    </BreadcrumbProvider>
   );
 }

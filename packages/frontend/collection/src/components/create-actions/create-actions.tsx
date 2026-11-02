@@ -2,7 +2,7 @@
 
 import type { LucideIcon } from 'lucide-react';
 
-import { SectionHeading } from '@synapcity/frontend-ui/components/section-heading';
+import { SectionHeading } from '@synapcity/frontend-blocks';
 import { Button } from '@synapcity/frontend-ui/core/button';
 
 /** One thing the user can create here: its id is passed back to `onCreate`. */

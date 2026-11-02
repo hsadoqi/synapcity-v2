@@ -19,6 +19,14 @@
     },
     "packages/frontend/tailwind-config": {
       "ignoreDependencies": ["tailwindcss"]
+    },
+    "packages/server/data": {
+      "entry": [
+        "src/**/*.dbtest.ts",
+        "vitest.db.config.ts",
+        "src/**/*.budget.ts",
+        "vitest.budgets.config.ts"
+      ]
     }
   },
   "ignoreBinaries": ["psql"]

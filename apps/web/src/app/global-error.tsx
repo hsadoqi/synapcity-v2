@@ -7,7 +7,7 @@ import { reportCaughtError } from '@synapcity/frontend-error-reports';
 import { Button, buttonVariants } from '@synapcity/frontend-ui/core/button';
 import { ModeProvider } from '@synapcity/frontend-preferences';
 
-import { MESSAGE_HEADING_ID, MessagePage } from '@synapcity/frontend-shells';
+import { MessagePage } from '@synapcity/frontend-shells';
 import { fontVariables } from '@synapcity/frontend-fonts/next';
 
 /**
@@ -32,7 +32,6 @@ export default function GlobalError({
     console.error('Unexpected error', { digest: error.digest });
     // Sent only if the person turned error reports on; scrubbed first.
     reportCaughtError(error);
-    document.getElementById(MESSAGE_HEADING_ID)?.focus();
   }, [error]);
 
   return (
@@ -51,6 +50,7 @@ export default function GlobalError({
             <MessagePage
               title="Something went wrong"
               description="An unexpected problem stopped the app from loading. Try again. If it keeps happening, wait a few minutes first."
+              focusKey={error}
             >
               <Button type="button" size="lg" onClick={() => retry()}>
                 Try again

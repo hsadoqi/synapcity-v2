@@ -1,11 +1,11 @@
 import { CollectionPage } from '@synapcity/frontend-collection';
-import type { OwnedRecordSummary } from '@synapcity/domain-records';
+import type { RecordSummary } from '@/lib/records/record-summary';
 
 import { DOCUMENTS_INTRO, DOCUMENTS_TITLE } from './documents-copy';
 import { DocumentsIndex } from './documents-index';
 
 interface DocumentsCollectionProps {
-  documents: OwnedRecordSummary[];
+  documents: RecordSummary[];
   userId: string;
 }
 

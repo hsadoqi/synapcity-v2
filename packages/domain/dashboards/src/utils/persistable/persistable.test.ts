@@ -72,4 +72,38 @@ describe('parsePersistableComposition', () => {
       reason: 'too-large',
     });
   });
+
+  describe('text the database cannot store', () => {
+    const withTitle = (title: string) => {
+      const c = with_('pinned');
+      return { ...c, widgets: c.widgets.map((w) => ({ ...w, title })) };
+    };
+
+    it.each([
+      ['a NUL', 'Pin\u0000ned'],
+      ['an unpaired high surrogate', 'Pinned \uD83D'],
+      ['an unpaired low surrogate', '\uDE00 Pinned'],
+    ])('refuses a title with %s, whole, never cleaned', (_name, title) => {
+      expect(parsePersistableComposition(withTitle(title))).toEqual({
+        ok: false,
+        reason: 'invalid-text',
+      });
+    });
+
+    it('accepts an astral character, which is a valid surrogate pair', () => {
+      expect(parsePersistableComposition(withTitle('Ideas 💡')).ok).toBe(true);
+    });
+
+    it('refuses text in an object key as well as a value', () => {
+      const c = with_('pinned');
+      const widget = c.widgets[0]!;
+      const config = { ...widget, config: { ['bad\u0000key']: 1 } };
+      const result = parsePersistableComposition({ ...c, widgets: [config] });
+      // Unknown keys are stripped by the contract, so the key never reaches storage.
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(JSON.stringify(result.composition)).not.toContain('bad');
+      }
+    });
+  });
 });

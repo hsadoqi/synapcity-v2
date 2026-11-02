@@ -1,17 +1,22 @@
 import type { BaseRecord } from '@synapcity/domain-records';
-import type { SupabaseServerClient } from '@synapcity/server-supabase';
+import {
+  toProviderFailure,
+  type ProviderFailure,
+  type SupabaseServerClient,
+} from '@synapcity/server-supabase';
 import { z } from 'zod';
 
 import { COLUMNS, recordFromRow, type OwnedRow } from '../../owned-row';
 import { readError } from '../../read-error';
+import type { ParticipantTable } from '../../records';
 
-type ParticipantKind = 'documents' | 'dashboards';
+const spaceIdSchema = z.uuid();
 
 /** The embedded items of one Space's participation rows, newest addition first. */
 async function participantRows(
   client: SupabaseServerClient,
   spaceId: string,
-  kind: ParticipantKind,
+  kind: ParticipantTable,
 ): Promise<(OwnedRow | null)[]> {
   // One literal query per kind, so each embed is checked against the schema.
   if (kind === 'documents') {
@@ -42,10 +47,10 @@ async function participantRows(
 async function listParticipants(
   client: SupabaseServerClient,
   spaceId: string,
-  kind: ParticipantKind,
+  kind: ParticipantTable,
 ): Promise<BaseRecord[]> {
   // A malformed id cannot match a uuid column; PostgREST would error instead.
-  if (!z.uuid().safeParse(spaceId).success) return [];
+  if (!spaceIdSchema.safeParse(spaceId).success) return [];
 
   const items = await participantRows(client, spaceId, kind);
   return items.flatMap((item) => (item ? [recordFromRow(item)] : []));
@@ -65,4 +70,62 @@ export function listSpaceDashboards(
   spaceId: string,
 ): Promise<BaseRecord[]> {
   return listParticipants(client, spaceId, 'dashboards');
+}
+
+/**
+ * What adding reports: done, or the failure by code and status. A failure
+ * without a code (a dropped connection) is not proof the row was not written.
+ */
+export type AddedOutcome = { ok: true } | { ok: false; error: ProviderFailure };
+
+/**
+ * Adds one participation row, idempotently: a pair already in the Space is
+ * left as it is (`on conflict do nothing` on the primary key), so a second add
+ * neither duplicates it nor resets its per-Space `pinned` and `position`.
+ * Row-level security checks the insert first: the caller must own the Space
+ * and the item, or the database refuses with an error, never a silent skip.
+ */
+async function addParticipant(
+  client: SupabaseServerClient,
+  spaceId: string,
+  itemId: string,
+  kind: ParticipantTable,
+): Promise<AddedOutcome> {
+  // One literal query per kind, so each insert is checked against the schema.
+  const { error, status } =
+    kind === 'documents'
+      ? await client
+          .from('space_documents')
+          .upsert(
+            { space_id: spaceId, document_id: itemId },
+            { onConflict: 'space_id,document_id', ignoreDuplicates: true },
+          )
+      : await client
+          .from('space_dashboards')
+          .upsert(
+            { space_id: spaceId, dashboard_id: itemId },
+            { onConflict: 'space_id,dashboard_id', ignoreDuplicates: true },
+          );
+
+  if (error)
+    return { ok: false, error: toProviderFailure({ ...error, status }) };
+  return { ok: true };
+}
+
+/** Adds one of the caller's documents to one of their Spaces. */
+export function addSpaceDocument(
+  client: SupabaseServerClient,
+  spaceId: string,
+  documentId: string,
+): Promise<AddedOutcome> {
+  return addParticipant(client, spaceId, documentId, 'documents');
+}
+
+/** Adds one of the caller's dashboards to one of their Spaces. */
+export function addSpaceDashboard(
+  client: SupabaseServerClient,
+  spaceId: string,
+  dashboardId: string,
+): Promise<AddedOutcome> {
+  return addParticipant(client, spaceId, dashboardId, 'dashboards');
 }

@@ -2,12 +2,12 @@
 
 // TODO: Can we make this more generic/reusable so it can be used for contexts/use cases beyond deleting account like deleting a space/document/dashboard/widget(future)?
 import { useActionState, useId } from 'react';
-import Link from 'next/link';
 import { Button, buttonVariants } from '@synapcity/frontend-ui/core/button';
 
 import type { DeleteAccountState } from '../../../../contracts';
 import { FormMessage } from '@synapcity/frontend-forms';
 import { AuthShell } from '../../../components/auth-shell';
+import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 
 const initialState: DeleteAccountState = {};
 
@@ -60,12 +60,12 @@ export function DeleteAccountCard({
           >
             {deleting ? 'Deleting…' : 'Permanently delete my account'}
           </Button>
-          <Link
+          <LinkButton
             href={settingsHref}
             className={buttonVariants({ variant: 'outline', size: 'lg' })}
           >
             Keep my account
-          </Link>
+          </LinkButton>
         </div>
       </form>
     </AuthShell>

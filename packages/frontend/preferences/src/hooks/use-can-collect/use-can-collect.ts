@@ -6,16 +6,11 @@ import {
   parseImport,
   type PrivacyPurpose,
 } from '@synapcity/domain-preferences';
-import { onStoredPreferencesChange, readStoredPreferences } from '../../store';
+import {
+  onStoredPreferencesChange,
+  tryReadStoredPreferences,
+} from '../../store';
 import { useGlobalPrivacyControl } from '../use-global-privacy-control';
-
-function readStored() {
-  try {
-    return readStoredPreferences();
-  } catch {
-    return null;
-  }
-}
 
 /**
  * Whether a collector may run, from the saved choice. Unlike the settings
@@ -26,7 +21,7 @@ function readStored() {
 export function useCanCollect(purpose: PrivacyPurpose) {
   const stored = useSyncExternalStore(
     onStoredPreferencesChange,
-    readStored,
+    tryReadStoredPreferences,
     () => null,
   );
   const globalPrivacyControl = useGlobalPrivacyControl();

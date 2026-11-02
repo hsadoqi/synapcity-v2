@@ -1,19 +1,6 @@
 import type { z } from 'zod';
-
-import type { FieldConfig, FieldGroup, FormRule } from './field-config';
-
-/** The string keys of a schema's inferred shape: the names a field may take. */
-export type FieldNamesOf<TSchema extends z.ZodObject> = Extract<
-  keyof z.infer<TSchema>,
-  string
->;
-
-/** Whether a field is shown, editable and required for the current values. */
-export interface FieldState {
-  readonly visible: boolean;
-  readonly enabled: boolean;
-  readonly required: boolean;
-}
+import type { FieldConfig } from './field-config';
+import type { FieldGroup, FieldNamesOf, FormRule } from './field-renderer';
 
 export type FormDefinitionIssueCode =
   | 'duplicate-name'

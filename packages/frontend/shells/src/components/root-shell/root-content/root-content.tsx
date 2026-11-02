@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { MAIN_CONTENT_ID } from '@synapcity/frontend-ui/core/skip-link';
 
 export const RootContent = ({ children }: { children: ReactNode }) => {
   return (
@@ -13,7 +14,7 @@ export const RootContent = ({ children }: { children: ReactNode }) => {
     // and the contextual panel measures the real work area, not the title.
     <div className="relative flex w-full flex-1 justify-center has-data-fill-viewport:min-h-0">
       <main
-        id="main-content"
+        id={MAIN_CONTENT_ID}
         tabIndex={-1}
         className="flex min-w-0 flex-1 outline-none transition-[padding] duration-200 ease-out group-data-[global-panel=open]/work-area:py-4 sm:group-data-[global-panel=open]/work-area:py-6 lg:group-data-[global-panel=open]/work-area:py-8"
       >

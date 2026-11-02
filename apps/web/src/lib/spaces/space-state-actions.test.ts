@@ -9,9 +9,12 @@ const mocks = vi.hoisted(() => ({
   eq: vi.fn(),
   select: vi.fn(),
   or: vi.fn(),
+  upsert: vi.fn(),
+  revalidatePath: vi.fn(),
   fixtureModeEnabled: vi.fn(() => false),
 }));
 
+vi.mock('next/cache', () => ({ revalidatePath: mocks.revalidatePath }));
 vi.mock('@/lib/supabase/server', () => ({
   createClient: async () => ({
     auth: { getUser: mocks.getUser, getClaims: mocks.getClaims },
@@ -23,9 +26,15 @@ vi.mock('@/lib/access/dev-fixture', () => ({
   fixtureModeEnabled: mocks.fixtureModeEnabled,
 }));
 
-import { recordSpaceView, setSpacePinned } from './space-state-actions';
+import {
+  addDashboardToSpace,
+  addDocumentToSpace,
+  recordSpaceView,
+  setSpacePinned,
+} from './space-state-actions';
 
 const ID = '9ab8c032-8759-44e9-808d-0573d13f290e';
+const ITEM_ID = '5d1f7c0e-3b0a-4f3e-9d57-0a1b2c3d4e5f';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -47,7 +56,8 @@ beforeEach(() => {
   mocks.or.mockResolvedValue({ error: null });
   mocks.eq.mockReturnValue({ select: mocks.select, or: mocks.or });
   mocks.update.mockReturnValue({ eq: mocks.eq });
-  mocks.from.mockReturnValue({ update: mocks.update });
+  mocks.upsert.mockResolvedValue({ error: null, status: 201 });
+  mocks.from.mockReturnValue({ update: mocks.update, upsert: mocks.upsert });
 });
 
 afterEach(() => {
@@ -219,3 +229,156 @@ describe('setSpacePinned caller identity', () => {
     expect(mocks.update).not.toHaveBeenCalled();
   });
 });
+
+const ADD_ACTIONS = [
+  {
+    kind: 'document',
+    add: addDocumentToSpace,
+    table: 'space_documents',
+    column: 'document_id',
+  },
+  {
+    kind: 'dashboard',
+    add: addDashboardToSpace,
+    table: 'space_dashboards',
+    column: 'dashboard_id',
+  },
+] as const;
+
+describe.each(ADD_ACTIONS)(
+  'add $kind to space',
+  ({ kind, add, table, column }) => {
+    it('adds the pair through the Space source and refreshes the caller’s home', async () => {
+      await expect(add(ID, ITEM_ID)).resolves.toEqual({ ok: true });
+
+      expect(mocks.from).toHaveBeenCalledWith(table);
+      expect(mocks.upsert).toHaveBeenCalledWith(
+        { space_id: ID, [column]: ITEM_ID },
+        { onConflict: `space_id,${column}`, ignoreDuplicates: true },
+      );
+      expect(mocks.revalidatePath).toHaveBeenCalledExactlyOnceWith(
+        '/user-1/home',
+        'layout',
+      );
+    });
+
+    it('treats an item already in the space as added, without touching it', async () => {
+      await add(ID, ITEM_ID);
+      await expect(add(ID, ITEM_ID)).resolves.toEqual({ ok: true });
+
+      // Only inserts, never an update that could reset its pin or position.
+      expect(mocks.upsert).toHaveBeenCalledTimes(2);
+      expect(mocks.update).not.toHaveBeenCalled();
+    });
+
+    it('records no view of the space', async () => {
+      await add(ID, ITEM_ID);
+
+      expect(mocks.update).not.toHaveBeenCalled();
+      expect(mocks.from).not.toHaveBeenCalledWith('spaces');
+    });
+
+    it('verifies the caller with a fresh lookup, as this is a write', async () => {
+      await add(ID, ITEM_ID);
+
+      expect(mocks.getUser).toHaveBeenCalled();
+      expect(mocks.getClaims).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      ['not-a-uuid', ITEM_ID],
+      [ID, 'not-a-uuid'],
+      [42, ITEM_ID],
+      [ID, undefined],
+      [{ id: ID }, ITEM_ID],
+    ])(
+      'rejects bad ids (%j, %j) without calling Supabase',
+      async (space, item) => {
+        await expect(add(space, item)).resolves.toEqual({
+          ok: false,
+          error: 'Could not save your changes. Try again.',
+        });
+        expect(mocks.getUser).not.toHaveBeenCalled();
+        expect(mocks.upsert).not.toHaveBeenCalled();
+        expect(mocks.revalidatePath).not.toHaveBeenCalled();
+      },
+    );
+
+    it('asks a signed-out caller to sign in again', async () => {
+      mocks.getUser.mockResolvedValue({ data: { user: null }, error: null });
+
+      await expect(add(ID, ITEM_ID)).resolves.toEqual({
+        ok: false,
+        error: 'Sign in again to save your changes.',
+        signedOut: true,
+      });
+      expect(mocks.upsert).not.toHaveBeenCalled();
+      expect(mocks.revalidatePath).not.toHaveBeenCalled();
+    });
+
+    it('tells the caller to try again when the provider is unreachable', async () => {
+      mocks.getUser.mockResolvedValue({
+        data: { user: null },
+        error: new AuthRetryableFetchError('fetch failed', 0),
+      });
+
+      await expect(add(ID, ITEM_ID)).resolves.toEqual({
+        ok: false,
+        error: 'Could not save your changes. Try again.',
+      });
+      expect(mocks.upsert).not.toHaveBeenCalled();
+    });
+
+    it('reports someone else’s space or item as a failure and logs the code only', async () => {
+      mocks.upsert.mockResolvedValue({
+        error: {
+          code: '42501',
+          message: 'new row violates row-level security policy',
+        },
+        status: 403,
+      });
+
+      await expect(add(ID, ITEM_ID)).resolves.toEqual({
+        ok: false,
+        error: 'Could not save your changes. Try again.',
+      });
+      expect(console.warn).toHaveBeenCalledWith('addToSpace failed', {
+        kind,
+        code: '42501',
+        status: 403,
+      });
+      expect(mocks.revalidatePath).not.toHaveBeenCalled();
+    });
+
+    it('reports a database failure without refreshing anything', async () => {
+      mocks.upsert.mockResolvedValue({ error: { code: '23503' }, status: 409 });
+
+      await expect(add(ID, ITEM_ID)).resolves.toMatchObject({ ok: false });
+      expect(mocks.revalidatePath).not.toHaveBeenCalled();
+    });
+
+    it('refreshes after a cut-off request, as the row may have been written', async () => {
+      mocks.upsert.mockResolvedValue({
+        error: { message: 'fetch failed' },
+        status: 0,
+      });
+
+      await expect(add(ID, ITEM_ID)).resolves.toMatchObject({ ok: false });
+      expect(mocks.revalidatePath).toHaveBeenCalledWith(
+        '/user-1/home',
+        'layout',
+      );
+    });
+
+    it('does nothing in fixture mode', async () => {
+      mocks.fixtureModeEnabled.mockReturnValue(true);
+
+      await expect(add(ID, ITEM_ID)).resolves.toEqual({
+        ok: false,
+        error: 'Saving is off in fixture mode.',
+      });
+      expect(mocks.getUser).not.toHaveBeenCalled();
+      expect(mocks.upsert).not.toHaveBeenCalled();
+    });
+  },
+);

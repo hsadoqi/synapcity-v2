@@ -393,6 +393,9 @@ importers:
       '@synapcity/features-spaces':
         specifier: workspace:*
         version: link:../../packages/features/spaces
+      '@synapcity/frontend-blocks':
+        specifier: workspace:*
+        version: link:../../packages/frontend/blocks
       '@synapcity/frontend-collection':
         specifier: workspace:*
         version: link:../../packages/frontend/collection
@@ -589,12 +592,12 @@ importers:
       '@synapcity/domain-prototypes':
         specifier: workspace:*
         version: link:../../domain/prototypes
+      '@synapcity/domain-records':
+        specifier: workspace:*
+        version: link:../../domain/records
       '@synapcity/domain-spaces':
         specifier: workspace:*
         version: link:../../domain/spaces
-      lucide-react:
-        specifier: ^1.55.0
-        version: 1.55.0(@types/react@19.3.0)(react@19.3.1)
     devDependencies:
       '@synapcity/dev-typescript-config':
         specifier: workspace:*
@@ -691,6 +694,9 @@ importers:
       '@synapcity/domain-prototypes':
         specifier: workspace:*
         version: link:../prototypes
+      '@synapcity/domain-records':
+        specifier: workspace:*
+        version: link:../records
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -770,6 +776,9 @@ importers:
 
   packages/domain/preferences:
     dependencies:
+      '@synapcity/domain-time':
+        specifier: workspace:*
+        version: link:../time
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -801,6 +810,9 @@ importers:
       '@synapcity/domain-records':
         specifier: workspace:*
         version: link:../records
+      '@synapcity/domain-time':
+        specifier: workspace:*
+        version: link:../time
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -829,6 +841,9 @@ importers:
 
   packages/domain/records:
     dependencies:
+      '@synapcity/domain-time':
+        specifier: workspace:*
+        version: link:../time
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -860,6 +875,34 @@ importers:
       '@synapcity/domain-records':
         specifier: workspace:*
         version: link:../records
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
+    devDependencies:
+      '@synapcity/dev-eslint-config':
+        specifier: workspace:*
+        version: link:../../dev/eslint-config
+      '@synapcity/dev-typescript-config':
+        specifier: workspace:*
+        version: link:../../dev/typescript-config
+      '@synapcity/dev-vitest-config':
+        specifier: workspace:*
+        version: link:../../dev/vitest-config
+      '@vitest/coverage-v8':
+        specifier: 5.0.5
+        version: 5.0.5(@vitest/browser@5.0.5)(vitest@5.0.5)
+      eslint:
+        specifier: 10.13.0
+        version: 10.13.0(jiti@2.7.0)(supports-color@7.2.0)
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: 5.0.5
+        version: 5.0.5(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/browser-playwright@5.0.5)(@vitest/coverage-v8@5.0.5)(@vitest/ui@5.0.5)(jsdom@30.1.2(@noble/hashes@1.8.0))(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
+
+  packages/domain/time:
+    dependencies:
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -1037,6 +1080,9 @@ importers:
       '@synapcity/domain-prototypes':
         specifier: workspace:*
         version: link:../../domain/prototypes
+      '@synapcity/frontend-blocks':
+        specifier: workspace:*
+        version: link:../../frontend/blocks
       '@synapcity/frontend-forms':
         specifier: workspace:*
         version: link:../../frontend/forms
@@ -1272,6 +1318,91 @@ importers:
         specifier: 5.0.5
         version: 5.0.5(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/browser-playwright@5.0.5)(@vitest/coverage-v8@5.0.5)(@vitest/ui@5.0.5)(jsdom@30.1.2(@noble/hashes@1.8.0))(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
 
+  packages/frontend/blocks:
+    dependencies:
+      '@base-ui/react':
+        specifier: ^1.9.0
+        version: 1.9.0(@date-fns/tz@1.5.0)(@types/react@19.3.0)(date-fns@4.4.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@synapcity/domain-identity':
+        specifier: workspace:*
+        version: link:../../domain/identity
+      '@synapcity/domain-preferences':
+        specifier: workspace:*
+        version: link:../../domain/preferences
+      '@synapcity/frontend-preferences':
+        specifier: workspace:*
+        version: link:../preferences
+      '@synapcity/frontend-ui':
+        specifier: workspace:*
+        version: link:../ui
+      chrono-node:
+        specifier: ^2.10.3
+        version: 2.10.3
+      date-fns:
+        specifier: ^4.4.0
+        version: 4.4.0
+      lucide-react:
+        specifier: ^1.55.0
+        version: 1.55.0(@types/react@19.3.0)(react@19.3.1)
+      next:
+        specifier: 16.4.3
+        version: 16.4.3(@babel/core@8.0.9)(@opentelemetry/api@1.9.1)(@playwright/test@1.64.1)(@types/node@26.6.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      react:
+        specifier: 19.3.1
+        version: 19.3.1
+    devDependencies:
+      '@storybook/nextjs-vite':
+        specifier: 10.6.3
+        version: 10.6.3(@babel/core@8.0.9)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(next@16.4.3(@babel/core@8.0.9)(@opentelemetry/api@1.9.1)(@playwright/test@1.64.1)(@types/node@26.6.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(rollup@4.64.7)(storybook@10.6.3(@types/react@19.3.0)(prettier@3.9.10)(react@19.3.1))(supports-color@7.2.0)(typescript@7.0.2)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
+      '@synapcity/dev-eslint-config':
+        specifier: workspace:*
+        version: link:../../dev/eslint-config
+      '@synapcity/dev-fixtures':
+        specifier: workspace:*
+        version: link:../../dev/fixtures
+      '@synapcity/dev-typescript-config':
+        specifier: workspace:*
+        version: link:../../dev/typescript-config
+      '@synapcity/dev-vitest-config':
+        specifier: workspace:*
+        version: link:../../dev/vitest-config
+      '@testing-library/dom':
+        specifier: 10.4.2
+        version: 10.4.2
+      '@testing-library/react':
+        specifier: 16.3.3
+        version: 16.3.3(@testing-library/dom@10.4.2)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@types/node':
+        specifier: 26.6.5
+        version: 26.6.5
+      '@types/react':
+        specifier: 19.3.0
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: 19.3.0
+        version: 19.3.0(@types/react@19.3.0)
+      '@vitest/coverage-v8':
+        specifier: 5.0.5
+        version: 5.0.5(@vitest/browser@5.0.5)(vitest@5.0.5)
+      eslint:
+        specifier: 10.13.0
+        version: 10.13.0(jiti@2.7.0)(supports-color@7.2.0)
+      jsdom:
+        specifier: 30.1.2
+        version: 30.1.2(@noble/hashes@1.8.0)
+      react-dom:
+        specifier: 19.3.1
+        version: 19.3.1(react@19.3.1)
+      storybook:
+        specifier: 10.6.3
+        version: 10.6.3(@types/react@19.3.0)(prettier@3.9.10)(react@19.3.1)
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: 5.0.5
+        version: 5.0.5(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/browser-playwright@5.0.5)(@vitest/coverage-v8@5.0.5)(@vitest/ui@5.0.5)(jsdom@30.1.2(@noble/hashes@1.8.0))(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
+
   packages/frontend/brand:
     dependencies:
       cn:
@@ -1329,6 +1460,9 @@ importers:
       '@synapcity/domain-records':
         specifier: workspace:*
         version: link:../../domain/records
+      '@synapcity/frontend-blocks':
+        specifier: workspace:*
+        version: link:../blocks
       '@synapcity/frontend-ui':
         specifier: workspace:*
         version: link:../ui
@@ -1485,6 +1619,12 @@ importers:
       '@hookform/resolvers':
         specifier: 6.0.0
         version: 6.0.0(@standard-schema/spec@1.1.0)(ajv-formats@2.1.1(ajv@8.20.0))(ajv@8.20.0)(react-hook-form@7.90.0(@types/react@19.3.0)(react@19.3.1))(zod@4.6.7)
+      '@synapcity/domain-time':
+        specifier: workspace:*
+        version: link:../../domain/time
+      '@synapcity/frontend-blocks':
+        specifier: workspace:*
+        version: link:../blocks
       '@synapcity/frontend-ui':
         specifier: workspace:*
         version: link:../ui
@@ -1610,6 +1750,9 @@ importers:
 
   packages/frontend/shells:
     dependencies:
+      '@synapcity/frontend-blocks':
+        specifier: workspace:*
+        version: link:../blocks
       '@synapcity/frontend-brand':
         specifier: workspace:*
         version: link:../brand
@@ -1827,9 +1970,6 @@ importers:
       '@synapcity/frontend-tokens':
         specifier: workspace:*
         version: link:../tokens
-      chrono-node:
-        specifier: ^2.10.3
-        version: 2.10.3
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -2008,6 +2148,9 @@ importers:
       '@synapcity/dev-vitest-config':
         specifier: workspace:*
         version: link:../../dev/vitest-config
+      '@types/node':
+        specifier: 26.6.5
+        version: 26.6.5
       '@vitest/coverage-v8':
         specifier: 5.0.5
         version: 5.0.5(@vitest/browser@5.0.5)(vitest@5.0.5)

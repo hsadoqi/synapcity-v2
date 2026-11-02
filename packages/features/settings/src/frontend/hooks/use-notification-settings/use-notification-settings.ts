@@ -2,7 +2,7 @@
 
 import { useCallback } from 'react';
 import type { NotificationSettingsPatch } from '@synapcity/domain-preferences';
-import { useSettings } from '../use-settings';
+import { useSettings } from '../use-settings-lifecycle/use-settings';
 
 export function useNotificationSettings() {
   const { settings, updateSettings } = useSettings();

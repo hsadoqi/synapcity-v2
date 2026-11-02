@@ -5,7 +5,10 @@ import { REQUEST_PATH_HEADER } from '../routing/request-path';
 import { safeNextPath } from '../routing/safe-next';
 import { signInHref } from '../routing/sign-in-href';
 import { fixtureModeEnabled } from './dev-fixture';
-import { getVerifiedClaims } from '../../features/auth/server/session';
+import {
+  AuthUnavailableError,
+  getClaimsResult,
+} from '../../features/auth/server/session';
 
 /**
  * Guards the `(protected)` route group: someone must be signed in. It does not
@@ -22,8 +25,10 @@ import { getVerifiedClaims } from '../../features/auth/server/session';
 export async function requireSignedIn(): Promise<void> {
   if (fixtureModeEnabled()) return;
 
-  const claims = await getVerifiedClaims();
-  if (!claims) redirect(await signedOutDestination());
+  const result = await getClaimsResult();
+  // An outage is not a sign-out: do not send someone who may be signed in away.
+  if (result.status === 'unavailable') throw new AuthUnavailableError();
+  if (result.status === 'signed-out') redirect(await signedOutDestination());
 }
 
 /** Sign in, with the page the visitor asked for as the way back when it is known and safe. */

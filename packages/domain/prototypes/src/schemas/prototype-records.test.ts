@@ -49,6 +49,12 @@ describe('prototype record schemas', () => {
     ).toBe(false);
   });
 
+  it('refuses a habit day that does not exist on the calendar', () => {
+    expect(
+      habitSchema.safeParse({ ...base, completedDays: ['2026-02-31'] }).success,
+    ).toBe(false);
+  });
+
   it('accepts only normalized http(s) links', () => {
     expect(
       linkSchema.safeParse({ ...base, url: 'https://example.com/' }).success,

@@ -1,6 +1,6 @@
 'use client';
 
-import { LoadingRegion } from '@synapcity/frontend-ui/components/loading-region';
+import { LoadingRegion } from '@synapcity/frontend-blocks';
 import {
   Alert,
   AlertDescription,

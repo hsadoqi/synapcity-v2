@@ -1,7 +1,7 @@
 import { baseRecordSchema } from '@synapcity/domain-records';
+import { calendarDateSchema, instantSchema } from '@synapcity/domain-time';
 import { z } from 'zod';
 
-import { DAY_KEY_PATTERN } from '../utils/calendar';
 import { normalizeLinkUrl } from '../utils/normalize-link-url';
 
 /**
@@ -30,9 +30,6 @@ export const entityRefSchema = z.object({
   id: z.string().min(1),
 });
 
-const timestamp = z.iso.datetime({ offset: true });
-const dayKey = z.string().regex(DAY_KEY_PATTERN);
-
 export const metricSchema = baseRecordSchema.extend({
   value: z.number(),
   unit: z.string(),
@@ -48,7 +45,7 @@ export const goalSchema = baseRecordSchema.extend({
 
 export const habitSchema = baseRecordSchema.extend({
   /** Local calendar days the habit was completed, as YYYY-MM-DD. */
-  completedDays: z.array(dayKey),
+  completedDays: z.array(calendarDateSchema),
 });
 
 export const projectSchema = baseRecordSchema;
@@ -61,11 +58,11 @@ export const taskSchema = baseRecordSchema.extend({
 });
 
 export const calendarEventSchema = baseRecordSchema.extend({
-  startsAt: timestamp,
+  startsAt: instantSchema,
 });
 
 export const activitySchema = baseRecordSchema.extend({
-  occurredAt: timestamp,
+  occurredAt: instantSchema,
   /** The record the activity is about, when there is one. */
   subject: entityRefSchema.optional(),
 });

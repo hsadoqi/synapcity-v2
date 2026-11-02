@@ -28,3 +28,19 @@ export function recordSpaceView(
 ): Promise<{ ok: true } | { ok: false; error: ProviderFailure }> {
   return recordRecordView(client, 'spaces', spaceId, now);
 }
+
+// export function addDocumentToSpace(
+//   client: SupabaseServerClient,
+//   spaceId: string,
+//   now: Date,
+// ) {
+//   return recordRecordView(client, 'spaces', spaceId, now);
+// }
+
+// export function addDashboardToSpace(
+//   client: SupabaseServerClient,
+//   spaceId: string,
+//   now: Date,
+// ) {
+//   return recordRecordView(client, 'spaces', spaceId, now);
+// }

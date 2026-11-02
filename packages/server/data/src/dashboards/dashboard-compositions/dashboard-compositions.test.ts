@@ -63,9 +63,12 @@ describe('loadComposition', () => {
     });
   });
 
-  it('is null when nothing was saved yet', async () => {
+  it('throws when the composition is missing, never an empty value', async () => {
     const { client } = fakeClient({ data: null });
-    await expect(loadComposition(client, ID)).resolves.toBeNull();
+    const failure = await loadComposition(client, ID).catch((e: unknown) => e);
+    expect(failure).toBeInstanceOf(Error);
+    expect(failure).toMatchObject({ code: 'composition_missing' });
+    expect((failure as Error).message).toContain(ID);
   });
 
   it('is null for an id that is not a uuid, without asking the database', async () => {
@@ -99,39 +102,30 @@ describe('loadComposition', () => {
 });
 
 describe('saveComposition', () => {
-  it('inserts the first save at revision 1', async () => {
-    const { client, calls } = fakeClient({ error: null });
-    await expect(
-      saveComposition(client, ID, { widgets: [] }, 0),
-    ).resolves.toEqual({ ok: true, revision: 1 });
-    expect(calls.find((c) => c.method === 'insert')?.args[0]).toEqual({
-      dashboard_id: ID,
-      composition: { widgets: [] },
-      schema_version: COMPOSITION_SCHEMA_VERSION,
-      revision: 1,
-    });
-  });
-
-  it('reports a racing first save as a conflict', async () => {
-    const { client } = fakeClient({ error: { code: '23505' }, status: 409 });
+  it('has no insert path: a first save does not exist any more', async () => {
+    const { client, calls } = fakeClient();
     await expect(saveComposition(client, ID, {}, 0)).resolves.toEqual({
       ok: false,
-      reason: 'conflict',
+      reason: 'failed',
+      error: { code: 'invalid_revision' },
     });
+    expect(calls).toHaveLength(0);
+    expect(calls.some((c) => c.method === 'insert')).toBe(false);
   });
 
-  it('reports a refused insert as a failure with code and status only', async () => {
-    const { client } = fakeClient({
-      error: { code: '42501', message: 'private' },
-      status: 403,
-    });
-    const outcome = await saveComposition(client, ID, {}, 0);
-    expect(outcome).toEqual({
-      ok: false,
-      reason: 'failed',
-      error: { code: '42501', status: 403 },
-    });
-  });
+  it.each([-1, 1.5, Number.NaN])(
+    'refuses revision %s before asking the database',
+    async (revision) => {
+      const { client, calls } = fakeClient();
+      await expect(
+        saveComposition(client, ID, {}, revision),
+      ).resolves.toMatchObject({
+        ok: false,
+        reason: 'failed',
+      });
+      expect(calls).toHaveLength(0);
+    },
+  );
 
   it('updates only the row still at the expected revision and bumps it', async () => {
     const { client, calls } = fakeClient({ data: [{ revision: 4 }] });
@@ -141,6 +135,7 @@ describe('saveComposition', () => {
     });
     expect(calls.find((c) => c.method === 'update')?.args[0]).toMatchObject({
       composition: { a: 1 },
+      schema_version: COMPOSITION_SCHEMA_VERSION,
       revision: 4,
     });
     const eqs = calls.filter((c) => c.method === 'eq').map((c) => c.args);
@@ -150,30 +145,111 @@ describe('saveComposition', () => {
     ]);
   });
 
-  it('never reports success for a zero-row write: a moved revision is a conflict', async () => {
-    const { client } = fakeClient({ data: [] }, { data: { revision: 9 } });
-    await expect(saveComposition(client, ID, {}, 3)).resolves.toEqual({
-      ok: false,
-      reason: 'conflict',
+  describe('when no row was written', () => {
+    it('a moved revision is a conflict', async () => {
+      const { client } = fakeClient(
+        { data: [] },
+        { data: { composition: {}, revision: 9 } },
+      );
+      await expect(saveComposition(client, ID, {}, 3)).resolves.toEqual({
+        ok: false,
+        reason: 'conflict',
+      });
+    });
+
+    it('the next revision holding other content is a conflict, not a success', async () => {
+      const { client } = fakeClient(
+        { data: [] },
+        { data: { composition: { a: 'someone else' }, revision: 4 } },
+      );
+      await expect(
+        saveComposition(client, ID, { a: 'mine' }, 3),
+      ).resolves.toEqual({
+        ok: false,
+        reason: 'conflict',
+      });
+    });
+
+    it('the next revision holding the submitted content is a success (a retry after a lost response)', async () => {
+      const { client } = fakeClient(
+        { data: [] },
+        {
+          data: { composition: { b: [1, 2], a: { y: 1, x: 2 } }, revision: 4 },
+        },
+      );
+      await expect(
+        saveComposition(client, ID, { a: { x: 2, y: 1 }, b: [1, 2] }, 3),
+      ).resolves.toEqual({ ok: true, revision: 4 });
+    });
+
+    it('array order matters: reordered content is not the same save', async () => {
+      const { client } = fakeClient(
+        { data: [] },
+        { data: { composition: { b: [2, 1] }, revision: 4 } },
+      );
+      await expect(
+        saveComposition(client, ID, { b: [1, 2] }, 3),
+      ).resolves.toMatchObject({ ok: false, reason: 'conflict' });
+    });
+
+    it('a row the caller cannot see is a failure, not a conflict', async () => {
+      const { client } = fakeClient({ data: [] }, { data: null });
+      await expect(saveComposition(client, ID, {}, 3)).resolves.toEqual({
+        ok: false,
+        reason: 'failed',
+        error: { code: 'row_not_written' },
+      });
+    });
+
+    it('a row still at the expected revision is a failure', async () => {
+      const { client } = fakeClient(
+        { data: [] },
+        { data: { composition: {}, revision: 3 } },
+      );
+      await expect(saveComposition(client, ID, {}, 3)).resolves.toEqual({
+        ok: false,
+        reason: 'failed',
+        error: { code: 'row_not_written' },
+      });
     });
   });
 
-  it('a zero-row write on a row the caller cannot see is a failure, not a conflict', async () => {
-    const { client } = fakeClient({ data: [] }, { data: null });
-    await expect(saveComposition(client, ID, {}, 3)).resolves.toEqual({
-      ok: false,
-      reason: 'failed',
-      error: { code: 'row_not_written' },
+  describe('the database conflict code', () => {
+    it('is read back like a zero-row write: a moved revision is a conflict', async () => {
+      const { client } = fakeClient(
+        { error: { code: 'PT409' }, status: 409 },
+        { data: { composition: {}, revision: 9 } },
+      );
+      await expect(saveComposition(client, ID, {}, 3)).resolves.toEqual({
+        ok: false,
+        reason: 'conflict',
+      });
+    });
+
+    it('is a conflict even when the row can no longer be read', async () => {
+      const { client } = fakeClient(
+        { error: { code: 'PT409' }, status: 409 },
+        { data: null },
+      );
+      await expect(saveComposition(client, ID, {}, 3)).resolves.toEqual({
+        ok: false,
+        reason: 'conflict',
+      });
     });
   });
 
-  it('a zero-row write whose row still has the expected revision is a failure', async () => {
-    const { client } = fakeClient({ data: [] }, { data: { revision: 3 } });
-    await expect(saveComposition(client, ID, {}, 3)).resolves.toEqual({
+  it('reports a refused update as a failure with code and status only', async () => {
+    const { client } = fakeClient({
+      error: { code: '23514', message: 'private row data' },
+      status: 400,
+    });
+    const outcome = await saveComposition(client, ID, {}, 3);
+    expect(outcome).toEqual({
       ok: false,
       reason: 'failed',
-      error: { code: 'row_not_written' },
+      error: { code: '23514', status: 400 },
     });
+    expect(JSON.stringify(outcome)).not.toContain('private');
   });
 
   it('reports a failed update and a failed follow-up read as failures', async () => {

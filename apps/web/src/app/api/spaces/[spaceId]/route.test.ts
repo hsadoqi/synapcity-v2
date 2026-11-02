@@ -36,6 +36,16 @@ describe('GET /api/spaces/[spaceId]', () => {
     expect(find).not.toHaveBeenCalled();
   });
 
+  it('answers 503, not 401, when the Auth service is unavailable', async () => {
+    getVerifiedIdentity.mockResolvedValue({ status: 'unavailable' });
+
+    const response = await call('s1');
+
+    expect(response.status).toBe(503);
+    expect(response.headers.get('Cache-Control')).toBe('no-store');
+    expect(find).not.toHaveBeenCalled();
+  });
+
   it('returns the space uncached', async () => {
     getVerifiedIdentity.mockResolvedValue({
       status: 'verified',

@@ -1,8 +1,5 @@
 import type { ReactNode } from 'react';
-import {
-  ActionsToolbar,
-  type ToolbarAction,
-} from '@synapcity/frontend-ui/blocks/actions-toolbar';
+import { ActionsToolbar, type ToolbarAction } from '@synapcity/frontend-blocks';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 
 import {

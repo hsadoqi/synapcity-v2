@@ -1,7 +1,7 @@
-import type { OwnedRecordSummary } from '@synapcity/domain-records';
+import type { RecordSummary } from '@/lib/records/record-summary';
 
 /** Sample data for development fixture mode and tests; these are not saved records. */
-export const DASHBOARD_FIXTURES: readonly OwnedRecordSummary[] = [
+export const DASHBOARD_FIXTURES: readonly RecordSummary[] = [
   {
     id: 'fixture-dashboard-project-status',
     ownerId: '11111111-1111-4111-8111-111111111111',

@@ -1,4 +1,4 @@
-import { SkipLinkButton } from '@synapcity/frontend-ui/components/skip-link';
+import { SkipLinkButton } from '@synapcity/frontend-ui/core/skip-link';
 import { RootHeader } from './root-header';
 import { RootFooter } from './root-footer';
 import { RootContent } from './root-content';
@@ -9,7 +9,7 @@ import {
 } from '../sidebar-shell/root-sidebar';
 import React from 'react';
 import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';
-import type { RootBreadcrumb } from '../header-breadcrumbs';
+import type { RootBreadcrumb } from '../breadcrumbs/header-breadcrumbs';
 
 type ShellProps = {
   children: React.ReactNode;

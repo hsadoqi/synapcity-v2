@@ -123,6 +123,47 @@ describe('SidebarShell', () => {
     expect(probe()).toBe('expanded:true');
   });
 
+  it('toggles the sidebar with Ctrl+B or Cmd+B', () => {
+    renderShell(<div>Header</div>, <SidebarStateProbe />);
+    const probe = () => screen.getByTestId('probe').textContent;
+    act(() => reportSize(1280));
+
+    fireEvent.keyDown(window, { key: 'b' });
+    expect(probe()).toBe('expanded:true');
+    fireEvent.keyDown(window, { key: 'b', ctrlKey: true });
+    expect(probe()).toBe('collapsed:false');
+    fireEvent.keyDown(window, { key: 'b', metaKey: true });
+    expect(probe()).toBe('expanded:true');
+  });
+
+  it('leaves Ctrl+B to a control or editor that handles it first', () => {
+    renderShell(
+      <div>Header</div>,
+      <>
+        <SidebarStateProbe />
+        {/* An editor's bold binding, at the element layer. */}
+        <div
+          data-testid="bold-owner"
+          tabIndex={0}
+          onKeyDown={(event) => event.preventDefault()}
+        />
+        <input aria-label="Notes" />
+      </>,
+    );
+    const probe = () => screen.getByTestId('probe').textContent;
+    act(() => reportSize(1280));
+
+    for (const [target, init] of [
+      [screen.getByTestId('bold-owner'), {}],
+      [screen.getByRole('textbox', { name: 'Notes' }), {}],
+      [window, { isComposing: true }],
+      [window, { repeat: true }],
+    ] as const) {
+      fireEvent.keyDown(target, { key: 'b', ctrlKey: true, ...init });
+      expect(probe()).toBe('expanded:true');
+    }
+  });
+
   it('lets wide content shrink instead of pushing past the viewport', () => {
     renderShell();
 

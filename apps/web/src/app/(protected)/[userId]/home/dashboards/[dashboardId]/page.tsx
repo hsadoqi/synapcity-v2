@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { SetBreadcrumbs } from '@synapcity/frontend-shells';
+import { PublishBreadcrumbs } from '@synapcity/frontend-shells';
 
 import { COLLECTION_LABELS } from '@/components/collections';
 import { DashboardView } from '@/features/dashboards/components/dashboard-view';
@@ -44,14 +44,15 @@ export default async function DashboardShowPage({
   await requireOwner(userId);
   const dashboard = await getDashboard(dashboardId);
   if (!dashboard) notFound();
-  const [{ composition, revision }, items] = await Promise.all([
-    getDashboardComposition(dashboardId),
-    getDashboardLinkItems(userId),
-  ]);
+  // The composition first: it says which kinds of record the link widgets list,
+  // so only those are read.
+  const { composition, revision } = await getDashboardComposition(dashboardId);
+  const { items, unavailableKinds, unloadedKinds } =
+    await getDashboardLinkItems(userId, composition);
 
   return (
     <>
-      <SetBreadcrumbs
+      <PublishBreadcrumbs
         items={[
           {
             label: COLLECTION_LABELS.dashboards,
@@ -70,6 +71,8 @@ export default async function DashboardShowPage({
         composition={composition}
         revision={revision}
         items={items}
+        unavailableKinds={unavailableKinds}
+        unloadedKinds={unloadedKinds}
         persistence={fixtureModeEnabled() ? 'browser' : 'server'}
       />
     </>

@@ -15,7 +15,7 @@ pnpm dev:web      # http://localhost:8080
 
 Per-app checks run through the root scripts (`pnpm lint`, `pnpm check-types`, `pnpm build`); `pnpm verify` runs everything. Start `pnpm verify` from the repository root: inside `apps/web`, `pnpm verify` is this package's own script (`lint`, `check-types`, `build` only) and skips the tests, end-to-end run, Storybook tests, `deps` and `boundaries`.
 
-Tests: Vitest unit tests sit beside the code they cover as `*.test.ts` (`pnpm test` from the root, or `pnpm --filter web test`). They cover the pure auth helpers and route policy in `src/lib`, the auth and profile server actions (with the Supabase client replaced), the auth callback route handler, the session proxy (`src/lib/supabase/middleware.ts`) and an import-boundary check (`src/architecture.test.ts`). Component and hook tests that need a DOM are named `*.dom.test.tsx` and run in jsdom; everything else runs in Node. `pnpm test:e2e` runs the Playwright tests against a production build. The authenticated shared-look case is opt-in: save a session for an account with saved preferences to `e2e/.auth/account.json` (ignored by Git); the test reads account preferences and does not change them. The dashboard server-path case (`e2e/dashboard-persistence.e2e.ts`) is opt-in the same way: it needs that saved session of a dedicated test account (or `E2E_AUTH_STATE`) and `E2E_DASHBOARD_PATH`, the path of an empty dashboard the account owns, and it adds and removes widgets on it. `e2e/dashboard-edit.e2e.ts` runs on the development fixture identity (`SYNAPCITY_DEV_AUTH=fixture` with a dev server) and keeps the composition in the browser, so it covers the interface, not the database.
+Tests: Vitest unit tests sit beside the code they cover as `*.test.ts` (`pnpm test` from the root, or `pnpm --filter web test`). They cover the pure auth helpers and route policy in `src/lib`, the auth and profile server actions (with the Supabase client replaced), the auth callback route handler, the session proxy (`src/lib/supabase/middleware.ts`) and an import-boundary check (`src/__guards__/architecture.test.ts`). Component and hook tests that need a DOM are named `*.dom.test.tsx` and run in jsdom; everything else runs in Node. `pnpm test:e2e` runs the Playwright tests against a production build. The authenticated shared-look case is opt-in: save a session for an account with saved preferences to `e2e/.auth/account.json` (ignored by Git); the test reads account preferences and does not change them. The dashboard server-path case (`e2e/dashboard-persistence.e2e.ts`) is opt-in the same way: it needs that saved session of a dedicated test account (or `E2E_AUTH_STATE`) and `E2E_DASHBOARD_PATH`, the path of an empty dashboard the account owns, and it adds and removes widgets on it. `e2e/dashboard-edit.e2e.ts` runs on the development fixture identity (`SYNAPCITY_DEV_AUTH=fixture` with a dev server) and keeps the composition in the browser, so it covers the interface, not the database.
 
 These tests replace the Supabase client, so they do not prove live email delivery, OAuth round trips, cookie behavior across tabs or database policies (RLS). Those need a live run against a real project. Pages are covered only by the end-to-end tests.
 
@@ -32,6 +32,8 @@ Set these in `apps/web/.env.local` (git-ignored) and, for deployments, in the ho
 | `NEXT_PUBLIC_PREFERENCES_COOKIE_DOMAIN` | yes                    | Optional. Valid parent DNS domain for the shared look cookie (for example `.example.com`). Empty means host-only. Set the same value in the web and docs production builds |
 
 The app throws on the first sign-up, reset or OAuth call if `SITE_URL` is missing.
+
+**One local origin.** Sign-in, sign-up, reset and OAuth flows run on `http://127.0.0.1:3000` (`pnpm dev:web:local`): it is the local stack's `site_url` and its redirect allow-list entry (`supabase/config.toml`), so the emailed links return to it. `pnpm dev` (port 8080) is for development fixture mode only, which has no session and does not use auth.
 
 ### A worktree has no `.env.local`
 
@@ -92,7 +94,7 @@ Each environment has its own `SITE_URL`, and the emailed link only works if Supa
 
 | Environment | `SITE_URL`                             | Redirect URLs entry                              |
 | ----------- | -------------------------------------- | ------------------------------------------------ |
-| Local       | `http://localhost:8080`                | `http://localhost:8080/auth/callback**`          |
+| Local       | `http://127.0.0.1:3000`                | `http://127.0.0.1:3000/auth/callback**`          |
 | Preview     | that deployment's own URL              | one exact entry per deployment; no wildcard host |
 | Production  | the production domain (not chosen yet) | `https://<domain>/auth/callback**`               |
 

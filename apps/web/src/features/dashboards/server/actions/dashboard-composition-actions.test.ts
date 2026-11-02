@@ -79,7 +79,7 @@ describe('saveDashboardComposition', () => {
   it('saves a composition that went through JSON, as it arrives from the browser', async () => {
     const c = composition('last-opened');
     await expect(
-      saveDashboardComposition(ID, JSON.parse(JSON.stringify(c)), 0),
+      saveDashboardComposition(ID, JSON.parse(JSON.stringify(c)), 3),
     ).resolves.toMatchObject({ ok: true });
   });
 
@@ -111,11 +111,15 @@ describe('saveDashboardComposition', () => {
 
   describe('refuses what the browser could forge, without touching the database', () => {
     const cases: [string, () => [unknown, unknown, unknown]][] = [
-      ['an id that is not a uuid', () => ['nope', composition('pinned'), 0]],
-      ['a missing id', () => [undefined, composition('pinned'), 0]],
-      ['a composition that is not one', () => [ID, { widgets: 'x' }, 0]],
-      ['no composition', () => [ID, null, 0]],
-      ['a widget type that owns data', () => [ID, composition('tasks'), 0]],
+      ['an id that is not a uuid', () => ['nope', composition('pinned'), 1]],
+      ['a missing id', () => [undefined, composition('pinned'), 1]],
+      ['a composition that is not one', () => [ID, { widgets: 'x' }, 1]],
+      ['no composition', () => [ID, null, 1]],
+      ['a widget type that owns data', () => [ID, composition('tasks'), 1]],
+      [
+        'revision 0, the retired first-save sentinel',
+        () => [ID, composition('pinned'), 0],
+      ],
       ['a negative revision', () => [ID, composition('pinned'), -1]],
       ['a fractional revision', () => [ID, composition('pinned'), 1.5]],
       [
@@ -136,7 +140,7 @@ describe('saveDashboardComposition', () => {
         ...c,
         widgets: c.widgets.map((w) => ({ ...w, status: 'hidden' as const })),
       };
-      const result = await saveDashboardComposition(ID, hidden, 0);
+      const result = await saveDashboardComposition(ID, hidden, 1);
       expect(result).toMatchObject({ ok: false, reason: 'failed' });
       expect(mocks.saveComposition).not.toHaveBeenCalled();
     });
@@ -145,7 +149,7 @@ describe('saveDashboardComposition', () => {
   it('asks the person to sign in again when the session is gone, and saves nothing', async () => {
     mocks.getUser.mockResolvedValue({ data: { user: null }, error: null });
     await expect(
-      saveDashboardComposition(ID, composition('pinned'), 0),
+      saveDashboardComposition(ID, composition('pinned'), 1),
     ).resolves.toEqual({
       ok: false,
       reason: 'failed',
@@ -160,7 +164,7 @@ describe('saveDashboardComposition', () => {
       error: new AuthRetryableFetchError('offline', 503),
     });
     await expect(
-      saveDashboardComposition(ID, composition('pinned'), 0),
+      saveDashboardComposition(ID, composition('pinned'), 1),
     ).resolves.toMatchObject({
       message: 'Could not save your changes. Try again.',
     });
@@ -170,7 +174,7 @@ describe('saveDashboardComposition', () => {
   it('saves nothing in development fixture mode', async () => {
     mocks.fixtureModeEnabled.mockReturnValue(true);
     await expect(
-      saveDashboardComposition(ID, composition('pinned'), 0),
+      saveDashboardComposition(ID, composition('pinned'), 1),
     ).resolves.toEqual({
       ok: false,
       reason: 'failed',

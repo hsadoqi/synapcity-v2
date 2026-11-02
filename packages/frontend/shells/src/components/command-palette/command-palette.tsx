@@ -1,7 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
-
 import {
   Command,
   CommandDialog,
@@ -11,6 +9,9 @@ import {
   CommandItem,
   CommandList,
 } from '@synapcity/frontend-ui/core/command';
+import { useKeyboardShortcut } from '@synapcity/frontend-ui/hooks/use-keyboard-shortcut';
+
+import { COMMAND_PALETTE_SHORTCUT } from '../../utils/shortcuts';
 
 type IconComponent = React.ComponentType<{ className?: string }>;
 
@@ -52,16 +53,11 @@ export function CommandPalette({
   search?: string;
   onSearchChange?: (search: string) => void;
 }) {
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey)) {
-        event.preventDefault();
-        onOpenChange(!open);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, onOpenChange]);
+  // Allowed in text fields, so it reaches the palette's own search field and
+  // opens from a search box; an editor that binds ⌘K itself handles it first.
+  useKeyboardShortcut(COMMAND_PALETTE_SHORTCUT, () => onOpenChange(!open), {
+    allowInEditable: true,
+  });
 
   const choose = (item: CommandPaletteItem) => {
     onOpenChange(false);

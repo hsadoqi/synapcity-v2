@@ -1,7 +1,7 @@
-import type { OwnedRecordSummary } from '@synapcity/domain-records';
+import type { RecordSummary } from '@/lib/records/record-summary';
 
 /** Sample data for development fixture mode and tests; these are not saved records. */
-export const DOCUMENT_FIXTURES: readonly OwnedRecordSummary[] = [
+export const DOCUMENT_FIXTURES: readonly RecordSummary[] = [
   {
     id: 'fixture-document-launch-plan',
     ownerId: '11111111-1111-4111-8111-111111111111',
@@ -112,7 +112,7 @@ export const DOCUMENT_FIXTURES: readonly OwnedRecordSummary[] = [
     // unbroken string, and five tags.
     id: 'fixture-document-long-reading',
     ownerId: '11111111-1111-4111-8111-111111111111',
-    name: 'Field notes from the long winter of rewriting the onboarding guide, chapter by chapter, with every open question we could not settle before the spring release',
+    name: 'Field notes from the long winter of rewriting the onboarding guide, chapter by chapter, with open questions unresolved',
     description:
       'Source material: https://example.com/research/onboarding/2026/field-notes/interviews/transcripts/session-twelve-the-one-where-everything-changed-and-we-started-over-from-the-very-first-page',
     icon: 'library',

@@ -9,9 +9,7 @@
     "./core/*": "./src/components/ui/*/index.ts",
     "./components": "./src/components/index.ts",
     "./components/*": "./src/components/*/index.ts",
-    "./next/*": "./src/next/*/index.ts",
-    "./blocks": "./src/blocks/index.ts",
-    "./blocks/*": "./src/blocks/*/index.ts"
+    "./next/*": "./src/next/*/index.ts"
   },
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
@@ -50,7 +48,6 @@
     "@synapcity/frontend-preferences": "workspace:*",
     "@synapcity/frontend-tailwind-config": "workspace:*",
     "@synapcity/frontend-tokens": "workspace:*",
-    "chrono-node": "^2.10.3",
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.1.1",
     "cn": "^0.5.0",

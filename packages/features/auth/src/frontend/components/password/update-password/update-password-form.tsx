@@ -60,7 +60,14 @@ export function UpdatePasswordForm({
         required
       />
       <FormMessage id={messageId} state={state} />
-      <Button type="submit" size="lg" disabled={pending} aria-busy={pending}>
+      {/* Stays in the tab order while pending, announced as unavailable. */}
+      <Button
+        type="submit"
+        size="lg"
+        disabled={pending}
+        focusableWhenDisabled
+        aria-busy={pending}
+      >
         {pending ? 'Updating…' : 'Update password'}
       </Button>
     </form>

@@ -69,11 +69,14 @@ export function EmailChange({
   }
 
   // While a change waits, look again now and then and whenever the tab comes
-  // back into view: the link is usually opened somewhere else.
+  // back into view: the link is usually opened somewhere else. A hidden tab
+  // skips its regular look; it catches up once on return.
   useEffect(() => {
     if (!pendingEmail) return;
     const lookAgain = () => router.refresh();
-    const timer = setInterval(lookAgain, LOOK_AGAIN_MS);
+    const timer = setInterval(() => {
+      if (document.visibilityState !== 'hidden') lookAgain();
+    }, LOOK_AGAIN_MS);
     const onVisible = () => {
       if (document.visibilityState === 'visible') lookAgain();
     };

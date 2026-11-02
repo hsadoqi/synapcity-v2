@@ -1,23 +1,25 @@
-import type { BaseRecord, OwnedRecordSummary } from '@synapcity/domain-records';
+import type { BaseRecord } from '@synapcity/domain-records';
 import {
   findRecord,
   listRecordSummaries,
   setRecordPinned,
-  type RecordKind,
+  type ParticipantTable,
 } from '@synapcity/server-data';
+import { cache } from 'react';
 import { z } from 'zod';
 
 import { getCallerIdentity, SAVE_FAILED } from '@/lib/access/caller';
 import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import { logFailure } from '@/lib/log-failure';
 import { createClient } from '@/lib/supabase/server';
+import type { RecordSummary } from './record-summary';
+
+const recordIdSchema = z.uuid();
 
 /** What pinning a record reports back; `pinnedAt` is the server's own time. */
 export type SetRecordPinnedResult =
   | { ok: true; pinnedAt: string | null }
   | { ok: false; error: string; signedOut?: boolean };
-
-const idSchema = z.uuid();
 
 /**
  * The body of the document and dashboard pin Server Actions. The browser asks
@@ -27,13 +29,13 @@ const idSchema = z.uuid();
  * `operation` names the action in the log.
  */
 export async function setRecordPinnedFor(
-  kind: RecordKind,
+  kind: ParticipantTable,
   operation: string,
   recordId: unknown,
   pinned: unknown,
 ): Promise<SetRecordPinnedResult> {
   if (fixtureModeEnabled()) return { ok: false, error: FIXTURE_MESSAGE };
-  const id = idSchema.safeParse(recordId);
+  const id = recordIdSchema.safeParse(recordId);
   if (!id.success || typeof pinned !== 'boolean') {
     return { ok: false, error: SAVE_FAILED };
   }
@@ -59,9 +61,9 @@ export async function setRecordPinnedFor(
  * sample records instead.
  */
 export async function loadRecordSummaries(
-  kind: RecordKind,
-  fixtures: readonly OwnedRecordSummary[],
-): Promise<OwnedRecordSummary[]> {
+  kind: ParticipantTable,
+  fixtures: readonly RecordSummary[],
+): Promise<RecordSummary[]> {
   if (fixtureModeEnabled()) return [...fixtures];
   return listRecordSummaries(await createClient(), kind);
 }
@@ -70,14 +72,21 @@ export async function loadRecordSummaries(
  * One of the signed-in owner's records of one kind, or null when it does not
  * exist or is not theirs (row-level security makes the two look the same).
  * Development fixture mode reads the sample records instead.
+ *
+ * Memoized with React's `cache`, which lasts for one request only: a page and
+ * its `generateMetadata` read the same record once, and nothing is shared
+ * between requests or people. The key is the arguments, so `fixtures` must be a
+ * stable module constant (every caller passes one).
  */
-export async function loadRecord(
-  kind: RecordKind,
-  id: string,
-  fixtures: readonly OwnedRecordSummary[],
-): Promise<BaseRecord | null> {
-  if (fixtureModeEnabled()) {
-    return fixtures.find((record) => record.id === id) ?? null;
-  }
-  return findRecord(await createClient(), kind, id);
-}
+export const loadRecord = cache(
+  async (
+    kind: ParticipantTable,
+    id: string,
+    fixtures: readonly RecordSummary[],
+  ): Promise<BaseRecord | null> => {
+    if (fixtureModeEnabled()) {
+      return fixtures.find((record) => record.id === id) ?? null;
+    }
+    return findRecord(await createClient(), kind, id);
+  },
+);

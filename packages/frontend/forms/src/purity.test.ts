@@ -19,11 +19,9 @@ const PURE = [
   'utils/describe-schema-field',
   'utils/is-empty-value',
   'utils/resolve-field-states',
-  'utils/build-schema',
+  'utils/build-schema/build-schema',
   'utils/async-check',
-  'utils/date-value',
   'utils/group-options',
-  'utils/time-value',
   'utils/define-form-from-schema',
 ];
 

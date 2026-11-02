@@ -9,13 +9,13 @@ import {
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ModeProvider, useMode } from '@synapcity/frontend-preferences';
 import { SettingsProvider } from '..';
-import { useSettings } from '../../../hooks/use-settings';
+import { useSettings } from '../../../hooks/use-settings-lifecycle/use-settings';
 import { useRegionalSettings } from '../../../hooks/use-regional-settings';
-import { useAppearanceSettings } from '../../../hooks/use-appearance-settings';
+import { useAppearanceSettings } from '../../../hooks/use-visuals/use-appearance-settings';
 import { useNotificationSettings } from '../../../hooks/use-notification-settings';
 import { useDataPrivacySettings } from '../../../hooks/use-data-privacy-settings';
-import { useThemeSettings } from '../../../hooks/use-theme-settings';
-import { SettingsHeader } from '../../../shared/settings-page/settings-header';
+import { useThemeSettings } from '../../../hooks/use-visuals/use-theme-settings';
+import { SettingsHeader } from '../../../components/shared/settings-page/settings-header';
 
 const KEY = 'synapcity-preferences';
 

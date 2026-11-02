@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
+import { FIXTURE_HOME } from './support/fixture-paths';
+
 // The authenticated shell is exercised against the existing read-only dev
 // fixture identity, never a fabricated production session. Run with a dev
 // server and SYNAPCITY_DEV_AUTH=fixture; production CI skips this group.
@@ -10,7 +12,7 @@ test.describe('global panel in the authenticated shell', () => {
   );
 
   const visit = async (page: Page) => {
-    await page.goto('/fixture-user/home');
+    await page.goto(FIXTURE_HOME);
     await page.waitForLoadState('networkidle');
     return page.getByRole('button', { name: 'Toggle global panel' });
   };

@@ -25,6 +25,22 @@ const root = fileURLToPath(new URL('../../..', import.meta.url));
 // `pnpm build` (which clears .next) never serves it by accident.
 const DIST_DIR = '.next/local-session';
 const START_TIMEOUT_MS = 60_000;
+// The directory whose supabase/ folder names the stack to use. By default this
+// checkout's own; `E2E_STACK_WORKDIR` points the run at another one, such as
+// the worktree's disposable stack (`pnpm db:stack start`, whose copy of
+// config.toml and migrations live under its `work` directory). The address
+// checks in support/local-stack.ts still refuse anything that is not loopback.
+const STACK_DIR =
+  process.env.E2E_STACK_WORKDIR === undefined
+    ? root
+    : process.env.E2E_STACK_WORKDIR;
+// A variable that is set but empty (a failed command substitution) must not
+// quietly mean "the default stack", which another checkout may be using.
+if (!STACK_DIR) {
+  throw new Error(
+    'E2E_STACK_WORKDIR is set but empty; unset it or give a directory.',
+  );
+}
 // A user older than this belongs to a run that died, not to one in progress.
 const LEFTOVER_AGE_MS = 15 * 60_000;
 // The stack stamps users with its own clock, which can trail this one.
@@ -55,7 +71,7 @@ function run(command, args, env) {
 function stackValues() {
   const status = execFileSync(
     'supabase',
-    ['status', '-o', 'env', '--workdir', root],
+    ['status', '-o', 'env', '--workdir', STACK_DIR],
     { stdio: ['ignore', 'pipe', 'ignore'] },
   ).toString();
   return Object.fromEntries(
@@ -78,7 +94,7 @@ async function main() {
   };
   const publishableKey = values.PUBLISHABLE_KEY ?? values.ANON_KEY;
   const origin = siteOriginFrom(
-    readFileSync(join(root, 'supabase', 'config.toml'), 'utf8'),
+    readFileSync(join(STACK_DIR, 'supabase', 'config.toml'), 'utf8'),
   );
 
   const runStart = Date.now();

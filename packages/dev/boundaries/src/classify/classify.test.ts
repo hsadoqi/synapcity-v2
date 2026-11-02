@@ -117,6 +117,8 @@ describe('classifyFile production', () => {
   it.each([
     '/r/apps/web/src/a.test.ts',
     '/r/apps/web/src/a.dom.test.tsx',
+    '/r/apps/web/src/a.dbtest.ts',
+    '/r/apps/web/src/a.budget.ts',
     '/r/packages/frontend/ui/src/button/button.stories.tsx',
     '/r/apps/web/e2e/home.e2e.ts',
     '/r/apps/web/.storybook/main.ts',

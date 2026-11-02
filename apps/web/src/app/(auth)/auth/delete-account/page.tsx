@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { buttonVariants } from '@synapcity/frontend-ui/core/button';
 
@@ -11,6 +10,7 @@ import { confirmAccountDeletion } from './actions';
 import { getVerifiedClaims } from '@/features/auth/server';
 import { hasRecentLinkSignInNow } from '@synapcity/features-auth/contracts';
 import { settingsPathFor } from '@/lib/routing/user-paths';
+import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 
 export const metadata: Metadata = { title: 'Delete your account' };
 
@@ -36,12 +36,12 @@ export default async function DeleteAccountPage() {
         title="Ask for a new link"
         description="This page works only right after you open the link we emailed you. Nothing was deleted."
         footer={
-          <Link
+          <LinkButton
             href={settingsHref}
             className={buttonVariants({ variant: 'outline' })}
           >
             Back to settings
-          </Link>
+          </LinkButton>
         }
       />
     );

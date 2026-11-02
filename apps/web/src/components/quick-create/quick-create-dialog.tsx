@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useId, useRef, useState, useTransition, type FormEvent } from 'react';
 import { Button, buttonVariants } from '@synapcity/frontend-ui/core/button';
 import {
@@ -18,15 +17,19 @@ import {
   FieldLabel,
 } from '@synapcity/frontend-ui/core/field';
 import { Input } from '@synapcity/frontend-ui/core/input';
+import { NAME_MAX } from '@synapcity/domain-records';
 
 import { signInPathFor } from '../../lib/routing/user-paths';
 import {
   createRecord,
   type CreateRecordResult,
 } from '../../lib/records/create-record-action';
+import {
+  NAME_NEEDED,
+  quickCreateNameSchema,
+} from '../../lib/records/quick-create-name';
 import { collectionFor, type CollectionKind } from '../collections';
-
-const NAME_NEEDED = 'Give it a name.';
+import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 
 const unconfirmedMessage = (singular: string, label: string) =>
   `We could not confirm that the ${singular} was created. Check ${label} in the sidebar before you try again.`;
@@ -86,8 +89,14 @@ export function QuickCreateDialog({
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!collection || pending || submitting.current) return;
-    if (name.trim() === '') {
-      setFailure({ message: NAME_NEEDED, signedOut: false });
+    // The same rule the Server Action applies, so the message appears here
+    // without a round trip: blank, over the limit, or unsavable text.
+    const checked = quickCreateNameSchema.safeParse(name);
+    if (!checked.success) {
+      setFailure({
+        message: checked.error.issues[0]?.message ?? NAME_NEEDED,
+        signedOut: false,
+      });
       return;
     }
     setFailure(null);
@@ -96,7 +105,8 @@ export function QuickCreateDialog({
       try {
         let result: CreateRecordResult;
         try {
-          result = await create(collection.kind, name);
+          // The parsed name: trimmed, as the server stores it.
+          result = await create(collection.kind, checked.data);
         } catch {
           // The request failed on the way or the action threw: the record
           // may or may not exist.
@@ -160,6 +170,10 @@ export function QuickCreateDialog({
                 name="name"
                 autoComplete="off"
                 autoFocus
+                // A hint only. It counts UTF-16 units and the check trims, so
+                // the exact limit is the schema's: an emoji is one character
+                // there and two units here. 2x never blocks a valid name.
+                maxLength={NAME_MAX * 2}
                 value={name}
                 readOnly={pending}
                 onChange={(event) => setName(event.target.value)}
@@ -172,7 +186,7 @@ export function QuickCreateDialog({
                   {failure.signedOut && (
                     <>
                       {' '}
-                      <Link
+                      <LinkButton
                         href={signInPathFor(collection.indexHref(userId))}
                         className={buttonVariants({
                           variant: 'link',
@@ -180,7 +194,7 @@ export function QuickCreateDialog({
                         })}
                       >
                         Sign in again
-                      </Link>
+                      </LinkButton>
                     </>
                   )}
                 </FieldError>

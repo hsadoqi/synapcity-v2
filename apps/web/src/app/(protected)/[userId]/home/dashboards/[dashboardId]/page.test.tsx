@@ -35,7 +35,7 @@ vi.mock('@/lib/access/dev-fixture', () => ({
 }));
 
 import { isValidElement, type ReactElement, type ReactNode } from 'react';
-import { SetBreadcrumbs } from '@synapcity/frontend-shells';
+import { PublishBreadcrumbs } from '@synapcity/frontend-shells';
 
 import { DashboardView } from '@/features/dashboards/components/dashboard-view';
 import { RecordDashboardView } from '@/features/dashboards/components/record-dashboard-view';
@@ -62,7 +62,11 @@ describe('the Dashboard page', () => {
       composition: null,
       revision: 0,
     });
-    mocks.getDashboardLinkItems.mockResolvedValue([]);
+    mocks.getDashboardLinkItems.mockResolvedValue({
+      items: [],
+      unavailableKinds: [],
+      unloadedKinds: [],
+    });
     mocks.fixtureModeEnabled.mockReturnValue(false);
   });
 
@@ -96,12 +100,14 @@ describe('the Dashboard page', () => {
       composition: null,
       revision: 0,
       items: [],
+      unavailableKinds: [],
+      unloadedKinds: [],
       persistence: 'server',
     });
     expect(find(page, RecordDashboardView)?.props).toMatchObject({
       dashboardId: 'x1',
     });
-    expect(find(page, SetBreadcrumbs)?.props).toEqual({
+    expect(find(page, PublishBreadcrumbs)?.props).toEqual({
       items: [
         {
           label: 'Dashboards',
@@ -135,16 +141,22 @@ describe('the Dashboard page', () => {
       composition,
       revision: 7,
     });
-    mocks.getDashboardLinkItems.mockResolvedValue(items);
+    mocks.getDashboardLinkItems.mockResolvedValue({
+      items,
+      unavailableKinds: ['document'],
+      unloadedKinds: ['space'],
+    });
 
     const page = await DashboardShowPage({ params: params('x1') });
 
     expect(mocks.getDashboardComposition).toHaveBeenCalledWith('x1');
-    expect(mocks.getDashboardLinkItems).toHaveBeenCalledWith('u1');
+    expect(mocks.getDashboardLinkItems).toHaveBeenCalledWith('u1', composition);
     expect(find(page, DashboardView)?.props).toMatchObject({
       composition,
       revision: 7,
       items,
+      unavailableKinds: ['document'],
+      unloadedKinds: ['space'],
     });
   });
 

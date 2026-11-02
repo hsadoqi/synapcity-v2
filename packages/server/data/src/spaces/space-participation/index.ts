@@ -1,1 +1,7 @@
-export { listSpaceDashboards, listSpaceDocuments } from './space-participation';
+export {
+  addSpaceDashboard,
+  addSpaceDocument,
+  listSpaceDashboards,
+  listSpaceDocuments,
+  type AddedOutcome,
+} from './space-participation';

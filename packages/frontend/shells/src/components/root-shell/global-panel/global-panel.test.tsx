@@ -137,6 +137,39 @@ describe('GlobalPanelShell', () => {
     await layout();
     expect(screen.queryByRole('region', { name: 'Global panel' })).toBeNull();
   });
+  it('leaves an Escape that a control in the panel consumed', async () => {
+    await setup(
+      <input
+        aria-label="Search"
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') event.preventDefault();
+        }}
+      />,
+    );
+    await openPanel();
+    fireEvent.keyDown(screen.getByRole('textbox', { name: 'Search' }), {
+      key: 'Escape',
+    });
+    await layout();
+    expect(screen.getByRole('region', { name: 'Global panel' })).toBeTruthy();
+  });
+  it('closes on an Escape from a text field that does not use it', async () => {
+    await setup(<input aria-label="Draft" />);
+    await openPanel();
+    fireEvent.keyDown(screen.getByRole('textbox', { name: 'Draft' }), {
+      key: 'Escape',
+    });
+    await layout();
+    expect(screen.queryByRole('region', { name: 'Global panel' })).toBeNull();
+  });
+  it('ignores an Escape held down or ending an IME composition', async () => {
+    await setup();
+    await openPanel();
+    fireEvent.keyDown(document, { key: 'Escape', repeat: true });
+    fireEvent.keyDown(document, { key: 'Escape', isComposing: true });
+    await layout();
+    expect(screen.getByRole('region', { name: 'Global panel' })).toBeTruthy();
+  });
   it('keeps a locked panel open for outside/Escape, allows explicit close, and releases the lock', async () => {
     await setup();
     await openPanel();

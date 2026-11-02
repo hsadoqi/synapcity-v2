@@ -44,4 +44,4 @@ export {
   providerImageFrom,
   providerLabel,
 } from './utils';
-export type { CurrentUser, DisplayProfile, OAuthProvider } from './utils';
+export type { User, CurrentUser, DisplayProfile, OAuthProvider } from './utils';

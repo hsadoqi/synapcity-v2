@@ -27,6 +27,8 @@ const REFRESHED = {
 
 const sdk = vi.hoisted(() => ({
   claims: null as { sub: string } | null,
+  error: null as unknown,
+  throws: null as unknown,
   refreshes: true,
   clients: 0,
 }));
@@ -48,12 +50,16 @@ vi.mock('@supabase/ssr', () => ({
       auth: {
         getClaims: async () => {
           if (sdk.refreshes) cookies.setAll([REFRESHED], CACHE_HEADERS);
+          if (sdk.throws) throw sdk.throws;
+          if (sdk.error) return { data: null, error: sdk.error };
           return { data: sdk.claims ? { claims: sdk.claims } : null };
         },
       },
     };
   },
 }));
+
+import { AuthApiError, AuthRetryableFetchError } from '@supabase/supabase-js';
 
 import { REQUEST_PATH_HEADER } from '../routing/request-path';
 import { updateSession } from './middleware';
@@ -72,6 +78,8 @@ function expectSessionCarried(response: Response) {
 
 beforeEach(() => {
   sdk.claims = null;
+  sdk.error = null;
+  sdk.throws = null;
   sdk.refreshes = true;
   sdk.clients = 0;
 });
@@ -114,6 +122,60 @@ describe('updateSession', () => {
     const response = await updateSession(request('/'));
 
     expect(response.headers.get('cache-control')).toBeNull();
+  });
+});
+
+describe('updateSession when the Auth service cannot answer', () => {
+  const outages = [
+    ['a dropped connection', new AuthRetryableFetchError('fetch failed', 0)],
+    ['a 503', new AuthApiError('down', 503, 'unexpected_failure')],
+  ] as const;
+
+  it.each(outages)(
+    'rewrites a protected page to the unavailable page, with no redirect (%s)',
+    async (_name, error) => {
+      sdk.error = error;
+
+      const response = await updateSession(request('/user-1/home'));
+
+      expect(response.headers.get('location')).toBeNull();
+      expect(response.headers.get('x-middleware-rewrite')).toBe(
+        'https://app.test/auth/unavailable',
+      );
+      expect(response.headers.get('cache-control')).toBe('no-store');
+      expect(response.headers.get('set-cookie')).toContain(REFRESHED.name);
+    },
+  );
+
+  it('rewrites to the unavailable page when getClaims throws', async () => {
+    sdk.throws = new TypeError('fetch failed');
+
+    const response = await updateSession(request('/user-1/settings'));
+
+    expect(response.headers.get('x-middleware-rewrite')).toBe(
+      'https://app.test/auth/unavailable',
+    );
+  });
+
+  it.each(['/', '/auth/login', '/auth/unavailable', '/about'])(
+    'lets the public path %s through',
+    async (path) => {
+      sdk.error = new AuthRetryableFetchError('fetch failed', 0);
+
+      const response = await updateSession(request(path));
+
+      expect(response.headers.get('x-middleware-rewrite')).toBeNull();
+      expect(response.headers.get('location')).toBeNull();
+    },
+  );
+
+  it('still redirects to sign in when the service answered "no session"', async () => {
+    sdk.error = new AuthApiError('gone', 400, 'refresh_token_not_found');
+
+    const response = await updateSession(request('/user-1/home'));
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get('location')).toContain('/auth/login');
   });
 });
 

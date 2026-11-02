@@ -1,16 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, userEvent, within } from 'storybook/test';
-import { useActionState } from 'react';
 import { Button } from '@synapcity/frontend-ui/core/button';
 import { Label } from '@synapcity/frontend-ui/core/label';
 import { Input } from '@synapcity/frontend-ui/core/input';
 import { z } from 'zod';
 
-import { FormField } from '../../components/form-field';
-import { FormMessage } from '../../components/form-message';
-import { fieldErrorProps } from '../../utils/form-feedback';
+import { FormField } from '../../components/form-parts/form-field';
+import { FormMessage } from '../../components/form-parts/form-message';
+import { fieldErrorProps } from '../../components/form-engine/form-feedback';
 import { useFocusFirstError } from '../use-focus-first-error';
 import { useActionForm, type FormFeedback } from './use-action-form';
+import React from 'react';
 
 type Result = FormFeedback & { readonly message?: string };
 
@@ -20,7 +20,7 @@ const schema = z.object({
 
 /** A form shaped like the forgot-password pilot, with a stand-in for the server action. */
 function ActionForm() {
-  const [result, action] = useActionState<Result, FormData>(
+  const [result, action] = React.useActionState<Result, FormData>(
     async (_previous, formData) => ({
       message: `Sent to ${String(formData.get('email'))}.`,
     }),
@@ -102,7 +102,7 @@ const avatarSchema = z.object({
 
 /** A file input, checked in a real browser: jsdom cannot set a chosen file. */
 function AvatarForm() {
-  const [result, action] = useActionState<Result, FormData>(
+  const [result, action] = React.useActionState<Result, FormData>(
     async (_previous, formData) => {
       const file = formData.get('avatar');
       return { message: `Uploaded ${file instanceof File ? file.name : ''}.` };

@@ -21,7 +21,7 @@ import {
   DropdownMenuTrigger,
 } from '@synapcity/frontend-ui/core/dropdown-menu';
 import type { CollectionItem, CollectionItemAction } from '../../types';
-import { ConfirmDialog } from '@synapcity/frontend-ui/components/confirm-dialog';
+import { ConfirmDialog } from '@synapcity/frontend-blocks';
 
 const ALL_ACTIONS: CollectionItemAction[] = [
   'open',

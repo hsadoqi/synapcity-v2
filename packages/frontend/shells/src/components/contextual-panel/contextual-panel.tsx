@@ -28,6 +28,8 @@ import {
 } from '@synapcity/frontend-ui/core/tooltip';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 
+import { GLIDE_MS } from '../../utils/panel-motion';
+
 /** One place the panel can show. The panel knows only this list; each destination owns its content. */
 export type ContextualPanelDestination = {
   /** Unique among the destinations. */
@@ -55,9 +57,6 @@ const ContextualPanelContext = createContext<ContextualPanelControls | null>(
 export function useContextualPanel(): ContextualPanelControls | null {
   return useContext(ContextualPanelContext);
 }
-
-/** Opening and closing glide for this long; a drag follows the pointer and never animates. */
-const GLIDE_MS = 200;
 
 /** Neither region may be dragged narrower than this. */
 const REGION_MIN = '16rem';

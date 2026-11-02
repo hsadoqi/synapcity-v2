@@ -180,20 +180,15 @@ describe('Sidebar', () => {
 
     expect(trigger().getAttribute('aria-label')).toBe('Close navigation');
     expect(trigger().hasAttribute('aria-pressed')).toBe(false);
-    expect(trigger().getAttribute('aria-keyshortcuts')).toBe(
-      'Control+B Meta+B',
-    );
     fireEvent.click(trigger());
     expect(trigger().getAttribute('aria-label')).toBe('Open navigation');
   });
 
-  it('toggles with Ctrl+B and Cmd+B but not plain b', () => {
+  it('leaves keyboard shortcuts to the shell that owns them', () => {
     renderShell();
 
-    fireEvent.keyDown(window, { key: 'b' });
-    expect(readState().open).toBe(true);
+    expect(trigger().hasAttribute('aria-keyshortcuts')).toBe(false);
     fireEvent.keyDown(window, { key: 'b', ctrlKey: true });
-    expect(readState().open).toBe(false);
     fireEvent.keyDown(window, { key: 'b', metaKey: true });
     expect(readState().open).toBe(true);
   });
