@@ -6,7 +6,11 @@ import {
   lookOf,
   settingsDefaults,
 } from '@synapcity/domain-preferences';
-import { ModeProvider, readLookCookie } from '@synapcity/frontend-preferences';
+import {
+  ModeProvider,
+  PreferencesProvider,
+  readLookCookie,
+} from '@synapcity/frontend-preferences';
 import { SettingsProvider } from '..';
 import { useAppearanceSettings } from '../../../hooks/use-visuals/use-appearance-settings';
 import { useRegionalSettings } from '../../../hooks/use-regional-settings';
@@ -39,10 +43,12 @@ function mount() {
         enableSystem
         shareLook
       >
-        <SettingsProvider name="Ada">
-          <SettingsHeader />
-          <Controls />
-        </SettingsProvider>
+        <PreferencesProvider session={{ kind: 'guest' }}>
+          <SettingsProvider name="Ada">
+            <SettingsHeader />
+            <Controls />
+          </SettingsProvider>
+        </PreferencesProvider>
       </ModeProvider>
     </StrictMode>,
   );

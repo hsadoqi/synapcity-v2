@@ -7,7 +7,11 @@ import {
   waitFor,
 } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ModeProvider, useMode } from '@synapcity/frontend-preferences';
+import {
+  ModeProvider,
+  PreferencesProvider,
+  useMode,
+} from '@synapcity/frontend-preferences';
 import { SettingsProvider } from '..';
 import { useSettings } from '../../../hooks/use-settings-lifecycle/use-settings';
 import { useRegionalSettings } from '../../../hooks/use-regional-settings';
@@ -79,10 +83,12 @@ function mount() {
   return render(
     <StrictMode>
       <ModeProvider attribute="class" defaultTheme="system" enableSystem>
-        <SettingsProvider name="Ada">
-          <SettingsHeader />
-          <Controls />
-        </SettingsProvider>
+        <PreferencesProvider session={{ kind: 'guest' }}>
+          <SettingsProvider name="Ada">
+            <SettingsHeader />
+            <Controls />
+          </SettingsProvider>
+        </PreferencesProvider>
       </ModeProvider>
     </StrictMode>,
   );

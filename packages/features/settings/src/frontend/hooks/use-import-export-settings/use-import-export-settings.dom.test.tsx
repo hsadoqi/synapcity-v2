@@ -1,7 +1,10 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ModeProvider } from '@synapcity/frontend-preferences';
+import {
+  ModeProvider,
+  PreferencesProvider,
+} from '@synapcity/frontend-preferences';
 
 const mocks = vi.hoisted(() => ({ download: vi.fn(), importFile: vi.fn() }));
 
@@ -18,7 +21,9 @@ import { useSettings } from '../use-settings-lifecycle/use-settings';
 
 const wrapper = ({ children }: { children: ReactNode }) => (
   <ModeProvider attribute="class" defaultTheme="system" enableSystem>
-    <SettingsProvider>{children}</SettingsProvider>
+    <PreferencesProvider session={{ kind: 'guest' }}>
+      <SettingsProvider>{children}</SettingsProvider>
+    </PreferencesProvider>
   </ModeProvider>
 );
 

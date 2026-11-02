@@ -8,7 +8,10 @@ import {
   within,
 } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ModeProvider } from '@synapcity/frontend-preferences';
+import {
+  ModeProvider,
+  PreferencesProvider,
+} from '@synapcity/frontend-preferences';
 
 import { ImportExportSettings } from './index';
 import {
@@ -299,10 +302,12 @@ function ReadSettings() {
 async function mount() {
   const view = render(
     <ModeProvider attribute="class" defaultTheme="system" enableSystem>
-      <SettingsProvider>
-        <ImportExportSettings />
-        <ReadSettings />
-      </SettingsProvider>
+      <PreferencesProvider session={{ kind: 'guest' }}>
+        <SettingsProvider>
+          <ImportExportSettings />
+          <ReadSettings />
+        </SettingsProvider>
+      </PreferencesProvider>
     </ModeProvider>,
   );
   await waitFor(() =>

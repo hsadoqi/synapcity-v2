@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./contracts": "./src/contracts/index.ts",
     "./frontend": "./src/frontend/index.ts",
     "./server": "./src/server/index.ts"
   },

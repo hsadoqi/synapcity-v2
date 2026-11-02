@@ -1,6 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ModeProvider } from '@synapcity/frontend-preferences';
+import {
+  ModeProvider,
+  PreferencesProvider,
+} from '@synapcity/frontend-preferences';
 
 import { stubBrowser } from '../../../../testing';
 import { SettingsProvider } from '../../../../providers/settings-provider';
@@ -12,9 +15,11 @@ afterEach(() => vi.unstubAllGlobals());
 const show = (name?: string | null) =>
   render(
     <ModeProvider attribute="class" defaultTheme="system" enableSystem>
-      <SettingsProvider name={name}>
-        <SettingsHeader />
-      </SettingsProvider>
+      <PreferencesProvider session={{ kind: 'guest' }}>
+        <SettingsProvider name={name}>
+          <SettingsHeader />
+        </SettingsProvider>
+      </PreferencesProvider>
     </ModeProvider>,
   );
 

@@ -6,7 +6,9 @@ import { SettingsCombobox } from '../shared/settings-combobox';
 import { SettingsSelect } from '../shared/settings-select';
 import {
   formatDate,
+  formatNumber,
   formatTime,
+  numberFormats,
   regionalDefaults,
   resolveDateTimeFormatting,
   SYSTEM_TIMEZONE,
@@ -207,22 +209,8 @@ export function FirstDayOfWeekRow({
   );
 }
 
-// `grouping` picks the digit grouping: en-IN groups by lakh and crore (12,34,567).
-// The space group is a narrow no-break space, as CLDR writes it, so a number
-// never wraps between its digit groups.
-const numberFormatParts: Record<
-  RegionalSettings['numberFormat'],
-  { group: string; decimal: string; grouping: 'en-US' | 'en-IN' }
-> = {
-  '1,000.00': { group: ',', decimal: '.', grouping: 'en-US' },
-  '1.000,00': { group: '.', decimal: ',', grouping: 'en-US' },
-  '1 000,00': { group: ' ', decimal: ',', grouping: 'en-US' },
-  "1'000.00": { group: "'", decimal: '.', grouping: 'en-US' },
-  '1,00,000.00': { group: ',', decimal: '.', grouping: 'en-IN' },
-};
-
 export function NumberFormatRow({ value, onChange }: RowProps<'numberFormat'>) {
-  const preview = formatNumber(value);
+  const preview = formatSampleNumber(value);
   return (
     <SettingRow
       id="number-format"
@@ -234,8 +222,8 @@ export function NumberFormatRow({ value, onChange }: RowProps<'numberFormat'>) {
         id="number-format"
         value={value}
         onChange={onChange}
-        options={Object.keys(numberFormatParts).map((format) => ({
-          value: format as RegionalSettings['numberFormat'],
+        options={numberFormats.map((format) => ({
+          value: format,
           label: format,
         }))}
       />
@@ -258,20 +246,12 @@ export function draftFormatting(
 }
 
 /** A sample number written with the chosen grouping and decimal marks. */
-export function formatNumber(
+export function formatSampleNumber(
   numberFormat: RegionalSettings['numberFormat'],
   value = 1234567.89,
 ): string {
-  const { group, decimal, grouping } = numberFormatParts[numberFormat];
-  return new Intl.NumberFormat(grouping, {
+  return formatNumber(value, numberFormat, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  })
-    .formatToParts(value)
-    .map((part) => {
-      if (part.type === 'group') return group;
-      if (part.type === 'decimal') return decimal;
-      return part.value;
-    })
-    .join('');
+  });
 }

@@ -10,7 +10,10 @@ import type { ReactNode } from 'react';
 import { renderToString } from 'react-dom/server';
 import { hydrateRoot } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ModeProvider } from '@synapcity/frontend-preferences';
+import {
+  ModeProvider,
+  PreferencesProvider,
+} from '@synapcity/frontend-preferences';
 
 import { DateFormatRow, NumberFormatRow, TimeFormatRow } from './regional-rows';
 import {
@@ -82,11 +85,13 @@ function ReadSettings() {
 async function mount(extra: ReactNode = null) {
   const result = render(
     <ModeProvider attribute="class" defaultTheme="system" enableSystem>
-      <SettingsProvider>
-        <RegionalSettings />
-        {extra}
-        <ReadSettings />
-      </SettingsProvider>
+      <PreferencesProvider session={{ kind: 'guest' }}>
+        <SettingsProvider>
+          <RegionalSettings />
+          {extra}
+          <ReadSettings />
+        </SettingsProvider>
+      </PreferencesProvider>
     </ModeProvider>,
   );
   await waitFor(() =>

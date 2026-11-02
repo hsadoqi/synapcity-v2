@@ -1,4 +1,4 @@
-import type { AccountSync } from '../../../../../contracts';
+import { usePreferences } from '@synapcity/frontend-preferences';
 import { SettingsProvider } from '../../../../providers/settings-provider';
 import { SettingsHeader } from '../settings-header';
 import { SettingsTabs } from '../../settings-tabs';
@@ -10,13 +10,11 @@ import {
 
 export function SettingsContent({
   name,
-  account,
   notice,
   draftScope,
   accountTab,
 }: {
   name?: string | null;
-  account?: AccountSync;
   /** Shown under the header, such as why account actions are unavailable. */
   notice?: string;
   /** Host identity scopes this browser tab's unsaved drafts. */
@@ -24,8 +22,9 @@ export function SettingsContent({
   /** The host-owned Profile/Auth panel, loaded only when the Account tab opens. */
   accountTab?: () => Promise<React.ComponentType>;
 }) {
+  const syncsToAccount = usePreferences((s) => s.sync === 'synced');
   return (
-    <SettingsProvider name={name} account={account} draftScope={draftScope}>
+    <SettingsProvider name={name} draftScope={draftScope}>
       {/* Every tab's draft registers here, so leaving the page asks about all
           unsaved tabs, not only the one in view. */}
       <SettingsDraftsProvider>
@@ -42,7 +41,7 @@ export function SettingsContent({
                 )}
               </>
             }
-            footer={<SettingsFooter syncsToAccount={account !== undefined} />}
+            footer={<SettingsFooter syncsToAccount={syncsToAccount} />}
           />
         </div>
         <UnsavedChangesGuard />

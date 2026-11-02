@@ -4,7 +4,7 @@ import {
   formatTime,
   type RegionalSettings,
 } from '@synapcity/domain-preferences';
-import { draftFormatting, formatNumber } from './regional-rows';
+import { draftFormatting, formatSampleNumber } from './regional-rows';
 
 const week = [
   ['sunday', 'Sunday'],
@@ -52,7 +52,7 @@ export function RegionalPreview({
       <div>
         <dt className="text-xs text-muted-foreground">A number</dt>
         <dd className="text-lg font-medium tabular-nums">
-          {formatNumber(regional.numberFormat)}
+          {formatSampleNumber(regional.numberFormat)}
         </dd>
       </div>
       <div>

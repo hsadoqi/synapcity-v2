@@ -7,7 +7,12 @@ import {
   type RenderResult,
 } from '@testing-library/react';
 import { expect, vi } from 'vitest';
-import { ModeProvider } from '@synapcity/frontend-preferences';
+import {
+  ModeProvider,
+  PreferencesProvider,
+  type SaveAccountPreferences,
+} from '@synapcity/frontend-preferences';
+import type { PreferencesSession } from '@synapcity/domain-preferences';
 
 import { useSettings } from '../hooks/use-settings-lifecycle/use-settings';
 import { SettingsProvider } from '../providers/settings-provider';
@@ -48,18 +53,47 @@ function ReadSettings() {
   );
 }
 
+const guest: PreferencesSession = { kind: 'guest' };
+
+/** The root providers a host mounts, around the Settings page's own provider. */
+export function SettingsTestProviders({
+  children,
+  session = guest,
+  save,
+  name,
+  draftScope,
+}: {
+  children: ReactNode;
+  session?: PreferencesSession;
+  save?: SaveAccountPreferences;
+  name?: string | null;
+  draftScope?: string;
+}) {
+  return (
+    <ModeProvider attribute="class" defaultTheme="system" enableSystem>
+      <PreferencesProvider session={session} saveAccountPreferences={save}>
+        <SettingsProvider name={name} draftScope={draftScope}>
+          {children}
+        </SettingsProvider>
+      </PreferencesProvider>
+    </ModeProvider>
+  );
+}
+
 /** Mounts `ui` inside the real providers and waits until stored settings load. */
 export async function renderWithSettings(
   ui: ReactNode,
-  options: { draftScope?: string } = {},
+  options: {
+    draftScope?: string;
+    session?: PreferencesSession;
+    save?: SaveAccountPreferences;
+  } = {},
 ): Promise<RenderResult> {
   const result = render(
-    <ModeProvider attribute="class" defaultTheme="system" enableSystem>
-      <SettingsProvider draftScope={options.draftScope}>
-        {ui}
-        <ReadSettings />
-      </SettingsProvider>
-    </ModeProvider>,
+    <SettingsTestProviders {...options}>
+      {ui}
+      <ReadSettings />
+    </SettingsTestProviders>,
   );
   await waitFor(() =>
     expect(screen.getByTestId('ready').textContent).toBe('true'),

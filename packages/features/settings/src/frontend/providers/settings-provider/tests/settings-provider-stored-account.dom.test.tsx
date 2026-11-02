@@ -1,6 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { ModeProvider } from '@synapcity/frontend-preferences';
+import {
+  ModeProvider,
+  PreferencesProvider,
+} from '@synapcity/frontend-preferences';
 
 import { SettingsProvider } from '..';
 import { useSettings } from '../../../hooks/use-settings-lifecycle/use-settings';
@@ -21,9 +24,11 @@ function Probe() {
 const mount = () =>
   render(
     <ModeProvider attribute="class" defaultTheme="system" enableSystem>
-      <SettingsProvider>
-        <Probe />
-      </SettingsProvider>
+      <PreferencesProvider session={{ kind: 'guest' }}>
+        <SettingsProvider>
+          <Probe />
+        </SettingsProvider>
+      </PreferencesProvider>
     </ModeProvider>,
   );
 const ready = () =>

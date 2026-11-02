@@ -6,19 +6,26 @@ import {
   waitFor,
 } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ModeProvider } from '@synapcity/frontend-preferences';
+import type {
+  PreferencesSession,
+  SavePreferencesResult,
+} from '@synapcity/domain-preferences';
+import type { SaveAccountPreferences } from '@synapcity/frontend-preferences';
 
 import { AppearanceSettings } from '../../../components/appearance-settings';
 import { useSettings } from '../../../hooks/use-settings-lifecycle/use-settings';
 import type { StoredAccountPreferences } from '@synapcity/domain-preferences';
-import type { AccountSync, SavePreferencesResult } from '../../../../contracts';
 import {
   accountPart,
   type DisplaySettings,
 } from '@synapcity/domain-preferences';
-import { currentSettings, saveTab, stubBrowser } from '../../../testing';
+import {
+  currentSettings,
+  saveTab,
+  SettingsTestProviders,
+  stubBrowser,
+} from '../../../testing';
 import { settingsDefaults, type Settings } from '@synapcity/domain-preferences';
-import { SettingsProvider } from '..';
 
 const KEY = 'synapcity-preferences';
 const SET_ASIDE_KEY = 'synapcity-device-display';
@@ -63,23 +70,29 @@ function sync(
   stored: Partial<StoredAccountPreferences> = {},
   result: SavePreferencesResult = { ok: true },
 ) {
-  const save = vi.fn<AccountSync['save']>().mockResolvedValue(result);
-  const account: AccountSync = {
-    stored: { preferences: null, deviceTimezone: DEVICE_TZ, ...stored },
-    save,
-  };
+  const save = vi.fn<SaveAccountPreferences>().mockResolvedValue(result);
+  const account: { session: PreferencesSession; save: SaveAccountPreferences } =
+    {
+      session: {
+        kind: 'account',
+        userId: 'user-1',
+        stored: { preferences: null, deviceTimezone: DEVICE_TZ, ...stored },
+      },
+      save,
+    };
   return { account, save };
 }
 
-async function mount(account?: AccountSync) {
+async function mount(account?: {
+  session: PreferencesSession;
+  save: SaveAccountPreferences;
+}) {
   const result = render(
-    <ModeProvider attribute="class" defaultTheme="system" enableSystem>
-      <SettingsProvider account={account}>
-        <AppearanceSettings />
-        <Status />
-        <SettingsRead />
-      </SettingsProvider>
-    </ModeProvider>,
+    <SettingsTestProviders session={account?.session} save={account?.save}>
+      <AppearanceSettings />
+      <Status />
+      <SettingsRead />
+    </SettingsTestProviders>,
   );
   await waitFor(() =>
     expect(screen.getByTestId('ready').textContent).toBe('true'),
@@ -123,6 +136,11 @@ describe('SettingsProvider with an account (ADR-0010)', () => {
 
   it('saves choices made before signing in when the account has none', async () => {
     localStorage.setItem(KEY, JSON.stringify(withLanguage('es')));
+    // Written while signed out by this build; a legacy copy is never adopted.
+    localStorage.setItem(
+      'synapcity-preferences-owner',
+      JSON.stringify({ v: 1, owner: { kind: 'guest', adoptable: true } }),
+    );
     const { account, save } = sync();
     await mount(account);
     await waitFor(() =>

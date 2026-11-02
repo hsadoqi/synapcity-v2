@@ -1,15 +1,20 @@
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { ModeProvider } from '@synapcity/frontend-preferences';
+import {
+  ModeProvider,
+  PreferencesProvider,
+} from '@synapcity/frontend-preferences';
 
 import { SettingsProvider } from '..';
 import { SettingsHeader } from '../../../components/shared/settings-page/settings-header';
 
 const page = (name: string | null) => (
   <ModeProvider attribute="class" defaultTheme="system" enableSystem>
-    <SettingsProvider name={name}>
-      <SettingsHeader />
-    </SettingsProvider>
+    <PreferencesProvider session={{ kind: 'guest' }}>
+      <SettingsProvider name={name}>
+        <SettingsHeader />
+      </SettingsProvider>
+    </PreferencesProvider>
   </ModeProvider>
 );
 
