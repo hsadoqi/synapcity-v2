@@ -47,6 +47,5 @@ export {
 export {
   MAX_COMPOSITION_BYTES,
   parsePersistableComposition,
-  type PersistableResult,
 } from './persistence';
 export { createWidget } from './create-widget';
