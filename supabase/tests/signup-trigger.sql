@@ -1,6 +1,6 @@
 -- private.handle_new_user (the signup trigger): a profile for every new user,
--- from the three metadata shapes the providers send, and it never raises (an
--- error here would abort the whole signup).
+-- from the three metadata shapes the providers send plus structured first and
+-- last names, and it never raises (an error here would abort the whole signup).
 -- Run through `pnpm db:test`. Rolled back.
 \set ON_ERROR_STOP on
 
@@ -21,7 +21,15 @@ insert into auth.users (id, email, raw_user_meta_data) values
   ('a0000000-0000-4000-8000-000000000007', 'signup-blank@example.test', '{"name":"   ","full_name":"  "}'),
   -- no metadata at all, and an odd shape
   ('a0000000-0000-4000-8000-000000000008', 'signup-none@example.test', null),
-  ('a0000000-0000-4000-8000-000000000009', 'signup-odd@example.test', '{"name":{"nested":true},"avatar_url":42}');
+  ('a0000000-0000-4000-8000-000000000009', 'signup-odd@example.test', '{"name":{"nested":true},"avatar_url":42}'),
+  -- structured names: both, first only, trimmed
+  ('a0000000-0000-4000-8000-000000000010', 'signup-names@example.test', '{"first_name":"Ada","last_name":"Lovelace","full_name":"Ada Lovelace"}'),
+  ('a0000000-0000-4000-8000-000000000011', 'signup-first@example.test', '{"first_name":"  Grace  "}'),
+  -- structured names that are not valid: blank, whitespace, too long, not strings
+  ('a0000000-0000-4000-8000-000000000012', 'signup-badnames@example.test', jsonb_build_object('first_name', E' \t ', 'last_name', repeat('l', 81))),
+  ('a0000000-0000-4000-8000-000000000013', 'signup-oddnames@example.test', '{"first_name":{"x":1},"last_name":42}'),
+  -- a full_name, name, display_name and username are never split into names
+  ('a0000000-0000-4000-8000-000000000014', 'signup-nosplit@example.test', '{"full_name":"Ada Lovelace","name":"Ada Lovelace","display_name":"Ada L","username":"ada"}');
 
 do $$
 declare
@@ -29,11 +37,19 @@ declare
   n integer;
 begin
   select count(*) into n from public.profiles where id::text like 'a0000000-%';
-  if n <> 9 then raise exception 'every signup must get a profile (saw % of 9)', n; end if;
+  if n <> 14 then raise exception 'every signup must get a profile (saw % of 14)', n; end if;
+  -- No signup is complete, and none gets a bio.
+  if exists (select 1 from public.profiles where id::text like 'a0000000-%'
+              and (profile_completed_at is not null or bio is not null)) then
+    raise exception 'a new profile must not be complete and must have no bio';
+  end if;
 
   select * into p from public.profiles where id = 'a0000000-0000-4000-8000-000000000001';
   if p.display_name is distinct from 'Ada Password' or p.avatar_url is not null then
     raise exception 'password signup: name only';
+  end if;
+  if p.first_name is not null or p.last_name is not null then
+    raise exception 'a "name" must not be split into first and last names';
   end if;
 
   select * into p from public.profiles where id = 'a0000000-0000-4000-8000-000000000002';
@@ -63,6 +79,40 @@ begin
 
   select * into p from public.profiles where id = 'a0000000-0000-4000-8000-000000000008';
   if not found then raise exception 'a signup without metadata still gets a profile'; end if;
+  if p.first_name is not null or p.last_name is not null then
+    raise exception 'a signup without metadata has no names';
+  end if;
+
+  select * into p from public.profiles where id = 'a0000000-0000-4000-8000-000000000010';
+  if p.first_name is distinct from 'Ada' or p.last_name is distinct from 'Lovelace' then
+    raise exception 'structured first_name and last_name must be copied';
+  end if;
+  if p.display_name is distinct from 'Ada Lovelace' then
+    raise exception 'the display-name prefill must be unchanged by structured names';
+  end if;
+
+  select * into p from public.profiles where id = 'a0000000-0000-4000-8000-000000000011';
+  if p.first_name is distinct from 'Grace' or p.last_name is not null then
+    raise exception 'a first name alone must be copied trimmed, with no last name (got %, %)', p.first_name, p.last_name;
+  end if;
+  if p.display_name is not null then
+    raise exception 'display_name must not be generated from first_name';
+  end if;
+
+  select * into p from public.profiles where id = 'a0000000-0000-4000-8000-000000000012';
+  if p.first_name is not null or p.last_name is not null then
+    raise exception 'blank or over-long names must become null';
+  end if;
+
+  select * into p from public.profiles where id = 'a0000000-0000-4000-8000-000000000013';
+  if p.first_name is not null or p.last_name is not null then
+    raise exception 'names that are not JSON strings must become null';
+  end if;
+
+  select * into p from public.profiles where id = 'a0000000-0000-4000-8000-000000000014';
+  if p.first_name is not null or p.last_name is not null then
+    raise exception 'full_name, name, display_name and username must not be split into names';
+  end if;
 end;
 $$;
 

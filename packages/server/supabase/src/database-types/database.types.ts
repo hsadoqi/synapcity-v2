@@ -193,24 +193,36 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null;
+          bio: string | null;
           created_at: string;
           display_name: string | null;
+          first_name: string | null;
           id: string;
+          last_name: string | null;
+          profile_completed_at: string | null;
           updated_at: string;
         };
         ComputedFields: never;
         Insert: {
           avatar_url?: string | null;
+          bio?: string | null;
           created_at?: string;
           display_name?: string | null;
+          first_name?: string | null;
           id: string;
+          last_name?: string | null;
+          profile_completed_at?: string | null;
           updated_at?: string;
         };
         Update: {
           avatar_url?: string | null;
+          bio?: string | null;
           created_at?: string;
           display_name?: string | null;
+          first_name?: string | null;
           id?: string;
+          last_name?: string | null;
+          profile_completed_at?: string | null;
           updated_at?: string;
         };
         Relationships: [];
