@@ -66,5 +66,4 @@ supabase/.temp
 .pnpm-store
 .archives
 
-docs/archive/notes
-docs/audits
+docs/archive
