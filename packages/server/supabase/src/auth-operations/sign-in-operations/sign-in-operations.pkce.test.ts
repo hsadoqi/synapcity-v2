@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { createRequestClient } from '../request-client';
+import { createRequestClient } from '../../request-client';
 import { exchangeAuthCode } from './sign-in-operations';
 
 /*

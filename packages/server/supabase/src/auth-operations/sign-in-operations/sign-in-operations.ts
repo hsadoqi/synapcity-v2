@@ -3,8 +3,11 @@ import {
   type OAuthProvider,
 } from '@synapcity/domain-identity';
 
-import { toProviderFailure, type ProviderFailure } from '../provider-failure';
-import type { SupabaseServerClient } from '../request-client';
+import {
+  toProviderFailure,
+  type ProviderFailure,
+} from '../../provider-failure';
+import type { SupabaseServerClient } from '../../request-client';
 
 /*
  * The operations that start, finish or end a session. The same contract as

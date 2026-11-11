@@ -1,13 +1,15 @@
 import { AuthApiError } from '@supabase/supabase-js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { resendSignupConfirmation, updateOwnPassword } from './auth-operations';
+import { updateOwnPassword } from '../password-operations';
+
 import {
   exchangeAuthCode,
   signInWithPassword,
   signOutSession,
   startOAuthSignIn,
 } from './sign-in-operations';
+import { resendSignupConfirmation } from '../recovery-operations';
 
 const mocks = vi.hoisted(() => ({
   signInWithPassword: vi.fn(),
