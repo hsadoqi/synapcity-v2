@@ -1,4 +1,7 @@
-import { AuthRetryableFetchError } from '@supabase/supabase-js';
+import {
+  AuthRetryableFetchError,
+  AuthSessionMissingError,
+} from '@supabase/supabase-js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
@@ -93,7 +96,7 @@ describe('saveAccountPreferences', () => {
   it('asks a signed-out caller to sign in again', async () => {
     mocks.getUser.mockResolvedValue({
       data: { user: null },
-      error: { code: 'session_not_found', status: 401 },
+      error: new AuthSessionMissingError(),
     });
     await expect(
       saveAccountPreferences(preferences, 'UTC'),

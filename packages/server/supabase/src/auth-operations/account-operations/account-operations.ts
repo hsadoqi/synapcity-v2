@@ -1,4 +1,3 @@
-import { isAuthRetryableFetchError } from '@supabase/supabase-js';
 import { OAuthProvider } from '@synapcity/domain-identity';
 import { classifyAuthError } from '../../auth-errors';
 import { SupabaseServerClient } from '../../request-client';
@@ -69,8 +68,7 @@ export async function disconnectAccount(
     if (unlinkError.code === 'identity_not_found') {
       return { kind: 'not-connected' };
     }
-    if (isAuthRetryableFetchError(unlinkError)) return { kind: 'unavailable' };
-    return { kind: 'provider-error', code: unlinkError.code };
+    return classifyAuthError(unlinkError);
   }
   return { kind: 'disconnected' };
 }

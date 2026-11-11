@@ -329,7 +329,7 @@ describe('updateAvatar', () => {
   it('asks to sign in again when there is no caller', async () => {
     mocks.getUser.mockResolvedValue({
       data: { user: null },
-      error: { code: 'session_not_found' },
+      error: new AuthSessionMissingError(),
     });
 
     const state = await updateAvatar({}, avatarForm(PNG));
@@ -644,7 +644,7 @@ describe('when the session cannot be checked', () => {
   ])('%s tells someone with no session to sign in again', async (_n, run) => {
     mocks.getUser.mockResolvedValue({
       data: { user: null },
-      error: { code: 'session_not_found' },
+      error: new AuthSessionMissingError(),
     });
 
     const state = await run();

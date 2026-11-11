@@ -1,6 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { changeEmail, resendEmailChange } from '../password-operations';
-import { AuthRetryableFetchError } from '@supabase/supabase-js';
+import {
+  AuthRetryableFetchError,
+  AuthSessionMissingError,
+} from '@supabase/supabase-js';
 import { requestRecoveryEmail } from './recovery-operations';
 
 const mocks = vi.hoisted(() => ({
@@ -159,7 +162,8 @@ describe('changeEmail', () => {
   it('tells a missing session from an unreachable service', async () => {
     mocks.getUser.mockResolvedValue({
       data: { user: null },
-      error: { code: 'session_not_found' },
+      // What auth-js returns for a `session_not_found` answer.
+      error: new AuthSessionMissingError(),
     });
     expect(await changeEmail(client, input)).toEqual({ kind: 'signed-out' });
 
@@ -226,7 +230,8 @@ describe('resendEmailChange', () => {
   it('tells a missing session from an unreachable service', async () => {
     mocks.getUser.mockResolvedValue({
       data: { user: null },
-      error: { code: 'session_not_found' },
+      // What auth-js returns for a `session_not_found` answer.
+      error: new AuthSessionMissingError(),
     });
     expect(await resendEmailChange(client, { redirectTo })).toEqual({
       kind: 'signed-out',

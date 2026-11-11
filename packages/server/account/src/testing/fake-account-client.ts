@@ -269,7 +269,10 @@ export function fakeAccountStore(options: {
           if (!state.accountExists) {
             return {
               data: { user: null },
+              // Shaped as auth-js's `AuthApiError` (its type guards read
+              // `__isAuthError` and `name`), without depending on the SDK.
               error: {
+                __isAuthError: true,
                 name: 'AuthApiError',
                 code: 'user_not_found',
                 status: 403,

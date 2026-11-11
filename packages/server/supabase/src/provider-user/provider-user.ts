@@ -1,6 +1,5 @@
-import { isAuthRetryableFetchError } from '@supabase/supabase-js';
-
-import { toProviderFailure, type ProviderFailure } from '../provider-failure';
+import { identityFailure, withDeadline } from '../auth-errors';
+import type { ProviderFailure } from '../provider-failure';
 import type { SupabaseServerClient } from '../request-client';
 
 /** What profile operations need to know about the signed-in user. */
@@ -28,17 +27,26 @@ export type ProviderUserResult =
 /**
  * Reads the user record for the caller's own session from the provider.
  *
- * A dropped connection is not a signed-out session, so the two are different
- * outcomes: the host tells a person to sign in again only for a rejected
- * session. A failure carries the code and status only, never the error, its
- * message or the session.
+ * Only an answered "no session" (a missing session, an invalid token, or a 4xx
+ * refusal with a code such as `user_not_found`) is signed out. A rate limit,
+ * an unexplained error, an outage, a thrown value and no answer within the
+ * shared deadline are `unavailable`, so the host tells a person to sign in
+ * again only for a rejected session. A failure carries the code and status
+ * only, never the error, its message or the session.
  */
 export async function readProviderUser(
   client: SupabaseServerClient,
 ): Promise<ProviderUserResult> {
-  const { data, error } = await client.auth.getUser();
-  if (!error && data.user) return { kind: 'user', user: data.user };
-  const failure: ProviderFailure = error ? toProviderFailure(error) : {};
-  if (isAuthRetryableFetchError(error)) return { kind: 'unavailable', failure };
-  return { kind: 'signed-out', failure };
+  try {
+    const response = await withDeadline(() => client.auth.getUser());
+    if (response === 'deadline') {
+      return { kind: 'unavailable', failure: { code: 'timeout' } };
+    }
+    const { data, error } = response;
+    if (error) return identityFailure(error);
+    if (data.user) return { kind: 'user', user: data.user };
+    return { kind: 'signed-out', failure: {} };
+  } catch (thrown) {
+    return identityFailure(thrown);
+  }
 }

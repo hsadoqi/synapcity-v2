@@ -1,6 +1,7 @@
 import { disconnectAccount, startAccountLink } from './account-operations';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  AuthApiError,
   AuthRetryableFetchError,
   AuthSessionMissingError,
 } from '@supabase/supabase-js';
@@ -81,11 +82,7 @@ describe('startAccountLink', () => {
   it('reduces a provider error to its code, such as linking being switched off', async () => {
     mocks.linkIdentity.mockResolvedValue({
       data: { provider: 'github', url: null },
-      error: {
-        code: 'manual_linking_disabled',
-        message: 'sentinel',
-        status: 422,
-      },
+      error: new AuthApiError('sentinel', 422, 'manual_linking_disabled'),
     });
 
     const outcome = await startAccountLink(client, input);
@@ -175,7 +172,7 @@ describe('disconnectAccount', () => {
     has(email, github);
     mocks.unlinkIdentity.mockResolvedValue({
       data: null,
-      error: { code, message: 'sentinel' },
+      error: new AuthApiError('sentinel', 422, code),
     });
 
     const outcome = await disconnectAccount(client, { provider: 'github' });
