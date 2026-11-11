@@ -1,6 +1,5 @@
-import { isAuthRetryableFetchError } from '@supabase/supabase-js';
-
 import { isRateLimited } from '../../auth-errors';
+import { readProviderUser } from '../../provider-user';
 import type { SupabaseServerClient } from '../../request-client';
 
 export type DeletionLinkOutcome =
@@ -28,13 +27,9 @@ export async function sendAccountDeletionLink(
     redirectTo: string;
   },
 ): Promise<DeletionLinkOutcome> {
-  const { data, error: userError } = await supabase.auth.getUser();
-  if (userError || !data.user) {
-    return isAuthRetryableFetchError(userError)
-      ? { kind: 'unavailable' }
-      : { kind: 'signed-out' };
-  }
-  const email = data.user.email;
+  const found = await readProviderUser(supabase);
+  if (found.kind !== 'user') return { kind: found.kind };
+  const email = found.user.email;
   if (!email) return { kind: 'no-email' };
   if (email.toLowerCase() !== input.typedEmail.trim().toLowerCase()) {
     return { kind: 'wrong-email' };

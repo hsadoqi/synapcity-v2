@@ -124,20 +124,37 @@ describe('supabaseIdentityProvider user()', () => {
     });
   });
 
-  it('treats an error that arrives with a user as a refusal, not a user', async () => {
+  it('treats an error that arrives with a user as a failure, not a user', async () => {
     const provider = supabaseIdentityProvider(
       clientWith({
         getUser: async () => ({
           data: { user: { id: 'u1' } },
-          error: new AuthApiError('odd', 500, 'unexpected_failure'),
+          error: new AuthApiError('odd', 403, 'bad_jwt'),
         }),
       }),
     );
 
     await expect(provider.user()).resolves.toEqual({
       kind: 'refused',
+      code: 'bad_jwt',
+      status: 403,
+    });
+  });
+
+  it('reads a 5xx API error as unreachable, not a refusal', async () => {
+    const provider = supabaseIdentityProvider(
+      clientWith({
+        getUser: async () => ({
+          data: { user: { id: 'u1' } },
+          error: new AuthApiError('odd', 505, 'unexpected_failure'),
+        }),
+      }),
+    );
+
+    await expect(provider.user()).resolves.toEqual({
+      kind: 'unreachable',
       code: 'unexpected_failure',
-      status: 500,
+      status: 505,
     });
   });
 });

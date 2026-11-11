@@ -1,6 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { sendOwnPasswordReset } from './password-operations';
-import { AuthRetryableFetchError } from '@supabase/supabase-js';
+import {
+  AuthRetryableFetchError,
+  AuthSessionMissingError,
+} from '@supabase/supabase-js';
 
 const mocks = vi.hoisted(() => ({
   signUp: vi.fn(),
@@ -79,7 +82,8 @@ describe('sendOwnPasswordReset', () => {
   it('tells a missing session from an unreachable service', async () => {
     mocks.getUser.mockResolvedValue({
       data: { user: null },
-      error: { code: 'session_not_found' },
+      // What auth-js returns for a `session_not_found` answer.
+      error: new AuthSessionMissingError(),
     });
     expect(await sendOwnPasswordReset(client, { resetRedirect })).toEqual({
       kind: 'signed-out',
