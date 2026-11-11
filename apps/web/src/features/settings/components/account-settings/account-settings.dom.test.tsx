@@ -64,6 +64,8 @@ describe('AccountSettings', () => {
       id: 'user-1',
       name: 'Ada Lovelace',
       displayName: 'Ada Lovelace',
+      firstName: null,
+      lastName: null,
       email: 'ada@example.com',
       imageUrl: null,
     };
@@ -117,31 +119,39 @@ describe('AccountSettings', () => {
     ).toBeTruthy();
   });
 
-  it('edits the name through the account form, with just that field', () => {
+  it('edits the names through the account form, without the photo', () => {
     show();
 
     fireEvent.click(screen.getByRole('button', { name: 'Edit name' }));
 
-    const input = screen.getByLabelText('Name') as HTMLInputElement;
+    const input = screen.getByLabelText('Display name') as HTMLInputElement;
     expect(input.value).toBe('Ada Lovelace');
+    expect(screen.getByLabelText('First name')).toBeTruthy();
     expect(screen.queryByLabelText('Photo')).toBeNull();
   });
 
-  it('edits the display name, not the name the header resolves', () => {
-    // An email registrant: the header shows the first name, but no display
-    // name is set, so the display-name row must not offer the first name as
-    // if it were one.
+  it('shows the first name with no display name, but never offers it as one', () => {
+    // An email registrant: no display name is set, so the row shows the
+    // first name, and the display-name field starts empty.
     mocks.user = {
       id: 'user-1',
       name: 'Ada',
       displayName: null,
+      firstName: 'Ada',
+      lastName: 'Lovelace',
       email: 'ada@example.com',
       imageUrl: null,
     };
     show();
 
-    expect(screen.getByText('No name yet')).toBeTruthy();
-    expect(screen.queryByText('Ada')).toBeNull();
+    expect(screen.getByText('Ada')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Edit name' }));
+    expect(
+      (screen.getByLabelText('Display name') as HTMLInputElement).value,
+    ).toBe('');
+    expect(
+      (screen.getByLabelText('First name') as HTMLInputElement).value,
+    ).toBe('Ada');
   });
 
   it('copes with an account that has no name or email', () => {
@@ -149,6 +159,8 @@ describe('AccountSettings', () => {
       id: 'user-1',
       name: null,
       displayName: null,
+      firstName: null,
+      lastName: null,
       email: null,
       imageUrl: null,
     };
@@ -187,6 +199,8 @@ describe('AccountSettings', () => {
       id: 'user-1',
       name: 'Ada',
       displayName: 'Ada',
+      firstName: null,
+      lastName: null,
       email: null,
       imageUrl: null,
     };

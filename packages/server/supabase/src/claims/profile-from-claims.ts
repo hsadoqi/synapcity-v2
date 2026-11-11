@@ -27,7 +27,11 @@ type ClaimsLike = {
  * `name` is resolved for presentation and may be the first name, which must
  * not be saved back as a display name.
  */
-export type ClaimsProfile = DisplayProfile & { displayName: string | null };
+export type ClaimsProfile = DisplayProfile & {
+  displayName: string | null;
+  firstName: string | null;
+  lastName: string | null;
+};
 
 function text(value: unknown): string | null {
   const trimmed = typeof value === 'string' ? value.trim() : '';
@@ -37,9 +41,12 @@ function text(value: unknown): string | null {
 export function profileFromClaims(claims: ClaimsLike): ClaimsProfile {
   const meta = claims.user_metadata ?? {};
   const displayName = text(meta.full_name) ?? text(meta.name);
+  const firstName = text(meta.first_name);
   return {
-    name: displayNameOf({ displayName, firstName: text(meta.first_name) }),
+    name: displayNameOf({ displayName, firstName }),
     displayName,
+    firstName,
+    lastName: text(meta.last_name),
     email: text(claims.email),
     // GitHub supplies `avatar_url`; Google supplies `picture`.
     imageUrl: text(meta.avatar_url) ?? text(meta.picture),
@@ -50,6 +57,15 @@ export function profileFromClaims(claims: ClaimsLike): ClaimsProfile {
 export function currentUserFromClaims(
   claims: ClaimsLike & { sub: string },
 ): CurrentUser {
-  const { name, displayName, email, imageUrl } = profileFromClaims(claims);
-  return { id: claims.sub, name, displayName, email, imageUrl };
+  const { name, displayName, firstName, lastName, email, imageUrl } =
+    profileFromClaims(claims);
+  return {
+    id: claims.sub,
+    name,
+    displayName,
+    firstName,
+    lastName,
+    email,
+    imageUrl,
+  };
 }

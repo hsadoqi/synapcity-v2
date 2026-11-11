@@ -11,7 +11,10 @@ const mocks = vi.hoisted(() => ({ completeProfile: vi.fn() }));
 
 import { ProfileSetupForm } from './profile-setup-form';
 
-const nameInput = () => screen.getByLabelText('Name') as HTMLInputElement;
+const nameInput = () =>
+  screen.getByLabelText('Display name') as HTMLInputElement;
+const firstNameInput = () =>
+  screen.getByLabelText('First name') as HTMLInputElement;
 
 const signInHref = (to: string) => `/auth/login?next=${encodeURIComponent(to)}`;
 
@@ -20,17 +23,24 @@ describe('ProfileSetupForm', () => {
     vi.clearAllMocks();
   });
 
-  it('prefills the name and shows the provider photo, with both fields labelled', () => {
+  it('prefills the names and shows the provider photo, with every field labelled', () => {
     render(
       <ProfileSetupForm
         action={mocks.completeProfile}
         signInHref={signInHref}
+        defaultFirstName="Ada"
+        defaultLastName="Lovelace"
         defaultName="Ada Lovelace"
         imageUrl="https://avatars.githubusercontent.com/u/1"
         onComplete={() => {}}
       />,
     );
 
+    expect(firstNameInput().value).toBe('Ada');
+    expect(firstNameInput().required).toBe(true);
+    expect((screen.getByLabelText('Last name') as HTMLInputElement).value).toBe(
+      'Lovelace',
+    );
     expect(nameInput().value).toBe('Ada Lovelace');
     expect((screen.getByLabelText('Photo') as HTMLInputElement).type).toBe(
       'file',
@@ -43,6 +53,8 @@ describe('ProfileSetupForm', () => {
       <ProfileSetupForm
         action={mocks.completeProfile}
         signInHref={signInHref}
+        defaultFirstName="Ada"
+        defaultLastName=""
         defaultName="Ada"
         imageUrl="https://x.supabase.co/storage/v1/object/public/avatars/u/a.png"
         onComplete={() => {}}
@@ -54,7 +66,7 @@ describe('ProfileSetupForm', () => {
     ).toBeNull();
   });
 
-  it('sends the name to the setup action and tells the caller when it is saved', async () => {
+  it('sends the names to the setup action and tells the caller when it is saved', async () => {
     const onComplete = vi.fn();
     mocks.completeProfile.mockResolvedValue({
       saved: true,
@@ -65,6 +77,8 @@ describe('ProfileSetupForm', () => {
       <ProfileSetupForm
         action={mocks.completeProfile}
         signInHref={signInHref}
+        defaultFirstName="Ada"
+        defaultLastName=""
         defaultName="Ada"
         imageUrl={null}
         onComplete={onComplete}
@@ -77,6 +91,7 @@ describe('ProfileSetupForm', () => {
     });
 
     const formData = mocks.completeProfile.mock.calls[0]![1] as FormData;
+    expect(formData.get('firstName')).toBe('Ada');
     expect(formData.get('name')).toBe('Grace');
     expect(onComplete).toHaveBeenCalledTimes(1);
     expect(toasts.add).toHaveBeenCalledWith({
@@ -88,14 +103,16 @@ describe('ProfileSetupForm', () => {
   it('does not tell the caller anything while the save is refused', async () => {
     const onComplete = vi.fn();
     mocks.completeProfile.mockResolvedValue({
-      error: 'Enter your name.',
-      fields: ['name'],
-      name: '',
+      error: 'Enter your first name.',
+      fields: ['firstName'],
+      firstName: '',
     });
     render(
       <ProfileSetupForm
         action={mocks.completeProfile}
         signInHref={signInHref}
+        defaultFirstName="Ada"
+        defaultLastName=""
         defaultName="Ada"
         imageUrl={null}
         onComplete={onComplete}
@@ -108,7 +125,9 @@ describe('ProfileSetupForm', () => {
 
     expect(onComplete).not.toHaveBeenCalled();
     expect(toasts.add).not.toHaveBeenCalled();
-    expect(screen.getByRole('alert').textContent).toBe('Enter your name.');
-    expect(nameInput().getAttribute('aria-invalid')).toBe('true');
+    expect(screen.getByRole('alert').textContent).toBe(
+      'Enter your first name.',
+    );
+    expect(firstNameInput().getAttribute('aria-invalid')).toBe('true');
   });
 });

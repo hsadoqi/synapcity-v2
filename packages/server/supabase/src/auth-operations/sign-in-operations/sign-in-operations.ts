@@ -1,7 +1,4 @@
-import {
-  needsProfileSetup,
-  type OAuthProvider,
-} from '@synapcity/domain-identity';
+import type { OAuthProvider } from '@synapcity/domain-identity';
 
 import {
   toProviderFailure,
@@ -58,8 +55,12 @@ export type CodeExchangeOutcome =
   | {
       kind: 'signed-in';
       userId: string;
-      /** A new account that has not confirmed its name and photo yet. */
-      needsProfileSetup: boolean;
+      /**
+       * When the account was made, for the host's profile-setup rule
+       * (`needsProfileSetup` in `@synapcity/domain-identity`), which also
+       * needs the setup timestamps the host reads from `profiles`.
+       */
+      createdAt: string | null;
     }
   | { kind: 'failed'; failure: ProviderFailure };
 
@@ -77,7 +78,7 @@ export async function exchangeAuthCode(
   return {
     kind: 'signed-in',
     userId: data.user.id,
-    needsProfileSetup: needsProfileSetup(data.user),
+    createdAt: data.user.created_at ?? null,
   };
 }
 

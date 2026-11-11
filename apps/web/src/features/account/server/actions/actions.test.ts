@@ -1,4 +1,7 @@
-import { AuthRetryableFetchError } from '@supabase/supabase-js';
+import {
+  AuthRetryableFetchError,
+  AuthSessionMissingError,
+} from '@supabase/supabase-js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
@@ -44,6 +47,7 @@ const CDN = 'https://cdn.test/storage/v1/object/public/avatars/';
 type Row = {
   avatar_url: string | null;
   account_deletion_started_at: string | null;
+  profile_completed_at?: string | null;
 };
 let row: Row | null = null;
 function setRow(next: Partial<Row> | null) {
@@ -54,9 +58,12 @@ function setRow(next: Partial<Row> | null) {
   };
 }
 
-function form(name: string): FormData {
+/** What the name form submits: first, last and display names. */
+function form(firstName: string, displayName = '', lastName = ''): FormData {
   const data = new FormData();
-  data.set('name', name);
+  data.set('firstName', firstName);
+  data.set('lastName', lastName);
+  data.set('name', displayName);
   return data;
 }
 
@@ -115,19 +122,21 @@ beforeEach(() => {
 });
 
 describe('updateName', () => {
-  it('points a blank name at the name field without calling Supabase', async () => {
+  it('points a blank first name at its field without calling Supabase', async () => {
     const state = await updateName({}, form('   '));
 
     expect(state).toEqual({
-      error: 'Enter your name.',
-      fields: ['name'],
+      error: 'Enter your first name.',
+      fields: ['firstName'],
+      firstName: '   ',
+      lastName: '',
       name: '',
     });
     expect(mocks.getUser).not.toHaveBeenCalled();
   });
 
-  it('points an over-long name at the name field', async () => {
-    const state = await updateName({}, form('a'.repeat(81)));
+  it('points an over-long display name at its field', async () => {
+    const state = await updateName({}, form('Ada', 'a'.repeat(81)));
 
     expect(state.fields).toEqual(['name']);
     expect(mocks.profileUpdate).not.toHaveBeenCalled();
@@ -137,7 +146,7 @@ describe('updateName', () => {
   it('asks to sign in again when there is no caller, about no one field', async () => {
     mocks.getUser.mockResolvedValue({
       data: { user: null },
-      error: { code: 'session_not_found' },
+      error: new AuthSessionMissingError(),
     });
 
     const state = await updateName({}, form('Ada'));
@@ -145,23 +154,35 @@ describe('updateName', () => {
     expect(state).toEqual({
       error: 'Sign in again to update your profile.',
       signedOut: true,
-      name: 'Ada',
+      firstName: 'Ada',
+      lastName: '',
+      name: '',
     });
     expect(mocks.profileUpdate).not.toHaveBeenCalled();
   });
 
-  it('saves the trimmed name to the caller own profile row first, then mirrors it', async () => {
+  it('saves the trimmed names and completes setup in one write, then mirrors them', async () => {
     mocks.getUser.mockResolvedValue(
       signedIn({ avatar_url: 'https://img.test/a.png', full_name: 'Old' }),
     );
 
-    const state = await updateName({}, form('  Ada  '));
+    const state = await updateName({}, form('  Ada ', '', ' Lovelace '));
 
     expect(mocks.from).toHaveBeenCalledWith('profiles');
-    expect(mocks.profileUpdate).toHaveBeenCalledWith({ display_name: 'Ada' });
+    expect(mocks.profileUpdate).toHaveBeenCalledExactlyOnceWith({
+      first_name: 'Ada',
+      last_name: 'Lovelace',
+      display_name: null,
+      profile_completed_at: expect.any(String),
+    });
     expect(mocks.profileEq).toHaveBeenCalledWith('id', 'user-1');
+    // No display name: the header falls back to the first name.
     expect(mocks.updateUser).toHaveBeenCalledWith({
-      data: { avatar_url: 'https://img.test/a.png', full_name: 'Ada' },
+      data: {
+        avatar_url: 'https://img.test/a.png',
+        first_name: 'Ada',
+        last_name: 'Lovelace',
+      },
     });
     expect(mocks.profileUpdate.mock.invocationCallOrder[0]).toBeLessThan(
       mocks.updateUser.mock.invocationCallOrder[0]!,
@@ -170,8 +191,31 @@ describe('updateName', () => {
     expect(state).toEqual({
       saved: true,
       message: 'Name updated.',
-      name: 'Ada',
+      firstName: 'Ada',
+      lastName: 'Lovelace',
+      name: '',
     });
+  });
+
+  it('keeps a chosen display name', async () => {
+    const state = await updateName({}, form('Ada', ' Countess '));
+
+    expect(mocks.profileUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ display_name: 'Countess' }),
+    );
+    expect(state.name).toBe('Countess');
+  });
+
+  it('points at the first name when the database refuses completion without one', async () => {
+    mocks.profileSelect.mockResolvedValue({
+      data: null,
+      error: { code: '23514' },
+    });
+
+    const state = await updateName({}, form('Ada'));
+
+    expect(state.fields).toEqual(['firstName']);
+    expect(mocks.updateUser).not.toHaveBeenCalled();
   });
 
   it('reports a failed profile save as a form error and mirrors nothing', async () => {
@@ -184,7 +228,7 @@ describe('updateName', () => {
 
     expect(state.error).toEqual(expect.any(String));
     expect(state.fields).toBeUndefined();
-    expect(state.name).toBe('Ada');
+    expect(state.firstName).toBe('Ada');
     expect(mocks.updateUser).not.toHaveBeenCalled();
     expect(mocks.refreshSession).not.toHaveBeenCalled();
   });
@@ -197,10 +241,9 @@ describe('updateName', () => {
 
     const state = await updateName({}, form('Ada'));
 
-    expect(state).toEqual({
+    expect(state).toMatchObject({
       saved: true,
       message: 'Name saved. It may take a little while to show everywhere.',
-      name: 'Ada',
     });
     expect(mocks.revalidatePath).toHaveBeenCalledWith('/', 'layout');
   });
@@ -213,8 +256,10 @@ describe('updateName', () => {
 
     const state = await updateName({}, form('Ada'));
 
-    expect(state.message).toContain('Name saved.');
-    expect(state.error).toBeUndefined();
+    expect(state).toMatchObject({
+      saved: true,
+      message: 'Name saved. It may take a little while to show everywhere.',
+    });
   });
 });
 
@@ -464,9 +509,8 @@ describe('updateAvatar removal returns to the default', () => {
   });
 });
 
-function setupForm(name: string, file?: File): FormData {
-  const data = new FormData();
-  data.set('name', name);
+function setupForm(firstName: string, file?: File): FormData {
+  const data = form(firstName);
   if (file) data.set('avatar', file);
   return data;
 }
@@ -476,72 +520,79 @@ const pngFile = () =>
   new File([new Uint8Array(PNG)], 'me.png', { type: 'image/png' });
 
 describe('completeProfile', () => {
-  it('points a blank name at the name field and echoes the current picture', async () => {
+  it('points a blank first name at its field and echoes the current picture', async () => {
     const state = await completeProfile(
       { avatarUrl: 'https://gh.test/a.png' },
       setupForm('  '),
     );
 
     expect(state).toEqual({
-      error: 'Enter your name.',
-      fields: ['name'],
+      error: 'Enter your first name.',
+      fields: ['firstName'],
+      firstName: '  ',
+      lastName: '',
       name: '',
       avatarUrl: 'https://gh.test/a.png',
     });
     expect(mocks.getUser).not.toHaveBeenCalled();
   });
 
-  it('saves just the name when no file was chosen, leaving the picture alone', async () => {
+  it('saves the names and completion when no file was chosen, leaving the picture alone', async () => {
     const state = await completeProfile(
       { avatarUrl: 'https://gh.test/a.png' },
       setupForm(' Ada ', emptyFile()),
     );
 
     expect(mocks.upload).not.toHaveBeenCalled();
-    expect(mocks.profileUpdate).toHaveBeenCalledTimes(1);
-    expect(mocks.profileUpdate).toHaveBeenCalledWith({ display_name: 'Ada' });
-    expect(state).toEqual({
+    expect(mocks.profileUpdate).toHaveBeenCalledExactlyOnceWith({
+      first_name: 'Ada',
+      last_name: null,
+      display_name: null,
+      profile_completed_at: expect.any(String),
+    });
+    expect(state).toMatchObject({
       saved: true,
-      name: 'Ada',
+      firstName: ' Ada ',
       avatarUrl: 'https://gh.test/a.png',
       message: 'Profile saved.',
     });
   });
 
-  it('saves the name and a chosen photo, mirroring both to the session in one update', async () => {
+  it('saves the names first, then the photo, mirroring both in one update', async () => {
     mocks.getUser.mockResolvedValue(signedIn({ full_name: 'Old' }));
 
     const state = await completeProfile({}, setupForm('Ada', pngFile()));
 
     const path = mocks.upload.mock.calls[0]![0] as string;
     const url = `https://cdn.test/storage/v1/object/public/avatars/${path}`;
-    expect(mocks.profileUpdate).toHaveBeenCalledWith({ avatar_url: url });
-    expect(mocks.profileUpdate).toHaveBeenCalledWith({ display_name: 'Ada' });
+    const [names, photo] = mocks.profileUpdate.mock.calls.map(([v]) => v);
+    expect(names).toMatchObject({ first_name: 'Ada' });
+    expect(photo).toEqual({ avatar_url: url });
     expect(mocks.updateUser).toHaveBeenCalledTimes(1);
     expect(mocks.updateUser).toHaveBeenCalledWith({
-      data: { full_name: 'Ada', avatar_url: url, profile_confirmed: true },
+      data: { first_name: 'Ada', avatar_url: url },
     });
     expect(mocks.refreshSession).toHaveBeenCalledTimes(1);
-    expect(state).toMatchObject({ saved: true, name: 'Ada', avatarUrl: url });
+    expect(state).toMatchObject({ saved: true, avatarUrl: url });
   });
 
-  it('saves nothing when the photo is refused, and points at the photo field', async () => {
-    const script = new File(['<script>1</script>'], 'x.png', {
-      type: 'image/png',
+  it('saves nothing when the names are refused', async () => {
+    mocks.profileSelect.mockResolvedValueOnce({
+      data: null,
+      error: { code: '42501' },
     });
 
-    const state = await completeProfile({}, setupForm('Ada', script));
+    const state = await completeProfile({}, setupForm('Ada', pngFile()));
 
-    expect(state.fields).toEqual(['avatar']);
-    expect(state.name).toBe('Ada');
-    expect(mocks.profileUpdate).not.toHaveBeenCalled();
+    expect(state.error).toBe('Could not save your changes. Try again.');
+    expect(mocks.upload).not.toHaveBeenCalled();
     expect(mocks.updateUser).not.toHaveBeenCalled();
   });
 
   it('asks to sign in again when there is no caller', async () => {
     mocks.getUser.mockResolvedValue({
       data: { user: null },
-      error: { code: 'session_not_found' },
+      error: new AuthSessionMissingError(),
     });
 
     const state = await completeProfile({}, setupForm('Ada'));
@@ -550,23 +601,29 @@ describe('completeProfile', () => {
   });
 });
 
-describe('completeProfile when the name cannot be saved after the photo was', () => {
-  it('reports the failure but keeps showing the photo that did save', async () => {
-    // First profile write (the photo) works, the second (the name) fails.
-    mocks.profileSelect
-      .mockResolvedValueOnce({ data: [{ id: 'user-1' }], error: null })
-      .mockResolvedValueOnce({ data: null, error: { code: '42501' } });
+describe('completeProfile when the photo fails after the names were saved', () => {
+  it('says the name was saved and the photo was not, mirrors the names, and stays on the form', async () => {
+    const script = new File(['<script>1</script>'], 'x.png', {
+      type: 'image/png',
+    });
 
-    const state = await completeProfile({}, setupForm('Ada', pngFile()));
-
-    const path = mocks.upload.mock.calls[0]![0] as string;
-    expect(state.error).toEqual(expect.any(String));
-    expect(state.saved).toBeUndefined();
-    expect(state.name).toBe('Ada');
-    expect(state.avatarUrl).toBe(
-      `https://cdn.test/storage/v1/object/public/avatars/${path}`,
+    const state = await completeProfile(
+      { avatarUrl: 'https://gh.test/a.png' },
+      setupForm('Ada', script),
     );
-    expect(mocks.updateUser).not.toHaveBeenCalled();
+
+    expect(mocks.profileUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ first_name: 'Ada' }),
+    );
+    expect(state.error).toBe(
+      'Your name was saved, but your photo was not. Use a PNG, JPEG or WebP image.',
+    );
+    expect(state.fields).toEqual(['avatar']);
+    expect(state.saved).toBeUndefined();
+    expect(state.avatarUrl).toBe('https://gh.test/a.png');
+    expect(mocks.updateUser).toHaveBeenCalledWith({
+      data: { first_name: 'Ada' },
+    });
   });
 });
 
@@ -663,9 +720,9 @@ describe('failure logging', () => {
       },
     });
 
-    await updateName({}, form('Secret Name'));
+    await updateName({}, form('Secret', 'Secret Name'));
 
-    expect(warn).toHaveBeenCalledWith('saveName failed', {
+    expect(warn).toHaveBeenCalledWith('saveProfileNames failed', {
       code: '42501',
       status: 403,
     });
@@ -681,7 +738,7 @@ describe('failure logging', () => {
 
     await updateName({}, form('Ada'));
 
-    expect(warn).toHaveBeenCalledWith('saveName failed', {
+    expect(warn).toHaveBeenCalledWith('saveProfileNames failed', {
       code: 'profile_row_missing',
       status: undefined,
     });
@@ -706,64 +763,69 @@ describe('failure logging', () => {
   });
 });
 
-describe('the name-and-photo step is marked done', () => {
-  it('when it is finished, even with just a name', async () => {
+describe('the profile-setup step is recorded in the profile row', () => {
+  it('as completed with the names, never in the token metadata', async () => {
     await completeProfile({}, setupForm('Ada'));
 
-    expect(mocks.updateUser).toHaveBeenCalledWith({
-      data: { full_name: 'Ada', profile_confirmed: true },
-    });
-  });
-
-  it('but not by an ordinary edit of the name or the photo', async () => {
-    await updateName({}, form('Ada'));
-    await updateAvatar({}, avatarForm(PNG));
-
+    expect(mocks.profileUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ profile_completed_at: expect.any(String) }),
+    );
     for (const [argument] of mocks.updateUser.mock.calls) {
       expect(JSON.stringify(argument)).not.toContain('profile_confirmed');
+    }
+  });
+
+  it('but not by an edit of the photo alone', async () => {
+    await updateAvatar({}, avatarForm(PNG));
+
+    for (const [values] of mocks.profileUpdate.mock.calls) {
+      expect(values).not.toHaveProperty('profile_completed_at');
     }
   });
 });
 
 describe('skipProfileSetup', () => {
-  it('marks the step done and changes nothing else', async () => {
-    mocks.getUser.mockResolvedValue(
-      signedIn({ full_name: 'Ada', avatar_url: 'https://gh.test/a.png' }),
-    );
-
+  it('records the skip, only while setup is incomplete, and changes nothing else', async () => {
     const result = await skipProfileSetup();
 
     expect(result).toEqual({ saved: true });
-    expect(mocks.updateUser).toHaveBeenCalledWith({
-      data: {
-        full_name: 'Ada',
-        avatar_url: 'https://gh.test/a.png',
-        profile_confirmed: true,
-      },
+    expect(mocks.profileUpdate).toHaveBeenCalledExactlyOnceWith({
+      profile_setup_skipped_at: expect.any(String),
     });
-    expect(mocks.profileUpdate).not.toHaveBeenCalled();
+    expect(mocks.updateUser).not.toHaveBeenCalled();
     expect(mocks.upload).not.toHaveBeenCalled();
     expect(mocks.revalidatePath).toHaveBeenCalledWith('/', 'layout');
+  });
+
+  it('counts an already-completed setup as done', async () => {
+    mocks.profileSelect.mockResolvedValueOnce({ data: [], error: null });
+    setRow({ profile_completed_at: '2026-11-11T00:00:00Z' });
+
+    expect(await skipProfileSetup()).toEqual({ saved: true });
   });
 
   it('reports not saved, and touches nothing, when there is no session', async () => {
     mocks.getUser.mockResolvedValue({
       data: { user: null },
-      error: { code: 'session_not_found' },
+      error: new AuthSessionMissingError(),
     });
 
     expect(await skipProfileSetup()).toEqual({ saved: false });
-    expect(mocks.updateUser).not.toHaveBeenCalled();
+    expect(mocks.profileUpdate).not.toHaveBeenCalled();
   });
 
-  it('reports not saved when the session cannot be updated', async () => {
+  it('reports not saved when the profile cannot be written', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    mocks.updateUser.mockResolvedValue({
-      data: {},
-      error: { code: 'over_request_rate_limit', status: 429 },
+    mocks.profileSelect.mockResolvedValueOnce({
+      data: null,
+      error: { code: '42501', status: 403 },
     });
 
     expect(await skipProfileSetup()).toEqual({ saved: false });
+    expect(warn).toHaveBeenCalledWith('skipProfileSetup failed', {
+      code: '42501',
+      status: 403,
+    });
     warn.mockRestore();
   });
 });

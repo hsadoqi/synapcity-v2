@@ -6,9 +6,11 @@ describe('ProfileState', () => {
   it('is one shape for every profile action, with every field optional', () => {
     expectTypeOf<ProfileState>().toEqualTypeOf<{
       error?: string;
-      fields?: ('name' | 'avatar')[];
+      fields?: ('name' | 'avatar' | 'firstName' | 'lastName')[];
       message?: string;
       name?: string;
+      firstName?: string;
+      lastName?: string;
       avatarUrl?: string | null;
       saved?: boolean;
       signedOut?: boolean;

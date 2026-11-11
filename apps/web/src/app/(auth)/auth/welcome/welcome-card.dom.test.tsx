@@ -14,6 +14,8 @@ describe('WelcomeCard', () => {
       <WelcomeCard
         completeProfile={vi.fn()}
         skipProfileSetup={vi.fn()}
+        defaultFirstName="Ada"
+        defaultLastName=""
         defaultName="Ada"
         imageUrl={null}
         next="/u1/home"

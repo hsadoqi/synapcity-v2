@@ -35,6 +35,8 @@ describe('profileFromClaims', () => {
     expect(profileFromClaims({})).toEqual({
       name: null,
       displayName: null,
+      firstName: null,
+      lastName: null,
       email: null,
       imageUrl: null,
     });
@@ -43,7 +45,14 @@ describe('profileFromClaims', () => {
   it('ignores non-string metadata values', () => {
     expect(
       profileFromClaims({ user_metadata: { full_name: 42, avatar_url: {} } }),
-    ).toEqual({ name: null, displayName: null, email: null, imageUrl: null });
+    ).toEqual({
+      name: null,
+      displayName: null,
+      firstName: null,
+      lastName: null,
+      email: null,
+      imageUrl: null,
+    });
   });
 
   it('trims the name', () => {
@@ -66,6 +75,8 @@ describe('profileFromClaims', () => {
     ).toEqual({
       name: 'Ada Lovelace',
       displayName: 'Ada Lovelace',
+      firstName: null,
+      lastName: null,
       email: 'a@b.co',
       imageUrl: 'https://x.test/a.png',
     });
@@ -92,6 +103,8 @@ describe('currentUserFromClaims', () => {
       id: 'u1',
       name: 'Ada',
       displayName: 'Ada',
+      firstName: null,
+      lastName: null,
       email: 'a@b.co',
       imageUrl: 'https://x/y.png',
     });
@@ -136,12 +149,21 @@ describe('the name of an email registrant', () => {
     ).toBeNull();
   });
 
+  it('reads the structured names, for prefilling forms', () => {
+    expect(currentUserFromClaims(registrant)).toMatchObject({
+      firstName: 'Ada',
+      lastName: 'Lovelace',
+    });
+  });
+
   it('keeps the current user to the display fields only', () => {
     expect(Object.keys(currentUserFromClaims(registrant)).sort()).toEqual([
       'displayName',
       'email',
+      'firstName',
       'id',
       'imageUrl',
+      'lastName',
       'name',
     ]);
   });

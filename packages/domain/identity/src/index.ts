@@ -17,7 +17,9 @@ export {
   MAX_NAME_LENGTH,
   checkName,
   displayNameOf,
+  firstNameSchema,
   initialsOf,
+  lastNameSchema,
   nameSchema,
   type NameInput,
 } from './names';
@@ -43,4 +45,6 @@ export {
   isNewAccount,
   isProfileConfirmed,
   needsProfileSetup,
+  profileSetupStateOf,
+  type ProfileSetupState,
 } from './profile-setup';

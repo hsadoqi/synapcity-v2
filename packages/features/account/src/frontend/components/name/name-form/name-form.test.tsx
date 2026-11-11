@@ -40,6 +40,8 @@ function render(state: ProfileState): string {
     <NameForm
       action={async () => ({})}
       signInHref={signInHref}
+      defaultFirstName="Ada"
+      defaultLastName=""
       defaultName="Ada"
     />,
   );
@@ -78,7 +80,9 @@ describe('NameForm', () => {
     const calm = render({ name: 'Ada' });
     const input = attributesOf(calm, NAME_INPUT);
     const hint = calm.match(/<p[^>]*\bid="name-hint"[^>]*>([^<]*)</);
-    expect(hint?.[1]).toBe(`Up to ${MAX_NAME_LENGTH} characters.`);
+    expect(hint?.[1]).toBe(
+      `Optional. Shown instead of your first name. Up to ${MAX_NAME_LENGTH} characters.`,
+    );
     expect(input['aria-describedby']).toBe('name-hint');
 
     const failed = render({

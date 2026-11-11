@@ -23,7 +23,12 @@ function deferred() {
   return { promise, finish };
 }
 
-const nameInput = () => screen.getByLabelText('Name') as HTMLInputElement;
+const nameInput = () =>
+  screen.getByLabelText('Display name') as HTMLInputElement;
+const firstNameInput = () =>
+  screen.getByLabelText('First name') as HTMLInputElement;
+const lastNameInput = () =>
+  screen.getByLabelText('Last name') as HTMLInputElement;
 const submit = () =>
   act(async () => {
     fireEvent.submit(nameInput().form!);
@@ -46,6 +51,8 @@ describe('NameForm submit', () => {
       <NameForm
         action={mocks.updateName}
         signInHref={signInHref}
+        defaultFirstName="Ada"
+        defaultLastName=""
         defaultName="Ada"
       />,
     );
@@ -57,6 +64,50 @@ describe('NameForm submit', () => {
     expect(formData.get('name')).toBe('Grace');
   });
 
+  it('sends the first and last names with the display name', async () => {
+    mocks.updateName.mockResolvedValue({ saved: true, message: 'Saved' });
+    render(
+      <NameForm
+        action={mocks.updateName}
+        signInHref={signInHref}
+        defaultFirstName="Ada"
+        defaultLastName=""
+        defaultName=""
+      />,
+    );
+    expect(firstNameInput().required).toBe(true);
+    expect(lastNameInput().required).toBe(false);
+    expect(nameInput().required).toBe(false);
+    fireEvent.change(lastNameInput(), { target: { value: 'Lovelace' } });
+    await submit();
+
+    const formData = mocks.updateName.mock.calls[0]![1] as FormData;
+    expect(formData.get('firstName')).toBe('Ada');
+    expect(formData.get('lastName')).toBe('Lovelace');
+    expect(formData.get('name')).toBe('');
+  });
+
+  it('marks the first name invalid and focuses it when it is missing', async () => {
+    mocks.updateName.mockResolvedValue({
+      error: 'Enter your first name.',
+      fields: ['firstName'],
+      firstName: '',
+    });
+    render(
+      <NameForm
+        action={mocks.updateName}
+        signInHref={signInHref}
+        defaultFirstName="Ada"
+        defaultLastName=""
+        defaultName=""
+      />,
+    );
+    await submit();
+
+    expect(firstNameInput().getAttribute('aria-invalid')).toBe('true');
+    expect(document.activeElement).toBe(firstNameInput());
+  });
+
   it('disables the button while saving and shows the status afterwards', async () => {
     const pending = deferred();
     mocks.updateName.mockReturnValue(pending.promise);
@@ -64,6 +115,8 @@ describe('NameForm submit', () => {
       <NameForm
         action={mocks.updateName}
         signInHref={signInHref}
+        defaultFirstName="Ada"
+        defaultLastName=""
         defaultName="Ada"
       />,
     );
@@ -87,7 +140,7 @@ describe('NameForm submit', () => {
 
   it('marks the name invalid, explains why and focuses it after a field error', async () => {
     mocks.updateName.mockResolvedValue({
-      error: 'Enter your name.',
+      error: 'Use a name of at most 80 characters.',
       fields: ['name'],
       name: '',
     });
@@ -95,13 +148,15 @@ describe('NameForm submit', () => {
       <NameForm
         action={mocks.updateName}
         signInHref={signInHref}
+        defaultFirstName="Ada"
+        defaultLastName=""
         defaultName="Ada"
       />,
     );
     await submit();
 
     const alert = screen.getByRole('alert');
-    expect(alert.textContent).toBe('Enter your name.');
+    expect(alert.textContent).toBe('Use a name of at most 80 characters.');
     expect(nameInput().getAttribute('aria-invalid')).toBe('true');
     expect(nameInput().getAttribute('aria-describedby')).toBe(alert.id);
     expect(document.activeElement).toBe(nameInput());
@@ -116,6 +171,8 @@ describe('NameForm submit', () => {
       <NameForm
         action={mocks.updateName}
         signInHref={signInHref}
+        defaultFirstName="Ada"
+        defaultLastName=""
         defaultName="Ada"
       />,
     );

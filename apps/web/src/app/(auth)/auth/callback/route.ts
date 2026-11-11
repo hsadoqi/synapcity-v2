@@ -9,7 +9,31 @@ import { homePathFor } from '@/lib/routing/user-paths';
 import { safeNextPath } from '@/lib/routing/safe-next';
 import { withNotice } from '@/lib/routing/notices';
 import { createClient } from '@/lib/supabase/server';
-import { exchangeAuthCode } from '@synapcity/server-supabase';
+import { needsProfileSetup } from '@synapcity/domain-identity';
+import { readProfileSetup } from '@synapcity/server-account';
+import {
+  exchangeAuthCode,
+  type SupabaseServerClient,
+} from '@synapcity/server-supabase';
+
+/**
+ * Whether a new account is asked once to confirm its name and photo: the
+ * setup state is read from `profiles`. If the read fails, the answer is no,
+ * so doubt never adds a step.
+ */
+async function welcomeNeeded(
+  supabase: SupabaseServerClient,
+  userId: string,
+  createdAt: string | null,
+): Promise<boolean> {
+  const read = await readProfileSetup(supabase, userId);
+  if (read.kind !== 'found') return false;
+  return needsProfileSetup({
+    createdAt,
+    completedAt: read.completedAt,
+    skippedAt: read.skippedAt,
+  });
+}
 
 /**
  * Redirects with a relative `Location`, so the browser resolves it against the
@@ -38,16 +62,17 @@ export async function GET(request: NextRequest) {
   const flow = parseAuthFlow(searchParams.get('flow'));
 
   if (code) {
-    const outcome = await exchangeAuthCode(await createClient(), code);
+    const supabase = await createClient();
+    const outcome = await exchangeAuthCode(supabase, code);
     if (outcome.kind === 'signed-in') {
       // No (or an unsafe) `next`: send them to their own home.
       const destination = safeNextPath(next, homePathFor(outcome.userId));
       // A new account is asked once to confirm its name and photo. Only when
       // the link was a sign-up or a provider sign-in: a password reset is
-      // someone who already has an account. If anything about the account is
-      // unknown, the answer is no, so doubt never adds a step.
+      // someone who already has an account.
       const welcome =
-        (flow === 'oauth' || flow === 'confirm') && outcome.needsProfileSetup;
+        (flow === 'oauth' || flow === 'confirm') &&
+        (await welcomeNeeded(supabase, outcome.userId, outcome.createdAt));
       // A confirmed email change, or a newly connected account, lands back
       // where it was asked for, saying so.
       const arrival =

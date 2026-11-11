@@ -6,6 +6,7 @@ import {
   isNewAccount,
   isProfileConfirmed,
   needsProfileSetup,
+  profileSetupStateOf,
 } from './profile-setup';
 
 const NOW = Date.parse('2026-10-17T12:00:00Z');
@@ -65,33 +66,49 @@ describe('isNewAccount', () => {
   });
 });
 
-describe('needsProfileSetup', () => {
-  it('is true for a new account that was never asked', () => {
+describe('profileSetupStateOf', () => {
+  it('is completed once completed, even after a skip', () => {
     expect(
-      needsProfileSetup({ created_at: ago(DAY), user_metadata: {} }, NOW),
-    ).toBe(true);
-    expect(needsProfileSetup({ created_at: ago(DAY) }, NOW)).toBe(true);
+      profileSetupStateOf({ completedAt: ago(DAY), skippedAt: null }),
+    ).toBe('completed');
+    expect(
+      profileSetupStateOf({ completedAt: ago(DAY), skippedAt: ago(2 * DAY) }),
+    ).toBe('completed');
   });
 
-  it('is false once they finished or skipped it', () => {
+  it('is skipped when only skipped, and incomplete with neither', () => {
     expect(
-      needsProfileSetup(
-        {
-          created_at: ago(DAY),
-          user_metadata: { [PROFILE_CONFIRMED_KEY]: true },
-        },
-        NOW,
-      ),
-    ).toBe(false);
+      profileSetupStateOf({ completedAt: null, skippedAt: ago(DAY) }),
+    ).toBe('skipped');
+    expect(
+      profileSetupStateOf({ completedAt: undefined, skippedAt: null }),
+    ).toBe('incomplete');
+  });
+});
+
+describe('needsProfileSetup', () => {
+  const fresh = { createdAt: ago(DAY), completedAt: null, skippedAt: null };
+
+  it('is true for a new account whose setup is incomplete', () => {
+    expect(needsProfileSetup(fresh, NOW)).toBe(true);
+  });
+
+  it('is false once they completed or skipped it', () => {
+    expect(needsProfileSetup({ ...fresh, completedAt: ago(1000) }, NOW)).toBe(
+      false,
+    );
+    expect(needsProfileSetup({ ...fresh, skippedAt: ago(1000) }, NOW)).toBe(
+      false,
+    );
   });
 
   it('is false for an account that existed long before this step', () => {
-    expect(
-      needsProfileSetup({ created_at: ago(90 * DAY), user_metadata: {} }, NOW),
-    ).toBe(false);
+    expect(needsProfileSetup({ ...fresh, createdAt: ago(90 * DAY) }, NOW)).toBe(
+      false,
+    );
   });
 
-  it('is false when nothing is known about the user', () => {
-    expect(needsProfileSetup({}, NOW)).toBe(false);
+  it('is false when the creation date is unknown', () => {
+    expect(needsProfileSetup({ ...fresh, createdAt: null }, NOW)).toBe(false);
   });
 });

@@ -111,12 +111,12 @@ describe('startOAuthSignIn', () => {
 });
 
 describe('exchangeAuthCode', () => {
-  it('signs in and says whether a new account still needs its profile step', async () => {
+  it('signs in and returns the user id and when the account was made, never the session', async () => {
     mocks.exchangeCodeForSession.mockResolvedValue({
       data: {
         user: {
           id: 'u1',
-          created_at: new Date().toISOString(),
+          created_at: '2026-11-11T12:00:00Z',
           user_metadata: {},
         },
         session: { access_token: SECRET },
@@ -130,26 +130,9 @@ describe('exchangeAuthCode', () => {
     expect(outcome).toStrictEqual({
       kind: 'signed-in',
       userId: 'u1',
-      needsProfileSetup: true,
+      createdAt: '2026-11-11T12:00:00Z',
     });
-  });
-
-  it('does not ask an older account for its profile', async () => {
-    mocks.exchangeCodeForSession.mockResolvedValue({
-      data: {
-        user: {
-          id: 'u1',
-          created_at: '2020-01-01T00:00:00Z',
-          user_metadata: {},
-        },
-        session: {},
-      },
-      error: null,
-    });
-
-    expect(await exchangeAuthCode(client, 'code-1')).toMatchObject({
-      needsProfileSetup: false,
-    });
+    expect(JSON.stringify(outcome)).not.toContain(SECRET);
   });
 
   it('fails by code and status only', async () => {

@@ -26,6 +26,8 @@ const show = () =>
       completeProfile={mocks.complete}
       skipProfileSetup={mocks.skip}
       signInHref={signInHref}
+      defaultFirstName="Ada"
+      defaultLastName="Lovelace"
       defaultName="Ada Lovelace"
       imageUrl={null}
       next="/u1/home"
@@ -44,9 +46,9 @@ describe('ProfileSetupCard', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'Welcome' }),
     ).toBeTruthy();
-    expect((screen.getByLabelText('Name') as HTMLInputElement).value).toBe(
-      'Ada Lovelace',
-    );
+    expect(
+      (screen.getByLabelText('Display name') as HTMLInputElement).value,
+    ).toBe('Ada Lovelace');
     expect(screen.getByLabelText('Photo')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Skip for now' })).toBeTruthy();
   });
@@ -60,7 +62,7 @@ describe('ProfileSetupCard', () => {
     show();
 
     await act(async () => {
-      fireEvent.submit(screen.getByLabelText('Name').closest('form')!);
+      fireEvent.submit(screen.getByLabelText('First name').closest('form')!);
     });
 
     expect(mocks.push).toHaveBeenCalledExactlyOnceWith('/u1/home');
@@ -74,7 +76,7 @@ describe('ProfileSetupCard', () => {
     show();
 
     await act(async () => {
-      fireEvent.submit(screen.getByLabelText('Name').closest('form')!);
+      fireEvent.submit(screen.getByLabelText('First name').closest('form')!);
     });
 
     expect(mocks.push).not.toHaveBeenCalled();

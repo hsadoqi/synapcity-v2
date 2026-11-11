@@ -19,6 +19,12 @@ export type DisplayProfile = {
 export type CurrentUser = DisplayProfile & {
   id: string;
   displayName: string | null;
+  /**
+   * The structured names, as last mirrored into the token. Display-only, for
+   * prefilling forms: `profiles` holds the record.
+   */
+  firstName: string | null;
+  lastName: string | null;
   fixture?: true;
 };
 

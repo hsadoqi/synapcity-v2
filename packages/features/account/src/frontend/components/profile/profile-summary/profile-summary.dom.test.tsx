@@ -32,7 +32,11 @@ describe('ProfileSummary', () => {
           updateAvatar: mocks.updateAvatar,
         }}
         signInHref={signInHref}
-        name="Ada Lovelace"
+        names={{
+          firstName: 'Ada',
+          lastName: 'Lovelace',
+          displayName: 'Ada Lovelace',
+        }}
         imageUrl={null}
       />,
     );
@@ -40,10 +44,10 @@ describe('ProfileSummary', () => {
     expect(screen.getByText('Ada Lovelace')).toBeTruthy();
     expect(edit('name')).toBeTruthy();
     expect(edit('photo')).toBeTruthy();
-    expect(screen.queryByLabelText('Name')).toBeNull();
+    expect(screen.queryByLabelText('First name')).toBeNull();
   });
 
-  it('edits only the name: the form has just that field and focuses it', () => {
+  it('edits only the names: first, last and display, focusing the first', () => {
     render(
       <ProfileSummary
         actions={{
@@ -51,14 +55,15 @@ describe('ProfileSummary', () => {
           updateAvatar: mocks.updateAvatar,
         }}
         signInHref={signInHref}
-        name="Ada"
+        names={{ firstName: 'Ada', lastName: '', displayName: '' }}
         imageUrl={null}
       />,
     );
 
     fireEvent.click(edit('name'));
 
-    expect(document.activeElement).toBe(screen.getByLabelText('Name'));
+    expect(document.activeElement).toBe(screen.getByLabelText('First name'));
+    expect(screen.getByLabelText('Display name')).toBeTruthy();
     expect(screen.queryByLabelText('Photo')).toBeNull();
     // The photo row is still just displayed.
     expect(edit('photo')).toBeTruthy();
@@ -72,7 +77,7 @@ describe('ProfileSummary', () => {
           updateAvatar: mocks.updateAvatar,
         }}
         signInHref={signInHref}
-        name="Ada"
+        names={{ firstName: 'Ada', lastName: '', displayName: '' }}
         imageUrl={null}
       />,
     );
@@ -80,7 +85,7 @@ describe('ProfileSummary', () => {
     fireEvent.click(edit('photo'));
 
     expect(screen.getByLabelText('Photo')).toBeTruthy();
-    expect(screen.queryByLabelText('Name')).toBeNull();
+    expect(screen.queryByLabelText('First name')).toBeNull();
     expect(edit('name')).toBeTruthy();
   });
 
@@ -92,7 +97,7 @@ describe('ProfileSummary', () => {
           updateAvatar: mocks.updateAvatar,
         }}
         signInHref={signInHref}
-        name="Ada"
+        names={{ firstName: 'Ada', lastName: '', displayName: '' }}
         imageUrl={null}
       />,
     );
@@ -100,13 +105,15 @@ describe('ProfileSummary', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
-    expect(screen.queryByLabelText('Name')).toBeNull();
+    expect(screen.queryByLabelText('First name')).toBeNull();
     expect(document.activeElement).toBe(edit('name'));
   });
 
   it('shows the new name and announces the save once it is saved', async () => {
     mocks.updateName.mockResolvedValue({
       saved: true,
+      firstName: 'Ada',
+      lastName: '',
       name: 'Grace Hopper',
       message: 'Name updated.',
     });
@@ -117,21 +124,21 @@ describe('ProfileSummary', () => {
           updateAvatar: mocks.updateAvatar,
         }}
         signInHref={signInHref}
-        name="Ada"
+        names={{ firstName: 'Ada', lastName: '', displayName: '' }}
         imageUrl={null}
       />,
     );
     fireEvent.click(edit('name'));
-    fireEvent.change(screen.getByLabelText('Name'), {
+    fireEvent.change(screen.getByLabelText('Display name'), {
       target: { value: 'Grace Hopper' },
     });
 
     await act(async () => {
-      fireEvent.submit(screen.getByLabelText('Name').closest('form')!);
+      fireEvent.submit(screen.getByLabelText('First name').closest('form')!);
     });
 
     expect(screen.getByText('Grace Hopper')).toBeTruthy();
-    expect(screen.queryByLabelText('Name')).toBeNull();
+    expect(screen.queryByLabelText('First name')).toBeNull();
     expect(toasts.add).toHaveBeenCalledWith({
       type: 'success',
       title: 'Name updated.',
@@ -140,9 +147,9 @@ describe('ProfileSummary', () => {
 
   it('stays in the editor and shows the error when the save is refused', async () => {
     mocks.updateName.mockResolvedValue({
-      error: 'Enter your name.',
-      fields: ['name'],
-      name: '',
+      error: 'Enter your first name.',
+      fields: ['firstName'],
+      firstName: '',
     });
     render(
       <ProfileSummary
@@ -151,17 +158,34 @@ describe('ProfileSummary', () => {
           updateAvatar: mocks.updateAvatar,
         }}
         signInHref={signInHref}
-        name="Ada"
+        names={{ firstName: 'Ada', lastName: '', displayName: '' }}
         imageUrl={null}
       />,
     );
     fireEvent.click(edit('name'));
 
     await act(async () => {
-      fireEvent.submit(screen.getByLabelText('Name').closest('form')!);
+      fireEvent.submit(screen.getByLabelText('First name').closest('form')!);
     });
 
-    expect(screen.getByRole('alert').textContent).toBe('Enter your name.');
-    expect(screen.getByLabelText('Name')).toBeTruthy();
+    expect(screen.getByRole('alert').textContent).toBe(
+      'Enter your first name.',
+    );
+    expect(screen.getByLabelText('First name')).toBeTruthy();
+  });
+});
+
+describe('ProfileSummary without a display name', () => {
+  it('shows the first name', () => {
+    render(
+      <ProfileSummary
+        actions={{ updateName: vi.fn(), updateAvatar: vi.fn() }}
+        signInHref={(to) => to}
+        names={{ firstName: 'Ada', lastName: 'Lovelace', displayName: '' }}
+        imageUrl={null}
+      />,
+    );
+
+    expect(screen.getByText('Ada')).toBeTruthy();
   });
 });

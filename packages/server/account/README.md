@@ -12,9 +12,10 @@ Runtime: server-only. The host supplies the request-bound Supabase client and ve
 - `writeAccountPreferenceRow(client, userId, preferences, deviceTimezone?)` writes the supplied, already-validated `AccountPreferences` and reports a `ProviderFailure` or the RLS/no-row result (`row_not_written`) without logging.
 - `saveName(client, user, name)` saves the name to the caller's own profile row and returns `{ ok: true, patch }` or `{ ok: false, failure }`.
 - `saveAvatar(client, user, request)` uploads or removes the picture and returns `{ ok: true, avatarUrl, patch }` or `{ ok: false, reason, message?, failure? }`, where `reason` is `invalid-file`, `unsupported-type`, `upload-failed`, `profile-not-saved`, `account-deleting`, `conflict` or `unconfirmed`. The host owns the wording. `avatarUrl` is what the row holds after the save, which a newer save may already have changed.
+- `readProfileSetup(client, userId)` reads the names and the setup state (`incomplete`, `skipped`, `completed`) from `profiles`. `saveProfileNames(client, userId, { firstName, lastName, displayName })` saves the names and marks setup completed in one write (the database stamps the time and keeps the first one), returning a patch that mirrors the names into the token; it reports `first-name-required` when the database refuses completion without a valid first name. `skipProfileSetup(client, userId)` records a skip only while setup is not completed.
 - `deleteOwnAccount(client)` deletes the caller's own account and returns an `AccountDeletionOutcome`: `deleted` (with an optional `cleanupFailure` to log), `link-required`, `signed-out`, `unavailable`, `failed { step, photoRemoved }` or `unconfirmed`.
 - `mirrorToSession(client, user, patches)` returns `{ ok: true }` or `{ ok: false, step, failure }`.
-- The pure helpers `withFullName`, `withAvatarUrl`, `withProfileConfirmed`, `detectImageType` and `extensionFor`.
+- The pure helpers `withFullName`, `withAvatarUrl`, `withProfileNames`, `detectImageType` and `extensionFor`. `withProfileConfirmed` (the old `user_metadata` flag) is transitional and no longer called; profile setup is recorded in `profiles`.
 
 ### Avatar lifecycle
 

@@ -1,7 +1,8 @@
 import type { ProfileInput } from '@synapcity/domain-identity';
 
 /** Profile fields an error can point at, so the form can mark them invalid. */
-type ProfileFieldName = keyof ProfileInput | 'avatar';
+type ProfileFieldName =
+  keyof ProfileInput | 'avatar' | 'firstName' | 'lastName';
 
 /**
  * What every profile action returns, whichever fields the form had. The name
@@ -15,6 +16,9 @@ export type ProfileState = {
   message?: string;
   /** Echoes the field so a failed submit does not clear what was typed. */
   name?: string;
+  /** Echoed like `name`, by forms that ask for structured names. */
+  firstName?: string;
+  lastName?: string;
   /**
    * The picture to show now: the new one after an upload, the default after a
    * removal. Failed submits echo the previous value. A file input cannot be

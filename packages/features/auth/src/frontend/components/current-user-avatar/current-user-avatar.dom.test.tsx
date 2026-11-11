@@ -16,6 +16,8 @@ describe('CurrentUserAvatar', () => {
       id: 'u1',
       name: 'Ada Lovelace',
       displayName: 'Ada Lovelace',
+      firstName: 'Ada',
+      lastName: 'Lovelace',
       email: 'a@b.co',
       imageUrl: null,
     };
@@ -32,6 +34,8 @@ describe('CurrentUserAvatar', () => {
       id: 'u1',
       name: null,
       displayName: null,
+      firstName: null,
+      lastName: null,
       email: null,
       imageUrl: null,
     };

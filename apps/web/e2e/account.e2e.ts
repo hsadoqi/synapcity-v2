@@ -118,13 +118,15 @@ test('sign up, confirm by email, set a name, then change the name', async ({
     const link = await newestLinkTo(stack!, email, started);
     await page.goto(link);
     await page.waitForURL('**/auth/welcome**', { timeout: 20_000 });
-    await expect(page.getByLabel('Name', { exact: true })).toHaveValue(
-      'E2E Person',
-    );
+    // The first name comes from the profile row the registration filled.
+    await expect(
+      page.getByLabel('First name', { exact: true }),
+    ).not.toHaveValue('');
   });
 
-  await test.step('saves the name and carries on to the workspace', async () => {
-    await page.getByLabel('Name', { exact: true }).fill('E2E Welcome');
+  await test.step('completes the step with names and carries on to the workspace', async () => {
+    await page.getByLabel('First name', { exact: true }).fill('E2E');
+    await page.getByLabel('Display name', { exact: true }).fill('E2E Welcome');
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.waitForURL(`**/${userId}/home**`, { timeout: 20_000 });
   });
@@ -132,7 +134,7 @@ test('sign up, confirm by email, set a name, then change the name', async ({
   await test.step('changes the name in Settings and finds it after a reload', async () => {
     await page.goto(`/${userId}/settings`);
     await page.getByRole('button', { name: 'Edit name' }).click();
-    await page.getByLabel('Name', { exact: true }).fill('E2E Renamed');
+    await page.getByLabel('Display name', { exact: true }).fill('E2E Renamed');
     await page.getByRole('button', { name: 'Save changes' }).click();
     await expect(page.getByText('E2E Renamed').first()).toBeVisible({
       timeout: 15_000,

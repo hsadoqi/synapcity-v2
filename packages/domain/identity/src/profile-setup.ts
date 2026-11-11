@@ -1,8 +1,9 @@
 /**
- * Whether someone has been asked to confirm their name and photo. It is a flag
- * in `user_metadata`, not a database column, so it needs no schema change. The
- * person can edit that metadata, which is harmless: it only decides whether a
- * friendly step is shown, and nothing is authorized by it.
+ * The `user_metadata` flag that recorded a finished or skipped setup step
+ * before `profiles.profile_setup_skipped_at` and `profile_completed_at`
+ * existed. Transitional: nothing writes it any more, and the migration
+ * `20261111200000_profile_setup_and_deletion_marker.sql` backfilled it as
+ * skipped. Kept until its removal is decided.
  */
 export const PROFILE_CONFIRMED_KEY = 'profile_confirmed';
 
@@ -40,19 +41,38 @@ export function isNewAccount(
 }
 
 /**
- * Whether to show the step that confirms name and photo: a new account that
- * has not been through it. Anyone already signed up before this step existed
- * is left alone, and so is anyone who has finished or skipped it.
+ * Where a person is with the profile-setup step, from the two database
+ * timestamps (`profiles.profile_completed_at`, `profiles.profile_setup_skipped_at`).
+ * Completion wins: someone who skipped and later saved a first name is
+ * completed. `profile_completed_at` is the only completion marker.
+ */
+export type ProfileSetupState = 'incomplete' | 'skipped' | 'completed';
+
+export function profileSetupStateOf(profile: {
+  completedAt: string | null | undefined;
+  skippedAt: string | null | undefined;
+}): ProfileSetupState {
+  if (profile.completedAt) return 'completed';
+  if (profile.skippedAt) return 'skipped';
+  return 'incomplete';
+}
+
+/**
+ * Whether to show the step that confirms name and photo: a new account whose
+ * setup is still incomplete. Anyone already signed up before this step existed
+ * is left alone, and so is anyone who has completed or skipped it. The inputs
+ * are plain values, so this rule does not depend on where they are stored.
  */
 export function needsProfileSetup(
-  user: {
-    created_at?: string | null;
-    user_metadata?: Record<string, unknown> | null;
+  profile: {
+    createdAt: string | null | undefined;
+    completedAt: string | null | undefined;
+    skippedAt: string | null | undefined;
   },
   now: number = Date.now(),
 ): boolean {
   return (
-    isNewAccount(user.created_at, now) &&
-    !isProfileConfirmed(user.user_metadata)
+    isNewAccount(profile.createdAt, now) &&
+    profileSetupStateOf(profile) === 'incomplete'
   );
 }
