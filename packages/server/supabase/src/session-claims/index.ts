@@ -3,3 +3,8 @@ export {
   hasRecentLinkSignIn,
   hasRecentLinkSignInNow,
 } from './recent-link-sign-in';
+export {
+  currentUserFromClaims,
+  profileFromClaims,
+  type ClaimsProfile,
+} from './profile-from-claims';
