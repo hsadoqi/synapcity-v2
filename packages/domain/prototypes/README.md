@@ -42,6 +42,10 @@ Every kind also has the ten base fields: `id`, `ownerId`, `name`, `description?`
 | `addEvent`, `localStartsAt`                                                                     | Add an event (a blank name or a bad timestamp changes nothing); a local day and time as a timestamp, or `null` for a day or time that is not real |
 | `dayKey`, `startOfWeek`, `weekDayStarts`, `weekdayIndex`, `isSameWeek`                          | Local-time calendar helpers; weeks start on Monday                                                                                                |
 
+## Structure
+
+Kept as it is (reviewed 2026-11-11 against the domain capability rules): `schemas/`, `types/` and one folder per record kind or helper under `utils/`. The package is provisional, its import graph is acyclic, and how its record kinds are organized waits for the widget source model PRODUCT.md leaves open, so restructuring now would be churn on code that may change shape or go away. `domain-dashboards` depends on it only through a recorded provisional bridge (see that package's README).
+
 ## Scripts
 
 `lint`, `check-types`, `test`, `test:coverage`. Tests sit beside each unit.

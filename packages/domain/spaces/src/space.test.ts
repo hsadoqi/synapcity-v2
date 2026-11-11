@@ -1,14 +1,16 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 
-import type {
-  CreateSpaceInput,
-  SpaceEntity,
-  UpdateSpaceInput,
-} from '../../types';
 import { editableFieldsOf, RECORD_MESSAGES } from '@synapcity/domain-records';
 import { limitVectorMismatches } from '@synapcity/domain-records/testing';
 
-import { createSpaceSchema, spaceSchema, updateSpaceSchema } from './index';
+import {
+  createSpaceSchema,
+  spaceSchema,
+  updateSpaceSchema,
+  type CreateSpaceInput,
+  type SpaceEntity,
+  type UpdateSpaceInput,
+} from './space';
 
 const savedSpace = {
   id: 'opaque/id',

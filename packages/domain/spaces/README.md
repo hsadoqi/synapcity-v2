@@ -24,6 +24,10 @@ History: created in Milestone 5.1 as the `spaces` module of `domain-records`; mo
 - User-facing result types that carry messages (for example the pin result) belong to the feature that shows them, not to this package.
 - Space is a provisional label (`docs/glossary.md`); this package does not settle its name.
 
+## Structure
+
+One capability file, `src/space.ts`: the create, update and saved-record schemas, the types inferred from them, and the hand-written `SpaceSummary` read model (shared by `server-data` and `features-spaces`). The Space wording applies to the write schemas; `spaceSchema` is the base record contract unchanged.
+
 ## Scripts
 
-`lint`, `check-types`, `test`, `test:coverage`. Tests sit beside the schemas (`*.test.ts`).
+`lint`, `check-types`, `test`, `test:coverage`. Tests sit beside the schemas (`space.test.ts`).

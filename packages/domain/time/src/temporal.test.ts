@@ -5,7 +5,7 @@ import {
   durationSchema,
   instantSchema,
   timeOfDaySchema,
-} from './time';
+} from './temporal';
 
 const accepts =
   (schema: { safeParse(v: unknown): { success: boolean } }) => (v: unknown) =>

@@ -4,7 +4,7 @@ import type { Ref } from 'react';
 import { DatePicker } from '@synapcity/frontend-ui/core/date-picker';
 
 import type { FieldRendererProps } from '../../../types';
-import { fromDateValue, toDateValue } from '@synapcity/domain-time';
+import { fromDateValue, toDateValue } from '../../../utils/date-value';
 
 /** Calendar-backed adapter for the form engine's yyyy-MM-dd date value. */
 export function DatePickerRenderer({

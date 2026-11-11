@@ -31,3 +31,8 @@ export const timeOfDaySchema = z.iso.time();
 
 /** An ISO 8601 duration such as `PT5M` or `P1DT2H`; never negative. */
 export const durationSchema = z.iso.duration();
+
+export type Instant = z.infer<typeof instantSchema>;
+export type CalendarDate = z.infer<typeof calendarDateSchema>;
+export type TimeOfDay = z.infer<typeof timeOfDaySchema>;
+export type Duration = z.infer<typeof durationSchema>;

@@ -8,7 +8,7 @@ import {
   fromDateRangeValue,
   fromDateValue,
   toDateRangeValue,
-} from '@synapcity/domain-time';
+} from '../../../utils/date-value';
 
 /**
  * A start and end day as `{ from, to }` local `yyyy-MM-dd` strings, posted as

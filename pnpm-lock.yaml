@@ -1617,9 +1617,6 @@ importers:
       '@hookform/resolvers':
         specifier: 6.0.0
         version: 6.0.0(@standard-schema/spec@1.1.0)(ajv-formats@2.1.1(ajv@8.20.0))(ajv@8.20.0)(react-hook-form@7.90.0(@types/react@19.3.0)(react@19.3.1))(zod@4.6.7)
-      '@synapcity/domain-time':
-        specifier: workspace:*
-        version: link:../../domain/time
       '@synapcity/frontend-blocks':
         specifier: workspace:*
         version: link:../blocks

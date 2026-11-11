@@ -1,3 +1,4 @@
+import type { z } from 'zod';
 import {
   baseRecordCreateSchema,
   baseRecordMetadataSchema,
@@ -8,8 +9,9 @@ import {
 } from '@synapcity/domain-records';
 
 // The Space's own wording (README and tests pin it). Record-wide messages live in
-// `RECORD_MESSAGES` in domain-records; only what is specific to a Space is here,
-// defined once and used by both the read and the write schema.
+// `RECORD_MESSAGES` in domain-records; only what is specific to a Space is here.
+// The write schemas (create, update) use it; the saved-record schema is the
+// base record contract unchanged, so a read reports the base wording.
 const SPACE_MESSAGES = {
   blankName: 'Enter a space name.',
   badIcon: 'Use a Lucide icon name.',
@@ -42,3 +44,16 @@ export const updateSpaceSchema = recordPatchSchema(spaceMetadataSchema);
  * a provisional label; content relationships and lifecycle stay undecided.
  */
 export const spaceSchema = baseRecordSchema;
+
+export type SpaceEntity = z.infer<typeof spaceSchema>;
+export type CreateSpaceInput = z.infer<typeof createSpaceSchema>;
+export type UpdateSpaceInput = z.infer<typeof updateSpaceSchema>;
+
+/**
+ * A space as the index lists it: the saved record plus how many documents and
+ * dashboards take part in it. The counts are derived, not stored on the space.
+ */
+export type SpaceSummary = SpaceEntity & {
+  documentsTotal: number;
+  dashboardsTotal: number;
+};
