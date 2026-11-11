@@ -1,4 +1,4 @@
-import type { IdentityResult } from '@synapcity/domain-identity/types';
+import type { IdentityResult } from '@synapcity/domain-identity';
 
 /**
  * Whether the verified caller is the user `userId` names. The supplied id is

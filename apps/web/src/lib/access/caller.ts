@@ -1,4 +1,4 @@
-import type { VerifiedIdentity } from '@synapcity/domain-identity/types';
+import type { VerifiedIdentity } from '@synapcity/domain-identity';
 import { verifyIdentityWithProvider } from '@synapcity/server-auth';
 import {
   supabaseIdentityProvider,

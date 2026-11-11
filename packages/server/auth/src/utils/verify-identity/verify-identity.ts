@@ -1,4 +1,4 @@
-import type { IdentityResult } from '@synapcity/domain-identity/types';
+import type { IdentityResult } from '@synapcity/domain-identity';
 
 import type {
   IdentityProvider,
