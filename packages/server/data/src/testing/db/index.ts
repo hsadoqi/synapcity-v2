@@ -4,3 +4,4 @@ export {
   withSessions,
   type PsqlSession,
 } from './two-sessions';
+export { stackEnv, type StackEnv } from './stack-env';

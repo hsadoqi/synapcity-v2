@@ -26,6 +26,8 @@ Runtime: server only. The root file starts with `import 'server-only'`, and no o
 | `listSpaceDocuments(client, spaceId)`                                 | The documents taking part in the Space as `BaseRecord[]`, newest addition first; `[]` for a malformed id                                                                                                                                                                                                                                                                                         |
 | `listSpaceDashboards(client, spaceId)`                                | The same for dashboards                                                                                                                                                                                                                                                                                                                                                                          |
 
+`@synapcity/server-data/testing` (test support only, never imported by production files): the database-test harness, `withTwoUsers` (two signed-in people on the disposable stack, deleted afterwards), `withSessions` and `waitUntilBlocked` (two `psql` sessions for concurrency tests), `harnessUserEmails` and `stackEnv` (the loopback-only stack description). `server-account`'s `test:db` uses it too.
+
 ## Rules
 
 - Row-level security scopes every query. No owner id is passed to any function.

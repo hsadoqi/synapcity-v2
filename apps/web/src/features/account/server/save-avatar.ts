@@ -1,5 +1,4 @@
 import {
-  removeOldAvatars,
   saveAvatar as saveProfileAvatar,
   type AvatarRequest,
 } from '@synapcity/server-account';
@@ -11,9 +10,15 @@ import { logFailure } from '@/lib/log-failure';
 
 import type { Caller, MetadataPatch } from './caller';
 
-export { removeOldAvatars, type AvatarRequest };
+export type { AvatarRequest };
 
 const UNSUPPORTED_TYPE = 'Use a PNG, JPEG or WebP image.';
+const ACCOUNT_DELETING =
+  'Your account is being deleted, so the photo was not saved.';
+const CONFLICT =
+  'Your photo was changed somewhere else at the same time. Try again.';
+const UNCONFIRMED =
+  'We could not confirm that your photo was saved. Reload the page to check.';
 
 export type AvatarSaved =
   | {
@@ -51,5 +56,12 @@ export async function saveAvatar(
     case 'profile-not-saved':
       logFailure('saveAvatar.profile', saved.failure);
       return { ok: false, error: SAVE_FAILED };
+    case 'account-deleting':
+      return { ok: false, error: ACCOUNT_DELETING };
+    case 'conflict':
+      return { ok: false, error: CONFLICT };
+    case 'unconfirmed':
+      logFailure('saveAvatar.unconfirmed', saved.failure);
+      return { ok: false, error: UNCONFIRMED };
   }
 }

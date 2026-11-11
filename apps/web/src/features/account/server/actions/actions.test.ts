@@ -10,6 +10,7 @@ const mocks = vi.hoisted(() => ({
   profileEq: vi.fn(),
   profileSelect: vi.fn(),
   profileUpdate: vi.fn(),
+  profileRead: vi.fn(),
   from: vi.fn(),
   upload: vi.fn(),
   getPublicUrl: vi.fn(),
@@ -38,6 +39,21 @@ import { updateAvatar } from './avatar-actions';
 import { updateName } from './name-actions';
 import { completeProfile, skipProfileSetup } from './setup-actions';
 
+const CDN = 'https://cdn.test/storage/v1/object/public/avatars/';
+
+type Row = {
+  avatar_url: string | null;
+  account_deletion_started_at: string | null;
+};
+let row: Row | null = null;
+function setRow(next: Partial<Row> | null) {
+  row = next && {
+    avatar_url: null,
+    account_deletion_started_at: null,
+    ...next,
+  };
+}
+
 function form(name: string): FormData {
   const data = new FormData();
   data.set('name', name);
@@ -58,12 +74,35 @@ beforeEach(() => {
     data: [{ id: 'user-1' }],
     error: null,
   });
-  mocks.profileEq.mockReturnValue({ select: mocks.profileSelect });
-  mocks.profileUpdate.mockReturnValue({ eq: mocks.profileEq });
-  mocks.from.mockReturnValue({ update: mocks.profileUpdate });
+  // The avatar's compare-and-set write chains .or() and .is()/.eq() after
+  // the id filter; each step returns the same chain.
+  const chain = {
+    select: mocks.profileSelect,
+    eq: mocks.profileEq,
+    or: () => chain,
+    is: () => chain,
+  };
+  mocks.profileEq.mockReturnValue(chain);
+  // A row the writes change and the reads see, so a read after a save
+  // returns what was saved.
+  setRow({ avatar_url: null });
+  mocks.profileUpdate.mockImplementation((values: Record<string, unknown>) => {
+    if (row) row = { ...row, ...values };
+    return chain;
+  });
+  mocks.profileRead.mockImplementation(async () => ({
+    data: row ? { ...row } : null,
+    error: null,
+  }));
+  mocks.from.mockReturnValue({
+    update: mocks.profileUpdate,
+    select: () => ({ eq: () => ({ maybeSingle: mocks.profileRead }) }),
+  });
   mocks.upload.mockResolvedValue({ error: null });
   mocks.getPublicUrl.mockImplementation((path: string) => ({
-    data: { publicUrl: `https://cdn.test/avatars/${path}` },
+    data: {
+      publicUrl: `https://cdn.test/storage/v1/object/public/avatars/${path}`,
+    },
   }));
   mocks.list.mockResolvedValue({ data: [], error: null });
   mocks.remove.mockResolvedValue({ error: null });
@@ -254,14 +293,11 @@ describe('updateAvatar', () => {
     expect(mocks.upload).not.toHaveBeenCalled();
   });
 
-  it('uploads into the caller own folder, records the URL, mirrors it and cleans up', async () => {
+  it('uploads into the caller own folder, records the URL, mirrors it and removes the picture it replaced', async () => {
     mocks.getUser.mockResolvedValue(
       signedIn({ full_name: 'Ada', avatar_url: 'https://old.test/a.png' }),
     );
-    mocks.list.mockResolvedValue({
-      data: [{ name: 'old-1.png' }],
-      error: null,
-    });
+    setRow({ avatar_url: `${CDN}user-1/old-1.png` });
 
     const state = await updateAvatar({}, avatarForm(PNG));
 
@@ -270,9 +306,14 @@ describe('updateAvatar', () => {
     expect(path).toMatch(/^user-1\/[0-9a-f-]{36}\.png$/);
     expect(options).toMatchObject({ contentType: 'image/png', upsert: false });
 
-    const url = `https://cdn.test/avatars/${path}`;
+    const url = `https://cdn.test/storage/v1/object/public/avatars/${path}`;
     expect(mocks.profileUpdate).toHaveBeenCalledWith({ avatar_url: url });
     expect(mocks.profileEq).toHaveBeenCalledWith('id', 'user-1');
+    // Only if the row still holds the picture read before the upload.
+    expect(mocks.profileEq).toHaveBeenCalledWith(
+      'avatar_url',
+      `${CDN}user-1/old-1.png`,
+    );
     expect(mocks.remove).toHaveBeenCalledWith(['user-1/old-1.png']);
     expect(mocks.updateUser).toHaveBeenCalledWith({
       data: { full_name: 'Ada', avatar_url: url },
@@ -285,18 +326,24 @@ describe('updateAvatar', () => {
     });
   });
 
-  it('keeps the file just uploaded when it clears the old ones', async () => {
+  it('keeps the file just uploaded, and young files, when it clears old unreferenced ones', async () => {
+    const hoursAgo = (h: number) =>
+      new Date(Date.now() - h * 3_600_000).toISOString();
     mocks.list.mockImplementation(async () => {
       const path = mocks.upload.mock.calls[0]![0] as string;
       return {
-        data: [{ name: path.split('/')[1] }, { name: 'old.png' }],
+        data: [
+          { name: path.split('/')[1], id: '1', created_at: hoursAgo(0) },
+          { name: 'old.png', id: '2', created_at: hoursAgo(2) },
+          { name: 'young.png', id: '3', created_at: hoursAgo(0.1) },
+        ],
         error: null,
       };
     });
 
     await updateAvatar({}, avatarForm(PNG));
 
-    expect(mocks.remove).toHaveBeenCalledWith(['user-1/old.png']);
+    expect(mocks.remove).toHaveBeenCalledExactlyOnceWith(['user-1/old.png']);
   });
 
   it('deletes the new file and keeps the old picture when the profile row cannot be saved', async () => {
@@ -326,12 +373,19 @@ describe('updateAvatar', () => {
     expect(mocks.profileUpdate).not.toHaveBeenCalled();
   });
 
-  it('removes the picture and every stored file when asked', async () => {
+  it('removes the picture, its file and old stray files when asked', async () => {
     mocks.getUser.mockResolvedValue(
       signedIn({ full_name: 'Ada', avatar_url: 'https://old.test/a.png' }),
     );
+    setRow({ avatar_url: `${CDN}user-1/a.png` });
     mocks.list.mockResolvedValue({
-      data: [{ name: 'a.png' }, { name: 'b.webp' }],
+      data: [
+        {
+          name: 'b.webp',
+          id: '2',
+          created_at: new Date(Date.now() - 7_200_000).toISOString(),
+        },
+      ],
       error: null,
     });
     const data = new FormData();
@@ -344,10 +398,8 @@ describe('updateAvatar', () => {
 
     expect(mocks.upload).not.toHaveBeenCalled();
     expect(mocks.profileUpdate).toHaveBeenCalledWith({ avatar_url: null });
-    expect(mocks.remove).toHaveBeenCalledWith([
-      'user-1/a.png',
-      'user-1/b.webp',
-    ]);
+    expect(mocks.remove).toHaveBeenCalledWith(['user-1/a.png']);
+    expect(mocks.remove).toHaveBeenCalledWith(['user-1/b.webp']);
     expect(mocks.updateUser).toHaveBeenCalledWith({
       data: { full_name: 'Ada' },
     });
@@ -462,7 +514,7 @@ describe('completeProfile', () => {
     const state = await completeProfile({}, setupForm('Ada', pngFile()));
 
     const path = mocks.upload.mock.calls[0]![0] as string;
-    const url = `https://cdn.test/avatars/${path}`;
+    const url = `https://cdn.test/storage/v1/object/public/avatars/${path}`;
     expect(mocks.profileUpdate).toHaveBeenCalledWith({ avatar_url: url });
     expect(mocks.profileUpdate).toHaveBeenCalledWith({ display_name: 'Ada' });
     expect(mocks.updateUser).toHaveBeenCalledTimes(1);
@@ -511,7 +563,9 @@ describe('completeProfile when the name cannot be saved after the photo was', ()
     expect(state.error).toEqual(expect.any(String));
     expect(state.saved).toBeUndefined();
     expect(state.name).toBe('Ada');
-    expect(state.avatarUrl).toBe(`https://cdn.test/avatars/${path}`);
+    expect(state.avatarUrl).toBe(
+      `https://cdn.test/storage/v1/object/public/avatars/${path}`,
+    );
     expect(mocks.updateUser).not.toHaveBeenCalled();
   });
 });
@@ -567,8 +621,10 @@ describe('when the session cannot be checked', () => {
 
 describe('an update that changes no row', () => {
   beforeEach(() => {
-    // Postgres reports no error when the filter matches nothing.
+    // Postgres reports no error when the filter matches nothing, and there is
+    // no row to read either.
     mocks.profileSelect.mockResolvedValue({ data: [], error: null });
+    setRow(null);
   });
 
   it('is not reported as a saved name', async () => {
@@ -579,13 +635,12 @@ describe('an update that changes no row', () => {
     expect(mocks.updateUser).not.toHaveBeenCalled();
   });
 
-  it('is not reported as a saved photo, and the upload is not left behind', async () => {
+  it('is not reported as a saved photo, and nothing is uploaded', async () => {
     const state = await updateAvatar({}, avatarForm(PNG));
 
-    const path = mocks.upload.mock.calls[0]![0] as string;
     expect(state.error).toBe(SAVE_FAILED);
     expect(state.saved).toBeUndefined();
-    expect(mocks.remove).toHaveBeenCalledWith([path]);
+    expect(mocks.upload).not.toHaveBeenCalled();
   });
 
   it('is not reported as a removed photo', async () => {
@@ -721,7 +776,7 @@ describe('development fixture mode', () => {
   afterEach(() => vi.unstubAllEnvs());
 
   it('rejects every profile action before a Supabase client is built', async () => {
-    const shown = 'https://cdn.test/avatars/old.png';
+    const shown = 'https://cdn.test/storage/v1/object/public/avatars/old.png';
     const results = await Promise.all([
       updateName({}, form('Ada')),
       updateAvatar({ avatarUrl: shown }, avatarForm(PNG)),
