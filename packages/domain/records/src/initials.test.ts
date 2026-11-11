@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { initialsOf } from './initials-of';
+import { initialsOf } from './initials';
 
 describe('initialsOf', () => {
   it.each([

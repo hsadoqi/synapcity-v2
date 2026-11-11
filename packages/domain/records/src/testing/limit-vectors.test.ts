@@ -2,12 +2,12 @@ import { describe, expect, it } from 'vitest';
 
 import { z } from 'zod';
 
-import { RECORD_MESSAGES } from '../constants';
 import {
+  RECORD_MESSAGES,
   baseRecordCreateSchema,
   baseRecordMetadataSchema,
   baseRecordPatchSchema,
-} from '../schemas';
+} from '..';
 import {
   expandVectorValue,
   LIMIT_VECTORS,

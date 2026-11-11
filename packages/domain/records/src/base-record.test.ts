@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { baseRecordSchema } from './index';
+import { baseRecordSchema } from './base-record';
 
 const record = {
   id: 'opaque/id',

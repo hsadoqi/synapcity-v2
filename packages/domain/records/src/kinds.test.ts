@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { RECORD_KINDS } from '../../constants';
-import { recordKindSchema } from '../../schemas';
-import { isRecordKind } from './is-record-kind';
+import { RECORD_KINDS, isRecordKind, recordKindSchema } from './kinds';
 
 describe('record kinds', () => {
   it('lists the three persisted kinds, singular', () => {

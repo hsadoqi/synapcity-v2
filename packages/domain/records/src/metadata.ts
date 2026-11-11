@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 import {
   DESCRIPTION_MAX,
   ICON_MAX,
@@ -6,16 +8,33 @@ import {
   RECORD_MESSAGES,
   TAG_MAX,
   TAGS_MAX,
-} from '../../constants';
+} from './limits';
 import {
   codePointLength,
   hasVisibleCharacter,
   isPlainText,
   isSingleLineText,
   isStorableText,
-  noCaseInsensitiveDuplicates,
-} from '../../utils';
-import { z } from 'zod';
+} from './text';
+
+/** No two tags are equal when case is ignored (the database checks the same). */
+export function noCaseInsensitiveDuplicates(
+  tags: string[],
+  ctx: z.RefinementCtx,
+) {
+  const seen = new Set<string>();
+  for (const [index, tag] of tags.entries()) {
+    const key = tag.toLowerCase();
+    if (seen.has(key)) {
+      ctx.addIssue({
+        code: 'custom',
+        message: RECORD_MESSAGES.duplicateTag,
+        path: [index],
+      });
+    }
+    seen.add(key);
+  }
+}
 
 /**
  * A name after trimming: 1 to {@link NAME_MAX} characters of storable text.
@@ -64,7 +83,8 @@ export const boundedTagsSchema = z
     z
       .string()
       .trim()
-      .min(1, { abort: true })
+      // A blank tag says what an invisible-only one says: there is nothing to see.
+      .min(1, { error: RECORD_MESSAGES.invisible, abort: true })
       .refine((value) => codePointLength(value) <= TAG_MAX, {
         error: RECORD_MESSAGES.tagTooLong,
       })
@@ -120,3 +140,31 @@ export function recordPatchSchema<Shape extends z.ZodRawShape>(
 export const baseRecordPatchSchema = recordPatchSchema(
   baseRecordMetadataSchema,
 );
+
+export type BaseRecordMetadata = z.infer<typeof baseRecordMetadataSchema>;
+export type BaseRecordCreate = z.infer<typeof baseRecordCreateSchema>;
+export type BaseRecordPatch = z.infer<typeof baseRecordPatchSchema>;
+
+export type BoundedDescription = z.output<typeof boundedDescriptionSchema>;
+export type BoundedIcon = z.output<ReturnType<typeof boundedIconSchema>>;
+export type BoundedName = z.output<ReturnType<typeof boundedNameSchema>>;
+export type BoundedTags = z.output<typeof boundedTagsSchema>;
+
+/**
+ * The editable fields of a saved record, and nothing else: what an edit form
+ * starts from. The write schemas are strict and refuse server-managed fields,
+ * so a caller that holds a saved record projects it here instead of relying
+ * on a schema to drop keys.
+ */
+export function editableFieldsOf(
+  record: BaseRecordMetadata,
+): BaseRecordMetadata {
+  return {
+    name: record.name,
+    ...(record.description !== undefined && {
+      description: record.description,
+    }),
+    icon: record.icon,
+    tags: [...record.tags],
+  };
+}
