@@ -1,9 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { RECORD_KINDS } from '../constants';
-import { baseRecordMetadataSchema, recordKindSchema } from '../schemas';
+import { baseRecordMetadataSchema } from '../../schemas';
 import { editableFieldsOf } from './editable-fields-of';
-import { isRecordKind } from './is-record-kind';
 
 const record = {
   id: 'opaque/id',
@@ -16,22 +14,6 @@ const record = {
   pinnedAt: '2026-10-04T09:00:00Z',
   lastViewedAt: '2026-10-05T18:00:00+00:00',
 };
-
-describe('record kinds', () => {
-  it('lists the three persisted kinds, singular', () => {
-    expect(RECORD_KINDS).toEqual(['space', 'document', 'dashboard']);
-  });
-
-  it.each(['space', 'document', 'dashboard'])('accepts %s', (kind) => {
-    expect(isRecordKind(kind)).toBe(true);
-    expect(recordKindSchema.parse(kind)).toBe(kind);
-  });
-
-  it.each(['spaces', 'task', '', null, 1])('refuses %j', (kind) => {
-    expect(isRecordKind(kind)).toBe(false);
-    expect(recordKindSchema.safeParse(kind).success).toBe(false);
-  });
-});
 
 describe('editableFieldsOf', () => {
   it('keeps the editable fields of a saved record and drops the rest', () => {

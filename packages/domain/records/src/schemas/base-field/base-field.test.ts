@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { RECORD_MESSAGES } from '../constants';
+import { RECORD_MESSAGES } from '../../constants';
 
 import {
   baseRecordCreateSchema,

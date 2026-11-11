@@ -1,4 +1,4 @@
-import { RECORD_KINDS } from '../constants';
+import { RECORD_KINDS } from '../../constants';
 
 /** True when `value` is one of the persisted record kinds, for input from outside. */
 export function isRecordKind(

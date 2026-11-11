@@ -1,4 +1,4 @@
-import { hasNoBidiControls } from './is-single-line-text';
+import { hasNoBidiControls } from '../is-single-line-text';
 
 /**
  * True for a control character a description may not hold: all of C0 and C1

@@ -1,8 +1,8 @@
 import { instantSchema } from '@synapcity/domain-time';
 import { z } from 'zod';
 
-import { RECORD_MESSAGES } from '../constants';
-import { baseRecordMetadataSchema } from './base-field';
+import { RECORD_MESSAGES } from '../../constants';
+import { baseRecordMetadataSchema } from '../base-field';
 
 /**
  * The ten fields every owned record shares (ADR-0012, ADR-0013): the editable

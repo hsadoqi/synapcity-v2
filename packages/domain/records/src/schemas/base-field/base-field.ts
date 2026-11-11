@@ -6,7 +6,7 @@ import {
   RECORD_MESSAGES,
   TAG_MAX,
   TAGS_MAX,
-} from '../constants';
+} from '../../constants';
 import {
   codePointLength,
   hasVisibleCharacter,
@@ -14,7 +14,7 @@ import {
   isSingleLineText,
   isStorableText,
   noCaseInsensitiveDuplicates,
-} from '../utils';
+} from '../../utils';
 import { z } from 'zod';
 
 /**

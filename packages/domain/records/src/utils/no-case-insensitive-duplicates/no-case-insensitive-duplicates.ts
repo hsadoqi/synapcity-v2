@@ -1,6 +1,6 @@
 import z from 'zod';
 
-import { RECORD_MESSAGES } from '../constants';
+import { RECORD_MESSAGES } from '../../constants';
 
 /** No two tags are equal when case is ignored (the database checks the same). */
 export function noCaseInsensitiveDuplicates(
