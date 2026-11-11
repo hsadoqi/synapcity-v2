@@ -4,7 +4,7 @@ import * as React from 'react';
 import { parseDate } from 'chrono-node';
 import { CalendarIcon } from 'lucide-react';
 
-import type { DateTimeFormatting } from '@synapcity/domain-preferences';
+import type { DateTimeFormatting } from '@synapcity/frontend-preferences';
 import { useDateTimeFormatting } from '@synapcity/frontend-preferences';
 import { Calendar } from '@synapcity/frontend-ui/core/calendar';
 import { Field, FieldLabel } from '@synapcity/frontend-ui/core/field';

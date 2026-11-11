@@ -1,6 +1,6 @@
 'use client';
 
-import { formatWrittenDate } from '@synapcity/domain-preferences';
+import { formatWrittenDate } from '@synapcity/frontend-preferences';
 import { useDateTimeFormatting } from '@synapcity/frontend-preferences';
 import { Badge } from '@synapcity/frontend-ui/core/badge';
 

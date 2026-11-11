@@ -1,9 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  regionalDefaults,
-  resolveDateTimeFormatting,
-} from '@synapcity/domain-preferences';
+import { regionalDefaults } from '@synapcity/domain-preferences';
+import { resolveDateTimeFormatting } from '@synapcity/frontend-preferences';
 import {
   addCalendarDays,
   formatCalendarDate,

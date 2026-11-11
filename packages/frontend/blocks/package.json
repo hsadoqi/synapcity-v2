@@ -35,7 +35,6 @@
   "dependencies": {
     "@base-ui/react": "^1.9.0",
     "@synapcity/domain-identity": "workspace:*",
-    "@synapcity/domain-preferences": "workspace:*",
     "@synapcity/frontend-preferences": "workspace:*",
     "@synapcity/frontend-ui": "workspace:*",
     "chrono-node": "^2.10.3",

@@ -1327,9 +1327,6 @@ importers:
       '@synapcity/domain-identity':
         specifier: workspace:*
         version: link:../../domain/identity
-      '@synapcity/domain-preferences':
-        specifier: workspace:*
-        version: link:../../domain/preferences
       '@synapcity/frontend-preferences':
         specifier: workspace:*
         version: link:../preferences
