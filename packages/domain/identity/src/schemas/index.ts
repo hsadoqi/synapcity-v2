@@ -3,12 +3,12 @@ export {
   AVATAR_FILE_TYPES,
   MAX_AVATAR_BYTES,
   avatarFileSchema,
-} from './avatar/avatar';
-export type { AvatarType, AvatarFileInput } from './avatar/avatar';
-export { MAX_NAME_LENGTH, nameSchema } from './name/name';
-export type { NameInput } from './name/name';
-export { profileSchema } from './profile/profile';
-export type { ProfileInput } from './profile/profile';
+} from './avatar';
+export type { AvatarType, AvatarFileInput } from './avatar';
+export { MAX_NAME_LENGTH, nameSchema } from './name';
+export type { NameInput } from './name';
+export { profileSchema } from './profile';
+export type { ProfileInput } from './profile';
 export {
   ALREADY_YOUR_EMAIL,
   MIN_PASSWORD_LENGTH,
@@ -23,5 +23,5 @@ export {
   signInSchema,
   signUpSchema,
   updatePasswordSchema,
-} from './credentials/credentials';
-export type { AuthFieldName } from './credentials/credentials';
+} from './credentials';
+export type { AuthFieldName } from './credentials';

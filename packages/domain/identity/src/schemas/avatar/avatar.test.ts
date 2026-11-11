@@ -6,7 +6,7 @@ import {
   MAX_AVATAR_BYTES,
   avatarFileSchema,
 } from './avatar';
-import { MAX_NAME_LENGTH } from '../name/name';
+import { MAX_NAME_LENGTH } from '../name';
 
 const file = (size: number, type: string) =>
   new File([new Uint8Array(size)], 'avatar', { type });
