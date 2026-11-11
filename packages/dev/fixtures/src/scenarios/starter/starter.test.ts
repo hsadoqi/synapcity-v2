@@ -1,6 +1,5 @@
-import { describe, it } from 'node:test';
-import { expect } from 'vitest';
-import { buildScenario } from '..';
+import { describe, expect, it } from 'vitest';
+import { buildScenario } from '../builder';
 
 describe('starter', () => {
   const s = buildScenario('starter');

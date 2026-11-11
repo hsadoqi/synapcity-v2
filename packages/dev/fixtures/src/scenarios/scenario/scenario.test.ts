@@ -4,11 +4,11 @@ import { describe, expect, it } from 'vitest';
 import { baseRecordSchema } from '@synapcity/domain-records';
 import { spaceSchema } from '@synapcity/domain-spaces';
 
-import { buildScenario, scenarioNames } from './builder';
+import { buildScenario, scenarioNames } from '../builder';
 import { stableId } from './scenario';
 
 const SEED_SQL = readFileSync(
-  new URL('../../../../../supabase/seed.sql', import.meta.url),
+  new URL('../../../../../../supabase/seed.sql', import.meta.url),
   'utf8',
 );
 
