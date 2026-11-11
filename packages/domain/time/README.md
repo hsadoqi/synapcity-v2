@@ -28,4 +28,4 @@ Why its own package: the instant is used by `domain-records` (the saved-record t
 
 ## Scripts
 
-`lint`, `check-types`, `test`, `test:coverage`. Tests sit beside the schemas and values (`*.test.ts`).
+`lint`, `check-types`, `test`, `test:coverage`. Tests sit beside the schemas and utils (`*.test.ts`).

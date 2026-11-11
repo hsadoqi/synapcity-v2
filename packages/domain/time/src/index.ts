@@ -14,5 +14,5 @@ export {
   toDateRangeValue,
   toDateValue,
   toTimeValue,
-} from './values';
-export type { DateRangeValue } from './values';
+} from './utils';
+export type { DateRangeValue } from './utils';
