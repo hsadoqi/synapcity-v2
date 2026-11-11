@@ -19,6 +19,8 @@ Runtime: server only. The root entry starts with `import 'server-only'`. Categor
 
 `@synapcity/server-auth/testing`: `fakeIdentityProvider({ claims, user })`, a controlled provider that counts calls. Tests, stories and dev hosts only.
 
+There is no `./utils` entry (removed 2026-11-11; it had no importers): `isOwner`, `verifyIdentity` and `verifyIdentityWithProvider` are on the root.
+
 The Supabase implementation of the port is `supabaseIdentityProvider` in `@synapcity/server-supabase`. Hosts build a provider per request from a request-bound client.
 
 ## Rules

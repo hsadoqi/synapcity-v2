@@ -14,7 +14,7 @@ Runtime: server-only. The host supplies the request-bound Supabase client and ve
 - `saveAvatar(client, user, request)` uploads or removes the picture and returns `{ ok: true, avatarUrl, patch }` or `{ ok: false, reason, message?, failure? }`, where `reason` is `invalid-file`, `unsupported-type`, `upload-failed`, `profile-not-saved`, `account-deleting`, `conflict` or `unconfirmed`. The host owns the wording. `avatarUrl` is what the row holds after the save, which a newer save may already have changed.
 - `deleteOwnAccount(client)` deletes the caller's own account and returns an `AccountDeletionOutcome`: `deleted` (with an optional `cleanupFailure` to log), `link-required`, `signed-out`, `unavailable`, `failed { step, photoRemoved }` or `unconfirmed`.
 - `mirrorToSession(client, user, patches)` returns `{ ok: true }` or `{ ok: false, step, failure }`.
-- The pure helpers `withFullName`, `withAvatarUrl`, `withProfileConfirmed`, `detectImageType` and `extensionFor`.
+- The pure helper `withProfileConfirmed`. The other metadata and image-type helpers (`withFullName`, `withAvatarUrl`, `detectImageType`, `extensionFor`) are internal; `src/index.test.ts` checks the root's names.
 
 ### Avatar lifecycle
 
