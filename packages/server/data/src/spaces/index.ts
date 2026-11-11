@@ -8,6 +8,7 @@ export {
 export {
   findSpace,
   getSpaceRelations,
+  listLatestSpaces,
   listSpaceNavItems,
   listSpaces,
   listSpacesWithRelations,

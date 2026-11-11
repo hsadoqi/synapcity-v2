@@ -1,6 +1,10 @@
 import type { BaseRecord } from '@synapcity/domain-records';
 
-import { loadRecord, loadRecordSummaries } from '@/lib/records';
+import {
+  loadLatestRecords,
+  loadRecord,
+  loadRecordSummaries,
+} from '@/lib/records';
 import type { RecordSummary } from '@/lib/records/record-summary';
 
 import { DOCUMENT_FIXTURES } from '../../lib/fixtures';
@@ -12,6 +16,14 @@ import { DOCUMENT_FIXTURES } from '../../lib/fixtures';
  */
 export function getDocuments(): Promise<RecordSummary[]> {
   return loadRecordSummaries('documents', DOCUMENT_FIXTURES);
+}
+
+/**
+ * At most `limit` of the signed-in owner's documents in the sidebar's order,
+ * without participation counts. Fixture mode orders the sample records.
+ */
+export function getLatestDocuments(limit: number): Promise<BaseRecord[]> {
+  return loadLatestRecords('documents', DOCUMENT_FIXTURES, limit);
 }
 
 /**

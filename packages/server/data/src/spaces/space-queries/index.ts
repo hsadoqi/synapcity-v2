@@ -3,6 +3,7 @@ export {
   listSpaces,
   listSpaceSummaries,
   getSpaceRelations,
+  listLatestSpaces,
   listSpaceNavItems,
   listSpacesWithRelations,
   type SpaceDashboardLink,

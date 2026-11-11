@@ -61,6 +61,12 @@ export interface SpaceSource {
   /** The same with the document and dashboard counts, for the index. */
   listSummaries(): Promise<SpaceSummary[]>;
   /**
+   * At most `limit` Spaces in the sidebar's order: pinned first (most recently
+   * pinned on top), then the most recently changed, then the newest. Plain
+   * Spaces, without counts.
+   */
+  listLatest(limit: number): Promise<SpaceEntity[]>;
+  /**
    * The owner's Spaces as navigation lists them: display fields only, pinned
    * first, then the most recently changed.
    */

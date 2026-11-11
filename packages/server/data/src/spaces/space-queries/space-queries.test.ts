@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   findSpace,
   getSpaceRelations,
+  listLatestSpaces,
   listSpaceNavItems,
   listSpaces,
   listSpacesWithRelations,
@@ -29,7 +30,7 @@ let client: SupabaseServerClient;
 /** A stand-in for the PostgREST query builder that resolves to `result`. */
 function queryReturning(result: { data: unknown; error: unknown }) {
   const builder: Record<string, unknown> = {};
-  for (const method of ['select', 'order', 'eq']) {
+  for (const method of ['select', 'order', 'eq', 'limit']) {
     builder[method] = vi.fn(() => builder);
   }
   builder.maybeSingle = vi.fn(() => Promise.resolve(result));
@@ -111,6 +112,36 @@ describe('space queries', () => {
       await expect(listSpaces(client)).rejects.toMatchObject({
         name: 'ZodError',
       });
+    });
+  });
+
+  describe('listLatestSpaces', () => {
+    it('reads the limit in sidebar order, with no participation counts', async () => {
+      const { from, builder } = queryReturning({ data: [row], error: null });
+
+      const spaces = await listLatestSpaces(client, 8);
+
+      expect(from).toHaveBeenCalledWith('spaces');
+      expect(builder.select).toHaveBeenCalledWith(
+        expect.not.stringContaining('count'),
+      );
+      expect((builder.order as ReturnType<typeof vi.fn>).mock.calls).toEqual([
+        ['pinned_at', { ascending: false, nullsFirst: false }],
+        ['updated_at', { ascending: false }],
+        ['created_at', { ascending: false }],
+        ['id'],
+      ]);
+      expect(builder.limit).toHaveBeenCalledWith(8);
+      expect(spaces[0]).toMatchObject({ id: row.id, name: 'Writing' });
+      expect(spaces[0]).not.toHaveProperty('documentsTotal');
+    });
+
+    it('reports a database error', async () => {
+      queryReturning({ data: null, error: { code: '42501', message: 'boom' } });
+
+      await expect(listLatestSpaces(client, 8)).rejects.toThrow(
+        'Failed to load spaces (code 42501)',
+      );
     });
   });
 

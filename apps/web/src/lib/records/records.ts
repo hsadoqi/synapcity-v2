@@ -1,6 +1,7 @@
 import type { BaseRecord } from '@synapcity/domain-records';
 import {
   findRecord,
+  listLatestRecords,
   listRecordSummaries,
   setRecordPinned,
   type ParticipantTable,
@@ -11,6 +12,7 @@ import { z } from 'zod';
 import { getCallerIdentity, SAVE_FAILED } from '@/lib/access/caller';
 import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import { logFailure } from '@/lib/log-failure';
+import { byLatest } from '@/lib/sidebar-records/latest-records';
 import { createClient } from '@/lib/supabase/server';
 import type { RecordSummary } from './record-summary';
 
@@ -66,6 +68,21 @@ export async function loadRecordSummaries(
 ): Promise<RecordSummary[]> {
   if (fixtureModeEnabled()) return [...fixtures];
   return listRecordSummaries(await createClient(), kind);
+}
+
+/**
+ * At most `limit` of the signed-in owner's records of one kind, in the
+ * sidebar's order (pinned first, then the most recently changed), without
+ * participation counts. Row-level security scopes the query to the session.
+ * Development fixture mode orders the sample records the same way in memory.
+ */
+export async function loadLatestRecords(
+  kind: ParticipantTable,
+  fixtures: readonly BaseRecord[],
+  limit: number,
+): Promise<BaseRecord[]> {
+  if (fixtureModeEnabled()) return [...fixtures].sort(byLatest).slice(0, limit);
+  return listLatestRecords(await createClient(), kind, limit);
 }
 
 /**

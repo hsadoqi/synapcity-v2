@@ -39,6 +39,8 @@ export function fixtureSpaceSource(): SpaceSource {
         documentsTotal: 0,
         dashboardsTotal: 0,
       })),
+    listLatest: async (limit) =>
+      [...DEMO_SPACES].sort(byNavOrder).slice(0, limit),
     listNavItems: async () =>
       [...DEMO_SPACES]
         .sort(byNavOrder)

@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   createRecord,
   findRecord,
+  listLatestRecords,
   listRecordSummaries,
   recordRecordView,
   setRecordPinned,
@@ -36,6 +37,7 @@ function clientReturning(result: {
     'eq',
     'insert',
     'single',
+    'limit',
   ]) {
     builder[method] = vi.fn(() => builder);
   }
@@ -110,6 +112,48 @@ describe('listRecordSummaries', () => {
     await expect(
       listRecordSummaries(client, 'documents'),
     ).rejects.toMatchObject({ name: 'ZodError' });
+  });
+});
+
+describe('listLatestRecords', () => {
+  it.each(['documents', 'dashboards'] as const)(
+    'reads the limit of %s in sidebar order, with no participation counts',
+    async (kind) => {
+      const { client, from, builder } = clientReturning({
+        data: [row],
+        error: null,
+      });
+
+      const [record] = await listLatestRecords(client, kind, 8);
+
+      expect(from).toHaveBeenCalledWith(kind);
+      expect(builder.select).toHaveBeenCalledWith(
+        expect.not.stringContaining('count'),
+      );
+      expect((builder.order as ReturnType<typeof vi.fn>).mock.calls).toEqual([
+        ['pinned_at', { ascending: false, nullsFirst: false }],
+        ['updated_at', { ascending: false }],
+        ['created_at', { ascending: false }],
+        ['id'],
+      ]);
+      expect(builder.limit).toHaveBeenCalledWith(8);
+      expect(record).toMatchObject({ id: row.id, name: 'Launch plan' });
+      expect(record).not.toHaveProperty('spacesTotal');
+    },
+  );
+
+  it('throws with the code, never the database message', async () => {
+    const { client } = clientReturning({
+      data: null,
+      error: { code: '42501', message: 'boom' },
+    });
+
+    const failure = listLatestRecords(client, 'dashboards', 8);
+
+    await expect(failure).rejects.toThrow(
+      'Failed to load dashboards (code 42501)',
+    );
+    await expect(failure).rejects.not.toThrow('boom');
   });
 });
 
