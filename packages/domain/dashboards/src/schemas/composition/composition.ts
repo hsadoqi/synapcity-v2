@@ -1,7 +1,7 @@
 import { entityRefSchema } from '@synapcity/domain-prototypes';
 import { z } from 'zod';
 
-import type { DashboardComposition } from '../types';
+import type { DashboardComposition } from '../../types';
 
 const placement = z.number().int().nonnegative();
 const span = z.number().int().positive();

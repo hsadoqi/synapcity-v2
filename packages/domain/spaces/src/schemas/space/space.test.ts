@@ -1,6 +1,10 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 
-import type { CreateSpaceInput, SpaceEntity, UpdateSpaceInput } from '../types';
+import type {
+  CreateSpaceInput,
+  SpaceEntity,
+  UpdateSpaceInput,
+} from '../../types';
 import { editableFieldsOf, RECORD_MESSAGES } from '@synapcity/domain-records';
 import { limitVectorMismatches } from '@synapcity/domain-records/testing';
 

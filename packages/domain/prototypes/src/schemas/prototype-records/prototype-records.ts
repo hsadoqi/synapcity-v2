@@ -2,7 +2,7 @@ import { baseRecordSchema } from '@synapcity/domain-records';
 import { calendarDateSchema, instantSchema } from '@synapcity/domain-time';
 import { z } from 'zod';
 
-import { normalizeLinkUrl } from '../utils/normalize-link-url';
+import { normalizeLinkUrl } from '../../utils/normalize-link-url';
 
 /**
  * Record kinds carried over from the responsive-grid prototype. Each one

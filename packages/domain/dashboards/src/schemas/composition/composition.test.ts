@@ -1,8 +1,8 @@
 import { emptyRecords } from '@synapcity/domain-prototypes';
 import { describe, expect, it } from 'vitest';
 
-import type { DashboardComposition, WidgetType } from '../types';
-import { addWidget, createComposition, createWidget } from '../utils';
+import type { DashboardComposition, WidgetType } from '../../types';
+import { addWidget, createComposition, createWidget } from '../../utils';
 import { dashboardCompositionSchema } from './index';
 
 const ctx = { ownerId: '11111111-1111-4111-8111-111111111111', now: 0 };

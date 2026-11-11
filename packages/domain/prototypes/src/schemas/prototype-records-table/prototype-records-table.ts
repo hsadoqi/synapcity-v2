@@ -11,7 +11,7 @@ import {
   noteSchema,
   projectSchema,
   taskSchema,
-} from './prototype-records';
+} from '../prototype-records';
 
 /** A table of records keyed by id; each record must sit under its own id. */
 function tableOf<T extends { id: string }>(schema: z.ZodType<T>) {

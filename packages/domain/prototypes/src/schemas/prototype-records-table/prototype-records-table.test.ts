@@ -1,9 +1,9 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 
-import type { PrototypeRecords } from '../types';
+import type { PrototypeRecords } from '../../types';
 
-import { newRecord } from '../utils/new-record';
-import { emptyRecords } from '../utils/record-tables';
+import { newRecord } from '../../utils/new-record';
+import { emptyRecords } from '../../utils/record-tables';
 import { prototypeRecordsSchema } from './index';
 
 const ctx = { ownerId: '11111111-1111-4111-8111-111111111111', now: 0 };
