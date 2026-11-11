@@ -1,4 +1,5 @@
 import {
+  AuthApiError,
   AuthRetryableFetchError,
   AuthSessionMissingError,
 } from '@supabase/supabase-js';
@@ -693,7 +694,7 @@ describe('changing the email', () => {
     mocks.getClaims.mockResolvedValue({ data: null, error: null });
     mocks.getUser.mockResolvedValue({
       data: { user: null },
-      error: { code: 'session_not_found' },
+      error: new AuthSessionMissingError(),
     });
   }
 
@@ -975,7 +976,7 @@ describe('requestOwnPasswordReset', () => {
   it('needs a session', async () => {
     mocks.getUser.mockResolvedValue({
       data: { user: null },
-      error: { code: 'session_not_found' },
+      error: new AuthSessionMissingError(),
     });
 
     const state = await requestOwnPasswordReset({}, form({}));
@@ -1044,7 +1045,7 @@ describe('when the session has gone, the form is told so it can link to sign-in'
     mocks.getClaims.mockResolvedValue({ data: null, error: null });
     mocks.getUser.mockResolvedValue({
       data: { user: null },
-      error: { code: 'session_not_found' },
+      error: new AuthSessionMissingError(),
     });
   };
   /** Claims still say signed in, but the provider no longer knows the session. */
@@ -1055,7 +1056,7 @@ describe('when the session has gone, the form is told so it can link to sign-in'
     });
     mocks.getUser.mockResolvedValue({
       data: { user: null },
-      error: { code: 'session_not_found' },
+      error: new AuthSessionMissingError(),
     });
   };
   const outage = () => {
@@ -1112,6 +1113,70 @@ describe('when the session has gone, the form is told so it can link to sign-in'
 
       expect(state.error).toBe('Something went wrong. Try again.');
       expect(state.signedOut).toBeUndefined();
+    },
+  );
+});
+
+describe('an Auth service that cannot answer is "try again", never "sign in again"', () => {
+  const OWN = { sub: USER_ID, email: 'ada@example.com' };
+
+  beforeEach(() => {
+    mocks.getUser.mockResolvedValue({
+      data: { user: { id: USER_ID, email: 'ada@example.com' } },
+      error: null,
+    });
+  });
+
+  const actions = [
+    [
+      'requestEmailChange',
+      () => requestEmailChange({}, form({ email: 'grace@example.com' })),
+    ],
+    ['resendEmailChange', () => resendEmailChange({}, form({}))],
+    ['requestOwnPasswordReset', () => requestOwnPasswordReset({}, form({}))],
+    ['connectAccount', () => connectAccount({}, form({ provider: 'google' }))],
+    [
+      'disconnectAccount',
+      () => disconnectAccount({}, form({ provider: 'github' })),
+    ],
+  ] as const;
+
+  it.each(actions)(
+    '%s, when the session check itself has no answer',
+    async (_name, run) => {
+      mocks.getClaims.mockResolvedValue({
+        data: null,
+        error: new AuthRetryableFetchError('fetch failed', 0),
+      });
+
+      const state = await run();
+
+      expect(state.error).toBe('Something went wrong. Try again.');
+      expect(state.signedOut).toBeUndefined();
+      expect(mocks.getUser).not.toHaveBeenCalled();
+      expect(mocks.linkIdentity).not.toHaveBeenCalled();
+      expect(mocks.getUserIdentities).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([
+    ['a rate limit', new AuthApiError('slow', 429, 'over_request_rate_limit')],
+    ['a 500', new AuthRetryableFetchError('boom', 500)],
+    ['a 4xx without a code', new AuthApiError('odd', 400, undefined)],
+  ])(
+    'requestEmailChange, when reading the account meets %s',
+    async (_name, error) => {
+      mocks.getClaims.mockResolvedValue({ data: { claims: OWN }, error: null });
+      mocks.getUser.mockResolvedValue({ data: { user: null }, error });
+
+      const state = await requestEmailChange(
+        {},
+        form({ email: 'grace@example.com' }),
+      );
+
+      expect(state.error).toBe('Something went wrong. Try again.');
+      expect(state.signedOut).toBeUndefined();
+      expect(mocks.updateUser).not.toHaveBeenCalled();
     },
   );
 });
@@ -1194,10 +1259,11 @@ describe('connectAccount', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     mocks.linkIdentity.mockResolvedValue({
       data: { provider: 'google', url: null },
-      error: {
-        code: 'manual_linking_disabled',
-        message: 'secret detail ada@example.com',
-      },
+      error: new AuthApiError(
+        'secret detail ada@example.com',
+        422,
+        'manual_linking_disabled',
+      ),
     });
 
     const state = await connectAccount({}, form({ provider: 'google' }));
@@ -1216,7 +1282,7 @@ describe('connectAccount', () => {
   it('shows a rate limit', async () => {
     mocks.linkIdentity.mockResolvedValue({
       data: { provider: 'google', url: null },
-      error: { code: 'over_request_rate_limit' },
+      error: new AuthApiError('slow down', 429, 'over_request_rate_limit'),
     });
 
     const state = await connectAccount({}, form({ provider: 'google' }));
@@ -1277,7 +1343,7 @@ describe('requestAccountDeletion', () => {
   it('offers sign-in when the session has gone', async () => {
     mocks.getUser.mockResolvedValue({
       data: { user: null },
-      error: { code: 'session_not_found' },
+      error: new AuthSessionMissingError(),
     });
 
     const state = await requestAccountDeletion({}, form({ email: OWN }));
@@ -1346,7 +1412,10 @@ describe('disconnectAccount', () => {
   );
 
   it('needs a session, and offers sign-in', async () => {
-    mocks.getClaims.mockResolvedValue({ data: null, error: { code: 'x' } });
+    mocks.getClaims.mockResolvedValue({
+      data: null,
+      error: new AuthSessionMissingError(),
+    });
 
     const state = await disconnectAccount({}, form({ provider: 'github' }));
 
@@ -1372,7 +1441,11 @@ describe('disconnectAccount', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     mocks.unlinkIdentity.mockResolvedValue({
       data: null,
-      error: { code: 'manual_linking_disabled', message: 'ada@example.com' },
+      error: new AuthApiError(
+        'ada@example.com',
+        422,
+        'manual_linking_disabled',
+      ),
     });
 
     const state = await disconnectAccount({}, form({ provider: 'github' }));

@@ -1,4 +1,7 @@
-import { AuthRetryableFetchError } from '@supabase/supabase-js';
+import {
+  AuthRetryableFetchError,
+  AuthSessionMissingError,
+} from '@supabase/supabase-js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
@@ -137,7 +140,7 @@ describe('updateName', () => {
   it('asks to sign in again when there is no caller, about no one field', async () => {
     mocks.getUser.mockResolvedValue({
       data: { user: null },
-      error: { code: 'session_not_found' },
+      error: new AuthSessionMissingError(),
     });
 
     const state = await updateName({}, form('Ada'));
@@ -284,7 +287,7 @@ describe('updateAvatar', () => {
   it('asks to sign in again when there is no caller', async () => {
     mocks.getUser.mockResolvedValue({
       data: { user: null },
-      error: { code: 'session_not_found' },
+      error: new AuthSessionMissingError(),
     });
 
     const state = await updateAvatar({}, avatarForm(PNG));
@@ -541,7 +544,7 @@ describe('completeProfile', () => {
   it('asks to sign in again when there is no caller', async () => {
     mocks.getUser.mockResolvedValue({
       data: { user: null },
-      error: { code: 'session_not_found' },
+      error: new AuthSessionMissingError(),
     });
 
     const state = await completeProfile({}, setupForm('Ada'));
@@ -587,7 +590,7 @@ describe('when the session cannot be checked', () => {
   ])('%s tells someone with no session to sign in again', async (_n, run) => {
     mocks.getUser.mockResolvedValue({
       data: { user: null },
-      error: { code: 'session_not_found' },
+      error: new AuthSessionMissingError(),
     });
 
     const state = await run();
@@ -749,7 +752,7 @@ describe('skipProfileSetup', () => {
   it('reports not saved, and touches nothing, when there is no session', async () => {
     mocks.getUser.mockResolvedValue({
       data: { user: null },
-      error: { code: 'session_not_found' },
+      error: new AuthSessionMissingError(),
     });
 
     expect(await skipProfileSetup()).toEqual({ saved: false });
