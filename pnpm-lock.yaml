@@ -2072,6 +2072,12 @@ importers:
       '@synapcity/dev-vitest-config':
         specifier: workspace:*
         version: link:../../dev/vitest-config
+      '@synapcity/server-data':
+        specifier: workspace:*
+        version: link:../data
+      '@types/node':
+        specifier: 26.6.5
+        version: 26.6.5
       '@vitest/coverage-v8':
         specifier: 5.0.5
         version: 5.0.5(@vitest/browser@5.0.5)(vitest@5.0.5)

@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from 'vitest';
 
-import { withTwoUsers } from './index';
+import { withTwoUsers } from '@synapcity/server-data/testing';
 
 // A real 1x1 PNG.
 const PNG = Uint8Array.from(

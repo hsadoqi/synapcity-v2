@@ -35,7 +35,7 @@ export function stackEnv(
   const serviceKey = env.DB_TEST_SERVICE_KEY;
   if (!dbUrl || !apiUrl || !publishableKey || !serviceKey) {
     throw new Error(
-      'The database stack is not described. Run `pnpm --filter @synapcity/server-data test:db`, which starts from `pnpm db:stack start`.',
+      "The database stack is not described. Run the package's `test:db` script (for example `pnpm --filter @synapcity/server-data test:db`), which starts from `pnpm db:stack start`.",
     );
   }
   assertLoopback('SUPABASE_DB_URL', dbUrl);
