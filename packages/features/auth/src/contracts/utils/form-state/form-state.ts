@@ -24,8 +24,16 @@ export type AuthState = {
 
 type UserData = {
   email: string;
-  /** Only collected when registering. */
+  /**
+   * Transitional: the register form still reads this to refill its `name`
+   * field. The `signUp` action no longer sets it; remove it when the form
+   * moves to `firstName` and `lastName`.
+   */
   name?: string;
+  /** Only collected when registering. */
+  firstName?: string;
+  /** Only collected when registering, and only when given. */
+  lastName?: string;
 };
 
 /**

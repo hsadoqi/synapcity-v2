@@ -184,44 +184,131 @@ describe('signInWithPassword', () => {
 
 describe('signUp', () => {
   const valid = {
+    firstName: 'Ada',
+    lastName: 'Lovelace',
     email: 'a@b.co',
-    name: 'Ada',
     password: STRONG,
+    confirm: STRONG,
   };
-
-  it('checks email, then name, then password, without calling Supabase', async () => {
-    expect((await signUp({}, form({ ...valid, email: '' }))).fields).toEqual([
-      'email',
-    ]);
-    expect((await signUp({}, form({ ...valid, name: ' ' }))).fields).toEqual([
-      'name',
-    ]);
-    expect(
-      (await signUp({}, form({ ...valid, password: 'short' }))).fields,
-    ).toEqual(['password']);
-    expect(mocks.signUp).not.toHaveBeenCalled();
-  });
-
-  it('asks for confirmation without promising a link was sent', async () => {
+  const accepted = () =>
     mocks.signUp.mockResolvedValue({
       data: { session: null, user: { id: USER_ID } },
       error: null,
     });
 
-    const state = await signUp({}, form({ ...valid, next: '/x' }));
+  it.each([
+    ['a missing first name', { firstName: '' }, 'firstName'],
+    ['a blank first name', { firstName: '   ' }, 'firstName'],
+    ['an invalid first name', { firstName: 'Ada1' }, 'firstName'],
+    ['an invalid last name', { lastName: '<b>' }, 'lastName'],
+    ['an invalid email', { email: 'not-an-address' }, 'email'],
+    [
+      'a weak password',
+      { password: 'weakpass', confirm: 'weakpass' },
+      'password',
+    ],
+    ['a mismatched confirmation', { confirm: `${STRONG}x` }, 'confirm'],
+    ['a missing confirmation', { confirm: '' }, 'confirm'],
+  ])(
+    'refuses %s without building a Supabase client',
+    async (_, change, fieldName) => {
+      const state = await signUp({}, form({ ...valid, ...change }));
 
-    expect(state.success).toBe(true);
-    expect(state.message).not.toMatch(/was sent|we sent/i);
-    expect(state.data?.user).toEqual({ email: 'a@b.co', name: 'Ada' });
-    expect(mocks.signUp).toHaveBeenCalledWith(
-      expect.objectContaining({
-        options: expect.objectContaining({
-          emailRedirectTo:
-            'https://app.test/auth/callback?next=%2Fx&flow=confirm',
-          data: { full_name: 'Ada' },
-        }),
+      expect(state.error).toBeDefined();
+      expect(state.fields).toEqual([fieldName]);
+      expect(mocks.createClient).not.toHaveBeenCalled();
+      expect(mocks.signUp).not.toHaveBeenCalled();
+    },
+  );
+
+  it('refuses a form that still sends only `name`', async () => {
+    const { firstName: _, ...rest } = valid;
+    const state = await signUp({}, form({ ...rest, name: 'Ada' }));
+
+    expect(state.fields).toEqual(['firstName']);
+    expect(mocks.signUp).not.toHaveBeenCalled();
+  });
+
+  it('echoes the trimmed names and email after a refusal, never the passwords', async () => {
+    const state = await signUp(
+      {},
+      form({ ...valid, firstName: ' Ada ', email: ' bad ', lastName: '' }),
+    );
+
+    expect(state.data?.user).toEqual({ email: 'bad', firstName: 'Ada' });
+  });
+
+  it('sends the exact structured names and asks for confirmation without promising a link was sent', async () => {
+    accepted();
+
+    const state = await signUp(
+      {},
+      form({
+        ...valid,
+        firstName: ' Ada ',
+        lastName: ' Lovelace ',
+        next: '/x',
       }),
     );
+
+    expect(state.success).toBe(true);
+    expect(state.message).toBe(
+      'Check your email for a link to confirm your account. If you already have an account, sign in or reset your password instead.',
+    );
+    expect(state.message).not.toMatch(/was sent|we sent/i);
+    expect(state.data?.user).toEqual({
+      email: 'a@b.co',
+      firstName: 'Ada',
+      lastName: 'Lovelace',
+    });
+    expect(mocks.signUp).toHaveBeenCalledWith({
+      email: 'a@b.co',
+      password: STRONG,
+      options: {
+        emailRedirectTo:
+          'https://app.test/auth/callback?next=%2Fx&flow=confirm',
+        data: { first_name: 'Ada', last_name: 'Lovelace' },
+      },
+    });
+  });
+
+  it('sends no last_name when the field is blank', async () => {
+    accepted();
+
+    const state = await signUp({}, form({ ...valid, lastName: '  ' }));
+
+    expect(state.data?.user).toEqual({ email: 'a@b.co', firstName: 'Ada' });
+    expect(mocks.signUp.mock.calls[0]?.[0].options.data).toEqual({
+      first_name: 'Ada',
+    });
+  });
+
+  it('drops an unsafe next from the confirmation callback', async () => {
+    accepted();
+
+    await signUp({}, form({ ...valid, next: 'https://evil.test/x' }));
+
+    expect(mocks.signUp.mock.calls[0]?.[0].options.emailRedirectTo).toBe(
+      'https://app.test/auth/callback?next=&flow=confirm',
+    );
+  });
+
+  it('words a provider error and marks its field', async () => {
+    mocks.signUp.mockResolvedValue({
+      data: { user: null, session: null },
+      error: { code: 'weak_password' },
+    });
+
+    const state = await signUp({}, form(valid));
+
+    expect(state.success).toBeUndefined();
+    expect(state.error).toBeDefined();
+    expect(state.fields).toEqual(['password']);
+    expect(state.data?.user).toEqual({
+      email: 'a@b.co',
+      firstName: 'Ada',
+      lastName: 'Lovelace',
+    });
   });
 
   it('signs straight in when the project hands back a session', async () => {
@@ -231,6 +318,17 @@ describe('signUp', () => {
     });
 
     expect(await redirectOf(signUp({}, form(valid)))).toBe(`/${USER_ID}/home`);
+  });
+
+  it('signs straight in to a safe next when one was given', async () => {
+    mocks.signUp.mockResolvedValue({
+      data: { session: {}, user: { id: USER_ID } },
+      error: null,
+    });
+
+    expect(await redirectOf(signUp({}, form({ ...valid, next: '/x' })))).toBe(
+      '/x',
+    );
   });
 });
 
@@ -483,7 +581,12 @@ describe('signOut', () => {
 
 describe('results never echo a password', () => {
   const PASSWORD = 'Sentinel-Passw0rd-5c1d!';
-  const valid = { email: 'a@b.co', name: 'Ada', password: PASSWORD };
+  const valid = {
+    email: 'a@b.co',
+    firstName: 'Ada',
+    password: PASSWORD,
+    confirm: PASSWORD,
+  };
 
   it('after a refused sign-in', async () => {
     mocks.signInWithPassword.mockResolvedValue({
@@ -498,9 +601,17 @@ describe('results never echo a password', () => {
   });
 
   it('after a validation failure and a provider failure at sign-up', async () => {
-    const invalid = await signUp({}, form({ ...valid, name: ' ' }));
+    const invalid = await signUp({}, form({ ...valid, firstName: ' ' }));
     expect(invalid.error).toBeDefined();
     expect(JSON.stringify(invalid)).not.toContain(PASSWORD);
+
+    const mismatch = await signUp(
+      {},
+      form({ ...valid, confirm: 'Other-Passw0rd-7e2a!' }),
+    );
+    expect(mismatch.fields).toEqual(['confirm']);
+    expect(JSON.stringify(mismatch)).not.toContain(PASSWORD);
+    expect(JSON.stringify(mismatch)).not.toContain('Other-Passw0rd-7e2a!');
 
     mocks.signUp.mockResolvedValue({
       data: { user: null, session: null },
@@ -1284,7 +1395,7 @@ describe('development fixture mode', () => {
     email: 'a@b.test',
     password: STRONG,
     confirm: STRONG,
-    name: 'Ada',
+    firstName: 'Ada',
     provider: 'google',
   });
 

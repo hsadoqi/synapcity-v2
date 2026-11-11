@@ -15,7 +15,7 @@ import {
   everyRefusal,
   firstRefusal,
   signInSchema,
-  signUpSchema,
+  registrationSchema,
   updatePasswordSchema,
 } from '@synapcity/domain-identity';
 import {
@@ -109,29 +109,35 @@ export async function signUp(
   // Empty when the visitor gave no destination: the callback then falls back
   // to the new user's own home.
   const next = safeNextPath(field(formData, 'next'), '');
-  const parsed = signUpSchema.safeParse({
+  const parsed = registrationSchema.safeParse({
+    firstName: field(formData, 'firstName'),
+    lastName: field(formData, 'lastName'),
     email: field(formData, 'email'),
-    name: field(formData, 'name'),
     password: field(formData, 'password'),
+    confirm: field(formData, 'confirm'),
   });
   if (!parsed.success) {
+    // Echo only what refills the form. Never the password or its confirmation.
+    const lastName = field(formData, 'lastName').trim();
     const { message, fields } = firstRefusal(parsed.error);
     return authFailure(
       message,
       {
         email: field(formData, 'email').trim(),
-        name: field(formData, 'name').trim(),
+        firstName: field(formData, 'firstName').trim(),
+        ...(lastName ? { lastName } : {}),
       },
       fields,
     );
   }
-  const { email, name, password } = parsed.data;
-  const user = { email, name };
+  const { firstName, lastName, email, password } = parsed.data;
+  const user = { email, firstName, ...(lastName ? { lastName } : {}) };
 
   const outcome = await registerWithPassword(await createClient(), {
     email,
     password,
-    name,
+    firstName,
+    ...(lastName ? { lastName } : {}),
     confirmationRedirect: callbackUrl(getOrigin(), next, 'confirm'),
   });
   if (outcome.kind === 'provider-error') {
