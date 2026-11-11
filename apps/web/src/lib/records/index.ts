@@ -1,4 +1,5 @@
 export {
+  loadLatestRecords,
   loadRecord,
   loadRecordSummaries,
   setRecordPinnedFor,

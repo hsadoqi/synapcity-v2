@@ -7,6 +7,7 @@ const data = vi.hoisted(() => ({
   createRecord: vi.fn(),
   findSpace: vi.fn(),
   getSpaceRelations: vi.fn(),
+  listLatestSpaces: vi.fn(),
   listSpaceDashboards: vi.fn(),
   listSpaceDocuments: vi.fn(),
   listSpaceNavItems: vi.fn(),
@@ -30,6 +31,7 @@ describe('serverSpaceSource', () => {
   it.each([
     ['list', 'listSpaces', []],
     ['listSummaries', 'listSpaceSummaries', []],
+    ['listLatest', 'listLatestSpaces', [8]],
     ['listNavItems', 'listSpaceNavItems', []],
     ['listWithRelations', 'listSpacesWithRelations', []],
     ['getRelations', 'getSpaceRelations', [ID, 'documents']],

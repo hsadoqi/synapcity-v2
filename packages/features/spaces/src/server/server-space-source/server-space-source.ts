@@ -4,6 +4,7 @@ import {
   createRecord,
   findSpace,
   getSpaceRelations,
+  listLatestSpaces,
   listSpaceDashboards,
   listSpaceDocuments,
   listSpaceNavItems,
@@ -27,6 +28,7 @@ export function serverSpaceSource(client: SupabaseServerClient): SpaceSource {
   return {
     list: () => listSpaces(client),
     listSummaries: () => listSpaceSummaries(client),
+    listLatest: (limit) => listLatestSpaces(client, limit),
     listNavItems: () => listSpaceNavItems(client),
     listWithRelations: () => listSpacesWithRelations(client),
     // An arrow cannot be checked against overloads; `getSpaceRelations`'s own

@@ -72,6 +72,31 @@ export async function listRecordSummaries(
   }));
 }
 
+/**
+ * At most `limit` of the signed-in owner's records of one kind, in the order
+ * the sidebar lists them: pinned first (most recently pinned on top), then the
+ * most recently changed, then the newest, then by id so equal rows always come
+ * back the same way. Only the record's own columns are read, no participation
+ * counts. Row-level security scopes the query to the session.
+ */
+export async function listLatestRecords(
+  client: SupabaseServerClient,
+  kind: ParticipantTable,
+  limit: number,
+): Promise<BaseRecord[]> {
+  const { data, error } = await client
+    .from(kind)
+    .select(COLUMNS)
+    .order('pinned_at', { ascending: false, nullsFirst: false })
+    .order('updated_at', { ascending: false })
+    .order('created_at', { ascending: false })
+    .order('id')
+    .limit(limit);
+
+  if (error) throw readError(kind, error);
+  return (data satisfies OwnedRow[]).map(recordFromRow);
+}
+
 /** Singular names for read errors. */
 const SINGULAR: Record<ParticipantTable, RecordKind> = {
   documents: 'document',

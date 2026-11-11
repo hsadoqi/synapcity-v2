@@ -77,6 +77,18 @@ describe('fixtureSpaceSource', () => {
     expect(items.map((item) => item.id)).toEqual(order);
   });
 
+  it('lists the latest sample Spaces as whole Spaces, in navigation order, cut to the limit', async () => {
+    const latest = await source.listLatest(3);
+    const nav = await source.listNavItems();
+
+    expect(latest.map((space) => space.id)).toEqual(
+      nav.slice(0, 3).map((item) => item.id),
+    );
+    expect(latest[0]).toEqual(
+      DEMO_SPACES.find((space) => space.id === latest[0]?.id),
+    );
+  });
+
   it('lists every sample Space with no participation rows, as there is no participation data', async () => {
     const spaces = await source.listWithRelations();
 
