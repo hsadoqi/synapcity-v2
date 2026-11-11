@@ -29,7 +29,10 @@ export async function GET(
   const { spaceId } = await params;
   const space = await (await getSpaceSource()).find(spaceId);
   if (!space) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    return NextResponse.json(
+      { error: 'Not found' },
+      { status: 404, headers: { 'Cache-Control': 'no-store' } },
+    );
   }
 
   return NextResponse.json(space, { headers: { 'Cache-Control': 'no-store' } });
