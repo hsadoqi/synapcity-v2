@@ -62,6 +62,20 @@ describe('the welcome page', () => {
     expect(element.props).toMatchObject({ defaultName: '', imageUrl: null });
   });
 
+  it('does not offer an email registrant their first name as a display name', async () => {
+    // Email registration stores first_name, not a display name. Completing
+    // this step saves the field as the display name, so it must start empty.
+    mocks.claims = {
+      sub: 'u1',
+      email: 'ada@example.com',
+      user_metadata: { first_name: 'Ada', last_name: 'Lovelace' },
+    };
+
+    const element = await page();
+
+    expect(element.props.defaultName).toBe('');
+  });
+
   it.each([
     ['no destination', undefined],
     ['an external URL', 'https://evil.test/steal'],

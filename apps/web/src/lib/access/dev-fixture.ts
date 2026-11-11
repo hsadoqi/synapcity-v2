@@ -1,7 +1,5 @@
-import {
-  currentUserFromClaims,
-  type CurrentUser,
-} from '@synapcity/domain-identity';
+import type { CurrentUser } from '@synapcity/domain-identity';
+import { currentUserFromClaims } from '@synapcity/server-supabase/claims';
 
 /**
  * Development-only fixture identity (ADR-0006, development amendment). It lets

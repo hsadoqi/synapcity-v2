@@ -49,8 +49,10 @@ export const AccountSettings = () => {
         <SettingsAccordion>
           <SettingsAccordionItem value="profile" title="Profile">
             <FieldGroup className="max-w-3xl">
+              {/* This row shows and edits the display name itself, so it gets the
+                  raw value, not the resolved name the header shows. */}
               <ProfileSummary
-                name={user.name ?? ''}
+                name={user.displayName ?? ''}
                 imageUrl={user.imageUrl}
                 actions={{ updateName, updateAvatar }}
                 signInHref={signInHref}

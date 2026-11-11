@@ -1,1 +1,1 @@
-export { classifyAuthError } from './auth-errors';
+export { classifyAuthError, isRateLimited } from './auth-errors';

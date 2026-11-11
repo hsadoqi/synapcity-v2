@@ -1,8 +1,6 @@
+import { avatarFileSchema } from '@synapcity/domain-identity';
 import {
-  avatarFileSchema,
   providerImageFrom,
-} from '@synapcity/domain-identity';
-import {
   toProviderFailure,
   type MetadataPatch,
   type ProviderFailure,

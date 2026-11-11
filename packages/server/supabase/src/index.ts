@@ -17,6 +17,7 @@ export type {
   TablesInsert,
   TablesUpdate,
 } from './database-types';
+export { isRateLimited } from './auth-errors';
 export * from './auth-operations';
 export * from './provider-failure';
 export * from './provider-user';

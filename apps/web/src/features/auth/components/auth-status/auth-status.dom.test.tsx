@@ -17,6 +17,7 @@ import { AuthStatus } from './auth-status';
 const user = {
   id: 'u1',
   name: 'Ada Lovelace',
+  displayName: 'Ada Lovelace',
   email: 'ada@example.com',
   imageUrl: null,
 };

@@ -68,3 +68,64 @@ export const lastNameSchema = z
       `Use a last name of at most ${MAX_NAME_LENGTH} characters.`,
     ).optional(),
   );
+
+/**
+ * Validates a display name against `nameSchema` and returns the trimmed name
+ * with the first problem's message, so sign-up and the profile form show the
+ * same rule in the same words.
+ */
+export function checkName(raw: string): { name: string; error?: string } {
+  const name = raw.trim();
+  const result = nameSchema.safeParse(raw);
+  if (result.success) return { name: result.data };
+  return { name, error: result.error.issues[0]?.message };
+}
+
+const graphemes = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+const LETTER_OR_DIGIT = /[\p{L}\p{N}]/u;
+
+function firstLetterOf(word: string): string | undefined {
+  for (const { segment } of graphemes.segment(word)) {
+    if (LETTER_OR_DIGIT.test(segment)) return segment;
+  }
+  return undefined;
+}
+
+/**
+ * Up to two capital letters from a display name, for an avatar fallback: the
+ * first letter of each of the first two words ("ada king lovelace" -> "AK").
+ * Empty without a name, so the avatar can show its default image instead.
+ *
+ * Words are read by grapheme, so an emoji or an accented letter is never cut
+ * in half, and a word with no letter or digit (an emoji, a bracket) is skipped.
+ */
+export function initialsOf(name: string | null): string {
+  if (!name) return '';
+  return name
+    .split(/\s+/)
+    .map(firstLetterOf)
+    .filter((letter): letter is string => letter !== undefined)
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+}
+
+function present(value: string | null | undefined): string | null {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : null;
+}
+
+/**
+ * The name to show for a person: their display name when they have one, else
+ * their first name, else `null` (the interface then falls back to the email).
+ * `display_name` is the person's own choice, prefilled once from the provider's
+ * name at an OAuth sign-up; it is never derived from `first_name` or
+ * `last_name`, so this resolution is for presentation only and its result is
+ * never written back as a display name.
+ */
+export function displayNameOf(profile: {
+  displayName?: string | null;
+  firstName?: string | null;
+}): string | null {
+  return present(profile.displayName) ?? present(profile.firstName);
+}

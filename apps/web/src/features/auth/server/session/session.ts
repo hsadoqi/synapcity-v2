@@ -5,6 +5,7 @@ import {
   readProviderUser,
 } from '@synapcity/server-supabase';
 import {
+  currentUserFromClaims,
   readClaims,
   type ClaimsResult,
 } from '@synapcity/server-supabase/claims';
@@ -17,10 +18,7 @@ import {
   type ConnectedAccount,
 } from '@synapcity/features-auth/contracts';
 
-import {
-  currentUserFromClaims,
-  type CurrentUser,
-} from '@synapcity/domain-identity';
+import type { CurrentUser } from '@synapcity/domain-identity';
 
 /**
  * Thrown by a page guard when the Auth service cannot answer. It is not a

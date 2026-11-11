@@ -5,7 +5,7 @@ import {
 } from '@supabase/supabase-js';
 import { describe, expect, it } from 'vitest';
 
-import { classifyAuthError } from './auth-errors';
+import { classifyAuthError, isRateLimited } from './auth-errors';
 
 describe('classifyAuthError', () => {
   it('is signed-out when there is no session', () => {
@@ -30,4 +30,20 @@ describe('classifyAuthError', () => {
       code: 'manual_linking_disabled',
     });
   });
+});
+
+describe('isRateLimited', () => {
+  it.each(['over_email_send_rate_limit', 'over_request_rate_limit'])(
+    'treats %s as rate limiting',
+    (code) => {
+      expect(isRateLimited(code)).toBe(true);
+    },
+  );
+
+  it.each([undefined, '', 'invalid_credentials', 'user_already_exists'])(
+    'does not treat %j as rate limiting',
+    (code) => {
+      expect(isRateLimited(code)).toBe(false);
+    },
+  );
 });

@@ -1,4 +1,4 @@
-import { isRateLimited } from '@synapcity/domain-identity';
+import { isRateLimited } from '../../auth-errors';
 import { SupabaseServerClient } from '../../request-client';
 
 export type RecoveryInput = {

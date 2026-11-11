@@ -6,7 +6,7 @@ import {
   isNewAccount,
   isProfileConfirmed,
   needsProfileSetup,
-} from './profile-confirmed';
+} from './profile-setup';
 
 const NOW = Date.parse('2026-10-17T12:00:00Z');
 const DAY = 24 * 60 * 60 * 1000;

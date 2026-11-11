@@ -7,7 +7,7 @@ import {
 } from '@/features/account/server/actions/setup-actions';
 import { WelcomeCard } from './welcome-card';
 import { getVerifiedClaims } from '@/features/auth/server';
-import { profileFromClaims } from '@synapcity/domain-identity';
+import { profileFromClaims } from '@synapcity/server-supabase/claims';
 import { welcomePath } from '@/lib/routing/auth-flow';
 import { safeNextPath } from '@/lib/routing/safe-next';
 import { homePathFor } from '@/lib/routing/user-paths';
@@ -35,13 +35,15 @@ export default async function WelcomePage({
   }
 
   const next = safeNextPath(requested, homePathFor(claims.sub));
-  const { name, imageUrl } = profileFromClaims(claims);
+  // The form edits the display name, so it starts from the raw value, never
+  // from the resolved name (which may be the first name).
+  const { displayName, imageUrl } = profileFromClaims(claims);
 
   return (
     <WelcomeCard
       completeProfile={completeProfile}
       skipProfileSetup={skipProfileSetup}
-      defaultName={name ?? ''}
+      defaultName={displayName ?? ''}
       imageUrl={imageUrl}
       next={next}
     />

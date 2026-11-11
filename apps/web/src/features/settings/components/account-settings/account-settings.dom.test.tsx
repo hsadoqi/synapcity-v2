@@ -63,6 +63,7 @@ describe('AccountSettings', () => {
     mocks.user = {
       id: 'user-1',
       name: 'Ada Lovelace',
+      displayName: 'Ada Lovelace',
       email: 'ada@example.com',
       imageUrl: null,
     };
@@ -126,8 +127,31 @@ describe('AccountSettings', () => {
     expect(screen.queryByLabelText('Photo')).toBeNull();
   });
 
+  it('edits the display name, not the name the header resolves', () => {
+    // An email registrant: the header shows the first name, but no display
+    // name is set, so the display-name row must not offer the first name as
+    // if it were one.
+    mocks.user = {
+      id: 'user-1',
+      name: 'Ada',
+      displayName: null,
+      email: 'ada@example.com',
+      imageUrl: null,
+    };
+    show();
+
+    expect(screen.getByText('No name yet')).toBeTruthy();
+    expect(screen.queryByText('Ada')).toBeNull();
+  });
+
   it('copes with an account that has no name or email', () => {
-    mocks.user = { id: 'user-1', name: null, email: null, imageUrl: null };
+    mocks.user = {
+      id: 'user-1',
+      name: null,
+      displayName: null,
+      email: null,
+      imageUrl: null,
+    };
     show();
 
     expect(screen.getByText('No name yet')).toBeTruthy();
@@ -159,7 +183,13 @@ describe('AccountSettings', () => {
     expect(buttons.at(-1)).toBe('Delete account');
     unmount();
 
-    mocks.user = { id: 'user-1', name: 'Ada', email: null, imageUrl: null };
+    mocks.user = {
+      id: 'user-1',
+      name: 'Ada',
+      displayName: 'Ada',
+      email: null,
+      imageUrl: null,
+    };
     show();
     expect(screen.queryByRole('button', { name: 'Delete account' })).toBeNull();
     expect(screen.getByText(/no email address/i)).toBeTruthy();

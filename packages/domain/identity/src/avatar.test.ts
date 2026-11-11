@@ -5,8 +5,9 @@ import {
   AVATAR_FILE_TYPES,
   MAX_AVATAR_BYTES,
   avatarFileSchema,
+  isUploadedAvatar,
 } from './avatar';
-import { MAX_NAME_LENGTH } from '../name';
+import { MAX_NAME_LENGTH } from './names';
 
 const file = (size: number, type: string) =>
   new File([new Uint8Array(size)], 'avatar', { type });
@@ -132,5 +133,28 @@ describe('limits match the database and the storage bucket', () => {
       'image/webp',
     ]);
     expect(AVATAR_ACCEPT).toBe('image/png,image/jpeg,image/webp');
+  });
+});
+
+describe('isUploadedAvatar', () => {
+  it('is true for a file in the public avatars bucket', () => {
+    expect(
+      isUploadedAvatar(
+        'https://x.supabase.co/storage/v1/object/public/avatars/u/a.png',
+      ),
+    ).toBe(true);
+  });
+
+  it('is false for a provider image, an empty value or another bucket', () => {
+    expect(isUploadedAvatar('https://avatars.githubusercontent.com/u/1')).toBe(
+      false,
+    );
+    expect(isUploadedAvatar(null)).toBe(false);
+    expect(isUploadedAvatar(undefined)).toBe(false);
+    expect(
+      isUploadedAvatar(
+        'https://x.supabase.co/storage/v1/object/public/docs/a.png',
+      ),
+    ).toBe(false);
   });
 });

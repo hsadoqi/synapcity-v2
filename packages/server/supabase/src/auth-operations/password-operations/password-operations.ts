@@ -1,4 +1,4 @@
-import { isRateLimited } from '@synapcity/domain-identity';
+import { isRateLimited } from '../../auth-errors';
 import { ProviderFailure, toProviderFailure } from '../../provider-failure';
 import { readProviderUser } from '../../provider-user';
 import { SupabaseServerClient } from '../../request-client';
