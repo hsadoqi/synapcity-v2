@@ -1,1 +1,0 @@
-export { dashboardCompositionSchema } from './composition';

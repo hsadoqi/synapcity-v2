@@ -1,8 +1,16 @@
 import { isStorableText } from '@synapcity/domain-records';
 
-import { dashboardCompositionSchema } from '../../schemas';
-import type { DashboardComposition } from '../../types';
-import { LINK_WIDGET_TYPES } from '../widgets';
+import { compositionSchema, type DashboardComposition } from './composition';
+import { LINK_WIDGET_TYPES } from './widgets';
+
+/**
+ * The composition contract with every object strict: the write boundary
+ * refuses keys the contract does not define, so nothing a client sends is
+ * silently dropped and stored without it. Built from the same definitions as
+ * `dashboardCompositionSchema`, so the two differ only in unknown keys and
+ * stay correct whatever transforms or defaults the definitions gain.
+ */
+const persistableCompositionSchema = compositionSchema('strict');
 
 /** The size cap on a stored composition (ADR-0016): 64 KB of JSON. */
 export const MAX_COMPOSITION_BYTES = 64 * 1024;
@@ -12,12 +20,14 @@ export type PersistableResult =
   | {
       ok: false;
       /**
-       * `invalid`: not a composition. The others are valid ones the server will
-       * not store. `invalid-text`: a string (or key) holds U+0000 or an unpaired
+       * `invalid`: not a composition. `unknown-keys`: a composition with keys
+       * the contract does not define, at any depth; it is refused, never
+       * trimmed. The others are valid ones the server will not store. `invalid-text`: a string (or key) holds U+0000 or an unpaired
        * surrogate, which the database cannot store; it is refused, never cleaned.
        */
       reason:
         | 'invalid'
+        | 'unknown-keys'
         | 'widget-type'
         | 'widget-status'
         | 'too-large'
@@ -44,8 +54,16 @@ function hasUnstorableText(value: unknown): boolean {
  * cap. Anything else is refused whole, never trimmed.
  */
 export function parsePersistableComposition(input: unknown): PersistableResult {
-  const parsed = dashboardCompositionSchema.safeParse(input);
-  if (!parsed.success) return { ok: false, reason: 'invalid' };
+  const parsed = persistableCompositionSchema.safeParse(input);
+  if (!parsed.success) {
+    // The strict schema shares every definition with the read schema, so a
+    // failure made only of unrecognized keys means the document is otherwise
+    // a valid composition.
+    const onlyUnknownKeys = parsed.error.issues.every(
+      (issue) => issue.code === 'unrecognized_keys',
+    );
+    return { ok: false, reason: onlyUnknownKeys ? 'unknown-keys' : 'invalid' };
+  }
   const composition = parsed.data;
   if (!composition.widgets.every((w) => LINK_WIDGET_TYPES.includes(w.type))) {
     return { ok: false, reason: 'widget-type' };

@@ -2,9 +2,9 @@ import { COLLAPSED_ROWS } from '@synapcity/domain-grids';
 import { emptyRecords } from '@synapcity/domain-prototypes';
 import { describe, expect, it } from 'vitest';
 
-import type { WidgetType } from '../../types';
-import { createWidget } from '../create-widget';
-import { addWidget, setWidgetStatus, updateWidget } from '../widgets';
+import type { WidgetType } from './index';
+import { createWidget } from './index';
+import { addWidget, setWidgetStatus, updateWidget } from './index';
 import {
   applyLayoutChange,
   createComposition,

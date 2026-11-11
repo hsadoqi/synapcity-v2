@@ -1,15 +1,18 @@
+/*
+ * Provisional bridge: creating a record-backed widget creates the prototype
+ * record it shows (see prototype-widgets.ts and the package README).
+ */
 import {
-  createId,
   newRecord,
   putRecord,
   type PrototypeRecords,
   type RecordContext,
 } from '@synapcity/domain-prototypes';
 
-import type { Widget, WidgetType } from '../../types';
+import { createWidgetId, type Widget, type WidgetType } from './widgets';
 
 const base = (title: string) => ({
-  id: createId('wgt'),
+  id: createWidgetId(),
   title,
   collapsed: false,
   highlight: 'none' as const,

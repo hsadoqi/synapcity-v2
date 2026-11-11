@@ -2,8 +2,8 @@ import { emptyLayouts } from '@synapcity/domain-grids';
 import { emptyRecords } from '@synapcity/domain-prototypes';
 import { describe, expect, it } from 'vitest';
 
-import type { DashboardComposition, WidgetType } from '../../types';
-import { createWidget } from '../create-widget';
+import type { DashboardComposition, WidgetType } from './index';
+import { createWidget } from './index';
 import {
   activeWidgets,
   addWidget,

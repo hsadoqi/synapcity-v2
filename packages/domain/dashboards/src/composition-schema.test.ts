@@ -1,8 +1,15 @@
 import { emptyRecords } from '@synapcity/domain-prototypes';
-import { describe, expect, it } from 'vitest';
+import type { LayoutItem } from '@synapcity/domain-grids';
+import { describe, expect, expectTypeOf, it } from 'vitest';
+import type { z } from 'zod';
 
-import type { DashboardComposition, WidgetType } from '../../types';
-import { addWidget, createComposition, createWidget } from '../../utils';
+import type {
+  DashboardComposition,
+  DashboardSettings,
+  Widget,
+  WidgetType,
+} from './index';
+import { addWidget, createComposition, createWidget } from './index';
 import { dashboardCompositionSchema } from './index';
 
 const ctx = { ownerId: '11111111-1111-4111-8111-111111111111', now: 0 };
@@ -166,4 +173,23 @@ describe('dashboardCompositionSchema', () => {
       );
     },
   );
+});
+
+describe('the hand-written types and the schema describe the same shape', () => {
+  // The types carry the documentation; the schema validates. These fail to
+  // compile when either gains, loses or changes a field the other lacks.
+  // `.branded` compares deep structure, so the intersection types
+  // (`WidgetBase & {...}`) compare equal to the flat parsed shapes.
+  type Parsed = z.output<typeof dashboardCompositionSchema>;
+
+  it('for the composition, its settings, its widgets and its layout items', () => {
+    expectTypeOf<Parsed>().branded.toEqualTypeOf<DashboardComposition>();
+    expectTypeOf<
+      Parsed['settings']
+    >().branded.toEqualTypeOf<DashboardSettings>();
+    expectTypeOf<Parsed['widgets'][number]>().branded.toEqualTypeOf<Widget>();
+    expectTypeOf<
+      Parsed['layouts']['lg'][number]
+    >().branded.toEqualTypeOf<LayoutItem>();
+  });
 });
