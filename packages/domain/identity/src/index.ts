@@ -7,8 +7,6 @@ export {
   emailRequestSchema,
   everyRefusal,
   firstRefusal,
-  missingCharactersMessage,
-  newPasswordSchema,
   registrationSchema,
   signInSchema,
   signUpSchema,
@@ -41,7 +39,6 @@ export {
   type OAuthProvider,
 } from './oauth-providers';
 export {
-  NEW_ACCOUNT_DAYS,
   PROFILE_CONFIRMED_KEY,
   isNewAccount,
   isProfileConfirmed,
