@@ -36,6 +36,7 @@ describe('@synapcity/domain-identity root entry', () => {
       'profileSchema',
       'providerImageFrom',
       'providerLabel',
+      'registrationSchema',
       'signInSchema',
       'signUpSchema',
       'updatePasswordSchema',

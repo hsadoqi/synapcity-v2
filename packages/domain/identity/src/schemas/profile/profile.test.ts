@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { profileSchema } from './user';
+import { profileSchema } from './profile';
 
 const png = new File([new Uint8Array(10)], 'avatar.png', {
   type: 'image/png',
@@ -37,5 +37,13 @@ describe('profileSchema', () => {
     const parsed = profileSchema.parse({ name: 'Ada', userId: 'someone-else' });
 
     expect(parsed).toEqual({ name: 'Ada' });
+  });
+  it('requires a name and treats the photo as optional', () => {
+    expect(Object.keys(profileSchema.shape)).toEqual(['name', 'avatar']);
+    expect(profileSchema.safeParse({ name: ' Ada ' })).toMatchObject({
+      success: true,
+      data: { name: 'Ada' },
+    });
+    expect(profileSchema.safeParse({}).success).toBe(false);
   });
 });

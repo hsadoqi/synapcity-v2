@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { nameSchema } from './name';
-import { avatarFileSchema } from './avatar';
+import { nameSchema } from '../name/name';
+import { avatarFileSchema } from '../avatar/avatar';
 
 /** What the profile form submits. Add a field here and the types follow. */
 export const profileSchema = z.object({

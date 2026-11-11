@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { nameSchema } from './name';
+import { firstNameSchema, lastNameSchema, nameSchema } from '../name/name';
 
 /** The shortest password the forms accept; the weak-password reply states it. */
 export const MIN_PASSWORD_LENGTH = 8;
@@ -84,12 +84,50 @@ export const signInSchema = z.object({
   password: z.string().min(1, ENTER_EMAIL_AND_PASSWORD),
 });
 
-/** The keys are in the order problems are reported: the first one wins. */
+/**
+ * The keys are in the order problems are reported: the first one wins.
+ *
+ * Transitional: the current register form still validates with this and
+ * submits `name`. The `signUp` action now uses `registrationSchema`. Remove
+ * this once the form moves to `registrationSchema`.
+ */
 export const signUpSchema = z.object({
   email,
   name: nameSchema,
   password: newPasswordSchema,
 });
+
+const ENTER_VALID_EMAIL = 'Enter a valid email address.';
+const CONFIRM_PASSWORD = 'Confirm your password.';
+
+/**
+ * A well-formed address for a new account. The pattern is Zod's copy of the
+ * one browsers use for `<input type="email">`, so the server refuses what the
+ * field itself would refuse and nothing stricter.
+ */
+const registrationEmail = z
+  .string()
+  .trim()
+  .min(1, ENTER_EMAIL)
+  .pipe(z.email({ pattern: z.regexes.html5Email, error: ENTER_VALID_EMAIL }));
+
+/**
+ * Email-and-password registration. The keys are in the order problems are
+ * reported. Names and email are trimmed; the password is kept exactly as typed.
+ * A blank `lastName` parses to `undefined`.
+ */
+export const registrationSchema = z
+  .object({
+    firstName: firstNameSchema,
+    lastName: lastNameSchema,
+    email: registrationEmail,
+    password: newPasswordSchema,
+    confirm: z.string().min(1, CONFIRM_PASSWORD),
+  })
+  .refine((value) => value.password === value.confirm, {
+    message: PASSWORDS_DO_NOT_MATCH,
+    path: ['confirm'],
+  });
 
 /** Resending a confirmation and asking for a reset link both need just this. */
 export const emailRequestSchema = z.object({ email });
@@ -107,10 +145,20 @@ export const updatePasswordSchema = z
 /** Form fields an auth error can point at, so the form can mark them invalid. */
 export type AuthFieldName =
   | keyof z.input<typeof signUpSchema>
+  | keyof z.input<typeof registrationSchema>
   | keyof z.input<typeof updatePasswordSchema>;
 
+const AUTH_FIELDS: ReadonlySet<PropertyKey> = new Set<AuthFieldName>([
+  'email',
+  'name',
+  'firstName',
+  'lastName',
+  'password',
+  'confirm',
+]);
+
 const isField = (key: PropertyKey | undefined): key is AuthFieldName =>
-  key === 'email' || key === 'name' || key === 'password' || key === 'confirm';
+  key !== undefined && AUTH_FIELDS.has(key);
 
 /**
  * The first problem in a failed parse: its message and the one field it is

@@ -16,6 +16,7 @@ export {
   nameSchema,
   newPasswordSchema,
   profileSchema,
+  registrationSchema,
   signInSchema,
   signUpSchema,
   updatePasswordSchema,

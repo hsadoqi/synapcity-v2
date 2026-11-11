@@ -6,6 +6,7 @@ import {
   MAX_AVATAR_BYTES,
   avatarFileSchema,
 } from './avatar';
+import { MAX_NAME_LENGTH } from '../name/name';
 
 const file = (size: number, type: string) =>
   new File([new Uint8Array(size)], 'avatar', { type });
@@ -80,5 +81,56 @@ describe('avatarFileSchema', () => {
   it('refuses a value that is not a file', () => {
     expect(avatarFileSchema.safeParse('avatar.png').success).toBe(false);
     expect(avatarFileSchema.safeParse({ size: 10 }).success).toBe(false);
+  });
+  it('accepts each allowed type at the size limit', () => {
+    for (const type of Object.keys(AVATAR_FILE_TYPES)) {
+      expect(
+        avatarFileSchema.safeParse(file(MAX_AVATAR_BYTES, type)).success,
+      ).toBe(true);
+    }
+  });
+
+  it('refuses a file one byte over the limit', () => {
+    const result = avatarFileSchema.safeParse(
+      file(MAX_AVATAR_BYTES + 1, 'image/png'),
+    );
+    expect(result.error?.issues[0]?.message).toBe(
+      'Use an image of at most 2 MB.',
+    );
+  });
+
+  it.each(['image/svg+xml', 'image/gif', 'text/html', ''])(
+    'refuses the type %j',
+    (type) => {
+      expect(
+        avatarFileSchema.safeParse(file(10, type)).error?.issues[0]?.message,
+      ).toBe('Use a PNG, JPEG or WebP image.');
+    },
+  );
+
+  it.each([
+    ['an empty file', file(0, 'image/png')],
+    ['no file at all', null],
+    ['text instead of a file', 'me.png'],
+  ])('asks to choose an image for %s', (_label, value) => {
+    expect(avatarFileSchema.safeParse(value).error?.issues[0]?.message).toBe(
+      'Choose an image.',
+    );
+  });
+});
+
+describe('limits match the database and the storage bucket', () => {
+  it('uses the profiles.display_name length and the avatars bucket size', () => {
+    expect(MAX_NAME_LENGTH).toBe(80);
+    expect(MAX_AVATAR_BYTES).toBe(2_097_152);
+  });
+
+  it('accepts exactly the types the bucket allows', () => {
+    expect(Object.keys(AVATAR_FILE_TYPES)).toEqual([
+      'image/png',
+      'image/jpeg',
+      'image/webp',
+    ]);
+    expect(AVATAR_ACCEPT).toBe('image/png,image/jpeg,image/webp');
   });
 });

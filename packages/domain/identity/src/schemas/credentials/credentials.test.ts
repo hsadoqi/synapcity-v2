@@ -10,6 +10,7 @@ import {
   newPasswordSchema,
   everyRefusal,
   firstRefusal,
+  registrationSchema,
   signInSchema,
   signUpSchema,
   updatePasswordSchema,
@@ -104,6 +105,171 @@ describe('signUpSchema', () => {
     expect(
       signUpSchema.safeParse({ ...valid, email: 'not-an-address' }).success,
     ).toBe(true);
+  });
+});
+
+describe('registrationSchema', () => {
+  const valid = {
+    firstName: 'Ada',
+    lastName: 'Lovelace',
+    email: 'ada@example.com',
+    password: STRONG,
+    confirm: STRONG,
+  };
+
+  it('reports one problem at a time: first name, last name, email, password, confirm', () => {
+    expect(
+      refusal(registrationSchema, {
+        firstName: '',
+        lastName: '1',
+        email: '',
+        password: '',
+        confirm: 'x',
+      }),
+    ).toEqual({ message: 'Enter your first name.', fields: ['firstName'] });
+    expect(refusal(registrationSchema, { ...valid, lastName: '42' })).toEqual({
+      message: 'Use letters, spaces, apostrophes, hyphens or full stops.',
+      fields: ['lastName'],
+    });
+    expect(refusal(registrationSchema, { ...valid, email: '  ' })).toEqual({
+      message: 'Enter your email.',
+      fields: ['email'],
+    });
+    expect(
+      refusal(registrationSchema, {
+        ...valid,
+        password: 'short',
+        confirm: 'short',
+      }),
+    ).toEqual({ message: PASSWORD_TOO_SHORT_MESSAGE, fields: ['password'] });
+    expect(refusal(registrationSchema, { ...valid, confirm: '' })).toEqual({
+      message: 'Confirm your password.',
+      fields: ['confirm'],
+    });
+  });
+
+  it.each(['  ', '', '-', "'.", 'Ada1', 'ada@home', '<b>'])(
+    'refuses %j as a first name',
+    (firstName) => {
+      expect(
+        refusal(registrationSchema, { ...valid, firstName }).fields,
+      ).toEqual(['firstName']);
+    },
+  );
+
+  it('refuses a missing first name', () => {
+    const { firstName: _, ...rest } = valid;
+    expect(refusal(registrationSchema, rest).fields).toEqual(['firstName']);
+  });
+
+  it.each([
+    'José',
+    'Zoë',
+    'Nguyễn',
+    'Søren',
+    'Łukasz',
+    '王',
+    'محمد',
+    'Дмитрий',
+    'Ἀθηνᾶ',
+    'नेहा',
+    "O'Brien",
+    'D’Angelo',
+    'Jean-Luc',
+    'Mary Ann',
+    'St. John',
+    // A zero-width non-joiner inside the word, as Persian writes some names.
+    'مهر\u200Cناز',
+  ])('accepts %j as a name', (name) => {
+    expect(
+      registrationSchema.safeParse({
+        ...valid,
+        firstName: name,
+        lastName: name,
+      }).success,
+    ).toBe(true);
+  });
+
+  it('keeps names within the database limit of 80 characters', () => {
+    expect(
+      registrationSchema.safeParse({ ...valid, firstName: 'a'.repeat(80) })
+        .success,
+    ).toBe(true);
+    expect(
+      refusal(registrationSchema, { ...valid, firstName: 'a'.repeat(81) }),
+    ).toEqual({
+      message: 'Use a first name of at most 80 characters.',
+      fields: ['firstName'],
+    });
+    expect(
+      refusal(registrationSchema, { ...valid, lastName: 'a'.repeat(81) }),
+    ).toEqual({
+      message: 'Use a last name of at most 80 characters.',
+      fields: ['lastName'],
+    });
+  });
+
+  it('trims names and email, and never changes the password', () => {
+    const password = ' Str0ng-Passw0rd! ';
+    expect(
+      registrationSchema.parse({
+        firstName: '  Ada ',
+        lastName: ' Lovelace  ',
+        email: ' ada@example.com ',
+        password,
+        confirm: password,
+      }),
+    ).toEqual({
+      firstName: 'Ada',
+      lastName: 'Lovelace',
+      email: 'ada@example.com',
+      password,
+      confirm: password,
+    });
+  });
+
+  it.each([
+    ['an empty', ''],
+    ['a blank', '   '],
+    ['a missing', undefined],
+  ])('treats %s last name as absent', (_, lastName) => {
+    const parsed = registrationSchema.parse({ ...valid, lastName });
+    expect(parsed.lastName).toBeUndefined();
+  });
+
+  it.each(['not-an-address', 'a@', '@b.co', 'a b@c.co', 'a@b@c.co'])(
+    'refuses %j as an email',
+    (email) => {
+      expect(refusal(registrationSchema, { ...valid, email })).toEqual({
+        message: 'Enter a valid email address.',
+        fields: ['email'],
+      });
+    },
+  );
+
+  it.each(['a@b.co', 'first.last+tag@sub.example.org', "o'brien@example.ie"])(
+    'accepts %j as an email',
+    (email) => {
+      expect(registrationSchema.safeParse({ ...valid, email }).success).toBe(
+        true,
+      );
+    },
+  );
+
+  it.each([
+    ['too short', 'Aa1!aaa', PASSWORD_TOO_SHORT_MESSAGE],
+    ['no uppercase', 'aa1!aaaa', 'Add an uppercase letter.'],
+    ['no symbol', 'Aa1aaaaa', 'Add a symbol such as ! # or ?.'],
+  ])('uses the new-password rule (%s)', (_, password, message) => {
+    expect(
+      refusal(registrationSchema, { ...valid, password, confirm: password }),
+    ).toEqual({ message, fields: ['password'] });
+  });
+
+  it('requires the confirmation to match exactly', () => {
+    expect(
+      refusal(registrationSchema, { ...valid, confirm: `${STRONG} ` }),
+    ).toEqual({ message: 'The passwords do not match.', fields: ['confirm'] });
   });
 });
 
