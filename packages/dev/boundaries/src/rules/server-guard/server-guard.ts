@@ -5,18 +5,26 @@ import { byFileThenRule, repoPath } from '../../paths/index.ts';
 
 const GUARD = 'server-only';
 
-/** The file behind each server entry: `server-*` root entries and feature `./server` entries. */
+/** The export key of the unguarded test-support entry (conventions, entry points rule 8). */
+const TESTING = './testing';
+
+/**
+ * The file behind each server entry: every export of a `server-*` package
+ * except `./testing`, and feature `./server` entries. A subpath of a server
+ * package is as server-only as its root, so it carries the guard too.
+ */
 function serverEntries(workspace: Workspace): Set<string> {
   const entries = new Set<string>();
   for (const pkg of workspace.packages) {
-    const key =
+    const targets =
       pkg.category === 'server'
-        ? '.'
-        : pkg.category === 'features'
-          ? './server'
-          : null;
-    const target = key ? pkg.exports[key] : undefined;
-    if (target) entries.add(join(pkg.dir, target));
+        ? Object.entries(pkg.exports)
+            .filter(([key]) => key !== TESTING)
+            .map(([, target]) => target)
+        : pkg.category === 'features' && pkg.exports['./server']
+          ? [pkg.exports['./server']]
+          : [];
+    for (const target of targets) entries.add(join(pkg.dir, target));
   }
   return entries;
 }

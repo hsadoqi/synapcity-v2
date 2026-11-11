@@ -4,6 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
   exchangeCodeForSession: vi.fn(),
   profileRead: vi.fn(),
+  onResponseHeaders: undefined as
+    ((headers: Record<string, string>) => void) | undefined,
 }));
 
 // Only the Supabase client is replaced: the code exchange and the profile row
@@ -11,12 +13,17 @@ const mocks = vi.hoisted(() => ({
 // helpers run for real, so this checks the handler's decisions and not a real
 // PKCE link or OAuth session.
 vi.mock('@/lib/supabase/server', () => ({
-  createClient: async () => ({
-    auth: { exchangeCodeForSession: mocks.exchangeCodeForSession },
-    from: () => ({
-      select: () => ({ eq: () => ({ maybeSingle: mocks.profileRead }) }),
-    }),
-  }),
+  createClient: async (options?: {
+    onResponseHeaders?: (headers: Record<string, string>) => void;
+  }) => {
+    mocks.onResponseHeaders = options?.onResponseHeaders;
+    return {
+      auth: { exchangeCodeForSession: mocks.exchangeCodeForSession },
+      from: () => ({
+        select: () => ({ eq: () => ({ maybeSingle: mocks.profileRead }) }),
+      }),
+    };
+  },
 }));
 
 /** The caller's profile row as the callback reads it. */
@@ -64,11 +71,48 @@ function location(response: Response): string {
   return new URL(header, ORIGIN).toString();
 }
 
+/** The cache headers `@supabase/ssr` hands over with a session cookie write. */
+const SESSION_HEADERS = {
+  'Cache-Control': 'private, no-cache, no-store, must-revalidate, max-age=0',
+  Expires: '0',
+  Pragma: 'no-cache',
+};
+
 describe('GET /auth/callback', () => {
   beforeEach(() => {
     mocks.exchangeCodeForSession.mockReset();
     mocks.profileRead.mockReset();
     mocks.profileRead.mockResolvedValue(profileRow({}));
+    mocks.onResponseHeaders = undefined;
+  });
+
+  describe('no response is stored by a cache', () => {
+    it('carries the cache headers the session write asked for', async () => {
+      mocks.exchangeCodeForSession.mockImplementation(async () => {
+        mocks.onResponseHeaders?.(SESSION_HEADERS);
+        return { data: { user: { id: USER_ID } }, error: null };
+      });
+      const response = await GET(request({ code: 'abc' }));
+
+      expect(response.headers.get('location')).toBe(HOME);
+      expect(response.headers.get('cache-control')).toBe(
+        SESSION_HEADERS['Cache-Control'],
+      );
+      expect(response.headers.get('expires')).toBe('0');
+      expect(response.headers.get('pragma')).toBe('no-cache');
+    });
+
+    it('is no-store even when no session was written', async () => {
+      mocks.exchangeCodeForSession.mockResolvedValue({
+        data: { user: null },
+        error: { name: 'AuthApiError', status: 400, code: 'bad_code' },
+      });
+      const failed = await GET(request({ code: 'abc' }));
+      const noCode = await GET(request({}));
+
+      expect(failed.headers.get('cache-control')).toBe('no-store');
+      expect(noCode.headers.get('cache-control')).toBe('no-store');
+    });
   });
 
   describe('the redirect is relative, so the browser keeps its own origin', () => {

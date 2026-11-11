@@ -7,7 +7,7 @@ import {
 } from '@/features/account/server/actions/setup-actions';
 import { WelcomeCard } from './welcome-card';
 import { getVerifiedClaims } from '@/features/auth/server';
-import { profileFromClaims } from '@synapcity/server-supabase/claims';
+import { profileFromClaims } from '@synapcity/server-supabase';
 import { welcomePath } from '@/lib/routing/auth-flow';
 import { safeNextPath } from '@/lib/routing/safe-next';
 import { homePathFor } from '@/lib/routing/user-paths';

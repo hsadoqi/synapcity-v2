@@ -15,7 +15,7 @@ Runtime: server-only. The host supplies the request-bound Supabase client and ve
 - `readProfileSetup(client, userId)` reads the names and the setup state (`incomplete`, `skipped`, `completed`) from `profiles`. `saveProfileNames(client, userId, { firstName, lastName, displayName })` saves the names and marks setup completed in one write (the database stamps the time and keeps the first one), returning a patch that mirrors the names into the token; it reports `first-name-required` when the database refuses completion without a valid first name. `skipProfileSetup(client, userId)` records a skip only while setup is not completed.
 - `deleteOwnAccount(client)` deletes the caller's own account and returns an `AccountDeletionOutcome`: `deleted` (with an optional `cleanupFailure` to log), `link-required`, `signed-out`, `unavailable`, `failed { step, photoRemoved }` or `unconfirmed`.
 - `mirrorToSession(client, user, patches)` returns `{ ok: true }` or `{ ok: false, step, failure }`.
-- The pure helpers `withFullName`, `withAvatarUrl`, `withProfileNames`, `detectImageType` and `extensionFor`. `withProfileConfirmed` (the old `user_metadata` flag) is transitional and no longer called; profile setup is recorded in `profiles`.
+- The pure helper `withProfileConfirmed`, transitional: it sets the old `user_metadata` flag, and nothing calls it any more because profile setup is recorded in `profiles`. The other metadata and image-type helpers (`withFullName`, `withAvatarUrl`, `withProfileNames`, `detectImageType`, `extensionFor`) are internal; `src/index.test.ts` checks the root's names.
 
 ### Avatar lifecycle
 

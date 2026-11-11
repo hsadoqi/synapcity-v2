@@ -53,6 +53,19 @@ describe('createClient', () => {
     expect(mocks.set).toHaveBeenCalledWith('sb-access', 'next', { path: '/' });
   });
 
+  it("passes a Route Handler's response-header sink to the client", async () => {
+    const onResponseHeaders = vi.fn();
+    await createClient({ onResponseHeaders });
+
+    expect(lastOptions()).toMatchObject({ onResponseHeaders });
+  });
+
+  it('passes no sink when the caller gives none', async () => {
+    await createClient();
+
+    expect(lastOptions()).toMatchObject({ onResponseHeaders: undefined });
+  });
+
   it('builds a new client on every call, never a shared one', async () => {
     await createClient();
     await createClient();

@@ -47,6 +47,36 @@ describe('serverGuardRule (R10)', () => {
     ).toEqual(['R10 packages/server/s/src/index.ts']);
   });
 
+  const subpathManifest = JSON.stringify({
+    name: '@t/server-s',
+    type: 'module',
+    exports: {
+      '.': './src/index.ts',
+      './claims': './src/claims/index.ts',
+      './testing': './src/testing/index.ts',
+    },
+  });
+
+  it('fails a server package subpath entry without the guard', () => {
+    expect(
+      summary(
+        run({
+          'packages/server/s/package.json': subpathManifest,
+          'packages/server/s/src/claims/index.ts': 'export const c = 1;',
+        }),
+      ),
+    ).toEqual(['R10 packages/server/s/src/claims/index.ts']);
+  });
+
+  it('passes a guarded subpath entry beside the unguarded ./testing entry', () => {
+    expect(
+      run({
+        'packages/server/s/package.json': subpathManifest,
+        'packages/server/s/src/claims/index.ts': `import 'server-only';\nexport const c = 1;`,
+      }),
+    ).toEqual([]);
+  });
+
   it('fails a feature server entry without the guard', () => {
     expect(
       summary(

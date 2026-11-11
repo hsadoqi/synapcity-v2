@@ -18,11 +18,52 @@ export type {
   TablesUpdate,
 } from './database-types';
 export { isRateLimited } from './auth-errors';
-export * from './auth-operations';
-export * from './provider-failure';
-export * from './provider-user';
+export {
+  changeEmail,
+  disconnectAccount,
+  exchangeAuthCode,
+  registerWithPassword,
+  requestRecoveryEmail,
+  resendEmailChange,
+  resendSignupConfirmation,
+  sendAccountDeletionLink,
+  sendOwnPasswordReset,
+  signInWithPassword,
+  signOutSession,
+  startAccountLink,
+  startOAuthSignIn,
+  updateOwnPassword,
+  type AccountLinkOutcome,
+  type CodeExchangeOutcome,
+  type DeletionLinkOutcome,
+  type DisconnectOutcome,
+  type EmailChangeInput,
+  type EmailChangeOutcome,
+  type OAuthSignInOutcome,
+  type OwnPasswordResetOutcome,
+  type PasswordSignInOutcome,
+  type PasswordUpdateOutcome,
+  type RecoveryInput,
+  type RecoveryOutcome,
+  type RegistrationInput,
+  type RegistrationOutcome,
+  type ResendEmailChangeOutcome,
+  type SignOutOutcome,
+  type SignOutScope,
+} from './auth-operations';
+export { toProviderFailure, type ProviderFailure } from './provider-failure';
+export {
+  providerImageFrom,
+  readProviderUser,
+  type MetadataPatch,
+  type ProviderUser,
+  type ProviderUserResult,
+} from './provider-user';
 export {
   LINK_SIGN_IN_WINDOW_SECONDS,
+  currentUserFromClaims,
   hasRecentLinkSignIn,
   hasRecentLinkSignInNow,
+  profileFromClaims,
+  type ClaimsProfile,
 } from './session-claims';

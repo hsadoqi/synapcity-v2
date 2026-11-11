@@ -1,18 +1,19 @@
 import type { IdentityResult } from '@synapcity/domain-identity';
 import { verifyIdentity } from '@synapcity/server-auth';
 import {
+  currentUserFromClaims,
   outcomeFromClaims,
   readProviderUser,
 } from '@synapcity/server-supabase';
 import {
-  currentUserFromClaims,
   readClaims,
   type ClaimsResult,
 } from '@synapcity/server-supabase/claims';
 import { cache } from 'react';
 
 import { createClient } from '@/lib/supabase/server';
-import { fixtureModeEnabled, fixtureUser } from '@/lib/access/dev-fixture';
+import { fixtureModeEnabled } from '@/lib/access/dev-fixture';
+import { fixtureUser } from '@/lib/access/fixture-user';
 import {
   connectedAccountsFrom,
   type ConnectedAccount,

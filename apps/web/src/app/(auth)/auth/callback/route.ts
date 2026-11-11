@@ -44,9 +44,22 @@ async function welcomeNeeded(
  * means no `Host` or forwarded header is ever trusted. The target is a path
  * built by this app; anything that is not a single-slash path goes home.
  */
-function redirectTo(path: string): NextResponse {
+function redirectTo(
+  path: string,
+  sessionHeaders: Record<string, string> = {},
+): NextResponse {
   const safe = /^\/(?![/\\])/.test(path) ? path : '/';
-  return new NextResponse(null, { status: 307, headers: { location: safe } });
+  // Every answer here is a one-time code exchange, and a successful one sets
+  // session cookies, so none may be stored. The SDK's own cache headers for
+  // the session write (`Cache-Control`, `Expires`, `Pragma`) go on top.
+  return new NextResponse(null, {
+    status: 307,
+    headers: {
+      'Cache-Control': 'no-store',
+      ...sessionHeaders,
+      location: safe,
+    },
+  });
 }
 
 /**
@@ -61,8 +74,15 @@ export async function GET(request: NextRequest) {
   // Set by the action that started the flow, so a failure can say which link broke.
   const flow = parseAuthFlow(searchParams.get('flow'));
 
+  // Filled by the SDK when the exchange writes the session cookies.
+  let sessionHeaders: Record<string, string> = {};
+
   if (code) {
-    const supabase = await createClient();
+    const supabase = await createClient({
+      onResponseHeaders: (headers) => {
+        sessionHeaders = { ...sessionHeaders, ...headers };
+      },
+    });
     const outcome = await exchangeAuthCode(supabase, code);
     if (outcome.kind === 'signed-in') {
       // No (or an unsafe) `next`: send them to their own home.
@@ -83,7 +103,7 @@ export async function GET(request: NextRequest) {
             : welcome
               ? welcomePath(destination)
               : destination;
-      return redirectTo(arrival);
+      return redirectTo(arrival, sessionHeaders);
     }
   }
 
@@ -104,5 +124,5 @@ export async function GET(request: NextRequest) {
     return redirectTo(withNotice(back, 'email-change-step'));
   }
 
-  return redirectTo(authErrorPath(flow));
+  return redirectTo(authErrorPath(flow), sessionHeaders);
 }
