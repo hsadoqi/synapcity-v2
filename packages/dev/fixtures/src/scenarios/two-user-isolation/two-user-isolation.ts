@@ -1,5 +1,5 @@
-import { item, membership, person, space, type Scenario } from './scenario';
-import { starterFor } from './starter';
+import { item, membership, person, space, type Scenario } from '../scenario';
+import { starterFor } from '../starter';
 
 /**
  * The starter set for two people, plus near-collisions between them: the same

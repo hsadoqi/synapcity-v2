@@ -5,7 +5,7 @@ import {
   space,
   type Scenario,
   type ScenarioUser,
-} from './scenario';
+} from '../scenario';
 
 /**
  * What one person starts with: the three starter Spaces, four Documents (one

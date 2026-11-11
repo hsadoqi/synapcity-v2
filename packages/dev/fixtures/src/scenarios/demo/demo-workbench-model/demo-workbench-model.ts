@@ -1,5 +1,5 @@
-import { demoCompositions } from './demo-sql';
-import { demoWorkbench } from './demo-workbench';
+import { demoCompositions } from '../demo-sql';
+import { demoWorkbench } from '../demo-workbench';
 
 /*
  * The "demo-workbench" scenario that `pnpm db:seed-demo` loads into the local

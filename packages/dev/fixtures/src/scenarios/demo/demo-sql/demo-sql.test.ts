@@ -2,9 +2,9 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-import { demoWorkbench } from './demo-workbench';
+import { demoWorkbench } from '../demo-workbench';
 import { scenarioToSql } from './demo-sql';
-import type { Scenario } from './scenario';
+import type { Scenario } from '../../scenario';
 
 describe('scenarioToSql', () => {
   const scenario = demoWorkbench();

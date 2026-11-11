@@ -6,7 +6,7 @@ import {
   type Widget,
 } from '@synapcity/domain-dashboards';
 
-import type { Scenario } from './scenario';
+import type { Scenario } from '../../scenario';
 
 /*
  * A scenario as SQL for the local database: its Spaces, Documents and

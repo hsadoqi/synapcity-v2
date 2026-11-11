@@ -9,7 +9,7 @@ import {
   space,
   type Membership,
   type Scenario,
-} from './scenario';
+} from '../../scenario';
 
 /*
  * One person with enough content to show how a workbench behaves: five Spaces
