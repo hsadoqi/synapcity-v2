@@ -3,11 +3,11 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   hasRecentLinkSignIn,
   hasRecentLinkSignInNow,
-  LINK_SIGN_IN_WINDOW_MINUTES,
+  LINK_SIGN_IN_WINDOW_SECONDS,
 } from './recent-link-sign-in';
 
 const NOW = 1_800_000_000;
-const WINDOW = LINK_SIGN_IN_WINDOW_MINUTES * 60;
+const WINDOW = LINK_SIGN_IN_WINDOW_SECONDS;
 
 describe('hasRecentLinkSignIn', () => {
   it.each(['otp', 'magiclink'])('accepts a recent %s sign-in', (method) => {

@@ -3,3 +3,4 @@ export * from './account-operations';
 export * from './password-operations';
 export * from './recovery-operations';
 export * from './registration-operations';
+export * from './account-deletion-operations';

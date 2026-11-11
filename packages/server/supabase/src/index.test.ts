@@ -5,10 +5,13 @@ describe('@synapcity/server-supabase root entry', () => {
     const entry = await import('./index');
 
     expect(Object.keys(entry).sort()).toEqual([
+      'LINK_SIGN_IN_WINDOW_SECONDS',
       'changeEmail',
       'createRequestClient',
       'disconnectAccount',
       'exchangeAuthCode',
+      'hasRecentLinkSignIn',
+      'hasRecentLinkSignInNow',
       'isRateLimited',
       'outcomeFromClaims',
       'providerImageFrom',
@@ -17,6 +20,7 @@ describe('@synapcity/server-supabase root entry', () => {
       'requestRecoveryEmail',
       'resendEmailChange',
       'resendSignupConfirmation',
+      'sendAccountDeletionLink',
       'sendOwnPasswordReset',
       'signInWithPassword',
       'signOutSession',

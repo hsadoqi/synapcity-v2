@@ -1,61 +1,12 @@
 import { isAuthRetryableFetchError } from '@supabase/supabase-js';
-import { isRateLimited } from '@synapcity/server-supabase';
+import { hasRecentLinkSignIn } from '@synapcity/server-supabase';
 
-import { hasRecentLinkSignIn } from '@synapcity/features-auth/contracts';
 import { createClient } from '@/lib/supabase/server';
 
 /*
- * The account-deletion operations (ADR-0008). The other provider operations
- * moved to `@synapcity/server-supabase`; these two stay until the delete-account
- * flow moves with `features-auth` (M7.5), because they use the recent-sign-in
- * check (M7 design Q5) and `deleteOwnAccount` logs.
+ * The account-deletion operation (ADR-0008). The other provider operations,
+ * including sending the deletion link, are in `@synapcity/server-supabase`.
  */
-
-export type DeletionLinkOutcome =
-  | { kind: 'sent'; email: string }
-  /** What was typed is not this account's address. Nothing was sent. */
-  | { kind: 'wrong-email' }
-  /** The account has no email address to send a link to. */
-  | { kind: 'no-email' }
-  | { kind: 'signed-out' }
-  | { kind: 'unavailable' }
-  | { kind: 'rate-limited'; code: string }
-  | { kind: 'provider-error'; code: string | undefined };
-
-/**
- * Sends the link that lets the signed-in person finish deleting their account.
- * The address typed is only a check that the right person is at the screen; the
- * link goes to the address the provider holds, never to the typed one, and
- * `shouldCreateUser: false` means it can never make an account. Opening the link
- * signs in and deletes nothing: that takes a further button.
- */
-export async function sendAccountDeletionLink(input: {
-  typedEmail: string;
-  redirectTo: string;
-}): Promise<DeletionLinkOutcome> {
-  const supabase = await createClient();
-  const { data, error: userError } = await supabase.auth.getUser();
-  if (userError || !data.user) {
-    return isAuthRetryableFetchError(userError)
-      ? { kind: 'unavailable' }
-      : { kind: 'signed-out' };
-  }
-  const email = data.user.email;
-  if (!email) return { kind: 'no-email' };
-  if (email.toLowerCase() !== input.typedEmail.trim().toLowerCase()) {
-    return { kind: 'wrong-email' };
-  }
-
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: { shouldCreateUser: false, emailRedirectTo: input.redirectTo },
-  });
-  if (error?.code && isRateLimited(error.code)) {
-    return { kind: 'rate-limited', code: error.code };
-  }
-  if (error) return { kind: 'provider-error', code: error.code };
-  return { kind: 'sent', email };
-}
 
 export type AccountDeletionOutcome =
   | { kind: 'deleted' }

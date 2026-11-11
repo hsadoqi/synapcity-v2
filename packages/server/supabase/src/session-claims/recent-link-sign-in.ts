@@ -12,15 +12,20 @@
  */
 const LINK_SIGN_IN_METHODS = ['otp', 'magiclink'] as const;
 
-/** How long after the emailed link the deletion may still be confirmed. */
-export const LINK_SIGN_IN_WINDOW_MINUTES = 10;
+/**
+ * How long after the emailed link the deletion may still be confirmed: the
+ * same 600 seconds as `public.delete_own_account()`. The settings screen words
+ * it with `LINK_SIGN_IN_WINDOW_MINUTES` from `@synapcity/features-auth/contracts`;
+ * a test in the web app keeps the two equal.
+ */
+export const LINK_SIGN_IN_WINDOW_SECONDS = 600;
 
 type AmrEntry = { method?: unknown; timestamp?: unknown };
 
 export function hasRecentLinkSignIn(
   amr: unknown,
   nowSeconds: number,
-  windowSeconds: number = LINK_SIGN_IN_WINDOW_MINUTES * 60,
+  windowSeconds: number = LINK_SIGN_IN_WINDOW_SECONDS,
 ): boolean {
   if (!Array.isArray(amr)) return false;
   return amr.some((entry: unknown) => {
@@ -39,7 +44,7 @@ export function hasRecentLinkSignIn(
   });
 }
 
-/** `hasRecentLinkSignIn` against the clock, for callers that are not components. */
+/** `hasRecentLinkSignIn` against this server's clock. */
 export function hasRecentLinkSignInNow(amr: unknown): boolean {
   return hasRecentLinkSignIn(amr, Math.floor(Date.now() / 1000));
 }

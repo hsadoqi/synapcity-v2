@@ -44,6 +44,7 @@ import {
   requestRecoveryEmail,
   resendEmailChange as resendEmailChangeOperation,
   resendSignupConfirmation,
+  sendAccountDeletionLink,
   sendOwnPasswordReset,
   signInWithPassword as signInWithPasswordOperation,
   signOutSession,
@@ -51,7 +52,6 @@ import {
   startOAuthSignIn,
   updateOwnPassword,
 } from '@synapcity/server-supabase';
-import { sendAccountDeletionLink } from '../operations';
 
 /**
  * Development fixture mode has no session (ADR-0006, development amendment),
@@ -500,7 +500,7 @@ export async function requestAccountDeletion(
     return authFailure(message, { email: typed }, fields);
   }
 
-  const outcome = await sendAccountDeletionLink({
+  const outcome = await sendAccountDeletionLink(await createClient(), {
     typedEmail: parsed.data.email,
     redirectTo: callbackUrl(
       getOrigin(),

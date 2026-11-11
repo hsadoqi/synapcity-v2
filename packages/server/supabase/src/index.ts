@@ -21,3 +21,8 @@ export { isRateLimited } from './auth-errors';
 export * from './auth-operations';
 export * from './provider-failure';
 export * from './provider-user';
+export {
+  LINK_SIGN_IN_WINDOW_SECONDS,
+  hasRecentLinkSignIn,
+  hasRecentLinkSignInNow,
+} from './session-claims';

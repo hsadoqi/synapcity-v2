@@ -8,7 +8,7 @@ import {
 } from '@synapcity/features-auth/frontend';
 import { confirmAccountDeletion } from './actions';
 import { getVerifiedClaims } from '@/features/auth/server';
-import { hasRecentLinkSignInNow } from '@synapcity/features-auth/contracts';
+import { hasRecentLinkSignInNow } from '@synapcity/server-supabase';
 import { settingsPathFor } from '@/lib/routing/user-paths';
 import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 
