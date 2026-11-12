@@ -1,7 +1,10 @@
 const PALETTE_BUTTON = '[data-slot="widget-palette"] button';
 
-/** How long a palette focus handoff waits for the panel to open: its 200 ms glide, plus margin. */
-export const PALETTE_FOCUS_TIMEOUT_MS = 400;
+/**
+ * How long a palette focus handoff waits for the panel and a restored
+ * dashboard to become interactive. User input still cancels it immediately.
+ */
+export const PALETTE_FOCUS_TIMEOUT_MS = 4_000;
 
 /** The handoff in progress, if any; a new one replaces it. */
 let pending: (() => void) | undefined;

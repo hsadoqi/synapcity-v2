@@ -169,18 +169,37 @@ function WidgetTitle({
 function WidgetSettings({
   widget,
   actions,
+  open: controlledOpen,
+  onOpenChange,
 }: {
   widget: Widget;
   actions: WidgetShellActions;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [localOpen, setLocalOpen] = useState(false);
+  const open = controlledOpen ?? localOpen;
+  const changeOpen = onOpenChange ?? setLocalOpen;
+  const triggerId = `widget-settings-${widget.id}`;
   const run = (fn: () => void) => () => {
-    setOpen(false);
+    changeOpen(false);
     fn();
   };
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover
+      open={open}
+      triggerId={controlledOpen === undefined ? undefined : triggerId}
+      onOpenChange={(next, details) => {
+        const triggerWasReplaced =
+          controlledOpen !== undefined &&
+          !next &&
+          (details.reason === 'none' || details.reason === 'focus-out') &&
+          !details.trigger?.isConnected;
+        if (!triggerWasReplaced) changeOpen(next);
+      }}
+    >
       <PopoverTrigger
+        id={triggerId}
         render={
           <Button
             variant="ghost"
@@ -265,6 +284,8 @@ export function WidgetShell({
   editMode,
   actions,
   toolbar,
+  settingsOpen,
+  onSettingsOpenChange,
   children,
 }: {
   widget: Widget;
@@ -273,6 +294,9 @@ export function WidgetShell({
   actions: WidgetShellActions;
   /** The content's actions and settings, shown in the header. Optional. */
   toolbar?: WidgetShellToolbar;
+  /** Controlled by a stable host when settings must survive a responsive remount. */
+  settingsOpen?: boolean;
+  onSettingsOpenChange?: (open: boolean) => void;
   children: ReactNode;
 }) {
   const titleId = useId();
@@ -373,7 +397,14 @@ export function WidgetShell({
         >
           <CollapseIcon />
         </Button>
-        {editMode && <WidgetSettings widget={widget} actions={actions} />}
+        {editMode && (
+          <WidgetSettings
+            widget={widget}
+            actions={actions}
+            open={settingsOpen}
+            onOpenChange={onSettingsOpenChange}
+          />
+        )}
       </header>
       {!widget.collapsed && showingSettings && toolbar?.settings && (
         <div className="flex min-h-0 flex-1 flex-col border-t border-divider px-3.5 py-3">

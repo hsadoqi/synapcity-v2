@@ -209,6 +209,28 @@ test.describe('editing a dashboard', () => {
     ).toBeVisible();
   });
 
+  test('keeps widget settings open while Edit layout responsively narrows the canvas', async ({
+    page,
+  }) => {
+    await openEmpty(page);
+    await page.getByRole('button', { name: 'Add a widget' }).click();
+    await page.getByRole('button', { name: 'Pinned' }).click();
+
+    const widgets = page
+      .getByRole('toolbar', { name: 'Contextual panel' })
+      .getByRole('button', { name: 'Widgets' });
+    await widgets.click();
+    await page.getByRole('button', { name: 'Edit layout' }).click();
+
+    await page.getByRole('button', { name: 'Edit layout' }).click();
+    await page.getByRole('button', { name: 'Settings for Pinned' }).click();
+    const remove = page.getByRole('button', { name: 'Remove widget' });
+    await expect(remove).toBeVisible();
+
+    await expect(page.locator('[data-gliding]')).toHaveCount(0);
+    await expect(remove).toBeVisible();
+  });
+
   test('switching the panel to Context and back keeps editing and the palette', async ({
     page,
   }) => {

@@ -8,6 +8,7 @@ import {
   within,
 } from '@testing-library/react';
 import { Profiler } from 'react';
+import { useState } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -19,6 +20,38 @@ import {
 import { ConnectedWidget } from './index';
 
 describe('ConnectedWidget', () => {
+  it('restores open settings after its responsive grid subtree remounts', async () => {
+    function ResponsiveWidget() {
+      const [breakpoint, setBreakpoint] = useState('lg');
+      return (
+        <>
+          <button onClick={() => setBreakpoint('sm')}>Narrow canvas</button>
+          <div key={breakpoint}>
+            <ConnectedWidget widgetId="wgt_seed1" />
+          </div>
+        </>
+      );
+    }
+
+    const { store } = renderWithStore(<ResponsiveWidget />);
+    const widget = store().getState().composition.widgets[0]!;
+    act(() => store().getState().toggleEditMode());
+    fireEvent.click(
+      await screen.findByRole('button', {
+        name: `Settings for ${widget.title}`,
+      }),
+    );
+    expect(
+      await screen.findByRole('button', { name: 'Remove widget' }),
+    ).toBeDefined();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Narrow canvas' }));
+
+    expect(
+      await screen.findByRole('button', { name: 'Remove widget' }),
+    ).toBeDefined();
+  });
+
   it('binds the shell actions to the store', async () => {
     const { store } = renderWithStore(<ConnectedWidget widgetId="wgt_seed1" />);
     const widget = store().getState().composition.widgets[0]!;
