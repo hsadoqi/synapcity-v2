@@ -184,7 +184,7 @@ describe('package.json exports', () => {
   it('resolves every component folder through its wildcard entry', () => {
     const prefixes: Record<string, string> = {
       components: './components/',
-      'components/ui': './core/',
+      'components/ui': './components/',
       next: './next/',
     };
 
