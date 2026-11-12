@@ -103,6 +103,39 @@ describe('ModeToggle', () => {
     ).toBe('true');
   });
 
+  it('checks System, not the appearance it resolves to, when System is chosen', async () => {
+    renderToggle({}, 'system');
+    fireEvent.click(screen.getByRole('button', { name: 'Theme' }));
+
+    expect(
+      (
+        await screen.findByRole('menuitemradio', { name: 'System' })
+      ).getAttribute('aria-checked'),
+    ).toBe('true');
+    for (const name of ['Light', 'Dark']) {
+      expect(
+        screen
+          .getByRole('menuitemradio', { name })
+          .getAttribute('aria-checked'),
+      ).toBe('false');
+    }
+  });
+
+  it('checks System once it is chosen from another mode', async () => {
+    renderToggle({}, 'dark');
+    fireEvent.click(screen.getByRole('button', { name: 'Theme' }));
+    const system = await screen.findByRole('menuitemradio', { name: 'System' });
+    fireEvent.click(system);
+
+    expect(localStorage.getItem('theme')).toBe('system');
+    expect(system.getAttribute('aria-checked')).toBe('true');
+    expect(
+      screen
+        .getByRole('menuitemradio', { name: 'Dark' })
+        .getAttribute('aria-checked'),
+    ).toBe('false');
+  });
+
   it('switches the document theme when a mode is chosen', async () => {
     renderToggle();
     fireEvent.click(screen.getByRole('button', { name: 'Theme' }));
