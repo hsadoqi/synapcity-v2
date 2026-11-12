@@ -209,12 +209,12 @@ export async function requestPasswordReset(
     const { message, fields } = firstRefusal(parsed.error);
     return authFailure(
       message,
-      { email: field(formData, 'email').trim(), name: '' },
+      { email: field(formData, 'email').trim() },
       fields,
     );
   }
   const { email } = parsed.data;
-  const user = { email, name: '' };
+  const user = { email };
 
   const outcome = await requestRecoveryEmail(await createClient(), {
     email,
@@ -241,7 +241,7 @@ export async function updatePassword(
   formData: FormData,
 ): Promise<AuthState> {
   if (fixtureModeEnabled()) return fixtureRefusal();
-  const user = { email: '', name: '' };
+  const user = { email: '' };
   // Where a reset started from settings goes back to. Untrusted, so checked.
   const next = safeNextPath(field(formData, 'next'), '');
   const parsed = updatePasswordSchema.safeParse({

@@ -370,6 +370,7 @@ describe('requestPasswordReset', () => {
       expect(state.error).toBe(
         'Too many attempts. Wait a few minutes and try again.',
       );
+      expect(state.data?.user).toEqual({ email: 'a@b.co' });
       expect(state.success).toBeUndefined();
     },
   );
@@ -407,6 +408,7 @@ describe('updatePassword', () => {
     );
 
     expect(state.fields).toEqual(['password']);
+    expect(state.data?.user).toEqual({ email: '' });
     expect(mocks.updateUser).not.toHaveBeenCalled();
   });
 

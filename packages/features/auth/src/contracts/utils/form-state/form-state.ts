@@ -24,11 +24,6 @@ export type AuthState = {
 
 type UserData = {
   email: string;
-  /**
-   * Transitional: nothing reads it. The register form refills `firstName` and
-   * `lastName`; only the password-reset actions still set it, to `''`.
-   */
-  name?: string;
   /** Only collected when registering. */
   firstName?: string;
   /** Only collected when registering, and only when given. */
