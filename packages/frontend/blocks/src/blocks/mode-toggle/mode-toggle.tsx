@@ -78,7 +78,9 @@ function ModeToggle({
   size?: IconSize;
   variant?: ButtonVariant;
 }) {
-  const { mode, setMode } = useMode();
+  // The menu shows the person's choice, so System stays checked when it is chosen. `mode` is
+  // the light or dark appearance System resolves to, which is for styling, not for this control.
+  const { nativeMode, setMode } = useMode();
 
   return (
     <div className={className}>
@@ -87,7 +89,10 @@ function ModeToggle({
           render={<ModeButton size={size} variant={variant} />}
         />
         <DropdownMenuContent align="end">
-          <ModeMenu value={isMode(mode) ? mode : 'system'} onUpdate={setMode} />
+          <ModeMenu
+            value={isMode(nativeMode) ? nativeMode : 'system'}
+            onUpdate={setMode}
+          />
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

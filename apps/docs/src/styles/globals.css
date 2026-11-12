@@ -4,4 +4,6 @@
 
 @source '../';
 @source '../../../../packages/frontend/ui/src';
+@source '../../../../packages/frontend/blocks/src';
+@source '../../../../packages/frontend/brand/src';
 @source '../../../../packages/frontend/shells/src';
