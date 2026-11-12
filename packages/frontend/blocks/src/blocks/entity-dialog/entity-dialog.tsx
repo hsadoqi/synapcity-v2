@@ -37,7 +37,9 @@ export interface EntityDialogApi {
   close: () => void;
   /**
    * Closes because the work is done, such as after a successful save, even
-   * while `busy` is still set. A dismissal uses `close` instead.
+   * while `busy` is still set. A dismissal uses `close` instead. It closes
+   * only the opening it was rendered in: if the shell was closed (and maybe
+   * reopened) while the work ran, it does nothing.
    */
   complete: () => void;
 }
@@ -211,6 +213,23 @@ export function EntityDialog({
   /** Its own submit or delete, or the owner's work: either blocks dismissal. */
   const locked = pending || busy;
 
+  // Each opening or closing starts a new session. Work started in one session
+  // (the shell's own submit or delete, or a save the owner awaits before
+  // `complete`) must not close a later one: a controlled owner can close and
+  // reopen the shell while that work is still running.
+  const [session, setSession] = useState({ open: isOpen, id: 0 });
+  if (session.open !== isOpen) {
+    // Derived during render, as React advises for state that follows props.
+    setSession({ open: isOpen, id: session.id + 1 });
+  }
+  const currentSession = useRef(session.id);
+  useEffect(() => {
+    currentSession.current = session.id;
+  });
+  /** The session this render belongs to; work started from it carries it. */
+  const thisSession = session.id;
+  const stillCurrent = () => currentSession.current === thisSession;
+
   // A dialog that is mid-save or mid-delete cannot be dismissed from outside.
   const request = (next: boolean) => {
     if (!next && locked) return;
@@ -218,7 +237,10 @@ export function EntityDialog({
     setOpen(next);
   };
   const close = () => request(false);
-  const complete = () => setOpen(false);
+  // Closes only the session the work was started in.
+  const complete = () => {
+    if (stillCurrent()) setOpen(false);
+  };
 
   const run = async (action: () => void | Promise<void>) => {
     setPending(true);
@@ -227,11 +249,11 @@ export function EntityDialog({
       await action();
       if (!mounted.current) return;
       setPending(false);
-      setOpen(false);
+      if (stillCurrent()) setOpen(false);
     } catch {
       if (!mounted.current) return;
       setPending(false);
-      setFailed(true);
+      if (stillCurrent()) setFailed(true);
     }
   };
 
@@ -244,7 +266,11 @@ export function EntityDialog({
   const deletable = mode === 'edit' && onDelete !== undefined;
   const ownsForm = onSubmit !== undefined;
   const api: EntityDialogApi = { mode, close, complete };
-  const content = typeof children === 'function' ? children(api) : children;
+  const content =
+    typeof children === 'function'
+      ? // eslint-disable-next-line react-hooks/refs -- `api` holds callbacks for events and settled work; none reads the session ref during render.
+        children(api)
+      : children;
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -362,7 +388,11 @@ export function EntityDialog({
         <Sheet open={isOpen} onOpenChange={request}>
           {trigger && <SheetTrigger render={trigger} />}
           <SheetPortal container={target}>
-            <SheetContent side={side} className={className}>
+            <SheetContent
+              side={side}
+              closeDisabled={locked}
+              className={className}
+            >
               <SheetHeader>
                 <SheetTitle>{heading}</SheetTitle>
                 {description && (
@@ -391,6 +421,7 @@ export function EntityDialog({
       <DialogPortalContainer
         open={isOpen}
         onOpenChange={request}
+        closeDisabled={locked}
         trigger={trigger}
         title={heading}
         description={description}

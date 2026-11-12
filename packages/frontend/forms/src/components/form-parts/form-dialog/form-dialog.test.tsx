@@ -352,6 +352,50 @@ describe('FormDialog', () => {
       expect(errors).not.toHaveBeenCalled();
     });
 
+    it('shows the close button disabled while saving', async () => {
+      const { onSubmit, settle } = deferred();
+      setup({ onSubmit });
+      const dialog = await openIt();
+      const close = () => within(dialog).getByRole('button', { name: 'Close' });
+      expect(close().hasAttribute('disabled')).toBe(false);
+      await startSave(dialog);
+      expect(close().hasAttribute('disabled')).toBe(true);
+      await act(async () => settle().resolve());
+    });
+
+    it('does not close a dialog the owner reopened while an earlier save ran', async () => {
+      const { onSubmit, settle } = deferred();
+      const onOpenChange = vi.fn();
+      const view = (open: boolean) => (
+        <FormDialog
+          mode="create"
+          entityName="event"
+          open={open}
+          onOpenChange={onOpenChange}
+          definition={definition}
+          onSubmit={onSubmit}
+        />
+      );
+      const { rerender } = render(view(true));
+      const dialog = await screen.findByRole('dialog');
+      await startSave(dialog);
+
+      // The owner closes and reopens it (its own state, not a dismissal).
+      rerender(view(false));
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      rerender(view(true));
+      const reopened = await screen.findByRole('dialog');
+      await act(async () => settle().resolve());
+
+      expect(onOpenChange).not.toHaveBeenCalledWith(false);
+      expect(screen.getByRole('dialog')).toBe(reopened);
+      expect(
+        within(reopened)
+          .getByRole('button', { name: 'Close' })
+          .hasAttribute('disabled'),
+      ).toBe(false);
+    });
+
     it('is not left busy under Strict Mode after a save', async () => {
       const { onSubmit, settle } = deferred();
       render(

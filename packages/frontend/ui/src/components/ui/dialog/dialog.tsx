@@ -43,10 +43,13 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  closeDisabled = false,
   showOverlay = true,
   ...props
 }: DialogPrimitive.Popup.Props & {
   showCloseButton?: boolean;
+  /** Shows the close button disabled, for a dialog that cannot be dismissed now. @default false */
+  closeDisabled?: boolean;
   showOverlay?: boolean;
 }) {
   return (
@@ -64,6 +67,7 @@ function DialogContent({
         {showCloseButton && (
           <DialogPrimitive.Close
             data-slot="dialog-close"
+            disabled={closeDisabled}
             render={
               <Button
                 variant="ghost"

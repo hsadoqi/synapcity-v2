@@ -114,6 +114,12 @@ export interface DialogPortalContainerProps extends Pick<
   /** @default true */
   showCloseButton?: boolean;
   /**
+   * Shows the close button disabled while the owner refuses dismissal (a
+   * save in progress). It does not refuse anything itself: `onOpenChange`
+   * does. @default false
+   */
+  closeDisabled?: boolean;
+  /**
    * Give the dialog a fixed share of the viewport and scroll the body under a
    * fixed header and footer. A ScrollArea only scrolls inside a parent of
    * known height, so a scrollable dialog is always that tall.
@@ -151,6 +157,7 @@ export function DialogPortalContainer({
   container = 'inline',
   overlay = true,
   showCloseButton = true,
+  closeDisabled = false,
   scrollable = false,
   width = 'sm',
   height,
@@ -176,6 +183,7 @@ export function DialogPortalContainer({
           <DialogContent
             showOverlay={overlay}
             showCloseButton={showCloseButton}
+            closeDisabled={closeDisabled}
             style={numericSize(width, height, scrollable)}
             className={cn(
               typeof width === 'number' ? undefined : widthClasses[width],

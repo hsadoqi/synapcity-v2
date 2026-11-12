@@ -113,6 +113,21 @@ describe('Dialog', () => {
     },
   );
 
+  it('shows the close button disabled with closeDisabled, and it does not close', async () => {
+    const onOpenChange = vi.fn();
+    render(
+      <Example
+        rootProps={{ defaultOpen: true, onOpenChange }}
+        contentProps={{ closeDisabled: true }}
+      />,
+    );
+    const dialog = await screen.findByRole('dialog');
+    const close = within(dialog).getByRole('button', { name: 'Close' });
+    expect(close.hasAttribute('disabled')).toBe(true);
+    fireEvent.click(close);
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
   it('dismisses on Escape', async () => {
     render(<Example rootProps={{ defaultOpen: true }} />);
     const dialog = await screen.findByRole('dialog');

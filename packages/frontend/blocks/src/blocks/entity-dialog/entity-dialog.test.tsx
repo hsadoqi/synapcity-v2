@@ -258,6 +258,133 @@ describe('EntityDialog', () => {
     expect(screen.queryByRole('region')).toBeNull();
   });
 
+  describe('the close button while dismissal is refused (DEC-5)', () => {
+    it.each(['dialog', 'sheet'] as const)(
+      'shows the %s close button disabled while busy, and enabled after',
+      async (presentation) => {
+        const view = (busy: boolean) => (
+          <EntityDialog
+            mode="edit"
+            entityName="event"
+            presentation={presentation}
+            open
+            busy={busy}
+          >
+            {fields}
+          </EntityDialog>
+        );
+        const { rerender } = render(view(false));
+        await screen.findByRole('dialog');
+        const close = () => screen.getByRole('button', { name: 'Close' });
+        expect(close().hasAttribute('disabled')).toBe(false);
+        rerender(view(true));
+        expect(close().hasAttribute('disabled')).toBe(true);
+        rerender(view(false));
+        expect(close().hasAttribute('disabled')).toBe(false);
+      },
+    );
+  });
+
+  describe('work that outlives its opening', () => {
+    /** A controlled dialog whose owner can close and reopen it by hand. */
+    function controlled(props: Partial<EntityDialogProps> = {}) {
+      const onOpenChange = vi.fn();
+      const view = (open: boolean, extra: Partial<EntityDialogProps> = {}) => (
+        <EntityDialog
+          mode="create"
+          entityName="event"
+          open={open}
+          onOpenChange={onOpenChange}
+          {...props}
+          {...extra}
+        >
+          {props.children ?? fields}
+        </EntityDialog>
+      );
+      const utils = render(view(true));
+      return {
+        onOpenChange,
+        setOpen: (open: boolean, extra?: Partial<EntityDialogProps>) =>
+          utils.rerender(view(open, extra)),
+      };
+    }
+
+    it('does not let complete from a closed opening close the reopened dialog', async () => {
+      let later!: () => void;
+      const { onOpenChange, setOpen } = controlled({
+        children: ({ complete }) => (
+          <button type="button" onClick={() => (later = complete)}>
+            Start
+          </button>
+        ),
+      });
+      await screen.findByRole('dialog');
+      fireEvent.click(screen.getByRole('button', { name: 'Start' }));
+
+      // The owner closes and reopens it while the work is still running.
+      setOpen(false);
+      setOpen(true);
+      await screen.findByRole('dialog');
+      act(() => later());
+
+      expect(onOpenChange).not.toHaveBeenCalledWith(false);
+      expect(screen.getByRole('dialog')).toBeDefined();
+    });
+
+    it('still closes from complete in the opening the work started in', async () => {
+      let later!: () => void;
+      const { onOpenChange } = controlled({
+        children: ({ complete }) => (
+          <button type="button" onClick={() => (later = complete)}>
+            Start
+          </button>
+        ),
+      });
+      await screen.findByRole('dialog');
+      fireEvent.click(screen.getByRole('button', { name: 'Start' }));
+      act(() => later());
+      expect(onOpenChange).toHaveBeenCalledWith(false);
+    });
+
+    it.each([
+      ['succeeds', false],
+      ['fails', true],
+    ])(
+      'leaves the reopened dialog open and not pending when its own submit %s late',
+      async (_, fails) => {
+        let settle!: { resolve: () => void; reject: (error: Error) => void };
+        const onSubmit = vi.fn(
+          () =>
+            new Promise<void>((resolve, reject) => {
+              settle = { resolve, reject };
+            }),
+        );
+        const { onOpenChange, setOpen } = controlled({ onSubmit });
+        await screen.findByRole('dialog');
+        await act(async () => {
+          fireEvent.click(screen.getByRole('button', { name: 'Create' }));
+        });
+        expect(onSubmit).toHaveBeenCalledTimes(1);
+
+        setOpen(false);
+        setOpen(true);
+        await screen.findByRole('dialog');
+        await act(async () => {
+          if (fails) settle.reject(new Error('refused'));
+          else settle.resolve();
+        });
+
+        expect(onOpenChange).not.toHaveBeenCalledWith(false);
+        expect(screen.queryByRole('alert')).toBeNull();
+        expect(
+          screen
+            .getByRole('button', { name: 'Create' })
+            .hasAttribute('disabled'),
+        ).toBe(false);
+      },
+    );
+  });
+
   describe('external busy (DEC-5)', () => {
     afterEach(() => vi.restoreAllMocks());
 

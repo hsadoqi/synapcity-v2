@@ -43,6 +43,14 @@ describe('Sheet', () => {
     );
   });
 
+  it('shows the close button disabled with closeDisabled', async () => {
+    renderSheet({ closeDisabled: true }, { defaultOpen: true });
+    await screen.findByRole('dialog');
+    expect(
+      screen.getByRole('button', { name: 'Close' }).hasAttribute('disabled'),
+    ).toBe(true);
+  });
+
   it('slides in from the right by default and honours side', async () => {
     const { unmount } = renderSheet({}, { defaultOpen: true });
     expect((await screen.findByRole('dialog')).getAttribute('data-side')).toBe(
