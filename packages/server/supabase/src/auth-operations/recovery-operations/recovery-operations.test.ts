@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { changeEmail, resendEmailChange } from '../password-operations';
 import {
+  AuthApiError,
   AuthRetryableFetchError,
   AuthSessionMissingError,
 } from '@supabase/supabase-js';
@@ -171,7 +172,10 @@ describe('changeEmail', () => {
       data: { user: null },
       error: new AuthRetryableFetchError('fetch failed', 0),
     });
-    expect(await changeEmail(client, input)).toEqual({ kind: 'unavailable' });
+    expect(await changeEmail(client, input)).toEqual({
+      kind: 'unavailable',
+      failure: { status: 0 },
+    });
     expect(mocks.updateUser).not.toHaveBeenCalled();
   });
 
@@ -179,7 +183,7 @@ describe('changeEmail', () => {
     mocks.getUser.mockResolvedValue(user());
     mocks.updateUser.mockResolvedValue({
       data: {},
-      error: { code: 'email_exists', message: 'sentinel-message', status: 422 },
+      error: new AuthApiError('sentinel-message', 422, 'email_exists'),
     });
 
     const outcome = await changeEmail(client, input);
@@ -243,6 +247,7 @@ describe('resendEmailChange', () => {
     });
     expect(await resendEmailChange(client, { redirectTo })).toEqual({
       kind: 'unavailable',
+      failure: { status: 0 },
     });
   });
 
@@ -253,7 +258,7 @@ describe('resendEmailChange', () => {
     });
     mocks.resend.mockResolvedValue({
       data: {},
-      error: { code: 'over_email_send_rate_limit', message: 'sentinel' },
+      error: new AuthApiError('sentinel', 429, 'over_email_send_rate_limit'),
     });
 
     const outcome = await resendEmailChange(client, { redirectTo });

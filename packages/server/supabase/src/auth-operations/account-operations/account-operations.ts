@@ -1,12 +1,14 @@
 import { OAuthProvider } from '@synapcity/domain-identity';
 import { classifyAuthError } from '../../auth-errors';
 import { SupabaseServerClient } from '../../request-client';
+import type { ProviderFailure } from '../../provider-failure';
 
 export type AccountLinkOutcome =
   /** Send the browser to the provider; it brings the person back to `redirectTo`. */
   | { kind: 'redirect'; url: string }
   | { kind: 'signed-out' }
-  | { kind: 'unavailable' }
+  /** The failure is for the log: code and status only. */
+  | { kind: 'unavailable'; failure: ProviderFailure }
   | { kind: 'provider-error'; code: string | undefined };
 
 /**
@@ -38,7 +40,8 @@ export type DisconnectOutcome =
   /** Removing it would leave no way to sign in. Nothing was changed. */
   | { kind: 'last-sign-in' }
   | { kind: 'signed-out' }
-  | { kind: 'unavailable' }
+  /** The failure is for the log: code and status only. */
+  | { kind: 'unavailable'; failure: ProviderFailure }
   | { kind: 'provider-error'; code: string | undefined };
 
 /**

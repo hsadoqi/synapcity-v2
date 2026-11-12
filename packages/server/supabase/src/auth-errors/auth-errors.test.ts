@@ -45,7 +45,8 @@ const SIGNED_OUT: Expected = {
 };
 const UNAVAILABLE: Expected = {
   identity: 'unavailable',
-  operations: { kind: 'unavailable' },
+  // The failure's code and status ride along so the host can log the outage.
+  operations: { kind: 'unavailable', failure: expect.any(Object) },
 };
 const refused = (code: string | undefined, identity: Expected['identity']) => ({
   identity,
@@ -258,6 +259,12 @@ describe('classifyAuthFailure', () => {
 });
 
 describe('classifyAuthError', () => {
+  it('reports an outage as unavailable with its code and status, never its message', () => {
+    expect(
+      classifyAuthError(new AuthRetryableFetchError('secret outage', 503)),
+    ).toStrictEqual({ kind: 'unavailable', failure: { status: 503 } });
+  });
+
   it('carries the code of a refusal, never its message', () => {
     expect(
       classifyAuthError(

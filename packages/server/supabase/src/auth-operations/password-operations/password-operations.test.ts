@@ -1,6 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { sendOwnPasswordReset } from './password-operations';
 import {
+  changeEmail,
+  resendEmailChange,
+  sendOwnPasswordReset,
+} from './password-operations';
+import {
+  AuthApiError,
   AuthRetryableFetchError,
   AuthSessionMissingError,
 } from '@supabase/supabase-js';
@@ -95,6 +100,7 @@ describe('sendOwnPasswordReset', () => {
     });
     expect(await sendOwnPasswordReset(client, { resetRedirect })).toEqual({
       kind: 'unavailable',
+      failure: { status: 0 },
     });
     expect(mocks.resetPasswordForEmail).not.toHaveBeenCalled();
   });
@@ -103,7 +109,7 @@ describe('sendOwnPasswordReset', () => {
     signedIn();
     mocks.resetPasswordForEmail.mockResolvedValue({
       data: {},
-      error: { code: 'over_email_send_rate_limit', message: 'sentinel' },
+      error: new AuthApiError('sentinel', 429, 'over_email_send_rate_limit'),
     });
     const limited = await sendOwnPasswordReset(client, { resetRedirect });
     expect(limited).toEqual({
@@ -113,7 +119,7 @@ describe('sendOwnPasswordReset', () => {
 
     mocks.resetPasswordForEmail.mockResolvedValue({
       data: {},
-      error: { code: 'unexpected_failure', message: 'sentinel' },
+      error: new AuthApiError('sentinel', 422, 'unexpected_failure'),
     });
     const failed = await sendOwnPasswordReset(client, { resetRedirect });
     expect(failed).toEqual({
@@ -121,5 +127,102 @@ describe('sendOwnPasswordReset', () => {
       code: 'unexpected_failure',
     });
     expect(JSON.stringify([limited, failed])).not.toContain('sentinel');
+  });
+});
+
+/*
+ * The second provider call of each operation (after the user was read) goes
+ * through the shared Auth classification: a lost session is not a provider
+ * refusal, an outage is not either and keeps its code and status for the log,
+ * and a rate limit stays apart from an outage.
+ */
+describe('second-call Auth failures', () => {
+  const withPending = () =>
+    mocks.getUser.mockResolvedValue({
+      data: {
+        user: {
+          id: 'user-1',
+          email: 'ada@example.com',
+          new_email: 'grace@example.com',
+        },
+      },
+      error: null,
+    });
+
+  const OPERATIONS = [
+    {
+      name: 'changeEmail',
+      call: mocks.updateUser,
+      run: () =>
+        changeEmail(client, {
+          newEmail: 'new@example.com',
+          redirectTo: 'https://app.test/r',
+        }),
+      rateLimited: {
+        kind: 'provider-error',
+        code: 'over_email_send_rate_limit',
+      },
+    },
+    {
+      name: 'resendEmailChange',
+      call: mocks.resend,
+      run: () =>
+        resendEmailChange(client, { redirectTo: 'https://app.test/r' }),
+      rateLimited: {
+        kind: 'provider-error',
+        code: 'over_email_send_rate_limit',
+      },
+    },
+    {
+      name: 'sendOwnPasswordReset',
+      call: mocks.resetPasswordForEmail,
+      run: () =>
+        sendOwnPasswordReset(client, { resetRedirect: 'https://app.test/r' }),
+      rateLimited: { kind: 'rate-limited', code: 'over_email_send_rate_limit' },
+    },
+  ] as const;
+
+  describe.each(OPERATIONS)('$name', ({ call, run, rateLimited }) => {
+    beforeEach(() => withPending());
+
+    it('reads a rejected session as signed out, not as a provider error', async () => {
+      call.mockResolvedValue({
+        data: {},
+        error: new AuthSessionMissingError(),
+      });
+      await expect(run()).resolves.toEqual({ kind: 'signed-out' });
+    });
+
+    it('reads an outage as unavailable, with its code and status only', async () => {
+      call.mockResolvedValue({
+        data: {},
+        error: new AuthRetryableFetchError('secret outage', 503),
+      });
+      const outcome = await run();
+      expect(outcome).toStrictEqual({
+        kind: 'unavailable',
+        failure: { status: 503 },
+      });
+      expect(JSON.stringify(outcome)).not.toContain('secret');
+    });
+
+    it('keeps a rate limit apart from an outage', async () => {
+      call.mockResolvedValue({
+        data: {},
+        error: new AuthApiError('slow down', 429, 'over_email_send_rate_limit'),
+      });
+      await expect(run()).resolves.toEqual(rateLimited);
+    });
+
+    it('carries the code of a refusal', async () => {
+      call.mockResolvedValue({
+        data: {},
+        error: new AuthApiError('secret', 422, 'validation_failed'),
+      });
+      await expect(run()).resolves.toStrictEqual({
+        kind: 'provider-error',
+        code: 'validation_failed',
+      });
+    });
   });
 });

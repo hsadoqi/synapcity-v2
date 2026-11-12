@@ -368,6 +368,8 @@ export async function requestEmailChange(
     case 'signed-out':
       return signedOutFailure(email);
     case 'unavailable':
+      // An outage the person can retry, still worth a trace: code and status only.
+      logFailure('requestEmailChange', outcome.failure);
       return authFailure(TRY_AGAIN, { email });
     case 'same-email':
       return authFailure(ALREADY_YOUR_EMAIL, { email }, ['email']);
@@ -407,6 +409,8 @@ export async function resendEmailChange(
     case 'signed-out':
       return signedOutFailure('');
     case 'unavailable':
+      // An outage the person can retry, still worth a trace: code and status only.
+      logFailure('resendEmailChange', outcome.failure);
       return authFailure(TRY_AGAIN, { email: '' });
     case 'nothing-pending':
       revalidatePath('/', 'layout');
@@ -446,6 +450,8 @@ export async function requestOwnPasswordReset(
     case 'signed-out':
       return signedOutFailure('');
     case 'unavailable':
+      // An outage the person can retry, still worth a trace: code and status only.
+      logFailure('requestOwnPasswordReset', outcome.failure);
       return authFailure(TRY_AGAIN, { email: '' });
     case 'no-email':
       return authFailure(

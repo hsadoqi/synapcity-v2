@@ -116,7 +116,8 @@ export function identityFailure(error: unknown): {
 /** How an operation that acts for the signed-in person reports an Auth error. */
 export type AuthErrorOutcome =
   | { kind: 'signed-out' }
-  | { kind: 'unavailable' }
+  /** Carries the code and status only, so the host can log the outage. */
+  | { kind: 'unavailable'; failure: ProviderFailure }
   | { kind: 'provider-error'; code: string | undefined };
 
 /**
@@ -132,7 +133,7 @@ export function classifyAuthError(error: unknown): AuthErrorOutcome {
     case 'signed-out':
       return { kind: 'signed-out' };
     case 'unavailable':
-      return { kind: 'unavailable' };
+      return { kind: 'unavailable', failure: sorted.failure };
     case 'refused':
     case 'rate-limited':
     case 'rejected':

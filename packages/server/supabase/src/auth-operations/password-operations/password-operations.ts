@@ -1,4 +1,4 @@
-import { isRateLimited } from '../../auth-errors';
+import { classifyAuthError, isRateLimited } from '../../auth-errors';
 import { ProviderFailure, toProviderFailure } from '../../provider-failure';
 import { readProviderUser } from '../../provider-user';
 import { SupabaseServerClient } from '../../request-client';
@@ -39,8 +39,8 @@ export type EmailChangeOutcome =
   | { kind: 'same-email' }
   /** There is no session, so there is no account to change. */
   | { kind: 'signed-out' }
-  /** The auth service could not be reached; trying again may work. */
-  | { kind: 'unavailable' }
+  /** The auth service could not be reached; trying again may work. The failure is for the log. */
+  | { kind: 'unavailable'; failure: ProviderFailure }
   | { kind: 'provider-error'; code: string | undefined };
 
 /**
@@ -54,7 +54,8 @@ export async function changeEmail(
   input: EmailChangeInput,
 ): Promise<EmailChangeOutcome> {
   const found = await readProviderUser(supabase);
-  if (found.kind !== 'user') return { kind: found.kind };
+  if (found.kind === 'signed-out') return { kind: 'signed-out' };
+  if (found.kind === 'unavailable') return found;
   const { user } = found;
   if (user.email?.toLowerCase() === input.newEmail.toLowerCase()) {
     return { kind: 'same-email' };
@@ -64,7 +65,9 @@ export async function changeEmail(
     { email: input.newEmail },
     { emailRedirectTo: input.redirectTo },
   );
-  if (error) return { kind: 'provider-error', code: error.code };
+  // A lost session or an outage on this second call is not the provider
+  // refusing the change; only a refusal keeps its code.
+  if (error) return classifyAuthError(error);
 
   // Without email confirmation the provider applies the change at once, and
   // nothing is left pending. Saying a link was sent would then be untrue.
@@ -84,7 +87,8 @@ export type ResendEmailChangeOutcome =
   /** There is no change waiting, so there is nothing to send again. */
   | { kind: 'nothing-pending' }
   | { kind: 'signed-out' }
-  | { kind: 'unavailable' }
+  /** The failure is for the log: code and status only. */
+  | { kind: 'unavailable'; failure: ProviderFailure }
   | { kind: 'provider-error'; code: string | undefined };
 
 /**
@@ -99,7 +103,8 @@ export async function resendEmailChange(
   },
 ): Promise<ResendEmailChangeOutcome> {
   const found = await readProviderUser(supabase);
-  if (found.kind !== 'user') return { kind: found.kind };
+  if (found.kind === 'signed-out') return { kind: 'signed-out' };
+  if (found.kind === 'unavailable') return found;
   const { user } = found;
   const pending = user.new_email;
   if (!pending) return { kind: 'nothing-pending' };
@@ -109,7 +114,7 @@ export async function resendEmailChange(
     email: pending,
     options: { emailRedirectTo: input.redirectTo },
   });
-  if (error) return { kind: 'provider-error', code: error.code };
+  if (error) return classifyAuthError(error);
   return { kind: 'sent', email: pending };
 }
 
@@ -118,7 +123,8 @@ export type OwnPasswordResetOutcome =
   /** The account has no email address to send a link to. */
   | { kind: 'no-email' }
   | { kind: 'signed-out' }
-  | { kind: 'unavailable' }
+  /** The failure is for the log: code and status only. */
+  | { kind: 'unavailable'; failure: ProviderFailure }
   | { kind: 'rate-limited'; code: string }
   | { kind: 'provider-error'; code: string | undefined };
 
@@ -136,7 +142,8 @@ export async function sendOwnPasswordReset(
   },
 ): Promise<OwnPasswordResetOutcome> {
   const found = await readProviderUser(supabase);
-  if (found.kind !== 'user') return { kind: found.kind };
+  if (found.kind === 'signed-out') return { kind: 'signed-out' };
+  if (found.kind === 'unavailable') return found;
   const { user } = found;
   const email = user.email;
   if (!email) return { kind: 'no-email' };
@@ -147,6 +154,6 @@ export async function sendOwnPasswordReset(
   if (error?.code && isRateLimited(error.code)) {
     return { kind: 'rate-limited', code: error.code };
   }
-  if (error) return { kind: 'provider-error', code: error.code };
+  if (error) return classifyAuthError(error);
   return { kind: 'sent', email };
 }

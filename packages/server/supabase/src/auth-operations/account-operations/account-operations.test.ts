@@ -76,6 +76,7 @@ describe('startAccountLink', () => {
     });
     expect(await startAccountLink(client, input)).toEqual({
       kind: 'unavailable',
+      failure: { status: 0 },
     });
   });
 
@@ -196,6 +197,7 @@ describe('disconnectAccount', () => {
     });
     expect(await disconnectAccount(client, { provider: 'github' })).toEqual({
       kind: 'unavailable',
+      failure: { status: 0 },
     });
     expect(mocks.unlinkIdentity).not.toHaveBeenCalled();
   });
@@ -209,6 +211,7 @@ describe('disconnectAccount', () => {
 
     expect(await disconnectAccount(client, { provider: 'github' })).toEqual({
       kind: 'unavailable',
+      failure: { status: 0 },
     });
   });
 });

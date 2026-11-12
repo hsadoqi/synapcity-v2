@@ -789,10 +789,11 @@ describe('changing the email', () => {
     it('says an address cannot be used without saying why', async () => {
       mocks.updateUser.mockResolvedValue({
         data: {},
-        error: {
-          code: 'email_exists',
-          message: 'A user with this email already exists',
-        },
+        error: new AuthApiError(
+          'A user with this email already exists',
+          422,
+          'email_exists',
+        ),
       });
 
       const state = await requestEmailChange({}, form({ email: NEW }));
@@ -808,7 +809,11 @@ describe('changing the email', () => {
     it('shows a rate limit as the request-wide problem it is', async () => {
       mocks.updateUser.mockResolvedValue({
         data: {},
-        error: { code: 'over_email_send_rate_limit' },
+        error: new AuthApiError(
+          'provider text',
+          429,
+          'over_email_send_rate_limit',
+        ),
       });
 
       const state = await requestEmailChange({}, form({ email: NEW }));
@@ -823,17 +828,20 @@ describe('changing the email', () => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       mocks.updateUser.mockResolvedValue({
         data: {},
-        error: {
-          code: 'unexpected_failure',
-          message: `could not email ${NEW}`,
-        },
+        error: new AuthApiError(
+          `could not email ${NEW}`,
+          500,
+          'unexpected_failure',
+        ),
       });
 
       const state = await requestEmailChange({}, form({ email: NEW }));
 
       expect(state.error).toBe('Something went wrong. Try again.');
+      // GoTrue sends this code with a 500: an outage, logged with its status.
       expect(warn).toHaveBeenCalledWith('requestEmailChange failed', {
         code: 'unexpected_failure',
+        status: 500,
       });
       expect(JSON.stringify(warn.mock.calls)).not.toContain(NEW);
       warn.mockRestore();
@@ -842,7 +850,7 @@ describe('changing the email', () => {
     it('echoes the typed address on a refusal so it can be corrected', async () => {
       mocks.updateUser.mockResolvedValue({
         data: {},
-        error: { code: 'email_address_invalid' },
+        error: new AuthApiError('provider text', 400, 'email_address_invalid'),
       });
 
       const state = await requestEmailChange(
@@ -901,7 +909,11 @@ describe('changing the email', () => {
       signedIn({ new_email: NEW });
       mocks.resend.mockResolvedValue({
         data: {},
-        error: { code: 'over_email_send_rate_limit' },
+        error: new AuthApiError(
+          'provider text',
+          429,
+          'over_email_send_rate_limit',
+        ),
       });
 
       const state = await resendEmailChange({}, form({}));
@@ -916,7 +928,7 @@ describe('changing the email', () => {
       signedIn({ new_email: NEW });
       mocks.resend.mockResolvedValue({
         data: {},
-        error: { code: 'unexpected_failure', message: `failed for ${NEW}` },
+        error: new AuthApiError(`failed for ${NEW}`, 500, 'unexpected_failure'),
       });
 
       const state = await resendEmailChange({}, form({}));
@@ -924,6 +936,7 @@ describe('changing the email', () => {
       expect(state.error).toBe('Something went wrong. Try again.');
       expect(warn).toHaveBeenCalledWith('resendEmailChange failed', {
         code: 'unexpected_failure',
+        status: 500,
       });
       expect(JSON.stringify(warn.mock.calls)).not.toContain(NEW);
       warn.mockRestore();
@@ -1010,7 +1023,11 @@ describe('requestOwnPasswordReset', () => {
   it('shows a rate limit', async () => {
     mocks.resetPasswordForEmail.mockResolvedValue({
       data: {},
-      error: { code: 'over_email_send_rate_limit' },
+      error: new AuthApiError(
+        'provider text',
+        429,
+        'over_email_send_rate_limit',
+      ),
     });
 
     const state = await requestOwnPasswordReset({}, form({}));
@@ -1025,7 +1042,7 @@ describe('requestOwnPasswordReset', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     mocks.resetPasswordForEmail.mockResolvedValue({
       data: {},
-      error: { code: 'unexpected_failure', message: `failed for ${OWN}` },
+      error: new AuthApiError(`failed for ${OWN}`, 500, 'unexpected_failure'),
     });
 
     const state = await requestOwnPasswordReset({}, form({}));
@@ -1034,6 +1051,7 @@ describe('requestOwnPasswordReset', () => {
     expect(state.success).toBeUndefined();
     expect(warn).toHaveBeenCalledWith('requestOwnPasswordReset failed', {
       code: 'unexpected_failure',
+      status: 500,
     });
     expect(JSON.stringify(warn.mock.calls)).not.toContain(OWN);
     warn.mockRestore();
@@ -1177,6 +1195,74 @@ describe('an Auth service that cannot answer is "try again", never "sign in agai
       expect(state.error).toBe('Something went wrong. Try again.');
       expect(state.signedOut).toBeUndefined();
       expect(mocks.updateUser).not.toHaveBeenCalled();
+    },
+  );
+});
+
+describe('second-call Auth failures in the account actions', () => {
+  const OWN = { sub: USER_ID, email: 'ada@example.com' };
+
+  beforeEach(() => {
+    mocks.getClaims.mockResolvedValue({ data: { claims: OWN }, error: null });
+    mocks.getUser.mockResolvedValue({
+      data: {
+        user: {
+          id: USER_ID,
+          email: 'ada@example.com',
+          new_email: 'grace@example.com',
+        },
+      },
+      error: null,
+    });
+  });
+
+  const SECOND_CALLS = [
+    [
+      'requestEmailChange',
+      mocks.updateUser,
+      () => requestEmailChange({}, form({ email: 'new@example.com' })),
+    ],
+    ['resendEmailChange', mocks.resend, () => resendEmailChange({}, form({}))],
+    [
+      'requestOwnPasswordReset',
+      mocks.resetPasswordForEmail,
+      () => requestOwnPasswordReset({}, form({})),
+    ],
+  ] as const;
+
+  it.each(SECOND_CALLS)(
+    '%s: an outage is "try again" and still logged, by code and status only',
+    async (name, call, run) => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      call.mockResolvedValue({
+        data: {},
+        error: new AuthRetryableFetchError('secret outage text', 503),
+      });
+
+      const state = await run();
+
+      expect(state.error).toBe('Something went wrong. Try again.');
+      expect(state.signedOut).toBeUndefined();
+      expect(warn).toHaveBeenCalledExactlyOnceWith(`${name} failed`, {
+        code: undefined,
+        status: 503,
+      });
+      expect(JSON.stringify(warn.mock.calls)).not.toContain('secret');
+      warn.mockRestore();
+    },
+  );
+
+  it.each(SECOND_CALLS)(
+    '%s: a session rejected on the second call says sign in again, not a provider error',
+    async (_name, call, run) => {
+      call.mockResolvedValue({
+        data: {},
+        error: new AuthSessionMissingError(),
+      });
+
+      const state = await run();
+
+      expect(state.signedOut).toBe(true);
     },
   );
 });
