@@ -10,7 +10,7 @@ import {
   ComboboxList,
   ComboboxVirtualList,
   useComboboxVirtualizer,
-} from '@synapcity/frontend-ui/components/ui/combobox';
+} from '@synapcity/frontend-ui/components/combobox';
 
 const meta: Meta<typeof Combobox> = {
   title: 'Components/Combobox',

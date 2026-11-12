@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { SidebarProvider } from '@synapcity/frontend-ui/components/sidebar';
 
-import { Button } from '@synapcity/frontend-ui/components/ui/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import { UserMenu } from '@synapcity/frontend-blocks';
 
 const meta: Meta<typeof UserMenu> = {

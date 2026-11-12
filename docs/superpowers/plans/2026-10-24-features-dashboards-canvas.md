@@ -316,7 +316,7 @@ Expected: PASS.
 
 **Files:**
 
-- Create: `packages/frontend/ui/src/components/ui/checkbox/{checkbox.tsx,checkbox.stories.tsx,checkbox.test.tsx,index.ts}`
+- Create: `packages/frontend/ui/src/components/checkbox/{checkbox.tsx,checkbox.stories.tsx,checkbox.test.tsx,index.ts}`
 
 **Interfaces:**
 

@@ -15,7 +15,7 @@ Runtime: browser and server rendering, framework-neutral at the root entry. Link
 
 ## Not here
 
-- The `ui` sidebar primitive (`components/ui/sidebar`) and other primitives: `frontend-ui`. This package depends on `frontend-ui`, never the reverse.
+- The `ui` sidebar primitive (`components/sidebar`) and other primitives: `frontend-ui`. This package depends on `frontend-ui`, never the reverse.
 - Settings page and tab frames: `features-settings`, until a second consumer appears.
 - Content wrappers tied to one feature (auth card, profile form, home, entity, widget): their features.
 - Saved panel or sidebar preferences: the preference owner. A shell keeps only session-local interaction state.

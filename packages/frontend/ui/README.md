@@ -4,7 +4,7 @@
 
 Owns: the shared React components (shadcn/ui, style `base-mira`, on Base UI), the `cn` class-merging helper, and the stylesheet entry that applies the shared theme.
 
-`core/logo-mark` (`src/components/ui/logo-mark`) is a transitional re-export of `@synapcity/frontend-brand/react`, which owns the logo components and geometry; new code imports the brand package.
+`core/logo-mark` (`src/components/logo-mark`) is a transitional re-export of `@synapcity/frontend-brand/react`, which owns the logo components and geometry; new code imports the brand package.
 
 It owns no theme tokens. Tokens live in `@synapcity/frontend-tailwind-config` ([ADR-0002](../../../docs/architecture/decisions/0002-styling-foundation.md)).
 
@@ -32,7 +32,7 @@ src/components/section-heading/
   index.ts                     the folder's public surface: re-exports from ./section-heading
 ```
 
-- `components/ui/<name>/` holds shadcn components (`core/<name>`) and `components/<name>/` the Synapcity ones. Larger compositions (blocks such as `day-agenda`) moved to `@synapcity/frontend-blocks`.
+- `components/<name>/` holds shadcn components (`core/<name>`) and `components/<name>/` the Synapcity ones. Larger compositions (blocks such as `day-agenda`) moved to `@synapcity/frontend-blocks`.
 - The `exports` map in `package.json` resolves each wildcard entry to `<folder>/index.ts`, so an import names the folder, never a file.
 - Code reaches any other folder through `@synapcity/frontend-ui/*`, including in stories and tests. A relative import may only name a file in the same folder (`./entity-icons`), such as an `index.ts` re-exporting its component or a component using a private helper beside it; never `../` or a path into a subfolder.
 - `src/package-structure.test.ts` enforces all of this: each folder has its component, index, stories and tests; relative imports only to same-folder files; every specifier and `exports` entry resolves.
@@ -45,7 +45,7 @@ From the repository root:
 pnpm ui:add <component>
 ```
 
-This runs the shadcn CLI against `apps/web`, whose `components.json` routes the `ui` alias to this package. The CLI writes a flat `src/components/ui/<name>.tsx`; move it into `src/components/ui/<name>/<name>.tsx` and add the index, stories and tests described above. Then edit the component here. Use a variant before reaching for `className`, and keep `className` to layout. If the CLI writes theme variables into an app's `globals.css`, remove them.
+This runs the shadcn CLI against `apps/web`, whose `components.json` routes the `ui` alias to this package. The CLI writes a flat `src/components/<name>.tsx`; move it into `src/components/<name>/<name>.tsx` and add the index, stories and tests described above. Then edit the component here. Use a variant before reaching for `className`, and keep `className` to layout. If the CLI writes theme variables into an app's `globals.css`, remove them.
 
 ## Rules
 

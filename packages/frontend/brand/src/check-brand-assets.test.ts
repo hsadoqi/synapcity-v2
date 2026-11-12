@@ -45,7 +45,7 @@ const RAW = [
   'public/apple-icon.png',
   'public/favicon.ico',
   'packages/frontend/site/src/open-graph.tsx',
-  'packages/frontend/ui/src/components/ui/logo-mark/logo-mark.tsx',
+  'packages/frontend/ui/src/components/logo-mark/logo-mark.tsx',
 ];
 
 beforeAll(() => {

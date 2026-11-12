@@ -112,7 +112,7 @@ consumer(
   'the social card must build its logo with the brand package',
 );
 consumer(
-  'packages/frontend/ui/src/components/ui/logo-mark/logo-mark.tsx',
+  'packages/frontend/ui/src/components/logo-mark/logo-mark.tsx',
   '@synapcity/frontend-brand/react',
   'the compatibility entry must re-export the brand package',
 );

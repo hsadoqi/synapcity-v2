@@ -6,9 +6,12 @@
     "strictNullChecks": true,
     "paths": {
       "@/*": ["./src/*"],
-      "@/components/ui/*": ["./src/components/ui/*"],
-      "@/components/*": ["./src/components/*"],
-      "@/providers/*": ["./src/providers/*"]
+      "@/components/*": ["./src/components/ui/*"],
+      "@/providers/*": ["./src/providers/*"],
+      "@/hooks/*": ["./src/hooks/*"],
+      "@/next/*": ["./src/next/*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/styles/*": ["./src/styles/*.css"]
     },
     "module": "preserve",
     "moduleResolution": "bundler",
