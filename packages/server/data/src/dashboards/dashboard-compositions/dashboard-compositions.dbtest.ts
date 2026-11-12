@@ -22,7 +22,7 @@ async function newDashboard(
 ): Promise<string> {
   const created = await createRecord(user.client, 'dashboards', { name });
   if (!created.ok)
-    throw new Error(`creating the dashboard failed: ${created.error.code}`);
+    throw new Error(`creating the dashboard failed: ${created.failure.code}`);
   return created.id;
 }
 
@@ -226,7 +226,7 @@ describe('saveComposition against the real database', () => {
       ).resolves.toMatchObject({
         ok: false,
         reason: 'failed',
-        error: { code: '23514' },
+        failure: { code: '23514' },
       });
       await expect(loadComposition(a.client, id)).resolves.toMatchObject({
         revision: 1,

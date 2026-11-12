@@ -1,5 +1,6 @@
 import {
   createComposition,
+  parsePersistableComposition,
   type DashboardComposition,
 } from '@synapcity/domain-dashboards';
 import { emptyRecords } from '@synapcity/domain-prototypes';
@@ -316,5 +317,55 @@ describe('createDashboardStore', () => {
       store.getState().requestSave();
       expect(store.getState().saveRequests).toBe(2);
     });
+  });
+});
+
+describe('what the store saves', () => {
+  // The server refuses a composition with keys its contract does not define
+  // (parsePersistableComposition). Whatever the store builds must still pass,
+  // or saving would fail for real people.
+  it('stays persistable through every composition action', () => {
+    const store = createDashboardStore(init());
+    const act = store.getState();
+    act.toggleEditMode();
+    act.addWidget('pinned');
+    act.addWidget('last-opened');
+    act.addWidget('spaces');
+    const [first, second] = store
+      .getState()
+      .composition.widgets.map((w) => w.id);
+    act.updateWidget(first!, {
+      title: 'Pinned work',
+      collapsed: true,
+      highlight: 'accent',
+      locked: false,
+      pinned: true,
+      resizable: false,
+    });
+    act.duplicateWidget(second!);
+    act.selectWidget(second!);
+    act.nudgeWidget(second!, { dx: 1, dy: 1, dw: 0, dh: 1 });
+    act.moveWidgetInOrder(first!, 1);
+    act.setWidgetStatus(second!, 'hidden');
+    act.setWidgetStatus(second!, 'active');
+    act.removeWidget(first!);
+    act.undoRemove();
+    act.updateSettings({ columns: 4, cardRadius: 12, showWidgetTitles: false });
+    act.applyLayoutChange(
+      'sm',
+      store
+        .getState()
+        .composition.layouts.sm.map((l) => ({ ...l, y: l.y + 1 })),
+    );
+
+    const { composition } = store.getState();
+    expect(parsePersistableComposition(composition)).toEqual({
+      ok: true,
+      composition,
+    });
+    // As a Server Action receives it.
+    expect(
+      parsePersistableComposition(JSON.parse(JSON.stringify(composition))).ok,
+    ).toBe(true);
   });
 });

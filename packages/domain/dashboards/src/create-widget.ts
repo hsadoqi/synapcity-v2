@@ -1,0 +1,142 @@
+/*
+ * Provisional bridge: creating a record-backed widget creates the prototype
+ * record it shows (see prototype-widgets.ts and the package README).
+ */
+import {
+  newRecord,
+  putRecord,
+  type PrototypeRecords,
+  type RecordContext,
+} from '@synapcity/domain-prototypes';
+
+import { createWidgetId, type Widget, type WidgetType } from './widgets';
+
+const base = (title: string) => ({
+  id: createWidgetId(),
+  title,
+  collapsed: false,
+  highlight: 'none' as const,
+  status: 'active' as const,
+});
+
+/**
+ * Creates a widget of `type` plus the record it shows. Query widgets
+ * (calendar, agenda, feed, pinned, last opened, spaces) select existing
+ * records and create none.
+ */
+export function createWidget(
+  type: WidgetType,
+  records: PrototypeRecords,
+  ctx: RecordContext,
+): { widget: Widget; records: PrototypeRecords } {
+  switch (type) {
+    case 'stat': {
+      const metric = {
+        ...newRecord('metric', 'New stat', ctx),
+        value: 0,
+        unit: 'this week',
+        note: '+0 vs last week',
+      };
+      return {
+        widget: {
+          ...base('New stat'),
+          type,
+          source: { kind: 'metric', id: metric.id },
+        },
+        records: putRecord(records, 'metric', metric),
+      };
+    }
+    case 'progress': {
+      const goal = {
+        ...newRecord('goal', 'New goal', ctx),
+        current: 0,
+        target: 10,
+        unit: 'done',
+      };
+      return {
+        widget: {
+          ...base('New goal'),
+          type,
+          source: { kind: 'goal', id: goal.id },
+        },
+        records: putRecord(records, 'goal', goal),
+      };
+    }
+    case 'habit': {
+      const habit = {
+        ...newRecord('habit', 'New habit', ctx),
+        completedDays: [],
+      };
+      return {
+        widget: {
+          ...base('New habit'),
+          type,
+          source: { kind: 'habit', id: habit.id },
+        },
+        records: putRecord(records, 'habit', habit),
+      };
+    }
+    case 'notes': {
+      const note = { ...newRecord('note', 'Notes', ctx), body: '' };
+      return {
+        widget: {
+          ...base('Notes'),
+          type,
+          source: { kind: 'note', id: note.id },
+        },
+        records: putRecord(records, 'note', note),
+      };
+    }
+    case 'tasks': {
+      const project = newRecord('project', 'Task list', ctx);
+      const task = {
+        ...newRecord('task', 'New task', ctx),
+        projectId: project.id,
+        done: false,
+        order: 0,
+      };
+      return {
+        widget: {
+          ...base('Task list'),
+          type,
+          source: { kind: 'project', id: project.id },
+        },
+        records: putRecord(
+          putRecord(records, 'project', project),
+          'task',
+          task,
+        ),
+      };
+    }
+    case 'agenda':
+      return {
+        widget: { ...base('Agenda'), type, query: { range: 'day' } },
+        records,
+      };
+    case 'calendar':
+      return {
+        widget: { ...base('Schedule'), type, query: { range: 'week' } },
+        records,
+      };
+    case 'feed':
+      return {
+        widget: { ...base('Recent activity'), type, query: { limit: 6 } },
+        records,
+      };
+    case 'pinned':
+      return {
+        widget: { ...base('Pinned'), type, query: { limit: 6 } },
+        records,
+      };
+    case 'last-opened':
+      return {
+        widget: { ...base('Last opened'), type, query: { limit: 6 } },
+        records,
+      };
+    case 'spaces':
+      return {
+        widget: { ...base('Spaces'), type, query: { limit: 6 } },
+        records,
+      };
+  }
+}

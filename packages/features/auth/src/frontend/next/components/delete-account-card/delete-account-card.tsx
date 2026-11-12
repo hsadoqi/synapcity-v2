@@ -50,23 +50,36 @@ export function DeleteAccountCard({
           signed out everywhere.
         </p>
         <FormMessage id={messageId} state={{ error: state.error }} />
-        <div className="flex flex-wrap gap-2">
-          <Button
-            type="submit"
-            variant="destructive"
-            size="lg"
-            disabled={deleting}
-            aria-busy={deleting}
-          >
-            {deleting ? 'Deleting…' : 'Permanently delete my account'}
-          </Button>
-          <LinkButton
-            href={settingsHref}
-            className={buttonVariants({ variant: 'outline', size: 'lg' })}
-          >
-            Keep my account
-          </LinkButton>
-        </div>
+        {state.linkRequired ? (
+          // This link can no longer delete anything, so pressing the button
+          // again would only fail again: the way forward is a new link.
+          <div className="flex flex-wrap gap-2">
+            <LinkButton
+              href={settingsHref}
+              className={buttonVariants({ size: 'lg' })}
+            >
+              Get a new link in settings
+            </LinkButton>
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="submit"
+              variant="destructive"
+              size="lg"
+              disabled={deleting}
+              aria-busy={deleting}
+            >
+              {deleting ? 'Deleting…' : 'Permanently delete my account'}
+            </Button>
+            <LinkButton
+              href={settingsHref}
+              className={buttonVariants({ variant: 'outline', size: 'lg' })}
+            >
+              Keep my account
+            </LinkButton>
+          </div>
+        )}
       </form>
     </AuthShell>
   );

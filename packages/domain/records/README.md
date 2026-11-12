@@ -56,6 +56,31 @@ boundary cases.
   `baseRecordMetadataSchema` or `baseRecordCreateSchema` and runs
   `limitVectorMismatches` on its write schemas.
 
+- A blank tag is refused with the message an invisible-only tag gets
+  (`RECORD_MESSAGES.invisible`), not Zod's default wording.
+
+## Structure
+
+Capability files under `src/`, each with its tests beside it (workspace
+conventions, domain packages):
+
+- `limits.ts`: the D5 limits and `RECORD_MESSAGES`.
+- `text.ts`: the text-safety predicates and `codePointLength`; one test file
+  covers them, as they are one rule set.
+- `kinds.ts`: `RECORD_KINDS`, `recordKindSchema`, `RecordKind`, `isRecordKind`.
+- `metadata.ts`: the bounded field schemas, the metadata, create and patch
+  schemas with their inferred types, `recordPatchSchema`, the duplicate-tag
+  refinement and `editableFieldsOf`, which projects onto the inferred
+  `BaseRecordMetadata` (an earlier hand-copied type existed only to dodge an
+  import cycle that kind folders created).
+- `base-record.ts`: `baseRecordSchema` and `BaseRecord`.
+- `initials.ts`: `initialsOf` for record names (first and last word); separate
+  from identity's person-name rule, which differs on purpose.
+- `testing/`: the shared limit vectors, imported through the package root.
+
+Dependencies run one way: `metadata` uses `limits` and `text`; `base-record`
+uses `metadata` and `limits`; `kinds` stands alone.
+
 ## Scripts
 
 `lint`, `check-types`, `test`, `test:coverage`. Tests sit beside the contract

@@ -6,8 +6,4 @@ export type {
   ProviderFailure,
   ProviderOutcome,
 } from './types';
-export { isOwner } from './utils/is-owner';
-export {
-  verifyIdentity,
-  verifyIdentityWithProvider,
-} from './utils/verify-identity';
+export { isOwner, verifyIdentity, verifyIdentityWithProvider } from './utils';

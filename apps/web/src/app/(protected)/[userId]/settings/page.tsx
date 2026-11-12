@@ -8,7 +8,7 @@ import {
   getConnectedAccounts,
   getPendingEmail,
 } from '@/features/auth/server/session';
-import { profileFromClaims } from '@synapcity/domain-identity';
+import { profileFromClaims } from '@synapcity/server-supabase';
 import { FIXTURE_MESSAGE } from '@/lib/access/dev-fixture';
 import { requireOwner } from '@/lib/access/require-owner';
 import { getAccountPreferences } from '@/features/settings/server/account-preferences';
@@ -23,7 +23,8 @@ export default async function SettingsPage({
   params: Promise<{ userId: string }>;
 }) {
   const { kind, claims } = await requireOwner((await params).userId);
-  const { name } = profileFromClaims(claims);
+  // Settings edits the display name: the raw value, not the resolved name.
+  const { displayName } = profileFromClaims(claims);
   // Only this page needs these, and they cost a call to the provider (made
   // once: both read the same memoized lookup). In fixture mode none of them
   // reaches Supabase: there is no pending email, no linked account and no row.
@@ -40,7 +41,7 @@ export default async function SettingsPage({
     <PendingEmailProvider pendingEmail={pendingEmail}>
       <ConnectedAccountsProvider accounts={accounts}>
         <SettingsContent
-          name={name}
+          name={displayName}
           account={account}
           draftScope={claims.sub}
           notice={kind === 'fixture' ? FIXTURE_MESSAGE : undefined}

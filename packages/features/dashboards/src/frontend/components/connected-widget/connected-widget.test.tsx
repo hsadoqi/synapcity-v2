@@ -10,6 +10,7 @@ import {
 import { Profiler } from 'react';
 import { describe, expect, it } from 'vitest';
 
+import { useDashboardStore } from '../../store';
 import {
   renderWithStore,
   SEED_NOW,
@@ -19,6 +20,43 @@ import {
 import { ConnectedWidget } from './index';
 
 describe('ConnectedWidget', () => {
+  it('restores open settings after its responsive grid subtree remounts', async () => {
+    // Mirrors DashboardCanvas, which keys its grid by the store's breakpoint.
+    // The breakpoint changes through the store, not a click, so no outside
+    // press dismisses the popover.
+    function ResponsiveWidget() {
+      const breakpoint = useDashboardStore((s) => s.breakpoint);
+      return (
+        <div key={breakpoint}>
+          <ConnectedWidget widgetId="wgt_seed1" />
+        </div>
+      );
+    }
+
+    const { store } = renderWithStore(<ResponsiveWidget />);
+    const widget = store().getState().composition.widgets[0]!;
+    act(() => store().getState().toggleEditMode());
+    fireEvent.click(
+      await screen.findByRole('button', {
+        name: `Settings for ${widget.title}`,
+      }),
+    );
+    expect(
+      await screen.findByRole('button', { name: 'Remove widget' }),
+    ).toBeDefined();
+
+    const trigger = screen.getByRole('button', {
+      name: `Settings for ${widget.title}`,
+    });
+    act(() => store().getState().chooseBreakpoint('sm'));
+    // The grid really remounted: the old trigger is gone.
+    expect(trigger.isConnected).toBe(false);
+
+    expect(
+      await screen.findByRole('button', { name: 'Remove widget' }),
+    ).toBeDefined();
+  });
+
   it('binds the shell actions to the store', async () => {
     const { store } = renderWithStore(<ConnectedWidget widgetId="wgt_seed1" />);
     const widget = store().getState().composition.widgets[0]!;

@@ -214,7 +214,7 @@ test.describe('server-side field errors', () => {
 
   test('register marks only the field the error is about', async ({ page }) => {
     await page.goto('/auth/register');
-    await page.getByLabel('Name').fill('Ada Lovelace');
+    await page.getByLabel('First name').fill('Ada');
     await page.getByLabel('Email').fill('ada@example.com');
     await page.getByLabel('Password', { exact: true }).fill('short');
     await submitWithoutNativeValidation(page, 'Create account');
@@ -233,7 +233,7 @@ test.describe('server-side field errors', () => {
       'aria-invalid',
       /.*/,
     );
-    await expect(page.getByLabel('Name')).not.toHaveAttribute(
+    await expect(page.getByLabel('First name')).not.toHaveAttribute(
       'aria-invalid',
       /.*/,
     );
@@ -322,7 +322,7 @@ test.describe('focus after a failed submit', () => {
 
   test('register skips fields that are fine', async ({ page }) => {
     await page.goto('/auth/register');
-    await page.getByLabel('Name').fill('Ada Lovelace');
+    await page.getByLabel('First name').fill('Ada');
     await page.getByLabel('Email').fill('ada@example.com');
     await page.getByLabel('Password', { exact: true }).fill('short');
     await submitWithoutNativeValidation(page, 'Create account');
@@ -396,7 +396,7 @@ test.describe('register validates in the browser and still works without it', ()
     });
     await page.goto('/auth/register');
     await page.waitForLoadState('networkidle');
-    await page.getByLabel('Name').fill('Ada Lovelace');
+    await page.getByLabel('First name').fill('Ada');
     await page.getByLabel('Email').fill('ada@example.com');
     const password = page.getByLabel('Password', { exact: true });
     await password.fill('short');
@@ -415,7 +415,10 @@ test.describe('register validates in the browser and still works without it', ()
     );
     expect(posts).toEqual([]);
 
-    const toggle = page.getByRole('button', { name: 'Show password' });
+    // The confirmation field has its own toggle: use the password field's one.
+    const toggle = password
+      .locator('..')
+      .getByRole('button', { name: 'Show password' });
     await toggle.click();
     await expect(password).toHaveAttribute('type', 'text');
     await expect(password).toHaveValue('short');
@@ -428,7 +431,7 @@ test.describe('register validates in the browser and still works without it', ()
       page,
     }) => {
       await page.goto('/auth/register');
-      await page.getByLabel('Name').fill('Ada Lovelace');
+      await page.getByLabel('First name').fill('Ada');
       await page.getByLabel('Email').fill('ada@example.com');
       await page.getByLabel('Password', { exact: true }).fill('short');
       await page
@@ -443,6 +446,8 @@ test.describe('register validates in the browser and still works without it', ()
         page.getByLabel('Password', { exact: true }),
       ).toHaveAttribute('aria-invalid', 'true');
       await expect(page.getByLabel('Email')).toHaveValue('ada@example.com');
+      // The server echoes the name, so the reset form gets it back.
+      await expect(page.getByLabel('First name')).toHaveValue('Ada');
     });
   });
 });

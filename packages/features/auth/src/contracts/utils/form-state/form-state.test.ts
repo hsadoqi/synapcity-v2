@@ -25,17 +25,22 @@ describe('authFailure', () => {
   });
 
   it('never carries a password', () => {
-    const state = authFailure('Nope.', { email: 'a@b.co', name: 'Ada' });
+    const state = authFailure('Nope.', {
+      email: 'a@b.co',
+      firstName: 'Ada',
+    });
     expect(JSON.stringify(state)).not.toMatch(/password/i);
   });
 });
 
 describe('authSuccess', () => {
   it('reports success with the message and echoed user', () => {
-    expect(authSuccess('Done.', { email: 'a@b.co', name: 'Ada' })).toEqual({
-      success: true,
-      message: 'Done.',
-      data: { user: { email: 'a@b.co', name: 'Ada' } },
-    });
+    expect(authSuccess('Done.', { email: 'a@b.co', firstName: 'Ada' })).toEqual(
+      {
+        success: true,
+        message: 'Done.',
+        data: { user: { email: 'a@b.co', firstName: 'Ada' } },
+      },
+    );
   });
 });

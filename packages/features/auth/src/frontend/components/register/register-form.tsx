@@ -6,9 +6,9 @@ import { Button } from '@synapcity/frontend-ui/core/button';
 import {
   MIN_PASSWORD_LENGTH,
   PASSWORD_REQUIREMENTS,
-  signUpSchema,
-  MAX_NAME_LENGTH,
+  registrationSchema,
 } from '@synapcity/domain-identity';
+import { PersonNameInputs } from '@synapcity/features-account/frontend';
 import type { AuthState } from '../../../contracts';
 import {
   FormField,
@@ -30,29 +30,27 @@ export function RegisterForm({
   pending: boolean;
 }) {
   // The schema the sign-up action parses with, so a refusal in the browser is
-  // the one the server would give, for the same first field.
+  // the one the server would give, for the same first field. The fields are in
+  // the order the schema reports them.
   const {
     formProps,
     register,
     state: shown,
-  } = useActionForm({ schema: signUpSchema, action: formAction, state });
+  } = useActionForm({ schema: registrationSchema, action: formAction, state });
   const formRef = useFocusFirstError(shown);
   const messageId = useId();
+  const user = state.data?.user;
 
   return (
     <form ref={formRef} {...formProps} className="flex flex-col gap-4">
       <input type="hidden" name="next" value={next} />
-      <FormField
-        id="name"
-        {...fieldErrorProps(shown, 'name', messageId)}
-        label="Name"
-        hint={`Up to ${MAX_NAME_LENGTH} characters.`}
-        type="text"
-        autoComplete="name"
-        maxLength={MAX_NAME_LENGTH}
-        defaultValue={state.data?.user?.name}
-        required
-        {...register('name')}
+      <PersonNameInputs
+        state={shown}
+        messageId={messageId}
+        defaultFirstName={user?.firstName ?? ''}
+        defaultLastName={user?.lastName ?? ''}
+        firstNameProps={register('firstName')}
+        lastNameProps={register('lastName')}
       />
       <FormField
         id="email"
@@ -60,7 +58,7 @@ export function RegisterForm({
         label="Email"
         type="email"
         autoComplete="email"
-        defaultValue={state.data?.user?.email}
+        defaultValue={user?.email}
         required
         {...register('email')}
       />
@@ -74,6 +72,16 @@ export function RegisterForm({
         minLength={MIN_PASSWORD_LENGTH}
         required
         {...register('password')}
+      />
+      <FormField
+        id="confirm"
+        {...fieldErrorProps(shown, 'confirm', messageId)}
+        label="Confirm password"
+        type="password"
+        autoComplete="new-password"
+        minLength={MIN_PASSWORD_LENGTH}
+        required
+        {...register('confirm')}
       />
       <FormMessage id={messageId} state={shown} />
       {/* Stays in the tab order while pending, announced as unavailable. */}

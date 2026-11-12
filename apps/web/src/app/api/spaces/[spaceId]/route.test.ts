@@ -61,13 +61,16 @@ describe('GET /api/spaces/[spaceId]', () => {
     await expect(response.json()).resolves.toEqual({ id: 's1' });
   });
 
-  it('answers 404 when the space is missing or not the owner’s', async () => {
+  it('answers 404, uncached, when the space is missing or not the owner’s', async () => {
     getVerifiedIdentity.mockResolvedValue({
       status: 'verified',
       identity: { userId: 'u1' },
     });
     find.mockResolvedValue(null);
 
-    expect((await call('s2')).status).toBe(404);
+    const response = await call('s2');
+
+    expect(response.status).toBe(404);
+    expect(response.headers.get('Cache-Control')).toBe('no-store');
   });
 });

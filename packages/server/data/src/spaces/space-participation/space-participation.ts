@@ -76,7 +76,8 @@ export function listSpaceDashboards(
  * What adding reports: done, or the failure by code and status. A failure
  * without a code (a dropped connection) is not proof the row was not written.
  */
-export type AddedOutcome = { ok: true } | { ok: false; error: ProviderFailure };
+export type AddedOutcome =
+  { ok: true } | { ok: false; failure: ProviderFailure };
 
 /**
  * Adds one participation row, idempotently: a pair already in the Space is
@@ -108,7 +109,7 @@ async function addParticipant(
           );
 
   if (error)
-    return { ok: false, error: toProviderFailure({ ...error, status }) };
+    return { ok: false, failure: toProviderFailure({ ...error, status }) };
   return { ok: true };
 }
 

@@ -15,6 +15,8 @@ import { AuthShell } from '../../../components/auth-shell';
  * page that rendered this.
  */
 export function ProfileSetupCard({
+  defaultFirstName,
+  defaultLastName,
   defaultName,
   imageUrl,
   next,
@@ -22,6 +24,9 @@ export function ProfileSetupCard({
   skipProfileSetup,
   signInHref,
 }: {
+  defaultFirstName: string;
+  defaultLastName: string;
+  /** The display name to start from, or empty. */
   defaultName: string;
   imageUrl: string | null;
   next: string;
@@ -37,7 +42,7 @@ export function ProfileSetupCard({
   return (
     <AuthShell
       title="Welcome"
-      description="Check how your name and photo will appear. You can change them any time in settings."
+      description="Tell us your first name and check how your name and photo will appear. You can change them any time in settings."
       footer={
         <Button
           type="button"
@@ -63,6 +68,8 @@ export function ProfileSetupCard({
       }
     >
       <ProfileSetupForm
+        defaultFirstName={defaultFirstName}
+        defaultLastName={defaultLastName}
         defaultName={defaultName}
         imageUrl={imageUrl}
         onComplete={goOn}

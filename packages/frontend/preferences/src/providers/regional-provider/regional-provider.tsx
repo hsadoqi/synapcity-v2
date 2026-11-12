@@ -10,10 +10,12 @@ import {
 import {
   parseImport,
   regionalDefaults,
-  resolveDateTimeFormatting,
-  type DateTimeFormatting,
   type RegionalSettings,
 } from '@synapcity/domain-preferences';
+import {
+  resolveDateTimeFormatting,
+  type DateTimeFormatting,
+} from '../../utils';
 import {
   deviceTimezone,
   onStoredPreferencesChange,

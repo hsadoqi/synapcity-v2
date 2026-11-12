@@ -1,13 +1,11 @@
-import {
-  currentUserFromClaims,
-  type CurrentUser,
-} from '@synapcity/domain-identity';
-
 /**
  * Development-only fixture identity (ADR-0006, development amendment). It lets
  * the owner-area pages be browsed without a Supabase project. It is never a
  * verified claim: `getVerifiedClaims` does not know about it, and it cannot
  * mutate anything, because every action rejects before a client is built.
+ *
+ * The proxy imports this file, so it holds only the flag and constants and
+ * imports nothing server-only. `fixtureUser()` lives in `fixture-user.ts`.
  */
 export const FIXTURE_USER_ID = 'fixture-user';
 
@@ -33,7 +31,3 @@ export const fixtureClaims = {
   email: 'fixture@localhost',
   user_metadata: { full_name: 'Fixture user' },
 };
-
-export function fixtureUser(): CurrentUser {
-  return { ...currentUserFromClaims(fixtureClaims), fixture: true };
-}

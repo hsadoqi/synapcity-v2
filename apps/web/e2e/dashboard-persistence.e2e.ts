@@ -75,12 +75,18 @@ test.describe('dashboard composition on the server', () => {
     page,
     context,
   }) => {
+    // One journey of five steps: three reloads, a second tab and several
+    // server saves. Its own 15 s waits do not fit in the default 30 s test
+    // budget once the earlier steps have used most of it.
+    test.setTimeout(90_000);
     await signIn(page);
     const path = dashboardPath;
 
     await test.step('opens the new dashboard (the database made its composition) and adds a widget that lists real records', async () => {
       await page.goto(path);
       await expect(page.getByText('No widgets yet')).toBeVisible();
+      // The editor is a client component: a click before hydration does nothing.
+      await page.waitForLoadState('networkidle');
       await page.getByRole('button', { name: 'Add a widget' }).click();
       await page.getByRole('button', { name: 'Pinned' }).click();
       await expect(page.getByRole('region', { name: 'Pinned' })).toBeVisible();
@@ -103,6 +109,7 @@ test.describe('dashboard composition on the server', () => {
       const other = await context.newPage();
       await other.goto(path);
       await expect(other.getByRole('region', { name: 'Pinned' })).toBeVisible();
+      await other.waitForLoadState('networkidle');
 
       // The first tab saves a change; the other still holds the old revision.
       await page.getByRole('button', { name: 'Edit layout' }).click();
@@ -163,10 +170,19 @@ test.describe('dashboard composition on the server', () => {
       await expect(
         page.getByRole('region', { name: 'Last opened' }),
       ).toBeVisible();
+      await page.waitForLoadState('networkidle');
     });
 
     await test.step('removes the widgets again, leaving the dashboard empty', async () => {
       await page.getByRole('button', { name: 'Edit layout' }).click();
+      // Edit layout opens the widgets panel, which narrows the canvas; each
+      // breakpoint it passes remounts the grid, and with it any open widget
+      // settings. The palette is exposed once the panel starts to open, and
+      // the panel drops data-gliding once its width has settled.
+      await expect(
+        page.getByRole('region', { name: 'Add to dashboard' }),
+      ).toBeVisible();
+      await expect(page.locator('[data-gliding]')).toHaveCount(0);
       for (const title of ['Pinned', 'Spaces', 'Last opened']) {
         await page
           .getByRole('button', { name: `Settings for ${title}` })

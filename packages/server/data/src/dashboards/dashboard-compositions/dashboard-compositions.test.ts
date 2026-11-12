@@ -107,7 +107,7 @@ describe('saveComposition', () => {
     await expect(saveComposition(client, ID, {}, 0)).resolves.toEqual({
       ok: false,
       reason: 'failed',
-      error: { code: 'invalid_revision' },
+      failure: { code: 'invalid_revision' },
     });
     expect(calls).toHaveLength(0);
     expect(calls.some((c) => c.method === 'insert')).toBe(false);
@@ -197,7 +197,7 @@ describe('saveComposition', () => {
       await expect(saveComposition(client, ID, {}, 3)).resolves.toEqual({
         ok: false,
         reason: 'failed',
-        error: { code: 'row_not_written' },
+        failure: { code: 'row_not_written' },
       });
     });
 
@@ -209,7 +209,7 @@ describe('saveComposition', () => {
       await expect(saveComposition(client, ID, {}, 3)).resolves.toEqual({
         ok: false,
         reason: 'failed',
-        error: { code: 'row_not_written' },
+        failure: { code: 'row_not_written' },
       });
     });
   });
@@ -247,7 +247,7 @@ describe('saveComposition', () => {
     expect(outcome).toEqual({
       ok: false,
       reason: 'failed',
-      error: { code: '23514', status: 400 },
+      failure: { code: '23514', status: 400 },
     });
     expect(JSON.stringify(outcome)).not.toContain('private');
   });
@@ -257,7 +257,7 @@ describe('saveComposition', () => {
     await expect(saveComposition(client, ID, {}, 3)).resolves.toEqual({
       ok: false,
       reason: 'failed',
-      error: { code: 'PGRST301', status: 401 },
+      failure: { code: 'PGRST301', status: 401 },
     });
     const followUp = fakeClient(
       { data: [] },

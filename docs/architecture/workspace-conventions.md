@@ -110,10 +110,10 @@ A package's `exports` defines its supported public interface. Consumers do not b
 Accepted 2026-10-23 through the [Milestone 3.2 design](../superpowers/specs/2026-10-23-m3-public-entry-points-design.md), which records the evidence and the owner's decisions.
 
 1. A package's `exports` map is its whole public interface; consumers never import by file path. List each entry. A wildcard is allowed only where every match is a deliberate public unit, as in `frontend-ui/core/*`.
-2. Single-runtime packages (domain, server, and frontend other than framework adapters) expose a root `.` entry. Add a module subpath such as `@synapcity/domain-identity/schemas` only when consumers need a narrower interface.
+2. Single-runtime packages (domain, server, and frontend other than framework adapters) expose a root `.` entry. Add a module subpath such as `@synapcity/<package>/schemas` only when consumers need a narrower interface.
 3. Feature packages expose `./contracts` (portable types, validation, view models), `./frontend` (presentation, including Server Components) and `./server` (backend orchestration and loaders), and no root entry. A feature without server work omits `./server`. Do not use `./client`.
 4. A `./frontend` or `./contracts` entry never re-exports from `./server`. Inside a mixed package, files reached from `./frontend` or `./contracts` never import files reached from `./server`, even by relative path.
-5. The file behind every server entry (`server-*` roots and feature `./server`) starts with `import 'server-only'` (`server-only@0.0.1`, added when the package is created). The guard sits in the entry file only.
+5. The file behind every server entry (every `server-*` export except `./testing`, and feature `./server`) starts with `import 'server-only'` (`server-only@0.0.1`, added when the package is created). The guard sits in the entry files only. A subpath needs a named R10 exception, with its runtime reason and removal condition, to go unguarded; none exists. The proxy loads the guarded `server-supabase/claims` entry (checked with a production build on Next 16.4.3, 2026-11-11).
 6. `'use client'` goes at the start of a client subtree, not on every file.
 7. Framework-specific code has a named entry, such as `./next`; root entries stay framework-neutral.
 8. Test-only code (fakes, fake capabilities, story helpers) has a `./testing` entry that only tests, stories and dev hosts import.
@@ -146,7 +146,20 @@ Accepted 2026-10-23 through the [Milestone 3.3 design](../superpowers/specs/2026
 
 **Package top level.** Source lives under `src/`, with one entry file per entry: `src/index.ts` for `.`, `src/<entry>/index.ts` for a named entry. Feature packages mirror their entries: `src/contracts/`, `src/frontend/`, `src/server/` and, if needed, `src/testing/`. Nothing under `frontend/` or `contracts/` imports from `server/`, nothing under `contracts/` imports from `frontend/`, and nothing outside `testing/` imports from `testing/`. Single-runtime packages group by module (`server-data/src/spaces/`); a one-module package puts its kind folders directly under `src/`.
 
-**Kind folders** (owner decision F4, 2026-10-23). Units are grouped by kind, even when there is only one unit of that kind: `types/` (type-only declarations), `schemas/` (runtime validation), `utils/` (pure functions and rules), and `components/`, `hooks/`, `providers/` for presentation. Each kind folder has an `index.ts` that re-exports its public units, and entry files re-export from kind or unit folders. Contract shapes that are not type-only (for example a port interface used by adapters) may keep their own unit folder (`identity-provider/`). Examples: `domain-identity/src/types/`, `server-auth/src/utils/is-owner/`.
+**Kind folders** (owner decision F4, 2026-10-23). Units are grouped by kind, even when there is only one unit of that kind: `types/` (type-only declarations), `schemas/` (runtime validation), `utils/` (pure functions and rules), and `components/`, `hooks/`, `providers/` for presentation. Each kind folder has an `index.ts` that re-exports its public units, and entry files re-export from kind or unit folders. Contract shapes that are not type-only (for example a port interface used by adapters) may keep their own unit folder (`identity-provider/`). Example: `server-auth/src/utils/is-owner/`. Domain packages follow the capability rules below instead.
+
+**Domain packages** (owner decision, 2026-11-11). `packages/domain/*` organize by capability instead of by kind, replacing the unit and kind-folder rules above for those packages:
+
+1. `package.json` exports `.` (and `./testing` when a package ships test support); `src/index.ts` names every public export explicitly, never `export *`.
+2. A capability is one file or a few related files with its tests beside it (`credentials.ts`, `credentials.test.ts`). It holds its schemas, the types inferred from them, the hand-written types and constants it owns, and its functions. Cohesion decides the split, not size rules; a tiny function does not get its own file.
+3. A directory is used when a capability has several files or gains encapsulation from one (`preferences/src/settings/`). It has one explicit `index.ts`; its files import each other directly, other files import it through that index, and it never imports a package's root-level files. There are no package-level `schemas/`, `utils/`, `types/` or `constants/` folders and no forwarding modules.
+4. A type inferred from a schema is exported beside that schema. A hand-written type that documents a contract may stay hand-written; when a schema validates the same shape, a two-way type test (`expectTypeOf(...).toEqualTypeOf`) keeps them equal.
+5. The capability graph is acyclic by design: a cycle is fixed by correcting ownership or dependency direction, never by a barrel or a copied type.
+6. Tests sit beside the capability they mainly cover; integration and cross-capability tests stay whole. Shared test support lives in `testing/` and imports through the package root.
+7. Provisional code sits in named files, and a stable package's dependency on a provisional one is a recorded bridge (see Migration and preservation).
+8. Domain holds product rules and contracts. Vendor data shapes belong to the vendor adapter (`server-supabase`); display formatting and HTML-control codecs belong to frontend packages. A shared parse or serialization rule stays in domain only when domain is the one boundary all its consumers share, and the package README records why.
+
+A package whose existing layout is cohesive and correct keeps it until real work touches it; uniformity alone is not a reason to move files. Each domain package's README records its structure and the reason for it.
 
 **Contracts.** If a second feature, the server or fixtures need a shape, it belongs in domain; if only one feature's own halves or its host need it, it belongs in that feature's `contracts/`. Features use domain types but never redefine or re-export them; a temporary migration bridge is the only exception. `shared` is not a folder name; `utils/` is the kind folder for pure functions and rules, and `lib` is allowed only when no kind or module name fits. Next.js-specific units sit behind the `./next` entry.
 
@@ -158,14 +171,14 @@ Accepted 2026-10-23 through the [Milestone 3.3 design](../superpowers/specs/2026
 
 The [ownership map](reorganization-ownership-map.md) covers all current source families. Migrate one slice with its real consumers and tests/stories; preserve behavior and public/serialized contracts unless changes are separately approved.
 
-Temporary compatibility exports point to one canonical implementation. Record each bridge's source, target, consumers, owner, and removal condition in the migration task scope. No broad legacy exemption authorizes new violations. Keep explicit production/demo bindings and identify existing fixture/fake-operation gaps.
+Temporary compatibility exports point to one canonical implementation. Record each bridge's source, target, consumers, owner, and removal condition in the migration task scope. A provisional dependency that stays in place is recorded the same way in the depending package's README, with its risks. No broad legacy exemption authorizes new violations. Keep explicit production/demo bindings and identify existing fixture/fake-operation gaps.
 
 Record the baseline before code migration. Milestone 1 baseline verification remains separate from documentation checks. Use focused checks during moves, then the repository gate at completed implementation checkpoints; report unrun checks and live-provider limits.
 
 ## Boundary checks
 
 Accepted 2026-10-23 through the [Milestone 3.4 design](../superpowers/specs/2026-10-23-m3-boundary-enforcement-design.md); enforced by `pnpm boundaries` (`dev-boundaries`) inside `pnpm verify`. Pre-existing violations are named in `packages/dev/boundaries/src/exceptions/exceptions.ts`, each with its removal milestone.
-R7 was amended by owner approval on 2026-10-24 to distinguish public folder interfaces from private same-package helpers.
+R7 was amended by owner approval on 2026-10-24 to distinguish public folder interfaces from private same-package helpers. The domain capability rules (2026-11-11) need no change to R7 or R9: files in one directory import each other freely, directories are imported through their index, and R9 still requires an acyclic module graph, type imports included.
 
 The checker classifies every file by path into package, category and entry graph (in apps, `'use client'` files and what they reach form the browser graph; `'use server'` files are action boundaries), resolves every import, including `import type`, `require()`, `import x = require()` and type-position `import('x')`, with the importing workspace's tsconfig and `exports`, and enforces:
 
@@ -181,7 +194,7 @@ The checker classifies every file by path into package, category and entry graph
 | R7  | In new packages, cross-folder imports of public units target the folder's `index.ts`; a private same-package helper not re-exported by that index may be imported directly.                  |
 | R8  | Production files never import `dev-*` packages, `./testing` entries, tests or stories.                                                                                                       |
 | R9  | No package or module cycles. An exception pins the exact cycle members, so a cycle that grows fails again.                                                                                   |
-| R10 | Every server entry file starts with `import 'server-only'`.                                                                                                                                  |
+| R10 | Every server entry file (each `server-*` export except `./testing`, and feature `./server`) starts with `import 'server-only'`; no other package file imports it.                            |
 | R11 | `next` imports in frontend packages occur only behind `./next` (`src/next/`); in a feature, only under `src/frontend/next/`.                                                                 |
 
 **Exceptions.** Existing violations are listed one file or edge at a time, each with its rule, reason and removal milestone. An entry that no longer matches fails the run, so the list only shrinks. Category, package or folder-wide exemptions are not allowed. Every rule has a probe that plants a violation in a temporary workspace and proves the check fails. R3's list of app server-only modules (`APP_SERVER_ONLY`) is checked too: an entry that matches no scanned file fails, so a rename cannot disarm the rule.

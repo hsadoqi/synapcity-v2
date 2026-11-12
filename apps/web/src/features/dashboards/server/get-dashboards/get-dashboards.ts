@@ -1,6 +1,10 @@
 import type { BaseRecord } from '@synapcity/domain-records';
 
-import { loadRecord, loadRecordSummaries } from '@/lib/records';
+import {
+  loadLatestRecords,
+  loadRecord,
+  loadRecordSummaries,
+} from '@/lib/records';
 import type { RecordSummary } from '@/lib/records/record-summary';
 
 import { DASHBOARD_FIXTURES } from '../../lib/fixtures';
@@ -12,6 +16,14 @@ import { DASHBOARD_FIXTURES } from '../../lib/fixtures';
  */
 export function getDashboards(): Promise<RecordSummary[]> {
   return loadRecordSummaries('dashboards', DASHBOARD_FIXTURES);
+}
+
+/**
+ * At most `limit` of the signed-in owner's dashboards in the sidebar's order,
+ * without participation counts. Fixture mode orders the sample records.
+ */
+export function getLatestDashboards(limit: number): Promise<BaseRecord[]> {
+  return loadLatestRecords('dashboards', DASHBOARD_FIXTURES, limit);
 }
 
 /**

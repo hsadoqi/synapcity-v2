@@ -5,7 +5,10 @@ const mocks = vi.hoisted(() => ({
   getUser: vi.fn(),
   setRecordPinned: vi.fn(),
   fixtureModeEnabled: vi.fn(() => false),
+  revalidatePath: vi.fn(),
 }));
+
+vi.mock('next/cache', () => ({ revalidatePath: mocks.revalidatePath }));
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: async () => ({ auth: { getUser: mocks.getUser } }),
@@ -48,6 +51,11 @@ describe('setDashboardPinned', () => {
       ID,
       true,
     );
+    // The sidebar, rendered by the shared layout, lists pinned records first.
+    expect(mocks.revalidatePath).toHaveBeenCalledExactlyOnceWith(
+      '/user-1/home',
+      'layout',
+    );
   });
 
   it.each([
@@ -76,13 +84,14 @@ describe('setDashboardPinned', () => {
   it('reports a failed save in plain words', async () => {
     mocks.setRecordPinned.mockResolvedValue({
       ok: false,
-      error: { code: '42501' },
+      failure: { code: '42501' },
     });
 
     await expect(setDashboardPinned(ID, true)).resolves.toMatchObject({
       ok: false,
       error: expect.stringContaining('Try again'),
     });
+    expect(mocks.revalidatePath).not.toHaveBeenCalled();
   });
 
   it('does nothing in fixture mode', async () => {

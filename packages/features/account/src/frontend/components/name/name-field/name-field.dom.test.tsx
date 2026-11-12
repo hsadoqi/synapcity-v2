@@ -26,18 +26,18 @@ const show = (
     </ProfileFormShell>,
   );
 
-const input = () => screen.getByLabelText('Name') as HTMLInputElement;
+const input = () => screen.getByLabelText('Display name') as HTMLInputElement;
 
 const signInHref = (to: string) => `/auth/login?next=${encodeURIComponent(to)}`;
 
 describe('NameField', () => {
-  it('is a required name input that autocompletes the person’s name', () => {
+  it('is an optional display-name input', () => {
     show();
 
     expect(input().name).toBe('name');
     expect(input().type).toBe('text');
-    expect(input().required).toBe(true);
-    expect(input().autocomplete).toBe('name');
+    expect(input().required).toBe(false);
+    expect(input().autocomplete).toBe('nickname');
     expect(input().maxLength).toBe(MAX_NAME_LENGTH);
   });
 
@@ -53,7 +53,9 @@ describe('NameField', () => {
     expect(
       document.getElementById(input().getAttribute('aria-describedby')!)
         ?.textContent,
-    ).toBe(`Up to ${MAX_NAME_LENGTH} characters.`);
+    ).toBe(
+      `Optional. Shown instead of your first name. Up to ${MAX_NAME_LENGTH} characters.`,
+    );
   });
 
   it('keeps what was typed when a save fails, and marks the error', () => {

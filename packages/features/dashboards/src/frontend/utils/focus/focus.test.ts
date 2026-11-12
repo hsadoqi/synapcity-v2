@@ -41,6 +41,18 @@ describe('focusPalette', () => {
     expect(document.activeElement?.id).toBe('a');
   });
 
+  it('waits for a palette restored after the panel animation budget', () => {
+    const root = mount('<section id="panel"></section>');
+    focusPalette(root);
+    vi.advanceTimersByTime(600);
+    expect(document.activeElement).toBe(document.body);
+
+    root.querySelector('section')!.innerHTML = PALETTE;
+    vi.advanceTimersByTime(40);
+
+    expect(document.activeElement?.id).toBe('a');
+  });
+
   it('never focuses hidden content and gives up after its time limit', () => {
     const root = mount(`<div hidden>${PALETTE}</div>`);
     focusPalette();

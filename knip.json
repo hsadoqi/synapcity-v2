@@ -20,6 +20,9 @@
     "packages/frontend/tailwind-config": {
       "ignoreDependencies": ["tailwindcss"]
     },
+    "packages/server/account": {
+      "entry": ["src/**/*.dbtest.ts", "vitest.db.config.ts"]
+    },
     "packages/server/data": {
       "entry": [
         "src/**/*.dbtest.ts",

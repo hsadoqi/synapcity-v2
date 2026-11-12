@@ -1,6 +1,7 @@
 export {
   createRecord,
   findRecord,
+  listLatestRecords,
   listRecordSummaries,
   recordRecordView,
   setRecordPinned,

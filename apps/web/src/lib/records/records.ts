@@ -1,16 +1,20 @@
 import type { BaseRecord } from '@synapcity/domain-records';
 import {
   findRecord,
+  listLatestRecords,
   listRecordSummaries,
   setRecordPinned,
   type ParticipantTable,
 } from '@synapcity/server-data';
+import { revalidatePath } from 'next/cache';
 import { cache } from 'react';
 import { z } from 'zod';
 
 import { getCallerIdentity, SAVE_FAILED } from '@/lib/access/caller';
 import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import { logFailure } from '@/lib/log-failure';
+import { homePathFor } from '@/lib/routing/user-paths';
+import { byLatest } from '@/lib/sidebar-records/latest-records';
 import { createClient } from '@/lib/supabase/server';
 import type { RecordSummary } from './record-summary';
 
@@ -48,9 +52,12 @@ export async function setRecordPinnedFor(
 
   const result = await setRecordPinned(supabase, kind, id.data, pinned);
   if (!result.ok) {
-    logFailure(operation, result.error);
+    logFailure(operation, result.failure);
     return { ok: false, error: SAVE_FAILED };
   }
+  // The sidebar lists pinned records first, from the shared layout, which
+  // keeps its render unless the caller's home area is revalidated.
+  revalidatePath(homePathFor(found.identity.userId), 'layout');
   return result;
 }
 
@@ -66,6 +73,21 @@ export async function loadRecordSummaries(
 ): Promise<RecordSummary[]> {
   if (fixtureModeEnabled()) return [...fixtures];
   return listRecordSummaries(await createClient(), kind);
+}
+
+/**
+ * At most `limit` of the signed-in owner's records of one kind, in the
+ * sidebar's order (pinned first, then the most recently changed), without
+ * participation counts. Row-level security scopes the query to the session.
+ * Development fixture mode orders the sample records the same way in memory.
+ */
+export async function loadLatestRecords(
+  kind: ParticipantTable,
+  fixtures: readonly BaseRecord[],
+  limit: number,
+): Promise<BaseRecord[]> {
+  if (fixtureModeEnabled()) return [...fixtures].sort(byLatest).slice(0, limit);
+  return listLatestRecords(await createClient(), kind, limit);
 }
 
 /**

@@ -25,7 +25,39 @@ export function withAvatarUrl(
   return url ? { ...rest, avatar_url: url } : rest;
 }
 
-/** Marks the name-and-photo step as done (finished or skipped). */
+/**
+ * The same for the structured names: `profiles` is canonical, and this mirrors
+ * `first_name`, `last_name` and the display name (`full_name`) into the token
+ * claims the header reads. A null last name or display name drops its key, so
+ * the header falls back to the first name.
+ */
+export function withProfileNames(
+  existing: Record<string, unknown> | null | undefined,
+  names: {
+    firstName: string;
+    lastName: string | null;
+    displayName: string | null;
+  },
+): Record<string, unknown> {
+  const {
+    first_name: _first,
+    last_name: _last,
+    full_name: _full,
+    ...rest
+  } = existing ?? {};
+  return {
+    ...rest,
+    first_name: names.firstName,
+    ...(names.lastName ? { last_name: names.lastName } : {}),
+    ...(names.displayName ? { full_name: names.displayName } : {}),
+  };
+}
+
+/**
+ * Marks the name-and-photo step as done in `user_metadata`. Transitional: the
+ * step is now recorded in `profiles` (`profile_completed_at`,
+ * `profile_setup_skipped_at`), and nothing calls this any more.
+ */
 export function withProfileConfirmed(
   existing: Record<string, unknown> | null | undefined,
 ): Record<string, unknown> {

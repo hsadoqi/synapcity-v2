@@ -11,7 +11,7 @@ import {
   formatWrittenDate,
   type DateTimeFormatting,
   type WrittenDateOptions,
-} from '@synapcity/domain-preferences';
+} from '@synapcity/frontend-preferences';
 
 const CALENDAR_DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
 

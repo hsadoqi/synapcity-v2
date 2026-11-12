@@ -4,7 +4,10 @@ import { FormField, fieldErrorProps } from '@synapcity/frontend-forms';
 import { MAX_NAME_LENGTH } from '@synapcity/domain-identity';
 import { useProfileForm } from '../../../next/components/profile-form-shell';
 
-/** The display-name input. Place it inside a `ProfileFormShell`. */
+/**
+ * The optional display-name input. Left blank, the person is shown by their
+ * first name. Place it inside a `ProfileFormShell`.
+ */
 export function NameField({
   defaultName,
   autoFocus,
@@ -18,14 +21,13 @@ export function NameField({
     <FormField
       id="name"
       {...fieldErrorProps(state, 'name', messageId)}
-      label="Name"
-      hint={`Up to ${MAX_NAME_LENGTH} characters.`}
+      label="Display name"
+      hint={`Optional. Shown instead of your first name. Up to ${MAX_NAME_LENGTH} characters.`}
       type="text"
-      autoComplete="name"
+      autoComplete="nickname"
       maxLength={MAX_NAME_LENGTH}
       defaultValue={state.name ?? defaultName}
       autoFocus={autoFocus}
-      required
     />
   );
 }

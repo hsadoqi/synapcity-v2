@@ -33,7 +33,8 @@ const persistedRecordIdSchema = z.uuid();
 
 /** What pinning reports: the database-stamped time, or the failure by code and status. */
 export type PinnedOutcome =
-  { ok: true; pinnedAt: string | null } | { ok: false; error: ProviderFailure };
+  | { ok: true; pinnedAt: string | null }
+  | { ok: false; failure: ProviderFailure };
 
 /** The kind's rows with the count of Spaces each takes part in. */
 async function summaryRows(
@@ -70,6 +71,31 @@ export async function listRecordSummaries(
     ...recordFromRow(row),
     spacesTotal: countOf(spaces),
   }));
+}
+
+/**
+ * At most `limit` of the signed-in owner's records of one kind, in the order
+ * the sidebar lists them: pinned first (most recently pinned on top), then the
+ * most recently changed, then the newest, then by id so equal rows always come
+ * back the same way. Only the record's own columns are read, no participation
+ * counts. Row-level security scopes the query to the session.
+ */
+export async function listLatestRecords(
+  client: SupabaseServerClient,
+  kind: ParticipantTable,
+  limit: number,
+): Promise<BaseRecord[]> {
+  const { data, error } = await client
+    .from(kind)
+    .select(COLUMNS)
+    .order('pinned_at', { ascending: false, nullsFirst: false })
+    .order('updated_at', { ascending: false })
+    .order('created_at', { ascending: false })
+    .order('id')
+    .limit(limit);
+
+  if (error) throw readError(kind, error);
+  return (data satisfies OwnedRow[]).map(recordFromRow);
 }
 
 /** Singular names for read errors. */
@@ -120,8 +146,8 @@ export async function setRecordPinned(
     .eq('id', id)
     .select('pinned_at');
 
-  if (error) return { ok: false, error: toProviderFailure(error) };
-  if (!data.length) return { ok: false, error: { code: 'row_not_written' } };
+  if (error) return { ok: false, failure: toProviderFailure(error) };
+  if (!data.length) return { ok: false, failure: { code: 'row_not_written' } };
   return { ok: true, pinnedAt: data[0]?.pinned_at ?? null };
 }
 
@@ -132,7 +158,7 @@ export async function setRecordPinned(
  * not proof either way: the row may exist.
  */
 export type CreatedOutcome =
-  { ok: true; id: string } | { ok: false; error: ProviderFailure };
+  { ok: true; id: string } | { ok: false; failure: ProviderFailure };
 
 /**
  * Creates one of the caller's Spaces, documents or dashboards from a parsed
@@ -146,14 +172,23 @@ export async function createRecord(
   table: RecordTable,
   input: BaseRecordCreate,
 ): Promise<CreatedOutcome> {
+  // Each column named, so a field added to the create contract cannot reach
+  // the insert unmapped. An omitted field stays undefined and is left out of
+  // the request, so the column default applies.
+  const row = {
+    name: input.name,
+    description: input.description,
+    icon: input.icon,
+    tags: input.tags,
+  } satisfies Record<keyof BaseRecordCreate, unknown>;
   const { data, error, status } = await client
     .from(table)
-    .insert(input)
+    .insert(row)
     .select('id')
     .single();
 
   if (error)
-    return { ok: false, error: toProviderFailure({ ...error, status }) };
+    return { ok: false, failure: toProviderFailure({ ...error, status }) };
   return { ok: true, id: data.id };
 }
 
@@ -171,7 +206,7 @@ export async function recordRecordView(
   table: RecordTable,
   id: string,
   now: Date,
-): Promise<{ ok: true } | { ok: false; error: ProviderFailure }> {
+): Promise<{ ok: true } | { ok: false; failure: ProviderFailure }> {
   const cutoff = new Date(now.getTime() - VIEW_THROTTLE_MS).toISOString();
   const { error } = await client
     .from(table)
@@ -179,5 +214,7 @@ export async function recordRecordView(
     .eq('id', id)
     .or(`last_viewed_at.is.null,last_viewed_at.lt.${cutoff}`);
 
-  return error ? { ok: false, error: toProviderFailure(error) } : { ok: true };
+  return error
+    ? { ok: false, failure: toProviderFailure(error) }
+    : { ok: true };
 }

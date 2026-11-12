@@ -9,7 +9,31 @@ import { homePathFor } from '@/lib/routing/user-paths';
 import { safeNextPath } from '@/lib/routing/safe-next';
 import { withNotice } from '@/lib/routing/notices';
 import { createClient } from '@/lib/supabase/server';
-import { exchangeAuthCode } from '@synapcity/server-supabase';
+import { needsProfileSetup } from '@synapcity/domain-identity';
+import { readProfileSetup } from '@synapcity/server-account';
+import {
+  exchangeAuthCode,
+  type SupabaseServerClient,
+} from '@synapcity/server-supabase';
+
+/**
+ * Whether a new account is asked once to confirm its name and photo: the
+ * setup state is read from `profiles`. If the read fails, the answer is no,
+ * so doubt never adds a step.
+ */
+async function welcomeNeeded(
+  supabase: SupabaseServerClient,
+  userId: string,
+  createdAt: string | null,
+): Promise<boolean> {
+  const read = await readProfileSetup(supabase, userId);
+  if (read.kind !== 'found') return false;
+  return needsProfileSetup({
+    createdAt,
+    completedAt: read.completedAt,
+    skippedAt: read.skippedAt,
+  });
+}
 
 /**
  * Redirects with a relative `Location`, so the browser resolves it against the
@@ -20,9 +44,22 @@ import { exchangeAuthCode } from '@synapcity/server-supabase';
  * means no `Host` or forwarded header is ever trusted. The target is a path
  * built by this app; anything that is not a single-slash path goes home.
  */
-function redirectTo(path: string): NextResponse {
+function redirectTo(
+  path: string,
+  sessionHeaders: Record<string, string> = {},
+): NextResponse {
   const safe = /^\/(?![/\\])/.test(path) ? path : '/';
-  return new NextResponse(null, { status: 307, headers: { location: safe } });
+  // Every answer here is a one-time code exchange, and a successful one sets
+  // session cookies, so none may be stored. The SDK's own cache headers for
+  // the session write (`Cache-Control`, `Expires`, `Pragma`) go on top.
+  return new NextResponse(null, {
+    status: 307,
+    headers: {
+      'Cache-Control': 'no-store',
+      ...sessionHeaders,
+      location: safe,
+    },
+  });
 }
 
 /**
@@ -37,17 +74,25 @@ export async function GET(request: NextRequest) {
   // Set by the action that started the flow, so a failure can say which link broke.
   const flow = parseAuthFlow(searchParams.get('flow'));
 
+  // Filled by the SDK when the exchange writes the session cookies.
+  let sessionHeaders: Record<string, string> = {};
+
   if (code) {
-    const outcome = await exchangeAuthCode(await createClient(), code);
+    const supabase = await createClient({
+      onResponseHeaders: (headers) => {
+        sessionHeaders = { ...sessionHeaders, ...headers };
+      },
+    });
+    const outcome = await exchangeAuthCode(supabase, code);
     if (outcome.kind === 'signed-in') {
       // No (or an unsafe) `next`: send them to their own home.
       const destination = safeNextPath(next, homePathFor(outcome.userId));
       // A new account is asked once to confirm its name and photo. Only when
       // the link was a sign-up or a provider sign-in: a password reset is
-      // someone who already has an account. If anything about the account is
-      // unknown, the answer is no, so doubt never adds a step.
+      // someone who already has an account.
       const welcome =
-        (flow === 'oauth' || flow === 'confirm') && outcome.needsProfileSetup;
+        (flow === 'oauth' || flow === 'confirm') &&
+        (await welcomeNeeded(supabase, outcome.userId, outcome.createdAt));
       // A confirmed email change, or a newly connected account, lands back
       // where it was asked for, saying so.
       const arrival =
@@ -58,7 +103,7 @@ export async function GET(request: NextRequest) {
             : welcome
               ? welcomePath(destination)
               : destination;
-      return redirectTo(arrival);
+      return redirectTo(arrival, sessionHeaders);
     }
   }
 
@@ -79,5 +124,5 @@ export async function GET(request: NextRequest) {
     return redirectTo(withNotice(back, 'email-change-step'));
   }
 
-  return redirectTo(authErrorPath(flow));
+  return redirectTo(authErrorPath(flow), sessionHeaders);
 }

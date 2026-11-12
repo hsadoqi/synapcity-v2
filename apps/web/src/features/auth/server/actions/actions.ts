@@ -15,7 +15,7 @@ import {
   everyRefusal,
   firstRefusal,
   signInSchema,
-  signUpSchema,
+  registrationSchema,
   updatePasswordSchema,
 } from '@synapcity/domain-identity';
 import {
@@ -36,7 +36,7 @@ import { createClient } from '@/lib/supabase/server';
 import { logFailure } from '@/lib/log-failure';
 import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 
-import { getCurrentUser } from '../session';
+import { getVerifiedIdentity } from '../session';
 import {
   changeEmail,
   disconnectAccount as disconnectAccountOperation,
@@ -44,6 +44,7 @@ import {
   requestRecoveryEmail,
   resendEmailChange as resendEmailChangeOperation,
   resendSignupConfirmation,
+  sendAccountDeletionLink,
   sendOwnPasswordReset,
   signInWithPassword as signInWithPasswordOperation,
   signOutSession,
@@ -51,17 +52,19 @@ import {
   startOAuthSignIn,
   updateOwnPassword,
 } from '@synapcity/server-supabase';
-import { sendAccountDeletionLink } from '../operations';
 
 /**
  * Development fixture mode has no session (ADR-0006, development amendment),
  * so every action refuses before a Supabase client is built. It must stay the
- * first statement: some actions treat `getCurrentUser()` as the signed-in
- * check, and in fixture mode that returns the fixture user.
+ * first statement: a fixture is not a session, so no action may reach the
+ * provider in fixture mode.
  */
 function fixtureRefusal(): AuthState {
   return authFailure(FIXTURE_MESSAGE, { email: '' });
 }
+
+const AUTH_UNAVAILABLE =
+  'Sign-in service is unavailable right now. Try again later.';
 
 export async function signInWithPassword(
   _previous: AuthState,
@@ -87,6 +90,10 @@ export async function signInWithPassword(
     email,
     password,
   });
+  if (outcome.kind === 'unavailable') {
+    logFailure('signInWithPassword', outcome.failure);
+    return authFailure(AUTH_UNAVAILABLE, { email });
+  }
   if (outcome.kind === 'refused')
     return {
       ...authFailure(
@@ -109,31 +116,41 @@ export async function signUp(
   // Empty when the visitor gave no destination: the callback then falls back
   // to the new user's own home.
   const next = safeNextPath(field(formData, 'next'), '');
-  const parsed = signUpSchema.safeParse({
+  const parsed = registrationSchema.safeParse({
+    firstName: field(formData, 'firstName'),
+    lastName: field(formData, 'lastName'),
     email: field(formData, 'email'),
-    name: field(formData, 'name'),
     password: field(formData, 'password'),
+    confirm: field(formData, 'confirm'),
   });
   if (!parsed.success) {
+    // Echo only what refills the form. Never the password or its confirmation.
+    const lastName = field(formData, 'lastName').trim();
     const { message, fields } = firstRefusal(parsed.error);
     return authFailure(
       message,
       {
         email: field(formData, 'email').trim(),
-        name: field(formData, 'name').trim(),
+        firstName: field(formData, 'firstName').trim(),
+        ...(lastName ? { lastName } : {}),
       },
       fields,
     );
   }
-  const { email, name, password } = parsed.data;
-  const user = { email, name };
+  const { firstName, lastName, email, password } = parsed.data;
+  const user = { email, firstName, ...(lastName ? { lastName } : {}) };
 
   const outcome = await registerWithPassword(await createClient(), {
     email,
     password,
-    name,
+    firstName,
+    ...(lastName ? { lastName } : {}),
     confirmationRedirect: callbackUrl(getOrigin(), next, 'confirm'),
   });
+  if (outcome.kind === 'unavailable') {
+    logFailure('signUp', outcome.failure);
+    return authFailure(AUTH_UNAVAILABLE, user);
+  }
   if (outcome.kind === 'provider-error') {
     return authFailure(
       authErrorMessage(outcome.code),
@@ -203,12 +220,12 @@ export async function requestPasswordReset(
     const { message, fields } = firstRefusal(parsed.error);
     return authFailure(
       message,
-      { email: field(formData, 'email').trim(), name: '' },
+      { email: field(formData, 'email').trim() },
       fields,
     );
   }
   const { email } = parsed.data;
-  const user = { email, name: '' };
+  const user = { email };
 
   const outcome = await requestRecoveryEmail(await createClient(), {
     email,
@@ -235,7 +252,7 @@ export async function updatePassword(
   formData: FormData,
 ): Promise<AuthState> {
   if (fixtureModeEnabled()) return fixtureRefusal();
-  const user = { email: '', name: '' };
+  const user = { email: '' };
   // Where a reset started from settings goes back to. Untrusted, so checked.
   const next = safeNextPath(field(formData, 'next'), '');
   const parsed = updatePasswordSchema.safeParse({
@@ -249,6 +266,10 @@ export async function updatePassword(
   const { password } = parsed.data;
 
   const outcome = await updateOwnPassword(await createClient(), { password });
+  if (outcome.kind === 'unavailable') {
+    logFailure('updatePassword', outcome.failure);
+    return authFailure(AUTH_UNAVAILABLE, user);
+  }
   if (outcome.kind === 'provider-error') {
     // Log the code (never the message or the password) so a failure that shows
     // the generic reply can be traced in the server logs.
@@ -310,11 +331,27 @@ function signedOutFailure(email: string): AuthState {
 }
 const TRY_AGAIN = authErrorMessage(undefined);
 
+/**
+ * The verified caller's id, or the failure to show instead. An outage is
+ * "try again", never "sign in again": only a signed-out session is flagged.
+ */
+async function signedInUserId(
+  email: string,
+): Promise<{ userId: string } | { failure: AuthState }> {
+  const identity = await getVerifiedIdentity();
+  switch (identity.status) {
+    case 'verified':
+      return { userId: identity.identity.userId };
+    case 'unavailable':
+      return { failure: authFailure(TRY_AGAIN, { email }) };
+    case 'signed-out':
+      return { failure: signedOutFailure(email) };
+  }
+}
+
 /** Where the confirmation link brings someone back to: their settings. */
-async function emailChangeRedirect(): Promise<string | null> {
-  const user = await getCurrentUser();
-  if (!user) return null;
-  return callbackUrl(getOrigin(), settingsPathFor(user.id), 'email-change');
+function emailChangeRedirect(userId: string): string {
+  return callbackUrl(getOrigin(), settingsPathFor(userId), 'email-change');
 }
 
 /**
@@ -335,17 +372,19 @@ export async function requestEmailChange(
   }
   const { email } = parsed.data;
 
-  const redirectTo = await emailChangeRedirect();
-  if (!redirectTo) return signedOutFailure(email);
+  const caller = await signedInUserId(email);
+  if ('failure' in caller) return caller.failure;
 
   const outcome = await changeEmail(await createClient(), {
     newEmail: email,
-    redirectTo,
+    redirectTo: emailChangeRedirect(caller.userId),
   });
   switch (outcome.kind) {
     case 'signed-out':
       return signedOutFailure(email);
     case 'unavailable':
+      // An outage the person can retry, still worth a trace: code and status only.
+      logFailure('requestEmailChange', outcome.failure);
       return authFailure(TRY_AGAIN, { email });
     case 'same-email':
       return authFailure(ALREADY_YOUR_EMAIL, { email }, ['email']);
@@ -375,16 +414,18 @@ export async function resendEmailChange(
   _formData: FormData,
 ): Promise<AuthState> {
   if (fixtureModeEnabled()) return fixtureRefusal();
-  const redirectTo = await emailChangeRedirect();
-  if (!redirectTo) return signedOutFailure('');
+  const caller = await signedInUserId('');
+  if ('failure' in caller) return caller.failure;
 
   const outcome = await resendEmailChangeOperation(await createClient(), {
-    redirectTo,
+    redirectTo: emailChangeRedirect(caller.userId),
   });
   switch (outcome.kind) {
     case 'signed-out':
       return signedOutFailure('');
     case 'unavailable':
+      // An outage the person can retry, still worth a trace: code and status only.
+      logFailure('resendEmailChange', outcome.failure);
       return authFailure(TRY_AGAIN, { email: '' });
     case 'nothing-pending':
       revalidatePath('/', 'layout');
@@ -411,11 +452,11 @@ export async function requestOwnPasswordReset(
   _formData: FormData,
 ): Promise<AuthState> {
   if (fixtureModeEnabled()) return fixtureRefusal();
-  const user = await getCurrentUser();
-  if (!user) return signedOutFailure('');
+  const caller = await signedInUserId('');
+  if ('failure' in caller) return caller.failure;
 
   // Where to come back to once the new password is chosen: here, not home.
-  const back = `/auth/update-password?${new URLSearchParams({ next: settingsPathFor(user.id) })}`;
+  const back = `/auth/update-password?${new URLSearchParams({ next: settingsPathFor(caller.userId) })}`;
   const outcome = await sendOwnPasswordReset(await createClient(), {
     resetRedirect: callbackUrl(getOrigin(), back, 'reset'),
   });
@@ -424,6 +465,8 @@ export async function requestOwnPasswordReset(
     case 'signed-out':
       return signedOutFailure('');
     case 'unavailable':
+      // An outage the person can retry, still worth a trace: code and status only.
+      logFailure('requestOwnPasswordReset', outcome.failure);
       return authFailure(TRY_AGAIN, { email: '' });
     case 'no-email':
       return authFailure(
@@ -456,12 +499,16 @@ export async function connectAccount(
   const provider = field(formData, 'provider');
   if (!isOAuthProvider(provider)) return authFailure(TRY_AGAIN, { email: '' });
 
-  const user = await getCurrentUser();
-  if (!user) return signedOutFailure('');
+  const caller = await signedInUserId('');
+  if ('failure' in caller) return caller.failure;
 
   const outcome = await startAccountLink(await createClient(), {
     provider,
-    redirectTo: callbackUrl(getOrigin(), settingsPathFor(user.id), 'link'),
+    redirectTo: callbackUrl(
+      getOrigin(),
+      settingsPathFor(caller.userId),
+      'link',
+    ),
   });
 
   switch (outcome.kind) {
@@ -471,6 +518,7 @@ export async function connectAccount(
     case 'signed-out':
       return signedOutFailure('');
     case 'unavailable':
+      logFailure('connectAccount', outcome.failure, { provider });
       return authFailure(TRY_AGAIN, { email: '' });
     case 'provider-error':
       logFailure('connectAccount', outcome, { provider });
@@ -494,7 +542,7 @@ export async function requestAccountDeletion(
     return authFailure(message, { email: typed }, fields);
   }
 
-  const outcome = await sendAccountDeletionLink({
+  const outcome = await sendAccountDeletionLink(await createClient(), {
     typedEmail: parsed.data.email,
     redirectTo: callbackUrl(
       getOrigin(),
@@ -544,8 +592,8 @@ export async function disconnectAccount(
   const provider = field(formData, 'provider');
   if (!isOAuthProvider(provider)) return authFailure(TRY_AGAIN, { email: '' });
 
-  const user = await getCurrentUser();
-  if (!user) return signedOutFailure('');
+  const caller = await signedInUserId('');
+  if ('failure' in caller) return caller.failure;
 
   const outcome = await disconnectAccountOperation(await createClient(), {
     provider,
@@ -555,6 +603,7 @@ export async function disconnectAccount(
     case 'signed-out':
       return signedOutFailure('');
     case 'unavailable':
+      logFailure('disconnectAccount', outcome.failure, { provider });
       return authFailure(TRY_AGAIN, { email: '' });
     case 'last-sign-in':
       return authFailure(LAST_SIGN_IN, { email: '' });

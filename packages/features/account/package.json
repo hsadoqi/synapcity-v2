@@ -19,7 +19,8 @@
     "@synapcity/frontend-ui": "workspace:*",
     "lucide-react": "^1.55.0",
     "next": "16.4.3",
-    "react": "19.3.1"
+    "react": "19.3.1",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@synapcity/dev-eslint-config": "workspace:*",

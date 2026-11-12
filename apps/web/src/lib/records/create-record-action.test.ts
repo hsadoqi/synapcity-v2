@@ -157,7 +157,7 @@ describe('createRecord', () => {
   it('logs a database refusal by code only and reports a generic failure', async () => {
     mocks.createRecord.mockResolvedValue({
       ok: false,
-      error: { code: '42501' },
+      failure: { code: '42501' },
     });
 
     await expect(createRecord('document', 'Launch plan')).resolves.toEqual({
@@ -193,7 +193,7 @@ describe('createRecord', () => {
   it('reports a cut-off save as unconfirmed and still refreshes the lists', async () => {
     mocks.createRecord.mockResolvedValue({
       ok: false,
-      error: { code: '', status: 0 },
+      failure: { code: '', status: 0 },
     });
 
     await expect(createRecord('space', 'Garden plans')).resolves.toEqual({

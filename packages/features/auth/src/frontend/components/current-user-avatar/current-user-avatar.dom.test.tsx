@@ -15,6 +15,9 @@ describe('CurrentUserAvatar', () => {
     mocks.user = {
       id: 'u1',
       name: 'Ada Lovelace',
+      displayName: 'Ada Lovelace',
+      firstName: 'Ada',
+      lastName: 'Lovelace',
       email: 'a@b.co',
       imageUrl: null,
     };
@@ -27,7 +30,15 @@ describe('CurrentUserAvatar', () => {
   });
 
   it('shows the default icon with no name', () => {
-    mocks.user = { id: 'u1', name: null, email: null, imageUrl: null };
+    mocks.user = {
+      id: 'u1',
+      name: null,
+      displayName: null,
+      firstName: null,
+      lastName: null,
+      email: null,
+      imageUrl: null,
+    };
     render(<CurrentUserAvatar />);
 
     expect(screen.getByText('Default photo')).toBeTruthy();

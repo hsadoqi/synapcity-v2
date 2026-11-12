@@ -5,7 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./prototype-workspace": "./src/prototype-workspace.ts",
+    "./prototype-workspace": "./src/prototype-workspace/index.ts",
     "./data/*": "./seed/*.json",
     "./scenarios": "./src/scenarios/index.ts"
   },

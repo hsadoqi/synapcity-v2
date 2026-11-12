@@ -1,9 +1,6 @@
 import { cn } from '@synapcity/frontend-ui/lib/utils';
-import {
-  formatDate,
-  formatTime,
-  type RegionalSettings,
-} from '@synapcity/domain-preferences';
+import { type RegionalSettings } from '@synapcity/domain-preferences';
+import { formatDate, formatTime } from '@synapcity/frontend-preferences';
 import { draftFormatting, formatNumber } from './regional-rows';
 
 const week = [

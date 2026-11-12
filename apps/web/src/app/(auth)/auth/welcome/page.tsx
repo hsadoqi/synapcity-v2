@@ -7,10 +7,24 @@ import {
 } from '@/features/account/server/actions/setup-actions';
 import { WelcomeCard } from './welcome-card';
 import { getVerifiedClaims } from '@/features/auth/server';
-import { profileFromClaims } from '@synapcity/domain-identity';
+import { profileFromClaims } from '@synapcity/server-supabase';
 import { welcomePath } from '@/lib/routing/auth-flow';
 import { safeNextPath } from '@/lib/routing/safe-next';
 import { homePathFor } from '@/lib/routing/user-paths';
+import { createClient } from '@/lib/supabase/server';
+import { readProfileSetup } from '@synapcity/server-account';
+
+/**
+ * A first name the provider gave explicitly (`given_name`, which Google sends
+ * and GitHub does not). It only prefills the field: nothing is saved until
+ * the person submits. A full name is never split into a first name.
+ */
+function providerGivenName(
+  metadata: Record<string, unknown> | undefined,
+): string {
+  const value = metadata?.given_name;
+  return typeof value === 'string' ? value.trim() : '';
+}
 
 export const metadata: Metadata = { title: 'Welcome' };
 
@@ -35,13 +49,22 @@ export default async function WelcomePage({
   }
 
   const next = safeNextPath(requested, homePathFor(claims.sub));
-  const { name, imageUrl } = profileFromClaims(claims);
+  // The names come from the profile row, which holds the record. The display
+  // name field starts from the raw value, never from the resolved name (which
+  // may be the first name). The picture is the one the token carries.
+  const { imageUrl } = profileFromClaims(claims);
+  const profile = await readProfileSetup(await createClient(), claims.sub);
+  const stored = profile.kind === 'found' ? profile : null;
 
   return (
     <WelcomeCard
       completeProfile={completeProfile}
       skipProfileSetup={skipProfileSetup}
-      defaultName={name ?? ''}
+      defaultFirstName={
+        stored?.firstName ?? providerGivenName(claims.user_metadata)
+      }
+      defaultLastName={stored?.lastName ?? ''}
+      defaultName={stored?.displayName ?? ''}
       imageUrl={imageUrl}
       next={next}
     />

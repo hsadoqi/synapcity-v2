@@ -18,6 +18,8 @@ import {
   AuthShell,
   DeleteAccountCard,
 } from '@synapcity/features-auth/frontend';
+import { LINK_SIGN_IN_WINDOW_MINUTES } from '@synapcity/features-auth/contracts';
+import { LINK_SIGN_IN_WINDOW_SECONDS } from '@synapcity/server-supabase';
 
 const NOW = 1_800_000_000;
 
@@ -67,4 +69,12 @@ describe('the delete-account page', () => {
       expect(element.props.title).toBe('Ask for a new link');
     },
   );
+});
+
+describe('the deletion link window', () => {
+  it('is worded on screen with the same length the rule enforces', () => {
+    // The server rule mirrors `public.delete_own_account()` (600 s); the
+    // settings screen and the email step word it in minutes.
+    expect(LINK_SIGN_IN_WINDOW_MINUTES * 60).toBe(LINK_SIGN_IN_WINDOW_SECONDS);
+  });
 });

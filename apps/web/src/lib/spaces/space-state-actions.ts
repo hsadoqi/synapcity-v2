@@ -42,9 +42,12 @@ export async function setSpacePinned(
 
   const outcome = await serverSpaceSource(supabase).setPinned(id.data, pinned);
   if (!outcome.ok) {
-    logFailure('setSpacePinned', outcome.error);
+    logFailure('setSpacePinned', outcome.failure);
     return { ok: false, error: SAVE_FAILED };
   }
+  // The sidebar lists pinned spaces first; it is rendered by the shared
+  // layout, which keeps its render unless told otherwise.
+  revalidateHome(found.identity.userId);
   return { ok: true, pinnedAt: outcome.pinnedAt };
 }
 
@@ -69,7 +72,7 @@ export async function recordSpaceView(spaceId: unknown): Promise<void> {
   const outcome = await serverSpaceSource(await createClient()).recordView(
     id.data,
   );
-  if (!outcome.ok) logFailure('recordSpaceView', outcome.error);
+  if (!outcome.ok) logFailure('recordSpaceView', outcome.failure);
 }
 
 /**
@@ -106,10 +109,10 @@ async function addToSpace(
       ? await source.addDocument(space.data, item.data)
       : await source.addDashboard(space.data, item.data);
   if (!outcome.ok) {
-    logFailure('addToSpace', outcome.error, { kind });
+    logFailure('addToSpace', outcome.failure, { kind });
     // Without a code the request was cut off and the row may exist; refresh
     // so it shows if it does. Retrying is safe either way.
-    if (!outcome.error.code) revalidateHome(found.identity.userId);
+    if (!outcome.failure.code) revalidateHome(found.identity.userId);
     return { ok: false, error: SAVE_FAILED };
   }
 
@@ -120,8 +123,8 @@ async function addToSpace(
 /**
  * The caller's home area: the space's page and the spaces index (item lists
  * and counts), the documents and dashboards indexes (how many spaces each is
- * in), and the sidebar, which lists spaces with their counts. Settings and
- * other people's pages are left alone.
+ * in), and the sidebar, which lists the latest spaces, pinned first. Settings
+ * and other people's pages are left alone.
  */
 function revalidateHome(userId: string) {
   revalidatePath(homePathFor(userId), 'layout');

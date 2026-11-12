@@ -78,6 +78,8 @@ type DashboardState = {
   readOnly: boolean;
   /** The widget selected for keyboard move or resize. View state, not saved. */
   selectedWidgetId: string | null;
+  /** Widget whose settings popover is open. View state survives responsive grid remounts. */
+  openWidgetSettingsId: string | null;
   saveStatus: SaveStatus;
   /** Why the save failed, when the host said. */
   saveMessage: string | null;
@@ -98,6 +100,7 @@ type DashboardActions = {
   chooseBreakpoint(bp: Breakpoint): void;
   toggleEditMode(): void;
   selectWidget(id: string | null): void;
+  setOpenWidgetSettings(id: string | null): void;
   nudgeWidget(id: string, delta: LayoutDelta): void;
   addWidget(type: WidgetType): void;
   updateWidget(id: string, patch: WidgetPatch): void;
@@ -189,6 +192,7 @@ export function createDashboardStore({
       editMode: editMode && !readOnly,
       readOnly,
       selectedWidgetId: null,
+      openWidgetSettingsId: null,
       saveStatus: 'saved',
       saveMessage: null,
       saveRequests: 0,
@@ -201,9 +205,14 @@ export function createDashboardStore({
       chooseBreakpoint: (bp) => set({ breakpoint: bp, breakpointLocked: true }),
       toggleEditMode: () => {
         if (readOnly) return;
-        set((s) => ({ editMode: !s.editMode, selectedWidgetId: null }));
+        set((s) => ({
+          editMode: !s.editMode,
+          selectedWidgetId: null,
+          openWidgetSettingsId: null,
+        }));
       },
       selectWidget: (id) => set({ selectedWidgetId: id }),
+      setOpenWidgetSettings: (id) => set({ openWidgetSettingsId: id }),
       nudgeWidget: (id, delta) =>
         compose(
           (c) => {
@@ -278,6 +287,9 @@ export function createDashboardStore({
           }),
         );
         if (get().selectedWidgetId === id) set({ selectedWidgetId: null });
+        if (get().openWidgetSettingsId === id) {
+          set({ openWidgetSettingsId: null });
+        }
       },
       undoRemove: () => {
         const { removed } = get();

@@ -5,7 +5,7 @@ import { Button } from '@synapcity/frontend-ui/core/button';
 import { Input } from '@synapcity/frontend-ui/core/input';
 
 import type { FieldRendererProps } from '../../../types';
-import { toTimeValue } from '@synapcity/domain-time';
+import { toTimeValue } from '../../../utils/time-value';
 
 /**
  * A time of day, `HH:mm` (`HH:mm:ss` for a step under a minute); nothing chosen

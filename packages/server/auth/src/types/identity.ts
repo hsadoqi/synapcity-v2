@@ -1,4 +1,4 @@
-import type { IdentityResult } from '@synapcity/domain-identity/types';
+import type { IdentityResult } from '@synapcity/domain-identity';
 
 /** A provider error's detail, kept for logging by code and status only. */
 export type ProviderFailure = { code?: string; status?: number };

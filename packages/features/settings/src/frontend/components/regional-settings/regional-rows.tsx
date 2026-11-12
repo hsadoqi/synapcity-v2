@@ -5,14 +5,16 @@ import { SettingRow } from '../shared/setting-row';
 import { SettingsCombobox } from '../shared/settings-combobox';
 import { SettingsSelect } from '../shared/settings-select';
 import {
-  formatDate,
-  formatTime,
   regionalDefaults,
-  resolveDateTimeFormatting,
   SYSTEM_TIMEZONE,
-  type DateTimeFormatting,
   type RegionalSettings,
 } from '@synapcity/domain-preferences';
+import {
+  formatDate,
+  formatTime,
+  resolveDateTimeFormatting,
+  type DateTimeFormatting,
+} from '@synapcity/frontend-preferences';
 import { deviceTimezone as browserTimezone } from '@synapcity/frontend-preferences';
 
 type RowProps<Key extends keyof RegionalSettings> = {

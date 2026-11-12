@@ -55,4 +55,42 @@ describe('latestRecords', () => {
 
     expect(records.map((r) => r.id)).toEqual(['a', 'b']);
   });
+
+  /*
+   * Ordering parity with the bounded SQL reads. This is the seed
+   * `packages/server/data/src/records/latest-order.dbtest.ts` writes, in the
+   * order the old full read returned it (newest first, `created_at DESC`) and
+   * with times in the format PostgREST returns. That test expects the SQL
+   * order to be this same list.
+   */
+  it('orders ties the way the bounded SQL reads do', () => {
+    const t = (value: string) => `2026-${value}+00:00`;
+    const seed = [
+      ['p3', t('09-05T00:00:00'), t('10-10T00:00:00')],
+      ['p2', t('09-05T00:00:00'), t('10-10T00:00:00')],
+      ['p1', t('09-01T00:00:00'), t('10-10T00:00:00')],
+      ['u4', t('10-15T00:00:00'), null],
+      ['u3', t('10-15T00:00:00'), null],
+      ['u2', t('10-20T00:00:00'), null],
+      ['u1', t('10-20T00:00:00.5'), null],
+      ['p4', t('08-01T00:00:00'), t('10-12T00:00:00')],
+      ['o2', t('07-02T00:00:00'), null],
+      ['o1', t('07-01T00:00:00'), null],
+    ] as const;
+
+    const latest = latestRecords(
+      seed.map(([id, updatedAt, pinnedAt]) => record(id, updatedAt, pinnedAt)),
+    );
+
+    expect(latest.map((r) => r.id)).toEqual([
+      'p4',
+      'p3',
+      'p2',
+      'p1',
+      'u1',
+      'u2',
+      'u4',
+      'u3',
+    ]);
+  });
 });

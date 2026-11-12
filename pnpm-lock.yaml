@@ -748,6 +748,10 @@ importers:
         version: 5.0.5(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/browser-playwright@5.0.5)(@vitest/coverage-v8@5.0.5)(@vitest/ui@5.0.5)(jsdom@30.1.2(@noble/hashes@1.8.0))(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
 
   packages/domain/identity:
+    dependencies:
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
     devDependencies:
       '@synapcity/dev-eslint-config':
         specifier: workspace:*
@@ -770,9 +774,6 @@ importers:
       vitest:
         specifier: 5.0.5
         version: 5.0.5(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/browser-playwright@5.0.5)(@vitest/coverage-v8@5.0.5)(@vitest/ui@5.0.5)(jsdom@30.1.2(@noble/hashes@1.8.0))(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
-      zod:
-        specifier: ^4.6.7
-        version: 4.6.7
 
   packages/domain/preferences:
     dependencies:
@@ -949,6 +950,9 @@ importers:
       react:
         specifier: 19.3.1
         version: 19.3.1
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
     devDependencies:
       '@synapcity/dev-eslint-config':
         specifier: workspace:*
@@ -1326,9 +1330,6 @@ importers:
       '@synapcity/domain-identity':
         specifier: workspace:*
         version: link:../../domain/identity
-      '@synapcity/domain-preferences':
-        specifier: workspace:*
-        version: link:../../domain/preferences
       '@synapcity/frontend-preferences':
         specifier: workspace:*
         version: link:../preferences
@@ -1619,9 +1620,6 @@ importers:
       '@hookform/resolvers':
         specifier: 6.0.0
         version: 6.0.0(@standard-schema/spec@1.1.0)(ajv-formats@2.1.1(ajv@8.20.0))(ajv@8.20.0)(react-hook-form@7.90.0(@types/react@19.3.0)(react@19.3.1))(zod@4.6.7)
-      '@synapcity/domain-time':
-        specifier: workspace:*
-        version: link:../../domain/time
       '@synapcity/frontend-blocks':
         specifier: workspace:*
         version: link:../blocks
@@ -2077,6 +2075,12 @@ importers:
       '@synapcity/dev-vitest-config':
         specifier: workspace:*
         version: link:../../dev/vitest-config
+      '@synapcity/server-data':
+        specifier: workspace:*
+        version: link:../data
+      '@types/node':
+        specifier: 26.6.5
+        version: 26.6.5
       '@vitest/coverage-v8':
         specifier: 5.0.5
         version: 5.0.5(@vitest/browser@5.0.5)(vitest@5.0.5)

@@ -31,7 +31,7 @@ export type StoredComposition = {
 export type SaveCompositionOutcome =
   | { ok: true; revision: number }
   | { ok: false; reason: 'conflict' }
-  | { ok: false; reason: 'failed'; error: ProviderFailure };
+  | { ok: false; reason: 'failed'; failure: ProviderFailure };
 
 /** The SQLSTATE the database raises when `revision` does not rise by exactly 1. */
 const REVISION_CONFLICT_CODE = 'PT409';
@@ -94,7 +94,11 @@ export async function saveComposition(
   expectedRevision: number,
 ): Promise<SaveCompositionOutcome> {
   if (!Number.isInteger(expectedRevision) || expectedRevision < 1) {
-    return { ok: false, reason: 'failed', error: { code: 'invalid_revision' } };
+    return {
+      ok: false,
+      reason: 'failed',
+      failure: { code: 'invalid_revision' },
+    };
   }
   const next = expectedRevision + 1;
 
@@ -113,7 +117,7 @@ export async function saveComposition(
     return {
       ok: false,
       reason: 'failed',
-      error: toProviderFailure({ ...error, status }),
+      failure: toProviderFailure({ ...error, status }),
     };
   }
   if (!error && data.length) return { ok: true, revision: next };
@@ -127,7 +131,7 @@ export async function saveComposition(
     return {
       ok: false,
       reason: 'failed',
-      error: toProviderFailure({ ...current.error, status: current.status }),
+      failure: toProviderFailure({ ...current.error, status: current.status }),
     };
   }
   const stored = current.data;
@@ -143,5 +147,5 @@ export async function saveComposition(
   }
   // The conflict code means the stored revision was not the one expected.
   if (error) return { ok: false, reason: 'conflict' };
-  return { ok: false, reason: 'failed', error: { code: 'row_not_written' } };
+  return { ok: false, reason: 'failed', failure: { code: 'row_not_written' } };
 }

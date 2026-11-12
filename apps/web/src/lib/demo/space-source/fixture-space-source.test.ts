@@ -77,6 +77,18 @@ describe('fixtureSpaceSource', () => {
     expect(items.map((item) => item.id)).toEqual(order);
   });
 
+  it('lists the latest sample Spaces as whole Spaces, in navigation order, cut to the limit', async () => {
+    const latest = await source.listLatest(3);
+    const nav = await source.listNavItems();
+
+    expect(latest.map((space) => space.id)).toEqual(
+      nav.slice(0, 3).map((item) => item.id),
+    );
+    expect(latest[0]).toEqual(
+      DEMO_SPACES.find((space) => space.id === latest[0]?.id),
+    );
+  });
+
   it('lists every sample Space with no participation rows, as there is no participation data', async () => {
     const spaces = await source.listWithRelations();
 
@@ -85,8 +97,8 @@ describe('fixtureSpaceSource', () => {
     );
     for (const space of spaces) {
       expect(space).toMatchObject({
-        space_documents: [],
-        space_dashboards: [],
+        documentLinks: [],
+        dashboardLinks: [],
       });
     }
   });
@@ -120,14 +132,14 @@ describe('fixtureSpaceSource', () => {
   it('does not save: a pin comes back as a fixture-mode failure', async () => {
     await expect(source.setPinned(DEMO_SPACES[0]!.id, true)).resolves.toEqual({
       ok: false,
-      error: { code: 'fixture_mode' },
+      failure: { code: 'fixture_mode' },
     });
   });
 
   it('does not create: a new Space comes back as a fixture-mode failure', async () => {
     await expect(source.create({ name: 'Garden plans' })).resolves.toEqual({
       ok: false,
-      error: { code: 'fixture_mode' },
+      failure: { code: 'fixture_mode' },
     });
   });
 
@@ -136,7 +148,7 @@ describe('fixtureSpaceSource', () => {
     async (method) => {
       await expect(
         source[method](DEMO_SPACES[0]!.id, DEMO_DOCUMENTS[0]!.id),
-      ).resolves.toEqual({ ok: false, error: { code: 'fixture_mode' } });
+      ).resolves.toEqual({ ok: false, failure: { code: 'fixture_mode' } });
     },
   );
 

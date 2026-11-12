@@ -25,7 +25,9 @@ export type AuthState = {
 type UserData = {
   email: string;
   /** Only collected when registering. */
-  name?: string;
+  firstName?: string;
+  /** Only collected when registering, and only when given. */
+  lastName?: string;
 };
 
 /**

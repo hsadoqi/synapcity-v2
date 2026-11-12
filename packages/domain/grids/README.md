@@ -23,6 +23,10 @@ Source: the `dashboard-core` layout module of the responsive-grid prototype. Rea
 | `toGridLayout`, `GridItem`, `COLLAPSED_ROWS`    | The render layout for one breakpoint: appends missing items, holds widths between the item's minimum and the columns, shrinks collapsed items without losing height. An item marked `fixed` is `static` (not dragged or resized; others move around it); `resizable: false` keeps its size |
 | `mergeLayoutChange`, `layoutsEqual`             | Fold a reported layout back into storage, keeping collapsed items' stored height; compare two layouts                                                                                                                                                                                      |
 
+## Structure
+
+Kept as it is (reviewed 2026-11-11 against the domain capability rules): `types/` and one folder per layout rule under `utils/` (`breakpoints`, `grid-metrics`, `grid-layout`, `layout-entries`, `pack-layout`, and the private `bottom-of`). The package is small, correct and acyclic, has no schemas whose types could sit beside them, and each folder is one rule with its tests. Its one-line folder indexes are the only cost; flattening them would be churn for uniformity alone, so the package moves to capability files when real work next touches it.
+
 ## Scripts
 
 `lint`, `check-types`, `test`, `test:coverage`. Tests sit beside each unit.

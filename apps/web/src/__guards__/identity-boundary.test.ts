@@ -14,13 +14,9 @@ import { describe, expect, it } from 'vitest';
  * shrinks. A lexical scan of non-test source with `//` and block comments
  * stripped; it does not follow aliases such as `const { auth } = supabase`.
  */
-const ALLOWED: Record<string, { calls: number; reason: string }> = {
-  'features/auth/server/operations/operations.ts': {
-    calls: 2,
-    reason:
-      'The account-deletion operations (provider user record and claims) stay until the delete-account flow moves (M7.5). The other operations moved to server-supabase in M7.2.',
-  },
-};
+// Empty since 2026-11-11: the account-deletion operations, the last direct
+// callers, moved to server-supabase and server-account.
+const ALLOWED: Record<string, { calls: number; reason: string }> = {};
 
 const SRC = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DIRECT_CALL = /\bauth\s*\.\s*(?:getClaims|getUser)\s*\(/g;

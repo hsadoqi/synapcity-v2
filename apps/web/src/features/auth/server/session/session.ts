@@ -1,6 +1,7 @@
-import type { IdentityResult } from '@synapcity/domain-identity/types';
+import type { IdentityResult } from '@synapcity/domain-identity';
 import { verifyIdentity } from '@synapcity/server-auth';
 import {
+  currentUserFromClaims,
   outcomeFromClaims,
   readProviderUser,
 } from '@synapcity/server-supabase';
@@ -11,16 +12,14 @@ import {
 import { cache } from 'react';
 
 import { createClient } from '@/lib/supabase/server';
-import { fixtureModeEnabled, fixtureUser } from '@/lib/access/dev-fixture';
+import { fixtureModeEnabled } from '@/lib/access/dev-fixture';
+import { fixtureUser } from '@/lib/access/fixture-user';
 import {
   connectedAccountsFrom,
   type ConnectedAccount,
 } from '@synapcity/features-auth/contracts';
 
-import {
-  currentUserFromClaims,
-  type CurrentUser,
-} from '@synapcity/domain-identity';
+import type { CurrentUser } from '@synapcity/domain-identity';
 
 /**
  * Thrown by a page guard when the Auth service cannot answer. It is not a

@@ -1,47 +1,49 @@
-export type { IdentityResult, VerifiedIdentity } from './types';
+export type { IdentityResult, VerifiedIdentity } from './identity-result';
 export {
   ALREADY_YOUR_EMAIL,
-  AVATAR_ACCEPT,
-  AVATAR_FILE_TYPES,
-  MAX_AVATAR_BYTES,
-  MAX_NAME_LENGTH,
   MIN_PASSWORD_LENGTH,
   PASSWORD_REQUIREMENTS,
   PASSWORD_TOO_SHORT_MESSAGE,
-  avatarFileSchema,
   emailRequestSchema,
   everyRefusal,
   firstRefusal,
-  missingCharactersMessage,
-  nameSchema,
-  newPasswordSchema,
-  profileSchema,
+  registrationSchema,
   signInSchema,
-  signUpSchema,
   updatePasswordSchema,
-} from './schemas';
-export type {
-  AuthFieldName,
-  AvatarType,
-  AvatarFileInput,
-  NameInput,
-  ProfileInput,
-} from './schemas';
+  type AuthFieldName,
+} from './credentials';
 export {
-  NEW_ACCOUNT_DAYS,
-  OAUTH_PROVIDERS,
-  PROFILE_CONFIRMED_KEY,
+  MAX_NAME_LENGTH,
   checkName,
-  currentUserFromClaims,
+  displayNameOf,
+  firstNameSchema,
   initialsOf,
-  isNewAccount,
-  isOAuthProvider,
-  isProfileConfirmed,
-  isRateLimited,
+  lastNameSchema,
+  nameSchema,
+  type NameInput,
+} from './names';
+export {
+  AVATAR_ACCEPT,
+  AVATAR_FILE_TYPES,
+  MAX_AVATAR_BYTES,
+  avatarFileSchema,
   isUploadedAvatar,
-  needsProfileSetup,
-  profileFromClaims,
-  providerImageFrom,
+  type AvatarFileInput,
+  type AvatarType,
+} from './avatar';
+export { profileSchema, type ProfileInput } from './profile';
+export type { CurrentUser, DisplayProfile, User } from './current-user';
+export {
+  OAUTH_PROVIDERS,
+  isOAuthProvider,
   providerLabel,
-} from './utils';
-export type { User, CurrentUser, DisplayProfile, OAuthProvider } from './utils';
+  type OAuthProvider,
+} from './oauth-providers';
+export {
+  PROFILE_CONFIRMED_KEY,
+  isNewAccount,
+  isProfileConfirmed,
+  needsProfileSetup,
+  profileSetupStateOf,
+  type ProfileSetupState,
+} from './profile-setup';

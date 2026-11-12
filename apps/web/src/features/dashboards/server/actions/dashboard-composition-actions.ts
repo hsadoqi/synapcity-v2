@@ -65,7 +65,7 @@ export async function saveDashboardComposition(
   );
   if (outcome.ok) return { ok: true, revision: outcome.revision };
   if (outcome.reason === 'conflict') return { ok: false, reason: 'conflict' };
-  logFailure('saveDashboardComposition', outcome.error);
+  logFailure('saveDashboardComposition', outcome.failure);
   return failed(SAVE_FAILED);
 }
 
@@ -88,5 +88,5 @@ export async function recordDashboardView(dashboardId: unknown): Promise<void> {
     id.data,
     new Date(),
   );
-  if (!outcome.ok) logFailure('recordDashboardView', outcome.error);
+  if (!outcome.ok) logFailure('recordDashboardView', outcome.failure);
 }

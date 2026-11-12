@@ -67,6 +67,12 @@ export function ConnectedWidget({ widgetId }: { widgetId: string }) {
     useShallow((s) => pickTables(s.records, widget?.type)),
   );
   const editMode = useDashboardStore((s) => s.editMode);
+  const settingsOpen = useDashboardStore(
+    (s) => s.openWidgetSettingsId === widgetId,
+  );
+  const setOpenWidgetSettings = useDashboardStore(
+    (s) => s.setOpenWidgetSettings,
+  );
   const { persistsStatus } = useDashboardConfig();
   const updateWidget = useDashboardStore((s) => s.updateWidget);
   const duplicateWidget = useDashboardStore((s) => s.duplicateWidget);
@@ -95,6 +101,10 @@ export function ConnectedWidget({ widgetId }: { widgetId: string }) {
         widget={widget}
         settings={settings}
         editMode={editMode}
+        settingsOpen={settingsOpen}
+        onSettingsOpenChange={(open) =>
+          setOpenWidgetSettings(open ? widgetId : null)
+        }
         actions={{
           update: (patch) => updateWidget(widgetId, patch),
           duplicate: () => duplicateWidget(widgetId),

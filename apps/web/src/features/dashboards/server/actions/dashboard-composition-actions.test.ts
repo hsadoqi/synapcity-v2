@@ -94,7 +94,7 @@ describe('saveDashboardComposition', () => {
     mocks.saveComposition.mockResolvedValue({
       ok: false,
       reason: 'failed',
-      error: { code: '42501', status: 403 },
+      failure: { code: '42501', status: 403 },
     });
     await expect(
       saveDashboardComposition(ID, composition('pinned'), 3),
@@ -209,7 +209,7 @@ describe('recordDashboardView', () => {
   it('logs a failed write and says nothing to the person', async () => {
     mocks.recordRecordView.mockResolvedValue({
       ok: false,
-      error: { code: '42501' },
+      failure: { code: '42501' },
     });
     await expect(recordDashboardView(ID)).resolves.toBeUndefined();
     expect(console.warn).toHaveBeenCalledWith('recordDashboardView failed', {

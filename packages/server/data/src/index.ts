@@ -5,6 +5,7 @@ export {
   addSpaceDocument,
   findSpace,
   getSpaceRelations,
+  listLatestSpaces,
   listSpaceDashboards,
   listSpaceDocuments,
   listSpaceNavItems,
@@ -30,6 +31,7 @@ export {
 export {
   createRecord,
   findRecord,
+  listLatestRecords,
   listRecordSummaries,
   recordRecordView,
   setRecordPinned,

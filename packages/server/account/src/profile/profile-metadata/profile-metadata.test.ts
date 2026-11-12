@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   withAvatarUrl,
   withFullName,
+  withProfileNames,
   withProfileConfirmed,
 } from './profile-metadata';
 
@@ -84,5 +85,30 @@ describe('withProfileConfirmed', () => {
     const existing = { full_name: 'Ada' };
     withProfileConfirmed(existing);
     expect(existing).toEqual({ full_name: 'Ada' });
+  });
+});
+
+describe('withProfileNames', () => {
+  it('writes the structured names and the display name, keeping other fields', () => {
+    expect(
+      withProfileNames(
+        { avatar_url: 'a', full_name: 'Old', first_name: 'X' },
+        { firstName: 'Ada', lastName: 'Lovelace', displayName: 'Countess' },
+      ),
+    ).toEqual({
+      avatar_url: 'a',
+      first_name: 'Ada',
+      last_name: 'Lovelace',
+      full_name: 'Countess',
+    });
+  });
+
+  it('drops the last name and display name when they are cleared', () => {
+    expect(
+      withProfileNames(
+        { full_name: 'Old', last_name: 'Old' },
+        { firstName: 'Ada', lastName: null, displayName: null },
+      ),
+    ).toEqual({ first_name: 'Ada' });
   });
 });

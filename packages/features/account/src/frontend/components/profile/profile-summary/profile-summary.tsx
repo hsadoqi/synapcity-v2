@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@synapcity/frontend-ui/core/button';
+import { displayNameOf } from '@synapcity/domain-identity';
 
 import type { ProfileAction, ProfileState } from '../../../../contracts';
 import { AvatarForm } from '../../avatar';
@@ -10,23 +11,32 @@ import { NameForm } from '../../name';
 
 type Editing = 'name' | 'avatar' | null;
 
+type Names = { firstName: string; lastName: string; displayName: string };
+
 /**
  * Shows the profile with an edit button for each item. Editing one item opens
- * a form with just that field, so the name and the photo save separately.
+ * a form with just that item, so the names and the photo save separately. The
+ * name shown is the display name, else the first name.
  */
 export function ProfileSummary({
-  name,
+  names,
   imageUrl,
   actions,
   signInHref,
 }: {
-  name: string;
+  /** The stored names; empty strings where there is none. */
+  names: Names;
   imageUrl: string | null;
   /** The save actions the host supplies for the two forms. */
   actions: { updateName: ProfileAction; updateAvatar: ProfileAction };
   signInHref: (returnTo: string) => string;
 }) {
-  const [current, setCurrent] = useState({ name, imageUrl });
+  const [current, setCurrent] = useState({ ...names, imageUrl });
+  const shownName =
+    displayNameOf({
+      displayName: current.displayName,
+      firstName: current.firstName,
+    }) ?? '';
   const [editing, setEditing] = useState<Editing>(null);
   const nameButton = useRef<HTMLButtonElement>(null);
   const avatarButton = useRef<HTMLButtonElement>(null);
@@ -50,7 +60,9 @@ export function ProfileSummary({
 
   const saved = (state: ProfileState) => {
     setCurrent((previous) => ({
-      name: state.name ?? previous.name,
+      firstName: state.firstName ?? previous.firstName,
+      lastName: state.lastName ?? previous.lastName,
+      displayName: state.name ?? previous.displayName,
       imageUrl:
         state.avatarUrl === undefined ? previous.imageUrl : state.avatarUrl,
     }));
@@ -63,7 +75,7 @@ export function ProfileSummary({
         <AvatarForm
           action={actions.updateAvatar}
           signInHref={signInHref}
-          name={current.name}
+          name={shownName}
           imageUrl={current.imageUrl}
           onSaved={saved}
           onCancel={close}
@@ -73,7 +85,7 @@ export function ProfileSummary({
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <ProfileAvatar
-              name={current.name}
+              name={shownName}
               imageUrl={current.imageUrl}
               size="lg"
               className="size-16"
@@ -96,7 +108,9 @@ export function ProfileSummary({
         <NameForm
           action={actions.updateName}
           signInHref={signInHref}
-          defaultName={current.name}
+          defaultFirstName={current.firstName}
+          defaultLastName={current.lastName}
+          defaultName={current.displayName}
           onSaved={saved}
           onCancel={close}
           autoFocus
@@ -106,7 +120,7 @@ export function ProfileSummary({
           <div className="flex flex-col gap-1">
             <span className="text-xs text-muted-foreground">Name</span>
             <span className="text-sm font-medium">
-              {current.name || 'No name yet'}
+              {shownName || 'No name yet'}
             </span>
           </div>
           <Button

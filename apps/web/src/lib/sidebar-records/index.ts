@@ -1,4 +1,5 @@
 export {
+  byLatest,
   latestRecords,
   NO_SIDEBAR_RECORDS,
   SIDEBAR_RECORD_LIMIT,

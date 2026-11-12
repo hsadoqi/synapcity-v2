@@ -75,6 +75,11 @@ describe('setSpacePinned', () => {
       expect.any(String),
     );
     expect(mocks.eq).toHaveBeenCalledWith('id', ID);
+    // The sidebar, rendered by the shared layout, lists pinned spaces first.
+    expect(mocks.revalidatePath).toHaveBeenCalledExactlyOnceWith(
+      '/user-1/home',
+      'layout',
+    );
   });
 
   it('unpins by clearing the time', async () => {
@@ -120,6 +125,8 @@ describe('setSpacePinned', () => {
       ok: false,
       error: 'Could not save your changes. Try again.',
     });
+    // Nothing changed, so the sidebar's render is still right.
+    expect(mocks.revalidatePath).not.toHaveBeenCalled();
     expect(console.warn).toHaveBeenCalledWith('setSpacePinned failed', {
       code: 'row_not_written',
       status: undefined,

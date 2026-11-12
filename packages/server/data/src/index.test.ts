@@ -13,6 +13,8 @@ describe('@synapcity/server-data root entry', () => {
       'findRecord',
       'findSpace',
       'getSpaceRelations',
+      'listLatestRecords',
+      'listLatestSpaces',
       'listRecordSummaries',
       'listSpaceDashboards',
       'listSpaceDocuments',

@@ -82,6 +82,30 @@ export async function listSpaces(
 }
 
 /**
+ * At most `limit` of the signed-in owner's Spaces, in the order the sidebar
+ * lists them: pinned first (most recently pinned on top), then the most
+ * recently changed, then the newest, then by id so equal rows always come back
+ * the same way. Plain Space contracts, with no participation counts.
+ * Row-level security scopes the query to the session.
+ */
+export async function listLatestSpaces(
+  client: SupabaseServerClient,
+  limit: number,
+): Promise<SpaceEntity[]> {
+  const { data, error } = await client
+    .from('spaces')
+    .select(COLUMNS)
+    .order('pinned_at', { ascending: false, nullsFirst: false })
+    .order('updated_at', { ascending: false })
+    .order('created_at', { ascending: false })
+    .order('id')
+    .limit(limit);
+
+  if (error) throw readError('spaces', error);
+  return (data satisfies OwnedRow[]).map(fromRow);
+}
+
+/**
  * The owner's spaces with how many documents and dashboards each holds, for
  * the index. Same scoping as `listSpaces`.
  */
