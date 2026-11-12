@@ -20,9 +20,26 @@ import { describe, expect, it } from 'vitest';
  * - `@source` lines in a workspace stylesheet the host imports count for the host, so a
  *   package that ships its own `@source` (as `frontend-ui` does) covers itself.
  *
- * Limits: it reads the files lexically, not with Tailwind's parser, so `@source not`,
- * `@source inline()` and `source()` on `@import` are not modelled; a class built at runtime
- * from fragments is not generated even from a scanned file, and nothing here can see that.
+ * Limits, so a pass is not read as more than it is:
+ * - Only `.tsx` files are read for `className=`. A package whose Tailwind classes live only in
+ *   `.ts` files (a `cva()` or `cn()` call, a class map) is not seen as rendering classes and is
+ *   not required. No package is like that today; every package with classes has a `.tsx` that
+ *   uses them.
+ * - Packages are found in six folders: `apps`, and `packages/` `frontend`, `features`,
+ *   `domain`, `server` and `dev`. Only `packages/frontend` and `packages/features` can be
+ *   required. A package in any other folder is not in the map, so a dependency on it is
+ *   silently not followed; add the folder here if the workspace gains one.
+ * - Storybook's roots are the packages its `stories` globs name. Its own `package.json`
+ *   dependencies are not roots, and a stories glob without `/src/` in its path does not
+ *   resolve to a package and makes the test throw.
+ * - It reads the files lexically, not with Tailwind's parser. A `@source` counts only as a
+ *   plain quoted directory that contains the package's whole `src`: a glob (`../src/**`),
+ *   a single file or a folder inside `src` does not count as covering the package, and a
+ *   glob fails the "path exists" check. `@source not`, `@source inline()` and `source()` on
+ *   `@import` are ignored, not modelled. Workspace stylesheets are followed only through an
+ *   `@import` of `@synapcity/...` whose `exports` entry is a plain string.
+ * - A class built at runtime from fragments is not generated even from a scanned file, and
+ *   nothing here can see that.
  */
 
 const repo = fileURLToPath(new URL('..', import.meta.url));
