@@ -6,12 +6,14 @@ import {
   setRecordPinned,
   type ParticipantTable,
 } from '@synapcity/server-data';
+import { revalidatePath } from 'next/cache';
 import { cache } from 'react';
 import { z } from 'zod';
 
 import { getCallerIdentity, SAVE_FAILED } from '@/lib/access/caller';
 import { FIXTURE_MESSAGE, fixtureModeEnabled } from '@/lib/access/dev-fixture';
 import { logFailure } from '@/lib/log-failure';
+import { homePathFor } from '@/lib/routing/user-paths';
 import { byLatest } from '@/lib/sidebar-records/latest-records';
 import { createClient } from '@/lib/supabase/server';
 import type { RecordSummary } from './record-summary';
@@ -53,6 +55,9 @@ export async function setRecordPinnedFor(
     logFailure(operation, result.failure);
     return { ok: false, error: SAVE_FAILED };
   }
+  // The sidebar lists pinned records first, from the shared layout, which
+  // keeps its render unless the caller's home area is revalidated.
+  revalidatePath(homePathFor(found.identity.userId), 'layout');
   return result;
 }
 

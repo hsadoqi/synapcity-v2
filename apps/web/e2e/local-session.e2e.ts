@@ -390,3 +390,51 @@ test.describe('the callback exchanges a real code', () => {
     await expect(page).toHaveURL(new RegExp(`${home()}$`));
   });
 });
+
+test.describe('pinning from an index', () => {
+  /** One of the user's spaces, made with the service key (provisioning only). */
+  async function createSpace(name: string): Promise<void> {
+    const response = await fetch(`${stack!.apiUrl}/rest/v1/spaces`, {
+      method: 'POST',
+      headers: {
+        apikey: stack!.serviceKey,
+        Authorization: `Bearer ${stack!.serviceKey}`,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ owner_id: user.id, name }),
+    });
+    if (!response.ok)
+      throw new Error(`Creating the space failed: ${response.status}`);
+  }
+
+  test('the sidebar follows a pin and an unpin without a reload', async ({
+    browser,
+  }) => {
+    // Made in this order, the newer one is the more recently changed, so it
+    // leads the sidebar until the older one is pinned. Pinning does not
+    // change updated_at, so only the pin can reorder them.
+    await createSpace('Pin order older');
+    await createSpace('Pin order newer');
+
+    const page = await signedInPage(browser);
+    await page.goto(`${home()}/spaces`);
+    await page.waitForLoadState('networkidle');
+    const inSidebar = page
+      .locator('[data-sidebar="sidebar"]')
+      .getByRole('link', { name: /^Pin order / });
+    await expect(inSidebar).toHaveText(['Pin order newer', 'Pin order older']);
+
+    const toggle = async (label: 'Pin' | 'Unpin') => {
+      await page
+        .getByRole('button', { name: 'Actions for Pin order older' })
+        .click();
+      await page.getByRole('menuitem', { name: label }).click();
+    };
+
+    await toggle('Pin');
+    await expect(inSidebar).toHaveText(['Pin order older', 'Pin order newer']);
+
+    await toggle('Unpin');
+    await expect(inSidebar).toHaveText(['Pin order newer', 'Pin order older']);
+  });
+});

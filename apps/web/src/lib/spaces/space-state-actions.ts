@@ -45,6 +45,9 @@ export async function setSpacePinned(
     logFailure('setSpacePinned', outcome.failure);
     return { ok: false, error: SAVE_FAILED };
   }
+  // The sidebar lists pinned spaces first; it is rendered by the shared
+  // layout, which keeps its render unless told otherwise.
+  revalidateHome(found.identity.userId);
   return { ok: true, pinnedAt: outcome.pinnedAt };
 }
 
@@ -120,8 +123,8 @@ async function addToSpace(
 /**
  * The caller's home area: the space's page and the spaces index (item lists
  * and counts), the documents and dashboards indexes (how many spaces each is
- * in), and the sidebar, which lists spaces with their counts. Settings and
- * other people's pages are left alone.
+ * in), and the sidebar, which lists the latest spaces, pinned first. Settings
+ * and other people's pages are left alone.
  */
 function revalidateHome(userId: string) {
   revalidatePath(homePathFor(userId), 'layout');
