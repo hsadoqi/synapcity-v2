@@ -50,7 +50,7 @@ export async function setRecordPinnedFor(
 
   const result = await setRecordPinned(supabase, kind, id.data, pinned);
   if (!result.ok) {
-    logFailure(operation, result.error);
+    logFailure(operation, result.failure);
     return { ok: false, error: SAVE_FAILED };
   }
   return result;

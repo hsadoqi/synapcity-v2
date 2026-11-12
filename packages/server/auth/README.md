@@ -1,6 +1,6 @@
 # @synapcity/server-auth
 
-Owns: the server identity boundary. It defines the `IdentityProvider` port, the policy that turns a provider's answer into a verified identity, and the ownership rule. Milestone 7 adds auth operations and verified-caller helpers here.
+Owns: the server identity boundary. It defines the `IdentityProvider` port, the policy that turns a provider's answer into a verified identity, and the ownership rule. Auth operations (sign-in, registration, password and email changes) currently live in `@synapcity/server-supabase`; whether they move here is unresolved.
 
 Runtime: server only. The root entry starts with `import 'server-only'`. Category rules: [server README](../README.md) and [ADR-0014](../../../docs/architecture/decisions/0014-multi-app-package-boundaries.md).
 

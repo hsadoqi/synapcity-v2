@@ -22,7 +22,8 @@ async function create(
   name: string = table,
 ): Promise<string> {
   const created = await createRecord(user.client, table, { name });
-  if (!created.ok) throw new Error(`Creating ${table}: ${created.error.code}`);
+  if (!created.ok)
+    throw new Error(`Creating ${table}: ${created.failure.code}`);
   return created.id;
 }
 
@@ -34,7 +35,7 @@ describe('listSpaceNavItems', () => {
       const pinned = await create(a, 'spaces', 'Pinned');
       await create(b, 'spaces', 'Not yours');
       const pin = await setSpacePinned(a.client, first, true);
-      if (!pin.ok) throw new Error(`Pinning: ${pin.error.code}`);
+      if (!pin.ok) throw new Error(`Pinning: ${pin.failure.code}`);
 
       const items = await listSpaceNavItems(a.client);
 

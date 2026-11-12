@@ -35,8 +35,8 @@ const space = (
   icon: 'house',
   updatedAt: times.updatedAt ?? '2026-10-01T00:00:00+00:00',
   pinnedAt: times.pinnedAt ?? null,
-  space_documents: documentIds.map((document_id) => ({ document_id })),
-  space_dashboards: dashboardIds.map((dashboard_id) => ({ dashboard_id })),
+  documentLinks: documentIds.map((itemId) => ({ itemId })),
+  dashboardLinks: dashboardIds.map((itemId) => ({ itemId })),
 });
 
 function sourceCalls() {

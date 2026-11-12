@@ -85,8 +85,9 @@ export async function createRecord(
       ? await serverSpaceSource(supabase).create(input)
       : await insertRecord(supabase, RECORD_TABLES[kind], input);
   if (!result.ok) {
-    logFailure('createRecord', result.error, { kind });
-    if (!isUnconfirmed(result.error)) return { ok: false, error: SAVE_FAILED };
+    logFailure('createRecord', result.failure, { kind });
+    if (!isUnconfirmed(result.failure))
+      return { ok: false, error: SAVE_FAILED };
     // It may exist: refresh the lists so it shows if it does.
     revalidatePath('/', 'layout');
     return { ok: false, error: SAVE_FAILED, unconfirmed: true };

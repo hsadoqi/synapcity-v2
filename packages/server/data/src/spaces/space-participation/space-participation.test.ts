@@ -196,7 +196,7 @@ describe.each(ADDS)('addSpace $kind', ({ add, table, column }) => {
 
     await expect(add(client, SPACE_ID, ITEM_ID)).resolves.toStrictEqual({
       ok: false,
-      error: { code: '42501', status: 403 },
+      failure: { code: '42501', status: 403 },
     });
   });
 
@@ -205,7 +205,7 @@ describe.each(ADDS)('addSpace $kind', ({ add, table, column }) => {
 
     await expect(add(client, SPACE_ID, ITEM_ID)).resolves.toStrictEqual({
       ok: false,
-      error: { status: 0 },
+      failure: { status: 0 },
     });
   });
 });

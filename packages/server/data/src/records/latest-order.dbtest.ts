@@ -112,7 +112,8 @@ async function setTimes(
 
 async function create(user: TestUser, table: RecordTable, name: string) {
   const created = await createRecord(user.client, table, { name });
-  if (!created.ok) throw new Error(`Creating ${table}: ${created.error.code}`);
+  if (!created.ok)
+    throw new Error(`Creating ${table}: ${created.failure.code}`);
   return created.id;
 }
 

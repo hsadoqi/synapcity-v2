@@ -48,7 +48,7 @@ export async function loadPlaygroundContexts(): Promise<
         id: 'documents',
         label: 'Documents',
         items: itemsIn(
-          space.space_documents.map((link) => link.document_id),
+          space.documentLinks.map((link) => link.itemId),
           documentsById,
         ).map((document) => ({
           id: document.id,
@@ -61,7 +61,7 @@ export async function loadPlaygroundContexts(): Promise<
         id: 'dashboards',
         label: 'Dashboards',
         items: itemsIn(
-          space.space_dashboards.map((link) => link.dashboard_id),
+          space.dashboardLinks.map((link) => link.itemId),
           dashboardsById,
         ).map((dashboard) => ({
           id: dashboard.id,

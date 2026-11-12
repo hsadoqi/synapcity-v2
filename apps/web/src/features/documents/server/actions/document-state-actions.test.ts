@@ -76,7 +76,7 @@ describe('setDocumentPinned', () => {
   it('reports a failed save in plain words', async () => {
     mocks.setRecordPinned.mockResolvedValue({
       ok: false,
-      error: { code: '42501' },
+      failure: { code: '42501' },
     });
 
     await expect(setDocumentPinned(ID, true)).resolves.toMatchObject({

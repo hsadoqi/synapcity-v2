@@ -25,22 +25,6 @@ export function recordSpaceView(
   client: SupabaseServerClient,
   spaceId: string,
   now: Date,
-): Promise<{ ok: true } | { ok: false; error: ProviderFailure }> {
+): Promise<{ ok: true } | { ok: false; failure: ProviderFailure }> {
   return recordRecordView(client, 'spaces', spaceId, now);
 }
-
-// export function addDocumentToSpace(
-//   client: SupabaseServerClient,
-//   spaceId: string,
-//   now: Date,
-// ) {
-//   return recordRecordView(client, 'spaces', spaceId, now);
-// }
-
-// export function addDashboardToSpace(
-//   client: SupabaseServerClient,
-//   spaceId: string,
-//   now: Date,
-// ) {
-//   return recordRecordView(client, 'spaces', spaceId, now);
-// }

@@ -55,8 +55,8 @@ export function fixtureSpaceSource(): SpaceSource {
     listWithRelations: async () =>
       DEMO_SPACES.map((space) => ({
         ...space,
-        space_documents: [],
-        space_dashboards: [],
+        documentLinks: [],
+        dashboardLinks: [],
       })),
     // An arrow cannot be checked against overloads; the shape follows `type`.
     getRelations: (async (spaceId: string, type?: SpaceRelationType) => {
@@ -65,12 +65,15 @@ export function fixtureSpaceSource(): SpaceSource {
     }) as SpaceSource['getRelations'],
     find: async (spaceId) =>
       DEMO_SPACES.find((space) => space.id === spaceId) ?? null,
-    create: async () => ({ ok: false, error: { code: 'fixture_mode' } }),
-    setPinned: async () => ({ ok: false, error: { code: 'fixture_mode' } }),
+    create: async () => ({ ok: false, failure: { code: 'fixture_mode' } }),
+    setPinned: async () => ({ ok: false, failure: { code: 'fixture_mode' } }),
     recordView: async () => ({ ok: true }),
     listDocuments: async () => [...DEMO_DOCUMENTS],
     listDashboards: async () => [...DEMO_DASHBOARDS],
-    addDocument: async () => ({ ok: false, error: { code: 'fixture_mode' } }),
-    addDashboard: async () => ({ ok: false, error: { code: 'fixture_mode' } }),
+    addDocument: async () => ({ ok: false, failure: { code: 'fixture_mode' } }),
+    addDashboard: async () => ({
+      ok: false,
+      failure: { code: 'fixture_mode' },
+    }),
   };
 }

@@ -33,7 +33,6 @@ describe('serverSpaceSource', () => {
     ['listSummaries', 'listSpaceSummaries', []],
     ['listLatest', 'listLatestSpaces', [8]],
     ['listNavItems', 'listSpaceNavItems', []],
-    ['listWithRelations', 'listSpacesWithRelations', []],
     ['getRelations', 'getSpaceRelations', [ID, 'documents']],
     ['getRelations', 'getSpaceRelations', [ID, undefined]],
     ['find', 'findSpace', [ID]],
@@ -56,6 +55,59 @@ describe('serverSpaceSource', () => {
       expect(data[fn]).toHaveBeenCalledWith(client, ...args);
     },
   );
+
+  it('reports participation rows as item links, without column names', async () => {
+    data.listSpacesWithRelations.mockResolvedValue([
+      {
+        id: ID,
+        name: 'Garden plans',
+        space_documents: [
+          {
+            space_id: ID,
+            document_id: ITEM_ID,
+            pinned: true,
+            position: 2,
+            added_at: '2026-11-01T00:00:00Z',
+          },
+        ],
+        space_dashboards: [
+          {
+            space_id: ID,
+            dashboard_id: 'dash-1',
+            pinned: false,
+            position: null,
+            added_at: '2026-11-02T00:00:00Z',
+          },
+        ],
+      },
+    ]);
+
+    await expect(
+      serverSpaceSource(client).listWithRelations(),
+    ).resolves.toEqual([
+      {
+        id: ID,
+        name: 'Garden plans',
+        documentLinks: [
+          {
+            itemId: ITEM_ID,
+            pinned: true,
+            position: 2,
+            addedAt: '2026-11-01T00:00:00Z',
+          },
+        ],
+        dashboardLinks: [
+          {
+            itemId: 'dash-1',
+            pinned: false,
+            position: null,
+            addedAt: '2026-11-02T00:00:00Z',
+          },
+        ],
+      },
+    ]);
+    expect(data.listSpacesWithRelations).toHaveBeenCalledWith(client);
+  });
 
   it('creates a Space through createRecord with only its name', async () => {
     const result = { ok: true, id: ID };

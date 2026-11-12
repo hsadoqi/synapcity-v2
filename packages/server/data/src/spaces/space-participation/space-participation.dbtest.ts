@@ -18,7 +18,8 @@ import {
 
 async function create(user: TestUser, table: RecordTable): Promise<string> {
   const created = await createRecord(user.client, table, { name: table });
-  if (!created.ok) throw new Error(`Creating ${table}: ${created.error.code}`);
+  if (!created.ok)
+    throw new Error(`Creating ${table}: ${created.failure.code}`);
   return created.id;
 }
 
@@ -115,7 +116,7 @@ describe.each(KINDS)(
           const outcome = await add(a.client, spaceId, itemId);
           expect(outcome).toMatchObject({
             ok: false,
-            error: { code: '42501' },
+            failure: { code: '42501' },
           });
         }
         expect(await list(a.client, aSpace)).toEqual([]);
@@ -134,7 +135,7 @@ describe.each(KINDS)(
         // The pair exists, but the policy is checked before the conflict.
         await expect(add(a.client, bSpace, bItem)).resolves.toMatchObject({
           ok: false,
-          error: { code: '42501' },
+          failure: { code: '42501' },
         });
       });
     });

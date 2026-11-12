@@ -58,7 +58,7 @@ describe('setSpacePinned', () => {
 
     await expect(setSpacePinned(client, ID, true)).resolves.toEqual({
       ok: false,
-      error: { code: 'row_not_written' },
+      failure: { code: 'row_not_written' },
     });
   });
 
@@ -68,7 +68,7 @@ describe('setSpacePinned', () => {
 
     await expect(setSpacePinned(client, ID, true)).resolves.toEqual({
       ok: false,
-      error,
+      failure: error,
     });
   });
 });
@@ -97,7 +97,7 @@ describe('recordSpaceView', () => {
 
     await expect(recordSpaceView(client, ID, now)).resolves.toEqual({
       ok: false,
-      error,
+      failure: error,
     });
   });
 });

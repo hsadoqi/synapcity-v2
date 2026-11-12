@@ -196,7 +196,10 @@ describe('setRecordPinned', () => {
 
     await expect(
       setRecordPinned(client, 'documents', 'id-1', true),
-    ).resolves.toStrictEqual({ ok: false, error: { code: 'row_not_written' } });
+    ).resolves.toStrictEqual({
+      ok: false,
+      failure: { code: 'row_not_written' },
+    });
   });
 
   it('reports a database error by code and status only', async () => {
@@ -207,7 +210,7 @@ describe('setRecordPinned', () => {
 
     await expect(
       setRecordPinned(client, 'documents', 'id-1', true),
-    ).resolves.toStrictEqual({ ok: false, error: { code: '42501' } });
+    ).resolves.toStrictEqual({ ok: false, failure: { code: '42501' } });
   });
 });
 
@@ -230,6 +233,31 @@ describe('createRecord', () => {
     },
   );
 
+  it('inserts only the create fields, by name, whatever else the input carries', async () => {
+    const { client, builder } = clientReturning({
+      data: { id: 'new-id' },
+      error: null,
+    });
+    // A non-literal can carry keys the type does not list; none of them may
+    // reach the insert as a column (the exact match below refuses owner_id).
+    const input = {
+      name: 'Garden plans',
+      description: 'Beds and paths',
+      icon: 'sprout',
+      tags: ['outdoors'],
+      owner_id: 'someone-else',
+    };
+
+    await createRecord(client, 'spaces', input);
+
+    expect(builder.insert).toHaveBeenCalledWith({
+      name: 'Garden plans',
+      description: 'Beds and paths',
+      icon: 'sprout',
+      tags: ['outdoors'],
+    });
+  });
+
   it('reports a database error by code and status only', async () => {
     const { client } = clientReturning({
       data: null,
@@ -238,7 +266,7 @@ describe('createRecord', () => {
 
     await expect(
       createRecord(client, 'documents', { name: 'x' }),
-    ).resolves.toStrictEqual({ ok: false, error: { code: '23514' } });
+    ).resolves.toStrictEqual({ ok: false, failure: { code: '23514' } });
   });
 
   it('keeps the response status, so a dropped request reads as unconfirmed', async () => {
@@ -250,7 +278,7 @@ describe('createRecord', () => {
 
     await expect(
       createRecord(client, 'spaces', { name: 'x' }),
-    ).resolves.toStrictEqual({ ok: false, error: { code: '', status: 0 } });
+    ).resolves.toStrictEqual({ ok: false, failure: { code: '', status: 0 } });
   });
 });
 
@@ -344,6 +372,6 @@ describe('recordRecordView', () => {
 
     await expect(
       recordRecordView(client, 'dashboards', id, now),
-    ).resolves.toEqual({ ok: false, error: { code: '42501' } });
+    ).resolves.toEqual({ ok: false, failure: { code: '42501' } });
   });
 });

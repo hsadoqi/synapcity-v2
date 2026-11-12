@@ -32,7 +32,10 @@ describe('two-user harness', () => {
 
       // The app's pin function writes nothing for B.
       const pinned = await setRecordPinned(b.client, 'spaces', spaceId, true);
-      expect(pinned).toEqual({ ok: false, error: { code: 'row_not_written' } });
+      expect(pinned).toEqual({
+        ok: false,
+        failure: { code: 'row_not_written' },
+      });
 
       // A direct update and a direct delete match no row for B.
       const updated = await b.client

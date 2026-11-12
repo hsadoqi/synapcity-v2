@@ -42,7 +42,7 @@ export async function setSpacePinned(
 
   const outcome = await serverSpaceSource(supabase).setPinned(id.data, pinned);
   if (!outcome.ok) {
-    logFailure('setSpacePinned', outcome.error);
+    logFailure('setSpacePinned', outcome.failure);
     return { ok: false, error: SAVE_FAILED };
   }
   return { ok: true, pinnedAt: outcome.pinnedAt };
@@ -69,7 +69,7 @@ export async function recordSpaceView(spaceId: unknown): Promise<void> {
   const outcome = await serverSpaceSource(await createClient()).recordView(
     id.data,
   );
-  if (!outcome.ok) logFailure('recordSpaceView', outcome.error);
+  if (!outcome.ok) logFailure('recordSpaceView', outcome.failure);
 }
 
 /**
@@ -106,10 +106,10 @@ async function addToSpace(
       ? await source.addDocument(space.data, item.data)
       : await source.addDashboard(space.data, item.data);
   if (!outcome.ok) {
-    logFailure('addToSpace', outcome.error, { kind });
+    logFailure('addToSpace', outcome.failure, { kind });
     // Without a code the request was cut off and the row may exist; refresh
     // so it shows if it does. Retrying is safe either way.
-    if (!outcome.error.code) revalidateHome(found.identity.userId);
+    if (!outcome.failure.code) revalidateHome(found.identity.userId);
     return { ok: false, error: SAVE_FAILED };
   }
 
