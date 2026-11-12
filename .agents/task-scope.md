@@ -1,3 +1,17 @@
+## Active task: CF-08 · keep pending dashboard edits through server refreshes (2026-11-12)
+
+- Outcome: a host refresh of the same dashboard (pin revalidation, quick-create, an auth event, the link widgets asking for records) no longer replaces the store, so an unsaved, saving or failed edit stays on screen and is saved once, from the revision it was read at, without a false conflict.
+- Interaction mode: correctness fix and local verification; opening the pull request approved by the owner (2026-11-12). Merging waits for owner approval, after R2.
+- Base: `main` at `e573e33ac49fbf9ad15cc7ad6255a3e826a4bba9` (#151), branch `fix/cf-08-dashboard-pending-edit`, commit `6a012b3f`.
+- Process record: this entry was omitted before the implementation commit and is added afterwards, before the pull request, at the owner's request. The commit itself is unchanged.
+- Decision: K3, audit option (a), compare by revision, extended so unsettled work is never replaced. Option (c), rebasing local edits onto a newer server state, was not taken because it would overwrite the other writer's work.
+- Ownership: the store owns `savedRevision`; only the save scheduler writes it. The provider decides replacement from dashboard, storage, save status and revision. `serverDashboardStorage` holds no page data, so it keeps one identity across refreshes.
+- Manifest (11 paths): this file; `packages/features/dashboards/src/frontend/store/dashboard-store.ts`; `.../storage/save-scheduler/save-scheduler.ts` and its test; `.../components/dashboard-workspace/dashboard-workspace-provider.tsx` and its test; `packages/features/dashboards/README.md`; `apps/web/src/features/dashboards/components/dashboard-view/dashboard-view.tsx` and its `.dom.test.tsx`; `apps/web/src/features/dashboards/lib/server-dashboard-storage/server-dashboard-storage.ts` and its test.
+- Open before merge (as recorded when the pull request opened, superseded by the follow-up below): after a conflict, an incidental refresh (not only the person's Reload) replaces the store and discards the unsaved draft; to be investigated so edits are never discarded silently. The server-path e2e (`dashboard-persistence.e2e.ts`, local stack) has not run.
+- Follow-up before merge (owner request, 2026-11-12): a conflicted draft now stays on screen through background refreshes. The provider wraps the config's `onReload`; only a Reload made while the store is in conflict marks that store as given up, and only a given-up conflicted store is replaced by the next read. A reload the link widgets ask for while everything is saved does not count. Same two source and test paths as the manifest; the existing conflict tests now press Reload explicitly, and two tests are added (both fail against `6a012b3f`). The server-path e2e is still open until Docker is available.
+- Not in scope: R2, R4, the frontend census restructuring, any server or schema change.
+- Verification: Prettier and `git diff --check`; lint, typecheck and tests for `features-dashboards`, `web` and their dependents; the dashboard Storybook stories; `dashboard-edit.e2e.ts` in fixture mode; `dashboard-persistence.e2e.ts` under `pnpm test:e2e:local-session` when Docker is available; CI `verify`.
+
 ## Active task: R3 · one loading announcement (D11 only; I1 deferred) (2026-11-02)
 
 - Outcome: the dashboard canvas skeleton and the collection loading skeleton each expose exactly one status announcement with meaningful generic text, inside one busy region, with the dashboard skeleton's layout unchanged.

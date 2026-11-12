@@ -367,6 +367,70 @@ describe('DashboardView composition', () => {
     });
   });
 
+  // A pin from the sidebar (`revalidatePath` on the home layout), quick-create,
+  // an auth event or the link widgets asking for records all refresh the page,
+  // and each refresh hands this view the stored composition as new objects.
+  describe('a page refresh while an edit is waiting to be saved', () => {
+    it('keeps the edit and saves it once, from the revision it was read at', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      const stored = createComposition();
+      const result = await setup({ composition: stored, revision: 3 });
+      await press(editToggle());
+      await press(within(palette()!).getByRole('button', { name: 'Pinned' }));
+      expect(screen.getByText('Unsaved changes')).toBeTruthy();
+
+      await result.rerenderWith({
+        composition: structuredClone(stored),
+        revision: 3,
+      });
+      expect(screen.getByRole('region', { name: 'Pinned' })).toBeTruthy();
+      expect(screen.getByText('Unsaved changes')).toBeTruthy();
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1000);
+      });
+      expect(mocks.save).toHaveBeenCalledTimes(1);
+      expect(mocks.save.mock.calls[0]?.[2]).toBe(3);
+      expect(await screen.findByText('Saved')).toBeTruthy();
+      expect(screen.getByRole('region', { name: 'Pinned' })).toBeTruthy();
+    });
+
+    it('keeps an edit made while the link widgets read their records, and saves it from the new revision', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      const result = await setup({
+        composition: createComposition(),
+        revision: 3,
+        unloadedKinds: ['document', 'dashboard'],
+      });
+      await press(editToggle());
+      await press(within(palette()!).getByRole('button', { name: 'Pinned' }));
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(500);
+      });
+      expect(await screen.findByText('Saved')).toBeTruthy();
+      // The saved Pinned widget needs records the page did not read.
+      expect(mocks.refresh).toHaveBeenCalledTimes(1);
+
+      // The person adds a widget before the refresh arrives.
+      await press(within(palette()!).getByRole('button', { name: 'Spaces' }));
+      const [, saved] = mocks.save.mock.calls[0] as [string, unknown, number];
+      await result.rerenderWith({
+        composition: structuredClone(saved) as never,
+        revision: 4,
+        unloadedKinds: [],
+      });
+      expect(screen.getByRole('region', { name: 'Pinned' })).toBeTruthy();
+      expect(screen.getByRole('region', { name: 'Spaces' })).toBeTruthy();
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1000);
+      });
+      expect(mocks.save).toHaveBeenCalledTimes(2);
+      expect(mocks.save.mock.calls[1]?.[2]).toBe(4);
+      expect(await screen.findByText('Saved')).toBeTruthy();
+    });
+  });
+
   describe('in a container too narrow for the canvas and the panel together', () => {
     beforeEach(() => {
       containerWidth = 400;

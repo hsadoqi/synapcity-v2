@@ -5,19 +5,18 @@ import type {
 } from '@synapcity/features-dashboards/contracts';
 
 /**
- * The server adapter for a dashboard canvas. The page already read the
- * composition and its revision on the server, so `load` hands back that
- * snapshot (a Reload is the page asking the server again, which gives this
- * a new snapshot). `save` is the Server Action. Records are not stored here:
- * the link widgets own no data.
+ * The server adapter for a dashboard canvas: `save` is the Server Action.
+ * The page reads the composition and its revision on the server and hands
+ * them to the provider as its `snapshot` (a Reload is the page asking the
+ * server again, which gives a new snapshot), so there is nothing to load in
+ * the browser and `load` refuses. Holding no page data keeps the adapter one
+ * object across page refreshes: a new storage would replace the store with an
+ * edit still waiting to be saved. Records are not stored here: the link
+ * widgets own no data.
  */
 export function serverDashboardStorage({
-  composition,
-  revision,
   save,
 }: {
-  composition: DashboardComposition | null;
-  revision: number;
   save: (
     dashboardId: string,
     composition: DashboardComposition,
@@ -25,7 +24,11 @@ export function serverDashboardStorage({
   ) => Promise<SaveOutcome>;
 }): DashboardStorage {
   return {
-    load: async () => ({ composition, records: null, revision }),
+    load: async () => {
+      throw new Error(
+        'The server adapter has nothing to load: the page supplies the dashboard as the snapshot.',
+      );
+    },
     saveComposition: async (dashboardId, next, baseRevision) => {
       try {
         return await save(dashboardId, next, baseRevision);
