@@ -4,37 +4,14 @@ import { describe, expect, it, vi } from 'vitest';
 import { serverDashboardStorage } from './server-dashboard-storage';
 
 describe('serverDashboardStorage', () => {
-  it('loads the snapshot the page read, with its revision and no records', async () => {
-    const composition = createComposition();
-    const storage = serverDashboardStorage({
-      composition,
-      revision: 4,
-      save: vi.fn(),
-    });
-    await expect(storage.load('d1')).resolves.toEqual({
-      composition,
-      records: null,
-      revision: 4,
-    });
-  });
-
-  it('loads an empty dashboard at revision 0', async () => {
-    const storage = serverDashboardStorage({
-      composition: null,
-      revision: 0,
-      save: vi.fn(),
-    });
-    await expect(storage.load('d1')).resolves.toMatchObject({
-      composition: null,
-      revision: 0,
-    });
+  it('refuses to load: the page supplies the dashboard as the snapshot', async () => {
+    const storage = serverDashboardStorage({ save: vi.fn() });
+    await expect(storage.load('d1')).rejects.toThrow(/snapshot/);
   });
 
   it('saves through the action with the id, composition and base revision, and passes its answer on', async () => {
     const save = vi.fn().mockResolvedValue({ ok: true, revision: 5 });
     const storage = serverDashboardStorage({
-      composition: null,
-      revision: 4,
       save,
     });
     const composition = createComposition();
@@ -50,8 +27,6 @@ describe('serverDashboardStorage', () => {
   it('passes a conflict on untouched', async () => {
     const save = vi.fn().mockResolvedValue({ ok: false, reason: 'conflict' });
     const storage = serverDashboardStorage({
-      composition: null,
-      revision: 4,
       save,
     });
     await expect(
@@ -65,8 +40,6 @@ describe('serverDashboardStorage', () => {
   it('reports an action that throws (the network dropped) as not saved', async () => {
     const save = vi.fn().mockRejectedValue(new Error('network'));
     const storage = serverDashboardStorage({
-      composition: null,
-      revision: 4,
       save,
     });
     await expect(
@@ -79,8 +52,6 @@ describe('serverDashboardStorage', () => {
 
   it('does not store records', async () => {
     const storage = serverDashboardStorage({
-      composition: null,
-      revision: 0,
       save: vi.fn(),
     });
     await expect(storage.saveRecords({} as never)).resolves.toBeUndefined();

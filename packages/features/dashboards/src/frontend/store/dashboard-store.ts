@@ -85,6 +85,12 @@ type DashboardState = {
   saveMessage: string | null;
   /** Bumped by Retry; the save scheduler watches it. */
   saveRequests: number;
+  /**
+   * The stored revision the composition was read or last saved at: the base
+   * of the next save. The save scheduler moves it on each confirmed save; a
+   * host's snapshot is newer than this store only when its revision is higher.
+   */
+  savedRevision: number;
   /** What a screen reader hears after a move, resize, reorder, add or remove. */
   announcement: string;
   /** Set by a removal and cleared by the next change or by Undo. */
@@ -116,6 +122,8 @@ type DashboardActions = {
   setSaveStatus(status: SaveStatus, message?: string | null): void;
   /** Asks the save scheduler to save again now (Retry). */
   requestSave(): void;
+  /** The save scheduler records the revision a save was confirmed at. */
+  setSavedRevision(revision: number): void;
   applyLayoutChange(bp: Breakpoint, items: LayoutItem[]): void;
   updateSettings(patch: Partial<DashboardSettings>): void;
   toggleTask(taskId: string): void;
@@ -142,6 +150,8 @@ export type DashboardStoreInit = {
   readOnly?: boolean;
   /** Start in edit mode (a replacement store keeps the person's mode). Ignored when read-only. @default false */
   editMode?: boolean;
+  /** The stored revision `composition` was read at. @default 0 */
+  revision?: number;
 };
 
 /**
@@ -158,6 +168,7 @@ export function createDashboardStore({
   now = Date.now,
   readOnly = false,
   editMode = false,
+  revision = 0,
 }: DashboardStoreInit): StoreApi<DashboardStore> {
   return createStore<DashboardStore>()((set, get) => {
     const context = (): RecordContext => ({ ownerId, now: now() });
@@ -196,6 +207,7 @@ export function createDashboardStore({
       saveStatus: 'saved',
       saveMessage: null,
       saveRequests: 0,
+      savedRevision: revision,
       announcement: '',
       removed: null,
       breakpointLocked,
@@ -340,6 +352,9 @@ export function createDashboardStore({
         set({ saveStatus: status, saveMessage: message });
       },
       requestSave: () => set((s) => ({ saveRequests: s.saveRequests + 1 })),
+      setSavedRevision: (next) => {
+        if (get().savedRevision !== next) set({ savedRevision: next });
+      },
       // The grid reports a layout right after any widget set change (it
       // compacts); that must not take Undo away.
       applyLayoutChange: (bp, items) =>

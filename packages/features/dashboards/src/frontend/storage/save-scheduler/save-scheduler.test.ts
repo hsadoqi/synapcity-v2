@@ -203,19 +203,19 @@ describe('connectSaves', () => {
       );
     });
 
-    it('starts from the revision it was given', async () => {
+    it('starts from the revision the store was read at, and records the confirmed one', async () => {
       const store = createDashboardStore({
         composition: createComposition(),
         records: emptyRecords(),
         ownerId: '11111111-1111-4111-8111-111111111111',
         breakpoint: 'lg',
+        revision: 7,
       });
       const saveComposition = vi.fn(async () => ({ ok: true, revision: 8 }));
       connectSaves(
         store,
         { load: vi.fn(), saveComposition, saveRecords: vi.fn() } as never,
         'dash-1',
-        { baseRevision: 7 },
       );
       store.getState().addWidget('stat');
       await vi.advanceTimersByTimeAsync(400);
@@ -224,6 +224,7 @@ describe('connectSaves', () => {
         expect.anything(),
         7,
       );
+      expect(store.getState().savedRevision).toBe(8);
     });
 
     it('retries a failure once, then reports it as failed with the host message, and Retry asks again', async () => {

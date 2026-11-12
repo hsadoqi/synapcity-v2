@@ -1,4 +1,8 @@
-import { addWidget, createComposition } from '@synapcity/domain-dashboards';
+import {
+  addWidget,
+  createComposition,
+  type DashboardComposition,
+} from '@synapcity/domain-dashboards';
 import { act, render, screen } from '@testing-library/react';
 import { useEffect, useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -258,11 +262,283 @@ describe('DashboardWorkspaceProvider', () => {
         await vi.advanceTimersByTimeAsync(500);
       });
       expect(old.getState().saveStatus).toBe('saving');
-      view.rerenderWith({ storage, snapshot: snapshotOf(seeded, 2) });
+      // A read of the same dashboard keeps a saving store (see "server
+      // refreshes"); moving to another dashboard abandons it.
+      view.rerenderWith({
+        storage,
+        dashboardId: OTHER,
+        snapshot: snapshotOf(seeded, 2),
+      });
       const next = mounts.stores.at(-1)!;
       act(() => next.getState().setSaveStatus('unsaved'));
       await act(async () => answer({ ok: true, revision: 2 }));
       expect(next.getState().saveStatus).toBe('unsaved');
+    });
+  });
+
+  /**
+   * A host page refreshes for reasons of its own (a pin elsewhere revalidates
+   * the layout, quick-create, an auth event, the link widgets asking for
+   * records). Each refresh hands the provider the stored dashboard again as
+   * new objects. Only a newer stored revision, an explicit Reload after a
+   * conflict, or another dashboard may replace what the person is editing.
+   */
+  describe('server refreshes', () => {
+    type Stored = { composition: DashboardComposition; revision: number };
+
+    /** A stored dashboard that checks base revisions the way the database does. */
+    function revisionedServer(initial: DashboardComposition = seeded) {
+      let stored: Stored = { composition: initial, revision: 1 };
+      const saves: string[] = [];
+      let fail = false;
+      let hold: Promise<void> | null = null;
+      const saveComposition = vi.fn(
+        async (
+          _id: string,
+          composition: DashboardComposition,
+          base: number,
+        ) => {
+          if (fail) {
+            saves.push(`failed@${base}`);
+            return { ok: false as const, reason: 'failed' as const };
+          }
+          if (base !== stored.revision) {
+            saves.push(`conflict@${base}`);
+            return { ok: false as const, reason: 'conflict' as const };
+          }
+          // Committed at once; the answer may be held back, as a slow network does.
+          stored = { composition, revision: base + 1 };
+          saves.push(`ok@${base}->${base + 1}`);
+          if (hold) await hold;
+          return { ok: true as const, revision: base + 1 };
+        },
+      );
+      const storage: DashboardStorage = {
+        ...memoryDashboardStorage(SEED_OWNER),
+        saveComposition,
+      };
+      return {
+        storage,
+        saves,
+        saveComposition,
+        /** What a refresh delivers: the stored values as new objects. */
+        read: (): DashboardSnapshot => ({
+          composition: structuredClone(stored.composition),
+          records,
+          revision: stored.revision,
+        }),
+        /** Another tab saves. */
+        writeElsewhere: (composition: DashboardComposition) => {
+          stored = { composition, revision: stored.revision + 1 };
+        },
+        failSaves: (value: boolean) => {
+          fail = value;
+        },
+        holdAnswers: () => {
+          let release!: () => void;
+          hold = new Promise((r) => (release = r));
+          return () => {
+            hold = null;
+            release();
+          };
+        },
+      };
+    }
+
+    const live = () => mounts.stores.at(-1)!;
+    const columns = () => live().getState().composition.settings.columns;
+    async function wait(ms: number) {
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(ms);
+      });
+    }
+
+    it('keeps a pending edit when a refresh delivers the same revision as new objects', async () => {
+      vi.useFakeTimers();
+      const server = revisionedServer();
+      const view = renderProvider({
+        storage: server.storage,
+        snapshot: server.read(),
+      });
+      const store = live();
+      act(() => store.getState().updateSettings({ columns: 4 }));
+      await wait(100);
+
+      view.rerenderWith({ storage: server.storage, snapshot: server.read() });
+      expect(live()).toBe(store);
+      expect(columns()).toBe(4);
+
+      await wait(1000);
+      act(() => live().getState().updateSettings({ columns: 2 }));
+      await wait(1000);
+      expect(server.saves).toEqual(['ok@1->2', 'ok@2->3']);
+      expect(live().getState().saveStatus).toBe('saved');
+      expect(columns()).toBe(2);
+    });
+
+    it('keeps the store, its selection and the undo offer when a refresh echoes the save', async () => {
+      vi.useFakeTimers();
+      const server = revisionedServer();
+      const view = renderProvider({
+        storage: server.storage,
+        snapshot: server.read(),
+      });
+      const store = live();
+      act(() => store.getState().toggleEditMode());
+      act(() => store.getState().removeWidget(first.id));
+      await wait(1000);
+      expect(server.saves).toEqual(['ok@1->2']);
+      act(() => store.getState().selectWidget(seeded.widgets[1]!.id));
+
+      // The page refreshes after the save, with what was just saved.
+      view.rerenderWith({ storage: server.storage, snapshot: server.read() });
+      expect(live()).toBe(store);
+      expect(store.getState().removed?.widgetId).toBe(first.id);
+      expect(store.getState().selectedWidgetId).toBe(seeded.widgets[1]!.id);
+      await wait(1000);
+      expect(server.saveComposition).toHaveBeenCalledTimes(1);
+      expect(store.getState().saveStatus).toBe('saved');
+    });
+
+    it('ignores a refresh that read an older revision than the store has saved', async () => {
+      vi.useFakeTimers();
+      const server = revisionedServer();
+      const stale = server.read();
+      const view = renderProvider({ storage: server.storage, snapshot: stale });
+      const store = live();
+      act(() => store.getState().updateSettings({ columns: 4 }));
+      await wait(1000);
+      expect(server.saves).toEqual(['ok@1->2']);
+
+      view.rerenderWith({ storage: server.storage, snapshot: { ...stale } });
+      expect(live()).toBe(store);
+      expect(columns()).toBe(4);
+    });
+
+    it('adopts a newer stored revision when nothing is pending', async () => {
+      vi.useFakeTimers();
+      const server = revisionedServer();
+      const view = renderProvider({
+        storage: server.storage,
+        snapshot: server.read(),
+      });
+      const store = live();
+      const elsewhere = addWidget(createComposition(), first);
+      server.writeElsewhere(elsewhere);
+
+      view.rerenderWith({ storage: server.storage, snapshot: server.read() });
+      expect(live()).not.toBe(store);
+      expect(live().getState().composition).toEqual(elsewhere);
+
+      act(() => live().getState().updateSettings({ columns: 2 }));
+      await wait(1000);
+      expect(server.saves).toEqual(['ok@2->3']);
+    });
+
+    it('keeps a pending edit over a newer revision, lets the save answer as a conflict, and Reload then replaces it', async () => {
+      vi.useFakeTimers();
+      const server = revisionedServer();
+      const view = renderProvider({
+        storage: server.storage,
+        snapshot: server.read(),
+      });
+      const store = live();
+      act(() => store.getState().updateSettings({ columns: 4 }));
+      const elsewhere = addWidget(createComposition(), first);
+      server.writeElsewhere(elsewhere);
+
+      view.rerenderWith({ storage: server.storage, snapshot: server.read() });
+      expect(live()).toBe(store);
+      expect(columns()).toBe(4);
+      await wait(1000);
+      expect(server.saves).toEqual(['conflict@1']);
+      expect(store.getState().saveStatus).toBe('conflict');
+
+      // The person's Reload: the page reads again, the same revision as before.
+      view.rerenderWith({ storage: server.storage, snapshot: server.read() });
+      expect(live()).not.toBe(store);
+      expect(live().getState().composition).toEqual(elsewhere);
+      expect(live().getState().saveStatus).toBe('saved');
+    });
+
+    it('keeps an edit made while a save is in flight, through a refresh that echoes that save', async () => {
+      vi.useFakeTimers();
+      const server = revisionedServer();
+      const view = renderProvider({
+        storage: server.storage,
+        snapshot: server.read(),
+      });
+      const store = live();
+      const release = server.holdAnswers();
+      act(() => store.getState().updateSettings({ columns: 4 }));
+      await wait(500);
+      expect(store.getState().saveStatus).toBe('saving');
+
+      // The server already holds revision 2; its answer has not arrived.
+      view.rerenderWith({ storage: server.storage, snapshot: server.read() });
+      expect(live()).toBe(store);
+      act(() => store.getState().updateSettings({ columns: 2 }));
+      await act(async () => release());
+      await wait(1000);
+
+      expect(server.saves).toEqual(['ok@1->2', 'ok@2->3']);
+      expect(live()).toBe(store);
+      expect(columns()).toBe(2);
+      expect(store.getState().saveStatus).toBe('saved');
+    });
+
+    it('keeps an edit whose save failed through a refresh, and Retry saves it', async () => {
+      vi.useFakeTimers();
+      const server = revisionedServer();
+      const view = renderProvider({
+        storage: server.storage,
+        snapshot: server.read(),
+      });
+      const store = live();
+      server.failSaves(true);
+      act(() => store.getState().updateSettings({ columns: 4 }));
+      await wait(2000);
+      expect(store.getState().saveStatus).toBe('failed');
+
+      view.rerenderWith({ storage: server.storage, snapshot: server.read() });
+      expect(live()).toBe(store);
+      expect(columns()).toBe(4);
+
+      server.failSaves(false);
+      act(() => store.getState().requestSave());
+      await wait(100);
+      expect(server.saves).toEqual(['failed@1', 'failed@1', 'ok@1->2']);
+      expect(store.getState().saveStatus).toBe('saved');
+    });
+
+    it('a different dashboard replaces the store, and the pending edit is saved to the dashboard it was made on', async () => {
+      vi.useFakeTimers();
+      const server = revisionedServer();
+      const view = renderProvider({
+        storage: server.storage,
+        snapshot: server.read(),
+      });
+      const store = live();
+      act(() => store.getState().updateSettings({ columns: 4 }));
+      await wait(100);
+
+      const other = createComposition();
+      view.rerenderWith({
+        storage: server.storage,
+        dashboardId: OTHER,
+        snapshot: snapshotOf(other, 5),
+      });
+      expect(live()).not.toBe(store);
+      expect(live().getState().composition).toBe(other);
+      await wait(1000);
+      expect(server.saveComposition).toHaveBeenCalledTimes(1);
+      expect(server.saveComposition).toHaveBeenCalledWith(
+        DASH,
+        expect.objectContaining({
+          settings: expect.objectContaining({ columns: 4 }),
+        }),
+        1,
+      );
     });
   });
 });

@@ -134,18 +134,19 @@ export function DashboardView({
 }) {
   const router = useRouter();
   const ownerId = dashboard.ownerId;
+  // One object for the life of the page: the server adapter holds no page
+  // data, so a refresh's new composition object never makes a new storage
+  // (which would replace the store with an edit still waiting to be saved).
   const storage = useMemo(
     () =>
       persistence === 'server'
-        ? serverDashboardStorage({
-            composition,
-            revision,
-            save: saveDashboardComposition,
-          })
+        ? serverDashboardStorage({ save: saveDashboardComposition })
         : withFixtureSeeds(browserDashboardStorage({ ownerId })),
-    [persistence, composition, revision, ownerId],
+    [persistence, ownerId],
   );
-  // Stable between renders: a different snapshot replaces the store.
+  // The provider compares its revision, not its identity: a refresh with the
+  // same revision keeps the store, and a newer one replaces it once nothing
+  // is waiting to be saved.
   const snapshot = useMemo<DashboardSnapshot | undefined>(
     () =>
       persistence === 'server'

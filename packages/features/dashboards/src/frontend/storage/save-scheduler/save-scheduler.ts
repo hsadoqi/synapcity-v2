@@ -13,8 +13,6 @@ type SaveTarget = {
 export type ConnectSavesOptions = {
   /** Debounce after the last change. @default 400 */
   delayMs?: number;
-  /** The revision the composition was read at. @default 0 */
-  baseRevision?: number;
   target?: SaveTarget;
 };
 
@@ -47,15 +45,18 @@ async function save(
  * writing on would overwrite newer work. While anything is unsaved, closing
  * the page asks first (`beforeunload`): an async save cannot be trusted to
  * finish after the page is gone.
+ *
+ * Each save is based on the store's `savedRevision` (the revision the store
+ * was read at), and a confirmed save moves it on, so whoever holds the store
+ * can tell its own saves from a newer stored revision.
  */
 export function connectSaves(
   store: StoreApi<DashboardStore>,
   storage: DashboardStorage,
   dashboardId: string,
-  { delayMs = 400, baseRevision = 0, target }: ConnectSavesOptions = {},
+  { delayMs = 400, target }: ConnectSavesOptions = {},
 ): () => void {
   const { window: win, document: doc } = target ?? { window, document };
-  let revision = baseRevision;
   let compositionVersion = 0;
   let savedCompositionVersion = 0;
   let recordsVersion = 0;
@@ -108,10 +109,10 @@ export function connectSaves(
             storage,
             dashboardId,
             composition,
-            revision,
+            store.getState().savedRevision,
           );
           if (outcome.ok) {
-            revision = outcome.revision;
+            store.getState().setSavedRevision(outcome.revision);
             savedCompositionVersion = compositionToSave;
           } else if (outcome.reason === 'conflict') {
             stopped = true;
