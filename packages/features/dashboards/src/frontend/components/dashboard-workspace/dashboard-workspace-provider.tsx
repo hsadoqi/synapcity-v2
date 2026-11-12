@@ -114,12 +114,13 @@ function replaces(
  * for another dashboard or storage, after a conflict once the person has
  * chosen Reload, or when nothing is waiting to be saved and the snapshot's
  * revision is newer than the store's. Otherwise the store, with any unsaved,
- * in-flight, failed or conflicted edit, stays as it is. A replacement is never a remount: the children stay
- * mounted, so what the host keeps in them (a panel's destination and width)
- * survives. Consumers move to the new store by context; saves for the old
- * store are disconnected and the new store saves from the new snapshot's
- * revision. Edit mode and the chosen layout carry over; selection, the
- * undo offer, the save state and the announcement start fresh.
+ * in-flight, failed or conflicted edit, stays as it is. A replacement is never
+ * a remount: the children stay mounted, so what the host keeps in them (a
+ * panel's destination and width) survives. Consumers move to the new store by
+ * context; saves for the old store are disconnected and the new store saves
+ * from the new snapshot's revision. Edit mode and the chosen layout carry
+ * over; selection, the undo offer, the save state and the announcement start
+ * fresh.
  *
  * With `snapshot` the host already holds the dashboard, so the first render
  * has the store and no `fallback` shows. Without it the provider reads
