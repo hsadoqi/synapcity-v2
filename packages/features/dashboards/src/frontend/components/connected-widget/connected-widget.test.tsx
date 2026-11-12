@@ -11,6 +11,7 @@ import { Profiler } from 'react';
 import { useState } from 'react';
 import { describe, expect, it } from 'vitest';
 
+import { useDashboardStore } from '../../store';
 import {
   renderWithStore,
   SEED_NOW,
@@ -46,6 +47,12 @@ describe('ConnectedWidget', () => {
     ).toBeDefined();
 
     fireEvent.click(screen.getByRole('button', { name: 'Narrow canvas' }));
+    const trigger = screen.getByRole('button', {
+      name: `Settings for ${widget.title}`,
+    });
+    act(() => store().getState().chooseBreakpoint('sm'));
+    // The grid really remounted: the old trigger is gone.
+    expect(trigger.isConnected).toBe(false);
 
     expect(
       await screen.findByRole('button', { name: 'Remove widget' }),
