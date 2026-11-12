@@ -78,7 +78,11 @@ function sameSource(a: Source, b: Source) {
  * which rises by exactly one on every write, says whether the dashboard
  * changed. What the person has not saved yet is never thrown away by a read.
  */
-function replaces(active: Active, next: Source) {
+function replaces(
+  active: Active,
+  next: Source,
+  givenUp: StoreApi<DashboardStore> | null,
+) {
   // Another dashboard, or another place to save it.
   if (
     next.dashboardId !== active.source.dashboardId ||
@@ -87,8 +91,10 @@ function replaces(active: Active, next: Source) {
     return true;
   }
   const { saveStatus, savedRevision } = active.store.getState();
-  // The person's Reload after a conflict: the draft has already been given up.
-  if (saveStatus === 'conflict') return true;
+  // After a conflict the draft can no longer be saved, but it stays on screen
+  // until the person chooses Reload, which gives it up. A refresh the host
+  // makes for its own reasons (pin revalidation, an auth event) keeps it.
+  if (saveStatus === 'conflict') return active.store === givenUp;
   // Unsaved, saving or failed work stays. If the read is newer, the save
   // answers as a conflict and the person chooses to reload.
   if (saveStatus !== 'saved') return false;
@@ -105,10 +111,10 @@ function replaces(active: Active, next: Source) {
  *
  * **A read replaces the store only when the dashboard changed.** Hosts read
  * again for reasons of their own, so a new snapshot replaces the store only
- * for another dashboard or storage, after a conflict (the person's Reload),
- * or when nothing is waiting to be saved and the snapshot's revision is newer
- * than the store's. Otherwise the store, with any unsaved or in-flight edit,
- * stays as it is. A replacement is never a remount: the children stay
+ * for another dashboard or storage, after a conflict once the person has
+ * chosen Reload, or when nothing is waiting to be saved and the snapshot's
+ * revision is newer than the store's. Otherwise the store, with any unsaved,
+ * in-flight, failed or conflicted edit, stays as it is. A replacement is never a remount: the children stay
  * mounted, so what the host keeps in them (a panel's destination and width)
  * survives. Consumers move to the new store by context; saves for the old
  * store are disconnected and the new store saves from the new snapshot's
@@ -214,11 +220,13 @@ export function DashboardWorkspaceProvider({
   };
 
   const [active, setActive] = useState<Active | null>(null);
+  // The store whose conflicted draft the person gave up by choosing Reload.
+  const [givenUp, setGivenUp] = useState<StoreApi<DashboardStore> | null>(null);
   if (
     source &&
     active &&
     !sameSource(active.source, source) &&
-    !replaces(active, source)
+    !replaces(active, source, givenUp)
   ) {
     // The same dashboard read again: keep the store and what it holds.
     setActive({ source, store: active.store });
@@ -276,7 +284,15 @@ export function DashboardWorkspaceProvider({
         widgetTypes={widgetTypes}
         persistsStatus={persistsStatus}
         LinkComponent={LinkComponent}
-        onReload={onReload ?? (() => setReloads((count) => count + 1))}
+        onReload={() => {
+          // Only Reload after a conflict gives the draft up; the next read of
+          // this dashboard then replaces the store.
+          if (active.store.getState().saveStatus === 'conflict') {
+            setGivenUp(active.store);
+          }
+          if (onReload) onReload();
+          else setReloads((count) => count + 1);
+        }}
       >
         <DashboardStoreScope store={active.store}>
           <LinkItemsLoader />

@@ -9,6 +9,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { StoreApi } from 'zustand/vanilla';
 
 import type { DashboardSnapshot, DashboardStorage } from '../../../contracts';
+import { useDashboardConfig } from '../../config';
 import { memoryDashboardStorage, SEED_OWNER } from '../../../testing';
 import { seededWorkspace } from '../../../testing';
 import {
@@ -38,6 +39,7 @@ function Probe() {
   const store = useDashboardStoreApi();
   const editMode = useDashboardStore((s) => s.editMode);
   const widgets = useDashboardStore((s) => s.composition.widgets.length);
+  const { onReload } = useDashboardConfig();
   useEffect(() => {
     mounts.count += 1;
   }, []);
@@ -47,6 +49,7 @@ function Probe() {
       <p data-testid="state">{`${local}|${editMode ? 'edit' : 'view'}|${widgets}`}</p>
       <button onClick={() => setLocal((n) => n + 1)}>bump</button>
       <button onClick={() => store.getState().toggleEditMode()}>edit</button>
+      <button onClick={() => onReload?.()}>reload</button>
     </div>
   );
 }
@@ -236,7 +239,9 @@ describe('DashboardWorkspaceProvider', () => {
       expect(saveComposition).toHaveBeenCalledTimes(1);
 
       // The person's explicit Reload hands the page a newer snapshot.
+      act(() => screen.getByRole('button', { name: 'reload' }).click());
       view.rerenderWith({ storage, snapshot: snapshotOf(seeded, 2) });
+      expect(mounts.stores.at(-1)).not.toBe(old);
       act(() => old.getState().updateSettings({ columns: 2 }));
       await act(async () => {
         await vi.advanceTimersByTimeAsync(1000);
@@ -455,10 +460,64 @@ describe('DashboardWorkspaceProvider', () => {
       expect(store.getState().saveStatus).toBe('conflict');
 
       // The person's Reload: the page reads again, the same revision as before.
+      act(() => screen.getByRole('button', { name: 'reload' }).click());
       view.rerenderWith({ storage: server.storage, snapshot: server.read() });
       expect(live()).not.toBe(store);
       expect(live().getState().composition).toEqual(elsewhere);
       expect(live().getState().saveStatus).toBe('saved');
+    });
+
+    it('keeps a conflicted draft on screen through a background refresh until the person chooses Reload', async () => {
+      vi.useFakeTimers();
+      const server = revisionedServer();
+      const view = renderProvider({
+        storage: server.storage,
+        snapshot: server.read(),
+      });
+      const store = live();
+      server.writeElsewhere(addWidget(createComposition(), first));
+      act(() => store.getState().updateSettings({ columns: 4 }));
+      await wait(1000);
+      expect(server.saves).toEqual(['conflict@1']);
+      expect(store.getState().saveStatus).toBe('conflict');
+
+      // Refreshes the host makes for its own reasons (pin revalidation, an
+      // auth event) do not give the draft up, however many arrive.
+      view.rerenderWith({ storage: server.storage, snapshot: server.read() });
+      view.rerenderWith({ storage: server.storage, snapshot: server.read() });
+      expect(live()).toBe(store);
+      expect(columns()).toBe(4);
+      expect(store.getState().saveStatus).toBe('conflict');
+      await wait(1000);
+      expect(server.saves).toEqual(['conflict@1']);
+
+      act(() => screen.getByRole('button', { name: 'reload' }).click());
+      view.rerenderWith({ storage: server.storage, snapshot: server.read() });
+      expect(live()).not.toBe(store);
+      expect(live().getState().saveStatus).toBe('saved');
+      expect(live().getState().savedRevision).toBe(2);
+    });
+
+    it('does not count a reload asked for before a conflict as the person giving the draft up', async () => {
+      vi.useFakeTimers();
+      const server = revisionedServer();
+      const view = renderProvider({
+        storage: server.storage,
+        snapshot: server.read(),
+      });
+      const store = live();
+      // A reload while everything is saved (the link widgets asking for records).
+      act(() => screen.getByRole('button', { name: 'reload' }).click());
+      view.rerenderWith({ storage: server.storage, snapshot: server.read() });
+      expect(live()).toBe(store);
+
+      server.writeElsewhere(addWidget(createComposition(), first));
+      act(() => store.getState().updateSettings({ columns: 4 }));
+      await wait(1000);
+      expect(store.getState().saveStatus).toBe('conflict');
+      view.rerenderWith({ storage: server.storage, snapshot: server.read() });
+      expect(live()).toBe(store);
+      expect(columns()).toBe(4);
     });
 
     it('keeps an edit made while a save is in flight, through a refresh that echoes that save', async () => {
