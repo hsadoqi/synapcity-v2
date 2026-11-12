@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { firstNameSchema, lastNameSchema, nameSchema } from './names';
+import { firstNameSchema, lastNameSchema } from './names';
 
 /** The shortest password the forms accept; the weak-password reply states it. */
 export const MIN_PASSWORD_LENGTH = 8;
@@ -84,19 +84,6 @@ export const signInSchema = z.object({
   password: z.string().min(1, ENTER_EMAIL_AND_PASSWORD),
 });
 
-/**
- * The keys are in the order problems are reported: the first one wins.
- *
- * Transitional: the current register form still validates with this and
- * submits `name`. The `signUp` action now uses `registrationSchema`. Remove
- * this once the form moves to `registrationSchema`.
- */
-export const signUpSchema = z.object({
-  email,
-  name: nameSchema,
-  password: newPasswordSchema,
-});
-
 const ENTER_VALID_EMAIL = 'Enter a valid email address.';
 const CONFIRM_PASSWORD = 'Confirm your password.';
 
@@ -144,13 +131,12 @@ export const updatePasswordSchema = z
 
 /** Form fields an auth error can point at, so the form can mark them invalid. */
 export type AuthFieldName =
-  | keyof z.input<typeof signUpSchema>
+  | keyof z.input<typeof signInSchema>
   | keyof z.input<typeof registrationSchema>
   | keyof z.input<typeof updatePasswordSchema>;
 
 const AUTH_FIELDS: ReadonlySet<PropertyKey> = new Set<AuthFieldName>([
   'email',
-  'name',
   'firstName',
   'lastName',
   'password',

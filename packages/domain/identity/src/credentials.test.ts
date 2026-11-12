@@ -12,7 +12,6 @@ import {
   firstRefusal,
   registrationSchema,
   signInSchema,
-  signUpSchema,
   updatePasswordSchema,
 } from './credentials';
 
@@ -62,49 +61,6 @@ describe('signInSchema', () => {
     expect(
       signInSchema.parse({ email: ' a@b.co ', password: ' pass ' }),
     ).toEqual({ email: 'a@b.co', password: ' pass ' });
-  });
-});
-
-describe('signUpSchema', () => {
-  const valid = { email: 'a@b.co', name: 'Ada', password: STRONG };
-
-  it('reports one problem at a time, in the order email, name, password', () => {
-    expect(
-      refusal(signUpSchema, { email: '', name: '', password: '' }),
-    ).toEqual({ message: 'Enter your email.', fields: ['email'] });
-    expect(
-      refusal(signUpSchema, { ...valid, name: '  ', password: '' }),
-    ).toEqual({ message: 'Enter your name.', fields: ['name'] });
-    expect(refusal(signUpSchema, { ...valid, password: 'short' })).toEqual({
-      message: PASSWORD_TOO_SHORT_MESSAGE,
-      fields: ['password'],
-    });
-  });
-
-  it('uses the account feature name rule, so sign-up and the profile agree', () => {
-    expect(
-      refusal(signUpSchema, { ...valid, name: 'x'.repeat(81) }).message,
-    ).toBe('Use a name of at most 80 characters.');
-  });
-
-  it('trims email and name, and accepts a password at exactly the minimum', () => {
-    expect(
-      signUpSchema.parse({
-        email: ' a@b.co ',
-        name: ' Ada ',
-        password: EXACTLY_MINIMUM,
-      }),
-    ).toEqual({
-      email: 'a@b.co',
-      name: 'Ada',
-      password: EXACTLY_MINIMUM,
-    });
-  });
-
-  it('leaves the format of an address to the provider', () => {
-    expect(
-      signUpSchema.safeParse({ ...valid, email: 'not-an-address' }).success,
-    ).toBe(true);
   });
 });
 

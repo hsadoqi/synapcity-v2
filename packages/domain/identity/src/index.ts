@@ -9,7 +9,6 @@ export {
   firstRefusal,
   registrationSchema,
   signInSchema,
-  signUpSchema,
   updatePasswordSchema,
   type AuthFieldName,
 } from './credentials';

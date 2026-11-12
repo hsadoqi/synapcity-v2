@@ -35,7 +35,6 @@ describe('@synapcity/domain-identity root entry', () => {
       'providerLabel',
       'registrationSchema',
       'signInSchema',
-      'signUpSchema',
       'updatePasswordSchema',
     ]);
   });

@@ -7,14 +7,35 @@ const mocks = vi.hoisted(() => ({
   signInWithOAuth: vi.fn(),
 }));
 
-import { firstRefusal, signUpSchema } from '@synapcity/domain-identity';
+import {
+  firstRefusal,
+  registrationSchema,
+  type AuthFieldName,
+} from '@synapcity/domain-identity';
 import { RegisterCard } from './register-card';
 
-type Typed = { name: string; email: string; password: string };
+type Typed = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirm: string;
+};
 const VALID: Typed = {
-  name: 'Ada Lovelace',
+  firstName: 'Ada',
+  lastName: 'Lovelace',
   email: 'ada@example.com',
   password: 'Analytical1!',
+  confirm: 'Analytical1!',
+};
+
+/** Each field's visible label, in the order the form shows them. */
+const LABELS: Record<keyof Typed, string> = {
+  firstName: 'First name',
+  lastName: 'Last name',
+  email: 'Email',
+  password: 'Password',
+  confirm: 'Confirm password',
 };
 
 /**
@@ -23,11 +44,11 @@ const VALID: Typed = {
  */
 const submit = (typed: Typed = VALID) =>
   act(async () => {
-    for (const [label, value] of [
-      ['Name', typed.name],
-      ['Email', typed.email],
-      ['Password', typed.password],
-    ] as const) {
+    for (const [key, label] of Object.entries(LABELS) as [
+      keyof Typed,
+      string,
+    ][]) {
+      const value = typed[key];
       fireEvent.change(screen.getByLabelText(label, { exact: true }), {
         target: { value },
       });
@@ -173,24 +194,26 @@ describe('RegisterCard', () => {
     expect(screen.queryByText(/Requested for/)).toBeNull();
   });
 
-  it.each<[string, Typed]>([
-    ['nothing typed', { name: '', email: '', password: '' }],
-    ['only a name', { name: 'Ada', email: '', password: '' }],
+  it.each<[string, Partial<Typed>]>([
     [
-      'no name',
-      { name: '   ', email: 'ada@example.com', password: 'Analytical1!' },
+      'nothing typed',
+      { firstName: '', lastName: '', email: '', password: '', confirm: '' },
     ],
-    [
-      'a short password',
-      { name: 'Ada', email: 'ada@example.com', password: 'short' },
-    ],
+    ['no first name', { firstName: '   ' }],
+    ['an invalid first name', { firstName: 'Ada1' }],
+    ['an invalid last name', { lastName: '<b>' }],
+    ['a malformed email', { email: 'not-an-address' }],
+    ['a short password', { password: 'short', confirm: 'short' }],
     [
       'a password missing a symbol',
-      { name: 'Ada', email: 'ada@example.com', password: 'Analytical1' },
+      { password: 'Analytical1', confirm: 'Analytical1' },
     ],
+    ['a confirmation that does not match', { confirm: 'Analytical1?' }],
+    ['no confirmation', { confirm: '' }],
   ])(
     'refuses %s in the browser with the message and field the server would give',
-    async (_label, typed) => {
+    async (_label, change) => {
+      const typed = { ...VALID, ...change };
       render(
         <RegisterCard
           signUp={mocks.signUp}
@@ -202,30 +225,50 @@ describe('RegisterCard', () => {
 
       await submit(typed);
 
-      const parsed = signUpSchema.safeParse(typed);
+      const parsed = registrationSchema.safeParse(typed);
       expect(parsed.success).toBe(false);
       const expected = firstRefusal(parsed.error!);
       expect(mocks.signUp).not.toHaveBeenCalled();
       const alert = screen.getByRole('alert');
       expect(alert.textContent).toBe(expected.message);
-      for (const label of ['Name', 'Email', 'Password']) {
+      for (const [key, label] of Object.entries(LABELS)) {
         const field = screen.getByLabelText(label, { exact: true });
-        const marked = expected.fields.includes(
-          label.toLowerCase() as (typeof expected.fields)[number],
-        );
+        const marked = expected.fields.includes(key as AuthFieldName);
         expect(field.getAttribute('aria-invalid')).toBe(marked ? 'true' : null);
       }
-      const first = screen.getByLabelText(
-        expected.fields[0] === 'name'
-          ? 'Name'
-          : expected.fields[0] === 'email'
-            ? 'Email'
-            : 'Password',
-        { exact: true },
+      const first = expected.fields[0] as keyof Typed;
+      expect(document.activeElement).toBe(
+        screen.getByLabelText(LABELS[first], { exact: true }),
       );
-      expect(document.activeElement).toBe(first);
     },
   );
+
+  it('reports the password rule once the names are valid', async () => {
+    render(
+      <RegisterCard
+        signUp={mocks.signUp}
+        resendConfirmation={mocks.resendConfirmation}
+        signInWithOAuth={mocks.signInWithOAuth}
+        next="/after"
+      />,
+    );
+
+    await submit({ ...VALID, password: 'short', confirm: 'short' });
+
+    expect(screen.getByRole('alert').textContent).toBe(
+      'Use a password of at least 8 characters.',
+    );
+    expect(
+      screen
+        .getByLabelText('First name', { exact: true })
+        .getAttribute('aria-invalid'),
+    ).toBeNull();
+    expect(
+      screen
+        .getByLabelText('Password', { exact: true })
+        .getAttribute('aria-invalid'),
+    ).toBe('true');
+  });
 
   it('keeps what was typed in every field when the browser refuses', async () => {
     render(
@@ -237,21 +280,24 @@ describe('RegisterCard', () => {
       />,
     );
 
-    await submit({ name: 'Ada', email: 'ada@example.com', password: 'short' });
+    await submit({ ...VALID, password: 'short', confirm: 'short' });
 
-    expect((screen.getByLabelText('Name') as HTMLInputElement).value).toBe(
-      'Ada',
-    );
-    expect((screen.getByLabelText('Email') as HTMLInputElement).value).toBe(
-      'ada@example.com',
-    );
-    expect(
-      (screen.getByLabelText('Password', { exact: true }) as HTMLInputElement)
-        .value,
-    ).toBe('short');
+    for (const [key, value] of Object.entries({
+      ...VALID,
+      password: 'short',
+      confirm: 'short',
+    })) {
+      expect(
+        (
+          screen.getByLabelText(LABELS[key as keyof Typed], {
+            exact: true,
+          }) as HTMLInputElement
+        ).value,
+      ).toBe(value);
+    }
   });
 
-  it('sends the destination with a valid sign-up', async () => {
+  it('sends every field under the name the server action reads', async () => {
     render(
       <RegisterCard
         signUp={mocks.signUp}
@@ -266,6 +312,29 @@ describe('RegisterCard', () => {
     expect(mocks.signUp).toHaveBeenCalledTimes(1);
     const formData = mocks.signUp.mock.calls[0]?.[1] as FormData;
     expect(formData.get('next')).toBe('/after');
-    expect(formData.get('email')).toBe('ada@example.com');
+    expect(Object.fromEntries(formData)).toEqual({ next: '/after', ...VALID });
+    // What the form sent is what the server's schema accepts, key for key.
+    expect(
+      registrationSchema.safeParse(Object.fromEntries(formData)).success,
+    ).toBe(true);
+    expect(formData.has('name')).toBe(false);
+  });
+
+  it('accepts a blank last name, which is optional', async () => {
+    render(
+      <RegisterCard
+        signUp={mocks.signUp}
+        resendConfirmation={mocks.resendConfirmation}
+        signInWithOAuth={mocks.signInWithOAuth}
+        next=""
+      />,
+    );
+
+    await submit({ ...VALID, lastName: '' });
+
+    expect(mocks.signUp).toHaveBeenCalledTimes(1);
+    const formData = mocks.signUp.mock.calls[0]?.[1] as FormData;
+    expect(formData.get('firstName')).toBe('Ada');
+    expect(formData.get('lastName')).toBe('');
   });
 });
