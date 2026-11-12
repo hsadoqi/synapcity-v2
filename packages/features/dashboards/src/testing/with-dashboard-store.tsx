@@ -1,5 +1,5 @@
 import type { Decorator } from '@storybook/nextjs-vite';
-import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
+import { TooltipProvider } from '@synapcity/frontend-ui/components/tooltip';
 import type { StoreApi } from 'zustand/vanilla';
 
 import {

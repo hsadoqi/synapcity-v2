@@ -2,7 +2,10 @@ import { Popover as PopoverPrimitive } from '@base-ui/react/popover';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Button, buttonVariants } from '@synapcity/frontend-ui/core/button';
+import {
+  Button,
+  buttonVariants,
+} from '@synapcity/frontend-ui/components/button';
 
 describe('Button', () => {
   it('is named by its visible text unless given a label', () => {

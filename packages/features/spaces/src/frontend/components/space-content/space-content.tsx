@@ -1,6 +1,9 @@
 import { EntityContent } from '@synapcity/frontend-collection';
 import type { EntityItem } from '@synapcity/frontend-collection';
-import { Alert, AlertDescription } from '@synapcity/frontend-ui/core/alert';
+import {
+  Alert,
+  AlertDescription,
+} from '@synapcity/frontend-ui/components/alert';
 
 import type { Space } from '../../../contracts';
 import { spaceItemPath } from '../../utils';

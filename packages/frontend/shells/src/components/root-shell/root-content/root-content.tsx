@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { MAIN_CONTENT_ID } from '@synapcity/frontend-ui/core/skip-link';
+import { MAIN_CONTENT_ID } from '@synapcity/frontend-ui/components/skip-link';
 
 export const RootContent = ({ children }: { children: ReactNode }) => {
   return (

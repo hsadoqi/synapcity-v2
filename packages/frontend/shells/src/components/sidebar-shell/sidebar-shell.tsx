@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from 'react';
 import {
   SidebarInset,
   SidebarProvider,
-} from '@synapcity/frontend-ui/core/sidebar';
-import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
+} from '@synapcity/frontend-ui/components/sidebar';
+import { TooltipProvider } from '@synapcity/frontend-ui/components/tooltip';
 import { useKeyboardShortcut } from '@synapcity/frontend-ui/hooks/use-keyboard-shortcut';
 import { GlobalPanelShell } from '../root-shell/global-panel';
 import { SIDEBAR_SHORTCUT } from '../../utils/shortcuts';

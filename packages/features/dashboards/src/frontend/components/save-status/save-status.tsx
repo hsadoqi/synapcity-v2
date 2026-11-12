@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 import { useDashboardConfig } from '../../config';
 import { useDashboardStore, type SaveStatus } from '../../store';

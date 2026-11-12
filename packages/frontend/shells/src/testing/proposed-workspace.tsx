@@ -7,14 +7,14 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@synapcity/frontend-ui/core/breadcrumb';
+} from '@synapcity/frontend-ui/components/breadcrumb';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@synapcity/frontend-ui/core/dropdown-menu';
-import { Button } from '@synapcity/frontend-ui/core/button';
+} from '@synapcity/frontend-ui/components/dropdown-menu';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 
 import {

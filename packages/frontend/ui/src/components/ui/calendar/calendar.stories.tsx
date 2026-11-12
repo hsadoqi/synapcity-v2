@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { Calendar } from '@synapcity/frontend-ui/core/calendar';
+import { Calendar } from '@synapcity/frontend-ui/components/calendar';
 
 const may4 = new Date(2026, 4, 4);
 const may9 = new Date(2026, 4, 9);

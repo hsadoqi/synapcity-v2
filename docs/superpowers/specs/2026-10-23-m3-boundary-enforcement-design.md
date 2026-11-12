@@ -23,7 +23,7 @@ The boundary rules fail the build instead of living only in documents. A forbidd
 - **TypeScript 7.0.2** exports only `./lib/version.cjs` and `./unstable/*` entries; there is no classic compiler API. ESLint already runs on `@babel/eslint-parser` 8.
 - **dependency-cruiser 18.7.0**: its `--info` lists `typescript >=2.0.0 <7.0.0` and Babel `<8.0.0` as unsupported, with `.ts`/`.tsx` disabled. With `@swc/core@1.16.20` added it parses the repository and resolves workspace `exports` once configured, but cannot resolve the web app's `@/` tsconfig paths (they need the TypeScript API).
 - **eslint-plugin-boundaries 7.3.0** checks direct imports per file and has no cycle detection.
-- **oxc-parser + oxc-resolver** (already installed as Knip 6.41.0 dependencies: `oxc-parser ^0.153.0`, `oxc-resolver 11.24.2`) parsed `apps/web/src/app/[userId]/home/dashboards/error.tsx` and resolved all four imports, including `@/…` through tsconfig and `@synapcity/frontend-ui/core/button` through `exports`, in about 15 ms, with no TypeScript API.
+- **oxc-parser + oxc-resolver** (already installed as Knip 6.41.0 dependencies: `oxc-parser ^0.153.0`, `oxc-resolver 11.24.2`) parsed `apps/web/src/app/[userId]/home/dashboards/error.tsx` and resolved all four imports, including `@/…` through tsconfig and `@synapcity/frontend-ui/components/button` through `exports`, in about 15 ms, with no TypeScript API.
 - Registry, same day: `oxc-parser` 0.155.0 (MIT, oxc-project), `oxc-resolver` 11.24.2.
 - Node 24.20.0 strips TypeScript types natively (`process.features.typescript === 'strip'`).
 - Tests run per workspace through Turbo; the root `vitest.config` lists projects; the root `scripts/` folder has no test runner.

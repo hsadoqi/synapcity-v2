@@ -2,7 +2,7 @@ import { createRef } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Badge, badgeVariants } from '@synapcity/frontend-ui/core/badge';
+import { Badge, badgeVariants } from '@synapcity/frontend-ui/components/badge';
 
 describe('Badge', () => {
   it('renders a non-interactive span by default', () => {

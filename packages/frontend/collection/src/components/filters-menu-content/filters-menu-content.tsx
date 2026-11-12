@@ -6,7 +6,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-} from '@synapcity/frontend-ui/core/dropdown-menu';
+} from '@synapcity/frontend-ui/components/dropdown-menu';
 
 import type { CollectionFilters, CollectionGrouping } from '../../types';
 import { CollectionFilterMenu } from '../collection-filter-menu';

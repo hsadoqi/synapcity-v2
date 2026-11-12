@@ -6,13 +6,13 @@ import {
   demoWorkspaceId,
   demoWorkspaces,
 } from '@synapcity/dev-fixtures/scenarios';
-import { Badge } from '@synapcity/frontend-ui/core/badge';
+import { Badge } from '@synapcity/frontend-ui/components/badge';
 import {
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@synapcity/frontend-ui/core/card';
+} from '@synapcity/frontend-ui/components/card';
 import { WorkbenchShell } from './workbench-shell';
 
 /*

@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from '@synapcity/frontend-ui/core/dropdown-menu';
+} from '@synapcity/frontend-ui/components/dropdown-menu';
 
 const open = async () => {
   fireEvent.click(screen.getByRole('button', { name: 'Menu' }));

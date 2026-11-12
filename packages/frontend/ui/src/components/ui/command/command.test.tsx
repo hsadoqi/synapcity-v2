@@ -9,7 +9,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@synapcity/frontend-ui/core/command';
+} from '@synapcity/frontend-ui/components/command';
 
 // cmdk measures its list; jsdom has no layout, so give it the APIs it calls.
 globalThis.ResizeObserver ??= class {

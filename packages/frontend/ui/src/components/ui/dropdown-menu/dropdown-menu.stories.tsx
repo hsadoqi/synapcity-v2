@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -16,7 +16,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from '@synapcity/frontend-ui/core/dropdown-menu';
+} from '@synapcity/frontend-ui/components/dropdown-menu';
 
 const meta: Meta<typeof DropdownMenu> = {
   title: 'Components/DropdownMenu',

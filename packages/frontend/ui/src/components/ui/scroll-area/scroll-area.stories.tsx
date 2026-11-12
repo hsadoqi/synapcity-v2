@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { ScrollArea } from '@synapcity/frontend-ui/core/scroll-area';
-import { Separator } from '@synapcity/frontend-ui/core/separator';
+import { ScrollArea } from '@synapcity/frontend-ui/components/scroll-area';
+import { Separator } from '@synapcity/frontend-ui/components/separator';
 
 const meta: Meta<typeof ScrollArea> = {
   title: 'Components/ScrollArea',

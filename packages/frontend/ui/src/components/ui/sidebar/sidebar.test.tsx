@@ -22,8 +22,8 @@ import {
   SidebarSeparator,
   SidebarTrigger,
   useSidebar,
-} from '@synapcity/frontend-ui/core/sidebar';
-import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
+} from '@synapcity/frontend-ui/components/sidebar';
+import { TooltipProvider } from '@synapcity/frontend-ui/components/tooltip';
 
 const State = () => {
   const { state, open, openMobile, isMobile } = useSidebar();

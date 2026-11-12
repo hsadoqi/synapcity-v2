@@ -9,7 +9,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@synapcity/frontend-ui/core/card';
+} from '@synapcity/frontend-ui/components/card';
 
 describe('Card', () => {
   it('composes every part and marks each with its slot', () => {

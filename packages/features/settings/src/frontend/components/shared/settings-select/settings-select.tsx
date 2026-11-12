@@ -8,7 +8,7 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-} from '@synapcity/frontend-ui/core/select';
+} from '@synapcity/frontend-ui/components/select';
 
 type SettingsSelectProps<T extends string> = {
   id: string;

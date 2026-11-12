@@ -2,7 +2,10 @@
 
 import { ArrowRight, Plus } from 'lucide-react';
 
-import { Button, buttonVariants } from '@synapcity/frontend-ui/core/button';
+import {
+  Button,
+  buttonVariants,
+} from '@synapcity/frontend-ui/components/button';
 import { useCollectionNavigation } from '../../providers';
 import { EntityIcon } from '../entity-icon';
 import { EntityItemCard } from '../entity-item-card';

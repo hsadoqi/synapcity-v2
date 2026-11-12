@@ -9,7 +9,7 @@ import {
 import { describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 
 import { defineForm } from '../../../utils';
 import { FormDialog, type FormDialogProps } from './index';

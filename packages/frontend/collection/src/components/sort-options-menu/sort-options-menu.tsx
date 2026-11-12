@@ -6,7 +6,7 @@ import {
   ArrowUpNarrowWide,
 } from 'lucide-react';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,12 +15,12 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-} from '@synapcity/frontend-ui/core/dropdown-menu';
+} from '@synapcity/frontend-ui/components/dropdown-menu';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@synapcity/frontend-ui/core/tooltip';
+} from '@synapcity/frontend-ui/components/tooltip';
 
 import type { CollectionSort, CollectionSortField } from '../../types';
 

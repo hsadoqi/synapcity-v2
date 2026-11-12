@@ -3,8 +3,11 @@
 import { useMemo, useState, useTransition, type ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
 
-import { Alert, AlertDescription } from '@synapcity/frontend-ui/core/alert';
-import { buttonVariants } from '@synapcity/frontend-ui/core/button';
+import {
+  Alert,
+  AlertDescription,
+} from '@synapcity/frontend-ui/components/alert';
+import { buttonVariants } from '@synapcity/frontend-ui/components/button';
 
 import { useCollectionNavigation } from '../../providers';
 import {

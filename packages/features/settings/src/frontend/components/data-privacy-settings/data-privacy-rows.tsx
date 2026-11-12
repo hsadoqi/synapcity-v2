@@ -1,4 +1,4 @@
-import { Switch } from '@synapcity/frontend-ui/core/switch';
+import { Switch } from '@synapcity/frontend-ui/components/switch';
 import type { PrivacyPurpose } from '@synapcity/domain-preferences';
 import { SettingRow } from '../shared/setting-row';
 

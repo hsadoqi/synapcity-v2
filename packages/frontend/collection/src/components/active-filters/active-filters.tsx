@@ -2,7 +2,7 @@
 
 import { X } from 'lucide-react';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 
 import { EMPTY_FILTERS, hasActiveFilters } from '../../utils';
 import type { CollectionFilters } from '../../types';

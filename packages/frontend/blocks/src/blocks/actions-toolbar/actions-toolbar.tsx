@@ -5,13 +5,13 @@ import {
   DialogPortalContainer,
   type DialogContainerTarget,
 } from '../dialog-portal-container';
-import { IconButton } from '@synapcity/frontend-ui/core/icon-button';
+import { IconButton } from '@synapcity/frontend-ui/components/icon-button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@synapcity/frontend-ui/core/dropdown-menu';
+} from '@synapcity/frontend-ui/components/dropdown-menu';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 import { Cog, Ellipsis } from 'lucide-react';
 import type { ReactElement, ReactNode } from 'react';

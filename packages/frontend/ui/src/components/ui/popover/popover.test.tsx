@@ -7,7 +7,7 @@ import {
   PopoverDescription,
   PopoverTitle,
   PopoverTrigger,
-} from '@synapcity/frontend-ui/core/popover';
+} from '@synapcity/frontend-ui/components/popover';
 
 const renderPopover = (rootProps = {}, contentProps = {}) =>
   render(

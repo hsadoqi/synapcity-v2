@@ -1,6 +1,9 @@
 'use client';
 
-import { Sidebar, SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
+import {
+  Sidebar,
+  SidebarProvider,
+} from '@synapcity/frontend-ui/components/sidebar';
 import { useState } from 'react';
 import { Workspace, WorkspaceResource } from './types';
 import { WorkbenchHeader } from './main-header';

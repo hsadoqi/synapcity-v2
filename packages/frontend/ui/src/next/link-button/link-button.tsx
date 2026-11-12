@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import type { LinkProps } from 'next/link';
-import { buttonVariants } from '@synapcity/frontend-ui/core/button';
-import type { ButtonProps } from '@synapcity/frontend-ui/core/button';
+import { buttonVariants } from '@synapcity/frontend-ui/components/button';
+import type { ButtonProps } from '@synapcity/frontend-ui/components/button';
 import { cn } from 'cn';
 import React from 'react';
 

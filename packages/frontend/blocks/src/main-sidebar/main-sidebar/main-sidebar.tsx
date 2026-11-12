@@ -1,7 +1,10 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { Sidebar, SidebarSeparator } from '@synapcity/frontend-ui/core/sidebar';
+import {
+  Sidebar,
+  SidebarSeparator,
+} from '@synapcity/frontend-ui/components/sidebar';
 import { MainSidebarContent } from './main-sidebar-content';
 import type { MainSidebarGroup, MainSidebarItem } from '../../types';
 import { MainSidebarFooter } from './main-sidebar-footer';

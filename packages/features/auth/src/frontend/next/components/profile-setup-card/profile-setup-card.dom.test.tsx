@@ -12,7 +12,7 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mocks.push }),
   usePathname: () => '/auth/welcome',
 }));
-vi.mock('@synapcity/frontend-ui/core/toast', () => ({
+vi.mock('@synapcity/frontend-ui/components/toast', () => ({
   toast: { add: mocks.toast },
 }));
 

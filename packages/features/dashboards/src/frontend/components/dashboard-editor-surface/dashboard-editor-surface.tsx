@@ -1,7 +1,7 @@
 'use client';
 
 import { resolveBreakpoint } from '@synapcity/domain-grids';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import { PencilRulerIcon } from 'lucide-react';
 import { useCallback, useEffect, useRef, type ReactNode } from 'react';
 

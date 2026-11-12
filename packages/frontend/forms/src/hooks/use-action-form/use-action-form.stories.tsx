@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, userEvent, within } from 'storybook/test';
-import { Button } from '@synapcity/frontend-ui/core/button';
-import { Label } from '@synapcity/frontend-ui/core/label';
-import { Input } from '@synapcity/frontend-ui/core/input';
+import { Button } from '@synapcity/frontend-ui/components/button';
+import { Label } from '@synapcity/frontend-ui/components/label';
+import { Input } from '@synapcity/frontend-ui/components/input';
 import { z } from 'zod';
 
 import { FormField } from '../../components/form-parts/form-field';

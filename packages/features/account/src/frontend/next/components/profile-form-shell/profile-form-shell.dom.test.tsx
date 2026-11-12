@@ -7,7 +7,7 @@ const toasts = vi.hoisted(() => ({
   path: '/u1/settings' as string | null,
 }));
 vi.mock('next/navigation', () => ({ usePathname: () => toasts.path }));
-vi.mock('@synapcity/frontend-ui/core/toast', () => ({
+vi.mock('@synapcity/frontend-ui/components/toast', () => ({
   toast: { add: toasts.add },
 }));
 

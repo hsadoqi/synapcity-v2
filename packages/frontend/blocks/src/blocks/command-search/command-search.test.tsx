@@ -10,7 +10,7 @@ import {
   vi,
 } from 'vitest';
 
-import { Command } from '@synapcity/frontend-ui/core/command';
+import { Command } from '@synapcity/frontend-ui/components/command';
 
 import { CommandSearch, type CommandSearchGroup } from '.';
 import { CommandSearchButton } from './command-search-button';

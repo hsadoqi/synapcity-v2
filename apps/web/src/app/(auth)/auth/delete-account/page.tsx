@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { buttonVariants } from '@synapcity/frontend-ui/core/button';
+import { buttonVariants } from '@synapcity/frontend-ui/components/button';
 
 import {
   AuthShell,

@@ -6,7 +6,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarMenuBadge,
-} from '@synapcity/frontend-ui/core/sidebar';
+} from '@synapcity/frontend-ui/components/sidebar';
 import { NAV } from '../data';
 
 export function WorkspaceNav() {

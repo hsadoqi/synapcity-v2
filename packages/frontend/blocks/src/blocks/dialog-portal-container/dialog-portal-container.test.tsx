@@ -7,7 +7,7 @@ import {
 } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import { DialogPortalContainer } from '.';
 
 describe('DialogPortalContainer', () => {

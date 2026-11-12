@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
-import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
-import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
+import { SidebarProvider } from '@synapcity/frontend-ui/components/sidebar';
+import { TooltipProvider } from '@synapcity/frontend-ui/components/tooltip';
 import type { RootBreadcrumb } from '@synapcity/frontend-shells';
 import { fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';

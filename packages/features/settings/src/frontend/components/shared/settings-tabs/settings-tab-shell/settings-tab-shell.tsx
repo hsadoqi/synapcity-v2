@@ -8,7 +8,7 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
-} from '@synapcity/frontend-ui/core/card';
+} from '@synapcity/frontend-ui/components/card';
 import { ReactNode } from 'react';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 import type { useSettingsDraft } from '../../../../hooks/use-settings-lifecycle/use-settings-draft';

@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   ToggleGroup,
   ToggleGroupItem,
-} from '@synapcity/frontend-ui/core/toggle-group';
+} from '@synapcity/frontend-ui/components/toggle-group';
 
 const renderGroup = (props = {}) =>
   render(

@@ -2,12 +2,12 @@
 
 import { ListFilter } from 'lucide-react';
 
-import { Badge } from '@synapcity/frontend-ui/core/badge';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Badge } from '@synapcity/frontend-ui/components/badge';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
-} from '@synapcity/frontend-ui/core/dropdown-menu';
+} from '@synapcity/frontend-ui/components/dropdown-menu';
 
 import { countActiveFilters } from '../../utils';
 import type { CollectionFilters, CollectionGrouping } from '../../types';

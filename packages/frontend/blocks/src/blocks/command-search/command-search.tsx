@@ -14,7 +14,7 @@ import {
   CommandInput,
   CommandList,
   CommandSeparator,
-} from '@synapcity/frontend-ui/core/command';
+} from '@synapcity/frontend-ui/components/command';
 import { CommandSearchButton } from './command-search-button';
 import { CommandSearchGroup as SearchGroup } from './command-search-group';
 import { defaultGroups } from './default-actions';

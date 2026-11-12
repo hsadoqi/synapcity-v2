@@ -12,7 +12,7 @@ import {
   AlertDialogMedia,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@synapcity/frontend-ui/core/alert-dialog';
+} from '@synapcity/frontend-ui/components/alert-dialog';
 
 const renderDialog = ({
   rootProps = {},

@@ -3,7 +3,7 @@ import { Pin } from 'lucide-react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { ActionsToolbar } from '.';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 
 const slot = (container: HTMLElement, name: string) =>
   container.querySelector(`[data-slot="${name}"]`);

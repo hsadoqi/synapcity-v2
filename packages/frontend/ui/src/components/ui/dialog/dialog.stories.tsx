@@ -2,9 +2,9 @@ import { type ComponentProps } from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, fn, screen, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
-import { Input } from '@synapcity/frontend-ui/core/input';
-import { Label } from '@synapcity/frontend-ui/core/label';
+import { Button } from '@synapcity/frontend-ui/components/button';
+import { Input } from '@synapcity/frontend-ui/components/input';
+import { Label } from '@synapcity/frontend-ui/components/label';
 import {
   Dialog,
   DialogClose,
@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@synapcity/frontend-ui/core/dialog';
+} from '@synapcity/frontend-ui/components/dialog';
 
 const meta = {
   title: 'Components/Dialog',

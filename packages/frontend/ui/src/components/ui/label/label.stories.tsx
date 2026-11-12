@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { Input } from '@synapcity/frontend-ui/core/input';
-import { Label } from '@synapcity/frontend-ui/core/label';
+import { Input } from '@synapcity/frontend-ui/components/input';
+import { Label } from '@synapcity/frontend-ui/components/label';
 
 const meta: Meta<typeof Label> = {
   title: 'Components/Label',

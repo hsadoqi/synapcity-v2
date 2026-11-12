@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { FileIcon, FolderIcon, SearchIcon } from 'lucide-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 import {
   Empty,
@@ -11,7 +11,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from '@synapcity/frontend-ui/core/empty';
+} from '@synapcity/frontend-ui/components/empty';
 
 const meta = {
   title: 'Components/Empty',

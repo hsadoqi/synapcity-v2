@@ -27,7 +27,7 @@ The plan relies on these decisions of ADR-0015, restated here so it stays readab
 - Dependencies: `@synapcity/frontend-ui` and `zod` only inside Tasks 1 to 5; no new third-party dependency in this plan.
 - UI is built from `frontend-ui` primitives and semantic classes. No raw `<button>` or `<label>`, no palette colours, no `style={{}}`, no bracket values, no `!important`.
 - No `any`. `unknown` is narrowed with guards.
-- `'use client'` goes at the start of the client subtree, not on every file (workspace conventions, entry rule 6). `frontend-ui` is imported through its `./core/*` entries, for example `@synapcity/frontend-ui/core/input`.
+- `'use client'` goes at the start of the client subtree, not on every file (workspace conventions, entry rule 6). `frontend-ui` is imported through its `./core/*` entries, for example `@synapcity/frontend-ui/components/input`.
 - Field identity is one string, `name`. There is no separate `id`.
 - Product copy is not owned here. Default messages are overridable options.
 - Errors and messages name field names and types, never field values, so nothing a user typed reaches error reporting.

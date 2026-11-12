@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { reportCaughtError } from '@synapcity/frontend-error-reports';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 
 import { MessagePage } from '@synapcity/frontend-shells';

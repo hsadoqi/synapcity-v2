@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Calendar } from '@synapcity/frontend-ui/core/calendar';
+import { Calendar } from '@synapcity/frontend-ui/components/calendar';
 
 const may4 = new Date(2026, 4, 4);
 const may9 = new Date(2026, 4, 9);

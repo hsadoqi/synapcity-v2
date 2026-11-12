@@ -1,8 +1,8 @@
 'use client';
 
 import type { Ref } from 'react';
-import { Button } from '@synapcity/frontend-ui/core/button';
-import { Input } from '@synapcity/frontend-ui/core/input';
+import { Button } from '@synapcity/frontend-ui/components/button';
+import { Input } from '@synapcity/frontend-ui/components/input';
 
 import type { FieldRendererProps } from '../../../types';
 import { toTimeValue } from '../../../utils/time-value';

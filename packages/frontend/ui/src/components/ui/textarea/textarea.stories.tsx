@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { createFixtures } from '@synapcity/dev-fixtures';
-import { Label } from '@synapcity/frontend-ui/core/label';
-import { Textarea } from '@synapcity/frontend-ui/core/textarea';
+import { Label } from '@synapcity/frontend-ui/components/label';
+import { Textarea } from '@synapcity/frontend-ui/components/textarea';
 
 const fixtures = createFixtures();
 

@@ -16,7 +16,7 @@
     "lib": "@/lib",
     "hooks": "@/hooks",
     "components": "@/components",
-    "ui": "@synapcity/frontend-ui/core",
+    "ui": "@synapcity/frontend-ui/components",
     "utils": "@synapcity/frontend-ui/lib/utils"
   },
   "menuColor": "default",

@@ -1,11 +1,11 @@
 'use client';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   Alert,
   AlertTitle,
   AlertDescription,
-} from '@synapcity/frontend-ui/core/alert';
+} from '@synapcity/frontend-ui/components/alert';
 import { CircleAlert, CheckCircle2 } from 'lucide-react';
 import type { TransferFeedback } from '../../types';
 

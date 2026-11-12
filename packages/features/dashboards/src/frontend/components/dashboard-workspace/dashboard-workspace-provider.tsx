@@ -6,7 +6,7 @@ import {
 } from '@synapcity/domain-dashboards';
 import { resolveBreakpoint, type Breakpoint } from '@synapcity/domain-grids';
 import { emptyRecords } from '@synapcity/domain-prototypes';
-import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
+import { TooltipProvider } from '@synapcity/frontend-ui/components/tooltip';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { StoreApi } from 'zustand/vanilla';
 

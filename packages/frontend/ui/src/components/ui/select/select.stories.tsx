@@ -10,7 +10,7 @@ import {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
-} from '@synapcity/frontend-ui/core/select';
+} from '@synapcity/frontend-ui/components/select';
 
 const meta: Meta<typeof Select> = {
   title: 'Components/Select',

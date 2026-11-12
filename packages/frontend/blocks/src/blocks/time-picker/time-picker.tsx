@@ -4,19 +4,19 @@ import * as React from 'react';
 import { ChevronDownIcon } from 'lucide-react';
 
 import { useDateTimeFormatting } from '@synapcity/frontend-preferences';
-import { Button } from '@synapcity/frontend-ui/core/button';
-import { Calendar } from '@synapcity/frontend-ui/core/calendar';
+import { Button } from '@synapcity/frontend-ui/components/button';
+import { Calendar } from '@synapcity/frontend-ui/components/calendar';
 import {
   Field,
   FieldGroup,
   FieldLabel,
-} from '@synapcity/frontend-ui/core/field';
-import { Input } from '@synapcity/frontend-ui/core/input';
+} from '@synapcity/frontend-ui/components/field';
+import { Input } from '@synapcity/frontend-ui/components/input';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@synapcity/frontend-ui/core/popover';
+} from '@synapcity/frontend-ui/components/popover';
 import { formatCalendarDay } from '@synapcity/frontend-ui/lib/calendar-utils';
 
 export function TimePicker() {

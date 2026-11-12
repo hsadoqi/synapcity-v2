@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { simulateTick } from '@synapcity/dev-fixtures/prototype-workspace';
-import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
+import { TooltipProvider } from '@synapcity/frontend-ui/components/tooltip';
 import { expect, userEvent, within } from 'storybook/test';
 
 import { memoryDashboardStorage } from '../../../testing';

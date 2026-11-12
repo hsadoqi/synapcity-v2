@@ -1,8 +1,8 @@
 'use client';
 
 import type { Ref } from 'react';
-import { Checkbox } from '@synapcity/frontend-ui/core/checkbox';
-import { Switch } from '@synapcity/frontend-ui/core/switch';
+import { Checkbox } from '@synapcity/frontend-ui/components/checkbox';
+import { Switch } from '@synapcity/frontend-ui/components/switch';
 
 import type { FieldRendererProps } from '../../../types';
 

@@ -4,7 +4,7 @@ import {
   Button,
   type ButtonProps,
   type ButtonSize,
-} from '@synapcity/frontend-ui/core/button';
+} from '@synapcity/frontend-ui/components/button';
 
 type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 

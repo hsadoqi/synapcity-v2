@@ -2,8 +2,8 @@
 
 import type { Ref } from 'react';
 import { PasswordInput } from '@synapcity/frontend-blocks';
-import { Input } from '@synapcity/frontend-ui/core/input';
-import { Textarea } from '@synapcity/frontend-ui/core/textarea';
+import { Input } from '@synapcity/frontend-ui/components/input';
+import { Textarea } from '@synapcity/frontend-ui/components/textarea';
 
 import type { FieldRendererProps, InputMode } from '../../../types';
 

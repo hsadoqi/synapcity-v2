@@ -19,8 +19,8 @@ import {
   SidebarRail,
   SidebarSeparator,
   SidebarTrigger,
-} from '@synapcity/frontend-ui/core/sidebar';
-import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
+} from '@synapcity/frontend-ui/components/sidebar';
+import { TooltipProvider } from '@synapcity/frontend-ui/components/tooltip';
 
 const meta: Meta<typeof Sidebar> = {
   title: 'Components/Sidebar',

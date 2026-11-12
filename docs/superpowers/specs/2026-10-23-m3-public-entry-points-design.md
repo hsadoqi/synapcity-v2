@@ -35,7 +35,7 @@ A consumer can only reach what a package deliberately exposes, and importing a p
 
 ## 5. Rules
 
-1. **Explicit `exports` only.** A package's `exports` map is its whole public interface. Consumers never import by file path. New packages list each entry; a wildcard is allowed only where every match is a deliberate public unit (one component folder per entry, as in `frontend-ui/core/*`).
+1. **Explicit `exports` only.** A package's `exports` map is its whole public interface. Consumers never import by file path. New packages list each entry; a wildcard is allowed only where every match is a deliberate public unit (one component folder per entry, as in `frontend-ui/components/*`).
 2. **Single-runtime packages** (domain, server, and frontend packages other than framework adapters) expose a root `.` entry. Add a module subpath, such as `@synapcity/domain-records/spaces`, only when consumers need a narrower interface.
 3. **Mixed packages** follow E1. The names come from the ADR-0014 matrix columns. `./client` is not used: in Next it means `'use client'` code, and feature presentation also renders on the server.
 4. **No cross-runtime barrels.** A `./frontend` or `./contracts` entry never re-exports from `./server`. Contracts are imported by both sides; server code is imported only by `./server` entries and app backend code.

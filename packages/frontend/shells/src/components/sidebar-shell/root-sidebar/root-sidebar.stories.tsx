@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { Globe } from 'lucide-react';
 
 import { RootSidebar } from '.';
-import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
-import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
+import { SidebarProvider } from '@synapcity/frontend-ui/components/sidebar';
+import { TooltipProvider } from '@synapcity/frontend-ui/components/tooltip';
 import { ModeProvider } from '@synapcity/frontend-preferences';
 import { ContextSwitcher } from '../../context-switcher';
 import { SearchForm } from '@synapcity/frontend-blocks';

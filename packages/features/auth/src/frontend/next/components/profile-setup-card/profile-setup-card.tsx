@@ -2,7 +2,7 @@
 
 import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 
 import { ProfileSetupForm } from '@synapcity/features-account/frontend';
 import type { ProfileAction } from '@synapcity/features-account/contracts';

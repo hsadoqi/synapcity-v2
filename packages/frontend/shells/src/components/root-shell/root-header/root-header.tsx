@@ -6,14 +6,14 @@ import { SynapcityLogo, SynapcityMark } from '@synapcity/frontend-brand/react';
 import { ModeToggle } from '@synapcity/frontend-blocks';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 import type { AccountLinks } from '@synapcity/frontend-ui/lib/account-links';
-import { Separator } from '@synapcity/frontend-ui/core/separator';
+import { Separator } from '@synapcity/frontend-ui/components/separator';
 import { GlobalPanelToggle } from '../global-panel';
 import { ShellLink } from '../../../providers/shell-navigation';
 import {
   SidebarTrigger,
   useSidebar,
-} from '@synapcity/frontend-ui/core/sidebar';
-import { IconButton } from '@synapcity/frontend-ui/core/icon-button';
+} from '@synapcity/frontend-ui/components/sidebar';
+import { IconButton } from '@synapcity/frontend-ui/components/icon-button';
 import {
   HeaderBreadcrumbs,
   type RootBreadcrumb,

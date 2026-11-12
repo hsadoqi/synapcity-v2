@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { TrashIcon } from 'lucide-react';
 import { expect, screen, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 
 import {
   AlertDialog,
@@ -15,7 +15,7 @@ import {
   AlertDialogMedia,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@synapcity/frontend-ui/core/alert-dialog';
+} from '@synapcity/frontend-ui/components/alert-dialog';
 
 const meta: Meta<typeof AlertDialog> = {
   title: 'Components/AlertDialog',

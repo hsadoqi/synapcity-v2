@@ -10,7 +10,7 @@ vi.mock('@/features/auth/server/actions/actions', () => ({
   signOut: mocks.signOut,
 }));
 
-import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
+import { SidebarProvider } from '@synapcity/frontend-ui/components/sidebar';
 
 import { AuthStatus } from './auth-status';
 

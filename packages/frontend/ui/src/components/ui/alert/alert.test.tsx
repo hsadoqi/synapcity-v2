@@ -6,7 +6,7 @@ import {
   AlertAction,
   AlertDescription,
   AlertTitle,
-} from '@synapcity/frontend-ui/core/alert';
+} from '@synapcity/frontend-ui/components/alert';
 
 describe('Alert', () => {
   it('is an alert landmark with a slot marker', () => {

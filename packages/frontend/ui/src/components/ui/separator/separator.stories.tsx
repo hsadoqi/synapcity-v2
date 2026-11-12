@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { Separator } from '@synapcity/frontend-ui/core/separator';
+import { Separator } from '@synapcity/frontend-ui/components/separator';
 
 const meta: Meta<typeof Separator> = {
   title: 'Components/Separator',

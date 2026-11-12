@@ -7,7 +7,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@synapcity/frontend-ui/core/card';
+} from '@synapcity/frontend-ui/components/card';
 
 /**
  * A page that is just a message and a way out: an unexpected error, a page that

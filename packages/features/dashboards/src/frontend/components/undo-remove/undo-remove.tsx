@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import { Undo2Icon } from 'lucide-react';
 import { useEffect } from 'react';
 

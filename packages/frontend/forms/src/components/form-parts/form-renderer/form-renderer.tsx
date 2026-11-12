@@ -12,7 +12,7 @@ import {
 } from 'react';
 import type { FieldErrors, FieldValues } from 'react-hook-form';
 import type { z } from 'zod';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 
 import type { FieldConfig, FormDefinition } from '../../../types';
 import type { FormFeedback } from '../../../hooks/use-action-form';

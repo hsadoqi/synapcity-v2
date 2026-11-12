@@ -1,7 +1,7 @@
 'use client';
 
 import type { User } from '@synapcity/domain-identity';
-import { Sidebar } from '@synapcity/frontend-ui/core/sidebar';
+import { Sidebar } from '@synapcity/frontend-ui/components/sidebar';
 import { Workbench } from './main-content';
 import { MainCombinedSidebar, UserAvatarActions } from './main-sidebar';
 import type {

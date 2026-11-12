@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SidebarShell } from '.';
 import { RootSidebar } from './root-sidebar';
-import { useSidebar } from '@synapcity/frontend-ui/core/sidebar';
+import { useSidebar } from '@synapcity/frontend-ui/components/sidebar';
 import { ModeProvider } from '@synapcity/frontend-preferences';
 import { sampleSidebarGroups } from '../../testing/sidebar-sample';
 

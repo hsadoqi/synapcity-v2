@@ -1,5 +1,5 @@
-import { Separator } from '@synapcity/frontend-ui/core/separator';
-import { Skeleton } from '@synapcity/frontend-ui/core/skeleton';
+import { Separator } from '@synapcity/frontend-ui/components/separator';
+import { Skeleton } from '@synapcity/frontend-ui/components/skeleton';
 
 import {
   CompactItemList,

@@ -6,7 +6,7 @@ import {
   type DialogContainerWidth,
 } from '../dialog-portal-container';
 import { ConfirmDialog } from '../confirm-dialog';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   Sheet,
   SheetContent,
@@ -16,7 +16,7 @@ import {
   SheetPortal,
   SheetTitle,
   SheetTrigger,
-} from '@synapcity/frontend-ui/core/sheet';
+} from '@synapcity/frontend-ui/components/sheet';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 import {
   useEffect,

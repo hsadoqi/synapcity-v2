@@ -3,8 +3,8 @@ import { Globe, PenLine } from 'lucide-react';
 import { describe, expect, it } from 'vitest';
 
 import { ContextSwitcher } from '.';
-import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
-import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
+import { SidebarProvider } from '@synapcity/frontend-ui/components/sidebar';
+import { TooltipProvider } from '@synapcity/frontend-ui/components/tooltip';
 
 const options = [
   { label: 'Global', href: '/u/home' },

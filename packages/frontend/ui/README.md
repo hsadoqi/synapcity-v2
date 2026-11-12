@@ -12,7 +12,7 @@ It owns no theme tokens. Tokens live in `@synapcity/frontend-tailwind-config` ([
 
 | Import                                     | Provides                                                                                                                 |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| `@synapcity/frontend-ui/core/<name>`       | A shadcn component, for example `@synapcity/frontend-ui/core/button`                                                     |
+| `@synapcity/frontend-ui/components/<name>` | A shadcn component, for example `@synapcity/frontend-ui/components/button`                                               |
 | `@synapcity/frontend-ui/components/<name>` | A Synapcity component, for example `.../components/section-heading`                                                      |
 | `@synapcity/frontend-ui/next/<name>`       | A component that needs Next.js, for example `.../next/link-button` (the only place in this package that imports `next`)  |
 | `@synapcity/frontend-ui/lib/<name>`        | Helpers: `utils` (`cn`, [ADR-0004](../../../docs/architecture/decisions/0004-class-merging-with-cn.md)), `account-links` |

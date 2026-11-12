@@ -4,13 +4,13 @@ import * as React from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 
 import { cn } from '@synapcity/frontend-ui/lib/utils';
-import { Input } from '@synapcity/frontend-ui/core/input';
-import { Toggle } from '@synapcity/frontend-ui/core/toggle';
+import { Input } from '@synapcity/frontend-ui/components/input';
+import { Toggle } from '@synapcity/frontend-ui/components/toggle';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@synapcity/frontend-ui/core/tooltip';
+} from '@synapcity/frontend-ui/components/tooltip';
 
 type PasswordInputProps = Omit<React.ComponentProps<'input'>, 'type'>;
 

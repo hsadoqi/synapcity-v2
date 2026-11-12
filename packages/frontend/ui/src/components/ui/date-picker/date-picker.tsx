@@ -6,14 +6,14 @@ import { CalendarIcon } from 'lucide-react';
 import type { DateRange, Matcher } from 'react-day-picker';
 
 import { useDateTimeFormatting } from '@synapcity/frontend-preferences';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import { formatCalendarDay } from '@synapcity/frontend-ui/lib/calendar-utils';
-import { Calendar } from '@synapcity/frontend-ui/core/calendar';
+import { Calendar } from '@synapcity/frontend-ui/components/calendar';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@synapcity/frontend-ui/core/popover';
+} from '@synapcity/frontend-ui/components/popover';
 
 /** How a date is written into a hidden input for a plain form post. */
 const toFormValue = (date: Date | undefined) =>

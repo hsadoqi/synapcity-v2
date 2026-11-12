@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { useArgs } from 'storybook/preview-api';
 import { HomeIcon, Settings } from 'lucide-react';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   Command,
   CommandDialog,
@@ -12,7 +12,7 @@ import {
   CommandItem,
   CommandList,
   CommandShortcut,
-} from '@synapcity/frontend-ui/core/command';
+} from '@synapcity/frontend-ui/components/command';
 
 const meta = {
   title: 'Navigation/Command',

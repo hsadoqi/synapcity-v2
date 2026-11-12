@@ -5,7 +5,7 @@ import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-} from '@synapcity/frontend-ui/core/hover-card';
+} from '@synapcity/frontend-ui/components/hover-card';
 
 const renderCard = (rootProps = {}, contentProps = {}) =>
   render(

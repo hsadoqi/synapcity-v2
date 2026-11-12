@@ -1,7 +1,7 @@
 import { ArrowRight } from 'lucide-react';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
-import { Skeleton } from '@synapcity/frontend-ui/core/skeleton';
+import { Button } from '@synapcity/frontend-ui/components/button';
+import { Skeleton } from '@synapcity/frontend-ui/components/skeleton';
 
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 

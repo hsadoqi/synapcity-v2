@@ -1,4 +1,4 @@
-import { Separator } from '@synapcity/frontend-ui/core/separator';
+import { Separator } from '@synapcity/frontend-ui/components/separator';
 
 export function AuthDivider({ label = 'or' }: { label?: string }) {
   return (

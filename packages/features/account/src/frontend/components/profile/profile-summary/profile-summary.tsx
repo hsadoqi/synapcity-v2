@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import { displayNameOf } from '@synapcity/domain-identity';
 
 import type { ProfileAction, ProfileState } from '../../../../contracts';

@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenu,
   DropdownMenuTrigger,
-} from '@synapcity/frontend-ui/core/dropdown-menu';
+} from '@synapcity/frontend-ui/components/dropdown-menu';
 import {
   Sparkles,
   BadgeCheck,

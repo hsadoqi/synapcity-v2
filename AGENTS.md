@@ -110,7 +110,7 @@ Follow these rules when writing or editing UI in this repo.
 
 - Design tokens live in `packages/frontend/tailwind-config`. `shared-styles.css` is the entry; `tokens/` holds the pieces (`utilities.css` has the `theme-light` and `theme-dark` colour values, `base.css` the base element styles, `accessibility.css` reduced motion, `variants.css` the `dark` variant). Reach for an existing token before inventing any value, and change a token there, never in an app or component.
 - Apps contain wiring only. `apps/web/src/styles/globals.css` is imports and `@source` lines; do not add `:root`, `.dark`, `@theme` or `@layer base` rules to it, and remove them if `shadcn init` or `shadcn add` writes them back.
-- Shared components live in `packages/frontend/ui/src/components/ui` and are consumed as `@synapcity/frontend-ui/core/*`. Prefer extending them over building parallel pieces.
+- Shared components live in `packages/frontend/ui/src/components/ui` and are consumed as `@synapcity/frontend-ui/components/*`. Prefer extending them over building parallel pieces.
 
 ### Colours
 

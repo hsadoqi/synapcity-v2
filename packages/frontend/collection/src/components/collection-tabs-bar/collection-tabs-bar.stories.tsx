@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { Tabs } from '@synapcity/frontend-ui/core/tabs';
+import { Tabs } from '@synapcity/frontend-ui/components/tabs';
 
 import { CollectionTabsBar } from './collection-tabs-bar';
 

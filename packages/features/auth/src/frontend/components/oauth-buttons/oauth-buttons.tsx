@@ -1,4 +1,4 @@
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import type { AuthFormAction } from '../../../contracts';
 
 export function OAuthButtons({

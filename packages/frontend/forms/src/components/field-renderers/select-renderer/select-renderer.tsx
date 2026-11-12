@@ -1,7 +1,7 @@
 'use client';
 
 import type { Ref } from 'react';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   Select,
   SelectContent,
@@ -10,7 +10,7 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from '@synapcity/frontend-ui/core/select';
+} from '@synapcity/frontend-ui/components/select';
 
 import type { FieldOption, FieldRendererProps } from '../../../types';
 import { groupOptions } from '../../../utils/group-options';

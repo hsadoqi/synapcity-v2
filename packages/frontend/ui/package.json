@@ -6,9 +6,8 @@
     "./styles.css": "./src/styles/globals.css",
     "./lib/*": "./src/lib/*.ts",
     "./hooks/*": "./src/hooks/*.ts",
-    "./core/*": "./src/components/ui/*/index.ts",
     "./components": "./src/components/index.ts",
-    "./components/*": "./src/components/*/index.ts",
+    "./components/*": "./src/components/ui/*/index.ts",
     "./next/*": "./src/next/*/index.ts"
   },
   "scripts": {

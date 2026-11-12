@@ -2,7 +2,7 @@
 
 import { useId } from 'react';
 
-import { Field, FieldLabel } from '@synapcity/frontend-ui/core/field';
+import { Field, FieldLabel } from '@synapcity/frontend-ui/components/field';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 
 import { SearchInput } from './search-input';

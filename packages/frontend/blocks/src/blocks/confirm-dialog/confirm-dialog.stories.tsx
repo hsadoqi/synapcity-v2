@@ -3,7 +3,7 @@ import { fn } from 'storybook/test';
 import { useArgs } from 'storybook/preview-api';
 
 import { ConfirmDialog } from '@synapcity/frontend-blocks';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 
 const meta: Meta<typeof ConfirmDialog> = {
   title: 'Components/ConfirmDialog',

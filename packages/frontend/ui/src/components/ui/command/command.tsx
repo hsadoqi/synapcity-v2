@@ -10,11 +10,11 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@synapcity/frontend-ui/core/dialog';
+} from '@synapcity/frontend-ui/components/dialog';
 import {
   InputGroup,
   InputGroupAddon,
-} from '@synapcity/frontend-ui/core/input-group';
+} from '@synapcity/frontend-ui/components/input-group';
 import { SearchIcon, CheckIcon } from 'lucide-react';
 
 function Command({

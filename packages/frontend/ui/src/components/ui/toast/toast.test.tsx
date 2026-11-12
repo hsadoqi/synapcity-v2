@@ -11,7 +11,7 @@ import {
   createToastManager,
   Toaster,
   useToastManager,
-} from '@synapcity/frontend-ui/core/toast';
+} from '@synapcity/frontend-ui/components/toast';
 
 const manager = createToastManager();
 

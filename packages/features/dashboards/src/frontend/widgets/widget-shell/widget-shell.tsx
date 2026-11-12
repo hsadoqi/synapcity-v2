@@ -12,13 +12,13 @@ import {
   type ToolbarSettings,
 } from '@synapcity/frontend-blocks';
 import { SettingsView } from '@synapcity/frontend-blocks';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   Popover,
   PopoverContent,
   PopoverTitle,
   PopoverTrigger,
-} from '@synapcity/frontend-ui/core/popover';
+} from '@synapcity/frontend-ui/components/popover';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 import {
   ChevronDownIcon,

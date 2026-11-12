@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { IconButton } from '@synapcity/frontend-ui/core/icon-button';
+import { IconButton } from '@synapcity/frontend-ui/components/icon-button';
 
 describe('IconButton', () => {
   it('is named by its label', () => {

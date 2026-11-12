@@ -10,8 +10,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@synapcity/frontend-ui/core/alert-dialog';
-import { Button } from '@synapcity/frontend-ui/core/button';
+} from '@synapcity/frontend-ui/components/alert-dialog';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import { settingsTabItems } from '../../../lib/data/tab-items';
 import { useSettingsDrafts } from './settings-drafts';
 

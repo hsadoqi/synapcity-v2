@@ -4,7 +4,7 @@ import {
   ResizablePanelGroup,
   ResizablePanel,
   ResizableHandle,
-} from '@synapcity/frontend-ui/core/resizable';
+} from '@synapcity/frontend-ui/components/resizable';
 
 const meta: Meta<typeof ResizablePanelGroup> = {
   title: 'Components/Resizable',

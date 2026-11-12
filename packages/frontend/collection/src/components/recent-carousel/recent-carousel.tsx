@@ -4,7 +4,7 @@ import { useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { EntityDate } from '../entity-date';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import { SectionHeading } from '@synapcity/frontend-blocks';
 
 import { cn } from '@synapcity/frontend-ui/lib/utils';

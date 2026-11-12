@@ -1,18 +1,18 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleIcon,
   CollapsibleTrigger,
-} from '@synapcity/frontend-ui/core/collapsible';
+} from '@synapcity/frontend-ui/components/collapsible';
 import {
   FieldDescription,
   FieldLegend,
   FieldSet,
-} from '@synapcity/frontend-ui/core/field';
+} from '@synapcity/frontend-ui/components/field';
 
 import type { FieldGroup } from '../../../types';
 

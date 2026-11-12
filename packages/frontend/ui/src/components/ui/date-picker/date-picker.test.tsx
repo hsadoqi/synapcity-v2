@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   DatePicker,
   DateRangePicker,
-} from '@synapcity/frontend-ui/core/date-picker';
+} from '@synapcity/frontend-ui/components/date-picker';
 
 const may4 = new Date(2026, 4, 4);
 

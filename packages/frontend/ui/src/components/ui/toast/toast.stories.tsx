@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, screen, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 
-import { Toaster, toast } from '@synapcity/frontend-ui/core/toast';
+import { Toaster, toast } from '@synapcity/frontend-ui/components/toast';
 
 const meta: Meta<typeof Toaster> = {
   title: 'Components/Toast',

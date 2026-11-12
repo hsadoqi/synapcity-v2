@@ -6,7 +6,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@synapcity/frontend-ui/core/tooltip';
+} from '@synapcity/frontend-ui/components/tooltip';
 
 const renderTooltip = (rootProps = {}, contentProps = {}) =>
   render(

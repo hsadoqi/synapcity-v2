@@ -26,12 +26,12 @@ import {
   type ToolbarSettings,
 } from '@synapcity/frontend-blocks';
 import { SettingsView } from '@synapcity/frontend-blocks';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-} from '@synapcity/frontend-ui/core/resizable';
+} from '@synapcity/frontend-ui/components/resizable';
 
 import { useKeyboardShortcut } from '@synapcity/frontend-ui/hooks/use-keyboard-shortcut';
 

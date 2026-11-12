@@ -6,7 +6,7 @@ import {
   CollapsibleContent,
   CollapsibleIcon,
   CollapsibleTrigger,
-} from '@synapcity/frontend-ui/core/collapsible';
+} from '@synapcity/frontend-ui/components/collapsible';
 
 function Example(props: {
   defaultOpen?: boolean;

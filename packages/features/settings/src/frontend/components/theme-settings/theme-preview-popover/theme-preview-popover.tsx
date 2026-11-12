@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import { Eye } from 'lucide-react';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@synapcity/frontend-ui/core/popover';
+} from '@synapcity/frontend-ui/components/popover';
 import { useSettingsTabActive } from '../../shared/settings-tabs/settings-tab-active';
 import type { ThemeSettings } from '@synapcity/domain-preferences';
 import { ThemeLivePreview } from '../theme-live-preview';

@@ -1,6 +1,6 @@
 import type { ComponentProps, ReactNode } from 'react';
-import { Input } from '@synapcity/frontend-ui/core/input';
-import { Label } from '@synapcity/frontend-ui/core/label';
+import { Input } from '@synapcity/frontend-ui/components/input';
+import { Label } from '@synapcity/frontend-ui/components/label';
 import { PasswordInput } from '@synapcity/frontend-blocks';
 
 type FormFieldProps = ComponentProps<'input'> & {

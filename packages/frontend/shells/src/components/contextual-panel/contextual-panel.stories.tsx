@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { FileText, PanelRight, PenLine } from 'lucide-react';
 import { ModeProvider } from '@synapcity/frontend-preferences';
-import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
+import { TooltipProvider } from '@synapcity/frontend-ui/components/tooltip';
 
 import { ContextualPanelShell, type ContextualPanelDestination } from '.';
 import { SidebarShell } from '../sidebar-shell';

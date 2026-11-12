@@ -4,7 +4,7 @@ import {
   defaultAgendaMenuItems,
   type AgendaMenuItem,
 } from '../../day-agenda/agenda-dropdown-menu';
-import { IconButton } from '@synapcity/frontend-ui/core/icon-button';
+import { IconButton } from '@synapcity/frontend-ui/components/icon-button';
 import { Cog } from 'lucide-react';
 import type { ReactElement, ReactNode } from 'react';
 

@@ -11,7 +11,7 @@ import {
   SheetPortal,
   SheetTitle,
   SheetTrigger,
-} from '@synapcity/frontend-ui/core/sheet';
+} from '@synapcity/frontend-ui/components/sheet';
 
 const renderSheet = (contentProps = {}, rootProps = {}) =>
   render(

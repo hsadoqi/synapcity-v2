@@ -5,7 +5,7 @@ import {
   FieldDescription,
   FieldError,
   FieldLabel,
-} from '@synapcity/frontend-ui/core/field';
+} from '@synapcity/frontend-ui/components/field';
 
 /** The ids a field's label, description, error and status use, derived from the control's id. */
 export function fieldIds(id: string) {

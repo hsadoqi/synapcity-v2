@@ -17,8 +17,8 @@ import {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
-} from '@synapcity/frontend-ui/core/dialog';
-import { ScrollArea } from '@synapcity/frontend-ui/core/scroll-area';
+} from '@synapcity/frontend-ui/components/dialog';
+import { ScrollArea } from '@synapcity/frontend-ui/components/scroll-area';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 
 type DialogRootProps = ComponentProps<typeof Dialog>;

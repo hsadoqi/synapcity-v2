@@ -15,8 +15,8 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from '@synapcity/frontend-ui/core/avatar';
-import { Button } from '@synapcity/frontend-ui/core/button';
+} from '@synapcity/frontend-ui/components/avatar';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,18 +26,18 @@ import {
   DropdownMenuLinkItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@synapcity/frontend-ui/core/dropdown-menu';
+} from '@synapcity/frontend-ui/components/dropdown-menu';
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@synapcity/frontend-ui/core/sidebar';
+} from '@synapcity/frontend-ui/components/sidebar';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@synapcity/frontend-ui/core/tooltip';
+} from '@synapcity/frontend-ui/components/tooltip';
 import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 
 type UserMenuProps = AccountLinks & {

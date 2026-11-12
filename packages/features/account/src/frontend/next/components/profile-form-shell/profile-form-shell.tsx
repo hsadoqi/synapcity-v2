@@ -10,9 +10,9 @@ import {
   type ReactNode,
 } from 'react';
 import { usePathname } from 'next/navigation';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
-import { toast } from '@synapcity/frontend-ui/core/toast';
+import { toast } from '@synapcity/frontend-ui/components/toast';
 
 import type { ProfileState } from '../../../../contracts';
 import { FormMessage, useFocusFirstError } from '@synapcity/frontend-forms';

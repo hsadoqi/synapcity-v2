@@ -4,7 +4,10 @@ import '../styles/globals.css';
 
 import { useEffect } from 'react';
 import { reportCaughtError } from '@synapcity/frontend-error-reports';
-import { Button, buttonVariants } from '@synapcity/frontend-ui/core/button';
+import {
+  Button,
+  buttonVariants,
+} from '@synapcity/frontend-ui/components/button';
 import { ModeProvider } from '@synapcity/frontend-preferences';
 
 import { MessagePage } from '@synapcity/frontend-shells';

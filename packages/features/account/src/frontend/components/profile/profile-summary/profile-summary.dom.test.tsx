@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 /** The toast is the success feedback: replace it so the tests can see what it was given. */
 const toasts = vi.hoisted(() => ({ add: vi.fn() }));
-vi.mock('@synapcity/frontend-ui/core/toast', () => ({
+vi.mock('@synapcity/frontend-ui/components/toast', () => ({
   toast: { add: toasts.add },
 }));
 

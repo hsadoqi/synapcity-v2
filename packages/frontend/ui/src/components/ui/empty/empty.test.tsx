@@ -2,7 +2,7 @@ import { createRef } from 'react';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   Empty,
   EmptyContent,
@@ -10,7 +10,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from '@synapcity/frontend-ui/core/empty';
+} from '@synapcity/frontend-ui/components/empty';
 
 describe('Empty', () => {
   it('composes media, title, description and actions in reading order', () => {

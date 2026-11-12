@@ -1,6 +1,6 @@
 'use client';
 
-import { Separator } from '@synapcity/frontend-ui/core/separator';
+import { Separator } from '@synapcity/frontend-ui/components/separator';
 import { RecentEntityItems } from '../recent-entity-items';
 import { EntityHeader } from '../entity-header';
 import type { EntityItem } from '../../types';

@@ -3,7 +3,7 @@
 import { Toast as ToastPrimitive } from '@base-ui/react/toast';
 import { cn } from 'cn';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   XIcon,
   CircleCheckIcon,

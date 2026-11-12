@@ -4,13 +4,13 @@ import * as React from 'react';
 import { Combobox as ComboboxPrimitive } from '@base-ui/react/combobox';
 import { cn } from 'cn';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
-} from '@synapcity/frontend-ui/core/input-group';
+} from '@synapcity/frontend-ui/components/input-group';
 import { buildComboboxRows } from '@synapcity/frontend-ui/lib/combobox-rows';
 import { useVirtualList } from '@synapcity/frontend-ui/hooks/use-virtual-list';
 import { CheckIcon, ChevronDownIcon, XIcon } from 'lucide-react';

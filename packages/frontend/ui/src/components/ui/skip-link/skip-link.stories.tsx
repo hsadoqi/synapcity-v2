@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { SkipLinkButton } from '@synapcity/frontend-ui/core/skip-link';
+import { SkipLinkButton } from '@synapcity/frontend-ui/components/skip-link';
 
 const meta: Meta<typeof SkipLinkButton> = {
   title: 'Components/SkipLink',

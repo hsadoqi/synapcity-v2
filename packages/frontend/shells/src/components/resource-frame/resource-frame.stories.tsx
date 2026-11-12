@@ -9,7 +9,7 @@ import {
   Star,
 } from 'lucide-react';
 import { ModeProvider } from '@synapcity/frontend-preferences';
-import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
+import { TooltipProvider } from '@synapcity/frontend-ui/components/tooltip';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 
 import { ResourceFrame, ResourceHeader } from '.';

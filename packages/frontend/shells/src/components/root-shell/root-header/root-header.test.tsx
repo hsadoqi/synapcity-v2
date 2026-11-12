@@ -4,8 +4,8 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { ModeProvider } from '@synapcity/frontend-preferences';
 import { RootHeader, RootHeaderContent } from '.';
-import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
-import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
+import { SidebarProvider } from '@synapcity/frontend-ui/components/sidebar';
+import { TooltipProvider } from '@synapcity/frontend-ui/components/tooltip';
 import { GlobalPanelShell } from '../global-panel';
 
 vi.mock('next/navigation', () => ({ usePathname: () => '/' }));

@@ -1,6 +1,6 @@
 'use client';
 
-import { FieldGroup } from '@synapcity/frontend-ui/core/field';
+import { FieldGroup } from '@synapcity/frontend-ui/components/field';
 import { useThemeDraft } from '../../hooks/use-visuals/use-theme-draft';
 import { SettingsTabShell } from '../shared/settings-tabs/settings-tab-shell';
 import {

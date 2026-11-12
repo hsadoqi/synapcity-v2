@@ -1,5 +1,5 @@
 import type { Metric } from '@synapcity/domain-prototypes';
-import { Input } from '@synapcity/frontend-ui/core/input';
+import { Input } from '@synapcity/frontend-ui/components/input';
 
 /** Commits on blur or Enter; an empty or non-numeric entry is ignored. */
 export function StatBody({

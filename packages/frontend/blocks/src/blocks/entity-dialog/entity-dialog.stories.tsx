@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, fn, screen, userEvent, waitFor, within } from 'storybook/test';
 
 import { EntityDialog } from '.';
-import { Button } from '@synapcity/frontend-ui/core/button';
-import { Input } from '@synapcity/frontend-ui/core/input';
-import { Label } from '@synapcity/frontend-ui/core/label';
+import { Button } from '@synapcity/frontend-ui/components/button';
+import { Input } from '@synapcity/frontend-ui/components/input';
+import { Label } from '@synapcity/frontend-ui/components/label';
 
 /** Plain fields: the shell supplies the form, the footer and the states. */
 const fields = (

@@ -5,7 +5,7 @@ import {
   SynapcityLogo,
   SynapcityMark,
   SynapcityWordmark,
-} from '@synapcity/frontend-ui/core/logo-mark';
+} from '@synapcity/frontend-ui/components/logo-mark';
 
 function svgOf(container: HTMLElement) {
   return container.querySelector('svg') as SVGSVGElement;

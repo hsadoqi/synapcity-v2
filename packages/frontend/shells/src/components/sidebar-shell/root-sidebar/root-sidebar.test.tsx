@@ -2,8 +2,8 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { RootSidebar } from '.';
-import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
-import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
+import { SidebarProvider } from '@synapcity/frontend-ui/components/sidebar';
+import { TooltipProvider } from '@synapcity/frontend-ui/components/tooltip';
 import { ModeProvider } from '@synapcity/frontend-preferences';
 import { sampleSidebarGroups } from '../../../testing/sidebar-sample';
 

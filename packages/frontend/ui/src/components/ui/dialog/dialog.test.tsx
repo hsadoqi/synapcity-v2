@@ -9,7 +9,7 @@ import {
 import { describe, expect, it, vi } from 'vitest';
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   Dialog,
   DialogClose,
@@ -21,7 +21,7 @@ import {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
-} from '@synapcity/frontend-ui/core/dialog';
+} from '@synapcity/frontend-ui/components/dialog';
 
 function Example({
   rootProps,

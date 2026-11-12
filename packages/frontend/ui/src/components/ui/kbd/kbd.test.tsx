@@ -2,7 +2,7 @@ import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { Kbd, KbdGroup } from '@synapcity/frontend-ui/core/kbd';
+import { Kbd, KbdGroup } from '@synapcity/frontend-ui/components/kbd';
 
 describe('Kbd', () => {
   it('renders its children in a kbd element with the kbd slot', () => {

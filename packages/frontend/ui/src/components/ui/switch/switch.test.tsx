@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Switch } from '@synapcity/frontend-ui/core/switch';
+import { Switch } from '@synapcity/frontend-ui/components/switch';
 
 describe('Switch', () => {
   it('is a switch that starts off', () => {

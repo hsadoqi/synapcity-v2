@@ -2,7 +2,7 @@
 
 import { useActionState, useId } from 'react';
 import { CircleCheck } from 'lucide-react';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -12,7 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@synapcity/frontend-ui/core/alert-dialog';
+} from '@synapcity/frontend-ui/components/alert-dialog';
 
 import { useConnectedAccounts } from '../../providers/connected-accounts';
 import {

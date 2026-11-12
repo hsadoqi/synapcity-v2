@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { SidebarHeader } from '@synapcity/frontend-ui/core/sidebar';
+import { SidebarHeader } from '@synapcity/frontend-ui/components/sidebar';
 
 export function MainSidebarHeader({
   label,

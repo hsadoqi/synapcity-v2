@@ -4,12 +4,12 @@ import type { Breakpoint } from '@synapcity/domain-grids';
 import {
   ToggleGroup,
   ToggleGroupItem,
-} from '@synapcity/frontend-ui/core/toggle-group';
+} from '@synapcity/frontend-ui/components/toggle-group';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@synapcity/frontend-ui/core/tooltip';
+} from '@synapcity/frontend-ui/components/tooltip';
 import {
   MonitorIcon,
   SmartphoneIcon,

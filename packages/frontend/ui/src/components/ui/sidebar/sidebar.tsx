@@ -7,22 +7,22 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from 'cn';
 
 import { useIsMobile } from '@synapcity/frontend-ui/hooks/use-mobile';
-import { Button } from '@synapcity/frontend-ui/core/button';
-import { Input } from '@synapcity/frontend-ui/core/input';
-import { Separator } from '@synapcity/frontend-ui/core/separator';
+import { Button } from '@synapcity/frontend-ui/components/button';
+import { Input } from '@synapcity/frontend-ui/components/input';
+import { Separator } from '@synapcity/frontend-ui/components/separator';
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from '@synapcity/frontend-ui/core/sheet';
-import { Skeleton } from '@synapcity/frontend-ui/core/skeleton';
+} from '@synapcity/frontend-ui/components/sheet';
+import { Skeleton } from '@synapcity/frontend-ui/components/skeleton';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@synapcity/frontend-ui/core/tooltip';
+} from '@synapcity/frontend-ui/components/tooltip';
 import { PanelLeftIcon } from 'lucide-react';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';

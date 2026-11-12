@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleIcon,
   CollapsibleTrigger,
-} from '@synapcity/frontend-ui/core/collapsible';
+} from '@synapcity/frontend-ui/components/collapsible';
 
 const meta: Meta<typeof Collapsible> = {
   title: 'Components/Collapsible',

@@ -4,7 +4,7 @@ import { AlignCenterIcon, AlignLeftIcon, AlignRightIcon } from 'lucide-react';
 import {
   ToggleGroup,
   ToggleGroupItem,
-} from '@synapcity/frontend-ui/core/toggle-group';
+} from '@synapcity/frontend-ui/components/toggle-group';
 
 const meta: Meta<typeof ToggleGroup> = {
   title: 'Components/ToggleGroup',

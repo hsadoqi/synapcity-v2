@@ -9,12 +9,12 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@synapcity/frontend-ui/core/dropdown-menu';
+} from '@synapcity/frontend-ui/components/dropdown-menu';
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@synapcity/frontend-ui/core/sidebar';
+} from '@synapcity/frontend-ui/components/sidebar';
 
 import { ShellLink } from '../../providers/shell-navigation';
 

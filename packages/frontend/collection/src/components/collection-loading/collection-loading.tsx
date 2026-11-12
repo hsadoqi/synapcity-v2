@@ -1,7 +1,7 @@
 'use client';
 
 import { LoadingRegion } from '@synapcity/frontend-blocks';
-import { Skeleton } from '@synapcity/frontend-ui/core/skeleton';
+import { Skeleton } from '@synapcity/frontend-ui/components/skeleton';
 
 import type { CollectionLayout } from '../../types';
 

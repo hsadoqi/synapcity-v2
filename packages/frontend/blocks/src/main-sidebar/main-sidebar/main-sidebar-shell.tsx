@@ -5,7 +5,7 @@ import {
   Sidebar,
   SidebarInset,
   SidebarProvider,
-} from '@synapcity/frontend-ui/core/sidebar';
+} from '@synapcity/frontend-ui/components/sidebar';
 import { MainCombinedSidebar } from './main-combined';
 import type { MainSidebarGroup, MainSidebarItem } from '../../types';
 

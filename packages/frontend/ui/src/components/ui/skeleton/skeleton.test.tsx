@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { Skeleton } from '@synapcity/frontend-ui/core/skeleton';
+import { Skeleton } from '@synapcity/frontend-ui/components/skeleton';
 
 describe('Skeleton', () => {
   it('renders a pulsing placeholder with its slot', () => {

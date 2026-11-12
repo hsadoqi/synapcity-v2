@@ -6,7 +6,7 @@ import {
   Alert,
   AlertDescription,
   AlertTitle,
-} from '@synapcity/frontend-ui/core/alert';
+} from '@synapcity/frontend-ui/components/alert';
 import { useEffect } from 'react';
 
 import type { DashboardLinkItem, DashboardStorage } from '../../../contracts';

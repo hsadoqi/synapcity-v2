@@ -1,7 +1,10 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Toggle, toggleVariants } from '@synapcity/frontend-ui/core/toggle';
+import {
+  Toggle,
+  toggleVariants,
+} from '@synapcity/frontend-ui/components/toggle';
 
 describe('Toggle', () => {
   it('is an unpressed button by default', () => {

@@ -4,7 +4,7 @@ import { Upload, Download, RotateCcw } from 'lucide-react';
 import { SettingRow } from '../shared/setting-row';
 import { useRef, useState } from 'react';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,7 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@synapcity/frontend-ui/core/alert-dialog';
+} from '@synapcity/frontend-ui/components/alert-dialog';
 export const ExportRow = ({
   onExport,
   disabled,

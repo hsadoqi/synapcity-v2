@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { CircleAlertIcon, InfoIcon } from 'lucide-react';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 
 import {
   Alert,
   AlertAction,
   AlertDescription,
   AlertTitle,
-} from '@synapcity/frontend-ui/core/alert';
+} from '@synapcity/frontend-ui/components/alert';
 
 const meta: Meta<typeof Alert> = {
   title: 'Components/Alert',

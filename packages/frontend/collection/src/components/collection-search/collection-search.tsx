@@ -6,7 +6,7 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-} from '@synapcity/frontend-ui/core/input-group';
+} from '@synapcity/frontend-ui/components/input-group';
 
 type CollectionSearchProps = {
   query: string;

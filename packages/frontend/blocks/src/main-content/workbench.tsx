@@ -1,6 +1,6 @@
 'use client';
 
-import { SidebarInset } from '@synapcity/frontend-ui/core/sidebar';
+import { SidebarInset } from '@synapcity/frontend-ui/components/sidebar';
 import { EmptyWorkspace } from './empty-workspace';
 import { Workspace } from '../types';
 

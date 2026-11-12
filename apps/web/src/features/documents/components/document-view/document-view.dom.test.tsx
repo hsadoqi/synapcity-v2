@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { regionalDefaults } from '@synapcity/domain-preferences';
 import type { BaseRecord } from '@synapcity/domain-records';
 import { RegionalProvider } from '@synapcity/frontend-preferences';
-import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
+import { TooltipProvider } from '@synapcity/frontend-ui/components/tooltip';
 import { DocumentDetails } from './document-details';
 import { DocumentView } from './document-view';
 

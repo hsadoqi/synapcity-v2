@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { Globe, Sprout } from 'lucide-react';
 
 import { ContextSwitcher } from '.';
-import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
-import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
+import { SidebarProvider } from '@synapcity/frontend-ui/components/sidebar';
+import { TooltipProvider } from '@synapcity/frontend-ui/components/tooltip';
 
 const meta: Meta<typeof ContextSwitcher> = {
   title: 'Blocks/ContextSwitcher',

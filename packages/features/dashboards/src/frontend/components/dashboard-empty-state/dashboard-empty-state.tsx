@@ -1,4 +1,4 @@
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   Empty,
   EmptyContent,
@@ -6,7 +6,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from '@synapcity/frontend-ui/core/empty';
+} from '@synapcity/frontend-ui/components/empty';
 import { LayoutDashboardIcon, PlusIcon } from 'lucide-react';
 
 /**

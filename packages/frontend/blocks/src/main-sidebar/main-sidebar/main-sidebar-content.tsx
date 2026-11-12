@@ -9,7 +9,7 @@ import {
   SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@synapcity/frontend-ui/core/sidebar';
+} from '@synapcity/frontend-ui/components/sidebar';
 import { NamedIcon } from '../../icon-by-name';
 import type { MainSidebarGroup, MainSidebarItem } from '../../types';
 

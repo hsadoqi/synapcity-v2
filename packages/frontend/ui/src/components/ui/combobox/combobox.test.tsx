@@ -16,7 +16,7 @@ import {
   ComboboxList,
   ComboboxVirtualList,
   useComboboxVirtualizer,
-} from '@synapcity/frontend-ui/core/combobox';
+} from '@synapcity/frontend-ui/components/combobox';
 
 const zones = ['UTC', 'Europe/Paris', 'Asia/Tokyo'];
 

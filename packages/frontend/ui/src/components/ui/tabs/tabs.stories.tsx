@@ -6,7 +6,7 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '@synapcity/frontend-ui/core/tabs';
+} from '@synapcity/frontend-ui/components/tabs';
 
 const meta: Meta<typeof Tabs> = {
   title: 'Components/Tabs',

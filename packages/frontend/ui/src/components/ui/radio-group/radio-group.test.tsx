@@ -1,11 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Label } from '@synapcity/frontend-ui/core/label';
+import { Label } from '@synapcity/frontend-ui/components/label';
 import {
   RadioGroup,
   RadioGroupItem,
-} from '@synapcity/frontend-ui/core/radio-group';
+} from '@synapcity/frontend-ui/components/radio-group';
 
 function Example({ onValueChange = vi.fn() }) {
   return (

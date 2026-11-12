@@ -8,7 +8,7 @@ import {
   AvatarGroup,
   AvatarGroupCount,
   AvatarImage,
-} from '@synapcity/frontend-ui/core/avatar';
+} from '@synapcity/frontend-ui/components/avatar';
 
 describe('Avatar', () => {
   it('marks its slot and defaults to the default size', () => {

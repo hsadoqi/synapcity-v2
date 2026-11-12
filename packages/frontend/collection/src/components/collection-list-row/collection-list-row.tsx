@@ -1,6 +1,6 @@
 'use client';
 
-import { Badge } from '@synapcity/frontend-ui/core/badge';
+import { Badge } from '@synapcity/frontend-ui/components/badge';
 
 import { formatUpdated } from '../../utils';
 import { ItemActionsMenu } from '../item-actions-menu';

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { toast } from '@synapcity/frontend-ui/core/toast';
+import { toast } from '@synapcity/frontend-ui/components/toast';
 
 import {
   NOTICES,

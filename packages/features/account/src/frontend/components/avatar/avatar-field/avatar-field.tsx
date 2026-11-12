@@ -1,7 +1,7 @@
 'use client';
 
 import { useId, useState } from 'react';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 
 import { FormField, fieldErrorProps } from '@synapcity/frontend-forms';
 import {

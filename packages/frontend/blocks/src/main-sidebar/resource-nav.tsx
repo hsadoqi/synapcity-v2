@@ -8,7 +8,7 @@ import {
   SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@synapcity/frontend-ui/core/sidebar';
+} from '@synapcity/frontend-ui/components/sidebar';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 import { PinIcon } from 'lucide-react';
 import { NamedIcon } from '../icon-by-name';

@@ -3,7 +3,7 @@
 import { useActionState, useEffect, useId, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 
 import { usePendingEmail } from '../../../providers/pending-email';
 import type { AuthState, AuthAction } from '../../../../contracts';

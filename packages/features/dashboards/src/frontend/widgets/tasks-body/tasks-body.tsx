@@ -1,9 +1,9 @@
 import { useState } from 'react';
 
 import type { Project, Task } from '@synapcity/domain-prototypes';
-import { Button } from '@synapcity/frontend-ui/core/button';
-import { Checkbox } from '@synapcity/frontend-ui/core/checkbox';
-import { Input } from '@synapcity/frontend-ui/core/input';
+import { Button } from '@synapcity/frontend-ui/components/button';
+import { Checkbox } from '@synapcity/frontend-ui/components/checkbox';
+import { Input } from '@synapcity/frontend-ui/components/input';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 
 import { WidgetEmpty } from '../widget-states';

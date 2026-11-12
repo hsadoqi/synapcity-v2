@@ -1,7 +1,10 @@
 'use client';
 
 import { useId, useRef, useState, useTransition, type FormEvent } from 'react';
-import { Button, buttonVariants } from '@synapcity/frontend-ui/core/button';
+import {
+  Button,
+  buttonVariants,
+} from '@synapcity/frontend-ui/components/button';
 import {
   Dialog,
   DialogClose,
@@ -10,13 +13,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@synapcity/frontend-ui/core/dialog';
+} from '@synapcity/frontend-ui/components/dialog';
 import {
   Field,
   FieldError,
   FieldLabel,
-} from '@synapcity/frontend-ui/core/field';
-import { Input } from '@synapcity/frontend-ui/core/input';
+} from '@synapcity/frontend-ui/components/field';
+import { Input } from '@synapcity/frontend-ui/components/input';
 import { NAME_MAX } from '@synapcity/domain-records';
 
 import { signInPathFor } from '../../lib/routing/user-paths';

@@ -9,7 +9,7 @@ import {
   type ComponentType,
   type ReactNode,
 } from 'react';
-import { Tabs, TabsContent } from '@synapcity/frontend-ui/core/tabs';
+import { Tabs, TabsContent } from '@synapcity/frontend-ui/components/tabs';
 import tabs from '../../../lib/data';
 import { settingsTabItems } from '../../../lib/data/tab-items';
 import { SettingsTabsHeader } from './settings-tab-header';

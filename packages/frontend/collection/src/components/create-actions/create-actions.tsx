@@ -3,7 +3,7 @@
 import type { LucideIcon } from 'lucide-react';
 
 import { SectionHeading } from '@synapcity/frontend-blocks';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 
 /** One thing the user can create here: its id is passed back to `onCreate`. */
 export type CreateAction = { id: string; label: string; icon: LucideIcon };

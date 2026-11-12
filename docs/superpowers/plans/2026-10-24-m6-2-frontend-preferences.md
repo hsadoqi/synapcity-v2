@@ -183,7 +183,7 @@ Every direct `localStorage` call for preferences goes behind one device-store un
 
 - [ ] **Step 1: Update the records.** No owner quotes.
 - [ ] **Step 2: Boundary probes** (planted, then removed, with `git diff` empty afterwards):
-  - `import { Button } from '@synapcity/frontend-ui/core/button';` in a `frontend-preferences` source file. Expected: R0, or with a temporary `node_modules` link, R9 package cycle.
+  - `import { Button } from '@synapcity/frontend-ui/components/button';` in a `frontend-preferences` source file. Expected: R0, or with a temporary `node_modules` link, R9 package cycle.
   - `import 'next/link';` in the same file. Expected: R0, or with a link, R11.
 
   Record both, and confirm the R9 mode-provider exception is gone and none was added.

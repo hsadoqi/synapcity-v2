@@ -15,17 +15,17 @@ import {
 } from 'react';
 import type { GroupProps, PanelImperativeHandle } from 'react-resizable-panels';
 import { PanelRightClose, type LucideIcon } from 'lucide-react';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-} from '@synapcity/frontend-ui/core/resizable';
+} from '@synapcity/frontend-ui/components/resizable';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@synapcity/frontend-ui/core/tooltip';
+} from '@synapcity/frontend-ui/components/tooltip';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 
 import { GLIDE_MS } from '../../utils/panel-motion';

@@ -1,6 +1,6 @@
 'use client';
 
-import { FieldGroup } from '@synapcity/frontend-ui/core/field';
+import { FieldGroup } from '@synapcity/frontend-ui/components/field';
 import { useSettingsDraft } from '../../hooks/use-settings-lifecycle/use-settings-draft';
 import { useSettings } from '../../hooks/use-settings-lifecycle/use-settings';
 import {

@@ -1,14 +1,14 @@
 'use client';
 
 import { AgendaDate } from '../../day-agenda/agenda-date';
-import { IconButton } from '@synapcity/frontend-ui/core/icon-button';
-import { Button } from '@synapcity/frontend-ui/core/button';
-import { Calendar } from '@synapcity/frontend-ui/core/calendar';
+import { IconButton } from '@synapcity/frontend-ui/components/icon-button';
+import { Button } from '@synapcity/frontend-ui/components/button';
+import { Calendar } from '@synapcity/frontend-ui/components/calendar';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@synapcity/frontend-ui/core/popover';
+} from '@synapcity/frontend-ui/components/popover';
 import {
   addCalendarDays,
   parseCalendarDate,

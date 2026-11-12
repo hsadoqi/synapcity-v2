@@ -7,7 +7,7 @@ import {
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
-} from '@synapcity/frontend-ui/core/combobox';
+} from '@synapcity/frontend-ui/components/combobox';
 
 type Option<T extends string> = { value: T; label: string };
 

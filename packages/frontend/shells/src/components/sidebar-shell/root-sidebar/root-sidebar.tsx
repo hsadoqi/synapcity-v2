@@ -15,7 +15,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from '@synapcity/frontend-ui/core/sidebar';
+} from '@synapcity/frontend-ui/components/sidebar';
 import { ModeToggle } from '@synapcity/frontend-blocks';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 import { ShellLink } from '../../../providers/shell-navigation';

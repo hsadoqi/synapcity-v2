@@ -4,7 +4,7 @@ import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-} from '@synapcity/frontend-ui/core/resizable';
+} from '@synapcity/frontend-ui/components/resizable';
 
 // jsdom has no layout observer. Actual sizing and keyboard/pointer behavior
 // are exercised with the real observer in the browser stories and web E2E.

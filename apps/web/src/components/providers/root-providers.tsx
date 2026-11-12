@@ -5,7 +5,7 @@ import {
   configureLookCookie,
   ModeProvider,
 } from '@synapcity/frontend-preferences';
-import { Toaster } from '@synapcity/frontend-ui/core/toast';
+import { Toaster } from '@synapcity/frontend-ui/components/toast';
 
 import { NoticeToast } from '../notices/notice-toast';
 import { ErrorReports } from '@synapcity/frontend-error-reports';

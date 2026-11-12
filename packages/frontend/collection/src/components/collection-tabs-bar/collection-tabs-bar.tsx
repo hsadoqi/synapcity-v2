@@ -1,6 +1,6 @@
 'use client';
 
-import { TabsList, TabsTrigger } from '@synapcity/frontend-ui/core/tabs';
+import { TabsList, TabsTrigger } from '@synapcity/frontend-ui/components/tabs';
 
 /** The value of the optional overview tab; no collection tab may use it as its id. */
 export const OVERVIEW_TAB = 'overview';

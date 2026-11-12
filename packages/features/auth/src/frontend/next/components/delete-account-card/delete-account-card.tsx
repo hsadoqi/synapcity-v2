@@ -2,7 +2,10 @@
 
 // TODO: Can we make this more generic/reusable so it can be used for contexts/use cases beyond deleting account like deleting a space/document/dashboard/widget(future)?
 import { useActionState, useId } from 'react';
-import { Button, buttonVariants } from '@synapcity/frontend-ui/core/button';
+import {
+  Button,
+  buttonVariants,
+} from '@synapcity/frontend-ui/components/button';
 
 import type { DeleteAccountState } from '../../../../contracts';
 import { FormMessage } from '@synapcity/frontend-forms';

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { FileText, Share2 } from 'lucide-react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
+import { TooltipProvider } from '@synapcity/frontend-ui/components/tooltip';
 
 import { ResourceFrame, ResourceHeader } from '.';
 

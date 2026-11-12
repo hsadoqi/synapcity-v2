@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { CheckIcon, XIcon } from 'lucide-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { Badge } from '@synapcity/frontend-ui/core/badge';
+import { Badge } from '@synapcity/frontend-ui/components/badge';
 
 const meta = {
   title: 'Components/Badge',

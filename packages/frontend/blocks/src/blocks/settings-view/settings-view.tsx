@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
-import { ScrollArea } from '@synapcity/frontend-ui/core/scroll-area';
+import { Button } from '@synapcity/frontend-ui/components/button';
+import { ScrollArea } from '@synapcity/frontend-ui/components/scroll-area';
 import { useEffect, useId, useRef, type ReactNode } from 'react';
 
 export interface SettingsViewProps {

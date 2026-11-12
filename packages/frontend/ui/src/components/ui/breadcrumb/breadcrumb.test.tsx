@@ -8,7 +8,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@synapcity/frontend-ui/core/breadcrumb';
+} from '@synapcity/frontend-ui/components/breadcrumb';
 
 function renderTrail() {
   render(

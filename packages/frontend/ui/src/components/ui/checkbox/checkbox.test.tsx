@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Checkbox } from '@synapcity/frontend-ui/core/checkbox';
+import { Checkbox } from '@synapcity/frontend-ui/components/checkbox';
 
 describe('Checkbox', () => {
   it('is a checkbox that starts unchecked', () => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { FieldGroup } from '@synapcity/frontend-ui/core/field';
+import { FieldGroup } from '@synapcity/frontend-ui/components/field';
 import {
   useNotificationPermission,
   type NotificationPermissionState,

@@ -1,5 +1,5 @@
 import { goalPercent, type Goal } from '@synapcity/domain-prototypes';
-import { Input } from '@synapcity/frontend-ui/core/input';
+import { Input } from '@synapcity/frontend-ui/components/input';
 
 export type GoalChange = { current?: number; target?: number };
 

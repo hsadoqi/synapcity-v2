@@ -43,7 +43,7 @@ vi.mock('@synapcity/features-dashboards/frontend', async (importOriginal) => {
 
 import { createComposition } from '@synapcity/domain-dashboards';
 import type { BaseRecord } from '@synapcity/domain-records';
-import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
+import { TooltipProvider } from '@synapcity/frontend-ui/components/tooltip';
 import { DashboardView } from './dashboard-view';
 
 // The panel library lays out against browser measurements; supply them, as the

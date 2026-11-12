@@ -1,4 +1,4 @@
-import { Skeleton } from '@synapcity/frontend-ui/core/skeleton';
+import { Skeleton } from '@synapcity/frontend-ui/components/skeleton';
 
 import type { CollectionLabels } from '../../types';
 

@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
-import { Kbd } from '@synapcity/frontend-ui/core/kbd';
+import { Button } from '@synapcity/frontend-ui/components/button';
+import { Kbd } from '@synapcity/frontend-ui/components/kbd';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 import { SearchIcon } from 'lucide-react';
 

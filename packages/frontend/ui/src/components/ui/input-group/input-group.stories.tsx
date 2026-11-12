@@ -8,7 +8,7 @@ import {
   InputGroupInput,
   InputGroupText,
   InputGroupTextarea,
-} from '@synapcity/frontend-ui/core/input-group';
+} from '@synapcity/frontend-ui/components/input-group';
 
 const meta: Meta<typeof InputGroup> = {
   title: 'Components/InputGroup',

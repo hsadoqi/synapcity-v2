@@ -1,7 +1,7 @@
 'use client';
 
 import { useId } from 'react';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 
 import {
   MIN_PASSWORD_LENGTH,

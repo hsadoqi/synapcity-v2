@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, userEvent, within } from 'storybook/test';
 
-import { Checkbox } from '@synapcity/frontend-ui/core/checkbox';
-import { Label } from '@synapcity/frontend-ui/core/label';
+import { Checkbox } from '@synapcity/frontend-ui/components/checkbox';
+import { Label } from '@synapcity/frontend-ui/components/label';
 
 const meta: Meta<typeof Checkbox> = {
   title: 'Components/Checkbox',

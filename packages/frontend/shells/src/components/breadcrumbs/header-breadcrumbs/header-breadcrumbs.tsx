@@ -7,7 +7,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@synapcity/frontend-ui/core/breadcrumb';
+} from '@synapcity/frontend-ui/components/breadcrumb';
 import { ShellLink } from '../../../providers/shell-navigation';
 
 /** One level of the trail. The last item is the current page and takes no link. */

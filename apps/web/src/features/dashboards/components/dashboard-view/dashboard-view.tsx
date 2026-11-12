@@ -29,7 +29,7 @@ import {
   Alert,
   AlertDescription,
   AlertTitle,
-} from '@synapcity/frontend-ui/core/alert';
+} from '@synapcity/frontend-ui/components/alert';
 
 import { saveDashboardComposition } from '../../server/actions/dashboard-composition-actions';
 import { fixtureComposition } from '../../lib/fixtures';

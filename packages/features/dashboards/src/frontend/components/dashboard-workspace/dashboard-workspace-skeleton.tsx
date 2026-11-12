@@ -1,5 +1,5 @@
 import { LoadingRegion } from '@synapcity/frontend-blocks';
-import { Skeleton } from '@synapcity/frontend-ui/core/skeleton';
+import { Skeleton } from '@synapcity/frontend-ui/components/skeleton';
 
 /** The canvas's shape while its saved state is read. */
 export function DashboardWorkspaceSkeleton() {

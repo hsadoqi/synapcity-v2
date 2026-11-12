@@ -5,7 +5,7 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from '@synapcity/frontend-ui/core/avatar';
+} from '@synapcity/frontend-ui/components/avatar';
 
 import { initialsOf } from '@synapcity/domain-identity';
 

@@ -7,7 +7,7 @@ import { AgendaDateNav } from '../day-agenda/agenda-date-nav';
 import { AgendaSettingsView } from '../day-agenda/agenda-settings-view';
 import type { AgendaMenuItem } from '../day-agenda/agenda-dropdown-menu';
 import { AgendaTimeSlot } from '../day-agenda/agenda-time-slot';
-import { ScrollArea } from '@synapcity/frontend-ui/core/scroll-area';
+import { ScrollArea } from '@synapcity/frontend-ui/components/scroll-area';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 import { useRef, useState, type ReactElement, type ReactNode } from 'react';
 import type {

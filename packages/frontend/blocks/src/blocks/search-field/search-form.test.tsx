@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { SearchForm } from '.';
-import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
+import { SidebarProvider } from '@synapcity/frontend-ui/components/sidebar';
 
 const renderForm = (props = {}) =>
   render(

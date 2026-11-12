@@ -2,7 +2,7 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from '@synapcity/frontend-ui/core/avatar';
+} from '@synapcity/frontend-ui/components/avatar';
 import type { User } from '@synapcity/domain-identity';
 
 /** The avatar and name on their own, without the actions menu. */

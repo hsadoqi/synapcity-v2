@@ -1,4 +1,4 @@
-import { Badge } from '@synapcity/frontend-ui/core/badge';
+import { Badge } from '@synapcity/frontend-ui/components/badge';
 
 import type { CollectionItem } from '@synapcity/frontend-collection';
 

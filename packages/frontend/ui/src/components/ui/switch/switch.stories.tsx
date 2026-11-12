@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, userEvent, within } from 'storybook/test';
 
-import { Label } from '@synapcity/frontend-ui/core/label';
-import { Switch } from '@synapcity/frontend-ui/core/switch';
+import { Label } from '@synapcity/frontend-ui/components/label';
+import { Switch } from '@synapcity/frontend-ui/components/switch';
 
 const meta: Meta<typeof Switch> = {
   title: 'Components/Switch',

@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import {
   SidebarFooter,
   SidebarSeparator,
-} from '@synapcity/frontend-ui/core/sidebar';
+} from '@synapcity/frontend-ui/components/sidebar';
 
 /** The panel footer is a slot so account or action ownership stays with the host. */
 export function MainSidebarFooter({ children }: { children: ReactNode }) {

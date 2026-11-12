@@ -5,7 +5,7 @@ import {
   addTags,
   parseTags,
   TagsInput,
-} from '@synapcity/frontend-ui/core/tags-input';
+} from '@synapcity/frontend-ui/components/tags-input';
 
 const field = () => screen.getByRole('textbox', { name: 'Topics' });
 const type = (text: string) =>

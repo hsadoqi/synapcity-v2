@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import { Workspace } from '../types';
 import { WorkspaceDropdown } from './workspace-dropdown';
 import {
@@ -10,8 +10,8 @@ import {
   BreadcrumbItem,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@synapcity/frontend-ui/core/breadcrumb';
-import { SidebarTrigger } from '@synapcity/frontend-ui/core/sidebar';
+} from '@synapcity/frontend-ui/components/breadcrumb';
+import { SidebarTrigger } from '@synapcity/frontend-ui/components/sidebar';
 
 export function WorkbenchHeader({
   workspaceName,

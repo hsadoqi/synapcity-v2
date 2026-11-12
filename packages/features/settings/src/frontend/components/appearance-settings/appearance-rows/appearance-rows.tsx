@@ -1,4 +1,4 @@
-import { Switch } from '@synapcity/frontend-ui/core/switch';
+import { Switch } from '@synapcity/frontend-ui/components/switch';
 import { SettingRow } from '../../shared/setting-row';
 import { SettingsSelect } from '../../shared/settings-select';
 import type { AppearanceSettings } from '@synapcity/domain-preferences';

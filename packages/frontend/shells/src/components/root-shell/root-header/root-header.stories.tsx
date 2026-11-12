@@ -3,8 +3,8 @@ import { RootHeader } from '.';
 import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 import { UserMenu } from '@synapcity/frontend-blocks';
 import { ModeProvider } from '@synapcity/frontend-preferences';
-import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
-import { TooltipProvider } from '@synapcity/frontend-ui/core/tooltip';
+import { SidebarProvider } from '@synapcity/frontend-ui/components/sidebar';
+import { TooltipProvider } from '@synapcity/frontend-ui/components/tooltip';
 
 const meta: Meta<typeof RootHeader> = {
   title: 'Blocks/RootHeader',

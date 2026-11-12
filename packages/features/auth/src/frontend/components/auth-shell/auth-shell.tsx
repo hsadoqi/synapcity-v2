@@ -8,7 +8,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@synapcity/frontend-ui/core/card';
+} from '@synapcity/frontend-ui/components/card';
 
 const FocusHeadingContext = createContext<() => void>(() => {});
 

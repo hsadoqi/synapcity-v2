@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { XIcon } from 'lucide-react';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 
 export interface TagsInputProps extends Omit<

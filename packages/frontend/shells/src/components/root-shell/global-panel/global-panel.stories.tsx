@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, screen, userEvent, waitFor, within } from 'storybook/test';
 import { GlobalPanelShell, GlobalPanelToggle } from '.';
-import { Input } from '@synapcity/frontend-ui/core/input';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Input } from '@synapcity/frontend-ui/components/input';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@synapcity/frontend-ui/core/select';
+} from '@synapcity/frontend-ui/components/select';
 
 const meta: Meta<typeof GlobalPanelShell> = {
   title: 'Blocks/GlobalPanel',

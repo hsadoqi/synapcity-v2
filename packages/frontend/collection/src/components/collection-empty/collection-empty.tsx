@@ -2,7 +2,7 @@
 
 import { Plus, type LucideIcon } from 'lucide-react';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   Empty,
   EmptyContent,
@@ -10,7 +10,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from '@synapcity/frontend-ui/core/empty';
+} from '@synapcity/frontend-ui/components/empty';
 
 import type { CollectionEmptyCopy } from '../../types';
 

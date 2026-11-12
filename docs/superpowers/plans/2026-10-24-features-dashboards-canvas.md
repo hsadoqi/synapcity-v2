@@ -18,7 +18,7 @@
 - Package `@synapcity/features-dashboards` at `packages/features/dashboards`, entries `./contracts`, `./frontend`, `./styles.css`; no root entry, no `./server`.
 - `./contracts` imports only domain packages. Nothing in `src/frontend/widgets/` imports `src/frontend/components/`, the store, `react-grid-layout` or `zustand`.
 - Colours: semantic classes only (`bg-background`, `bg-card`, `bg-muted`, `text-foreground`, `text-muted-foreground`, `border-border`, `bg-primary`, `text-primary-foreground`). No palette classes, no hand-written `dark:` colours, no bracket values, no static `style={{}}`, no `!important`, `cn()` from `@synapcity/frontend-ui/lib/utils`, `gap-*` not `space-*`, `size-*` not `w-* h-*`.
-- shadcn components from `@synapcity/frontend-ui/core/<name>`; use variants before `className`, and `className` on them for layout only.
+- shadcn components from `@synapcity/frontend-ui/components/<name>`; use variants before `className`, and `className` on them for layout only.
 - Storage keys: `synapcity.dashboard.<ownerId>.<dashboardId>.v1`, `synapcity.records.<ownerId>.v1`; invalid values copied to `<key>.invalid`.
 - Save batching: 400 ms after the last change; flush on `pagehide` and on `visibilitychange` to hidden; flush on unmount.
 - Every component folder has `name.tsx`, `name.stories.tsx`, `name.test.tsx`, `index.ts`. Stories run in `apps/storybook` with the a11y addon.
@@ -320,7 +320,7 @@ Expected: PASS.
 
 **Interfaces:**
 
-- Produces: `Checkbox` from `@synapcity/frontend-ui/core/checkbox`, shadcn's `base-mira` checkbox on Base UI (`checked`, `onCheckedChange`, `disabled`, `aria-label`).
+- Produces: `Checkbox` from `@synapcity/frontend-ui/components/checkbox`, shadcn's `base-mira` checkbox on Base UI (`checked`, `onCheckedChange`, `disabled`, `aria-label`).
 
 - [x] **Step 1: Add it with the shadcn CLI**
 

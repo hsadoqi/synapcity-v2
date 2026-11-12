@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { SkipLinkButton } from '@synapcity/frontend-ui/core/skip-link';
+import { SkipLinkButton } from '@synapcity/frontend-ui/components/skip-link';
 
 describe('SkipLinkButton', () => {
   it('links to the main content landmark', () => {

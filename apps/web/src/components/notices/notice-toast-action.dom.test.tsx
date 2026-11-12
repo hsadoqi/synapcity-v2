@@ -16,7 +16,7 @@ vi.mock('next/navigation', () => ({
   usePathname: () => '/abc/home',
   useRouter: () => ({ replace: mocks.replace, push: mocks.push }),
 }));
-vi.mock('@synapcity/frontend-ui/core/toast', () => ({
+vi.mock('@synapcity/frontend-ui/components/toast', () => ({
   toast: { add: mocks.add, close: mocks.close },
 }));
 vi.mock('@/lib/routing/notices', async (importOriginal) => {

@@ -4,7 +4,7 @@ import {
   CommandSeparator,
   CommandGroup,
   CommandItem,
-} from '@synapcity/frontend-ui/core/command';
+} from '@synapcity/frontend-ui/components/command';
 import React from 'react';
 import type { CommandSearchItem as Item } from './types';
 

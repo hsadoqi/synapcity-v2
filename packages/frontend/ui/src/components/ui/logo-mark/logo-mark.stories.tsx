@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { SynapcityLogo } from '@synapcity/frontend-ui/core/logo-mark';
+import { SynapcityLogo } from '@synapcity/frontend-ui/components/logo-mark';
 
 const meta: Meta<typeof SynapcityLogo> = {
   title: 'Components/LogoMark',

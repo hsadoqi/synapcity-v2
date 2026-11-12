@@ -5,7 +5,7 @@ import {
   AccordionTrigger,
   AccordionContent,
   Accordion,
-} from '@synapcity/frontend-ui/core/accordion';
+} from '@synapcity/frontend-ui/components/accordion';
 import { ReactNode, Children, isValidElement, useState } from 'react';
 
 type SettingsAccordionItemProps = {

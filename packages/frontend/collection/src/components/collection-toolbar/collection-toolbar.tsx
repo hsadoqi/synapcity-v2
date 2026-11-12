@@ -7,7 +7,7 @@ import type {
   CollectionLayout,
   CollectionSort,
 } from '../../types';
-import { buttonVariants } from '@synapcity/frontend-ui/core/button';
+import { buttonVariants } from '@synapcity/frontend-ui/components/button';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 
 import { useCollectionNavigation } from '../../providers';

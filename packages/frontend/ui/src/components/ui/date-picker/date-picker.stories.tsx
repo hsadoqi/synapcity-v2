@@ -4,8 +4,8 @@ import { expect, fn, screen, userEvent, waitFor, within } from 'storybook/test';
 import {
   DatePicker,
   DateRangePicker,
-} from '@synapcity/frontend-ui/core/date-picker';
-import { Field, FieldLabel } from '@synapcity/frontend-ui/core/field';
+} from '@synapcity/frontend-ui/components/date-picker';
+import { Field, FieldLabel } from '@synapcity/frontend-ui/components/field';
 
 const may4 = new Date(2026, 4, 4);
 

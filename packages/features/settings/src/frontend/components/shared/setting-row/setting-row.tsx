@@ -2,13 +2,13 @@
 
 import type { ReactNode } from 'react';
 import { cn } from '@synapcity/frontend-ui/lib/utils';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   Field,
   FieldContent,
   FieldDescription,
   FieldLabel,
-} from '@synapcity/frontend-ui/core/field';
+} from '@synapcity/frontend-ui/components/field';
 import { useSettingsDraftFields } from '../settings-drafts';
 
 type SettingRowProps = {

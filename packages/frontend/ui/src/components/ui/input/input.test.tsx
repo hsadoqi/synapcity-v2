@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Input } from '@synapcity/frontend-ui/core/input';
+import { Input } from '@synapcity/frontend-ui/components/input';
 
 describe('Input', () => {
   it('renders a textbox marked with its slot', () => {

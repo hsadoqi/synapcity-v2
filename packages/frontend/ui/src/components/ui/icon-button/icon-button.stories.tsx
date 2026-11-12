@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { IconButton } from '@synapcity/frontend-ui/core/icon-button';
+import { IconButton } from '@synapcity/frontend-ui/components/icon-button';
 import { Home } from 'lucide-react';
 
 const meta: Meta<typeof IconButton> = {

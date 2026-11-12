@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, type Ref } from 'react';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import {
   Combobox,
   ComboboxChip,
@@ -15,7 +15,7 @@ import {
   ComboboxVirtualList,
   useComboboxAnchor,
   useComboboxVirtualizer,
-} from '@synapcity/frontend-ui/core/combobox';
+} from '@synapcity/frontend-ui/components/combobox';
 
 import type {
   FieldOption,

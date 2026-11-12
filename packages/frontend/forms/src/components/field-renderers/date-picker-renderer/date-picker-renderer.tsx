@@ -1,7 +1,7 @@
 'use client';
 
 import type { Ref } from 'react';
-import { DatePicker } from '@synapcity/frontend-ui/core/date-picker';
+import { DatePicker } from '@synapcity/frontend-ui/components/date-picker';
 
 import type { FieldRendererProps } from '../../../types';
 import { fromDateValue, toDateValue } from '../../../utils/date-value';

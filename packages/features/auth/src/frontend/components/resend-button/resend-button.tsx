@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 
 /**
  * The submit for a resend form. It stays focusable while it waits: a disabled

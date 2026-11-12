@@ -8,7 +8,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@synapcity/frontend-ui/core/command';
+} from '@synapcity/frontend-ui/components/command';
 import { useKeyboardShortcut } from '@synapcity/frontend-ui/hooks/use-keyboard-shortcut';
 
 import { COMMAND_PALETTE_SHORTCUT } from '../../utils/shortcuts';

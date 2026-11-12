@@ -1,6 +1,6 @@
 import { Clock } from 'lucide-react';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 
 import type { CollectionItem } from '@synapcity/frontend-collection';
 

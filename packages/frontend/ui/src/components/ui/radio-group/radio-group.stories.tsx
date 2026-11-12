@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { Label } from '@synapcity/frontend-ui/core/label';
+import { Label } from '@synapcity/frontend-ui/components/label';
 import {
   RadioGroup,
   RadioGroupItem,
-} from '@synapcity/frontend-ui/core/radio-group';
+} from '@synapcity/frontend-ui/components/radio-group';
 
 const options = [
   ['daily', 'Daily'],

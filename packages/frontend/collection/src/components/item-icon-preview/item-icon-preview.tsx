@@ -7,7 +7,7 @@ import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-} from '@synapcity/frontend-ui/core/hover-card';
+} from '@synapcity/frontend-ui/components/hover-card';
 
 import type { CollectionItem } from '../../types';
 import { ItemIcon } from '../item-icon';

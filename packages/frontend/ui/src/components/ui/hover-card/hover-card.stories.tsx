@@ -4,7 +4,7 @@ import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-} from '@synapcity/frontend-ui/core/hover-card';
+} from '@synapcity/frontend-ui/components/hover-card';
 
 const meta: Meta<typeof HoverCard> = {
   title: 'Components/HoverCard',

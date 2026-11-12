@@ -4,7 +4,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from '@synapcity/frontend-ui/core/empty';
+} from '@synapcity/frontend-ui/components/empty';
 import { NamedIcon } from '../icon-by-name';
 import { Workspace } from '../types';
 

@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { useArgs } from 'storybook/preview-api';
 
-import { Label } from '@synapcity/frontend-ui/core/label';
-import { TagsInput } from '@synapcity/frontend-ui/core/tags-input';
+import { Label } from '@synapcity/frontend-ui/components/label';
+import { TagsInput } from '@synapcity/frontend-ui/components/tags-input';
 
 const meta: Meta<typeof TagsInput> = {
   title: 'Components/TagsInput',

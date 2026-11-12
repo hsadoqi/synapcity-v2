@@ -1,7 +1,7 @@
 'use client';
 
 import type { Ref } from 'react';
-import { Input } from '@synapcity/frontend-ui/core/input';
+import { Input } from '@synapcity/frontend-ui/components/input';
 
 import type { FieldRendererProps } from '../../../types';
 

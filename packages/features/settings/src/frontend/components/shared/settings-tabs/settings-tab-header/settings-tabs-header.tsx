@@ -1,4 +1,4 @@
-import { TabsList, TabsTrigger } from '@synapcity/frontend-ui/core/tabs';
+import { TabsList, TabsTrigger } from '@synapcity/frontend-ui/components/tabs';
 import { settingsTabItems } from '../../../../lib/data/tab-items';
 
 export const SettingsTabsHeader = ({

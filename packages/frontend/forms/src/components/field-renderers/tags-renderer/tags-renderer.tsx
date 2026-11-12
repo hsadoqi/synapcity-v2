@@ -1,7 +1,7 @@
 'use client';
 
 import type { Ref } from 'react';
-import { TagsInput } from '@synapcity/frontend-ui/core/tags-input';
+import { TagsInput } from '@synapcity/frontend-ui/components/tags-input';
 
 import type { FieldRendererProps } from '../../../types';
 

@@ -6,19 +6,19 @@ import { CalendarIcon } from 'lucide-react';
 
 import type { DateTimeFormatting } from '@synapcity/frontend-preferences';
 import { useDateTimeFormatting } from '@synapcity/frontend-preferences';
-import { Calendar } from '@synapcity/frontend-ui/core/calendar';
-import { Field, FieldLabel } from '@synapcity/frontend-ui/core/field';
+import { Calendar } from '@synapcity/frontend-ui/components/calendar';
+import { Field, FieldLabel } from '@synapcity/frontend-ui/components/field';
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
-} from '@synapcity/frontend-ui/core/input-group';
+} from '@synapcity/frontend-ui/components/input-group';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@synapcity/frontend-ui/core/popover';
+} from '@synapcity/frontend-ui/components/popover';
 import { formatCalendarDay } from '@synapcity/frontend-ui/lib/calendar-utils';
 
 function formatPickerDate(

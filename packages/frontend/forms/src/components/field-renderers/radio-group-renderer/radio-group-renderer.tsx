@@ -2,11 +2,11 @@
 
 import type { Ref } from 'react';
 
-import { Label } from '@synapcity/frontend-ui/core/label';
+import { Label } from '@synapcity/frontend-ui/components/label';
 import {
   RadioGroup,
   RadioGroupItem,
-} from '@synapcity/frontend-ui/core/radio-group';
+} from '@synapcity/frontend-ui/components/radio-group';
 
 import type { FieldRendererProps } from '../../../types';
 

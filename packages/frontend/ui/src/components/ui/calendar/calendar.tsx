@@ -13,7 +13,10 @@ import {
 } from 'react-day-picker';
 
 import { useDateTimeFormatting } from '@synapcity/frontend-preferences';
-import { Button, buttonVariants } from '@synapcity/frontend-ui/core/button';
+import {
+  Button,
+  buttonVariants,
+} from '@synapcity/frontend-ui/components/button';
 import {
   ChevronLeftIcon,
   ChevronRightIcon,

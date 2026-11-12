@@ -6,7 +6,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@synapcity/frontend-ui/core/accordion';
+} from '@synapcity/frontend-ui/components/accordion';
 
 function Example(props: {
   defaultValue?: string[];

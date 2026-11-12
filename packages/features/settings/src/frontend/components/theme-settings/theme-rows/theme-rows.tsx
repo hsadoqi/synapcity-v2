@@ -1,4 +1,4 @@
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import { Mode } from '@synapcity/frontend-preferences';
 import { SettingRow } from '../../shared/setting-row';
 import { SettingsSelect } from '../../shared/settings-select';

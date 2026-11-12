@@ -8,8 +8,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@synapcity/frontend-ui/core/alert-dialog';
-import { Button } from '@synapcity/frontend-ui/core/button';
+} from '@synapcity/frontend-ui/components/alert-dialog';
+import { Button } from '@synapcity/frontend-ui/components/button';
 
 type ConfirmDialogProps = {
   /** Controlled by the parent: the parent owns whether the dialog is open. */

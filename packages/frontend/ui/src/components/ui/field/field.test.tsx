@@ -12,7 +12,7 @@ import {
   FieldSeparator,
   FieldSet,
   FieldTitle,
-} from '@synapcity/frontend-ui/core/field';
+} from '@synapcity/frontend-ui/components/field';
 
 describe('Field', () => {
   it('is a vertical group by default', () => {

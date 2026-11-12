@@ -3,8 +3,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@synapcity/frontend-ui/core/dropdown-menu';
-import { IconButton } from '@synapcity/frontend-ui/core/icon-button';
+} from '@synapcity/frontend-ui/components/dropdown-menu';
+import { IconButton } from '@synapcity/frontend-ui/components/icon-button';
 import { Ellipsis } from 'lucide-react';
 import type { ReactElement } from 'react';
 

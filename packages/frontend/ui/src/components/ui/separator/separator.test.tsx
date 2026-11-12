@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { Separator } from '@synapcity/frontend-ui/core/separator';
+import { Separator } from '@synapcity/frontend-ui/components/separator';
 
 describe('Separator', () => {
   it('is a horizontal separator by default', () => {

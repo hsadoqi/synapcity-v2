@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 
 import type { ProfileAction, ProfileState } from '../../../../contracts';
 import { AvatarField } from '../avatar-field';

@@ -15,8 +15,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@synapcity/frontend-ui/core/alert-dialog';
-import { Button } from '@synapcity/frontend-ui/core/button';
+} from '@synapcity/frontend-ui/components/alert-dialog';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react';
 import { useId, type ReactNode } from 'react';
 

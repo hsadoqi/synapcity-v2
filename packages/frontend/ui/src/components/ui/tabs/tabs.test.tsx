@@ -7,7 +7,7 @@ import {
   TabsList,
   TabsTrigger,
   tabsListVariants,
-} from '@synapcity/frontend-ui/core/tabs';
+} from '@synapcity/frontend-ui/components/tabs';
 
 const renderTabs = (rootProps = {}, listProps = {}) =>
   render(

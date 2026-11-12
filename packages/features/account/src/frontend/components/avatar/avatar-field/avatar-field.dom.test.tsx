@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('next/navigation', () => ({ usePathname: () => '/u1/settings' }));
-vi.mock('@synapcity/frontend-ui/core/toast', () => ({
+vi.mock('@synapcity/frontend-ui/components/toast', () => ({
   toast: { add: vi.fn() },
 }));
 

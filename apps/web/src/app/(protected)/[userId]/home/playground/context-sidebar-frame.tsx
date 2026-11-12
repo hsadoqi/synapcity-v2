@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { SidebarTrigger } from '@synapcity/frontend-ui/core/sidebar';
+import { SidebarTrigger } from '@synapcity/frontend-ui/components/sidebar';
 
 export function ContextSidebarFrame({
   contextLabel,

@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 
-import { Separator } from '@synapcity/frontend-ui/core/separator';
-import { Tabs, TabsContent } from '@synapcity/frontend-ui/core/tabs';
+import { Separator } from '@synapcity/frontend-ui/components/separator';
+import { Tabs, TabsContent } from '@synapcity/frontend-ui/components/tabs';
 
 import {
   applyCollectionQuery,

@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useId } from 'react';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 import { LinkButton } from '@synapcity/frontend-ui/next/link-button';
 
 import type { AuthState, AuthAction } from '../../../../contracts';

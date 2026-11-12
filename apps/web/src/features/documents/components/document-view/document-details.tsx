@@ -2,7 +2,7 @@
 
 import { formatWrittenDate } from '@synapcity/frontend-preferences';
 import { useDateTimeFormatting } from '@synapcity/frontend-preferences';
-import { Badge } from '@synapcity/frontend-ui/core/badge';
+import { Badge } from '@synapcity/frontend-ui/components/badge';
 
 /** One term and its value; the terms share a width so the values line up. */
 const ROW = 'flex items-baseline gap-4';

@@ -1,7 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { ScrollArea, ScrollBar } from '@synapcity/frontend-ui/core/scroll-area';
+import {
+  ScrollArea,
+  ScrollBar,
+} from '@synapcity/frontend-ui/components/scroll-area';
 
 describe('ScrollArea', () => {
   it('renders its children inside a viewport', () => {

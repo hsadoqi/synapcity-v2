@@ -10,13 +10,13 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-} from '@synapcity/frontend-ui/core/dropdown-menu';
+} from '@synapcity/frontend-ui/components/dropdown-menu';
 import {
   IconButton,
   IconButtonProps,
   IconSize,
-} from '@synapcity/frontend-ui/core/icon-button';
-import { ButtonVariant } from '@synapcity/frontend-ui/core/button';
+} from '@synapcity/frontend-ui/components/icon-button';
+import { ButtonVariant } from '@synapcity/frontend-ui/components/button';
 
 const ModeButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
   ({ className, ...props }, ref) => {

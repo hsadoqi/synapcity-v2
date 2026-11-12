@@ -7,7 +7,7 @@ import {
   AvatarFallback,
   AvatarGroup,
   AvatarGroupCount,
-} from '@synapcity/frontend-ui/core/avatar';
+} from '@synapcity/frontend-ui/components/avatar';
 
 const meta: Meta<typeof Avatar> = {
   title: 'Components/Avatar',

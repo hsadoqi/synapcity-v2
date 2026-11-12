@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { SearchForm, SearchInput } from '.';
-import { SidebarProvider } from '@synapcity/frontend-ui/core/sidebar';
+import { SidebarProvider } from '@synapcity/frontend-ui/components/sidebar';
 
 const meta: Meta<typeof SearchForm> = {
   title: 'Blocks/SearchForm',

@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { Input } from '@synapcity/frontend-ui/core/input';
-import { Label } from '@synapcity/frontend-ui/core/label';
+import { Input } from '@synapcity/frontend-ui/components/input';
+import { Label } from '@synapcity/frontend-ui/components/label';
 
 describe('Label', () => {
   it('labels the control it points at', () => {

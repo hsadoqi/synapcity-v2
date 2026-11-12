@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { RotateCcw } from 'lucide-react';
-import { Button } from '@synapcity/frontend-ui/core/button';
+import { Button } from '@synapcity/frontend-ui/components/button';
 
 type SettingsTabFooterProps = {
   /** The tab's name, as its reset action says it ("Reset Regional to defaults"). */

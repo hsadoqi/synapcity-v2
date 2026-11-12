@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { Input } from '@synapcity/frontend-ui/core/input';
-import { Switch } from '@synapcity/frontend-ui/core/switch';
+import { Input } from '@synapcity/frontend-ui/components/input';
+import { Switch } from '@synapcity/frontend-ui/components/switch';
 
 import {
   Field,
@@ -14,7 +14,7 @@ import {
   FieldSeparator,
   FieldSet,
   FieldTitle,
-} from '@synapcity/frontend-ui/core/field';
+} from '@synapcity/frontend-ui/components/field';
 
 const meta: Meta<typeof Field> = {
   title: 'Components/Field',
