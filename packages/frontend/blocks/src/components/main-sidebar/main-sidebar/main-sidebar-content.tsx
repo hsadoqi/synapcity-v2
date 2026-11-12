@@ -11,7 +11,7 @@ import {
   SidebarMenuItem,
 } from '@synapcity/frontend-ui/components/sidebar';
 import { NamedIcon } from '../../icon-by-name';
-import type { MainSidebarGroup, MainSidebarItem } from '../../types';
+import type { MainSidebarGroup, MainSidebarItem } from '../../../types';
 
 export interface MainSidebarContentProps {
   groups: MainSidebarGroup[];

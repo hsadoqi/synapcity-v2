@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@synapcity/frontend-ui/components/button';
-import { Workspace } from '../types';
+import { Workspace } from '../../types';
 import { WorkspaceDropdown } from './workspace-dropdown';
 import {
   BreadcrumbList,

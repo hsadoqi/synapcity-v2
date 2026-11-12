@@ -5,12 +5,12 @@ import { describe, expect, it } from 'vitest';
 
 /*
  * The package's layout contract, enforced rather than remembered (the same
- * contract `frontend-ui` and `frontend-shells` follow; the blocks carried it
+ * contract `frontend-ui` and `frontend-shells` follow; the components carried it
  * in `frontend-ui` before they moved here):
  *
  * - every component is a folder named after it, holding the component, its
  *   stories, its tests and an index that is the folder's public surface;
- * - no component file sits loose beside its siblings in `blocks/`;
+ * - no component file sits loose beside its siblings in `components/`;
  * - the `exports` entry resolves to a real file.
  *
  * A unit folder holds `<folder>/<folder>.tsx`. It is a component folder unless
@@ -70,7 +70,7 @@ describe('component folders', () => {
 
   it('finds the components', () => {
     // A silent scan would pass every rule below.
-    expect(folders.map(rel)).toContain('blocks/day-agenda');
+    expect(folders.map(rel)).toContain('components/day-agenda');
   });
 
   it('has its component, index, stories and tests in every folder', () => {
@@ -94,14 +94,14 @@ describe('component folders', () => {
     ).toEqual([]);
   });
 
-  it('leaves no component file loose beside its siblings in blocks/', () => {
-    const loose = list(join(src, 'blocks'))
+  it('leaves no component file loose beside its siblings in components/', () => {
+    const loose = list(join(src, 'components'))
       .filter((name) => /\.tsx$/.test(name))
-      .map((name) => `blocks/${name}`);
+      .map((name) => `components/${name}`);
 
     expect(
       loose,
-      'Move each into its own folder: blocks/<name>/<name>.tsx with index, stories and tests.',
+      'Move each into its own folder: components/<name>/<name>.tsx with index, stories and tests.',
     ).toEqual([]);
   });
 

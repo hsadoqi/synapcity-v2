@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { Sidebar } from '@synapcity/frontend-ui/components/sidebar';
 import { SidebarIconRail } from '../../sidebar-rail';
 import { MainSidebar } from './main-sidebar';
-import type { MainSidebarGroup, MainSidebarItem } from '../../types';
+import type { MainSidebarGroup, MainSidebarItem } from '../../../types';
 
 export function MainCombinedSidebar({
   railItems,

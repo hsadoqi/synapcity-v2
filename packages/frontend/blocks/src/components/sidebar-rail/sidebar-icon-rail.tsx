@@ -13,7 +13,7 @@ import {
   SidebarMenuItem,
 } from '@synapcity/frontend-ui/components/sidebar';
 import { NamedIcon } from '../icon-by-name';
-import type { MainSidebarItem } from '../types';
+import type { MainSidebarItem } from '../../types';
 
 /**
  * The always-visible level of the two-part sidebar. It knows only generic

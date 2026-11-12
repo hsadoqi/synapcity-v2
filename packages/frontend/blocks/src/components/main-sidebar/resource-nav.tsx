@@ -12,7 +12,7 @@ import {
 import { cn } from '@synapcity/frontend-ui/lib/utils';
 import { PinIcon } from 'lucide-react';
 import { NamedIcon } from '../icon-by-name';
-import type { ResourceKind, WorkspaceResource } from '../types';
+import type { ResourceKind, WorkspaceResource } from '../../types';
 
 const SECTIONS: { kind: ResourceKind; label: string }[] = [
   { kind: 'document', label: 'Documents' },

@@ -2,7 +2,7 @@
 
 import { SidebarInset } from '@synapcity/frontend-ui/components/sidebar';
 import { EmptyWorkspace } from './empty-workspace';
-import { Workspace } from '../types';
+import { Workspace } from '../../types';
 
 /** The scrolling area beside the sidebar. It shows what it is given, or the empty state. */
 export function Workbench({

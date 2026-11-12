@@ -23,7 +23,7 @@ import {
   CopyIcon,
   ArchiveIcon,
 } from 'lucide-react';
-import { PROJECTS } from '../data';
+import { PROJECTS } from '../../lib/data';
 
 export function ProjectNav() {
   return (

@@ -12,7 +12,7 @@ import {
 import { SidebarSeparator } from '@synapcity/frontend-ui/components/sidebar';
 import { ChevronsUpDownIcon, CheckIcon, PlusIcon } from 'lucide-react';
 import { NamedIcon } from '../icon-by-name';
-import { Workspace } from '../types';
+import { Workspace } from '../../types';
 import { UserAvatarActions } from '../main-sidebar';
 
 export function WorkspaceDropdown({

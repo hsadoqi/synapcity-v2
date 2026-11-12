@@ -6,7 +6,7 @@ import {
   EmptyTitle,
 } from '@synapcity/frontend-ui/components/empty';
 import { NamedIcon } from '../icon-by-name';
-import { Workspace } from '../types';
+import { Workspace } from '../../types';
 
 export function EmptyWorkspace({ workspace }: { workspace: Workspace }) {
   return (
