@@ -5,9 +5,9 @@ import { defineMain } from '@storybook/nextjs-vite/node';
 const config: StorybookConfig = {
   stories: [
     '../../../packages/frontend/blocks/src/**/*.stories.@(ts|tsx)',
-    '../../../packages/frontend/ui/src/components/**/*.stories.@(ts|tsx)',
+    '../../../packages/frontend/ui/src/components/ui/**/*.stories.@(ts|tsx)',
     '../../../packages/frontend/preferences/src/**/*.stories.@(ts|tsx)',
-    '../../../packages/frontend/collection/src/**/*.stories.@(ts|tsx)',
+    '../../../packages/frontend/collections/src/**/*.stories.@(ts|tsx)',
     '../../../packages/frontend/forms/src/**/*.stories.@(ts|tsx)',
     '../../../packages/frontend/shells/src/**/*.stories.@(ts|tsx)',
     '../../../packages/features/auth/src/**/*.stories.@(ts|tsx)',

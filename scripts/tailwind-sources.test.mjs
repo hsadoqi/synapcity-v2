@@ -78,7 +78,7 @@ const workspaceDeps = (dir, fields) => {
 const closure = (roots) => {
   const seen = new Set();
   const visit = (name) => {
-    if (seen.has(name)) return;
+    if (!seen || seen.has(name)) return;
     seen.add(name);
     for (const dep of workspaceDeps(workspace.get(name), [
       'dependencies',

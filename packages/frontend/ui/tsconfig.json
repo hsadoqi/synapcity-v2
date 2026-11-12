@@ -10,8 +10,7 @@
       "@/providers/*": ["./src/providers/*"],
       "@/hooks/*": ["./src/hooks/*"],
       "@/next/*": ["./src/next/*"],
-      "@/lib/*": ["./src/lib/*"],
-      "@/styles/*": ["./src/styles/*.css"]
+      "@/lib/*": ["./src/lib/*"]
     },
     "module": "preserve",
     "moduleResolution": "bundler",
