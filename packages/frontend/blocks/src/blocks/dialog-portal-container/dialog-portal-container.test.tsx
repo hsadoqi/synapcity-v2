@@ -80,6 +80,19 @@ describe('DialogPortalContainer', () => {
     expect(within(dialog).queryByRole('button', { name: 'Close' })).toBeNull();
   });
 
+  it('passes closeDisabled to the close button, which is enabled by default', async () => {
+    const { rerender } = render(
+      <DialogPortalContainer defaultOpen title="Saving" />,
+    );
+    const dialog = await screen.findByRole('dialog');
+    const close = () => within(dialog).getByRole('button', { name: 'Close' });
+    expect(close().hasAttribute('disabled')).toBe(false);
+    rerender(
+      <DialogPortalContainer defaultOpen closeDisabled title="Saving" />,
+    );
+    expect(close().hasAttribute('disabled')).toBe(true);
+  });
+
   it('wraps the body in a scroll area only when scrollable', async () => {
     const { rerender } = render(
       <DialogPortalContainer defaultOpen title="Plain">

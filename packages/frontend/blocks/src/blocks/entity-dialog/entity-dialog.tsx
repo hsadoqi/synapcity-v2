@@ -33,8 +33,15 @@ export type EntityPresentation = 'dialog' | 'sheet' | 'inline';
 
 export interface EntityDialogApi {
   mode: EntityMode;
-  /** Asks the shell to close, as Cancel does. */
+  /** Asks the shell to close, as Cancel does. Refused while pending or busy. */
   close: () => void;
+  /**
+   * Closes because the work is done, such as after a successful save, even
+   * while `busy` is still set. A dismissal uses `close` instead. It closes
+   * only the opening it was rendered in: if the shell was closed (and maybe
+   * reopened) while the work ran, it does nothing.
+   */
+  complete: () => void;
 }
 
 export interface EntityDialogMessages {
@@ -70,6 +77,12 @@ export interface EntityDialogProps {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /**
+   * Work the owner is doing, such as a form that is saving. While it is set,
+   * as while the shell's own submit or delete runs, nothing dismisses the
+   * shell, and Cancel and Delete are inert. @default false
+   */
+  busy?: boolean;
   /** Dialog and sheet: where it renders. @default 'body' */
   container?: DialogContainerTarget;
   /** Dialog only. @default 'md' */
@@ -162,6 +175,7 @@ export function EntityDialog({
   open,
   defaultOpen = false,
   onOpenChange,
+  busy = false,
   container = 'body',
   width = 'md',
   scrollable = false,
@@ -187,25 +201,59 @@ export function EntityDialog({
   const [failed, setFailed] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const { target, anchorElement } = usePortalTarget(container);
+  // Its own submit or delete that settles after the shell has gone tells
+  // nobody. Work the caller awaits is the caller's to guard before `complete`.
+  const mounted = useRef(false);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+  /** Its own submit or delete, or the owner's work: either blocks dismissal. */
+  const locked = pending || busy;
+
+  // Each opening or closing starts a new session. Work started in one session
+  // (the shell's own submit or delete, or a save the owner awaits before
+  // `complete`) must not close a later one: a controlled owner can close and
+  // reopen the shell while that work is still running.
+  const [session, setSession] = useState({ open: isOpen, id: 0 });
+  if (session.open !== isOpen) {
+    // Derived during render, as React advises for state that follows props.
+    setSession({ open: isOpen, id: session.id + 1 });
+  }
+  const currentSession = useRef(session.id);
+  useEffect(() => {
+    currentSession.current = session.id;
+  });
+  /** The session this render belongs to; work started from it carries it. */
+  const thisSession = session.id;
+  const stillCurrent = () => currentSession.current === thisSession;
 
   // A dialog that is mid-save or mid-delete cannot be dismissed from outside.
   const request = (next: boolean) => {
-    if (!next && pending) return;
+    if (!next && locked) return;
     if (next) setFailed(false);
     setOpen(next);
   };
   const close = () => request(false);
+  // Closes only the session the work was started in.
+  const complete = () => {
+    if (stillCurrent()) setOpen(false);
+  };
 
   const run = async (action: () => void | Promise<void>) => {
     setPending(true);
     setFailed(false);
     try {
       await action();
+      if (!mounted.current) return;
       setPending(false);
-      setOpen(false);
+      if (stillCurrent()) setOpen(false);
     } catch {
+      if (!mounted.current) return;
       setPending(false);
-      setFailed(true);
+      if (stillCurrent()) setFailed(true);
     }
   };
 
@@ -217,12 +265,16 @@ export function EntityDialog({
     title ?? `${mode === 'create' ? 'New' : 'Edit'} ${entityName}`;
   const deletable = mode === 'edit' && onDelete !== undefined;
   const ownsForm = onSubmit !== undefined;
-  const api: EntityDialogApi = { mode, close };
-  const content = typeof children === 'function' ? children(api) : children;
+  const api: EntityDialogApi = { mode, close, complete };
+  const content =
+    typeof children === 'function'
+      ? // eslint-disable-next-line react-hooks/refs -- `api` holds callbacks for events and settled work; none reads the session ref during render.
+        children(api)
+      : children;
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (pending || !onSubmit) return;
+    if (locked || !onSubmit) return;
     void run(onSubmit);
   };
 
@@ -260,7 +312,7 @@ export function EntityDialog({
           <Button
             type="button"
             variant="destructive"
-            disabled={pending}
+            disabled={locked}
             onClick={() => setConfirming(true)}
             className="sm:mr-auto"
           >
@@ -272,7 +324,7 @@ export function EntityDialog({
             <Button
               type="button"
               variant="outline"
-              disabled={pending}
+              disabled={locked}
               onClick={close}
             >
               {cancelLabel}
@@ -280,7 +332,7 @@ export function EntityDialog({
             <Button
               type="submit"
               form={formId}
-              disabled={pending || submitDisabled}
+              disabled={locked || submitDisabled}
               aria-busy={pending || undefined}
             >
               {submitLabel ?? (mode === 'create' ? 'Create' : 'Save changes')}
@@ -308,7 +360,7 @@ export function EntityDialog({
       <section
         aria-labelledby={headingId}
         data-slot="entity-dialog"
-        aria-busy={pending || undefined}
+        aria-busy={locked || undefined}
         className={cn('flex min-h-0 flex-col gap-3', className)}
       >
         <div className="flex flex-col gap-1">
@@ -336,7 +388,11 @@ export function EntityDialog({
         <Sheet open={isOpen} onOpenChange={request}>
           {trigger && <SheetTrigger render={trigger} />}
           <SheetPortal container={target}>
-            <SheetContent side={side} className={className}>
+            <SheetContent
+              side={side}
+              closeDisabled={locked}
+              className={className}
+            >
               <SheetHeader>
                 <SheetTitle>{heading}</SheetTitle>
                 {description && (
@@ -365,6 +421,7 @@ export function EntityDialog({
       <DialogPortalContainer
         open={isOpen}
         onOpenChange={request}
+        closeDisabled={locked}
         trigger={trigger}
         title={heading}
         description={description}

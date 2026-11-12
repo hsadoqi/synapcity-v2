@@ -41,10 +41,13 @@ function SheetContent({
   children,
   side = 'right',
   showCloseButton = true,
+  closeDisabled = false,
   ...props
 }: SheetPrimitive.Popup.Props & {
   side?: 'top' | 'right' | 'bottom' | 'left';
   showCloseButton?: boolean;
+  /** Shows the close button disabled, for a sheet that cannot be dismissed now. @default false */
+  closeDisabled?: boolean;
 }) {
   return (
     <SheetPortal>
@@ -62,6 +65,7 @@ function SheetContent({
         {showCloseButton && (
           <SheetPrimitive.Close
             data-slot="sheet-close"
+            disabled={closeDisabled}
             render={
               <Button
                 variant="ghost"

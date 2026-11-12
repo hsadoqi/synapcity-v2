@@ -1,11 +1,12 @@
 import {
+  act,
   fireEvent,
   render,
   screen,
   waitFor,
   within,
 } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { EntityDialog, type EntityDialogProps } from '.';
 import { Button } from '@synapcity/frontend-ui/core/button';
@@ -255,5 +256,253 @@ describe('EntityDialog', () => {
       </EntityDialog>,
     );
     expect(screen.queryByRole('region')).toBeNull();
+  });
+
+  describe('the close button while dismissal is refused (DEC-5)', () => {
+    it.each(['dialog', 'sheet'] as const)(
+      'shows the %s close button disabled while busy, and enabled after',
+      async (presentation) => {
+        const view = (busy: boolean) => (
+          <EntityDialog
+            mode="edit"
+            entityName="event"
+            presentation={presentation}
+            open
+            busy={busy}
+          >
+            {fields}
+          </EntityDialog>
+        );
+        const { rerender } = render(view(false));
+        await screen.findByRole('dialog');
+        const close = () => screen.getByRole('button', { name: 'Close' });
+        expect(close().hasAttribute('disabled')).toBe(false);
+        rerender(view(true));
+        expect(close().hasAttribute('disabled')).toBe(true);
+        rerender(view(false));
+        expect(close().hasAttribute('disabled')).toBe(false);
+      },
+    );
+  });
+
+  describe('work that outlives its opening', () => {
+    /** A controlled dialog whose owner can close and reopen it by hand. */
+    function controlled(props: Partial<EntityDialogProps> = {}) {
+      const onOpenChange = vi.fn();
+      const view = (open: boolean, extra: Partial<EntityDialogProps> = {}) => (
+        <EntityDialog
+          mode="create"
+          entityName="event"
+          open={open}
+          onOpenChange={onOpenChange}
+          {...props}
+          {...extra}
+        >
+          {props.children ?? fields}
+        </EntityDialog>
+      );
+      const utils = render(view(true));
+      return {
+        onOpenChange,
+        setOpen: (open: boolean, extra?: Partial<EntityDialogProps>) =>
+          utils.rerender(view(open, extra)),
+      };
+    }
+
+    it('does not let complete from a closed opening close the reopened dialog', async () => {
+      let later!: () => void;
+      const { onOpenChange, setOpen } = controlled({
+        children: ({ complete }) => (
+          <button type="button" onClick={() => (later = complete)}>
+            Start
+          </button>
+        ),
+      });
+      await screen.findByRole('dialog');
+      fireEvent.click(screen.getByRole('button', { name: 'Start' }));
+
+      // The owner closes and reopens it while the work is still running.
+      setOpen(false);
+      setOpen(true);
+      await screen.findByRole('dialog');
+      act(() => later());
+
+      expect(onOpenChange).not.toHaveBeenCalledWith(false);
+      expect(screen.getByRole('dialog')).toBeDefined();
+    });
+
+    it('still closes from complete in the opening the work started in', async () => {
+      let later!: () => void;
+      const { onOpenChange } = controlled({
+        children: ({ complete }) => (
+          <button type="button" onClick={() => (later = complete)}>
+            Start
+          </button>
+        ),
+      });
+      await screen.findByRole('dialog');
+      fireEvent.click(screen.getByRole('button', { name: 'Start' }));
+      act(() => later());
+      expect(onOpenChange).toHaveBeenCalledWith(false);
+    });
+
+    it.each([
+      ['succeeds', false],
+      ['fails', true],
+    ])(
+      'leaves the reopened dialog open and not pending when its own submit %s late',
+      async (_, fails) => {
+        let settle!: { resolve: () => void; reject: (error: Error) => void };
+        const onSubmit = vi.fn(
+          () =>
+            new Promise<void>((resolve, reject) => {
+              settle = { resolve, reject };
+            }),
+        );
+        const { onOpenChange, setOpen } = controlled({ onSubmit });
+        await screen.findByRole('dialog');
+        await act(async () => {
+          fireEvent.click(screen.getByRole('button', { name: 'Create' }));
+        });
+        expect(onSubmit).toHaveBeenCalledTimes(1);
+
+        setOpen(false);
+        setOpen(true);
+        await screen.findByRole('dialog');
+        await act(async () => {
+          if (fails) settle.reject(new Error('refused'));
+          else settle.resolve();
+        });
+
+        expect(onOpenChange).not.toHaveBeenCalledWith(false);
+        expect(screen.queryByRole('alert')).toBeNull();
+        expect(
+          screen
+            .getByRole('button', { name: 'Create' })
+            .hasAttribute('disabled'),
+        ).toBe(false);
+      },
+    );
+  });
+
+  describe('external busy (DEC-5)', () => {
+    afterEach(() => vi.restoreAllMocks());
+
+    /** A controlled edit dialog with a delete the test settles by hand. */
+    function busyDialog() {
+      let settle!: { resolve: () => void; reject: (error: Error) => void };
+      const onDelete = vi.fn(
+        () =>
+          new Promise<void>((resolve, reject) => {
+            settle = { resolve, reject };
+          }),
+      );
+      const onOpenChange = vi.fn();
+      const view = (busy: boolean) => (
+        <EntityDialog
+          mode="edit"
+          entityName="event"
+          open
+          onOpenChange={onOpenChange}
+          busy={busy}
+          onDelete={onDelete}
+        >
+          {fields}
+        </EntityDialog>
+      );
+      const utils = render(view(false));
+      return {
+        onOpenChange,
+        setBusy: (busy: boolean) => utils.rerender(view(busy)),
+        settle: () => settle,
+      };
+    }
+    const escape = () =>
+      act(async () => {
+        fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+      });
+    const startDelete = async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+      const confirm = await screen.findByRole('alertdialog');
+      await act(async () => {
+        fireEvent.click(
+          within(confirm).getByRole('button', { name: 'Delete' }),
+        );
+      });
+    };
+
+    it('refuses every dismissal while busy and allows it after', async () => {
+      const { onOpenChange, setBusy } = busyDialog();
+      await screen.findByRole('dialog');
+      setBusy(true);
+      await escape();
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+      });
+      expect(onOpenChange).not.toHaveBeenCalledWith(false);
+      expect(
+        screen.getByRole('button', { name: 'Delete' }).hasAttribute('disabled'),
+      ).toBe(true);
+
+      setBusy(false);
+      await escape();
+      expect(onOpenChange).toHaveBeenCalledWith(false);
+    });
+
+    it.each([
+      ['busy clears first', ['busy', 'delete'] as const],
+      ['the delete settles first', ['delete', 'busy'] as const],
+    ])('stays undismissable until both are done: %s', async (_, order) => {
+      const { onOpenChange, setBusy, settle } = busyDialog();
+      await screen.findByRole('dialog');
+      await startDelete();
+      setBusy(true);
+
+      for (const step of order) {
+        await escape();
+        expect(onOpenChange).not.toHaveBeenCalledWith(false);
+        if (step === 'busy') setBusy(false);
+        else await act(async () => settle().reject(new Error('no')));
+      }
+      await escape();
+      expect(onOpenChange).toHaveBeenCalledWith(false);
+    });
+
+    it('closes through complete even while busy', async () => {
+      const onOpenChange = vi.fn();
+      render(
+        <EntityDialog mode="create" open onOpenChange={onOpenChange} busy>
+          {({ complete }) => (
+            <button type="button" onClick={complete}>
+              Done
+            </button>
+          )}
+        </EntityDialog>,
+      );
+      fireEvent.click(await screen.findByRole('button', { name: 'Done' }));
+      expect(onOpenChange).toHaveBeenCalledWith(false);
+    });
+
+    it('tells nobody when a delete settles after it unmounts', async () => {
+      const errors = vi.spyOn(console, 'error');
+      let finish!: () => void;
+      const onOpenChange = vi.fn();
+      const { unmount } = render(
+        <EntityDialog
+          mode="edit"
+          open
+          onOpenChange={onOpenChange}
+          onDelete={() => new Promise<void>((resolve) => (finish = resolve))}
+        >
+          {fields}
+        </EntityDialog>,
+      );
+      await screen.findByRole('dialog');
+      await startDelete();
+      unmount();
+      await act(async () => finish());
+      expect(onOpenChange).not.toHaveBeenCalled();
+      expect(errors).not.toHaveBeenCalled();
+    });
   });
 });
