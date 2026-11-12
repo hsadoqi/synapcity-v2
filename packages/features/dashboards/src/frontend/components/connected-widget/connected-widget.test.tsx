@@ -8,7 +8,6 @@ import {
   within,
 } from '@testing-library/react';
 import { Profiler } from 'react';
-import { useState } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { useDashboardStore } from '../../store';
@@ -22,15 +21,15 @@ import { ConnectedWidget } from './index';
 
 describe('ConnectedWidget', () => {
   it('restores open settings after its responsive grid subtree remounts', async () => {
+    // Mirrors DashboardCanvas, which keys its grid by the store's breakpoint.
+    // The breakpoint changes through the store, not a click, so no outside
+    // press dismisses the popover.
     function ResponsiveWidget() {
-      const [breakpoint, setBreakpoint] = useState('lg');
+      const breakpoint = useDashboardStore((s) => s.breakpoint);
       return (
-        <>
-          <button onClick={() => setBreakpoint('sm')}>Narrow canvas</button>
-          <div key={breakpoint}>
-            <ConnectedWidget widgetId="wgt_seed1" />
-          </div>
-        </>
+        <div key={breakpoint}>
+          <ConnectedWidget widgetId="wgt_seed1" />
+        </div>
       );
     }
 
@@ -46,7 +45,6 @@ describe('ConnectedWidget', () => {
       await screen.findByRole('button', { name: 'Remove widget' }),
     ).toBeDefined();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Narrow canvas' }));
     const trigger = screen.getByRole('button', {
       name: `Settings for ${widget.title}`,
     });
