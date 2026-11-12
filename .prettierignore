@@ -9,6 +9,7 @@ pnpm-lock.yaml
 .next
 next-env.d.ts
 docs/archive
+.agents
 .vscode
 .pnpm-store
 **/coverage/**
