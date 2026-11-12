@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatAgo } from '@synapcity/frontend-collection';
+import { formatAgo } from '@synapcity/frontend-collections';
 
 import { FIXTURE_NOW } from './fixture-clock';
 import { fixtureItems, fixturePinned } from './overview.fixtures';

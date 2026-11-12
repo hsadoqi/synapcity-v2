@@ -1,6 +1,6 @@
 import { Badge } from '@synapcity/frontend-ui/components/badge';
 
-import type { CollectionItem } from '@synapcity/frontend-collection';
+import type { CollectionItem } from '@synapcity/frontend-collections';
 
 /** What the hover card shows for a dashboard: the same facts as its row, a little roomier. */
 export function DashboardPreview({ item }: { item: CollectionItem }) {

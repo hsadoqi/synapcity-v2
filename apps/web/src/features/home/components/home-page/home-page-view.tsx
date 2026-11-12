@@ -11,7 +11,7 @@ import {
   CollectionTabs,
   CreateActions,
   FeaturedItems,
-} from '@synapcity/frontend-collection';
+} from '@synapcity/frontend-collections';
 
 import type { CollectionKind } from '../../../../components/collections';
 import { useQuickCreate } from '../../../../components/quick-create';

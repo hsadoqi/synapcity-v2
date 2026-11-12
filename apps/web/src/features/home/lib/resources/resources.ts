@@ -1,8 +1,8 @@
 import type {
   CollectionTabDefinition,
   CollectionViewConfig,
-} from '@synapcity/frontend-collection';
-import type { CollectionItem } from '@synapcity/frontend-collection';
+} from '@synapcity/frontend-collections';
+import type { CollectionItem } from '@synapcity/frontend-collections';
 
 import { DASHBOARDS } from './dashboards';
 import { dashboardFixtures } from './dashboards.fixtures';

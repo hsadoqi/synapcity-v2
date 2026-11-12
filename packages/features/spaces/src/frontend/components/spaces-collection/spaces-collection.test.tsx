@@ -12,7 +12,7 @@ const mocks = vi.hoisted(() => ({
   setSpacePinned: vi.fn(),
 }));
 
-import { CollectionNavigationProvider } from '@synapcity/frontend-collection';
+import { CollectionNavigationProvider } from '@synapcity/frontend-collections';
 import { createSpaceEntity } from '@synapcity/dev-fixtures';
 import type { SpaceSummary } from '@synapcity/domain-spaces';
 import {

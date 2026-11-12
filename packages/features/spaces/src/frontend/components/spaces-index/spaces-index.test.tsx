@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { createSpaceEntity } from '@synapcity/dev-fixtures';
-import { CollectionNavigationProvider } from '@synapcity/frontend-collection';
+import { CollectionNavigationProvider } from '@synapcity/frontend-collections';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { SetSpacePinnedResult } from '../../../contracts';

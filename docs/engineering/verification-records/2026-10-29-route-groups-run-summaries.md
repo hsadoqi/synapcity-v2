@@ -50,7 +50,7 @@ Exit 0
 storybook:check-types: cache hit, replaying logs 555891f9d3ab592d
 @synapcity/frontend-forms:check-types: cache hit, replaying logs 832e15ed4049f88b
 @synapcity/features-settings:check-types: cache hit, replaying logs 4b530cab85ab1271
-@synapcity/frontend-collection:check-types: cache hit, replaying logs ce8671fce1a456f5
+@synapcity/frontend-collections:check-types: cache hit, replaying logs ce8671fce1a456f5
 @synapcity/features-account:check-types: cache hit, replaying logs 286af296bcb1c6bd
 @synapcity/features-dashboards:check-types: cache hit, replaying logs 02619b298bb5a96a
 docs:check-types: cache hit, replaying logs 663a6fee9024fc77
@@ -58,7 +58,7 @@ docs:check-types: cache hit, replaying logs 663a6fee9024fc77
 @synapcity/features-auth:check-types: cache hit, replaying logs 65e0b027450cecb1
 @synapcity/frontend-forms:lint: cache hit, replaying logs 049af856bdbd8a75
 @synapcity/frontend-shells:lint: cache hit, replaying logs ba11d9dda3da623d
-@synapcity/frontend-collection:lint: cache hit, replaying logs 6cf2e43d1f472b6a
+@synapcity/frontend-collections:lint: cache hit, replaying logs 6cf2e43d1f472b6a
 @synapcity/features-settings:lint: cache hit, replaying logs 9d2ea9f2ce0e9b5e
 storybook:lint: cache hit, replaying logs 6ac1036c25c3502d
 web:check-types: cache miss, executing d51faf15246ad15a
@@ -135,9 +135,9 @@ web:lint: cache miss, executing c7332568d1e3afe7
 @synapcity/frontend-forms:test:coverage: cache hit, replaying logs fbf49e5272371f78
 @synapcity/frontend-forms:test:coverage:  Test Files  37 passed (37)
 @synapcity/frontend-forms:test:coverage:       Tests  365 passed (365)
-@synapcity/frontend-collection:test:coverage: cache hit, replaying logs fb038fe6258ba50e
-@synapcity/frontend-collection:test:coverage:  Test Files  26 passed (26)
-@synapcity/frontend-collection:test:coverage:       Tests  178 passed (178)
+@synapcity/frontend-collections:test:coverage: cache hit, replaying logs fb038fe6258ba50e
+@synapcity/frontend-collections:test:coverage:  Test Files  26 passed (26)
+@synapcity/frontend-collections:test:coverage:       Tests  178 passed (178)
 @synapcity/features-settings:test:coverage: cache hit, replaying logs 6783085fc1618a03
 @synapcity/features-settings:test:coverage:  Test Files  40 passed (40)
 @synapcity/features-settings:test:coverage:       Tests  306 passed (306)
@@ -219,7 +219,7 @@ The bare owner root had been moved out of `(protected)`, which broke the "every 
 @synapcity/frontend-forms:lint: cache hit, replaying logs 049af856bdbd8a75
 @synapcity/features-settings:lint: cache hit, replaying logs 9d2ea9f2ce0e9b5e
 storybook:lint: cache hit, replaying logs 6ac1036c25c3502d
-@synapcity/frontend-collection:lint: cache hit, replaying logs 6cf2e43d1f472b6a
+@synapcity/frontend-collections:lint: cache hit, replaying logs 6cf2e43d1f472b6a
 @synapcity/frontend-shells:lint: cache hit, replaying logs ba11d9dda3da623d
 @synapcity/frontend-ui:check-types: cache hit, replaying logs 491d287f30812973
 @synapcity/features-account:lint: cache hit, replaying logs b3aecdc15df6d6c9
@@ -227,7 +227,7 @@ storybook:lint: cache hit, replaying logs 6ac1036c25c3502d
 @synapcity/features-spaces:lint: cache hit, replaying logs abee3fbb0382f53d
 docs:lint: cache hit, replaying logs 66d3205683c09dee
 @synapcity/frontend-forms:check-types: cache hit, replaying logs 832e15ed4049f88b
-@synapcity/frontend-collection:check-types: cache hit, replaying logs ce8671fce1a456f5
+@synapcity/frontend-collections:check-types: cache hit, replaying logs ce8671fce1a456f5
 storybook:check-types: cache hit, replaying logs 555891f9d3ab592d
 @synapcity/frontend-shells:check-types: cache hit, replaying logs bcaa377d35d04f98
 @synapcity/features-auth:lint: cache hit, replaying logs fb80a106f4d60b93
@@ -309,9 +309,9 @@ web:check-types: cache hit, replaying logs 1bfae3cb5e144d03
 @synapcity/features-settings:test:coverage: cache hit, replaying logs 6783085fc1618a03
 @synapcity/features-settings:test:coverage:  Test Files  40 passed (40)
 @synapcity/features-settings:test:coverage:       Tests  306 passed (306)
-@synapcity/frontend-collection:test:coverage: cache hit, replaying logs fb038fe6258ba50e
-@synapcity/frontend-collection:test:coverage:  Test Files  26 passed (26)
-@synapcity/frontend-collection:test:coverage:       Tests  178 passed (178)
+@synapcity/frontend-collections:test:coverage: cache hit, replaying logs fb038fe6258ba50e
+@synapcity/frontend-collections:test:coverage:  Test Files  26 passed (26)
+@synapcity/frontend-collections:test:coverage:       Tests  178 passed (178)
 @synapcity/features-account:test:coverage: cache hit, replaying logs eca91fd7261d0359
 @synapcity/features-account:test:coverage:  Test Files  10 passed (10)
 @synapcity/features-account:test:coverage:       Tests  61 passed (61)
@@ -389,7 +389,7 @@ EXIT 0
 storybook:lint: cache hit, replaying logs 6ac1036c25c3502d
 @synapcity/frontend-shells:lint: cache hit, replaying logs ba11d9dda3da623d
 @synapcity/frontend-ui:check-types: cache hit, replaying logs 491d287f30812973
-@synapcity/frontend-collection:lint: cache hit, replaying logs 6cf2e43d1f472b6a
+@synapcity/frontend-collections:lint: cache hit, replaying logs 6cf2e43d1f472b6a
 @synapcity/features-settings:lint: cache hit, replaying logs 9d2ea9f2ce0e9b5e
 @synapcity/frontend-forms:check-types: cache hit, replaying logs 832e15ed4049f88b
 @synapcity/frontend-shells:check-types: cache hit, replaying logs bcaa377d35d04f98
@@ -399,7 +399,7 @@ storybook:lint: cache hit, replaying logs 6ac1036c25c3502d
 docs:lint: cache hit, replaying logs 66d3205683c09dee
 storybook:check-types: cache hit, replaying logs 555891f9d3ab592d
 @synapcity/features-spaces:lint: cache hit, replaying logs abee3fbb0382f53d
-@synapcity/frontend-collection:check-types: cache hit, replaying logs ce8671fce1a456f5
+@synapcity/frontend-collections:check-types: cache hit, replaying logs ce8671fce1a456f5
 @synapcity/features-account:check-types: cache hit, replaying logs 286af296bcb1c6bd
 @synapcity/features-dashboards:check-types: cache hit, replaying logs 02619b298bb5a96a
 @synapcity/features-spaces:check-types: cache hit, replaying logs c32b7b162014546c
@@ -475,9 +475,9 @@ web:check-types: cache miss, executing 9997a40145759d87
 @synapcity/frontend-forms:test:coverage: cache hit, replaying logs fbf49e5272371f78
 @synapcity/frontend-forms:test:coverage:  Test Files  37 passed (37)
 @synapcity/frontend-forms:test:coverage:       Tests  365 passed (365)
-@synapcity/frontend-collection:test:coverage: cache hit, replaying logs fb038fe6258ba50e
-@synapcity/frontend-collection:test:coverage:  Test Files  26 passed (26)
-@synapcity/frontend-collection:test:coverage:       Tests  178 passed (178)
+@synapcity/frontend-collections:test:coverage: cache hit, replaying logs fb038fe6258ba50e
+@synapcity/frontend-collections:test:coverage:  Test Files  26 passed (26)
+@synapcity/frontend-collections:test:coverage:       Tests  178 passed (178)
 @synapcity/features-settings:test:coverage: cache hit, replaying logs 6783085fc1618a03
 @synapcity/features-settings:test:coverage:  Test Files  40 passed (40)
 @synapcity/features-settings:test:coverage:       Tests  306 passed (306)

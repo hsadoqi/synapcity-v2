@@ -1,6 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
 
-import type { CollectionLabels } from '@synapcity/frontend-collection';
+import type { CollectionLabels } from '@synapcity/frontend-collections';
 
 /**
  * What one resource tells the collection feature about itself. Each resource

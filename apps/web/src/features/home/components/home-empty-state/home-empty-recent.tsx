@@ -2,7 +2,7 @@ import { Clock } from 'lucide-react';
 
 import { Button } from '@synapcity/frontend-ui/components/button';
 
-import type { CollectionItem } from '@synapcity/frontend-collection';
+import type { CollectionItem } from '@synapcity/frontend-collections';
 
 type HomeEmptyRecentProps = {
   items: CollectionItem[];

@@ -1,5 +1,5 @@
-import { itemFromRecord } from '@synapcity/frontend-collection';
-import type { CollectionItem } from '@synapcity/frontend-collection';
+import { itemFromRecord } from '@synapcity/frontend-collections';
+import type { CollectionItem } from '@synapcity/frontend-collections';
 import { describeSpaceCount } from '@/lib/records/describe-space-count';
 import type { RecordSummary } from '@/lib/records/record-summary';
 import { documentPathFor } from '@/lib/routing/user-paths';

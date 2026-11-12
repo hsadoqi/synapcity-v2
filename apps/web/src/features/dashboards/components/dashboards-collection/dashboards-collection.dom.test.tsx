@@ -18,7 +18,7 @@ vi.mock('../../server/actions/dashboard-state-actions', () => ({
 
 import type { RecordSummary } from '@/lib/records/record-summary';
 
-import { CollectionNavigationProvider } from '@synapcity/frontend-collection';
+import { CollectionNavigationProvider } from '@synapcity/frontend-collections';
 import { DASHBOARD_FIXTURES } from '../../lib/fixtures';
 import { DashboardsCollection } from './dashboards-collection';
 import { DashboardsCollectionSkeleton } from './dashboards-collection-skeleton';

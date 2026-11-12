@@ -34,7 +34,7 @@ describe('the repository', () => {
       '@synapcity/features-dashboards',
       '@synapcity/features-settings',
       '@synapcity/features-spaces',
-      '@synapcity/frontend-collection',
+      '@synapcity/frontend-collections',
       '@synapcity/frontend-preferences',
     ]) {
       expect(result.fileCounts[name]).toBeGreaterThan(0);

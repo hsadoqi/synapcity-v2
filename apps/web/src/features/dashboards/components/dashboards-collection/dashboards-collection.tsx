@@ -1,4 +1,4 @@
-import { CollectionPage } from '@synapcity/frontend-collection';
+import { CollectionPage } from '@synapcity/frontend-collections';
 import type { RecordSummary } from '@/lib/records/record-summary';
 
 import { DASHBOARDS_INTRO, DASHBOARDS_TITLE } from './dashboards-copy';

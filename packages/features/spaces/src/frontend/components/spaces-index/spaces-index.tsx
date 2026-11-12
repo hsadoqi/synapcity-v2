@@ -6,11 +6,11 @@ import { Shapes } from 'lucide-react';
 import {
   CollectionIndex,
   type SetPinnedResult,
-} from '@synapcity/frontend-collection';
+} from '@synapcity/frontend-collections';
 import type {
   CollectionItem,
   CollectionItemAction,
-} from '@synapcity/frontend-collection';
+} from '@synapcity/frontend-collections';
 
 import type { SpaceSummary } from '@synapcity/domain-spaces';
 

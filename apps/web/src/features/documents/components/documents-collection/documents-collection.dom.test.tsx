@@ -18,7 +18,7 @@ vi.mock('../../server/actions/document-state-actions', () => ({
 
 import type { RecordSummary } from '@/lib/records/record-summary';
 
-import { CollectionNavigationProvider } from '@synapcity/frontend-collection';
+import { CollectionNavigationProvider } from '@synapcity/frontend-collections';
 import { DOCUMENT_FIXTURES } from '../../lib/fixtures';
 import { DocumentsCollection } from './documents-collection';
 import { DocumentsCollectionSkeleton } from './documents-collection-skeleton';

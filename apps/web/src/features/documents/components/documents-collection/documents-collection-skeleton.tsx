@@ -1,4 +1,4 @@
-import { CollectionPageSkeleton } from '@synapcity/frontend-collection';
+import { CollectionPageSkeleton } from '@synapcity/frontend-collections';
 
 import { DOCUMENTS_INTRO, DOCUMENTS_TITLE } from './documents-copy';
 

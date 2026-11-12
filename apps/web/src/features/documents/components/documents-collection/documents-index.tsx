@@ -6,11 +6,11 @@ import { FileText } from 'lucide-react';
 import {
   CollectionIndex,
   type SetPinnedResult,
-} from '@synapcity/frontend-collection';
+} from '@synapcity/frontend-collections';
 import type {
   CollectionItem,
   CollectionItemAction,
-} from '@synapcity/frontend-collection';
+} from '@synapcity/frontend-collections';
 import type { RecordSummary } from '@/lib/records/record-summary';
 import { homePathFor, signInPathFor } from '@/lib/routing/user-paths';
 

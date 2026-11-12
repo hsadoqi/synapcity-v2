@@ -1,5 +1,5 @@
 import type { Decorator } from '@storybook/nextjs-vite';
-import { CollectionNavigationProvider } from '@synapcity/frontend-collection';
+import { CollectionNavigationProvider } from '@synapcity/frontend-collections';
 import { fn } from 'storybook/test';
 
 /** Story-only. Links and pushes report here instead of leaving the story. */

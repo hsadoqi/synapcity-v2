@@ -1,7 +1,7 @@
 'use client';
 
 import type { BaseRecord } from '@synapcity/domain-records';
-import { EntityIcon } from '@synapcity/frontend-collection';
+import { EntityIcon } from '@synapcity/frontend-collections';
 import { ResourceFrame, ResourceHeader } from '@synapcity/frontend-shells';
 
 import { RESOURCE_PANEL } from '@/components/resource-panel';

@@ -1,4 +1,4 @@
-import { CollectionPageSkeleton } from '@synapcity/frontend-collection';
+import { CollectionPageSkeleton } from '@synapcity/frontend-collections';
 
 import { DASHBOARDS_INTRO, DASHBOARDS_TITLE } from './dashboards-copy';
 

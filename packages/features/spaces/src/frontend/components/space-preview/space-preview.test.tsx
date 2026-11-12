@@ -1,5 +1,5 @@
 import { render, screen, within } from '@testing-library/react';
-import type { CollectionItem } from '@synapcity/frontend-collection';
+import type { CollectionItem } from '@synapcity/frontend-collections';
 import { describe, expect, it } from 'vitest';
 
 import { SpacePreview } from './space-preview';

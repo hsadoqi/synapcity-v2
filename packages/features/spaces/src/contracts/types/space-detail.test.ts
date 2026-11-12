@@ -1,5 +1,5 @@
 import { describe, expectTypeOf, it } from 'vitest';
-import type { EntityItem } from '@synapcity/frontend-collection';
+import type { EntityItem } from '@synapcity/frontend-collections';
 
 import type { DashboardItem, DocumentItem, Space } from './space-detail';
 

@@ -1,4 +1,4 @@
-import { NextCollectionNavigation } from '@synapcity/frontend-collection/next';
+import { NextCollectionNavigation } from '@synapcity/frontend-collections/next';
 
 import { requireOwner } from '@/lib/access/require-owner';
 

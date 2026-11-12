@@ -19,7 +19,7 @@ import {
   DashboardWorkspaceSkeleton,
   LiveAnnouncer,
 } from '@synapcity/features-dashboards/frontend';
-import { EntityIcon } from '@synapcity/frontend-collection';
+import { EntityIcon } from '@synapcity/frontend-collections';
 import {
   ResourceFrame,
   ResourceHeader,

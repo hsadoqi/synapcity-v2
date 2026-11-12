@@ -6,7 +6,7 @@ import {
   spacesPathFor,
 } from '@/lib/routing/user-paths';
 import { SidebarRecords } from '@/lib/sidebar-records';
-import { EntityIcon } from '@synapcity/frontend-collection';
+import { EntityIcon } from '@synapcity/frontend-collections';
 import {
   RootBreadcrumb,
   activeContext,

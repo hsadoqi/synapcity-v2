@@ -1,4 +1,4 @@
-# @synapcity/frontend-collection
+# @synapcity/frontend-collections
 
 Owns: the browse mechanics every collection page shares (ADR-0011, query ownership) and the generic entity blocks. Item presentation projections, search, filter and sort, the toolbar and its menus, the grid and list views, highlights, empty and loading states, and local browse state. Resource features supply their items, labels, supported actions and destinations; nothing here knows what a Space, Document or Dashboard means. Moved from `apps/web/src/features/collection` and `frontend-ui`'s entity blocks and screen-only entity shapes in Milestone 5.3.
 
@@ -6,10 +6,10 @@ Runtime: browser and server rendering, framework-neutral. Links and navigation c
 
 ## Public interface
 
-| Entry                                 | Exports                                                                                                                                       |
-| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@synapcity/frontend-collection`      | The components, the collection and entity types, the query and record helpers, and `CollectionNavigationProvider` / `useCollectionNavigation` |
-| `@synapcity/frontend-collection/next` | `NextCollectionNavigation`: the Next.js binding (`next/link` and `useRouter().push`), mounted once by the host                                |
+| Entry                                  | Exports                                                                                                                                       |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@synapcity/frontend-collections`      | The components, the collection and entity types, the query and record helpers, and `CollectionNavigationProvider` / `useCollectionNavigation` |
+| `@synapcity/frontend-collections/next` | `NextCollectionNavigation`: the Next.js binding (`next/link` and `useRouter().push`), mounted once by the host                                |
 
 `apps/web` mounts `NextCollectionNavigation` in `app/(protected)/[userId]/layout.tsx`, so every collection and Space page under it navigates client-side.
 

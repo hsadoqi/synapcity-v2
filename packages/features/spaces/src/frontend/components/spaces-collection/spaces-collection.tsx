@@ -2,7 +2,7 @@ import type { SpaceSummary } from '@synapcity/domain-spaces';
 import {
   CollectionPage,
   CollectionPageSkeleton,
-} from '@synapcity/frontend-collection';
+} from '@synapcity/frontend-collections';
 
 import type { SetSpacePinnedResult } from '../../../contracts';
 import { SpacesIndex } from '../spaces-index';

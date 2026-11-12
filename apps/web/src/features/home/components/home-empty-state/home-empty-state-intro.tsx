@@ -2,7 +2,7 @@
 
 import { House, type LucideIcon } from 'lucide-react';
 
-import { CreateButton } from '@synapcity/frontend-collection';
+import { CreateButton } from '@synapcity/frontend-collections';
 
 type HomeEmptyStateIntroProps = {
   title?: string;

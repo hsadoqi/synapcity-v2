@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { findEntityIcon } from '@synapcity/frontend-collection';
+import { findEntityIcon } from '@synapcity/frontend-collections';
 
 import { recordSummarySchema } from '@/lib/records/record-summary';
 

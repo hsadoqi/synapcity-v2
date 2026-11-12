@@ -1,4 +1,4 @@
-import { CollectionPage } from '@synapcity/frontend-collection';
+import { CollectionPage } from '@synapcity/frontend-collections';
 import type { RecordSummary } from '@/lib/records/record-summary';
 
 import { DOCUMENTS_INTRO, DOCUMENTS_TITLE } from './documents-copy';

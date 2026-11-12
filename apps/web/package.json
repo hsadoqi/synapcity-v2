@@ -31,7 +31,7 @@
     "@synapcity/features-dashboards": "workspace:*",
     "@synapcity/features-settings": "workspace:*",
     "@synapcity/features-spaces": "workspace:*",
-    "@synapcity/frontend-collection": "workspace:*",
+    "@synapcity/frontend-collections": "workspace:*",
     "@synapcity/frontend-error-reports": "workspace:*",
     "@synapcity/frontend-fonts": "workspace:*",
     "@synapcity/frontend-preferences": "workspace:*",

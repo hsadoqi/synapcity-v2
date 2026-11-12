@@ -1,6 +1,6 @@
 'use client';
 
-import { EntitySection } from '@synapcity/frontend-collection';
+import { EntitySection } from '@synapcity/frontend-collections';
 
 import type { DashboardItem, DocumentItem, Space } from '../../../contracts';
 import { spaceItemPath, spacePath } from '../../utils';

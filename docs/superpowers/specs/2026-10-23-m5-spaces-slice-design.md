@@ -92,7 +92,7 @@ Root `.` plus module subpaths only if a consumer needs a narrower interface. Run
 - Navigation (Q5): root entry is framework-neutral. Components that open an item take a host-supplied link capability (a `CollectionLinkProvider` or a `renderLink` slot, decided in the plan). A `./next` entry (`src/next/`) supplies the Next.js binding (`next/link`, `useRouter`). Same pattern for `frontend-ui`'s `link-button`, which moves behind `frontend-ui/next` (its exception's stated removal).
 - Entity blocks: the ones with consumers move. Blocks with no consumer outside `frontend-ui` stories are listed in the plan, not deleted; deletion needs separate approval (preservation policy). The `entity-section` self-barrel cycle disappears with the move.
 - Storybook discovery for new packages: `apps/storybook/.storybook/main.ts` adds `packages/frontend/collection/src/**/*.stories.@(ts|tsx)`, checked against the installed Storybook version's docs before the change. This closes the decisions-index item carried from M3.5.
-- Consumers re-pointed in the same slice: documents, dashboards and home collection imports (≈30 files) switch to `@synapcity/frontend-collection`. Behavior unchanged; their tests keep their assertions.
+- Consumers re-pointed in the same slice: documents, dashboards and home collection imports (≈30 files) switch to `@synapcity/frontend-collections`. Behavior unchanged; their tests keep their assertions.
 
 ### 4.4 Feature: `features-spaces`
 

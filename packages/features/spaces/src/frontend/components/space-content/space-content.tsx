@@ -1,5 +1,5 @@
-import { EntityContent } from '@synapcity/frontend-collection';
-import type { EntityItem } from '@synapcity/frontend-collection';
+import { EntityContent } from '@synapcity/frontend-collections';
+import type { EntityItem } from '@synapcity/frontend-collections';
 import {
   Alert,
   AlertDescription,

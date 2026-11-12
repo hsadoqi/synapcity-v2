@@ -1,4 +1,4 @@
-import type { CollectionItem } from '@synapcity/frontend-collection';
+import type { CollectionItem } from '@synapcity/frontend-collections';
 
 /** The date the header shows; it matches `FIXTURE_NOW`. */
 export const fixtureDate = {
