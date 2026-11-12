@@ -1,5 +1,6 @@
 import type { OAuthProvider } from '@synapcity/domain-identity';
 
+import { classifyAuthError } from '../../auth-errors';
 import {
   toProviderFailure,
   type ProviderFailure,
@@ -14,6 +15,8 @@ import type { SupabaseServerClient } from '../../request-client';
 
 export type PasswordSignInOutcome =
   | { kind: 'signed-in'; userId: string }
+  /** The auth service did not answer; trying again may work. */
+  | { kind: 'unavailable'; failure: ProviderFailure }
   /** The provider refused; the code says why (wrong password, unconfirmed, …). */
   | { kind: 'refused'; code: string | undefined };
 
@@ -26,7 +29,14 @@ export async function signInWithPassword(
     email: input.email,
     password: input.password,
   });
-  if (error) return { kind: 'refused', code: error.code };
+  if (error) {
+    const outcome = classifyAuthError(error);
+    if (outcome.kind === 'unavailable') return outcome;
+    return {
+      kind: 'refused',
+      code: outcome.kind === 'provider-error' ? outcome.code : error.code,
+    };
+  }
   if (!data.user) return { kind: 'refused', code: undefined };
   return { kind: 'signed-in', userId: data.user.id };
 }

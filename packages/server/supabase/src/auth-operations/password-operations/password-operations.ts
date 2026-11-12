@@ -5,6 +5,7 @@ import { SupabaseServerClient } from '../../request-client';
 
 export type PasswordUpdateOutcome =
   | { kind: 'updated'; userId: string }
+  | { kind: 'unavailable'; failure: ProviderFailure }
   | { kind: 'provider-error'; failure: ProviderFailure };
 
 /**
@@ -18,8 +19,11 @@ export async function updateOwnPassword(
   const { data, error } = await supabase.auth.updateUser({
     password: input.password,
   });
-  if (error)
+  if (error) {
+    const outcome = classifyAuthError(error);
+    if (outcome.kind === 'unavailable') return outcome;
     return { kind: 'provider-error', failure: toProviderFailure(error) };
+  }
   if (!data.user) return { kind: 'provider-error', failure: {} };
   return { kind: 'updated', userId: data.user.id };
 }

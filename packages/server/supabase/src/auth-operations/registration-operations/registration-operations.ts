@@ -13,6 +13,8 @@
  * client as its first argument; nothing is cached between requests or users.
  */
 
+import { classifyAuthError } from '../../auth-errors';
+import type { ProviderFailure } from '../../provider-failure';
 import { SupabaseServerClient } from '../../request-client';
 
 export type RegistrationInput = {
@@ -31,6 +33,8 @@ export type RegistrationOutcome =
   | { kind: 'confirmation-required' }
   /** The project does not require confirmation, so a session exists already. */
   | { kind: 'signed-in'; userId: string }
+  /** The auth service did not answer; trying again may work. */
+  | { kind: 'unavailable'; failure: ProviderFailure }
   | { kind: 'provider-error'; code: string | undefined };
 
 /** Creates a password account. Supabase hides whether the address was taken. */
@@ -51,7 +55,14 @@ export async function registerWithPassword(
       },
     },
   });
-  if (error) return { kind: 'provider-error', code: error.code };
+  if (error) {
+    const outcome = classifyAuthError(error);
+    if (outcome.kind === 'unavailable') return outcome;
+    return {
+      kind: 'provider-error',
+      code: outcome.kind === 'provider-error' ? outcome.code : error.code,
+    };
+  }
 
   if (data.session && data.user) {
     return { kind: 'signed-in', userId: data.user.id };

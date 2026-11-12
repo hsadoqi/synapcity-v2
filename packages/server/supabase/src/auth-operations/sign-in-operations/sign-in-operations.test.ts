@@ -1,4 +1,4 @@
-import { AuthApiError } from '@supabase/supabase-js';
+import { AuthApiError, AuthRetryableFetchError } from '@supabase/supabase-js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { updateOwnPassword } from '../password-operations';
@@ -64,6 +64,24 @@ describe('signInWithPassword', () => {
       kind: 'refused',
       code: 'email_not_confirmed',
     });
+  });
+
+  it('reports an outage as unavailable by status only', async () => {
+    mocks.signInWithPassword.mockResolvedValue({
+      data: { user: null, session: null },
+      error: new AuthRetryableFetchError('secret outage', 503),
+    });
+
+    const outcome = await signInWithPassword(client, {
+      email: 'a@b.co',
+      password: 'x',
+    });
+
+    expect(outcome).toStrictEqual({
+      kind: 'unavailable',
+      failure: { status: 503 },
+    });
+    expect(JSON.stringify(outcome)).not.toContain('secret');
   });
 });
 
@@ -250,5 +268,20 @@ describe('updateOwnPassword', () => {
       failure: { code: 'same_password', status: 422 },
     });
     expect(JSON.stringify(outcome)).not.toContain(SECRET);
+  });
+
+  it('reports an outage separately from a provider refusal', async () => {
+    mocks.updateUser.mockResolvedValue({
+      data: { user: null },
+      error: new AuthRetryableFetchError('secret outage', 503),
+    });
+
+    const outcome = await updateOwnPassword(client, { password: 'x' });
+
+    expect(outcome).toStrictEqual({
+      kind: 'unavailable',
+      failure: { status: 503 },
+    });
+    expect(JSON.stringify(outcome)).not.toContain('secret');
   });
 });

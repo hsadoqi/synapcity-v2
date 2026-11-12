@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { AuthApiError, AuthRetryableFetchError } from '@supabase/supabase-js';
 import { registerWithPassword } from './registration-operations';
 
 const mocks = vi.hoisted(() => ({
@@ -115,11 +116,11 @@ describe('registerWithPassword', () => {
   it('reports a provider error as its code only', async () => {
     mocks.signUp.mockResolvedValue({
       data: { user: null, session: null },
-      error: {
-        code: 'weak_password',
-        message: 'Password is too weak for user ada@example.com',
-        status: 422,
-      },
+      error: new AuthApiError(
+        'Password is too weak for user ada@example.com',
+        422,
+        'weak_password',
+      ),
     });
 
     const outcome = await registerWithPassword(client, registration);
@@ -128,16 +129,31 @@ describe('registerWithPassword', () => {
     expect(JSON.stringify(outcome)).not.toContain('ada@example.com');
   });
 
-  it('tolerates a provider error that has no code', async () => {
+  it('treats an unexplained non-Auth failure as unavailable', async () => {
     mocks.signUp.mockResolvedValue({
       data: { user: null, session: null },
       error: { message: 'boom' },
     });
 
     expect(await registerWithPassword(client, registration)).toEqual({
-      kind: 'provider-error',
-      code: undefined,
+      kind: 'unavailable',
+      failure: {},
     });
+  });
+
+  it('reports an outage as unavailable by status only', async () => {
+    mocks.signUp.mockResolvedValue({
+      data: { user: null, session: null },
+      error: new AuthRetryableFetchError('secret outage', 503),
+    });
+
+    const outcome = await registerWithPassword(client, registration);
+
+    expect(outcome).toStrictEqual({
+      kind: 'unavailable',
+      failure: { status: 503 },
+    });
+    expect(JSON.stringify(outcome)).not.toContain('secret');
   });
 
   it.each([

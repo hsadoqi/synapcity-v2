@@ -117,7 +117,11 @@ describe('signInWithPassword', () => {
   it('echoes the email but never the password on a refusal', async () => {
     mocks.signInWithPassword.mockResolvedValue({
       data: {},
-      error: { code: 'invalid_credentials' },
+      error: new AuthApiError(
+        'Invalid login credentials',
+        400,
+        'invalid_credentials',
+      ),
     });
 
     const state = await signInWithPassword(
@@ -135,7 +139,11 @@ describe('signInWithPassword', () => {
   it('flags an unconfirmed address so the form can offer a new link', async () => {
     mocks.signInWithPassword.mockResolvedValue({
       data: {},
-      error: { code: 'email_not_confirmed' },
+      error: new AuthApiError(
+        'Email not confirmed',
+        400,
+        'email_not_confirmed',
+      ),
     });
 
     const state = await signInWithPassword(
@@ -144,6 +152,30 @@ describe('signInWithPassword', () => {
     );
 
     expect(state.unconfirmed).toBe(true);
+  });
+
+  it('presents and safely logs an unavailable provider', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    mocks.signInWithPassword.mockResolvedValue({
+      data: {},
+      error: new AuthRetryableFetchError('secret outage', 503),
+    });
+
+    const state = await signInWithPassword(
+      {},
+      form({ email: 'a@b.co', password: STRONG }),
+    );
+
+    expect(state.error).toBe(
+      'Sign-in service is unavailable right now. Try again later.',
+    );
+    expect(state.data?.user?.email).toBe('a@b.co');
+    expect(warn).toHaveBeenCalledExactlyOnceWith('signInWithPassword failed', {
+      code: undefined,
+      status: 503,
+    });
+    expect(JSON.stringify(warn.mock.calls)).not.toContain('secret');
+    warn.mockRestore();
   });
 
   it('goes to a safe `next` after signing in', async () => {
@@ -297,7 +329,7 @@ describe('signUp', () => {
   it('words a provider error and marks its field', async () => {
     mocks.signUp.mockResolvedValue({
       data: { user: null, session: null },
-      error: { code: 'weak_password' },
+      error: new AuthApiError('Weak password', 422, 'weak_password'),
     });
 
     const state = await signUp({}, form(valid));
@@ -310,6 +342,31 @@ describe('signUp', () => {
       firstName: 'Ada',
       lastName: 'Lovelace',
     });
+  });
+
+  it('presents and safely logs an unavailable provider', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    mocks.signUp.mockResolvedValue({
+      data: { user: null, session: null },
+      error: new AuthRetryableFetchError('secret outage', 503),
+    });
+
+    const state = await signUp({}, form(valid));
+
+    expect(state.error).toBe(
+      'Sign-in service is unavailable right now. Try again later.',
+    );
+    expect(state.data?.user).toEqual({
+      email: 'a@b.co',
+      firstName: 'Ada',
+      lastName: 'Lovelace',
+    });
+    expect(warn).toHaveBeenCalledExactlyOnceWith('signUp failed', {
+      code: undefined,
+      status: 503,
+    });
+    expect(JSON.stringify(warn.mock.calls)).not.toContain('secret');
+    warn.mockRestore();
   });
 
   it('signs straight in when the project hands back a session', async () => {
@@ -420,6 +477,29 @@ describe('updatePassword', () => {
 
     expect(state.fields).toEqual(['confirm']);
     expect(mocks.updateUser).not.toHaveBeenCalled();
+  });
+
+  it('presents and safely logs an unavailable provider', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    mocks.updateUser.mockResolvedValue({
+      data: {},
+      error: new AuthRetryableFetchError('secret outage', 503),
+    });
+
+    const state = await updatePassword(
+      {},
+      form({ password: STRONG, confirm: STRONG }),
+    );
+
+    expect(state.error).toBe(
+      'Sign-in service is unavailable right now. Try again later.',
+    );
+    expect(warn).toHaveBeenCalledExactlyOnceWith('updatePassword failed', {
+      code: undefined,
+      status: 503,
+    });
+    expect(JSON.stringify(warn.mock.calls)).not.toContain('secret');
+    warn.mockRestore();
   });
 
   it('goes back to where the reset was started from, carrying the notice', async () => {
@@ -594,7 +674,11 @@ describe('results never echo a password', () => {
   it('after a refused sign-in', async () => {
     mocks.signInWithPassword.mockResolvedValue({
       data: {},
-      error: { code: 'invalid_credentials' },
+      error: new AuthApiError(
+        'Invalid login credentials',
+        400,
+        'invalid_credentials',
+      ),
     });
 
     const state = await signInWithPassword({}, form(valid));
@@ -618,7 +702,7 @@ describe('results never echo a password', () => {
 
     mocks.signUp.mockResolvedValue({
       data: { user: null, session: null },
-      error: { code: 'weak_password', message: PASSWORD },
+      error: new AuthApiError(PASSWORD, 422, 'weak_password'),
     });
     const refused = await signUp({}, form(valid));
     expect(refused.error).toBeDefined();
@@ -646,7 +730,7 @@ describe('results never echo a password', () => {
 
     mocks.updateUser.mockResolvedValue({
       data: {},
-      error: { code: 'same_password' },
+      error: new AuthApiError('Same password', 422, 'same_password'),
     });
     const refused = await updatePassword(
       {},
@@ -1332,6 +1416,7 @@ describe('connectAccount', () => {
   });
 
   it('does not call an outage a signed-out session', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     mocks.linkIdentity.mockResolvedValue({
       data: { provider: 'google', url: null },
       error: new AuthRetryableFetchError('fetch failed', 0),
@@ -1341,6 +1426,13 @@ describe('connectAccount', () => {
 
     expect(state.error).toBe('Something went wrong. Try again.');
     expect(state.signedOut).toBeUndefined();
+    expect(warn).toHaveBeenCalledExactlyOnceWith('connectAccount failed', {
+      provider: 'google',
+      code: undefined,
+      status: 0,
+    });
+    expect(JSON.stringify(warn.mock.calls)).not.toContain('fetch failed');
+    warn.mockRestore();
   });
 
   it('says plainly when connecting accounts is switched off for the project', async () => {
@@ -1509,6 +1601,26 @@ describe('disconnectAccount', () => {
 
     expect(state.signedOut).toBe(true);
     expect(mocks.unlinkIdentity).not.toHaveBeenCalled();
+  });
+
+  it('safely logs an unavailable provider without calling it signed out', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    mocks.getUserIdentities.mockResolvedValue({
+      data: { identities: [] },
+      error: new AuthRetryableFetchError('secret outage', 503),
+    });
+
+    const state = await disconnectAccount({}, form({ provider: 'github' }));
+
+    expect(state.error).toBe('Something went wrong. Try again.');
+    expect(state.signedOut).toBeUndefined();
+    expect(warn).toHaveBeenCalledExactlyOnceWith('disconnectAccount failed', {
+      provider: 'github',
+      code: undefined,
+      status: 503,
+    });
+    expect(JSON.stringify(warn.mock.calls)).not.toContain('secret');
+    warn.mockRestore();
   });
 
   it('explains the only way to sign in, and changes nothing', async () => {

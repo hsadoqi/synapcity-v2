@@ -63,6 +63,9 @@ function fixtureRefusal(): AuthState {
   return authFailure(FIXTURE_MESSAGE, { email: '' });
 }
 
+const AUTH_UNAVAILABLE =
+  'Sign-in service is unavailable right now. Try again later.';
+
 export async function signInWithPassword(
   _previous: AuthState,
   formData: FormData,
@@ -87,6 +90,10 @@ export async function signInWithPassword(
     email,
     password,
   });
+  if (outcome.kind === 'unavailable') {
+    logFailure('signInWithPassword', outcome.failure);
+    return authFailure(AUTH_UNAVAILABLE, { email });
+  }
   if (outcome.kind === 'refused')
     return {
       ...authFailure(
@@ -140,6 +147,10 @@ export async function signUp(
     ...(lastName ? { lastName } : {}),
     confirmationRedirect: callbackUrl(getOrigin(), next, 'confirm'),
   });
+  if (outcome.kind === 'unavailable') {
+    logFailure('signUp', outcome.failure);
+    return authFailure(AUTH_UNAVAILABLE, user);
+  }
   if (outcome.kind === 'provider-error') {
     return authFailure(
       authErrorMessage(outcome.code),
@@ -255,6 +266,10 @@ export async function updatePassword(
   const { password } = parsed.data;
 
   const outcome = await updateOwnPassword(await createClient(), { password });
+  if (outcome.kind === 'unavailable') {
+    logFailure('updatePassword', outcome.failure);
+    return authFailure(AUTH_UNAVAILABLE, user);
+  }
   if (outcome.kind === 'provider-error') {
     // Log the code (never the message or the password) so a failure that shows
     // the generic reply can be traced in the server logs.
@@ -503,6 +518,7 @@ export async function connectAccount(
     case 'signed-out':
       return signedOutFailure('');
     case 'unavailable':
+      logFailure('connectAccount', outcome.failure, { provider });
       return authFailure(TRY_AGAIN, { email: '' });
     case 'provider-error':
       logFailure('connectAccount', outcome, { provider });
@@ -587,6 +603,7 @@ export async function disconnectAccount(
     case 'signed-out':
       return signedOutFailure('');
     case 'unavailable':
+      logFailure('disconnectAccount', outcome.failure, { provider });
       return authFailure(TRY_AGAIN, { email: '' });
     case 'last-sign-in':
       return authFailure(LAST_SIGN_IN, { email: '' });
