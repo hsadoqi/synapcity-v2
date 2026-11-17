@@ -40,7 +40,7 @@
     "chrono-node": "^2.10.3",
     "date-fns": "^4.4.0",
     "lucide-react": "^1.55.0",
-    "next": "16.4.3",
+    "next": "16.4.5",
     "react": "19.3.1"
   }
 }
